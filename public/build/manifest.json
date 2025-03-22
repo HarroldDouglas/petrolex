@@ -1,0 +1,78 @@
+{
+  "public/assets/images/avtar/9.png": {
+    "file": "assets/9-AaFbjrgd.png",
+    "src": "public/assets/images/avtar/9.png"
+  },
+  "public/assets/images/background/01.jpg": {
+    "file": "assets/01-B7Seaee8.jpg",
+    "src": "public/assets/images/background/01.jpg"
+  },
+  "public/assets/images/background/06.jpg": {
+    "file": "assets/06-BhAacw_4.jpg",
+    "src": "public/assets/images/background/06.jpg"
+  },
+  "public/assets/images/background/box-bg.jpg": {
+    "file": "assets/box-bg-BvsTm805.jpg",
+    "src": "public/assets/images/background/box-bg.jpg"
+  },
+  "public/assets/images/background/coming-soon.jpg": {
+    "file": "assets/coming-soon-BzqbJ1Il.jpg",
+    "src": "public/assets/images/background/coming-soon.jpg"
+  },
+  "public/assets/images/dashboard/project/pattern-grid.png": {
+    "file": "assets/pattern-grid-B7uFhRBh.png",
+    "src": "public/assets/images/dashboard/project/pattern-grid.png"
+  },
+  "public/assets/images/landing/map_bg.png": {
+    "file": "assets/map_bg-BXuPhIr4.png",
+    "src": "public/assets/images/landing/map_bg.png"
+  },
+  "public/assets/images/profile-app/20.jpg": {
+    "file": "assets/20-3_YqsxPd.jpg",
+    "src": "public/assets/images/profile-app/20.jpg"
+  },
+  "public/assets/images/profile-app/28.jpg": {
+    "file": "assets/28-DUtk996K.jpg",
+    "src": "public/assets/images/profile-app/28.jpg"
+  },
+  "public/assets/images/slick/11.jpg": {
+    "file": "assets/11-DHcSSU0T.jpg",
+    "src": "public/assets/images/slick/11.jpg"
+  },
+  "public/assets/images/slick/29.jpg": {
+    "file": "assets/29-B-Xf0DZw.jpg",
+    "src": "public/assets/images/slick/29.jpg"
+  },
+  "public/assets/images/slick/30.jpg": {
+    "file": "assets/30-rBWvX_5E.jpg",
+    "src": "public/assets/images/slick/30.jpg"
+  },
+  "public/assets/images/slick/31.jpg": {
+    "file": "assets/31-BWJgS59b.jpg",
+    "src": "public/assets/images/slick/31.jpg"
+  },
+  "public/assets/images/slick/32.jpg": {
+    "file": "assets/32-CYzN9nLI.jpg",
+    "src": "public/assets/images/slick/32.jpg"
+  },
+  "public/assets/images/slick/33.jpg": {
+    "file": "assets/33-CgZ7-hls.jpg",
+    "src": "public/assets/images/slick/33.jpg"
+  },
+  "public/assets/scss/style.scss": {
+    "file": "assets/style-BfW0E3X2.css",
+    "src": "public/assets/scss/style.scss",
+    "isEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-17usm3Qz.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Xaw6OIO1.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}
