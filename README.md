@@ -103,6 +103,8 @@ composer duster           # Suite complète
 - [Documentation Laravel](https://laravel.com/docs)
 - [Guide de Contribution](CONTRIBUTING.md)
 - [Documentation API](API.md)
+- [Guide du Projet](guide.md) - Document essentiel détaillant les spécifications techniques, 
+  les phases du projet et la stack technique complète du projet ISOGAZ
 
 ## 🧰 Maintenance
 

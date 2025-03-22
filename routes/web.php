@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DataTableDemoController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -362,3 +363,36 @@ Route::view('wishlist', 'wishlist')->name('wishlist');
 Route::view('wrapper', 'wrapper')->name('wrapper');
 
 Route::get('/demos/datatable-static', [DataTableDemoController::class, 'staticDemo'])->name('datatable.static');
+
+
+
+
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
+});
+
+
+// Inclure les routes modulaires
+require __DIR__.'/web/auth.php';
+require __DIR__.'/web/admin.php';
+require __DIR__.'/web/orders.php';
+require __DIR__.'/web/users.php';
+require __DIR__.'/web/bottles.php';
+require __DIR__.'/web/deliveries.php';
+require __DIR__.'/web/reports.php';
+require __DIR__.'/web/settings.php';
