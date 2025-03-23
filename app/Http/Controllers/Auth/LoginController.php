@@ -33,12 +33,12 @@ class LoginController extends Controller
                 'title' => 'Connexion réussie !',
                 'text' => 'Bienvenue sur votre tableau de bord.',
                 'icon' => 'success',
-                'timer' => 5000,
+                'timer' => 3000,
                 'showConfirmButton' => false,
                 'customClass' => [
                     'popup' => 'card',
                     'title' => 'card-header h5',
-                ]
+                ],
             ];
 
             return redirect()->intended(route('dashboard'))->with('sweet_alert', $sweetAlert);

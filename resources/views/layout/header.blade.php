@@ -54,11 +54,12 @@
                                     </li>
 
                                     <li>
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                            class="d-none">
                                             @csrf
                                         </form>
                                         <a class="btn btn-light-danger btn-sm w-100" href="#"
-                                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             <i class="ph-duotone ph-sign-out pe-2"></i>Se déconnecter
                                         </a>
                                     </li>

@@ -48,7 +48,6 @@ class ApiResponse implements Responsable
      * Create a success response.
      *
      * @param  mixed  $data
-     * @return self
      */
     public static function success($data = null, ?string $message = null, int $statusCode = 200): self
     {
@@ -59,7 +58,6 @@ class ApiResponse implements Responsable
      * Create an error response.
      *
      * @param  mixed  $data
-     * @return self
      */
     public static function error(?string $message = null, $data = null, int $statusCode = 400): self
     {

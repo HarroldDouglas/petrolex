@@ -12,6 +12,7 @@
 </style>
 
 <x-sweet-alert />
+
 <body>
     <div class="app-wrapper d-block">
         <div class="">
