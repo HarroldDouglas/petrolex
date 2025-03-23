@@ -29,7 +29,19 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard'));
+            $sweetAlert = [
+                'title' => 'Connexion réussie !',
+                'text' => 'Bienvenue sur votre tableau de bord.',
+                'icon' => 'success',
+                'timer' => 5000,
+                'showConfirmButton' => false,
+                'customClass' => [
+                    'popup' => 'card',
+                    'title' => 'card-header h5',
+                ]
+            ];
+
+            return redirect()->intended(route('dashboard'))->with('sweet_alert', $sweetAlert);
         }
 
         throw ValidationException::withMessages([
@@ -44,6 +56,12 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login')->with('sweet_alert', [
+            'title' => 'Déconnexion réussie !',
+            'text' => 'À bientôt !',
+            'icon' => 'success',
+            'timer' => 2000,
+            'showConfirmButton' => false,
+        ]);
     }
 }

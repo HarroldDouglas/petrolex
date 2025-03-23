@@ -52,6 +52,7 @@
     </div>
 </body>
 
+<x-sweet-alert />
 <!--customizer-->
 <div id="customizer"></div>
 
