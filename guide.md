@@ -76,6 +76,16 @@
 
 ## 🛠️ Stack Technique
 
+### Sécurité et Traçabilité
+- **Spatie Laravel Permission**
+  - Gestion fine des rôles et permissions
+  - ACL hiérarchique
+  - Integration avec les guards Laravel
+- **Spatie Laravel Activitylog**
+  - Journalisation automatique des activités
+  - Suivi des modifications de modèles
+  - Audit trail complet
+
 ### Documentation API
 - Eloquent API Resources
 - Laravel Scribe/L5-Swagger

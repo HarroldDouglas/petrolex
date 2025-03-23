@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Api\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
 
-// API Auth Routes
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-Route::post('/refresh', [AuthController::class, 'refresh'])->middleware('auth:sanctum');
+Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
+    Route::get('/user', [AuthController::class, 'user'])->name('api.user');
+});

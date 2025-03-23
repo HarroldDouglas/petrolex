@@ -1,0 +1,36 @@
+:root, .default, body, html {
+        --primary: 125, 158, 24 !important;
+    }
+
+    .btn-primary,
+    .bg-primary,
+    [class*="btn-primary"],
+    [class*="bg-primary"] {
+        background-color: rgb(var(--primary)) !important;
+        border-color: rgb(var(--primary)) !important;
+    }
+
+    .text-primary,
+    [class*="text-primary"] {
+        color: rgb(var(--primary)) !important;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active {
+        background-color: rgba(var(--primary), 0.85) !important;
+        border-color: rgba(var(--primary), 0.85) !important;
+    }
+
+    .form-check-input:checked {
+        background-color: rgb(var(--primary)) !important;
+        border-color: rgb(var(--primary)) !important;
+    }
+
+    a:not(.btn), .link-primary {
+        color: rgb(var(--primary)) !important;
+    }
+
+    .border-primary {
+        border-color: rgb(var(--primary)) !important;
+    }

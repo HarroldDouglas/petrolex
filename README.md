@@ -49,6 +49,11 @@ DB_PORT=3306
 DB_DATABASE=nom_de_votre_base
 DB_USERNAME=votre_utilisateur
 DB_PASSWORD=votre_mot_de_passe
+
+# Configuration Admin
+ADMIN_EMAIL=admin@petrolex.com
+ADMIN_PASSWORD=votre_mot_de_passe_securise
+ADMIN_NAME="Super Admin"
 ```
 
 5. **Finaliser l'installation**
@@ -74,12 +79,18 @@ Visitez http://localhost:8000 dans votre navigateur.
 | Duster | Suite d'outils | Orchestration d'analyse de code |
 | PHPStan + Larastan | Analyse statique | Détection d'erreurs |
 | Blade Formatter | Templates | Formatage Blade |
+| Spatie Permissions | Gestion des rôles | ACL pour Laravel |
+| Spatie Activitylog | Journalisation | Suivi des activités |
 
 ### Installation des Outils
 
 ```bash
 # Outils PHP
 composer require --dev laravel/pint tightenco/duster phpstan/phpstan nunomaduro/larastan
+
+# Packages Spatie
+composer require spatie/laravel-permission
+composer require spatie/laravel-activitylog
 
 # Blade Formatter
 npm install -g blade-formatter
@@ -107,6 +118,13 @@ composer duster           # Suite complète
   les phases du projet et la stack technique complète du projet ISOGAZ
 
 ## 🧰 Maintenance
+
+### Gestion des Logs
+
+Les logs sont automatiquement:
+- Générés quotidiennement dans `/storage/logs/petrolex-YYYY-MM-DD.log`
+- Conservés pendant 30 jours
+- Formatés avec horodatage et niveau de gravité
 
 ### Commandes Essentielles
 

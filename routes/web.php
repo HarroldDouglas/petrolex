@@ -364,31 +364,26 @@ Route::view('wrapper', 'wrapper')->name('wrapper');
 
 Route::get('/demos/datatable-static', [DataTableDemoController::class, 'staticDemo'])->name('datatable.static');
 
-
-
-
-
-
-
-
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
 
-
 Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('dashboard');
     }
+
     return redirect()->route('login');
 });
 
-
-// Inclure les routes modulaires
+/**
+ * Include routes modules
+ */
 require __DIR__.'/web/auth.php';
+require __DIR__.'/web/dashboard.php';
+
 require __DIR__.'/web/admin.php';
 require __DIR__.'/web/orders.php';
 require __DIR__.'/web/users.php';
