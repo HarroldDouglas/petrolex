@@ -2,6 +2,8 @@
 
 return [
     'email' => env('ADMIN_EMAIL', 'admin@petrolex.com'),
-    'password' => env('ADMIN_PASSWORD', 'admin123'),
-    'name' => env('ADMIN_NAME', 'Admin'),
+    'phone' => env('ADMIN_PHONE', 237699999999),
+    'password' => env('ADMIN_PASSWORD', 'password'),
+    'first_name' => env('ADMIN_FIRST_NAME', 'Admin'),
+    'last_name' => env('ADMIN_LAST_NAME', 'Admin'),
 ];

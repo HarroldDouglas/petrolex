@@ -14,7 +14,7 @@ return new class () extends Migration {
             $table->foreignId('warehouse_id')->nullable()->constrained();
             $table->string('name')->nullable();
             $table->date('route_date');
-            $table->enum('status', DeliveryStatus::values())->default(DeliveryStatus::PLANNED()->value);
+            $table->enum('status', DeliveryStatus::toValues())->default(DeliveryStatus::PLANNED()->value);
             $table->integer('estimated_duration')->nullable();
             $table->integer('actual_duration')->nullable();
             $table->decimal('estimated_distance', 10, 2)->nullable();

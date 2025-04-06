@@ -15,20 +15,4 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self CANCELLED()
  * @method static self RETURNED()
  */
-class OrderStatus extends Enum
-{
-    protected static function values(): array
-    {
-        return [
-            'PENDING' => 'pending',
-            'CONFIRMED' => 'confirmed',
-            'PROCESSING' => 'processing',
-            'ASSIGNED' => 'assigned',
-            'IN_TRANSIT' => 'in_transit',
-            'DELIVERED' => 'delivered',
-            'COMPLETED' => 'completed',
-            'CANCELLED' => 'cancelled',
-            'RETURNED' => 'returned',
-        ];
-    }
-}
+class OrderStatus extends Enum {}

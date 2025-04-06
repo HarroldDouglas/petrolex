@@ -15,13 +15,13 @@ return new class () extends Migration {
             $table->foreignId('client_id')->constrained();
             $table->foreignId('warehouse_id')->constrained();
             $table->foreignId('address_id')->nullable()->constrained('client_addresses');
-            $table->enum('status', OrderStatus::values())->default(OrderStatus::PENDING()->value);
+            $table->enum('status', OrderStatus::toValues())->default(OrderStatus::PENDING()->value);
             $table->decimal('subtotal', 10, 2);
             $table->decimal('tax', 10, 2)->default(0);
             $table->decimal('delivery_fee', 10, 2)->default(0);
             $table->decimal('discount', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
-            $table->enum('payment_status', PaymentStatus::values())->default(PaymentStatus::PENDING()->value);
+            $table->enum('payment_status', PaymentStatus::toValues())->default(PaymentStatus::PENDING()->value);
             $table->text('notes')->nullable();
             $table->timestamp('requested_delivery_date')->nullable();
             $table->timestamp('cancelled_at')->nullable();

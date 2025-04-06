@@ -2,23 +2,17 @@
 
 namespace App\Http\Api\Responses\Auth;
 
-use App\Http\Api\Resources\UserResource;
+use App\DTOs\Auth\TokenDTO;
 use App\Http\Api\Responses\ApiResponse;
-use App\Models\User;
 
 class LoginResponse extends ApiResponse
 {
-    /**
-     * Créer une réponse formatée pour une connexion réussie
-     *
-     * @param  User  $user  L'utilisateur qui vient de se connecter
-     * @param  string  $token  Le jeton d'authentification généré
-     */
-    public static function fromUserAndToken(User $user, string $token): ApiResponse
+    public static function withToken(TokenDTO $token): self
     {
-        return parent::success([
-            'user' => new UserResource($user),
-            'token' => $token,
-        ], 'Authentification réussie - Connexion établie avec succès');
+        // TODO: move this hard code text to translate file
+        return new self([
+            'access_token' => $token->accessToken,
+            'token_type' => $token->tokenType,
+        ], 'Authentification réussie');
     }
 }

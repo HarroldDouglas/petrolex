@@ -11,16 +11,4 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self FAILED()
  * @method static self REFUNDED()
  */
-class PaymentStatus extends Enum
-{
-    protected static function values(): array
-    {
-        return [
-            'PENDING' => 'pending',
-            'PROCESSING' => 'processing',
-            'PAID' => 'paid',
-            'FAILED' => 'failed',
-            'REFUNDED' => 'refunded',
-        ];
-    }
-}
+class PaymentStatus extends Enum {}

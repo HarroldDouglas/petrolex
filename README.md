@@ -105,6 +105,78 @@ composer phpstan          # Analyse statique
 composer duster           # Suite complète
 ```
 
+## 🧪 Tests
+
+Le projet utilise plusieurs niveaux de tests pour assurer la qualité du code :
+
+### Tests Unitaires et d'Intégration (PHPUnit)
+
+Les tests sont organisés dans le dossier `tests/` :
+- `tests/Unit/` : Tests unitaires
+- `tests/Feature/` : Tests d'intégration
+- `tests/Browser/` : Tests E2E avec Laravel Dusk
+
+Commandes pour exécuter les tests :
+```bash
+# Lancer tous les tests
+php artisan test
+
+# Lancer les tests avec couverture de code
+php artisan test --coverage
+
+# Lancer un test spécifique
+php artisan test --filter=NomDuTest
+
+# Lancer les tests en parallèle
+php artisan test --parallel
+```
+
+### Tests API (Curl Scripts)
+
+Le dossier `tests/Curl/` contient des scripts shell pour tester les endpoints API manuellement.
+
+1. Rendre les scripts exécutables :
+```bash
+chmod +x tests/Curl/*.sh
+```
+
+2. Lancer les tests API :
+```bash
+# Test d'authentification
+./tests/Curl/test_auth.sh
+
+# Autres tests disponibles
+./tests/Curl/test_users.sh
+./tests/Curl/test_products.sh
+```
+
+### Tests E2E (Laravel Dusk)
+
+> ⚠️ En cours d'intégration
+
+Laravel Dusk est utilisé pour les tests de navigation web.
+
+Installation et configuration :
+```bash
+# Installation
+composer require --dev laravel/dusk
+php artisan dusk:install
+
+# Création d'un test Dusk
+php artisan dusk:make NomDuTest
+
+# Exécution des tests Dusk
+php artisan dusk
+```
+
+### Bonnes Pratiques de Test
+
+- Créer un test pour chaque nouvelle fonctionnalité
+- Maintenir une couverture de code > 80%
+- Utiliser des données de test cohérentes
+- Nettoyer l'environnement après chaque test
+- Documenter les cas de test complexes
+
 ## 📚 Documentation & Ressources
 
 - [Documentation Laravel](https://laravel.com/docs)

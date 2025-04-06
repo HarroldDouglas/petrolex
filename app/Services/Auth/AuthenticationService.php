@@ -2,39 +2,76 @@
 
 namespace App\Services\Auth;
 
+use App\Constants\AuthConstants;
+use App\Contracts\Repositories\TokenRepositoryInterface;
+use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Contracts\Services\AuthenticationServiceInterface;
+use App\DTOs\Auth\LoginCredentialsDTO;
+use App\DTOs\Auth\TokenDTO;
 use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
-class AuthenticationService
+class AuthenticationService implements AuthenticationServiceInterface
 {
+    public function __construct(
+        protected UserRepositoryInterface $userRepository,
+        protected TokenRepositoryInterface $tokenRepository,
+    ) {}
+
     /**
-     * Attempt to authenticate a user.
+     * Attempt to authenticate a user with email or phone
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function attemptLogin(array $credentials): User
+    public function authenticate(LoginCredentialsDTO $credentials): TokenDTO
     {
-        if (! Auth::attempt($credentials)) {
-            throw new AuthenticationException('Les identifiants fournis sont incorrects.');
+        $user = $this->findUser($credentials->login);
+
+        // TODO : instead of directly writing text, let's start using quickly translation!
+        if (! $user || ! Hash::check($credentials->password, $user->password)) {
+            throw new AuthenticationException('Les identifiants fournits sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
         }
 
+        $plainTextToken = $this->tokenRepository->createToken($user, AuthConstants::API_TOKEN_NAME);
+
+        return new TokenDTO(
+            accessToken: $plainTextToken,
+            tokenType: AuthConstants::TOKEN_TYPE
+        );
+    }
+
+    private function findUser(string $login): ?User
+    {
+        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            return $this->userRepository->findByEmail($login);
+        } else {
+            return $this->userRepository->findByPhone($login);
+        }
+    }
+
+    /**
+     * Revoke the user's current access token
+     */
+    public function revokeCurrentToken(string $tokenId, User $user): void
+    {
+        $this->tokenRepository->revokeToken($tokenId, $user);
+    }
+
+    /**
+     * Revoke all tokens for a user
+     */
+    public function revokeAllTokens(User $user): void
+    {
+        $this->tokenRepository->revokeAllTokens($user);
+    }
+
+    /**
+     * Get authenticated user
+     */
+    public function getAuthenticatedUser(): ?User
+    {
         return Auth::user();
-    }
-
-    /**
-     * Generate a token for the user.
-     */
-    public function createToken(User $user, string $tokenName = 'api-token'): string
-    {
-        return $user->createToken($tokenName)->plainTextToken;
-    }
-
-    /**
-     * Revoke the user's current access token.
-     */
-    public function revokeCurrentToken(User $user): void
-    {
-        $user->tokens()->where('id', $user->currentAccessToken()->id)->delete();
     }
 }

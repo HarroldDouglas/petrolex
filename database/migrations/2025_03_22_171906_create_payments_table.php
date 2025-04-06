@@ -14,7 +14,7 @@ return new class () extends Migration {
             $table->foreignId('order_id')->constrained();
             $table->string('transaction_id')->nullable()->unique();
             $table->decimal('amount', 10, 2);
-            $table->enum('status', PaymentStatus::values())->default(PaymentStatus::PENDING()->value);
+            $table->enum('status', PaymentStatus::toValues())->default(PaymentStatus::PENDING()->value);
             $table->text('payment_details')->nullable();
             $table->string('payment_method')->default(PaymentMethod::CASH()->value);
             $table->timestamp('payment_date')->useCurrent();

@@ -5,13 +5,15 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class AdminSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     public function run()
     {
         User::create([
-            'name' => config('admin.name'),
+            'last_name' => config('admin.last_name'),
+            'first_name' => config('admin.first_name'),
             'email' => config('admin.email'),
+            'phone_number' => config('admin.phone'),
             'email_verified_at' => now(),
             'password' => bcrypt(config('admin.password')),
             'remember_token' => \Illuminate\Support\Str::random(10),
