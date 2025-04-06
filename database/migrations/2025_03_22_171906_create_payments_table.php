@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,12 +13,14 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('order_id')->constrained();
             $table->string('transaction_id')->nullable()->unique();
-            $table->enum('payment_method', ['cash', 'credit_card', 'mobile_money', 'bank_transfer', 'other'])->default('cash');
             $table->decimal('amount', 10, 2);
-            $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
+            $table->enum('status', PaymentStatus::values())->default(PaymentStatus::PENDING()->value);
             $table->text('payment_details')->nullable();
-            $table->foreignId('collected_by')->nullable()->constrained('users');
+            $table->string('payment_method')->default(PaymentMethod::CASH()->value);
             $table->timestamp('payment_date')->useCurrent();
+            $table->text('notes')->nullable();
+            $table->boolean('is_confirmed')->default(false);
+            $table->timestamp('confirmed_at')->nullable();
             $table->timestamps();
         });
     }

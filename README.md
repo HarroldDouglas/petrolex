@@ -67,7 +67,7 @@ npm run build
 ```bash
 php artisan serve
 ```
-Visitez http://localhost:8000 dans votre navigateur.
+Visitez http://localhost:8000 ou le lien généré dans votre navigateur.
 
 ## 🛠️ Outils de Qualité de Code
 
@@ -86,14 +86,10 @@ Visitez http://localhost:8000 dans votre navigateur.
 
 ```bash
 # Outils PHP
-composer require --dev laravel/pint tightenco/duster phpstan/phpstan nunomaduro/larastan
+composer intall
 
-# Packages Spatie
-composer require spatie/laravel-permission
-composer require spatie/laravel-activitylog
-
-# Blade Formatter
-npm install -g blade-formatter
+# Outils JS
+npm install
 ```
 
 ### Commandes Utiles
@@ -141,10 +137,3 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-## 📝 Licence
-
-Ce projet est sous licence [MIT](LICENSE).
-
-## 🤝 Contribution
-
-Les contributions sont bienvenues ! Consultez notre [Guide de Contribution](CONTRIBUTING.md).

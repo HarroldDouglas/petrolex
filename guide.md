@@ -37,8 +37,36 @@
 
 ### 5. Tests
 - Tests unitaires
+  - PHPUnit pour la logique métier
+  - Tests des repositories et services
+  - Tests des validations de formulaires
+  - Tests des transformations de données
+  - Couverture de code > 80%
+
 - Tests d'intégration
+  - Tests des endpoints API
+  - Tests des flux de données
+  - Tests des middleware et guards
+  
+- Tests End-to-End avec Laravel Dusk
+  - Tests des parcours utilisateur complets
+  - Tests de l'interface utilisateur
+  - Tests des interactions JavaScript
+  - Tests des formulaires et validations
+  - Tests des redirections et alertes
+  - Tests des sessions et authentification
+
+- Tests Postman
+  - Collection complète des endpoints API
+  - Tests des scénarios d'utilisation
+  - Variables d'environnement (dev/prod)
+  - Tests automatisés avec Newman
+  - Documentation API via Postman
+
 - Tests de performance
+  - Tests de charge
+  - Tests de stress
+  - Benchmarking
 
 ## 📅 Phases du Projet
 
@@ -104,3 +132,32 @@
 - PHPUnit
 - Faker
 - Laravel Dusk
+
+## 🚨 Tâches Urgentes
+
+### Migration vers Livewire
+1. **Installation et Configuration**
+   - Installation de Livewire
+   - Configuration des assets
+   - Mise en place des composants de base
+
+2. **Migration des Fonctionnalités**
+   - Authentication
+     - Conversion du formulaire de login en composant Livewire
+     - Gestion des états de formulaire
+     - Validation en temps réel
+     - Messages d'erreur dynamiques
+     - Gestion de la redirection post-login
+   - Autres fonctionnalités à migrer progressivement
+
+3. **Optimisations Livewire**
+   - Lazy loading des composants
+   - Polling et rafraîchissement automatique
+   - Gestion des événements
+   - States et loading states
+
+4. **Tests Livewire**
+   - Tests des composants
+   - Tests des événements
+   - Tests des validations
+   - Tests de l'interaction utilisateur

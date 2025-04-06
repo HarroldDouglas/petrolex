@@ -10,10 +10,9 @@ return new class () extends Migration {
         Schema::create('bottle_returns', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bottle_delivery_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('user_id')->constrained(); // client qui retourne
+            $table->foreignId('user_id')->constrained();
             $table->foreignId('received_by')->nullable()->constrained('users'); // employé qui reçoit
             $table->foreignId('bottle_id')->constrained();
-            $table->enum('condition', ['empty', 'partially_used', 'damaged'])->default('empty');
             $table->text('notes')->nullable();
             $table->timestamp('return_date')->useCurrent();
             $table->timestamps();

@@ -12,7 +12,6 @@ return new class () extends Migration {
             $table->foreignId('delivery_id')->constrained()->onDelete('cascade');
             $table->foreignId('order_item_id')->constrained()->onDelete('cascade');
             $table->string('bottle_serial')->nullable();
-            $table->enum('condition', ['full', 'empty', 'damaged'])->default('full');
             $table->text('notes')->nullable();
             $table->timestamps();
         });
