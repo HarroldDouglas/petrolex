@@ -8,6 +8,7 @@ use App\Http\Api\Resources\UserResource;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
+// TODO: implement this class, should be only related to client
 class RegisterClientController extends Controller
 {
     /**

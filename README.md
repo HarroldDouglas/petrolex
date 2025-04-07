@@ -5,7 +5,8 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## 📋 Vue d'ensemble
-
+Pour avoir une idée du contexte de ce projet, lisez le document à la racine: projet isogaz.pdf. 
+Pour ce qui est de la partie web, nous avons utilisé un template nommé Axelit.
 Axelit est un tableau de bord d'administration moderne pour Laravel offrant :
 - Des interfaces riches et intuitives
 - Une architecture robuste et extensible
@@ -37,8 +38,29 @@ npm install
 
 3. **Configuration de l'environnement**
 ```bash
+# Environnement principal
 cp .env.example .env
 php artisan key:generate
+
+# Environnement de test
+cp .env.example .env.testing
+php artisan key:generate --env=testing
+```
+
+Configurez votre `.env.testing` avec une base de données dédiée aux tests :
+```env
+# .env.testing
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=petrolex_testing
+DB_USERNAME=votre_utilisateur
+DB_PASSWORD=votre_mot_de_passe
+
+# Configuration Admin de test
+ADMIN_EMAIL=admin@test.com
+ADMIN_PHONE=237699999999
+ADMIN_PASSWORD=password
 ```
 
 4. **Configurer la base de données**
