@@ -5,7 +5,9 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## 📋 Vue d'ensemble
-Pour avoir une idée du contexte de ce projet, lisez le document à la racine: projet isogaz.pdf. 
+Pour avoir une idée du contexte de ce projet, parcourez les documents ici
+https://drive.google.com/drive/u/3/folders/1os9Y6VpL0Jyb7VTC9U6nkuYl-1hmj-44
+Si vous n'avez pas d'accès, contactez l'administrateur du projet.
 Pour ce qui est de la partie web, nous avons utilisé un template nommé Axelit.
 Axelit est un tableau de bord d'administration moderne pour Laravel offrant :
 - Des interfaces riches et intuitives
