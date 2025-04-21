@@ -2,12 +2,13 @@
 @include('layout.head')
 
 @include('layout.css')
-<link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
 
 <style>
     .login-form-container {
         background-image: none !important;
-        // background-color: rgba(125, 158, 24, 0.336) !important;
+    }
+    a:not(.btn), .link-primary {
+        color: rgb(var(--primary)) !important;
     }
 </style>
 

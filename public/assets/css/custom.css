@@ -27,7 +27,7 @@
         border-color: rgb(var(--primary)) !important;
     }
 
-    a:not(.btn), .link-primary {
+    .link-primary {
         color: rgb(var(--primary)) !important;
     }
 

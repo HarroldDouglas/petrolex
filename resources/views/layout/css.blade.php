@@ -32,6 +32,9 @@
 <!-- Simplebar css-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/simplebar/simplebar.css') }}">
 
+<!-- Custom css-->
+<link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
+
 @yield('css')
 
 @vite(['public/assets/scss/style.scss'])
