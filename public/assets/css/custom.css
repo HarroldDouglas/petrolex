@@ -1,5 +1,5 @@
-:root, .default, body, html {
-        --primary: 125, 158, 24 !important;
+    :root, .default, body, html {
+        --primary: 0,137,183 !important;
     }
 
     .btn-primary,

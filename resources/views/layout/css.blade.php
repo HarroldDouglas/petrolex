@@ -10,6 +10,9 @@
 <!-- iconoir icon css  -->
 <link href="{{ asset('assets/vendor/ionio-icon/css/iconoir.css') }}" rel="stylesheet">
 
+<!-- fontawesome icon css  -->
+<link href="{{ asset('assets/vendor/fontawesome/css/all.css') }}" rel="stylesheet">
+
 <!-- Weather icon css-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/weather/weather-icons.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/weather/weather-icons-wind.css') }}">

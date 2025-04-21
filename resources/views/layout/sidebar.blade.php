@@ -11,9 +11,7 @@
     </div>
     <div class="app-nav" id="app-simple-bar">
         <ul class="main-nav p-0 mt-2">
-            <li class="menu-title">
-                <span>Accueil</span>
-            </li>
+
             <li class="no-sub">
                 <a class="" href="{{ route('dashboard') }}">
                     <i class="iconoir-home-alt"></i> Tableau de bord
