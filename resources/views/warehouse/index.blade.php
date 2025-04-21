@@ -197,42 +197,47 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un utilisateur</h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un point de vente</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <form class="app-form">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Nom</label>
-                                <input type="text" class="form-control" placeholder="Nom" id="last_name">
+                                <label for="name" class="form-label">Nom</label>
+                                <input type="text" class="form-control" placeholder="Nom" id="name">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">Prénom</label>
-                                <input type="text" class="form-control" placeholder="Prénom" id="first_name">
+                                <label for="city" class="form-label">Ville</label>
+                                <input type="text" class="form-control" placeholder="Prénom" id="city">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" placeholder="email@example.com" id="email">
+                                <label for="email" class="form-label">Adresse</label>
+                                <input type="text" class="form-control" placeholder="Adresse" id="adress">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Téléphone</label>
                                 <input type="text" class="form-control" placeholder="690102030" id="phone">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="point_vente" class="form-label">Point de vente</label>
-                                <select class="form-select" id="point_vente">
-                                    <option value="Point A">Point A</option>
-                                    <option value="Point B">Point B</option>
-                                </select>
+                                <label for="email" class="form-label">Email</label>
+                                <input type="text" class="form-control" placeholder="email@example.com" id="email">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="fonction" class="form-label">Fonction</label>
-                                <select class="form-select" id="fonction">
-                                    <option value="" selected disabled>Choisir une fonction</option>
-                                    <option value="Responsable de point de vente">Responsable de point de vente</option>
-                                    <option value="Responsable de Gaz">Responsable de Gaz</option>
-                                </select>
+                                <label for="point_vente" class="form-label">Code postal</label>
+                                <input type="text" class="form-control" placeholder="Code postal" id="postal_code">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="latitude" class="form-label">Latitude</label>
+                                <input type="text" class="form-control" placeholder="Latitude" id="latitude">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="Longitiude" class="form-label">Longitiude</label>
+                                <input type="text" class="form-control" placeholder="Longitiude" id="Longitiude">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="storage_capacity" class="form-label">Capacité de stockage</label>
+                                <input type="text" class="form-control" placeholder="storage_capacity" id="storage_capacity">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="statut" class="form-label">Statut</label>
@@ -250,6 +255,7 @@
                 </div>
         </div>
     </div>
+
 
 @endsection
 
