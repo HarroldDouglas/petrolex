@@ -78,7 +78,7 @@
                                 <h5>Details de l'utilisateur</h5>
                             </div>
                             <div class="card-body">
-                                <table class=" project-details-table table table-borderless  align-middle mb-0">
+                                <table class=" project-details-table table table-borderless align-middle mb-0">
                                     <tbody>
                                     <tr>
                                         <td>
