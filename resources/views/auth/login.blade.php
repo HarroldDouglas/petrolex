@@ -2,12 +2,13 @@
 @include('layout.head')
 
 @include('layout.css')
-<link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
 
 <style>
     .login-form-container {
         background-image: none !important;
-        background-color: rgba(125, 158, 24, 0.336) !important;
+    }
+    a:not(.btn), .link-primary {
+        color: rgb(var(--primary)) !important;
     }
 </style>
 
@@ -26,12 +27,11 @@
                             <div class="login-form-container">
                                 <div class="mb-4">
                                     <a class="logo d-inline-block" href="{{ route('index') }}">
-                                        <img src="{{ asset('../assets/images/logo/isogaz-no-bg.png') }}" width="250"
+                                        <img src="{{ asset('../assets/images/logo/isogaz-no-bg.png') }}" width="150"
                                             alt="#">
                                     </a>
                                 </div>
                                 <div class="form_container">
-
                                     <form class="app-form" method="POST" action="{{ route('login') }}">
                                         @csrf
                                         <div class="mb-3 text-center">
@@ -74,7 +74,6 @@
                                             <button type="submit" class="btn btn-primary w-100">Connexion</button>
                                         </div>
                                     </form>
-
                                 </div>
                             </div>
                         </div>
