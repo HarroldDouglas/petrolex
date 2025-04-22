@@ -99,7 +99,7 @@
             </div>
             
             <div class="col-12 collapse mb-4" id="collapseFilter">
-                <div class="card bg-white">
+                <div class="card bg-white text-black">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-4">
@@ -127,7 +127,7 @@
                                     <label for="wfirstName2" class="form-label"> Date : </label>
                                     <div>
                                         <button type="button" class="btn btn-default"
-                                            style="width: 100%; background-color: white; color: black" id="daterange-btn">
+                                            style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
                                             <span>
                                                 <i class="fa fa-calendar"></i> Sélectionner une date
                                             </span>
