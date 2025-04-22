@@ -137,7 +137,7 @@
         
             <!-- Stock & Sales table-->
             <<div class="row">
-            <div class="col-9">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title">Stock & Ventes</h4>
@@ -281,7 +281,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-xxl-3">
+            <div class="col-md-12 col-xxl-12">
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex align-items-center">
