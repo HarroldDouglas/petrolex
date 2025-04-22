@@ -39,7 +39,7 @@
                                 <th class="text-start w-20">Nom complet</th>
                                 <th class="w-10">Point de vente</th>
                                 <th class="w-10">Téléphone</th>
-                                <th class="w-15">Profil</th>
+                                <th class="w-15">Fonction</th>
                                 <th class="w-15">Date</th>
                                 <th class="w-5">Status</th>
                                 <th class="w-25">Actions</th>
@@ -73,7 +73,7 @@
                                     </td>
                                     <td>Point B</td>
                                     <td>+237 698 345 221</td>
-                                    <td>Responsable de Gaz</td>
+                                    <td>Responsable point de vente</td>
                                     <td>11 Avr,2024 09:45</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
@@ -109,7 +109,7 @@
                                     </td>
                                     <td>Point D</td>
                                     <td>+237 655 789 123</td>
-                                    <td>Responsable de Gaz</td>
+                                    <td>Responsable point de vente</td>
                                     <td>13 Avr,2024 14:15</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
@@ -145,7 +145,7 @@
                                     </td>
                                     <td>Point E</td>
                                     <td>+237 675 888 999</td>
-                                    <td>Responsable de Gaz</td>
+                                    <td>Responsable point de vente</td>
                                     <td>15 Avr,2024 16:45</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
@@ -181,7 +181,7 @@
                                     </td>
                                     <td>Point G</td>
                                     <td>+237 699 888 444</td>
-                                    <td>Responsable de Gaz</td>
+                                    <td>Responsable point de vente</td>
                                     <td>17 Avr,2024 15:30</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
@@ -250,14 +250,6 @@
                                 <select class="form-select" id="point_vente">
                                     <option value="Point A">Point A</option>
                                     <option value="Point B">Point B</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="fonction" class="form-label">Fonction</label>
-                                <select class="form-select" id="fonction">
-                                    <option value="" selected disabled>Choisir une fonction</option>
-                                    <option value="Responsable de point de vente">Responsable de point de vente</option>
-                                    <option value="Responsable de Gaz">Responsable de Gaz</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
