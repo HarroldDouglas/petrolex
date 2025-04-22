@@ -60,7 +60,7 @@
             <li>
                 <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#orders-page">
                     <i class="iconoir-page"></i>
-                    Suvivi des commandes Globales
+                    Suivi des commandes Globales
                 </a>
                 <ul class="collapse" id="orders-page">
                     <li><a href="{{route('dashboard')}}"><i class="iconoir-plus"></i> Ajouter</a></li>
