@@ -33,8 +33,8 @@
                     Points de vente
                 </a>
                 <ul class="collapse" id="point-of-sales">
-                    <li><a href="{{route('dashboard')}}"><i class="iconoir-plus"></i> Ajouter</a></li>
-                    <li><a href="{{route('dashboard')}}"><i class="iconoir-list"></i> Lister</a></li>
+                    <li><a href="{{route('warehouses.create')}}"><i class="iconoir-plus"></i> Ajouter</a></li>
+                    <li><a href="{{route('warehouses.list')}}"><i class="iconoir-list"></i> Lister</a></li>
                 </ul>
             </li>
             <li>
