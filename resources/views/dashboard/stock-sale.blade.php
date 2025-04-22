@@ -13,7 +13,7 @@
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-12 ">
+            <div class="col-8 ">
                 <h4 class="main-title">Tableau de bord</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
@@ -25,8 +25,56 @@
                     </li>
                 </ul>
             </div>
+            <!-- Filter -->
+            <div class="col-4">
+                <div class="d-flex justify-content-end gap-1">
+                    <a type="button" href="javascript!:" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
+                        aria-expanded="false" aria-controls="collapseFilter"
+                        class="waves-effect btn btn-white text-info bg-white btn-md mb-2">
+                        <i class="ti ti-chevron-down"></i> Filtrer
+                    </a>
+                </div>
+            </div>
         </div>
         <!-- Breadcrumb end -->
+        
+         <!-- Filter Options-->
+        <div class="col-12 collapse mb-4" id="collapseFilter">
+            <div class="card bg-white text-black">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
+                                <select id="warehouse_filter" name="warehouse" class="form-select">
+                                    <option value="" selected>Tous</option>
+                                    <option value="Point A">Point A</option>
+                                    <option value="Point B">Point B</option>
+                                    <option value="Point C">Point C</option>
+                                    <option value="Point D">Point D</option>
+                                    <option value="Point E">Point E</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="wfirstName2" class="form-label"> Date : </label>
+                                <div>
+                                    <button type="button" class="btn btn-default"
+                                        style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
+                                        <span>
+                                            <i class="fa fa-calendar"></i> Sélectionner une date
+                                        </span>
+                                        <i class="fa fa-caret-down"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Stock 1 Sales start -->
         <div class="row ticket-app">
@@ -86,62 +134,7 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Filter -->
-            <div class="col-12">
-                <div class="d-flex justify-content-end gap-1">
-                    <a type="button" href="javascript!:" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
-                        aria-expanded="false" aria-controls="collapseFilter"
-                        class="waves-effect btn btn-white text-info bg-white btn-md mb-2">
-                        <i class="ti ti-chevron-down"></i> Filtrer
-                    </a>
-                </div>
-            </div>
-            
-            <div class="col-12 collapse mb-4" id="collapseFilter">
-                <div class="card bg-white text-black">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
-                                    <select id="warehouse_filter" name="warehouse" class="form-select">
-                                        <option value="" selected>Tous</option>
-                                        <option value="Point A">Point A</option>
-                                        <option value="Point B">Point B</option>
-                                        <option value="Point C">Point C</option>
-                                        <option value="Point D">Point D</option>
-                                        <option value="Point E">Point E</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="city_filter" class="form-label"> Ville : </label>
-                                    <input type="text" class="form-control" id="city_filter" name="city" 
-                                        placeholder="Ville">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="wfirstName2" class="form-label"> Date : </label>
-                                    <div>
-                                        <button type="button" class="btn btn-default"
-                                            style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
-                                            <span>
-                                                <i class="fa fa-calendar"></i> Sélectionner une date
-                                            </span>
-                                            <i class="fa fa-caret-down"></i>
-                                        </button>
-                                    </div>
-                                </div>
-    
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        
             <!-- Stock & Sales table-->
             <<div class="row">
             <div class="col-9">
@@ -289,11 +282,22 @@
                 </div>
             </div>
             <div class="col-md-6 col-xxl-3">
-                <div class="p-3">
-                    <h5>Rapport des ventes</h5>
-                </div>
-
                 <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            <h4 class="card-title me-auto">Rapport des ventes</h4>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="chartType" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Graphe
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="chartType">
+                                    <li><a class="dropdown-item" href="javascript:;" data-type="column">Bande</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" data-type="Pie">Camembert</a></li>
+                                    <li><a class="dropdown-item" href="javascript:;" data-type="line">Ligne</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <div>
                             <div id="totalSales"></div>
