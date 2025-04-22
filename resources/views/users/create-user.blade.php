@@ -101,14 +101,6 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="fonction" class="form-label">Fonction</label>
-                                            <select class="form-select" id="fonction">
-                                                <option value="" selected disabled>Choisir une fonction</option>
-                                                <option value="Responsable de point de vente">Responsable de point de vente</option>
-                                                <option value="Responsable de Gaz">Responsable de Gaz</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
                                             <label for="statut" class="form-label">Statut</label>
                                             <select class="form-select" id="statut">
                                                 <option value="actif">Actif</option>
