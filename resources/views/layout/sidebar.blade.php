@@ -18,6 +18,19 @@
                 </a>
             </li>
             <li>
+                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#analytics">
+                    <i class="iconoir-dashboard"></i>
+                    Suivi et Rapports
+                </a>
+                <ul class="collapse" id="analytics">
+                    <li><a href="{{route('warehouse-stock-dashboard')}}"> Stock & Ventes</a></li>
+                    <li><a href="#"> Mouvement de stock</a></li>
+                    <li><a href="#"> Commandes & Livraisons</a></li>
+                    <li><a href="#">Rapport financier</a></li>
+                    <li><a href="#">Transactions</a></li>
+                </ul>
+            </li>
+            <li>
                 <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#users">
                     <i class="iconoir-user-square"></i>
                     Utilisateurs
@@ -43,26 +56,6 @@
                     Bouteilles
                 </a>
                 <ul class="collapse" id="bottles">
-                    <li><a href="{{route('dashboard')}}"><i class="iconoir-plus"></i> Ajouter</a></li>
-                    <li><a href="{{route('dashboard')}}"><i class="iconoir-list"></i> Lister</a></li>
-                </ul>
-            </li>
-            <li>
-                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#financial-page">
-                    <i class="iconoir-money-square"></i>
-                    Rapports Financiers
-                </a>
-                <ul class="collapse" id="financial-page">
-                    <li><a href="{{route('dashboard')}}"><i class="iconoir-plus"></i> Ajouter</a></li>
-                    <li><a href="{{route('dashboard')}}"><i class="iconoir-list"></i> Lister</a></li>
-                </ul>
-            </li>
-            <li>
-                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#orders-page">
-                    <i class="iconoir-page"></i>
-                    Suivi des commandes Globales
-                </a>
-                <ul class="collapse" id="orders-page">
                     <li><a href="{{route('dashboard')}}"><i class="iconoir-plus"></i> Ajouter</a></li>
                     <li><a href="{{route('dashboard')}}"><i class="iconoir-list"></i> Lister</a></li>
                 </ul>
