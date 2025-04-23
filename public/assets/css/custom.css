@@ -34,3 +34,10 @@
     .border-primary {
         border-color: rgb(var(--primary)) !important;
     }
+
+    nav .app-logo .logo img {
+        width: 100px !important;
+        float: none !important;
+        margin-left: 20px;
+    }
+
