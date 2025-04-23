@@ -1,5 +1,7 @@
 @extends('layout.master')
-@section('title', 'Détils du point de distribution')
+
+@section('title', 'Details de point de distribution')
+
 @section('css')
     <!-- Data Table css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
@@ -95,6 +97,11 @@
                 </div>
 
             </div>
+<<<<<<< HEAD
+
+=======
+
+>>>>>>> dev
         </div>
         <!-- Order Details end -->
     </div>
