@@ -57,7 +57,7 @@
                                     <td>+237 690 123 456</td>
                                     <td>Responsable point de vente</td>
                                     <td>10 Avr,2024 08:30</td>
-                                    <td><span class="badge text-light-info">ACTIF</span></td>
+                            <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
                                         <a href="{{ route('users.details', 2) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
                                         <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
