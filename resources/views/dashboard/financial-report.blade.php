@@ -13,7 +13,7 @@
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-8 ">
+            <div class="col-8 p-0">
                 <h4 class="main-title">Suivi et rapports</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
@@ -26,11 +26,11 @@
                 </ul>
             </div>
             <!-- Filter -->
-            <div class="col-4">
-                <div class="d-flex justify-content-end gap-1">
+            <div class="col-4 p-0">
+                <div class="d-flex justify-content-end ">
                     <a type="button" href="javascript!:" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
                         aria-expanded="false" aria-controls="collapseFilter"
-                        class="waves-effect btn btn-white text-info bg-white btn-md mb-2">
+                        class="waves-effect btn text-info bg-white btn-md mb-2">
                         <i class="ti ti-chevron-down"></i> Filtrer
                     </a>
                 </div>
@@ -39,34 +39,36 @@
         <!-- Breadcrumb end -->
         
          <!-- Filter Options-->
-        <div class="col-12 collapse mb-4" id="collapseFilter">
-            <div class="card bg-white text-black">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
-                                <select id="warehouse_filter" name="warehouse" class="form-select">
-                                    <option value="" selected>Tous</option>
-                                    <option value="Point A">Point A</option>
-                                    <option value="Point B">Point B</option>
-                                    <option value="Point C">Point C</option>
-                                    <option value="Point D">Point D</option>
-                                    <option value="Point E">Point E</option>
-                                </select>
+         <div class="row m-1">
+            <div class="col-12 collapse mb-4 p-0 bg-white" id="collapseFilter">
+                <div class="card bg-white text-black">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
+                                    <select id="warehouse_filter" name="warehouse" class="form-select">
+                                        <option value="" selected>Tous</option>
+                                        <option value="Point A">Point A</option>
+                                        <option value="Point B">Point B</option>
+                                        <option value="Point C">Point C</option>
+                                        <option value="Point D">Point D</option>
+                                        <option value="Point E">Point E</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label for="wfirstName2" class="form-label"> Date : </label>
-                                <div>
-                                    <button type="button" class="btn btn-default"
-                                        style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
-                                        <span>
-                                            <i class="fa fa-calendar"></i> Sélectionner une date
-                                        </span>
-                                        <i class="fa fa-caret-down"></i>
-                                    </button>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="wfirstName2" class="form-label"> Date : </label>
+                                    <div>
+                                        <button type="button" class="btn btn-default"
+                                            style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
+                                            <span>
+                                                <i class="fa fa-calendar"></i> Sélectionner une date
+                                            </span>
+                                            <i class="fa fa-caret-down"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -135,73 +137,72 @@
             </div>
         
             <!-- Fiancial report table-->
-            <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Rapport financier</h4>
-                    </div>
-                    <div class="card-body px-0">
-                        <div class="table-responsive app-scroll app-datatable-default">
-                            <table class="w-100 display ticket-app-table" id="ticketdatatable">
-                                <thead>
-                                    <tr>
-                                        <th class="w-15">Date</th>
-                                        <th class="w-15">Type</th>
-                                        <th class="w-30">Montant (en CFA)</th>
-                                        <th class="w-20">Utilisateur</th>
-                                        <th class="w-20 text-center">Statut</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>01/05/2025</td>
-                                        <td>Vente</td>
-                                        <td>1.000.000</td>
-                                        <td>Nguefack Jean</td>
-                                        <td class="text-center"><span class="badge text-light-success">Terminé</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>03/05/2025</td>
-                                        <td>Achat</td>
-                                        <td>500.000</td>
-                                        <td>Eyoum Claire</td>
-                                        <td class="text-center"><span class="badge text-light-success">Terminé</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>05/05/2025</td>
-                                        <td>Vente</td>
-                                        <td>750.000</td>
-                                        <td>Ndongmo Roger</td>
-                                        <td class="text-center"><span class="badge text-light-warning">En attente</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>07/05/2025</td>
-                                        <td>Achat</td>
-                                        <td>300.000</td>
-                                        <td>Mbarga Elise</td>
-                                        <td class="text-center"><span class="badge text-light-success">Terminé</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>10/05/2025</td>
-                                        <td>Vente</td>
-                                        <td>1.200.000</td>
-                                        <td>Fouda Mireille</td>
-                                        <td class="text-center"><span class="badge text-light-warning">En attente</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12/05/2025</td>
-                                        <td>Vente</td>
-                                        <td>950.000</td>
-                                        <td>Tchatchoua Paul</td>
-                                        <td class="text-center"><span class="badge text-light-success">Terminé</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="card-header">
+                    <h4 class="card-title">Rapport financier</h4>
+                </div>
+                <div class="card-body px-0">
+                    <div class="table-responsive app-scroll app-datatable-default">
+                        <table class="w-100 display ticket-app-table" id="ticketdatatable">
+                            <thead>
+                                <tr>
+                                    <th class="w-15">Date</th>
+                                    <th class="w-15">Type</th>
+                                    <th class="w-30">Montant (en CFA)</th>
+                                    <th class="w-20">Utilisateur</th>
+                                    <th class="w-20 text-center">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>01/05/2025</td>
+                                    <td>Vente</td>
+                                    <td>1.000.000</td>
+                                    <td>Nguefack Jean</td>
+                                    <td class="text-center"><span class="badge text-light-success">Terminé</span></td>
+                                </tr>
+                                <tr>
+                                    <td>03/05/2025</td>
+                                    <td>Achat</td>
+                                    <td>500.000</td>
+                                    <td>Eyoum Claire</td>
+                                    <td class="text-center"><span class="badge text-light-success">Terminé</span></td>
+                                </tr>
+                                <tr>
+                                    <td>05/05/2025</td>
+                                    <td>Vente</td>
+                                    <td>750.000</td>
+                                    <td>Ndongmo Roger</td>
+                                    <td class="text-center"><span class="badge text-light-warning">En attente</span></td>
+                                </tr>
+                                <tr>
+                                    <td>07/05/2025</td>
+                                    <td>Achat</td>
+                                    <td>300.000</td>
+                                    <td>Mbarga Elise</td>
+                                    <td class="text-center"><span class="badge text-light-success">Terminé</span></td>
+                                </tr>
+                                <tr>
+                                    <td>10/05/2025</td>
+                                    <td>Vente</td>
+                                    <td>1.200.000</td>
+                                    <td>Fouda Mireille</td>
+                                    <td class="text-center"><span class="badge text-light-warning">En attente</span></td>
+                                </tr>
+                                <tr>
+                                    <td>12/05/2025</td>
+                                    <td>Vente</td>
+                                    <td>950.000</td>
+                                    <td>Tchatchoua Paul</td>
+                                    <td class="text-center"><span class="badge text-light-success">Terminé</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+            
             <div class="col-md-12 col-xxl-12">
                 <div class="card">
                     <div class="card-header">
