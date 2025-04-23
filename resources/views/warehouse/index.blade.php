@@ -1,638 +1,269 @@
 @extends('layout.master')
-@section('title', 'List Table')
+@section('title', 'Liste des points de vente')
 @section('css')
-    <!--font-awesome-css-->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/fontawesome/css/all.css') }}">
 
 @endsection
 @section('main-content')
     <div class="container-fluid">
-
         <!-- Breadcrumb start -->
         <div class="row m-1">
             <div class="col-12 ">
-                <h4 class="main-title">List Table</h4>
+                <h4 class="main-title"> liste des points de vente</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
                       <span>
-                        <i class="ph-duotone  ph-table f-s-16"></i> Table
+                        <i class="ph-duotone  ph-stack f-s-16"></i> Apps
                       </span>
                         </a>
                     </li>
+                    <li>
+                        <a href="#" class="f-s-14 f-w-500">Points de vente</a>
+                    </li>
                     <li class="active">
-                        <a href="#" class="f-s-14 f-w-500">List Table</a>
+                        <a href="#" class="f-s-14 f-w-500">Liste des points de vente</a>
                     </li>
                 </ul>
             </div>
         </div>
-
         <!-- Breadcrumb end -->
 
         <div class="row">
-            <!-- List Js Table start -->
-            <div class="col-xxl-8">
-                <div class="card equal-card ">
-                    <div class="card-header">
-                        <h5>Add, Edit & Remove table</h5>
+            <div class="card">
+                <div class="card-body p-0">
+                    <!-- table -->
+                    <div class="table-responsive">
+                        <table class="table table-bottom-border align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th class="text-start">Nom</th>
+                                <th>Ville</th>
+                                <th>Adresse</th>
+                                <th>Téléphone</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point A
+                                    </td>
+                                    <td>Yaoundé</td>
+                                    <td>Bastos, derrière l'usine</td>
+                                    <td>+237 690 123 456</td>
+                                    <td>10 Avr,2024 08:30</td>
+                                    <td><span class="badge text-light-info">ACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 2) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point B
+                                    </td>
+                                    <td>Douala</td>
+                                    <td>Akwa, près de la banque</td>
+                                    <td>+237 691 234 567</td>
+                                    <td>11 Avr,2024 09:45</td>
+                                    <td><span class="badge text-light-danger">INACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 3) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point C
+                                    </td>
+                                    <td>Yaoundé</td>
+                                    <td>Mokolo, derrière le marché</td>
+                                    <td>+237 692 345 678</td>
+                                    <td>12 Avr,2024 11:00</td>
+                                    <td><span class="badge text-light-info">ACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 4) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point D
+                                    </td>
+                                    <td>Douala</td>
+                                    <td>Bonanjo, près du port</td>
+                                    <td>+237 693 456 789</td>
+                                    <td>13 Avr,2024 14:15</td>
+                                    <td><span class="badge text-light-danger">INACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 5) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point E
+                                    </td>
+                                    <td>Yaoundé</td>
+                                    <td>Nlongkak, près de l'école</td>
+                                    <td>+237 694 567 890</td>
+                                    <td>14 Avr,2024 10:30</td>
+                                    <td><span class="badge text-light-info">ACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 6) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point F
+                                    </td>
+                                    <td>Douala</td>
+                                    <td>Bonamoussadi, près du supermarché</td>
+                                    <td>+237 695 678 901</td>
+                                    <td>15 Avr,2024 16:45</td>
+                                    <td><span class="badge text-light-danger">INACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 7) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point G
+                                    </td>
+                                    <td>Yaoundé</td>
+                                    <td>Essos, près de la gare</td>
+                                    <td>+237 696 789 012</td>
+                                    <td>16 Avr,2024 09:00</td>
+                                    <td><span class="badge text-light-info">ACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 8) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point H
+                                    </td>
+                                    <td>Douala</td>
+                                    <td>Bonaberi, près du pont</td>
+                                    <td>+237 697 890 123</td>
+                                    <td>17 Avr,2024 15:30</td>
+                                    <td><span class="badge text-light-danger">INACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 9) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="d-flex align-items-center gap-2">
+                                        Point I
+                                    </td>
+                                    <td>Yaoundé</td>
+                                    <td>Ekounou, près de l'église</td>
+                                    <td>+237 698 901 234</td>
+                                    <td>18 Avr,2024 13:20</td>
+                                    <td><span class="badge text-light-info">ACTIF</span></td>
+                                    <td>
+                                        <a href="{{ route('warehouses.details', 10) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
+                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                    </td>
+                                </tr>
+                                
+                                
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="card-body p-0">
-                        <div id="myTable">
-                            <div class="list-table-header d-flex justify-content-sm-between mb-3">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#exampleModal">Add</button>
-                                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                                     aria-hidden="true">
-                                    <form id="add_employee_form">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Add Employee
-                                                    </h1>
-                                                    <button type="button" class="btn-close m-0" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="employee mb-3">
-                                                        <input type="hidden" id="id-field">
-                                                        <label class="form-label">Employee :</label>
-                                                        <input class="form-control" type="text" id="employee-field" placeholder="employee"
-                                                               required>
-                                                    </div>
-
-                                                    <div class="email mb-3">
-                                                        <label class="form-label">Email :</label>
-                                                        <input class="form-control" type="email" id="email-field" placeholder="email" required>
-                                                    </div>
-
-                                                    <div class="contact mb-3">
-                                                        <label class="form-label">contact :</label>
-                                                        <input class="form-control" type="text" id="contact-field" placeholder="contact"
-                                                               required>
-                                                    </div>
-
-                                                    <div class="date mb-3">
-                                                        <label class="form-label">date :</label>
-                                                        <input class="form-control" type="date" id="date-field" required>
-                                                    </div>
-
-                                                    <div class="status mb-3">
-                                                        <label class="form-label">status :</label>
-                                                        <select class="form-select" id="status-field" aria-label="Default select example">
-                                                            <option value="">Status</option>
-                                                            <option value="success">Active</option>
-                                                            <option value="danger">Block</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer add">
-                                                    <input type="button" class="btn btn-secondary" data-bs-dismiss="modal" value="Close">
-                                                    <input type="submit" class="btn btn-primary" id="add-btn" value="Add">
-                                                    <button class="btn btn-success" id="edit-btn">Edit</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-
-                                <form class="app-form app-icon-form " action="#">
-                                    <div class="position-relative ">
-                                        <input type="search" class="form-control search" placeholder="Search..."
-                                               aria-label="Search">
-                                        <i class="ti ti-search text-dark"></i>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="overflow-auto app-scroll">
-                                <table class="table table-bottom-border  list-table-data align-middle mb-0">
-                                    <thead>
-                                    <tr class="app-sort">
-                                        <th>
-                                            <input type="checkbox" class="form-check-input  checkAll" name="checkAll">
-                                        </th>
-                                        <th class="d-none">ID</th>
-                                        <th class="sort" data-sort="employee" scope="col">Employee</th>
-                                        <th class="sort" data-sort="email" scope="col">Email</th>
-                                        <th class="sort" data-sort="contact" scope="col">contact</th>
-                                        <th class="sort" data-sort="date" scope="col">Joining Date</th>
-                                        <th class="sort" data-sort="status" scope="col">Status</th>
-                                        <th class="sort" data-sort="action" scope="col">Edit</th>
-                                        <th class="sort" data-sort="action" scope="col">Delete</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody class="list" id="t-data">
-                                    <tr>
-                                        <th scope="row"><input class="form-check-input mt-0 ms-2" type="checkbox"  name="item"></th>
-                                        <td class="id d-none">1</td>
-                                        <td class="employee">Allie Grater</td>
-                                        <td class="email">graterallie@gmail.com</td>
-                                        <td class="contact">8054478398</td>
-                                        <td class="date">2021-03-19</td>
-                                        <td class="status">
-                                            <span class="badge bg-danger-subtle text-danger text-uppercase">Block</span>
-                                        </td>
-                                        <td class="edit"><button class="btn edit-item-btn btn-sm btn-success"
-                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
-                                        </td>
-                                        <td class="remove"><button class="btn remove-item-btn btn-sm btn-danger">Remove</button>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="row"><input class="form-check-input mt-0 ms-2" type="checkbox"  name="item" value="2"></th>
-                                        <td class="id d-none">2</td>
-                                        <td class="employee">Rhoda Report</td>
-                                        <td class="email">reportrhoda@gmail.com</td>
-                                        <td class="contact">7765392112</td>
-                                        <td class="date">2020-01-19</td>
-                                        <td class="status"><span
-                                                class="badge bg-success-subtle text-success text-uppercase">Active</span>
-                                        </td>
-                                        <td class="edit"><button class="btn edit-item-btn btn-sm btn-success"
-                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
-                                        </td>
-                                        <td class="remove"><button class="btn remove-item-btn btn-sm btn-danger">Remove</button>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="row"><input class="form-check-input mt-0 ms-2" type="checkbox"  name="item" value="3"></th>
-                                        <td class="id d-none">3</td>
-                                        <td class="employee">Rose Bush</td>
-                                        <td class="email">rose@gmail.com</td>
-                                        <td class="contact">9674903425</td>
-                                        <td class="date">2020-10-26</td>
-                                        <td class="status"><span
-                                                class="badge bg-success-subtle text-success text-uppercase">Active</span>
-                                        </td>
-                                        <td class="edit"><button class="btn edit-item-btn btn-sm btn-success"
-                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
-                                        </td>
-                                        <td class="remove"><button class="btn remove-item-btn btn-sm btn-danger">Remove</button>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="row"><input class="form-check-input mt-0 ms-2" type="checkbox"  name="item" value="4"></th>
-                                        <td class="id d-none">4</td>
-                                        <td class="employee">Dave Allippa</td>
-                                        <td class="email">dave@gmail.com</td>
-                                        <td class="contact">6490537289</td>
-                                        <td class="date">2020-06-19</td>
-                                        <td class="status">
-                                            <span class="badge bg-danger-subtle text-danger text-uppercase">Block</span>
-                                        </td>
-                                        <td class="edit"><button class="btn edit-item-btn btn-sm btn-success"
-                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
-                                        </td>
-                                        <td class="remove"><button class="btn remove-item-btn btn-sm btn-danger">Remove</button>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="row"><input class="form-check-input mt-0 ms-2" type="checkbox"  name="item" value="5"></th>
-                                        <td class="id d-none">5</td>
-                                        <td class="employee">Emma Grate</td>
-                                        <td class="email">emma@gmail.com</td>
-                                        <td class="contact">9123456031</td>
-                                        <td class="date">2022-03-20</td>
-                                        <td class="status"><span
-                                                class="badge bg-danger-subtle text-danger text-uppercase">Block</span>
-                                        </td>
-                                        <td class="edit"><button class="btn edit-item-btn btn-sm btn-success"
-                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
-                                        </td>
-                                        <td class="remove"><button class="btn remove-item-btn btn-sm btn-danger">Remove</button>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="row"><input class="form-check-input mt-0 ms-2" type="checkbox"  name="item" value="6"></th>
-                                        <td class="id d-none">6</td>
-                                        <td class="employee">Mal Nurrisht</td>
-                                        <td class="email">Nurrishtmal@gmail.com</td>
-                                        <td class="contact">6490267839</td>
-                                        <td class="date">2019-12-29</td>
-                                        <td class="status"><span
-                                                class="badge bg-success-subtle text-success text-uppercase">Active</span>
-                                        </td>
-                                        <td class="edit"><button class="btn edit-item-btn btn-sm btn-success"
-                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
-                                        </td>
-                                        <td class="remove"><button class="btn remove-item-btn btn-sm btn-danger">Remove</button>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="row"><input class="form-check-input mt-0 ms-2" type="checkbox"  name="item" value="7"></th>
-                                        <td class="id d-none">7</td>
-                                        <td class="employee">Bess Twishes</td>
-                                        <td class="email">twishes@gmail.com</td>
-                                        <td class="contact">8702643868</td>
-                                        <td class="date">2020-5-16</td>
-                                        <td class="status"><span
-                                                class="badge bg-danger-subtle text-danger text-uppercase">Block</span>
-                                        </td>
-                                        <td class="edit"><button class="btn edit-item-btn btn-sm btn-success"
-                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
-                                        </td>
-                                        <td class="remove"><button class="btn remove-item-btn btn-sm btn-danger">Remove</button>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="row"><input class="form-check-input mt-0 ms-2" type="checkbox"  name="item" value="8"></th>
-                                        <td class="id d-none">8</td>
-                                        <td class="employee">C. Yasoon</td>
-                                        <td class="email">yasoon@gmail.com</td>
-                                        <td class="contact">9345067125</td>
-                                        <td class="date">2022-02-16</td>
-                                        <td class="status"><span
-                                                class="badge bg-success-subtle text-success text-uppercase">Active</span>
-                                        </td>
-                                        <td class="edit"><button class="btn edit-item-btn btn-sm btn-success"
-                                                                 data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>
-                                        </td>
-                                        <td class="remove"><button class="btn remove-item-btn btn-sm btn-danger">Remove</button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="list-pagination">
-                                <ul class="pagination"></ul>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- table -->
                 </div>
             </div>
-            <!-- List Js Table end -->
-
-            <!-- List table start -->
-            <div class="col-md-6 col-xxl-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>List table</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="users">
-                            <div class="row">
-                                <div class="col-12 col-sm">
-                                    <div class="mb-3">
-                                        <input type="search" class="form-control search" placeholder="Search..."
-                                               aria-label="Search">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-auto">
-                                    <div class=" mb-3">
-                                        <button class="sort btn btn-sm btn-secondary" data-sort="name">
-                                            Sort by name
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="list list-tables">
-                                <div data-id="1" class="d-flex align-items-center justify-content-between mt-2">
-                                    <input class="form-check-input mt-0" type="checkbox" name="item">
-                                    <div class="link name ps-3 flex-grow-1 pe-2">
-                                        <p class="mb-0">Olive Yew</p>
-                                        <h6 class="fw-bold" data-timestamp="12345">1986</h6>
-                                    </div>
-                                    <div class="h-25 w-25 d-flex-center b-r-50 overflow-hidden text-bg-secondary">
-                                        <img src="{{ asset('../assets/images/avtar/7.png') }}" alt="" class="img-fluid">
-                                    </div>
-                                </div>
-
-                                <div data-id="2" class="d-flex align-items-center justify-content-between mt-2">
-                                    <input class="form-check-input mt-0" type="checkbox" name="item">
-                                    <div class="link name ps-3 flex-grow-1 pe-2">
-                                        <p class="mb-0">Olive Yew</p>
-                                        <h6 class="fw-bold" data-timestamp="12345">1957</h6>
-                                    </div>
-                                    <div class="h-25 w-25 d-flex-center b-r-50 overflow-hidden text-bg-secondary">
-                                        <img src="{{ asset('../assets/images/avtar/7.png') }}" alt="" class="img-fluid">
-                                    </div>
-                                </div>
-
-                                <div data-id="3" class="d-flex align-items-center justify-content-between mt-2">
-                                    <input class="form-check-input mt-0" type="checkbox" name="item">
-                                    <div class="link name ps-3 flex-grow-1 pe-2">
-                                        <p class="mb-0">Allie Grater</p>
-                                        <h6 class="fw-bold" data-timestamp="12345">1860</h6>
-                                    </div>
-                                    <div class="h-25 w-25 d-flex-center b-r-50 overflow-hidden text-bg-secondary">
-                                        <img src="{{ asset('../assets/images/avtar/1.png') }}" alt="" class="img-fluid">
-                                    </div>
-                                </div>
-
-                                <div data-id="4" class="d-flex align-items-center justify-content-between mt-2">
-                                    <input class="form-check-input mt-0" type="checkbox" name="item">
-                                    <div class="link name ps-3 flex-grow-1 pe-2">
-                                        <p class="mb-0">Rita Book</p>
-                                        <h6 class="fw-bold" data-timestamp="12345">1976</h6>
-                                    </div>
-                                    <div class="h-25 w-25 d-flex-center b-r-50 overflow-hidden text-bg-secondary">
-                                        <img src="{{ asset('../assets/images/avtar/16.png') }}" alt="" class="img-fluid">
-                                    </div>
-                                </div>
-
-                                <div data-id="5" class="d-flex align-items-center justify-content-between mt-2">
-                                    <input class="form-check-input mt-0" type="checkbox" name="item">
-                                    <div class="link name ps-3 flex-grow-1 pe-2">
-                                        <p class="mb-0">Rose Bush</p>
-                                        <h6 class="fw-bold" data-timestamp="12345">1960</h6>
-                                    </div>
-                                    <div class="h-25 w-25 d-flex-center b-r-50 overflow-hidden text-bg-secondary">
-                                        <img src="{{ asset('../assets/images/avtar/4.png') }}" alt="" class="img-fluid">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- List Table end -->
-
-            <!-- Existing list Table start -->
-            <div class="col-md-6 col-xxl-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Existing list</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="sidelist">
-                            <div class="row">
-                                <div class="col-md">
-                                    <div class="mb-3">
-                                        <input type="search" class="form-control search" placeholder="Search..."
-                                               aria-label="Search">
-                                    </div>
-                                </div>
-                                <div class="col-md-auto">
-                                    <div class="float-end mb-3">
-                                        <button class="sort btn btn-sm btn-secondary" data-sort="side">
-                                            Sort by name
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="list existing-list">
-                                <div data-id="1" class="d-flex justify-content-between">
-                                    <div>
-                            <span class="position-relative text-light-info h-40 w-40 d-flex-center b-r-50">
-                              <i class="fa-solid fa-user"></i>
-                              <span
-                                  class="position-absolute end-0 top-0 p-1 bg-info border border-light rounded-circle"></span>
-                            </span>
-                                    </div>
-                                    <div class="flex-grow-1 ps-2">
-                                        <h6 class="link side">
-                                            Olive Yew
-                                        </h6>
-                                        <p>
-                                            This is the content of the email.</p>
-                                    </div>
-                                    <div class="text-muted">28 min</div>
-                                </div>
-
-
-                                <div data-id="2" class="d-flex justify-content-between">
-                                    <div>
-                            <span class="position-relative text-light-success h-40 w-40 d-flex-center b-r-50">
-                              <i class="fa-solid fa-user"></i>
-                              <span
-                                  class="position-absolute end-0 top-0 p-1 bg-success border border-light rounded-circle"></span>
-                            </span>
-                                    </div>
-                                    <div class="flex-grow-1 ps-2">
-                                        <h6 class="link side">
-                                            Bea Mine
-                                        </h6>
-                                        <p>It enables users to easily.</p>
-                                    </div>
-                                    <div class="text-muted">48 min</div>
-                                </div>
-
-                                <div data-id="3" class="d-flex justify-content-between">
-                                    <div>
-                            <span class="position-relative text-light-primary h-40 w-40 d-flex-center b-r-50">
-                              <i class="fa-solid fa-user"></i>
-                              <span
-                                  class="position-absolute end-0 top-0 p-1 bg-primary border border-light rounded-circle"></span>
-                            </span>
-                                    </div>
-                                    <div class="flex-grow-1 ps-2">
-                                        <h6 class="link side">
-                                            Toi Story
-                                        </h6>
-                                        <p>
-                                            Companies can use to convey .</p>
-                                    </div>
-                                    <div class="text-muted">2 hours</div>
-                                </div>
-
-                                <div data-id="4" class="d-flex justify-content-between">
-                                    <div>
-                            <span class="position-relative text-light-info h-40 w-40 d-flex-center b-r-50">
-                              <i class="fa-solid fa-user"></i>
-                              <span
-                                  class="position-absolute end-0 top-0 p-1 bg-info border border-light rounded-circle"></span>
-                            </span>
-                                    </div>
-                                    <div class="flex-grow-1 ps-2">
-                                        <h6 class="link side">
-                                            Art Decco
-                                        </h6>
-                                        <p>
-                                            System Software is closer.</p>
-                                    </div>
-                                    <div class="text-muted">1 day</div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Existing list Table end -->
-
-            <!-- search List Table start -->
-            <div class="col-md-6 col-xxl-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>search List table</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="test-list">
-                            <div class="mb-3">
-                                <input type="search" class="fuzzy-search form-control search" placeholder="Search..."
-                                       aria-label="Search">
-                            </div>
-                            <ul class="list fuzzy-list">
-                                <li>
-                                    <p class="name">Guybrush Threepwood</p>
-                                </li>
-                                <li>
-                                    <p class="name">Elaine Marley</p>
-                                </li>
-                                <li>
-                                    <p class="name">LeChuck</p>
-                                </li>
-                                <li>
-                                    <p class="name">Stan</p>
-                                </li>
-                                <li>
-                                    <p class="name">Voodoo Lady</p>
-                                </li>
-                                <li>
-                                    <p class="name">Herman Toothrot</p>
-                                </li>
-                                <li>
-                                    <p class="name">Meathook</p>
-                                </li>
-                                <li>
-                                    <p class="name">Carla</p>
-                                </li>
-                                <li>
-                                    <p class="name">Otis</p>
-                                </li>
-                                <li>
-                                    <p class="name">Rapp Scallion</p>
-                                </li>
-                                <li>
-                                    <p class="name">Rum Rogers Sr.</p>
-                                </li>
-                                <li>
-                                    <p class="name">Men of Low Moral Fiber</p>
-                                </li>
-                                <li>
-                                    <p class="name">Murray</p>
-                                </li>
-                                <li>
-                                    <p class="name">Cannibals</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- search List Table end -->
-
-            <!-- Table with Pagination Table start -->
-            <div class="col-md-6 col-xxl-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Table with Pagination</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="user">
-                            <div class="mb-3">
-                                <input type="search" class="form-control search" placeholder="Search..." aria-label="Search">
-                            </div>
-
-                            <table class="table table-bordered align-middle">
-
-                                <tbody class="list">
-                                <tr>
-                                    <td class="name">Jonny Stromberg</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="name">Jonas Arnklint</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="name">Martina Elm</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="name">Olive Yew</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="name">Dave Allippa</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="name">Rhoda Report</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="name">Rita Book</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="name">Bess Twishes</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="name">Gustaf Lindqvist</td>
-                                    <td>
-                                        <button type="button" class="btn btn-light-secondary float-end">
-                                            <i class="bi bi-envelope-at-fill"></i> Message
-                                        </button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            <div class="list-pagination">
-                                <ul class="pagination"></ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Table with Pagination Table end -->
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un point de vente</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form class="app-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Nom</label>
+                                <input type="text" class="form-control" placeholder="Nom" id="name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">Ville</label>
+                                <input type="text" class="form-control" placeholder="Prénom" id="city">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Adresse</label>
+                                <input type="text" class="form-control" placeholder="Adresse" id="adress">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Téléphone</label>
+                                <input type="text" class="form-control" placeholder="690102030" id="phone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="text" class="form-control" placeholder="email@example.com" id="email">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="point_vente" class="form-label">Code postal</label>
+                                <input type="text" class="form-control" placeholder="Code postal" id="postal_code">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="latitude" class="form-label">Latitude</label>
+                                <input type="text" class="form-control" placeholder="Latitude" id="latitude">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="Longitiude" class="form-label">Longitiude</label>
+                                <input type="text" class="form-control" placeholder="Longitiude" id="Longitiude">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="storage_capacity" class="form-label">Capacité de stockage</label>
+                                <input type="text" class="form-control" placeholder="storage_capacity" id="storage_capacity">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="statut" class="form-label">Statut</label>
+                                <select class="form-select" id="statut">
+                                    <option value="actif">Actif</option>
+                                    <option value="inactif">Inactif</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer px-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary">Modifier</button>
+                </div>
+        </div>
+    </div>
+
+
 @endsection
 
 @section('script')
 <!--customizer-->
 <div id="customizer"></div>
 
-<!-- List js -->
-<script src="{{ asset('assets/vendor/listJs/list-jquery.min.js') }}"></script>
-<script src="{{ asset('assets/vendor/listJs/list.min.js') }}"></script>
+<!-- js-->
+<script src="{{ asset('assets/js/orders_list.js') }}"></script>
 
-
-<!-- list table js -->
-<script src="{{ asset('assets/js/list_js.js') }}"></script>
 @endsection
-
-
