@@ -1,7 +1,5 @@
 @extends('layout.master')
-
-@section('title', 'Details de point de vente')
-
+@section('title', 'Détils du point de distribution')
 @section('css')
     <!-- Data Table css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">

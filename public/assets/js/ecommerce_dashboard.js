@@ -146,7 +146,7 @@ options = {
       }
     }
   },
-  labels: ["Comedy", "Action", "SciFi", "Drama", "Horror"],
+  labels: ["Point A", "Point B", "Point C", "Point D", "Point E"],
 
   dataLabels: {
   enabled: false,
