@@ -12,6 +12,6 @@ class GetWarehouseListController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return view('warehouse.index');
+        return view('warehouse.warehouse-list');
     }
 }
