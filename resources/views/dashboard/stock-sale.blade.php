@@ -352,6 +352,6 @@
      <script src="{{asset('assets/js/select.js')}}"></script>
 
      <!--Custom js -->
-     <script src="{{asset('assets/js/pages/stock-sale.js')}}"></script>
+     <script src="{{asset('assets/js/pages/order-sale.js')}}"></script>
 
 @endsection

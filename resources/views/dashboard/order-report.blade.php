@@ -19,7 +19,7 @@
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
                             <span>
-                                <i class="ph-duotone  ph-stack f-s-16"></i> Mouvement de stock
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Commandes et livraisons
                             </span>
                         </a>
                     </li>
