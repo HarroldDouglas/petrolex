@@ -16,7 +16,7 @@ var options = {
       type: 'bar',
       height: 350
     },
-    colors: ['#8973ea','#e90bc4', '#147534'],
+    colors: ['#8973ea', '#147534', '#e90bc4'],
     plotOptions: {
       bar: {
         horizontal: false,
