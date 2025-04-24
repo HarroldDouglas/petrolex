@@ -37,7 +37,7 @@
             </div>
         </div>
         <!-- Breadcrumb end -->
-        
+
         <!-- Filter Options-->
         <div class="row m-1">
             <div class="col-12 collapse mb-4 p-0 bg-white" id="collapseFilter">
@@ -135,7 +135,7 @@
                     </div>
                 </div>
             </div>
-        
+
             <!-- Stock & Sales table-->
             <div class="col-12">
                 <div class="card">
@@ -280,7 +280,7 @@
                         </div>
                     </div>
                 </div>
-           
+
             <div class="col-md-12 col-xxl-12">
                 <div class="card">
                     <div class="card-header">
@@ -300,12 +300,12 @@
                     </div>
                     <div class="card-body">
                         <div>
-                            <div id="totalSales"></div>
+                            <div id="order-sale-chart"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- ticket table end -->
         </div>
         <!-- Ticket end -->
@@ -348,7 +348,10 @@
      <!-- select2 -->
      <script src="{{asset('assets/vendor/select/select2.min.js')}}"></script>
 
-     <!--js-->
+     <!--Select js-->
      <script src="{{asset('assets/js/select.js')}}"></script>
+
+     <!--Custom js -->
+     <script src="{{asset('assets/js/pages/stock-sale.js')}}"></script>
 
 @endsection
