@@ -8,6 +8,7 @@
 
     <!-- css start-->
     @include('layout.css')
+    <link rel="stylesheet" href="{{ asset('assets/css/force-livewire-pagination.css') }}">
     @stack('styles')
     @livewireStyles
     <!-- css end-->
