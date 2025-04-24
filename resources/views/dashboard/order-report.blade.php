@@ -148,7 +148,7 @@
                 </div>
             </div>
 
-            <!-- Stock & Sales table-->
+            <!-- order report table-->
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
@@ -167,12 +167,11 @@
                                         <th>Livreur</th>
                                         <th>Date</th>
                                         <th>Statut</th>
-                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ticket_key_body">
                                     <tr>
-                                        <td>CMD00125</td>
+                                        <td><a href="#">CMD00125</a></td>
                                         <td>Point YDE A</td>
                                         <td>Fotso Jules</td>
                                         <td>Bouteille 12kg</td>
@@ -180,14 +179,9 @@
                                         <td>Nguefack Jean</td>
                                         <td>23/04/2025</td>
                                         <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a class="dropdown-item" href="#">
-                                                <i class="ti ti-eye text-primary me-2"></i>
-                                            </a>
-                                        </td>
                                     </tr>
                                     <tr>
-                                        <td>CMD00126</td>
+                                        <td><a href="#">CMD00126</a></td>
                                         <td>Point YDE A</td>
                                         <td>Ndongo Carine</td>
                                         <td>Bouteille 6kg</td>
@@ -195,14 +189,9 @@
                                         <td>Eyoum Claire</td>
                                         <td>23/04/2025</td>
                                         <td><span class="badge text-outline-warning">En cours</span></td>
-                                        <td>
-                                            <a class="dropdown-item" href="#">
-                                                <i class="ti ti-eye text-primary me-2"></i>
-                                            </a>
-                                        </td>
                                     </tr>
                                     <tr>
-                                        <td>CMD00127</td>
+                                        <td><a href="#">CMD00127</a></td>
                                         <td>Point YDE A</td>
                                         <td>Mbarga Elise</td>
                                         <td>Bouteille 9kg</td>
@@ -210,14 +199,9 @@
                                         <td>Kamga Lionel</td>
                                         <td>23/04/2025</td>
                                         <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a class="dropdown-item" href="#">
-                                                <i class="ti ti-eye text-primary me-2"></i>
-                                            </a>
-                                        </td>
                                     </tr>
                                     <tr>
-                                        <td>CMD00128</td>
+                                        <td><a href="#">CMD00128</a></td>
                                         <td>Point YDE A</td>
                                         <td>Ndongmo Roger</td>
                                         <td>Bouteille 12kg</td>
@@ -225,14 +209,9 @@
                                         <td>Fouda Mireille</td>
                                         <td>23/04/2025</td>
                                         <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a class="dropdown-item" href="#">
-                                                <i class="ti ti-eye text-primary me-2"></i>
-                                            </a>
-                                        </td>
                                     </tr>
                                     <tr>
-                                        <td>CMD00129</td>
+                                        <td><a href="#">CMD00129</a></td>
                                         <td>Point YDE A</td>
                                         <td>Ekani Paul</td>
                                         <td>Bouteille 6kg</td>
@@ -240,11 +219,6 @@
                                         <td>Tchatchoua Paul</td>
                                         <td>23/04/2025</td>
                                         <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a class="dropdown-item" href="#">
-                                                <i class="ti ti-eye text-primary me-2"></i>
-                                            </a>
-                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
