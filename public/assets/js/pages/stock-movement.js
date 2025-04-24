@@ -16,7 +16,7 @@ var options = {
       type: 'bar',
       height: 350
     },
-    colors: ['#8973ea', '#147534', '#e90bc4'],
+    colors: ['rgba(var(--primary),.8)', 'rgba(var(--warning),.8)', 'rgba(var(--success),.8)'],
     plotOptions: {
       bar: {
         horizontal: false,
@@ -73,6 +73,6 @@ var options = {
       },
     },
   };
-  
+
   var chart = new ApexCharts(document.querySelector("#basic-colum"), options);
   chart.render();

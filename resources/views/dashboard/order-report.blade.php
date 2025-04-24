@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Mouvement de stock')
+@section('title', 'Commandes')
 @section('css')
     <!-- slick css -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick.css') }}">
@@ -19,7 +19,7 @@
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
                             <span>
-                                <i class="ph-duotone  ph-stack f-s-16"></i> Mouvement de stock
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Commandes et livraisons
                             </span>
                         </a>
                     </li>
@@ -44,7 +44,7 @@
                 <div class="card bg-white text-black">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
                                     <select id="warehouse_filter" name="warehouse" class="form-select">
@@ -57,7 +57,18 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="warehouse_filter" class="form-label"> Statut : </label>
+                                    <select id="warehouse_filter" name="warehouse" class="form-select">
+                                        <option value="" selected>Tous</option>
+                                        <option value="in_progress">En cours</option>
+                                        <option value="delivered">Livrée</option>
+                                        <option value="cancelled">Annulée</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="wfirstName2" class="form-label"> Date : </label>
                                     <div>
@@ -85,12 +96,12 @@
                         <div class="card ticket-card bg-light-primary">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Entrées<br>(Bouteille)</p>
+                                    <p class="f-s-16 mb-0">Total Commandes<br>reçues</p>
                                     <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
-                                        <i class="ph-bold ph-arrow-circle-down f-s-25 text-primary"></i>
+                                        <i class="ph-bold ph-shopping-cart f-s-25 text-primary"></i>
                                     </div>
                                 </div>
-                                <h3 class="text-primary-dark">4500</h3>
+                                <h3 class="text-primary-dark">500</h3>
                             </div>
                         </div>
                     </div>
@@ -98,12 +109,12 @@
                         <div class="card ticket-card bg-light-warning">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Sorties<br>(Bouteille)</p>
+                                    <p class="f-s-16 mb-0">Commandes<br>en cours</p>
                                     <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
-                                        <i class="ph-bold ph-arrow-circle-up f-s-25 text-warning"></i>
+                                        <i class="ph-bold ph-clock-countdown f-s-25 text-warning"></i>
                                     </div>
                                 </div>
-                                <h3 class="text-warning-dark">2000</h3>
+                                <h3 class="text-warning-dark">200</h3>
                             </div>
                         </div>
                     </div>
@@ -111,12 +122,12 @@
                         <div class="card ticket-card bg-light-success">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Mouvement de <br>Stock Net</p>
+                                    <p class="f-s-16 mb-0">Commandes<br>livrées</p>
                                     <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
-                                        <i class="ph-bold ph-arrows-left-right f-s-25 text-success"></i>
+                                        <i class="ph-bold ph-check-circle f-s-25 text-success"></i>
                                     </div>
                                 </div>
-                                <h3 class="text-success-dark">2500</h3>
+                                <h3 class="text-success-dark">290</h3>
                             </div>
                         </div>
                     </div>
@@ -124,12 +135,12 @@
                         <div class="card ticket-card bg-light-danger">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Taux d’occupation <br>de l’entrepôt</p>
+                                    <p class="f-s-16 mb-0">Commandes <br>annulées</p>
                                     <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
-                                        <i class="ph-bold ph-warehouse f-s-25 text-danger"></i>
+                                        <i class="ph-bold ph-x-circle f-s-25 text-danger"></i>
                                     </div>
                                 </div>
-                                <h3 class="text-danger-dark">88%</h3>
+                                <h3 class="text-danger-dark">10</h3>
                             </div>
                         </div>
                     </div>
@@ -137,80 +148,77 @@
                 </div>
             </div>
 
-            <!-- Stock & Sales table-->
+            <!-- order report table-->
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Mouvement de stock</h4>
+                        <h4 class="card-title">Commandes et livraisons</h4>
                     </div>
                     <div class="card-body px-0">
                         <div class="table-responsive app-scroll app-datatable-default">
                             <table class="w-100 display ticket-app-table" id="ticketdatatable">
                                 <thead>
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Type</th>
+                                        <th>N° commande</th>
+                                        <th>Point de distr.</th>
+                                        <th>Client</th>
                                         <th>Produit</th>
                                         <th>Quantité</th>
-                                        <th>Origine</th>
-                                        <th>Destination</th>
-                                        <th>Utilisateur</th>
+                                        <th>Livreur</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ticket_key_body">
                                     <tr>
-                                        <td>22/04/2025 - 10:14</td>
-                                        <td>Entrée</td>
-                                        <td>Bouteille 9kg</td>
-                                        <td>+100</td>
-                                        <td>Achat fournisseur</td>
+                                        <td><a href="#">CMD00125</a></td>
                                         <td>Point YDE A</td>
-                                        <td>Ntang Luc</td>
-                                    </tr>
-                                    <tr>
-                                        <td>22/04/2025 - 11:30</td>
-                                        <td>Sortie</td>
-                                        <td>Bouteille 6kg</td>
-                                        <td>-50</td>
-                                        <td>Point YDE A</td>
-                                        <td>Client final</td>
-                                        <td>Mbarga Elise</td>
-                                    </tr>
-                                    <tr>
-                                        <td>22/04/2025 - 14:45</td>
-                                        <td>Transfert</td>
+                                        <td>Fotso Jules</td>
                                         <td>Bouteille 12kg</td>
-                                        <td>-30/+30</td>
-                                        <td>Point YDE A</td>
-                                        <td>Point DLA B</td>
-                                        <td>Kamga Lionel</td>
+                                        <td>1</td>
+                                        <td>Nguefack Jean</td>
+                                        <td>23/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
                                     </tr>
                                     <tr>
-                                        <td>22/04/2025 - 16:00</td>
-                                        <td>Entrée</td>
-                                        <td>Bouteille 6kg</td>
-                                        <td>+80</td>
-                                        <td>Retour client</td>
-                                        <td>Point DLA B</td>
+                                        <td><a href="#">CMD00126</a></td>
+                                        <td>Point YDE A</td>
                                         <td>Ndongo Carine</td>
+                                        <td>Bouteille 6kg</td>
+                                        <td>4</td>
+                                        <td>Eyoum Claire</td>
+                                        <td>23/04/2025</td>
+                                        <td><span class="badge text-outline-warning">En cours</span></td>
                                     </tr>
                                     <tr>
-                                        <td>22/04/2025 - 17:15</td>
-                                        <td>Sortie</td>
-                                        <td>Bouteille 12kg</td>
-                                        <td>-60</td>
-                                        <td>Point DLA B</td>
-                                        <td>Client final</td>
-                                        <td>Ekani Paul</td>
-                                    </tr>
-                                    <tr>
-                                        <td>22/04/2025 - 18:30</td>
-                                        <td>Transfert</td>
-                                        <td>Bouteille 9kg</td>
-                                        <td>-20/+20</td>
-                                        <td>Point DLA B</td>
+                                        <td><a href="#">CMD00127</a></td>
                                         <td>Point YDE A</td>
+                                        <td>Mbarga Elise</td>
+                                        <td>Bouteille 9kg</td>
+                                        <td>3</td>
+                                        <td>Kamga Lionel</td>
+                                        <td>23/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">CMD00128</a></td>
+                                        <td>Point YDE A</td>
+                                        <td>Ndongmo Roger</td>
+                                        <td>Bouteille 12kg</td>
+                                        <td>2</td>
                                         <td>Fouda Mireille</td>
+                                        <td>23/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">CMD00129</a></td>
+                                        <td>Point YDE A</td>
+                                        <td>Ekani Paul</td>
+                                        <td>Bouteille 6kg</td>
+                                        <td>3</td>
+                                        <td>Tchatchoua Paul</td>
+                                        <td>23/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -222,7 +230,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex align-items-center">
-                            <h4 class="card-title me-auto">Mouvement de stock</h4>
+                            <h4 class="card-title me-auto">Commandes</h4>
                             <div class="dropdown">
                                 <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="chartType" data-bs-toggle="dropdown" aria-expanded="false">
                                     Graphe
@@ -237,7 +245,7 @@
                     </div>
                     <div class="card-body p-0">
                         <div>
-                            <div id="basic-colum"></div>
+                            <div id="order-report-chart"></div>
                         </div>
                     </div>
                 </div>
@@ -247,10 +255,6 @@
         </div>
         <!-- Ticket end -->
     </div>
-
-
-
-
 
 @endsection
 
@@ -289,6 +293,6 @@
      <script src="{{asset('assets/js/select.js')}}"></script>
 
      <!--js-->
-     <script src="{{asset('assets/js/pages/stock-movement.js')}}"></script>
+     <script src="{{asset('assets/js/pages/order-report.js')}}"></script>
 
 @endsection

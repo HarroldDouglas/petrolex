@@ -25,7 +25,7 @@
                 <ul class="collapse" id="analytics">
                     <li><a href="{{route('warehouse-stock-dashboard')}}"> Stock & Ventes</a></li>
                     <li><a href="{{route('stock-movement')}}"> Mouvement de stock</a></li>
-                    <li><a href="#"> Commandes & Livraisons</a></li>
+                    <li><a href="{{route('order-report')}}"> Commandes & Livraisons</a></li>
                     <li><a href="{{route('financial-report')}}">Rapport financier</a></li>
                     <li><a href="#">Transactions</a></li>
                 </ul>

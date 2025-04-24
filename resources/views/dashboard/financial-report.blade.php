@@ -37,7 +37,7 @@
             </div>
         </div>
         <!-- Breadcrumb end -->
-        
+
          <!-- Filter Options-->
          <div class="row m-1">
             <div class="col-12 collapse mb-4 p-0 bg-white" id="collapseFilter">
@@ -106,7 +106,7 @@
                                 <h3 class="text-warning-dark">8.000.000</h3>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                     <div class="col-lg-3">
                         <div class="card ticket-card bg-light-success">
                             <div class="card-body">
@@ -135,7 +135,7 @@
                     </div>
                 </div>
             </div>
-        
+
             <!-- Fiancial report table-->
             <div class="col-12">
                 <div class="card">
@@ -202,7 +202,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-12 col-xxl-12">
                 <div class="card">
                     <div class="card-header">
@@ -227,7 +227,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- ticket table end -->
         </div>
         <!-- Ticket end -->
@@ -274,6 +274,6 @@
      <script src="{{asset('assets/js/select.js')}}"></script>
 
      <!-- custom js -->
-     <script src="{{asset('assets/js/financial-report.js')}}"></script>
+     <script src="{{asset('assets/js/pages/financial-report.js')}}"></script>
 
 @endsection
