@@ -1663,12 +1663,12 @@
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/HarroldDouglas/harroldwafo-laravel-custom-datatable.git",
-                "reference": "088b7f60b10f7e3f1f9b211a9123b050e2531ea2"
+                "reference": "d25f2e2950dbea5b8109bd78b3e51f484770a1d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/HarroldDouglas/harroldwafo-laravel-custom-datatable/get/088b7f60b10f7e3f1f9b211a9123b050e2531ea2.zip",
-                "reference": "088b7f60b10f7e3f1f9b211a9123b050e2531ea2",
+                "url": "https://bitbucket.org/HarroldDouglas/harroldwafo-laravel-custom-datatable/get/d25f2e2950dbea5b8109bd78b3e51f484770a1d8.zip",
+                "reference": "d25f2e2950dbea5b8109bd78b3e51f484770a1d8",
                 "shasum": ""
             },
             "require": {
@@ -1704,9 +1704,9 @@
             "description": "Custom DataTable extension for Laravel Livewire with PDF, Excel and CSV export capabilities",
             "homepage": "https://bitbucket.org/HarroldDouglas/harroldwafo-laravel-custom-datatable",
             "support": {
-                "source": "https://bitbucket.org/HarroldDouglas/harroldwafo-laravel-custom-datatable/src/088b7f60b10f7e3f1f9b211a9123b050e2531ea2/?at=v1.0.0"
+                "source": "https://bitbucket.org/HarroldDouglas/harroldwafo-laravel-custom-datatable/src/d25f2e2950dbea5b8109bd78b3e51f484770a1d8/?at=1.0.0"
             },
-            "time": "2025-04-25T06:00:36+00:00"
+            "time": "2025-04-25T13:57:43+00:00"
         },
         {
             "name": "laravel/framework",

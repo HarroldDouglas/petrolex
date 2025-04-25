@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Dashboard\StockSaleDashboardController;
 use App\Http\Controllers\Dashboard\DashboardController;
-use App\Http\Controllers\Dashboard\StockMovementController;
 use App\Http\Controllers\Dashboard\FinancialReportController;
 use App\Http\Controllers\Dashboard\OrderReportController;
+use App\Http\Controllers\Dashboard\StockMovementController;
+use App\Http\Controllers\Dashboard\StockSaleDashboardController;
 use App\Http\Controllers\Dashboard\TransactionReportController;
 use Illuminate\Support\Facades\Route;
 

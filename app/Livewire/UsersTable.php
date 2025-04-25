@@ -113,7 +113,7 @@ class UsersTable extends BaseDataTable
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where(function ($query) use ($value) {
                         $query->where('last_name', 'like', '%'.$value.'%')
-                              ->orWhere('first_name', 'like', '%'.$value.'%');
+                            ->orWhere('first_name', 'like', '%'.$value.'%');
                     });
                 }),
 

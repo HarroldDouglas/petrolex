@@ -22,3 +22,18 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('notify', (event) => {
+                Swal.fire({
+                    icon: event[0].type,
+                    title: event[0].message,
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        });
+    </script>
+@endpush

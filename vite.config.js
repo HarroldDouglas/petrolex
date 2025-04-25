@@ -3,17 +3,6 @@ import laravel from "laravel-vite-plugin";
 import path from "path";
 import fs from "fs";
 
-// Créer une fonction pour générer un fichier .watchignore si nécessaire
-const createWatchIgnore = () => {
-    const watchIgnorePath = path.resolve(__dirname, ".watchignore");
-    if (!fs.existsSync(watchIgnorePath)) {
-        fs.writeFileSync(watchIgnorePath, "resources/lang/**/*\n");
-    }
-};
-
-// Exécuter la fonction
-createWatchIgnore();
-
 export default defineConfig({
     plugins: [
         laravel({
@@ -33,10 +22,9 @@ export default defineConfig({
                 "**/resources/lang/**",
                 "**/.git/**",
             ],
-            usePolling: false, // Désactiver le polling peut aider dans certains cas
+            usePolling: false,
         },
         hmr: {
-            // Exclure les fichiers spécifiques du HMR
             exclude: ["resources/lang/**/*.json", "resources/lang/**/*.php"],
         },
     },
@@ -60,9 +48,7 @@ export default defineConfig({
     optimizeDeps: {
         exclude: ["resources/lang"],
     },
-    // Configurations de build améliorées
     build: {
-        // Ignorer les fichiers de langues lors de la construction
         rollupOptions: {
             external: [/resources\/lang\/.*/],
         },
