@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Warehouse;
+namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class GetWarehouseListController extends Controller
+class StockSaleDashboardController extends Controller
 {
     /**
      * Handle the incoming request.
      */
     public function __invoke(Request $request)
     {
-        return view('warehouse.warehouse-list');
+        return view('dashboard.stock-sale');
     }
 }

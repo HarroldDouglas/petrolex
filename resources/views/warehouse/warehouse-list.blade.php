@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Liste des points de vente')
+@section('title', 'Liste des points de distribution')
 @section('css')
 
 @endsection
@@ -8,7 +8,7 @@
         <!-- Breadcrumb start -->
         <div class="row m-1">
             <div class="col-12 ">
-                <h4 class="main-title"> liste des points de vente</h4>
+                <h4 class="main-title"> liste des points de distribution</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
@@ -18,10 +18,10 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="f-s-14 f-w-500">Points de vente</a>
+                        <a href="#" class="f-s-14 f-w-500">Points de distribution</a>
                     </li>
                     <li class="active">
-                        <a href="#" class="f-s-14 f-w-500">Liste des points de vente</a>
+                        <a href="#" class="f-s-14 f-w-500">Liste des points de distribution</a>
                     </li>
                 </ul>
             </div>
@@ -181,8 +181,8 @@
                                         <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
-                                
-                                
+
+
                             </tbody>
                         </table>
                     </div>
@@ -197,7 +197,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un point de vente</h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un point de distribution</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
