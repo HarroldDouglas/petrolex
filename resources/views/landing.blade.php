@@ -49,7 +49,7 @@
     <link href="{{ asset('assets/vendor/slick/slick.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/slick/slick-theme.css') }}" rel="stylesheet">
 
-    @vite(['public/assets/scss/style.scss'])
+    {{--@vite(['public/assets/scss/style.scss']) --}}
 
 </head>
 
