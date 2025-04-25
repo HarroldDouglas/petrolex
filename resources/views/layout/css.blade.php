@@ -37,4 +37,4 @@
 
 @yield('css')
 
-{{--@vite(['public/assets/scss/style.scss']) --}}
+@vite(['public/assets/scss/style.scss'])

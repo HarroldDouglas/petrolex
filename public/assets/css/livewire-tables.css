@@ -26,15 +26,19 @@
     background-color: white!important;
 }
 
-/* Corps du tableau */
+/* Corps du tableau - règle de base avec spécificité maximale */
 .table-responsive .table.table-hover tbody tr {
     border-bottom: 1px solid #dee2e6;
-    background-color: #fff;
 }
 
-/* Alternance des lignes */
+/* Alternance des lignes - avec spécificité maximale et valeur RGB explicite */
 .table-responsive .table.table-hover tbody tr:nth-child(odd) {
-    background-color: rgba(var(--light), 0.2)!important;
+    background-color: rgb(255, 255, 255) !important;
+    /* Utilisation de RGB explicite au lieu de 'white' */
+}
+
+.table-responsive .table.table-hover tbody tr:nth-child(even) {
+    background-color: white !important;
 }
 
 /* Cellules du tableau */
