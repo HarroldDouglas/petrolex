@@ -4,23 +4,35 @@ namespace App\Livewire;
 
 use App\Exports\UsersExport;
 use App\Models\User;
+use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Facades\Excel;
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
-class UsersTable extends DataTableComponent
+class UsersTable extends BaseDataTable
 {
     protected $model = User::class;
 
-    // IMPORTANT : Utilisez des propriétés protégées (non public) pour ces options
-    protected $showExportOption = true;
-    protected $exports = ['csv', 'xlsx', 'pdf']; // Définir les formats disponibles directement
-    protected $exportFileName = 'utilisateurs-export'; // Nom du fichier d'exportation
+    protected const DEFAULT_SORT_FIELD = 'last_name';
+    protected const DEFAULT_SORT_DIRECTION = 'asc';
+
+    protected function getExportClass(): string
+    {
+        return UsersExport::class;
+    }
+
+    protected function getPdfView(): string
+    {
+        return 'exports.users-pdf';
+    }
+
+    protected function getExportFileName(): string
+    {
+        return 'utilisateurs';
+    }
 
     public bool $rememberColumnSelection = true;
     public bool $rememberFilters = true;
@@ -29,6 +41,8 @@ class UsersTable extends DataTableComponent
 
     public function configure(): void
     {
+        parent::configure();
+
         $this->setPrimaryKey('id')
             ->setTableWrapperAttributes([
                 'class' => 'table-responsive',
@@ -39,13 +53,9 @@ class UsersTable extends DataTableComponent
             ->setTheadAttributes([
                 'class' => 'table-light',
             ])
-            ->setDefaultSort('last_name', 'asc')
+            ->setDefaultSort(self::DEFAULT_SORT_FIELD, self::DEFAULT_SORT_DIRECTION)
             ->setPerPageAccepted([10, 25, 50, 100])
-            ->setPerPage(10)
-            ->setBulkActions([
-                'exportExcel' => 'Exporter en Excel',
-                'exportCsv' => 'Exporter en CSV',
-            ]);
+            ->setPerPage(10);
     }
 
     public function columns(): array
@@ -91,7 +101,7 @@ class UsersTable extends DataTableComponent
                     function ($row) {
                         return view('components.user-actions', ['user' => $row]);
                     }
-                ), // Exclure cette colonne des exports
+                ),
         ];
     }
 
@@ -103,7 +113,7 @@ class UsersTable extends DataTableComponent
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where(function ($query) use ($value) {
                         $query->where('last_name', 'like', '%'.$value.'%')
-                            ->orWhere('first_name', 'like', '%'.$value.'%');
+                              ->orWhere('first_name', 'like', '%'.$value.'%');
                     });
                 }),
 
@@ -139,21 +149,5 @@ class UsersTable extends DataTableComponent
                     $builder->whereBetween('last_login_at', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
                 }),
         ];
-    }
-
-    public function exportExcel()
-    {
-        $users = $this->getSelected();
-        $this->clearSelected();
-
-        return Excel::download(new UsersExport($users), 'utilisateurs-'.date('Y-m-d').'.xlsx');
-    }
-
-    public function exportCsv()
-    {
-        $users = $this->getSelected();
-        $this->clearSelected();
-
-        return Excel::download(new UsersExport($users), 'utilisateurs-'.date('Y-m-d').'.csv');
     }
 }

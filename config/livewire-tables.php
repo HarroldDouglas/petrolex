@@ -129,13 +129,4 @@ return [
         'enableUserForEvent' => true,
     ],
 
-    'exports' => [
-        'enabled' => true,
-        'drivers' => [
-            'csv',
-            'xlsx',
-            'pdf',
-        ],
-    ],
-
 ];

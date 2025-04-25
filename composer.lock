@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0bc5b920db4053c7e91798cbc6895016",
+    "content-hash": "b8644788a74a2ba7e7e99e68ae0f59ae",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -1656,6 +1656,49 @@
                 }
             ],
             "time": "2025-02-03T10:55:03+00:00"
+        },
+        {
+            "name": "harrold-wafo/laravel-custom-datatable",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "./customPackages/harrold-wafo/laravel-custom-datatable",
+                "reference": "27ec870fe215e27257db9d4fb7ce2f57dbe5e1a6"
+            },
+            "require": {
+                "barryvdh/laravel-dompdf": "^2.0|^3.0",
+                "laravel/framework": "^8.0|^9.0|^10.0|^11.0",
+                "maatwebsite/excel": "^3.1",
+                "php": "^8.0",
+                "rappasoft/laravel-livewire-tables": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "HarroldWafo\\LaravelCustomDatatable\\DataTableServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HarroldWafo\\LaravelCustomDatatable\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Harrold Wafo",
+                    "email": "harroldwafo@gmail.com"
+                }
+            ],
+            "description": "Custom DataTable extension for Laravel Livewire with PDF, Excel and CSV export capabilities",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "laravel/framework",

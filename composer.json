@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
+        "harrold-wafo/laravel-custom-datatable": "^1.0",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
@@ -22,6 +23,15 @@
         "spatie/laravel-enum": "^3.2",
         "spatie/laravel-permission": "^6.16"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./customPackages/harrold-wafo/laravel-custom-datatable",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.2",

@@ -3,25 +3,16 @@
 namespace App\Exports;
 
 use App\Models\User;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use HarroldWafo\LaravelCustomDatatable\Exports\BaseExport;
 
-class UsersExport implements FromCollection, WithHeadings, WithMapping
+class UsersExport extends BaseExport
 {
-    protected $users;
-
-    public function __construct($users)
+    protected function getModelClass(): string
     {
-        $this->users = $users;
+        return User::class;
     }
 
-    public function collection()
-    {
-        return User::whereIn('id', $this->users)->get();
-    }
-
-    public function headings(): array
+    protected function getHeadings(): array
     {
         return [
             'ID',
@@ -35,7 +26,7 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping
         ];
     }
 
-    public function map($user): array
+    protected function mapRow($user): array
     {
         return [
             $user->id,
@@ -43,9 +34,9 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping
             $user->first_name,
             $user->email,
             $user->phone_number,
-            $user->is_active ? 'Oui' : 'Non',
-            $user->last_login_at ? $user->last_login_at->format('d/m/Y H:i') : '-',
-            $user->created_at->format('d/m/Y'),
+            $this->formatBoolean($user->is_active),
+            $this->formatDateTime($user->last_login_at),
+            $this->formatDate($user->created_at),
         ];
     }
 }
