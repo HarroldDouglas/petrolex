@@ -378,6 +378,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/test-dynamic-datatable', function () {
+    return view('test-datatable');
+})->name('test.dynamic.datatable');
+
 /**
  * Include routes modules
  */
