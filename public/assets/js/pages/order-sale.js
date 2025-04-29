@@ -1,3 +1,120 @@
+$(function () {
+    "use strict";
+    var status_filter = $("#status_filter"),
+        customer_filter = $("#customer_filter"),
+        date_filter = $('#daterange-btn');
+
+    /*var table = $("#bookings").DataTable({
+        paging: true,
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        autoWidth: false,
+        dom: "Bfrtip",
+        buttons: ["copy", "csv", "excel", "pdf", "print"],
+        buttons: [
+            {
+                extend: 'copy',
+                title: 'liste_des_reservations'
+            },
+            {
+                extend: 'csv',
+                title: 'liste_des_reservations'
+            },
+            {
+                extend: 'excel',
+                title: 'liste_des_reservations'
+            },
+            {
+                extend: 'pdf',
+                title: 'liste_des_reservations'
+            },
+            {
+                extend: 'print',
+                title: 'liste_des_reservations'
+            }
+        ],
+        language: {
+            url: "/js/i18n/datatables/fr-FR.json",
+        },
+        ajax: {
+            url: "/company/bookings/json?type=5&key=users",
+            data: function (d) {
+                d.status = status_filter.val();
+                d.customer_id = customer_filter.val();
+                let dateRange = date_filter.data('daterangepicker');
+                if (dateRange) {
+                    d.date_range = `${dateRange.startDate.format('YYYY-MM-DD')} - ${dateRange.endDate.format('YYYY-MM-DD')}`;
+                }
+            },
+        },
+        processing: true,
+        serverSide: true,
+        columns: [
+            { data: "customer_id", name: "customer_id" },
+            { data: "number", name: "number" },
+            { data: "order_id", name: "order_id" },
+            { data: "tables", name: "tables"},
+            { data: "seats", name: "seats" },
+            { data: "created_at", name: "created_at" },
+            { data: "time_range", name: "time_range"},
+            { data: "total_price", name: "total_price"},
+            { data: "status", name: "status" },
+            {
+                data: "action",
+                name: "action",
+                orderable: false,
+                searchable: false,
+            },
+        ],
+    });
+
+    $('#status_filter, #customer_filter').on('change keyup', function () {
+        table.draw();
+    });
+
+    date_filter.on('apply.daterangepicker', function(ev, picker) {
+        table.draw();
+    });*/
+
+    console.log("daterange", $("#daterange-btn"));
+
+    $("#daterange-btn").daterangepicker(
+        {
+            ranges: {
+                "Aujourd'hui": [moment(), moment()],
+                Hier: [
+                    moment().subtract(1, "days"),
+                    moment().subtract(1, "days"),
+                ],
+                "7 derniers jours": [moment().subtract(6, "days"), moment()],
+                "30 derniers jours": [moment().subtract(29, "days"), moment()],
+                "Le mois en cours": [
+                    moment().startOf("month"),
+                    moment().endOf("month"),
+                ],
+                "Le mois dernier": [
+                    moment().subtract(1, "month").startOf("month"),
+                    moment().subtract(1, "month").endOf("month"),
+                ],
+            },
+            startDate: moment().subtract(29, "days"),
+            endDate: moment(),
+        },
+        function (start, end) {
+            console.log("date span");
+            console.log(start.format("MMMM D, YYYY"), end.format("MMMM D, YYYY"));
+            $("#daterange-btn span").html(
+                start.format("MMMM D, YYYY") +
+                    " - " +
+                    end.format("MMMM D, YYYY")
+            );
+        }
+    );
+});
+// End of use strict
+
 // totalSales chart
 options = {
     series: [44, 55, 41, 17, 15],
