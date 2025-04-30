@@ -4,12 +4,18 @@
     <!-- Data Table css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
+
+    <!-- Daterangepicker CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-daterangepicker@3.1.0/daterangepicker.css" rel="stylesheet" />
+    <!-- Bootstrap Datepicker CSS -->
+    <link href="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+
 @endsection
 @section('main-content')
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-12 ">
+            <div class="col-8 p-O ">
                 <h4 class="main-title"> liste des approvisionnements</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
@@ -27,8 +33,57 @@
                     </li>
                 </ul>
             </div>
+            <!-- Filter -->
+            <div class="col-4 p-0">
+                <div class="d-flex justify-content-end ">
+                    <a type="button" href="javascript!:" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
+                        aria-expanded="false" aria-controls="collapseFilter"
+                        class="waves-effect btn text-info bg-white btn-md mb-2">
+                        <i class="ti ti-chevron-down"></i> Filtrer
+                    </a>
+                </div>
+            </div>
         </div>
         <!-- Breadcrumb end -->
+
+        <!-- Filter Options-->
+        <div class="row m-1">
+            <div class="col-12 collapse mb-4 p-0 bg-white" id="collapseFilter">
+                <div class="card bg-white text-black">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
+                                    <select id="warehouse_filter" name="warehouse" class="form-select">
+                                        <option value="" selected>Tous</option>
+                                        <option value="Point A">Point A</option>
+                                        <option value="Point B">Point B</option>
+                                        <option value="Point C">Point C</option>
+                                        <option value="Point D">Point D</option>
+                                        <option value="Point E">Point E</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="wfirstName2" class="form-label"> Date : </label>
+                                    <div>
+                                        <button type="button" class="btn btn-default"
+                                            style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
+                                            <span>
+                                                <i class="fa fa-calendar"></i> Sélectionner une date
+                                            </span>
+                                            <i class="fa fa-caret-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="row">
             <div class="card">
