@@ -156,7 +156,7 @@
                                     <tr>
                                         <th>Date</th>
                                         <th>Type</th>
-                                        <th>Produit</th>
+                                        <th>Produits</th>
                                         <th>Quantité</th>
                                         <th>Origine</th>
                                         <th>Destination</th>
