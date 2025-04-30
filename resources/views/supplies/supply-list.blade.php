@@ -90,7 +90,7 @@
                 <div class="card-body p-0">
                     <!-- table -->
                     <div class="table-responsive app-scroll app-datatable-default">
-                        <table class="-100 display ticket-app-table" id="ticketdatatable">
+                        <table class="w-100 display ticket-app-table" id="ticketdatatable">
                             <thead>
                             <tr>
                                 <th class="w-10">Reference</th>

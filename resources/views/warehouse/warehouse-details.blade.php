@@ -97,11 +97,6 @@
                 </div>
 
             </div>
-<<<<<<< HEAD
-
-=======
-
->>>>>>> dev
         </div>
         <!-- Order Details end -->
     </div>
