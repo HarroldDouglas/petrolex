@@ -277,9 +277,6 @@
      <!-- Tooltips_popovers. Js -->
     <script src="{{ asset('assets/js/tooltips_popovers.js') }}"></script>
 
-    <!-- Ecommerce Dashboard js-->
-    <script src="{{ asset('assets/js/ecommerce_dashboard.js') }}"></script>
-
     <!-- api js -->
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
 

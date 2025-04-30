@@ -10,6 +10,10 @@
     a:not(.btn), .link-primary {
         color: rgb(var(--primary)) !important;
     }
+
+    .login-logo{
+        width: 100px !important;
+    }
 </style>
 
 <x-sweet-alert />
@@ -27,7 +31,7 @@
                             <div class="login-form-container">
                                 <div class="mb-4">
                                     <a class="logo d-inline-block" href="{{ route('index') }}">
-                                        <img src="{{ asset('../assets/images/logo/isogaz-no-bg.png') }}" width="150"
+                                        <img src="{{ asset('../assets/images/logo/isogaz-no-bg.png') }}" width="100"
                                             alt="#">
                                     </a>
                                 </div>
@@ -52,11 +56,17 @@
                                             @enderror
                                         </div>
 
-                                        <div class="mb-3">
+                                        <div class="form-group mb-3">
                                             <label for="password" class="form-label">Mot de passe</label>
-                                            <input type="password"
-                                                class="form-control @error('password') is-invalid @enderror"
-                                                id="password" name="password" required>
+                                            <div class="input-group">
+                                                <input type="password" name="password"
+                                                    class="form-control ps-15 bg-transparent @error('password') is-invalid @enderror"
+                                                    placeholder="Password" id="password" wire:model="password">
+                                                <span class="input-group-text bg-transparent" id="basic-addon2">
+                                                    <i class="fas fa-eye toggle-password" style="cursor: pointer;"></i>
+                                                </span>
+                                            </div>
+
                                             @error('password')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -84,10 +94,11 @@
             <!-- Body main section ends -->
         </div>
     </div>
-
 </body>
-@section('script')
 
-    <!-- Bootstrap js-->
-    <script src="{{ asset('assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
-@endsection
+@include('layout.script')
+<!-- Bootstrap js-->
+<script src="{{ asset('assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+<!-- Toggle password js-->
+<script src="{{ asset('assets/js/password-toggle.js') }}"></script>
+
