@@ -1,5 +1,4 @@
 $(function () {
-alert('hello');
     $(".toggle-password").on('click', function (e) {
 
         var parent = $(this).closest(".form-group");
