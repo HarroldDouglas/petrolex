@@ -12,6 +12,6 @@ class CreateSupplyController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return view('supplies.create-supply');
+        return view('supplies.supply-create');
     }
 }
