@@ -41,12 +41,21 @@
                 </ul>
             </li>
             <li>
+                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#supply">
+                    <i class="iconoir-delivery-truck"></i>
+                    Approvisionnements
+                </a>
+                <ul class="collapse" id="supply">
+                    <li><a href="{{route('supplies.create')}}"><i class="iconoir-plus"></i> Ajouter</a></li>
+                    <li><a href="{{route('supplies.list')}}"><i class="iconoir-list"></i> Lister</a></li>
+                </ul>
+            </li>
+            <li>
                 <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#bottles">
                     <i class="iconoir-cylinder"></i>
                     Bouteilles
                 </a>
                 <ul class="collapse" id="bottles">
-                    <li><a href="{{route('dashboard')}}"><i class="iconoir-plus"></i> Ajouter</a></li>
                     <li><a href="{{route('dashboard')}}"><i class="iconoir-list"></i> Lister</a></li>
                 </ul>
             </li>
