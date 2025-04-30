@@ -94,6 +94,15 @@
                                             <input type="text" class="form-control" placeholder="690102030" id="phone">
                                         </div>
                                         <div class="col-md-6 mb-3">
+                                            <label for="point_vente" class="form-label">Fonction</label>
+                                            <select class="form-select" id="point_vente">
+                                                <option value="Responsable de point de distribution">Responsable de point de distribution</option>
+                                                <option value="Responsable Gaz">Responsable Gaz</option>
+                                                <option value="Responsable informatique">Responsable informatique</option>
+
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
                                             <label for="point_vente" class="form-label">Point de distribution</label>
                                             <select class="form-select" id="point_vente">
                                                 <option value="Point A">Point A</option>

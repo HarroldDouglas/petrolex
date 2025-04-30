@@ -20,7 +20,7 @@
         <!-- Breadcrumb start -->
         <div class="row m-1">
             <div class="col-8 p-0">
-                <h4 class="main-title">Tableau de bord</h4>
+                <h4 class="main-title">Suivi et Rapports</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
@@ -154,7 +154,6 @@
                                 <thead>
                                     <tr>
                                         <th>Point de distrib.</th>
-                                        <th>Ville</th>
                                         <th>Ventes</th>
                                         <th>En stock</th>
                                         <th>Status</th>
@@ -163,121 +162,67 @@
                                 <tbody id="ticket_key_body">
                                     <tr>
                                         <td>Point YDE 123</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Yaoundé
-                                            </div>
-                                        </td>
+
                                         <td>2 350 000</td>
                                         <td>300</td>
                                         <td><span class="badge text-outline-success">Actif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point YDE 123</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Yaoundé
-                                            </div>
-                                        </td>
                                         <td>2 350 000</td>
                                         <td>300</td>
                                         <td><span class="badge text-outline-success">Actif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point DLA 456</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Douala
-                                            </div>
-                                        </td>
                                         <td>3 100 000</td>
                                         <td>250</td>
                                         <td><span class="badge text-outline-danger">Inactif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point BAF 789</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Bafoussam
-                                            </div>
-                                        </td>
                                         <td>1 750 000</td>
                                         <td>400</td>
                                         <td><span class="badge text-outline-success">Actif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point YDE 321</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Yaoundé
-                                            </div>
-                                        </td>
                                         <td>2 500 000</td>
                                         <td>150</td>
                                         <td><span class="badge text-outline-danger">Inactif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point DLA 654</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Douala
-                                            </div>
-                                        </td>
                                         <td>3 200 000</td>
                                         <td>350</td>
                                         <td><span class="badge text-outline-success">Actif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point BAF 987</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Bafoussam
-                                            </div>
-                                        </td>
                                         <td>1 900 000</td>
                                         <td>100</td>
                                         <td><span class="badge text-outline-danger">Inactif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point YDE 654</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Yaoundé
-                                            </div>
-                                        </td>
                                         <td>2 700 000</td>
                                         <td>200</td>
                                         <td><span class="badge text-outline-success">Actif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point DLA 987</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Douala
-                                            </div>
-                                        </td>
                                         <td>3 500 000</td>
                                         <td>275</td>
                                         <td><span class="badge text-outline-danger">Inactif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point BAF 123</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Bafoussam
-                                            </div>
-                                        </td>
                                         <td>2 050 000</td>
                                         <td>325</td>
                                         <td><span class="badge text-outline-success">Actif</span></td>
                                     </tr>
                                     <tr>
                                         <td>Point YDE 789</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Yaoundé
-                                            </div>
-                                        </td>
                                         <td>2 800 000</td>
                                         <td>180</td>
                                         <td><span class="badge text-outline-danger">Inactif</span></td>
