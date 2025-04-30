@@ -1,19 +1,25 @@
 @extends('layout.master')
 @section('title', 'Ticket')
 @section('css')
-    <!-- slick css -->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick-theme.css') }}">
+     <!-- slick css -->
+     <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick.css') }}">
+     <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick-theme.css') }}">
 
-    <!-- Data Table css-->
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
+     <!-- Data Table css-->
+     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
+     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
+
+     <!-- Daterangepicker CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap-daterangepicker@3.1.0/daterangepicker.css" rel="stylesheet" />
+     <!-- Bootstrap Datepicker CSS -->
+     <link href="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+
 @endsection
 @section('main-content')
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-12 ">
+            <div class="col-8 p-0">
                 <h4 class="main-title">Accueil</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
@@ -25,8 +31,57 @@
                     </li>
                 </ul>
             </div>
+            <!-- Filter -->
+            <div class="col-4 p-0">
+                <div class="d-flex justify-content-end ">
+                    <a type="button" href="javascript!:" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
+                        aria-expanded="false" aria-controls="collapseFilter"
+                        class="waves-effect btn text-info bg-white btn-md mb-2">
+                        <i class="ti ti-chevron-down"></i> Filtrer
+                    </a>
+                </div>
+            </div>
         </div>
         <!-- Breadcrumb end -->
+
+        <!-- Filter Options-->
+        <div class="row m-1">
+            <div class="col-12 collapse mb-4 p-0 bg-white" id="collapseFilter">
+                <div class="card bg-white text-black">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
+                                    <select id="warehouse_filter" name="warehouse" class="form-select">
+                                        <option value="" selected>Tous</option>
+                                        <option value="Point A">Point A</option>
+                                        <option value="Point B">Point B</option>
+                                        <option value="Point C">Point C</option>
+                                        <option value="Point D">Point D</option>
+                                        <option value="Point E">Point E</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="wfirstName2" class="form-label"> Date : </label>
+                                    <div>
+                                        <button type="button" class="btn btn-default"
+                                            style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
+                                            <span>
+                                                <i class="fa fa-calendar"></i> Sélectionner une date
+                                            </span>
+                                            <i class="fa fa-caret-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Ticket start -->
         <div class="row ticket-app">
@@ -98,451 +153,135 @@
                             <table class="w-100 display ticket-app-table" id="ticketdatatable">
                                 <thead>
                                     <tr>
-                                        <th>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input id="select-all1" type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </th>
-                                        <th>ID Bouteille</th>
+                                        <th>N° commande</th>
+                                        <th>Point de distr.</th>
                                         <th>Client</th>
-                                        <th>Status</th>
+                                        <th>Produits</th>
+                                        <th>Total (CFA)</th>
+                                        <th>Livreur</th>
                                         <th>Date</th>
-                                        <th>Action</th>
+                                        <th>Statut</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ticket_key_body">
                                     <tr>
+                                        <td><a href="{{ route('orders.details', 2) }}">CMD00126</a></td>
+                                        <td>Point YDE B</td>
+                                        <td>Ndongo Carine</td>
                                         <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1 text-small">3 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary text-small">4 x Bouteille de 12kg</span>
                                         </td>
-                                        <td>BTL-2044</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                Gavin Cortez
-                                            </div>
-                                        </td>
-                                        <td><span class="badge text-outline-success">En cours</span></td>
-                                        <td>1 jan 2024</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
+                                        <td>45 000</td>
+                                        <td>Eyoum Claire</td>
+                                        <td>23/04/2025</td>
+                                        <td><span class="badge text-outline-warning">En cours</span></td>
                                     </tr>
                                     <tr>
+                                        <td><a href="{{ route('orders.details', 3) }}">CMD00127</a></td>
+                                        <td>Point YDE C</td>
+                                        <td>Mbarga Elise</td>
                                         <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">2 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">5 x Bouteille de 12kg</span>
                                         </td>
-                                        <td>AR 1763</td>
+                                        <td>60 000</td>
+                                        <td>Kamga Lionel</td>
+                                        <td>24/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="{{ route('orders.details', 4) }}">CMD00128</a></td>
+                                        <td>Point YDE D</td>
+                                        <td>Ndongmo Roger</td>
                                         <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-dark me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/14.png') }}">
-                                                </div>
-                                                Martena Mccray
-                                            </div>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">4 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">3 x Bouteille de 12kg</span>
                                         </td>
+                                        <td>50 000</td>
+                                        <td>Fouda Mireille</td>
+                                        <td>24/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="{{ route('orders.details', 5) }}">CMD00129</a></td>
+                                        <td>Point YDE E</td>
+                                        <td>Ekani Paul</td>
                                         <td>
-                                            <span class="badge text-outline-danger">lower</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">5 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">2 x Bouteille de 12kg</span>
                                         </td>
-                                        <td>8 jan 2024</td>
+                                        <td>70 000</td>
+                                        <td>Tchatchoua Paul</td>
+                                        <td>25/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="{{ route('orders.details', 6) }}">CMD00130</a></td>
+                                        <td>Point YDE F</td>
+                                        <td>Fotso Jules</td>
                                         <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">3 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">6 x Bouteille de 12kg</span>
                                         </td>
+                                        <td>85 000</td>
+                                        <td>Nguefack Jean</td>
+                                        <td>25/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="{{ route('orders.details', 7) }}">CMD00131</a></td>
+                                        <td>Point YDE F</td>
+                                        <td>Fotso Jules</td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">5 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">3 x Bouteille de 12kg</span>
+                                        </td>
+                                        <td>70 000</td>
+                                        <td>Nguefack Jean</td>
+                                        <td>26/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="{{ route('orders.details', 8) }}">CMD00132</a></td>
+                                        <td>Point YDE F</td>
+                                        <td>Fotso Jules</td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">3 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">4 x Bouteille de 12kg</span>
+                                        </td>
+                                        <td>80 000</td>
+                                        <td>Nguefack Jean</td>
+                                        <td>27/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="{{ route('orders.details', 9) }}">CMD00133</a></td>
+                                        <td>Point YDE F</td>
+                                        <td>Fotso Jules</td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">6 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">2 x Bouteille de 12kg</span>
+                                        </td>
+                                        <td>90 000</td>
+                                        <td>Nguefack Jean</td>
+                                        <td>28/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="{{ route('orders.details', 10) }}">CMD00134</a></td>
+                                        <td>Point YDE F</td>
+                                        <td>Fotso Jules</td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">8 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">4 x Bouteille de 12kg</span>
+                                        </td>
+                                        <td>110 000</td>
+                                        <td>Nguefack Jean</td>
+                                        <td>29/04/2025</td>
+                                        <td><span class="badge text-outline-success">Terminée</span></td>
+                                    </tr>
 
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>AR 7452</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-info me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/10.png') }}">
-                                                </div>
-                                                Gavin Joyce
-                                            </div>
-                                        </td>
-                                        <td><span class="badge text-outline-success">High</span></td>
-                                        <td>14 jan 2024</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>AR 1023</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-dark me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/2.png') }}">
-                                                </div>
-                                                Gloria Little
-                                            </div>
-
-                                        </td>
-                                        <td><span class="badge text-outline-warning">Medium</span></td>
-                                        <td>6 hours ago</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>AR 2305</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-dark me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/8.png') }}">
-                                                </div>
-                                                Jena Gaines
-                                            </div>
-                                        </td>
-                                        <td><span class="badge text-outline-success">High</span></td>
-                                        <td>6 hours ago</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>AR2058</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-dark me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/11.png') }}">
-                                                </div>
-                                                Jenette Caldwell
-                                            </div>
-                                        </td>
-                                        <td><span class="badge text-outline-danger">lower</span></td>
-                                        <td>20 jan 2024</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>AR 1935</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-dark me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/4.png') }}">
-                                                </div>
-                                                Jennifer Acosta
-                                            </div>
-                                        </td>
-                                        <td><span class="badge text-outline-warning">Medium</span></td>
-                                        <td>7 June 2024</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>AR 3056</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-dark me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/2.png') }}">
-                                                </div>
-                                                Jennifer Chang
-                                            </div>
-                                        </td>
-                                        <td><span class="badge text-outline-success">High</span></td>
-                                        <td>10 hours ago</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>AR 0358</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-dark me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/3.png') }}">
-                                                </div>
-                                                Michael Silva
-                                            </div>
-                                        </td>
-                                        <td><span class="badge text-outline-warning">Medium</span></td>
-                                        <td>14 June 2024</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox-wrapper">
-                                                <label class="check-box m-0">
-                                                    <input type="checkbox">
-                                                    <span class="checkmark outline-secondary"></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>AR 4590</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div
-                                                    class="h-30 w-30 d-flex-center b-r-50 overflow-hidden text-bg-dark me-2">
-                                                    <img alt="" class="img-fluid"
-                                                        src="{{ asset('../assets/images/avtar/4.png') }}">
-                                                </div>
-                                                Michelle House
-                                            </div>
-                                        </td>
-                                        <td><span class="badge text-outline-danger">lower</span></td>
-                                        <td>4 July 2024</td>
-                                        <td>
-                                            <div class="btn-group dropdown-icon-none">
-                                                <button aria-expanded="false"
-                                                    class="btn border-0 icon-btn b-r-4 dropdown-toggle active"
-                                                    data-bs-auto-close="true" data-bs-toggle="dropdown" type="button">
-                                                    <i class="ti ti-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="{{ route('ticket_details') }}"><i
-                                                                class="ti ti-eye text-primary me-2"></i> View
-                                                        </a></li>
-                                                    <li><a class="dropdown-item" href="#"><i
-                                                                class="ti ti-edit text-success me-2"></i>
-                                                            Edit </a></li>
-                                                    <li><a class="dropdown-item delete-btn" href="#"><i
-                                                                class="ti ti-trash text-danger me-2"></i> Delete
-                                                        </a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
