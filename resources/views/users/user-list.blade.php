@@ -37,7 +37,7 @@
                             <thead>
                             <tr>
                                 <th class="text-start w-20">Nom complet</th>
-                                <th class="w-10">Point de vente</th>
+                                <th class="w-10">Point de distribution</th>
                                 <th class="w-10">Téléphone</th>
                                 <th class="w-15">Fonction</th>
                                 <th class="w-15">Date</th>
@@ -55,7 +55,7 @@
                                     </td>
                                     <td>Point A</td>
                                     <td>+237 690 123 456</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>10 Avr,2024 08:30</td>
                             <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
@@ -73,7 +73,7 @@
                                     </td>
                                     <td>Point B</td>
                                     <td>+237 698 345 221</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>11 Avr,2024 09:45</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
@@ -91,7 +91,7 @@
                                     </td>
                                     <td>Point C</td>
                                     <td>+237 677 890 456</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>12 Avr,2024 11:00</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
@@ -109,7 +109,7 @@
                                     </td>
                                     <td>Point D</td>
                                     <td>+237 655 789 123</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>13 Avr,2024 14:15</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
@@ -127,7 +127,7 @@
                                     </td>
                                     <td>Point D</td>
                                     <td>+237 699 654 789</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>14 Avr,2024 10:30</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
@@ -145,7 +145,7 @@
                                     </td>
                                     <td>Point E</td>
                                     <td>+237 675 888 999</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>15 Avr,2024 16:45</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
@@ -163,7 +163,7 @@
                                     </td>
                                     <td>Point F</td>
                                     <td>+237 662 222 333</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>16 Avr,2024 09:00</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
@@ -181,7 +181,7 @@
                                     </td>
                                     <td>Point G</td>
                                     <td>+237 699 888 444</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>17 Avr,2024 15:30</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
@@ -199,7 +199,7 @@
                                     </td>
                                     <td>Point H</td>
                                     <td>+237 699 321 789</td>
-                                    <td>Responsable point de vente</td>
+                                    <td>Responsable point de distribution</td>
                                     <td>18 Avr,2024 13:20</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
@@ -208,7 +208,7 @@
                                         <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
-                                
+
                             </tbody>
                         </table>
                     </div>
@@ -246,7 +246,7 @@
                                 <input type="text" class="form-control" placeholder="690102030" id="phone">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="point_vente" class="form-label">Point de vente</label>
+                                <label for="point_vente" class="form-label">Point de distribution</label>
                                 <select class="form-select" id="point_vente">
                                     <option value="Point A">Point A</option>
                                     <option value="Point B">Point B</option>

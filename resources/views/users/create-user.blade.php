@@ -94,7 +94,7 @@
                                             <input type="text" class="form-control" placeholder="690102030" id="phone">
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="point_vente" class="form-label">Point de vente</label>
+                                            <label for="point_vente" class="form-label">Point de distribution</label>
                                             <select class="form-select" id="point_vente">
                                                 <option value="Point A">Point A</option>
                                                 <option value="Point B">Point B</option>
@@ -116,11 +116,11 @@
                                     </div>
                                 </form>
                             </div>
-                           
+
                         </div>
                     </div>
                 </div>
-            
+
         </div>
         <!-- Add Product end -->
     </div>

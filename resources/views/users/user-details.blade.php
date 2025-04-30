@@ -58,8 +58,8 @@
                                         <h5 class="f-w-600">Kamdem Boniface
                                             <img src="{{ asset('../assets/images/profile-app/01.png') }}" class="w-20 h-20" alt="instagram-check-mark">
                                         </h5>
-                                        <p>Responsable de point de vente</p>
-                                        
+                                        <p>Responsable de point de distribution</p>
+
                                         <div class="my-2">
                                             <button type="button" class="btn btn-primary b-r-22" id="followButton"> <i class="ti ti-user"></i>
                                                 Profile</button>
@@ -117,12 +117,12 @@
                                             <p class="f-w-600 mb-0">Poste</p>
                                         </td>
                                         <td class="text-end">
-                                            Responsable de point de vente
+                                            Responsable de point de distribution
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <p class="f-w-600 mb-0">Point de vente</p>
+                                            <p class="f-w-600 mb-0">Point de distribution</p>
                                         </td>
                                         <td class="text-end">
                                             Mimboman
@@ -153,7 +153,7 @@
                 </div>
 
             </div>
-           
+
         </div>
         <!-- Order Details end -->
     </div>

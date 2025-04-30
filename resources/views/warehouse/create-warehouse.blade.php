@@ -16,7 +16,7 @@
         <!-- Breadcrumb start -->
         <div class="row m-1">
             <div class="col-12 ">
-                <h4 class="main-title">Ajouter un point de vente</h4>
+                <h4 class="main-title">Ajouter un point de distribution</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
@@ -26,7 +26,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="f-s-14 f-w-500">Point de vente</a>
+                        <a href="#" class="f-s-14 f-w-500">Point de distribution</a>
                     </li>
                     <li class="active">
                         <a href="#" class="f-s-14 f-w-500">Ajouter</a>
@@ -100,11 +100,11 @@
                                     </div>
                                 </form>
                             </div>
-                           
+
                         </div>
                     </div>
                 </div>
-            
+
         </div>
         <!-- Add Product end -->
     </div>
