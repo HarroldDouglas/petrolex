@@ -114,7 +114,7 @@
             <div class="col-12">
                 <div class="card card-border">
                     <div class="card-header">
-                        <h4 class="card-title">Les 10 dernières commandes</h4>
+                        <h4 class="card-title">Les Ventes</h4>
                     </div>
                     <div class="card-body px-0">
                         <div class="table-responsive app-scroll app-datatable-default">
@@ -355,7 +355,6 @@
 
 @section('script')
 
-    <!-- slick-file -->
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
 
     <!-- data table js-->
@@ -364,8 +363,6 @@
     <!-- api js -->
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
 
-    <!-- Date Range Picker -->
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/daterangepicker/daterangepicker.js') }}"></script>
 
 @endsection

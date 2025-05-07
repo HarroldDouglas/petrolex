@@ -16,25 +16,18 @@
                     <i class="iconoir-view-grid"></i> Tableau de bord
                 </a>
             </li>
-            <li>
-                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#analytics">
-                    <i class="iconoir-stats-up-square"></i> Suivi et Rapports
+            <li class="no-sub">
+                <a class="" href="{{ route('stock_movement') }}">
+                    <i class="iconoir-data-transfer-both"></i> Mouvement de stock
                 </a>
-                <ul class="collapse" id="analytics">
-                    <li><a href="{{route('warehouse_stock_dashboard')}}"> Stock & Ventes</a></li>
-                    <li><a href="{{route('stock_movement')}}"> Mouvement de stock</a></li>
-                    <li><a href="{{route('order_report')}}"> Commandes & Livraisons</a></li>
-                    <li><a href="{{route('financial_report')}}">Rapport financier</a></li>
-                    <li><a href="{{route('transaction_report')}}">Transactions</a></li>
-                </ul>
             </li>
             <li>
                 <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#users">
-                    <i class="iconoir-user-badge-check"></i> Utilisateurs
+                    <i class="iconoir-user"></i> Utilisateurs
                 </a>
                 <ul class="collapse" id="users">
-                    <li><a href="{{route('users.create')}}">Ajouter</a></li>
-                    <li><a href="{{route('users.list')}}">Lister</a></li>
+                    <li><a href="{{route('users.create')}}"> Nouveau</a></li>
+                    <li><a href="{{route('users.list')}}"> Liste</a></li>
                 </ul>
             </li>
             <li>
@@ -42,22 +35,26 @@
                     <i class="iconoir-database-restore"></i> Approvisionnements
                 </a>
                 <ul class="collapse" id="supply">
-                    <li><a href="{{route('supplies.create')}}">Ajouter</a></li>
-                    <li><a href="{{route('supplies.list')}}">Lister</a></li>
+                    <li><a href="{{route('supplies.create')}}"> Nouveau</a></li>
+                    <li><a href="{{route('supplies.list')}}"> Liste</a></li>
                 </ul>
             </li>
-            <li class="no-sub">
-                <a class="" href="{{route('bottles.list')}}">
-                    <i class="iconoir-cylinder"></i> Bouteilles
+            <li>
+                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#bottles">
+                    <i class="iconoir-cylinder"></i>
+                    Bouteilles
                 </a>
+                <ul class="collapse" id="bottles">
+                    <li><a href="{{route('bottles.list')}}"> Liste</a></li>
+                </ul>
             </li>
             <li>
                 <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#point-of-sales">
                     <i class="iconoir-home-simple-door"></i> Points de distribution
                 </a>
                 <ul class="collapse" id="point-of-sales">
-                    <li><a href="{{route('warehouses.create')}}">Ajouter</a></li>
-                    <li><a href="{{route('warehouses.list')}}">Lister</a></li>
+                    <li><a href="{{route('warehouses.create')}}"> Nouveau</a></li>
+                    <li><a href="{{route('warehouses.list')}}"> Liste</a></li>
                 </ul>
             </li>
         </ul>

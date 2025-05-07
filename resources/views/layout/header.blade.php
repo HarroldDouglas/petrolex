@@ -48,7 +48,7 @@
                                     </li>
 
                                     <li class="mb-2">
-                                        <a class="f-w-500 d-block rounded hover-bg-light" href="{{ route('faq') }}">
+                                        <a class="f-w-500 d-block rounded hover-bg-light" href="#">
                                             <i class="iconoir-help-circle pe-2 f-s-18"></i>Aide
                                         </a>
                                     </li>

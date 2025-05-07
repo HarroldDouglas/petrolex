@@ -12,14 +12,14 @@ abstract class BaseFilterComponent extends Component
     public $startDate;
     public $endDate;
     public $warehouseId;
-    
+
     protected $listeners = ['dateUpdated'];
 
     public function updatedSelectedPeriod()
     {
         $this->showCustomDate = ($this->selectedPeriod === 'custom');
-        
-        if (!$this->showCustomDate) {
+
+        if (! $this->showCustomDate) {
             $this->calculateDates();
         }
 
@@ -28,7 +28,7 @@ abstract class BaseFilterComponent extends Component
 
     protected function calculateDates()
     {
-        switch($this->selectedPeriod) {
+        switch ($this->selectedPeriod) {
             case '1week':
                 $this->startDate = Carbon::now()->subWeek()->format('Y-m-d');
                 break;
@@ -55,7 +55,7 @@ abstract class BaseFilterComponent extends Component
         $this->dispatch('dateUpdated', [
             'start' => $this->startDate,
             'end' => $this->endDate,
-            'warehouse' => $this->warehouseId
+            'warehouse' => $this->warehouseId,
         ]);
     }
 
@@ -73,7 +73,7 @@ abstract class BaseFilterComponent extends Component
     public function render()
     {
         return view('livewire.components.filter-component', [
-            'warehouses' => $this->getWarehouses()
+            'warehouses' => $this->getWarehouses(),
         ]);
     }
 }
