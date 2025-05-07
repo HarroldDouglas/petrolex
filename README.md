@@ -20,7 +20,7 @@ Axelit est un tableau de bord d'administration moderne pour Laravel offrant :
 
 - PHP 8.1 ou supérieur
 - Composer
-- Node.js et NPM
+- Node.js 18.19 et NPM
 - MySQL ou autre SGBD compatible
 - Git
 

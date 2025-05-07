@@ -10,7 +10,6 @@
 use App\Http\Controllers\Order\CreateOrderController;
 use App\Http\Controllers\Order\DeleteOrderController;
 use App\Http\Controllers\Order\EditOrderController;
-use App\Http\Controllers\Order\GetOrderDataTableController;
 use App\Http\Controllers\Order\GetOrderDetailsController;
 use App\Http\Controllers\Order\GetOrderListController;
 use Illuminate\Support\Facades\Route;

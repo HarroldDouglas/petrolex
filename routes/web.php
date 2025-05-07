@@ -397,6 +397,5 @@ require __DIR__.'/web/reports.php';
 require __DIR__.'/web/settings.php';
 
 require __DIR__.'/web/warehouses.php';
-require __DIR__.'/web/bottles.php';
 require __DIR__.'/web/supplies.php';
 require __DIR__.'/web/orders.php';

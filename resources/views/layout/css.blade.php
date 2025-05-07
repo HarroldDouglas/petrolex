@@ -10,9 +10,6 @@
 <!-- iconoir icon css  -->
 <link href="{{ asset('assets/vendor/ionio-icon/css/iconoir.css') }}" rel="stylesheet">
 
-<!-- fontawesome icon css  -->
-<link href="{{ asset('assets/vendor/fontawesome/css/all.css') }}" rel="stylesheet">
-
 <!-- Weather icon css-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/weather/weather-icons.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/weather/weather-icons-wind.css') }}">
@@ -32,9 +29,11 @@
 <!-- Simplebar css-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/simplebar/simplebar.css') }}">
 
-<!-- Custom css-->
-<link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
+<!-- Custom CSS -->
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/custom.css') }}">
 
-@yield('css')
-
+<link rel="stylesheet" href="{{ asset('assets/css/force-livewire-pagination.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/livewire-tables.css') }}">
+<!-- Toatify css-->
+<link rel="stylesheet" href="{{ asset('assets/vendor/notifications/toastify.min.css') }}">
 @vite(['public/assets/scss/style.scss'])
