@@ -7,7 +7,7 @@ use App\Http\Controllers\Supply\GetSupplyDetailsController;
 use App\Http\Controllers\Supply\GetSupplyListController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'supplies', 'as' => 'supplies.'], function () {
+Route::middleware(['auth'])->group(['prefix' => 'supplies', 'as' => 'supplies.'], function () {
     Route::get('/', GetSupplyListController::class)->name('list');
     Route::get('/create', CreateSupplyController::class)->name('create');
     Route::get('/{supply_id}/edit', EditSupplyController::class)->name('edit');

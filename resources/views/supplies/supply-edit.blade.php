@@ -11,11 +11,11 @@
     <!-- Breadcrumb start -->
     <div class="row m-1">
         <div class="col-12 ">
-            <h4 class="main-title">Ajouter un approvisionnement</h4>
+            <h4 class="main-title">Modifier un approvisionnement</h4>
             <ul class="app-line-breadcrumbs mb-3">
                 <li><a href="#" class="f-s-14 f-w-500"><i class="ph-duotone ph-stack f-s-16"></i> Apps</a></li>
                 <li><a href="#" class="f-s-14 f-w-500">Approvisionnements</a></li>
-                <li class="active"><a href="#" class="f-s-14 f-w-500">Créer</a></li>
+                <li class="active"><a href="#" class="f-s-14 f-w-500">Modifier</a></li>
             </ul>
         </div>
     </div>
@@ -35,11 +35,11 @@
                                 <div class="col-md-6 mb-3">
                                     <div class="col-md-12 mb-4">
                                         <label for="ref" class="form-label">Titre</label>
-                                        <input type="text" class="form-control" id="ref" placeholder="Ex: Approvisionnement abc">
+                                        <input type="text" class="form-control" id="ref" placeholder="Ex: Approvisionnement abc" value="Approvisionnement abc">
                                     </div>
                                     <div class="col-md-12 mb-3">
                                         <label for="date" class="form-label">Date</label>
-                                        <input type="datetime-local" class="form-control" id="date">
+                                        <input type="datetime-local" class="form-control" id="date" value="2022-11-22T14:30">
                                     </div>
                                 </div>
 
