@@ -53,8 +53,7 @@
             </li>
             <li>
                 <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#point-of-sales">
-                    <i class="iconoir-home-sale"></i>
-                    Points de distribution
+                    <i class="iconoir-home-simple-door"></i> Points de distribution
                 </a>
                 <ul class="collapse" id="point-of-sales">
                     <li><a href="{{route('warehouses.create')}}">Ajouter</a></li>

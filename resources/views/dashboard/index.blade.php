@@ -367,6 +367,5 @@
     <!-- Date Range Picker -->
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/daterangepicker/daterangepicker.js') }}"></script>
-    <script src="{{ asset('assets/js/dashboard/filter.js') }}"></script>
 
 @endsection

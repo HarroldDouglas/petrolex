@@ -1,10 +1,6 @@
 @extends('layout.master')
 @section('title', 'Ticket')
 @section('css')
-    <!-- slick css -->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick-theme.css') }}">
-
     <!-- Data Table css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
@@ -33,10 +29,10 @@
             </div>
             <!-- Filter -->
             <div class="col-4 p-0">
-                <div class="d-flex justify-content-end ">
-                    <a type="button" href="javascript!:" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
+                <div class="d-flex justify-content-end text-primary-dark">
+                    <a type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
                         aria-expanded="false" aria-controls="collapseFilter"
-                        class="waves-effect btn text-info bg-white btn-md mb-2">
+                        class="waves-effect btn text-primary-dark bg-white btn-md mb-2">
                         <i class="ti ti-chevron-down"></i> Filtrer
                     </a>
                 </div>
@@ -46,40 +42,8 @@
 
         <!-- Filter Options-->
         <div class="row m-1">
-            <div class="col-12 collapse mb-4 p-0 bg-white" id="collapseFilter">
-                <div class="card bg-white text-black">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
-                                    <select id="warehouse_filter" name="warehouse" class="form-select">
-                                        <option value="" selected>Tous</option>
-                                        <option value="Point A">Point A</option>
-                                        <option value="Point B">Point B</option>
-                                        <option value="Point C">Point C</option>
-                                        <option value="Point D">Point D</option>
-                                        <option value="Point E">Point E</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="wfirstName2" class="form-label"> Date : </label>
-                                    <div>
-                                        <button type="button" class="btn btn-default"
-                                            style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
-                                            <span>
-                                                <i class="fa fa-calendar"></i> Sélectionner une date
-                                            </span>
-                                            <i class="fa fa-caret-down"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-12 collapse mb-4 p-0" id="collapseFilter">
+                @livewire('dashboard.filter-component')
             </div>
         </div>
 
@@ -92,8 +56,8 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <p class="f-s-16 mb-0">Chiffre d'affaires<br>(en CFA)</p>
-                                    <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
-                                        <i class="ph-bold ph-currency-circle-dollar f-s-25 text-primary"></i>
+                                    <div class="h-40 w-40 d-flex-center">
+                                        <i class="ph-bold ph-currency-circle-dollar f-s-45 text-primary"></i>
                                     </div>
                                 </div>
                                 <h3 class="text-primary-dark">15.000.000</h3>
@@ -104,9 +68,9 @@
                         <div class="card ticket-card bg-light-warning">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Stock<br>disponilbe</p>
-                                    <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
-                                        <i class="ph-bold ph-package f-s-25 text-warning"></i>
+                                    <p class="f-s-16 mb-0">Stock<br>disponible</p>
+                                    <div class="h-40 w-40 d-flex-center">
+                                        <i class="ph-bold ph-package f-s-45 text-warning"></i>
                                     </div>
                                 </div>
                                 <h3 class="text-warning-dark">430</h3>
@@ -118,8 +82,8 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <p class="f-s-16 mb-0">Points de<br>distribution</p>
-                                    <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
-                                        <i class="ph-bold ph-map-pin f-s-25 text-success"></i>
+                                    <div class="h-40 w-40 d-flex-center">
+                                        <i class="ph-bold ph-map-pin f-s-45 text-success"></i>
                                     </div>
                                 </div>
                                 <h3 class="text-success-dark">05</h3>
@@ -131,8 +95,8 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <p class="f-s-16 mb-0">Seuil<br>minimal</p>
-                                    <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
-                                        <i class="ph-bold ph-warning-circle f-s-25 text-danger"></i>
+                                    <div class="h-40 w-40 d-flex-center">
+                                        <i class="ph-bold ph-warning-circle f-s-45 text-danger"></i>
                                     </div>
                                 </div>
                                 <h3 class="text-danger-dark">10</h3>
@@ -144,7 +108,7 @@
 
             <!-- Stock & Sales table-->
             <div class="col-12">
-                <div class="card">
+                <div class="card card-border">
                     <div class="card-header">
                         <h4 class="card-title">Stock & Ventes</h4>
                     </div>

@@ -6,11 +6,9 @@
                     <label for="warehouse_filter" class="form-label">Point de distribution :</label>
                     <select wire:model.live="warehouseId" class="form-select">
                         <option value="">Tous</option>
-                        <option value="1">Point A</option>
-                        <option value="2">Point B</option>
-                        <option value="3">Point C</option>
-                        <option value="4">Point D</option>
-                        <option value="5">Point E</option>
+                        @foreach($warehouses ?? [] as $warehouse)
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>

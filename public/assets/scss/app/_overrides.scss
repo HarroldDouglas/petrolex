@@ -1,7 +1,11 @@
-header.header-main .container-fluid .header-left .header-toggle {
-  background-color: white!important;
-}
-
 .card {
 border-radius: 10px;
+}
+
+.app-datatable-default .dataTables_wrapper .dataTables_paginate .paginate_button.previous {
+    color:var(--dark) !important;
+}
+
+.app-datatable-default .dataTables_wrapper .dataTables_paginate .paginate_button.previous:hover {
+    color:var(--primary) !important;
 }

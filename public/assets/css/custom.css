@@ -95,3 +95,17 @@ button:focus,
 .card-border {
     border: solid 2px white!important;
 }
+
+td a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: rgba(var(--primary), 0.5);
+    
+    &:hover {
+        text-decoration-color: rgba(var(--primary), 1);
+    }
+}
+
+header.header-main .container-fluid .header-left .header-toggle {
+  background-color: white!important;
+}
