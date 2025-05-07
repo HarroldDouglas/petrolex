@@ -12,6 +12,6 @@ class EditSupplyController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return view('supplies.edit-supply');
+        return view('supplies.supply-edit');
     }
 }

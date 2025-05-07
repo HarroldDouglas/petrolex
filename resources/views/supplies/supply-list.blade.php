@@ -117,7 +117,7 @@
                                     <td><span class="badge text-outline-warning">En cours</span></td>
                                     <td>
                                         <a href="{{ route('supplies.details', 3) }}" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <a href="{{ route('supplies.edit', 3) }}" class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
@@ -132,7 +132,7 @@
                                     <td><span class="badge text-outline-secondary">En attente</span></td>
                                     <td>
                                         <a href="{{ route('supplies.details', 4) }}" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <a href="{{ route('supplies.edit', 4) }}" class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
@@ -147,7 +147,7 @@
                                     <td><span class="badge text-outline-danger">Annulé</span></td>
                                     <td>
                                         <a href="{{ route('supplies.details', 5) }}" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <a href="{{ route('supplies.edit', 5) }}" class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
@@ -162,7 +162,7 @@
                                     <td><span class="badge text-outline-success">Terminé</span></td>
                                     <td>
                                         <a href="{{ route('supplies.details', 6) }}" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <a href="{{ route('supplies.edit', 6) }}" class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
@@ -177,7 +177,7 @@
                                     <td><span class="badge text-outline-secondary">En attente</span></td>
                                     <td>
                                         <a href="{{ route('supplies.details', 8) }}" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <a href="{{ route('supplies.edit', 8) }}" class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
@@ -192,7 +192,7 @@
                                     <td><span class="badge text-outline-danger">Annulé</span></td>
                                     <td>
                                         <a href="{{ route('supplies.details', 9) }}" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
+                                        <a href="{{ route('supplies.edit', 9) }}" class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-edit"></i></a>
                                         <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
                                     </td>
                                 </tr>
@@ -207,6 +207,9 @@
                                     <td><span class="badge text-outline-success">Terminé</span></td>
                                     <td>
                                         <a href="{{ route('supplies.details', 10) }}" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-0"><i class="ti ti-eye"></i></a>
+                                    </td>
+                                </tr>
+
                         </table>
                     </div>
                     <!-- table -->
