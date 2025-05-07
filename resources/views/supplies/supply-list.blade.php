@@ -220,43 +220,29 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un utilisateur</h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un approvisionnement</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <form class="app-form">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Nom</label>
-                                <input type="text" class="form-control" placeholder="Nom" id="last_name">
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="ref" class="form-label">Titre</label>
+                                <input type="text" class="form-control" id="ref" value="Approvisionnement abc" placeholder="Ex: Approvisionnement abc">
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">Prénom</label>
-                                <input type="text" class="form-control" placeholder="Prénom" id="first_name">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" placeholder="email@example.com" id="email">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Téléphone</label>
-                                <input type="text" class="form-control" placeholder="690102030" id="phone">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="point_vente" class="form-label">Point de distribution</label>
-                                <select class="form-select" id="point_vente">
-                                    <option value="Point A">Point A</option>
-                                    <option value="Point B">Point B</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="statut" class="form-label">Statut</label>
-                                <select class="form-select" id="statut">
-                                    <option value="actif">Actif</option>
-                                    <option value="inactif">Inactif</option>
-                                </select>
+                            <div class="col-md-6">
+                                <label for="date" class="form-label">Date</label>
+                                <input type="datetime-local" class="form-control" id="date">
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="mb-3">
+                                <label for="point" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" rows="6" placeholder="Ex: Description de l'approvisionnement"></textarea>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
                 <div class="modal-footer px-4">
