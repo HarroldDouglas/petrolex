@@ -9,7 +9,7 @@ use App\Http\Controllers\Dashboard\TransactionReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/tableau-de-bord', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/performance-point-de-distribution', StockSaleDashboardController::class)->name('warehouse_stock_dashboard');
     Route::get('/mouvement-de-stock', StockMovementController::class)->name('stock_movement');
     Route::get('/rapport-financier', FinancialReportController::class)->name('financial_report');

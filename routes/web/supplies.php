@@ -3,7 +3,6 @@
 use App\Http\Controllers\Supply\CreateSupplyController;
 use App\Http\Controllers\Supply\DeleteSupplyController;
 use App\Http\Controllers\Supply\EditSupplyController;
-use App\Http\Controllers\Supply\GetSupplyDataTableController;
 use App\Http\Controllers\Supply\GetSupplyDetailsController;
 use App\Http\Controllers\Supply\GetSupplyListController;
 use Illuminate\Support\Facades\Route;

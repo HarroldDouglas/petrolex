@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <!-- All meta and title start-->
@@ -8,7 +8,7 @@
 
     <!-- css start-->
     @include('layout.css')
-    <link rel="stylesheet" href="{{ asset('assets/css/force-livewire-pagination.css') }}">
+    @yield('css')
     @stack('styles')
     @livewireStyles
     <!-- css end-->
@@ -54,13 +54,12 @@
 </body>
 
 <x-sweet-alert />
-<!--customizer-->
-<div id="customizer"></div>
 
 <!-- scripts start-->
 @include('layout.script')
+@yield('script')
+
 @stack('scripts')
-@livewireScripts
 <!-- scripts end-->
 
 </html>

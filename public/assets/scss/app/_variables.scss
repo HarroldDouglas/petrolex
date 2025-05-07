@@ -8,15 +8,14 @@
     --font-light-color: #a0a0b0;
     --grid_color: rgba(144, 164, 246, 0.21);
     --border_color: rgba(0, 0, 0, 0.21);
-    --primary: 0,137,183;
-    --secondary: 100,100,100;
-    --success: 20, 120, 52;
-    --danger: 240,10,200;
-    //--warning: 241,241,80;
-    --warning: 215, 220, 65;
-    --info : 46,94,231;
-    --light: 215, 208, 200;
-    --dark: 40, 38, 50;
+    --primary: 34,112,147; /* #227093 */
+    --secondary: 201,165,5; /* #c9a505 */
+    --success: 20, 120, 52; /* Unchanged */
+    --danger: 192,57,43; /* #c0392b */
+    --warning: 215, 220, 65; /* Unchanged */
+    --info: 46,94,231; /* Unchanged */
+    --light: 215, 208, 200; /* Unchanged */
+    --dark: 40, 38, 50; /* Unchanged */
     --white: 255,255,255;
     --black: 0, 0, 0;
     --border_color: #e0dfd6;
@@ -26,10 +25,10 @@
     --bs-dropdown-link-active-color: rgba(var(--primary), 1);
     --bs-dropdown-link-active-bg: rgba(var(--primary), 0.2);
 
-    --primary-dark: 36, 17, 135;
-    --secondary-dark: 106, 90, 100;
+    --primary-dark: 24,82,117; /* Version plus sombre de primary */
+    --secondary-dark: 171,135,5; /* Version plus sombre de secondary */
     --success-dark: 52, 50, 46;
-    --danger-dark: 102, 15, 106;
+    --danger-dark: 162,27,13; /* Version plus sombre de danger */
     --warning-dark: 99, 89, 29;
     --info-dark: 8, 60, 128;
     --dark-dark:30, 29, 35;

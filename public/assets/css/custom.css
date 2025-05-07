@@ -1,4 +1,4 @@
-    :root, .default, body, html {
+:root, .default, body, html {
         --primary: 0,137,183 !important;
     }
 
@@ -41,5 +41,57 @@
         margin-left: 50px;
     }
 
+/* Global Form Styles */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus,
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus,
+.btn:focus,
+.btn-close:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: rgb(var(--primary)) !important;
+}
 
+.form-check-input:checked {
+    border-color: rgb(var(--primary)) !important;
+    background-color: rgb(var(--primary)) !important;
+}
 
+/* Style pour l'icône de test-dashboard */
+.side-menu__icon {
+    fill: currentColor;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+/* Les éléments du menu en rouge utilisent la couleur primary */
+.main-nav li.no-sub a[style*="color: rgb(var(--primary))"] {
+    &:hover {
+        color: rgba(var(--primary), 0.8) !important;
+    }
+}
+
+/* Style pour les menus actifs */
+.main-nav li a.active,
+.main-nav li a.active i,
+.main-nav li a.active svg,
+.main-nav li a.active span {
+    color: rgb(var(--primary)) !important;
+    fill: rgb(var(--primary)) !important;
+}
+
+.main-nav li a.active:hover {
+    color: rgba(var(--primary), 0.8) !important;
+}
+
+/* Pour les sous-menus actifs */
+.main-nav li ul li a.active {
+    color: rgb(var(--primary)) !important;
+}
+.card-border {
+    border: solid 2px white!important;
+}
