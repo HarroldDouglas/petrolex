@@ -50,7 +50,7 @@
                 </ul>
             </li>
             <li>
-                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#bottles">
+                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#products">
                     <i class="iconoir-box-3d-point"></i>
                     Produits
                 </a>

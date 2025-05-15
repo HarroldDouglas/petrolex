@@ -333,9 +333,6 @@
         </div>
     </div>
 
-<<<<<<< HEAD
-@endsection
-=======
     <!-- Modal -->
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -390,7 +387,6 @@
         </div>
 
     @endsection
->>>>>>> feature/update-ui-for-sketch
 
     @section('script')
         <!-- slick-file -->
