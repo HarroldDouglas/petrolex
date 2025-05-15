@@ -1,32 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AuthCheckController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', AuthCheckController::class);
 
-Route::view('index', 'index')->name('index');
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('dashboard');
-    }
-
-    return redirect()->route('login');
-});
-
-Route::get('/test-dynamic-datatable', function () {
-    return view('test-datatable');
-})->name('test.dynamic.datatable');
-
-Route::view('profile', 'profile')->name('profile');
 /**
  * Include routes modules
  */

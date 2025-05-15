@@ -7,15 +7,15 @@
     @endif
 
     <div class="form-group mb-3">
-        <label class="form-label">Adresse e-mail</label>
+        <label class="form-label">{{ __('auth.email_or_phone') }}</label>
         <input
-            class="form-control @error('email') is-invalid @enderror"
-            type="email"
-            wire:model="email"
+            class="form-control @error('identifier') is-invalid @enderror"
+            type="text"
+            wire:model="identifier"
             required
         >
-        @error('email')
-            <div class="invalid-feedback">{{ $message }}</div>
+        @error('identifier')
+            <div class="invalid-feedback">{{ __($message) }}</div>
         @enderror
     </div>
 
@@ -56,7 +56,9 @@
     >
         <span wire:loading.class="d-none" wire:target="login">Se connecter</span>
         <span wire:loading wire:target="login">
-            <i class="fas fa-spinner fa-spin"></i> Connexion...
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            Connexion...
         </span>
+
     </button>
 </form>

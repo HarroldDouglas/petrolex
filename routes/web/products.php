@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Bottle\GetBottleListController;
 use App\Http\Controllers\Product\CreateProductController;
 use App\Http\Controllers\Product\DetailsProductController;
 use App\Http\Controllers\Product\EditProductController;

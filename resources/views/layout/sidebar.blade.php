@@ -1,7 +1,7 @@
 <!-- Menu Navigation starts -->
 <nav>
     <div class="app-logo">
-        <a class="logo d-inline-block" href="{{ route('index') }}">
+        <a class="logo d-inline-block" href="/">
             <img src="{{ asset('../assets/images/logo/isogaz-no-bg.png') }}" alt="#">
         </a>
 

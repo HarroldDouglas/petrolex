@@ -17,7 +17,6 @@
     <link href="{{ asset('assets/css/css2.css') }}" rel="stylesheet">
     @livewireStyles
     <link href="{{ asset('assets/vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/login.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/ionio-icon/css/iconoir.css') }}" rel="stylesheet">
 </head>
@@ -45,7 +44,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/login.js') }}"></script>
     @livewireScripts
 </body>

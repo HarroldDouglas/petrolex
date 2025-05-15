@@ -9,5 +9,6 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::view('profile', 'profile')->name('profile');
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });
