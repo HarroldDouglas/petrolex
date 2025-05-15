@@ -109,3 +109,59 @@ td a {
 header.header-main .container-fluid .header-left .header-toggle {
   background-color: white!important;
 }
+
+/* Form control overrides */
+.form-control {
+    border-color: var(--bs-dark) !important;
+    
+    &::placeholder {
+        color: var(--bs-dark) !important;
+        opacity: 0.65;
+    }
+    
+    &:focus {
+        border-color: var(--bs-dark) !important;
+        box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.25) !important;
+    }
+}
+
+/* Select overrides */
+.form-select {
+    border-color: var(--bs-dark) !important;
+    
+    &:focus {
+        border-color: var(--bs-dark) !important;
+        box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.25) !important;
+    }
+
+    /* Ajout du style pour le placeholder du select */
+    option:first-child {
+        color: var(--bs-dark) !important;
+        opacity: 0.65;
+    }
+
+    /* Style pour l'option sélectionnée par défaut */
+    &:required:invalid {
+        color: var(--bs-dark) !important;
+        opacity: 0.65;
+    }
+}
+
+/* Input group text override */
+.input-group-text {
+    border-color: var(--bs-dark) !important;
+    color: var(--bs-dark) !important;
+}
+
+/* Form floating labels */
+.form-floating {
+    label {
+        color: var(--bs-dark) !important;
+    }
+    
+    > .form-control:focus ~ label,
+    > .form-control:not(:placeholder-shown) ~ label {
+        color: var(--bs-dark) !important;
+        opacity: 0.65;
+    }
+}

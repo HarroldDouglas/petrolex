@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/trumbowyg/trumbowyg.min.css') }}">
 
     <!-- select2 css -->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/select/select2.min.css') }}" >
+    <link rel="stylesheet" href="{{ asset('assets/vendor/select/select2.min.css') }}">
 @endsection
 @section('main-content')
     <div class="container-fluid">
@@ -20,9 +20,9 @@
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
-                      <span>
-                        <i class="ph-duotone  ph-stack f-s-16"></i> Apps
-                      </span>
+                            <span>
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Apps
+                            </span>
                         </a>
                     </li>
                     <li>
@@ -43,7 +43,8 @@
                     <div class="card-body">
                         <div class="profile-container">
                             <div class="image-details">
-                                <div class="profile-image" style="background-image: url(/build/assets/28-DUtk996K.jpg);"></div>
+                                <div class="profile-image" style="background-image: url(/build/assets/28-DUtk996K.jpg);">
+                                </div>
                                 <div class="profile-pic">
                                     <div class="avatar-upload">
                                         <div class="avatar-edit">
@@ -59,7 +60,8 @@
                             </div>
                             <div class="person-details">
                                 <h5 class="f-w-600">Photo de profil
-                                    <img src="{{ asset('../assets/images/profile-app/01.png') }}" class="w-20 h-20" alt="instagram-check-mark">
+                                    <img src="{{ asset('../assets/images/profile-app/01.png') }}" class="w-20 h-20"
+                                        alt="instagram-check-mark">
                                 </h5>
                                 <p>Ajouter une photo de profil</p>
                             </div>
@@ -71,9 +73,6 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="app-product-section">
-                            <div class="main-title">
-                                <h6>Informations Générales</h6>
-                            </div>
                             <div>
                                 <form class="app-form">
                                     <div class="row">
@@ -87,16 +86,19 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="email" class="form-label">Email</label>
-                                            <input type="text" class="form-control" placeholder="email@example.com" id="email">
+                                            <input type="text" class="form-control" placeholder="email@example.com"
+                                                id="email">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="phone" class="form-label">Téléphone</label>
-                                            <input type="text" class="form-control" placeholder="690102030" id="phone">
+                                            <input type="text" class="form-control" placeholder="690102030"
+                                                id="phone">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="point_vente" class="form-label">Fonction</label>
                                             <select class="form-select" id="point_vente">
-                                                <option value="Responsable de point de distribution">Responsable de point de distribution</option>
+                                                <option value="Responsable de point de distribution">Responsable de point de
+                                                    distribution</option>
                                                 <option value="Responsable Gaz">Responsable Gaz</option>
                                                 <option value="Responsable informatique">Responsable informatique</option>
 
@@ -109,17 +111,11 @@
                                                 <option value="Point B">Point B</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="statut" class="form-label">Statut</label>
-                                            <select class="form-select" id="statut">
-                                                <option value="actif">Actif</option>
-                                                <option value="inactif">Inactif</option>
-                                            </select>
-                                        </div>
                                         <div class="col-12">
-                                            <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
-                                                <button type="button" class="btn btn-light-secondary b-r-22">Annuler</button>
-                                                <button type="submit" class="btn btn-primary b-r-22">Enregistrer</bu>
+                                            <div
+                                                class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
+                                                <button type="button" class="btn btn-light-danger">Annuler</button>
+                                                <button type="submit" class="btn btn-primary">Enregistrer</bu>
                                             </div>
                                         </div>
                                     </div>
@@ -130,31 +126,29 @@
                     </div>
                 </div>
 
+            </div>
+            <!-- Add Product end -->
         </div>
-        <!-- Add Product end -->
-    </div>
-@endsection
+    @endsection
 
-@section('script')
-    <!--customizer-->
-    <div id="customizer"></div>
+    @section('script')
+        <!--customizer-->
+        <div id="customizer"></div>
 
-    <!-- select2 -->
-    <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
+        <!-- select2 -->
+        <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
 
-    <!-- filepond -->
-    <script src="{{ asset('assets/vendor/filepond/file-encode.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/validate-size.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/validate-type.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/exif-orientation.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/image-preview.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/filepond.min.js') }}"></script>
+        <!-- filepond -->
+        <script src="{{ asset('assets/vendor/filepond/file-encode.min.js') }}"></script>
+        <script src="{{ asset('assets/vendor/filepond/validate-size.min.js') }}"></script>
+        <script src="{{ asset('assets/vendor/filepond/validate-type.js') }}"></script>
+        <script src="{{ asset('assets/vendor/filepond/exif-orientation.min.js') }}"></script>
+        <script src="{{ asset('assets/vendor/filepond/image-preview.min.js') }}"></script>
+        <script src="{{ asset('assets/vendor/filepond/filepond.min.js') }}"></script>
 
-    <!-- Trumbowyg js -->
-    <script src="{{ asset('assets/vendor/trumbowyg/trumbowyg.min.js') }}"></script>
+        <!-- Trumbowyg js -->
+        <script src="{{ asset('assets/vendor/trumbowyg/trumbowyg.min.js') }}"></script>
 
-    <!-- add product -->
-    <script src="{{ asset('assets/js/add_product.js') }}"></script>
-@endsection
-
-
+        <!-- add product -->
+        <script src="{{ asset('assets/js/add_product.js') }}"></script>
+    @endsection

@@ -1,7 +1,9 @@
 @extends('layout.master')
 @section('title', 'Liste des points de distribution')
 @section('css')
-
+    <!-- Data Table css-->
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
 @endsection
 @section('main-content')
     <div class="container-fluid">
@@ -12,9 +14,9 @@
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
-                      <span>
-                        <i class="ph-duotone  ph-stack f-s-16"></i> Apps
-                      </span>
+                            <span>
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Apps
+                            </span>
                         </a>
                     </li>
                     <li>
@@ -32,18 +34,18 @@
             <div class="card">
                 <div class="card-body p-0">
                     <!-- table -->
-                    <div class="table-responsive">
-                        <table class="table table-bottom-border align-middle mb-0">
+                    <div class="table-responsive app-scroll app-datatable-default">
+                        <table class="w-100 display ticket-app-table" id="ticketdatatable">
                             <thead>
-                            <tr>
-                                <th class="text-start">Nom</th>
-                                <th>Ville</th>
-                                <th>Adresse</th>
-                                <th>Téléphone</th>
-                                <th>Date</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </tr>
+                                <tr>
+                                    <th class="text-start">Nom</th>
+                                    <th>Ville</th>
+                                    <th>Adresse</th>
+                                    <th>Téléphone</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 <tr>
@@ -56,9 +58,32 @@
                                     <td>10 Avr,2024 08:30</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 2) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('warehouses.details', 2) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="2">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="2">
+                                                        <i class="ti ti-ban text-warning me-2"></i> Désactiver
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -71,9 +96,32 @@
                                     <td>11 Avr,2024 09:45</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 3) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('warehouses.details', 3) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="3">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="3">
+                                                        <i class="ti ti-check text-success me-2"></i> Activer
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -86,9 +134,32 @@
                                     <td>12 Avr,2024 11:00</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 4) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton4" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton4">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('warehouses.details', 4) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="4">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="4">
+                                                        <i class="ti ti-ban text-warning me-2"></i> Désactiver
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -101,9 +172,32 @@
                                     <td>13 Avr,2024 14:15</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 5) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton5" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton5">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('warehouses.details', 5) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="5">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="5">
+                                                        <i class="ti ti-check text-success me-2"></i> Activer
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -116,9 +210,32 @@
                                     <td>14 Avr,2024 10:30</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 6) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton6" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton6">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('warehouses.details', 6) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="6">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="6">
+                                                        <i class="ti ti-ban text-warning me-2"></i> Désactiver
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -131,9 +248,32 @@
                                     <td>15 Avr,2024 16:45</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 7) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton7" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton7">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('warehouses.details', 7) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="7">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="7">
+                                                        <i class="ti ti-check text-success me-2"></i> Activer
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -146,9 +286,32 @@
                                     <td>16 Avr,2024 09:00</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 8) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton8" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton8">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('warehouses.details', 8) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="8">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="8">
+                                                        <i class="ti ti-ban text-warning me-2"></i> Désactiver
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -161,9 +324,32 @@
                                     <td>17 Avr,2024 15:30</td>
                                     <td><span class="badge text-light-danger">INACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 9) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton9" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton9">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('warehouses.details', 9) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="9">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="9">
+                                                        <i class="ti ti-check text-success me-2"></i> Activer
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -176,13 +362,35 @@
                                     <td>18 Avr,2024 13:20</td>
                                     <td><span class="badge text-light-info">ACTIF</span></td>
                                     <td>
-                                        <a href="{{ route('warehouses.details', 10) }}" target="_blank" class="btn btn-light-primary icon-btn w-30 h-30 b-r-22 me-1"><i class="ti ti-eye"></i></a>
-                                        <button class="btn btn-light-success icon-btn w-30 h-30 b-r-22 me-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="ti ti-edit"></i></button>
-                                        <button class="btn btn-light-danger icon-btn w-30 h-30 b-r-22 delete-btn"><i class="ti ti-trash"></i></button>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                type="button" id="dropdownMenuButton10" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton10">
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('warehouses.details', 10) }}">
+                                                        <i class="ti ti-eye text-primary me-2"></i> Détail
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editWarehouseModal" data-warehouse-id="10">
+                                                        <i class="ti ti-edit text-success me-2"></i> Editer
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item toggle-status-btn" href="#"
+                                                        data-warehouse-id="10">
+                                                        <i class="ti ti-ban text-warning me-2"></i> Désactiver
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
-
-
                             </tbody>
                         </table>
                     </div>
@@ -193,7 +401,8 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -221,7 +430,8 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" placeholder="email@example.com" id="email">
+                                <input type="text" class="form-control" placeholder="email@example.com"
+                                    id="email">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="point_vente" class="form-label">Code postal</label>
@@ -237,7 +447,8 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="storage_capacity" class="form-label">Capacité de stockage</label>
-                                <input type="text" class="form-control" placeholder="storage_capacity" id="storage_capacity">
+                                <input type="text" class="form-control" placeholder="storage_capacity"
+                                    id="storage_capacity">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="statut" class="form-label">Statut</label>
@@ -253,17 +464,16 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
                     <button type="button" class="btn btn-primary">Modifier</button>
                 </div>
+            </div>
         </div>
-    </div>
 
 
-@endsection
+    @endsection
 
-@section('script')
-<!--customizer-->
-<div id="customizer"></div>
-
-<!-- js-->
-<script src="{{ asset('assets/js/orders_list.js') }}"></script>
-
-@endsection
+    @section('script')
+        <!-- slick-file -->
+        <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
+        <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
+        <script src="{{ asset('assets/js/ticket.js') }}"></script>
+        <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    @endsection

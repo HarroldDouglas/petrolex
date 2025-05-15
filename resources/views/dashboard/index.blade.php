@@ -1,19 +1,13 @@
 @extends('layout.master')
 @section('title', 'Ticket')
 @section('css')
-     <!-- slick css -->
-     <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick.css') }}">
-     <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick-theme.css') }}">
+    <!-- slick css -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick-theme.css') }}">
 
-     <!-- Data Table css-->
-     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
-     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
-
-     <!-- Daterangepicker CSS -->
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap-daterangepicker@3.1.0/daterangepicker.css" rel="stylesheet" />
-     <!-- Bootstrap Datepicker CSS -->
-     <link href="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet" />
-
+    <!-- Data Table css-->
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
 @endsection
 @section('main-content')
     <div class="container-fluid">
@@ -137,8 +131,10 @@
                                         <td>Point YDE B</td>
                                         <td>Ndongo Carine</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1 text-small">3 x Bouteille de 9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary text-small">4 x Bouteille de 12kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1 text-small">3 x
+                                                Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary text-small">4 x Bouteille de
+                                                12kg</span>
                                         </td>
                                         <td>45 000</td>
                                         <td>Eyoum Claire</td>
@@ -150,7 +146,8 @@
                                         <td>Point YDE C</td>
                                         <td>Mbarga Elise</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">2 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">2 x Bouteille de
+                                                9kg</span>
                                             <span class="badge rounded-pill bg-light-secondary">5 x Bouteille de 12kg</span>
                                         </td>
                                         <td>60 000</td>
@@ -163,7 +160,8 @@
                                         <td>Point YDE D</td>
                                         <td>Ndongmo Roger</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">4 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">4 x Bouteille de
+                                                9kg</span>
                                             <span class="badge rounded-pill bg-light-secondary">3 x Bouteille de 12kg</span>
                                         </td>
                                         <td>50 000</td>
@@ -176,7 +174,8 @@
                                         <td>Point YDE E</td>
                                         <td>Ekani Paul</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">5 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">5 x Bouteille de
+                                                9kg</span>
                                             <span class="badge rounded-pill bg-light-secondary">2 x Bouteille de 12kg</span>
                                         </td>
                                         <td>70 000</td>
@@ -189,7 +188,8 @@
                                         <td>Point YDE F</td>
                                         <td>Fotso Jules</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">3 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">3 x Bouteille de
+                                                9kg</span>
                                             <span class="badge rounded-pill bg-light-secondary">6 x Bouteille de 12kg</span>
                                         </td>
                                         <td>85 000</td>
@@ -202,7 +202,8 @@
                                         <td>Point YDE F</td>
                                         <td>Fotso Jules</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">5 x Bouteille de 9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">5 x Bouteille de
+                                                9kg</span>
                                             <span class="badge rounded-pill bg-light-secondary">3 x Bouteille de 12kg</span>
                                         </td>
                                         <td>70 000</td>
@@ -215,8 +216,10 @@
                                         <td>Point YDE F</td>
                                         <td>Fotso Jules</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">3 x Bouteille de 9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">4 x Bouteille de 12kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">3 x Bouteille de
+                                                9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">4 x Bouteille de
+                                                12kg</span>
                                         </td>
                                         <td>80 000</td>
                                         <td>Nguefack Jean</td>
@@ -228,8 +231,10 @@
                                         <td>Point YDE F</td>
                                         <td>Fotso Jules</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">6 x Bouteille de 9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">2 x Bouteille de 12kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">6 x Bouteille de
+                                                9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">2 x Bouteille de
+                                                12kg</span>
                                         </td>
                                         <td>90 000</td>
                                         <td>Nguefack Jean</td>
@@ -241,8 +246,10 @@
                                         <td>Point YDE F</td>
                                         <td>Fotso Jules</td>
                                         <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">8 x Bouteille de 9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">4 x Bouteille de 12kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary mb-1">8 x Bouteille de
+                                                9kg</span>
+                                            <span class="badge rounded-pill bg-light-secondary">4 x Bouteille de
+                                                12kg</span>
                                         </td>
                                         <td>110 000</td>
                                         <td>Nguefack Jean</td>

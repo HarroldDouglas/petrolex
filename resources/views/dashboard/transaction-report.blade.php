@@ -34,8 +34,8 @@
             <!-- Filter -->
             <div class="col-4 p-0">
                 <div class="d-flex justify-content-end ">
-                    <a type="button" href="javascript!:" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
-                        aria-expanded="false" aria-controls="collapseFilter"
+                    <a type="button" href="javascript!:" data-bs-toggle="collapse" data-bs-target="#collapseFilter"
+                        role="button" aria-expanded="false" aria-controls="collapseFilter"
                         class="waves-effect btn text-info bg-white btn-md mb-2">
                         <i class="ti ti-chevron-down"></i> Filtrer
                     </a>
@@ -79,7 +79,8 @@
                                     <label for="wfirstName2" class="form-label"> Date : </label>
                                     <div>
                                         <button type="button" class="btn btn-default"
-                                            style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey" id="daterange-btn">
+                                            style="width: 100%; background-color: white; color: black; border: 1px solid lightgrey"
+                                            id="daterange-btn">
                                             <span>
                                                 <i class="fa fa-calendar"></i> Sélectionner une date
                                             </span>
@@ -250,70 +251,73 @@
                     </div>
                 </div>
 
-            <div class="col-md-12 col-xxl-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="d-flex align-items-center">
-                            <h4 class="card-title me-auto">Commandes</h4>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="chartType" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Graphe
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="chartType">
-                                    <li><a class="dropdown-item" href="javascript:;" data-type="column">Bande</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" data-type="Pie">Camembert</a></li>
-                                    <li><a class="dropdown-item" href="javascript:;" data-type="line">Ligne</a></li>
-                                </ul>
+                <div class="col-md-12 col-xxl-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center">
+                                <h4 class="card-title me-auto">Commandes</h4>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
+                                        id="chartType" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Graphe
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="chartType">
+                                        <li><a class="dropdown-item" href="javascript:;" data-type="column">Bande</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:;" data-type="Pie">Camembert</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:;" data-type="line">Ligne</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div>
+                                <div id="transaction-report-chart"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body p-0">
-                        <div>
-                            <div id="transaction-report-chart"></div>
-                        </div>
-                    </div>
                 </div>
+
+                <!-- ticket table end -->
             </div>
-
-            <!-- ticket table end -->
+            <!-- Ticket end -->
         </div>
-        <!-- Ticket end -->
-    </div>
 
-@endsection
+    @endsection
 
-@section('script')
-    <!--customizer-->
-    <div id="customizer"></div>
+    @section('script')
+        <!--customizer-->
+        <div id="customizer"></div>
 
-    <!-- slick-file -->
-    <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-daterangepicker@3.1.0/daterangepicker.js"></script>
-    <script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+        <!-- slick-file -->
+        <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-daterangepicker@3.1.0/daterangepicker.js"></script>
+        <script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
 
-    <!-- data table js-->
-    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
+        <!-- data table js-->
+        <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
 
-    <!-- apexcharts js-->
-    <script src="{{ asset('assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
+        <!-- apexcharts js-->
+        <script src="{{ asset('assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
 
-     <!-- Tooltips_popovers. Js -->
-    <script src="{{ asset('assets/js/tooltips_popovers.js') }}"></script>
+        <!-- Tooltips_popovers. Js -->
+        <script src="{{ asset('assets/js/tooltips_popovers.js') }}"></script>
 
-    <!-- api js -->
-    <script src="{{ asset('assets/js/ticket.js') }}"></script>
+        <!-- api js -->
+        <script src="{{ asset('assets/js/ticket.js') }}"></script>
 
-    <!-- Dashboard js -->
-    <script src="{{asset('assets/js/dashboard.js')}}"></script>
+        <!-- Dashboard js -->
+        <script src="{{ asset('assets/js/dashboard.js') }}"></script>
 
-     <!-- select2 -->
-     <script src="{{asset('assets/vendor/select/select2.min.js')}}"></script>
+        <!-- select2 -->
+        <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
 
-     <!--js-->
-     <script src="{{asset('assets/js/select.js')}}"></script>
+        <!--js-->
+        <script src="{{ asset('assets/js/select.js') }}"></script>
 
-     <!--js-->
-     <script src="{{asset('assets/js/pages/transaction-report.js')}}"></script>
+        <!--js-->
+        <script src="{{ asset('assets/js/pages/transaction-report.js') }}"></script>
 
-@endsection
+    @endsection

@@ -26,8 +26,8 @@
                     <i class="iconoir-user"></i> Utilisateurs
                 </a>
                 <ul class="collapse" id="users">
-                    <li><a href="{{route('users.create')}}"> Nouveau</a></li>
-                    <li><a href="{{route('users.list')}}"> Liste</a></li>
+                    <li><a href="{{ route('users.create') }}"> Nouveau</a></li>
+                    <li><a href="{{ route('users.list') }}"> Liste</a></li>
                 </ul>
             </li>
             <li>
@@ -35,26 +35,37 @@
                     <i class="iconoir-database-restore"></i> Approvisionnements
                 </a>
                 <ul class="collapse" id="supply">
-                    <li><a href="{{route('supplies.create')}}"> Nouveau</a></li>
-                    <li><a href="{{route('supplies.list')}}"> Liste</a></li>
+                    <li><a href="{{ route('supplies.create') }}"> Nouveau</a></li>
+                    <li><a href="{{ route('supplies.list') }}"> Liste</a></li>
                 </ul>
             </li>
             <li>
                 <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#bottles">
-                    <i class="iconoir-cylinder"></i>
+                    <i class="iconoir-gas"></i>
                     Bouteilles
                 </a>
                 <ul class="collapse" id="bottles">
-                    <li><a href="{{route('bottles.list')}}"> Liste</a></li>
+                    <li><a href="{{ route('bottles.list') }}"> Liste</a></li>
+                    <li><a href="{{ route('bottles.types') }}"> Types</a></li>
+                </ul>
+            </li>
+            <li>
+                <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#bottles">
+                    <i class="iconoir-box-3d-point"></i>
+                    Produits
+                </a>
+                <ul class="collapse" id="products">
+                    <li><a href="{{ route('products.create') }}"> Nouveau</a></li>
+                    <li><a href="{{ route('products.list') }}"> Liste</a></li>
                 </ul>
             </li>
             <li>
                 <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#point-of-sales">
-                    <i class="iconoir-home-simple-door"></i> Points de distribution
+                    <i class="iconoir-network"></i> Points de distribution
                 </a>
                 <ul class="collapse" id="point-of-sales">
-                    <li><a href="{{route('warehouses.create')}}"> Nouveau</a></li>
-                    <li><a href="{{route('warehouses.list')}}"> Liste</a></li>
+                    <li><a href="{{ route('warehouses.create') }}"> Nouveau</a></li>
+                    <li><a href="{{ route('warehouses.list') }}"> Liste</a></li>
                 </ul>
             </li>
         </ul>

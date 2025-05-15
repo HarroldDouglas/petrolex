@@ -4,8 +4,8 @@
     </a>
 
     <button class="btn btn-sm btn-danger"
-            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?') || event.stopImmediatePropagation()"
-            wire:click="$emit('deleteUser', {{ $user->id }})">
+        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?') || event.stopImmediatePropagation()"
+        wire:click="$emit('deleteUser', {{ $user->id }})">
         <i class="fas fa-trash"></i>
     </button>
 </div>
