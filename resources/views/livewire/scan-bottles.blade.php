@@ -226,8 +226,7 @@
 
                             // Get all selected IDs
                             const selectedIds = isChecked ?
-                                Array.from(checkboxItems).map(checkbox => parseInt(checkbox.value)) :
-                                [];
+                                Array.from(checkboxItems).map(checkbox => parseInt(checkbox.value)) : [];
 
                             // Update Livewire component
                             @this.set('selectedBottles', selectedIds);

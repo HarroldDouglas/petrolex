@@ -37,8 +37,8 @@
                                             </span>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">Laura Monaldo</h6>
-                                            <p class="f-s-12 mb-0 text-secondary">lauradesign@gmail.com</p>
+                                            <h6 class="mb-0">David Toukam</h6>
+                                            <p class="f-s-12 mb-0 text-secondary">directeur@petrolex.com</p>
                                         </div>
                                     </li>
 

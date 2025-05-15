@@ -13,41 +13,34 @@ class GetProductsController extends Controller
     public function __invoke(Request $request)
     {
         // Données statiques pour le mock-up
-        $bottleTypes = [
+        $products = [
             [
                 'id' => 1,
                 'name' => 'Détenteurs',
-                'categorie' => 'Accessoires',
+                'price' => '1500 - 2000',
                 'status' => 'Actif',
+                'stock' => 25,
                 'created_at' => '2023-06-18 08:30:00',
             ],
             [
                 'id' => 2,
-                'name' => 'Bouteille 9kg',
+                'name' => 'Câbles',
+                'price' => '1000 - 1500',
                 'status' => 'Actif',
+                'stock' => 10,
                 'created_at' => '2023-06-17 14:15:00',
             ],
             [
                 'id' => 3,
-                'name' => 'Bouteille 12.5kg',
+                'name' => 'Extincteurs',
+                'price' => '5000 - 10000',
                 'status' => 'Inactif',
+                'stock' => 0,
                 'created_at' => '2023-06-16 09:45:00',
-            ],
-            [
-                'id' => 4,
-                'name' => 'Bouteille 35kg',
-                'status' => 'Actif',
-                'created_at' => '2023-06-15 16:20:00',
-            ],
-            [
-                'id' => 5,
-                'name' => 'Bouteille 45kg',
-                'status' => 'Actif',
-                'created_at' => '2023-06-14 11:10:00',
             ],
         ];
 
         // Retourner la vue avec les données
-        return view('bottles.bottle-type-list', compact('bottleTypes'));
+        return view('product.product-list', compact('products'));
     }
 }

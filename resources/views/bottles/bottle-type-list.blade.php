@@ -155,7 +155,7 @@
 
                 if (confirm(
                         `Êtes-vous sûr de vouloir ${action === 'activate' ? 'activer' : 'désactiver'} ce type de bouteille?`
-                        )) {
+                    )) {
                     // Ici vous pourriez faire un appel AJAX pour changer le statut
                     // Pour l'exemple, nous affichons juste un message
                     alert(`Le type de bouteille a été ${statusText}.`);
@@ -168,7 +168,7 @@
 
                 if (confirm(
                         'Êtes-vous sûr de vouloir supprimer ce type de bouteille? Cette action est irréversible.'
-                        )) {
+                    )) {
                     // Ici vous pourriez faire un appel AJAX pour supprimer le type
                     // Pour l'exemple, nous affichons juste un message
                     alert(`Le type de bouteille a été supprimé.`);
