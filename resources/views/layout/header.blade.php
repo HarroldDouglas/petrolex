@@ -21,7 +21,8 @@
                         <a aria-controls="profilecanvasRight" class="d-block head-icon"
                             data-bs-target="#profilecanvasRight" data-bs-toggle="offcanvas" href="#"
                             role="button">
-                            <img alt="avtar" class="b-r-50 h-35 w-35 bg-dark" src="../assets/images/avtar/woman.jpg">
+                            <img alt="avtar" class="b-r-50 h-35 w-35 bg-dark"
+                                src="{{ asset('assets/images/avtar/woman.jpg') }}">
                         </a>
 
                         <div aria-labelledby="profilecanvasRight" class="offcanvas offcanvas-end header-profile-canvas"

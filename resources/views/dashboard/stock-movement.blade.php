@@ -133,7 +133,8 @@
                                     <tr>
                                         <td>22/04/2025 - 10:14</td>
                                         <td><span class="badge text-outline-primary">Entrée</span></td>
-                                        <td><span class="badge rounded-pill bg-light-secondary mb-1">100 x Bouteille de 9kg</span></td>
+                                        <td><span class="badge rounded-pill bg-light-secondary mb-1">100 x Bouteille de
+                                                9kg</span></td>
                                         <td>+100</td>
                                         <td>Approvisionnement Petrolex Central</td>
                                         <td>Point YDE A</td>
@@ -142,7 +143,8 @@
                                     <tr>
                                         <td>22/04/2025 - 14:45</td>
                                         <td><span class="badge text-outline-success">Échange</span></td>
-                                        <td><span class="badge rounded-pill bg-light-secondary">30 x Bouteille de 12kg</span></td>
+                                        <td><span class="badge rounded-pill bg-light-secondary">30 x Bouteille de
+                                                12kg</span></td>
                                         <td>30</td>
                                         <td>Vente</td>
                                         <td>Point DLA B</td>

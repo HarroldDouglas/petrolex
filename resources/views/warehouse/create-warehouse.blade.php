@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/trumbowyg/trumbowyg.min.css') }}">
 
     <!-- select2 css -->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/select/select2.min.css') }}" >
+    <link rel="stylesheet" href="{{ asset('assets/vendor/select/select2.min.css') }}">
 @endsection
 @section('main-content')
     <div class="container-fluid">
@@ -20,9 +20,9 @@
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
-                      <span>
-                        <i class="ph-duotone  ph-stack f-s-16"></i> Apps
-                      </span>
+                            <span>
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Apps
+                            </span>
                         </a>
                     </li>
                     <li>
@@ -38,13 +38,10 @@
 
         <!-- Add Product start -->
         <div class="row">
-            <div class="col-lg-9 col-xxl-10">
+            <div class="col-lg-12 col-xxl-10">
                 <div class="card">
                     <div class="card-body">
                         <div class="app-product-section">
-                            <div class="main-title">
-                                <h6>Informations Générales</h6>
-                            </div>
                             <div>
                                 <form class="app-form">
                                     <div class="row">
@@ -62,27 +59,33 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="phone" class="form-label">Téléphone</label>
-                                            <input type="text" class="form-control" placeholder="690102030" id="phone">
+                                            <input type="text" class="form-control" placeholder="690102030"
+                                                id="phone">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="email" class="form-label">Email</label>
-                                            <input type="text" class="form-control" placeholder="email@example.com" id="email">
+                                            <input type="text" class="form-control" placeholder="email@example.com"
+                                                id="email">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="point_vente" class="form-label">Code postal</label>
-                                            <input type="text" class="form-control" placeholder="Code postal" id="postal_code">
+                                            <input type="text" class="form-control" placeholder="Code postal"
+                                                id="postal_code">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="latitude" class="form-label">Latitude</label>
-                                            <input type="text" class="form-control" placeholder="Latitude" id="latitude">
+                                            <input type="text" class="form-control" placeholder="Latitude"
+                                                id="latitude">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="Longitiude" class="form-label">Longitiude</label>
-                                            <input type="text" class="form-control" placeholder="Longitiude" id="Longitiude">
+                                            <input type="text" class="form-control" placeholder="Longitiude"
+                                                id="Longitiude">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="storage_capacity" class="form-label">Capacité de stockage</label>
-                                            <input type="text" class="form-control" placeholder="storage_capacity" id="storage_capacity">
+                                            <input type="text" class="form-control" placeholder="storage_capacity"
+                                                id="storage_capacity">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="statut" class="form-label">Statut</label>
@@ -92,9 +95,10 @@
                                             </select>
                                         </div>
                                         <div class="col-12">
-                                            <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
-                                                <button type="button" class="btn btn-light-secondary b-r-22">Annuler</button>
-                                                <button type="submit" class="btn btn-primary b-r-22">Enregistrer</bu>
+                                            <div
+                                                class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
+                                                <button type="button" class="btn btn-light-danger">Annuler</button>
+                                                <button type="submit" class="btn btn-primary">Enregistrer</bu>
                                             </div>
                                         </div>
                                     </div>
@@ -105,31 +109,7 @@
                     </div>
                 </div>
 
+            </div>
+            <!-- Add Product end -->
         </div>
-        <!-- Add Product end -->
-    </div>
-@endsection
-
-@section('script')
-    <!--customizer-->
-    <div id="customizer"></div>
-
-    <!-- select2 -->
-    <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
-
-    <!-- filepond -->
-    <script src="{{ asset('assets/vendor/filepond/file-encode.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/validate-size.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/validate-type.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/exif-orientation.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/image-preview.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/filepond/filepond.min.js') }}"></script>
-
-    <!-- Trumbowyg js -->
-    <script src="{{ asset('assets/vendor/trumbowyg/trumbowyg.min.js') }}"></script>
-
-    <!-- add product -->
-    <script src="{{ asset('assets/js/add_product.js') }}"></script>
-@endsection
-
-
+    @endsection
