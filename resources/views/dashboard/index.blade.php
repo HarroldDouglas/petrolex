@@ -288,8 +288,6 @@
         </div>
     </div>
 
-
-
     <!-- edit modal  -->
     <div class="modal fade" id="ticketeditModal" tabindex="-1" aria-labelledby="ticketeditModalLabel"
         aria-hidden="true">

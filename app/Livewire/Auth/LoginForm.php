@@ -32,6 +32,8 @@ class LoginForm extends Component
         'password.required' => 'auth.password_required',
     ];
 
+    protected $listeners = ['showLoginForm' => 'resetForm'];
+
     /**
      * Attempt user authentication
      *
@@ -141,5 +143,21 @@ class LoginForm extends Component
     {
         $this->error = __('auth.error_occurred');
         $this->password = '';
+    }
+
+    /**
+     * Reset form state
+     */
+    public function resetForm()
+    {
+        $this->reset(['identifier', 'password', 'error']);
+    }
+
+    /**
+     * Show forgot password form
+     */
+    public function forgotPassword()
+    {
+        $this->dispatch('showForgotPasswordForm');
     }
 }

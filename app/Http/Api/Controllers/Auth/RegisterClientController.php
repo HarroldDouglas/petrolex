@@ -2,10 +2,10 @@
 
 namespace App\Http\Api\Controllers\Auth;
 
-use App\Contracts\Services\AuthenticationServiceInterface;
 use App\Http\Api\Requests\Auth\RegisterRequest;
 use App\Http\Api\Resources\UserResource;
 use App\Http\Controllers\Controller;
+use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 use Illuminate\Http\JsonResponse;
 
 // TODO: implement this class, should be only related to client

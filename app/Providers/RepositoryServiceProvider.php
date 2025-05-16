@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\Repositories\TokenRepositoryInterface;
-use App\Contracts\Repositories\UserRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Eloquent\TokenRepositoryEloquent;
 use App\Repositories\Eloquent\UserRepositoryEloquent;
 use Illuminate\Contracts\Support\DeferrableProvider;

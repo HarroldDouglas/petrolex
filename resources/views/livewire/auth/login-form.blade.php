@@ -43,9 +43,11 @@
     <div class="remember-forgot-row">
         <div class="form-check">
             <input class="form-check-input" type="checkbox" id="remember" wire:model="remember">
-            <label class="form-check-label" for="remember">Souvenez-vous de moi</label>
+            <label class="form-check-label" for="remember">{{ __('auth.remember_me') }}</label>
         </div>
-        <a href="#" class="epena-red text-decoration-none">Mot de passe oublié ?</a>
+        <a href="#" class="epena-red text-decoration-none" wire:click.prevent="forgotPassword">
+            {{ __('auth.forgot_password') }}
+        </a>
     </div>
 
     <button

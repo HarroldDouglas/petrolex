@@ -9,7 +9,7 @@
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-8 p-O ">
+            <div class="col-8 p-0">
                 <h4 class="main-title"> Liste des produits</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
@@ -40,7 +40,7 @@
             <div class="col-lg-12">
                 <div class="row">
                     <div class="col-lg-6">
-                        <div class="card card-border ticket-card bg-light-primary">
+                        <div class="card ticket-card bg-light-primary">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <p class="f-s-16 mb-0"> <span class="text-primary-dark">3</span> Produits Actifs</p>
@@ -55,7 +55,7 @@
                         <div class="card ticket-card bg-light-danger">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0"> <span class="text-danger-dark">3</span> Produits Inactifs</p>
+                                    <p class="f-s-16 mb-0"> <span class="text-danger-dark">4</span> Produits Inactifs</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="iconoir-minus-square-dashed f-s-45"></i>
                                     </div>
@@ -66,7 +66,7 @@
                 </div>
             </div>
 
-            <div class="col-12">
+            <div class="col-lg-12">
                 <div class="card card-border">
                     <div class="card-body p-0">
                         <!-- table -->

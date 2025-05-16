@@ -35,10 +35,10 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row ticket-app">
             <div class="col-12">
                 <div class="card card-border">
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <div class="table-responsive app-scroll app-datatable-default">
                             <table class="w-100 display ticket-app-table" id="ticketdatatable">
                                 <thead>

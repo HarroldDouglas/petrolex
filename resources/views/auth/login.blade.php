@@ -34,9 +34,16 @@
                                     class="welcome-logo">
                             </div>
                         </div>
-                        <p>Suivez en temps réel les ventes, livraisons, et gestion des points de distribution,
-                            connectez-vous à votre compte pour débuter svp</p>
-                        @livewire('auth.login-form')
+
+                        <div id="login-form-container">
+                            <p>Suivez en temps réel les ventes, livraisons, et gestion des points de distribution,
+                                connectez-vous à votre compte pour débuter svp</p>
+                            @livewire('auth.login-form')
+                        </div>
+
+                        <div id="forgot-password-container" style="display: none;">
+                            @livewire('auth.forgot-password-form')
+                        </div>
                     </div>
                 </div>
             </div>
@@ -46,6 +53,20 @@
     <!-- Scripts -->
     <script src="{{ asset('assets/js/login.js') }}"></script>
     @livewireScripts
+
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('showForgotPasswordForm', () => {
+                document.getElementById('login-form-container').style.display = 'none';
+                document.getElementById('forgot-password-container').style.display = 'block';
+            });
+
+            Livewire.on('showLoginForm', () => {
+                document.getElementById('forgot-password-container').style.display = 'none';
+                document.getElementById('login-form-container').style.display = 'block';
+            });
+        });
+    </script>
 </body>
 
 </html>
