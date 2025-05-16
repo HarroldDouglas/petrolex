@@ -18,7 +18,7 @@
     @endif
 
     <!-- Step 1: Identifier Input -->
-    @if($currentStep === \App\Livewire\Auth\ForgotPasswordForm::STEP_IDENTIFIER)
+    @if($this->isIdentifierStep())
         <form wire:submit.prevent="submitIdentifier">
             <div class="form-group mb-3">
                 <label class="form-label">{{ __('auth.email_or_phone') }}</label>
@@ -61,7 +61,7 @@
     @endif
 
     <!-- Step 2: OTP Verification -->
-    @if($currentStep === \App\Livewire\Auth\ForgotPasswordForm::STEP_OTP)
+    @if($this->isOtpStep())
         <form wire:submit.prevent="verifyOtp">
             <div class="text-center mb-4">
                 <p>{{ __('auth.otp_instructions') }}</p>
@@ -76,7 +76,7 @@
                     type="text"
                     class="form-control @error('otp') is-invalid @enderror"
                     wire:model="otp"
-                    placeholder="123456"
+                    placeholder="Ex: 123456"
                     maxlength="6"
                     required
                 >
@@ -118,7 +118,7 @@
     @endif
 
     <!-- Step 3: New Password -->
-    @if($currentStep === \App\Livewire\Auth\ForgotPasswordForm::STEP_RESET)
+    @if($this->isResetStep())
         <form wire:submit.prevent="resetPassword">
             <div class="form-group mb-3">
                 <label for="password" class="form-label">{{ __('auth.new_password') }}</label>
@@ -126,17 +126,17 @@
                     <input
                         type="password"
                         class="form-control @error('password') is-invalid @enderror"
-                        id="password"
-                        wire:model="password"
+                        id="password_original"
+                        wire:model.live="password"
                         required
                     >
-                    <span class="password-toggle">
-                        <i class="iconoir-eye" id="toggleNewPassword"></i>
+                    <span class="password-toggle" onclick="togglePasswordVisibility('password_original', this)">
+                        <i class="iconoir-eye"></i>
                     </span>
+                    @error('password')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                 </div>
-                @error('password')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
             </div>
 
             <div class="form-group mb-3">
@@ -146,16 +146,16 @@
                         type="password"
                         class="form-control @error('password_confirmation') is-invalid @enderror"
                         id="password_confirmation"
-                        wire:model="password_confirmation"
+                        wire:model.live="password_confirmation"
                         required
                     >
-                    <span class="password-toggle">
-                        <i class="iconoir-eye" id="toggleConfirmPassword"></i>
+                    <span class="password-toggle" onclick="togglePasswordVisibility('password_confirmation', this)">
+                        <i class="iconoir-eye"></i>
                     </span>
+                    @error('password_confirmation')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                 </div>
-                @error('password_confirmation')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
             </div>
 
             <div class="d-flex justify-content-end mt-4">
@@ -179,29 +179,6 @@
 
 <script>
     document.addEventListener('livewire:initialized', () => {
-        // Toggle password visibility
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.id === 'toggleNewPassword') {
-                const passwordInput = document.getElementById('password');
-                togglePasswordVisibility(passwordInput, e.target);
-            }
-
-            if (e.target && e.target.id === 'toggleConfirmPassword') {
-                const confirmInput = document.getElementById('password_confirmation');
-                togglePasswordVisibility(confirmInput, e.target);
-            }
-        });
-
-        function togglePasswordVisibility(input, icon) {
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.replace('iconoir-eye', 'iconoir-eye-off');
-            } else {
-                input.type = 'password';
-                icon.classList.replace('iconoir-eye-off', 'iconoir-eye');
-            }
-        }
-
         // Redirect after password reset
         Livewire.on('passwordResetCompleted', () => {
             setTimeout(() => {
@@ -209,4 +186,18 @@
             }, 2000);
         });
     });
+
+    // Function to toggle password visibility
+    function togglePasswordVisibility(inputId, element) {
+        const input = document.getElementById(inputId);
+        const icon = element.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('iconoir-eye', 'iconoir-eye-closed');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('iconoir-eye-closed', 'iconoir-eye');
+        }
+    }
 </script>

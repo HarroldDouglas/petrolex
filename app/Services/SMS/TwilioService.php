@@ -5,7 +5,7 @@ namespace App\Services\SMS;
 use Illuminate\Support\Facades\Log;
 use Twilio\Rest\Client;
 
-class TwilioService
+class TwilioService implements SmsServiceInterface
 {
     protected Client $client;
     protected string $from;

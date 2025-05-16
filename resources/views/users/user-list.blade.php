@@ -21,8 +21,13 @@
             <div class="col-8 p-0">
                 <h4 class="main-title">Liste des utilisateurs</h4>
                 <ul class="app-line-breadcrumbs mb-3">
-                    <li class=""><a href="#" class="f-s-14 f-w-500"><span><i class="iconoir-user f-s-16"></i>
-                                Utilisateurs</span></a></li>
+                    <li class="">
+                        <a href="#" class="f-s-14 f-w-500">
+                            <span>
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Utilisateurs
+                            </span>
+                        </a>
+                    </li>
                     <li class="active"><a href="#" class="f-s-14 f-w-500">Liste</a></li>
                 </ul>
             </div>

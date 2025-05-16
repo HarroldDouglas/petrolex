@@ -3,7 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Enums\LoginChannel;
-use App\Exceptions\OtpDeliveryException;
+use App\Exceptions\Auth\OtpDeliveryException;
 use App\Exceptions\SmsDeliveryException;
 use App\Exceptions\UserNotFoundException;
 use App\Mail\OtpMail;

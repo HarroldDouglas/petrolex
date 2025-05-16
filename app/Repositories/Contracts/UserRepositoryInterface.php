@@ -4,7 +4,7 @@ namespace App\Repositories\Contracts;
 
 use App\Models\User;
 
-interface UserRepositoryInterface
+interface UserRepositoryInterface extends baseRepositoryInterface
 {
     /**
      * Find a user by email or phone

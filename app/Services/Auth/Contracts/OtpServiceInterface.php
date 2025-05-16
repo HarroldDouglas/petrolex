@@ -14,7 +14,7 @@ interface OtpServiceInterface
      * @return bool Success status of the operation
      *
      * @throws \App\Exceptions\UserNotFoundException
-     * @throws \App\Exceptions\OtpDeliveryException
+     * @throws \App\Exceptions\Auth\OtpDeliveryException
      */
     public function sendOtp(string $identifier): bool;
 
@@ -34,7 +34,7 @@ interface OtpServiceInterface
      * @return bool Success status of the operation
      *
      * @throws \App\Exceptions\UserNotFoundException
-     * @throws \App\Exceptions\OtpDeliveryException
+     * @throws \App\Exceptions\Auth\OtpDeliveryException
      */
     public function resendOtp(string $identifier): bool;
 

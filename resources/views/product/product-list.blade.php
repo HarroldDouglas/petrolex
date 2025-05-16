@@ -24,7 +24,6 @@
                     </li>
                 </ul>
             </div>
-            <!-- Filter -->
             <div class="col-4 p-0">
                 <div class="d-flex justify-content-end text-success-dark">
                     <a type="button" href="{{ route('products.create') }}"

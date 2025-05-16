@@ -31,7 +31,7 @@ return [
     // Forgot password translations
     'reset_password' => 'Réinitialisation du mot de passe',
     'email_or_phone' => 'Email ou Téléphone',
-    'enter_email_or_phone' => 'Entrez votre email ou téléphone',
+    'enter_email_or_phone' => 'Entrez votre email ou téléphone(Ex: +237699859878)',
     'back_to_login' => 'Retour à la connexion',
     'send_reset_code' => 'Envoyer le code',
     'sending' => 'Envoi en cours',

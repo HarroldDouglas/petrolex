@@ -5,7 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 
-class UserRepositoryEloquent implements UserRepositoryInterface
+class UserEloquentRepository extends BaseEloquentRepository implements UserRepositoryInterface
 {
     /**
      * Find a user by email or phone

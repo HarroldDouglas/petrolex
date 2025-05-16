@@ -2,9 +2,9 @@
 
 namespace App\Exceptions;
 
-use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class UserNotFoundException extends Exception
+class UserNotFoundException extends ModelNotFoundException
 {
     public function __construct(string $identifier)
     {
