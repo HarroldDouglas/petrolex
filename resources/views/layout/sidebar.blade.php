@@ -4,10 +4,6 @@
         <a class="logo d-inline-block" href="/">
             <img src="{{ asset('../assets/images/logo/isogaz-no-bg.png') }}" alt="#">
         </a>
-
-        <span class="bg-light-primary toggle-semi-nav">
-            <i class="ti ti-chevrons-right f-s-20"></i>
-        </span>
     </div>
     <div class="app-nav" id="app-simple-bar">
         <ul class="main-nav p-0 mt-2">
