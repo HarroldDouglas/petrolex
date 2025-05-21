@@ -12,6 +12,7 @@ use App\Http\Controllers\Order\DeleteOrderController;
 use App\Http\Controllers\Order\EditOrderController;
 use App\Http\Controllers\Order\GetOrderDetailsController;
 use App\Http\Controllers\Order\GetOrderListController;
+use App\Http\Controllers\MapController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
@@ -21,3 +22,5 @@ Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
     Route::get('/{order_id}/details', GetOrderDetailsController::class)->name('details');
     Route::delete('/{order_id}/delete', DeleteOrderController::class)->name('delete');
 });
+
+Route::post('/get-directions', [MapController::class, 'getDirections'])->name('get.directions');
