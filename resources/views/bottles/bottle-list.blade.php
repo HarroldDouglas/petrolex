@@ -9,7 +9,7 @@
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-8 p-O ">
+            <div class="col-8 p-0">
                 <h4 class="main-title"> Liste des bouteilles</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
@@ -44,7 +44,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row ticket-app">
             <div class="col-lg-12">
                 <div class="row">
                     <div class="col-lg-3">
@@ -103,7 +103,7 @@
             </div>
 
             <div class="col-12">
-                <div class="card">
+                <div class="card card-border">
                     <div class="card-body p-0">
                         <!-- table -->
                         <div class="table-responsive app-scroll app-datatable-default">
@@ -139,23 +139,43 @@
                                                 <span class="badge {{ $badgeClass }}">{{ $bottle['status'] }}</span>
                                             </td>
                                             <td>
-                                                <button type="button" class="btn btn-primary btn-sm view-history"
-                                                    data-id="{{ $bottle['id'] }}" data-bs-toggle="modal"
-                                                    data-bs-target="#historyModal">
-                                                    <i class="iconoir-clock-rotate-right"></i> Historique
-                                                </button>
-
-                                                @if ($bottle['status'] !== 'Perdu')
-                                                    <button type="button" class="btn btn-danger btn-sm mark-lost"
-                                                        data-id="{{ $bottle['id'] }}">
-                                                        <i class="iconoir-chat-bubble-question"></i> Déclarer perdu
+                                                <div class="btn-group dropdown-icon-none">
+                                                    <button
+                                                        class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                                                        type="button" id="dropdownMenuButton{{ $bottle['id'] }}"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="ti ti-dots-vertical"></i>
                                                     </button>
-                                                @else
-                                                    <button type="button" class="btn btn-success btn-sm mark-found"
-                                                        data-id="{{ $bottle['id'] }}">
-                                                        <i class="iconoir-circle-spark"></i> Marquer retrouvée
-                                                    </button>
-                                                @endif
+                                                    <ul class="dropdown-menu"
+                                                        aria-labelledby="dropdownMenuButton{{ $bottle['id'] }}">
+                                                        <li>
+                                                            <a class="dropdown-item view-history" href="#"
+                                                                data-id="{{ $bottle['id'] }}" data-bs-toggle="modal"
+                                                                data-bs-target="#historyModal">
+                                                                <i class="iconoir-clock-rotate-right text-primary me-2"></i>
+                                                                Historique
+                                                            </a>
+                                                        </li>
+                                                        @if ($bottle['status'] !== 'Perdu')
+                                                            <li>
+                                                                <a class="dropdown-item mark-lost" href="#"
+                                                                    data-id="{{ $bottle['id'] }}">
+                                                                    <i
+                                                                        class="iconoir-chat-bubble-question text-danger me-2"></i>
+                                                                    Déclarer perdu
+                                                                </a>
+                                                            </li>
+                                                        @else
+                                                            <li>
+                                                                <a class="dropdown-item mark-found" href="#"
+                                                                    data-id="{{ $bottle['id'] }}">
+                                                                    <i class="iconoir-circle-spark text-success me-2"></i>
+                                                                    Marquer retrouvée
+                                                                </a>
+                                                            </li>
+                                                        @endif
+                                                    </ul>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach

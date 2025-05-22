@@ -15,21 +15,18 @@
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-12 ">
+            <div class="col-8 p-0">
                 <h4 class="main-title">Ajouter un utilisateur</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
                             <span>
-                                <i class="ph-duotone  ph-stack f-s-16"></i> Apps
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Utilisateurs
                             </span>
                         </a>
                     </li>
-                    <li>
-                        <a href="#" class="f-s-14 f-w-500">Utilisateur</a>
-                    </li>
                     <li class="active">
-                        <a href="#" class="f-s-14 f-w-500">Ajouter</a>
+                        <a href="#" class="f-s-14 f-w-500">Nouveau</a>
                     </li>
                 </ul>
             </div>

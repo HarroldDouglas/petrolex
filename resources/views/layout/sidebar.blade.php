@@ -1,13 +1,9 @@
 <!-- Menu Navigation starts -->
 <nav>
     <div class="app-logo">
-        <a class="logo d-inline-block" href="{{ route('index') }}">
+        <a class="logo d-inline-block" href="/">
             <img src="{{ asset('../assets/images/logo/isogaz-no-bg.png') }}" alt="#">
         </a>
-
-        <span class="bg-light-primary toggle-semi-nav">
-            <i class="ti ti-chevrons-right f-s-20"></i>
-        </span>
     </div>
     <div class="app-nav" id="app-simple-bar">
         <ul class="main-nav p-0 mt-2">
@@ -26,8 +22,8 @@
                     <i class="iconoir-user"></i> Utilisateurs
                 </a>
                 <ul class="collapse" id="users">
-                    <li><a href="{{ route('users.create') }}"> Nouveau</a></li>
                     <li><a href="{{ route('users.list') }}"> Liste</a></li>
+                    <li><a href="{{ route('users.create') }}"> Nouveau</a></li>
                 </ul>
             </li>
             <li>
@@ -35,8 +31,8 @@
                     <i class="iconoir-database-restore"></i> Approvisionnements
                 </a>
                 <ul class="collapse" id="supply">
-                    <li><a href="{{ route('supplies.create') }}"> Nouveau</a></li>
                     <li><a href="{{ route('supplies.list') }}"> Liste</a></li>
+                    <li><a href="{{ route('supplies.create') }}"> Nouveau</a></li>
                 </ul>
             </li>
             <li>
@@ -55,8 +51,8 @@
                     Produits
                 </a>
                 <ul class="collapse" id="products">
-                    <li><a href="{{ route('products.create') }}"> Nouveau</a></li>
                     <li><a href="{{ route('products.list') }}"> Liste</a></li>
+                    <li><a href="{{ route('products.create') }}"> Nouveau</a></li>
                 </ul>
             </li>
             <li>
@@ -64,8 +60,8 @@
                     <i class="iconoir-network"></i> Points de distribution
                 </a>
                 <ul class="collapse" id="point-of-sales">
-                    <li><a href="{{ route('warehouses.create') }}"> Nouveau</a></li>
                     <li><a href="{{ route('warehouses.list') }}"> Liste</a></li>
+                    <li><a href="{{ route('warehouses.create') }}"> Nouveau</a></li>
                 </ul>
             </li>
         </ul>

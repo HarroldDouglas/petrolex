@@ -18,4 +18,3 @@ group(function () {
     Route::get('/{supply_id}/bottle-type/{type_id}/scan', ScanBottlesController::class)->name('scan-bottles');
     Route::delete('/{supply_id}/delete', DeleteSupplyController::class)->name('delete');
 });
-

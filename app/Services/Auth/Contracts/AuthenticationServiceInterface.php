@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts\Services;
+namespace App\Services\Auth\Contracts;
 
 use App\DTOs\Auth\LoginCredentialsDTO;
 use App\DTOs\Auth\TokenDTO;

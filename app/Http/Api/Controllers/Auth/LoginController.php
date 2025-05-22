@@ -2,12 +2,12 @@
 
 namespace App\Http\Api\Controllers\Auth;
 
-use App\Contracts\Services\AuthenticationServiceInterface;
 use App\DTOs\Auth\LoginCredentialsDTO;
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\Auth\LoginResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 use Illuminate\Http\JsonResponse;
 
 class LoginController extends Controller

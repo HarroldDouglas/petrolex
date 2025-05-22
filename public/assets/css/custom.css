@@ -37,9 +37,16 @@
 
     nav .app-logo .logo img {
         width: 65px !important;
-        float: none !important;
-        margin-left: 50px;
     }
+    .semi-nav .app-logo .logo img {
+        width: 35px !important;
+    }
+
+    .app-logo {
+        display: flex;
+        justify-content: center;
+    }
+
 
 /* Global Form Styles */
 input:focus,
@@ -100,7 +107,7 @@ td a {
     text-decoration: underline;
     text-underline-offset: 2px;
     text-decoration-color: rgba(var(--primary), 0.5);
-    
+
     &:hover {
         text-decoration-color: rgba(var(--primary), 1);
     }
@@ -113,12 +120,12 @@ header.header-main .container-fluid .header-left .header-toggle {
 /* Form control overrides */
 .form-control {
     border-color: var(--bs-dark) !important;
-    
+
     &::placeholder {
         color: var(--bs-dark) !important;
         opacity: 0.65;
     }
-    
+
     &:focus {
         border-color: var(--bs-dark) !important;
         box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.25) !important;
@@ -128,7 +135,7 @@ header.header-main .container-fluid .header-left .header-toggle {
 /* Select overrides */
 .form-select {
     border-color: var(--bs-dark) !important;
-    
+
     &:focus {
         border-color: var(--bs-dark) !important;
         box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.25) !important;
@@ -158,7 +165,7 @@ header.header-main .container-fluid .header-left .header-toggle {
     label {
         color: var(--bs-dark) !important;
     }
-    
+
     > .form-control:focus ~ label,
     > .form-control:not(:placeholder-shown) ~ label {
         color: var(--bs-dark) !important;

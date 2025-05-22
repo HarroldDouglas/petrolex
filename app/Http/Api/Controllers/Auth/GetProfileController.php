@@ -2,9 +2,9 @@
 
 namespace App\Http\Api\Controllers\Auth;
 
-use App\Contracts\Services\AuthenticationServiceInterface;
 use App\Http\Api\Responses\Auth\ProfileResponse;
 use App\Http\Controllers\Controller;
+use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 
 class GetProfileController extends Controller
 {

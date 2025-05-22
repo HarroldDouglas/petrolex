@@ -9,7 +9,7 @@
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-8 p-O ">
+            <div class="col-8 p-0">
                 <h4 class="main-title">Types de bouteilles</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
@@ -38,7 +38,7 @@
 
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <div class="card card-border">
                     <div class="card-body p-0">
                         <!-- table -->
                         <div class="table-responsive app-scroll app-datatable-default">
@@ -155,7 +155,7 @@
 
                 if (confirm(
                         `Êtes-vous sûr de vouloir ${action === 'activate' ? 'activer' : 'désactiver'} ce type de bouteille?`
-                        )) {
+                    )) {
                     // Ici vous pourriez faire un appel AJAX pour changer le statut
                     // Pour l'exemple, nous affichons juste un message
                     alert(`Le type de bouteille a été ${statusText}.`);
@@ -168,7 +168,7 @@
 
                 if (confirm(
                         'Êtes-vous sûr de vouloir supprimer ce type de bouteille? Cette action est irréversible.'
-                        )) {
+                    )) {
                     // Ici vous pourriez faire un appel AJAX pour supprimer le type
                     // Pour l'exemple, nous affichons juste un message
                     alert(`Le type de bouteille a été supprimé.`);

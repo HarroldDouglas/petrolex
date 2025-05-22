@@ -112,17 +112,6 @@ function copyvalue() {
   console.timeEnd('time2');
 }
 
-
-
-// >>-- 04 Sidebar toggle js --<<
-$(document).on('click', '.header-toggle', function () {
-  $("nav").toggleClass("semi-nav");
-});
-$(".toggle-semi-nav").on("click", function () {
-  $("nav").removeClass("semi-nav");
-});
-
-
 // >>-- 05 List page js --<<
 $(".contact-listbox").on("click", function () {
   $(this).toggleClass("stared");
