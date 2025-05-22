@@ -1,11 +1,4 @@
 $(function() {
-    $('#example').DataTable(); 
-    $('#DataTableone').DataTable(); 
-  });
-
- //  **------checkbox**
-
-$(function() {
     $("#select_all_checkbox").on("click", function() {
       $(this)
         .closest("table")
