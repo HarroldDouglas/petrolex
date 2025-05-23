@@ -1,6 +1,8 @@
 @extends('layout.master')
 @section('title', 'Détails de la Commande')
 @section('css')
+<!-- leaflet css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 @endsection
 
 @section('main-content')
@@ -247,6 +249,8 @@
 
 <!-- js-->
 <script src="{{ asset('assets/js/orders_details.js') }}"></script>
+<!-- leaflet js -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-@stack('scripts')
+{{--@stack('scripts')--}}
 @endsection
