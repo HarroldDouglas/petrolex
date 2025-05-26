@@ -12,11 +12,11 @@ class RouteMap extends Component
     const POINT_A_LAT = 3.8775; // Yaoundé, point A
     const POINT_A_LNG = 11.5468;
     const POINT_A_NAME = 'Dépôt central Petrolex';
-    
+
     const POINT_B_LAT = 3.8615; // Point B (à ~2km du Point A)
     const POINT_B_LNG = 11.5208;
     const POINT_B_NAME = 'Centre de distribution Nlongkak';
-    
+
     /**
      * Mode de transport fixé à 'driving' (voiture)
      * Autres modes possibles (non utilisés dans l'interface):
@@ -27,14 +27,14 @@ class RouteMap extends Component
      * - 'WALKING' : marche
      */
     public $transportMode = 'DRIVING';
-    
+
     /**
      * Résultats de l'itinéraire
      */
     public $distance = null;
     public $duration = null;
     public $steps = [];
-    
+
     /**
      * Paramètres de la carte
      */
@@ -62,13 +62,13 @@ class RouteMap extends Component
             'pointA' => [
                 'lat' => self::POINT_A_LAT,
                 'lng' => self::POINT_A_LNG,
-                'name' => self::POINT_A_NAME
+                'name' => self::POINT_A_NAME,
             ],
             'pointB' => [
                 'lat' => self::POINT_B_LAT,
                 'lng' => self::POINT_B_LNG,
-                'name' => self::POINT_B_NAME
-            ]
+                'name' => self::POINT_B_NAME,
+            ],
         ]);
     }
 }
