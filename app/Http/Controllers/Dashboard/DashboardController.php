@@ -143,7 +143,7 @@ class DashboardController extends Controller
                 'status' => 'Terminée',
             ],
         ];
-        
+
         // Types de bouteilles et statuts pour les filtres
         $itemTypes = ['Bouteille 9kg', 'Bouteille 12kg'];
         $statuses = ['En cours', 'Terminée'];

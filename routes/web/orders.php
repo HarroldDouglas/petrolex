@@ -7,12 +7,12 @@
  * @license MIT License
  */
 
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\Order\CreateOrderController;
 use App\Http\Controllers\Order\DeleteOrderController;
 use App\Http\Controllers\Order\EditOrderController;
 use App\Http\Controllers\Order\GetOrderDetailsController;
 use App\Http\Controllers\Order\GetOrderListController;
-use App\Http\Controllers\MapController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {

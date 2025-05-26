@@ -12,7 +12,7 @@ class GetOrderDetailsController extends Controller
      */
     public function __invoke(Request $request, $order_id)
     {
-         // Données statiques pour le mock-up
+        // Données statiques pour le mock-up
         $orders = [
             [
                 'id' => 'CMD00120',
@@ -132,7 +132,6 @@ class GetOrderDetailsController extends Controller
                 'status' => 'Terminée',
             ],
         ];
-
 
         $order = collect($orders)->firstWhere('id', $order_id);
 
