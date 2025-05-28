@@ -2,27 +2,68 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        User::create([
-            'last_name' => config('admin.last_name'),
-            'first_name' => config('admin.first_name'),
-            'email' => config('admin.email'),
-            'phone_number' => config('admin.phone'),
-            'email_verified_at' => now(),
-            'password' => bcrypt(config('admin.password')),
-            'remember_token' => \Illuminate\Support\Str::random(10),
+        $this->createSuperAdmin();
+        $this->createGasManager();
+        $this->createCenterManager();
+    }
+
+    /**
+     * Create the Super Admin user
+     */
+    private function createSuperAdmin(): void
+    {
+        $superAdmin = User::factory()->create([
+            'first_name' => config('super-admin.first_name', 'Super'),
+            'last_name' => config('super-admin.last_name', 'Admin'),
+            'email' => config('super-admin.email', 'admin@petrolex.com'),
+            'phone_number' => config('super-admin.phone', '+237670000001'),
+            'password' => Hash::make(config('super-admin.password', 'password')),
         ]);
 
-        User::factory()
-            ->count(100)
-            ->create();
+        $superAdmin->assignRole(UserRole::SUPER_ADMIN()->value);
+    }
 
-        $this->command->info('101 utilisateurs créés avec succès ! (1 admin + 100 utilisateurs)');
+    /**
+     * Create the Gas Manager user
+     */
+    private function createGasManager(): void
+    {
+        $gasManager = User::factory()->create([
+            'first_name' => 'Responsable',
+            'last_name' => 'Gaz',
+            'email' => 'responsablegaz@petrolex.com',
+            'phone_number' => '+237670000002',
+            'password' => Hash::make('password'),
+        ]);
+
+        $gasManager->assignRole(UserRole::GAS_MANAGER()->value);
+    }
+
+    /**
+     * Create the Center Manager user
+     */
+    private function createCenterManager(): void
+    {
+        $centerManager = User::factory()->create([
+            'first_name' => 'Responsable',
+            'last_name' => 'Centre',
+            'email' => 'responsablecentre@petrolex.com',
+            'phone_number' => '+237670000003',
+            'password' => Hash::make('password'),
+        ]);
+
+        $centerManager->assignRole(UserRole::CENTER_MANAGER()->value);
     }
 }

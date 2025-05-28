@@ -18,10 +18,9 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         $this->resetTables();
-        $config = config('permissions_structure');
 
-        $this->createPermissions($config['permissions']);
-        $this->createRolesWithPermissions($config['roles']);
+        $this->createPermissions(config('permissions'));
+        $this->createRolesWithPermissions(config('roles'));
 
         $this->command->info('Roles and permissions created successfully!');
     }

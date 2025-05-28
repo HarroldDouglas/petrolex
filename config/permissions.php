@@ -1,77 +1,112 @@
 <?php
 
-// config/permissions.php
-
 return [
-    'roles' => [
-        'super_admin' => [
-            'name' => 'Super Administrator',
-            'permissions' => '*', // tous les droits
-        ],
-        'admin' => [
-            'name' => 'Administrator',
-            'permissions' => [
-                'create-users', 'edit-users', 'view-users',
-                'manage-warehouses', 'view-all-warehouses',
-                'manage-all-stocks', 'view-all-stocks',
-                'view-all-orders', 'cancel-orders',
-                'view-all-finances',
-            ],
-        ],
-        'global_accountant' => [
-            'name' => 'Global Accountant',
-            'permissions' => [
-                'view-all-warehouses', 'view-all-stocks',
-                'view-all-orders', 'view-all-finances',
-                'manage-all-finances', 'create-invoices',
-            ],
-        ],
-        'warehouse_director' => [
-            'name' => 'Warehouse Director',
-            'permissions' => [
-                'view-warehouse', 'manage-warehouse-stock',
-                'view-warehouse-stock', 'view-warehouse-orders',
-                'cancel-orders', 'manage-warehouse-finances',
-                'view-warehouse-finances',
-            ],
-        ],
-        'warehouse_accountant' => [
-            'name' => 'Warehouse Accountant',
-            'permissions' => [
-                'view-warehouse', 'view-warehouse-stock',
-                'view-warehouse-orders', 'view-warehouse-finances',
-                'manage-warehouse-finances', 'create-invoices',
-            ],
-        ],
-        'cashier' => [
-            'name' => 'Cashier',
-            'permissions' => [
-                'create-orders', 'edit-orders',
-                'view-warehouse-orders', 'view-warehouse-stock',
-            ],
-        ],
-        'delivery_person' => [
-            'name' => 'Delivery Person',
-            'permissions' => [
-                'view-warehouse-orders', 'update-delivery-status',
-            ],
-        ],
-        'client' => [
-            'name' => 'Client',
-            'permissions' => [
-                'create-orders', 'view-own-orders',
-            ],
-        ],
-    ],
-    'all_permissions' => [
-        'create-users', 'edit-users', 'view-users', 'delete-users',
-        'manage-warehouses', 'view-warehouse', 'view-all-warehouses',
-        'manage-warehouse-stock', 'manage-all-stocks',
-        'view-warehouse-stock', 'view-all-stocks',
-        'create-orders', 'edit-orders', 'view-own-orders',
-        'view-warehouse-orders', 'view-all-orders', 'cancel-orders',
-        'update-delivery-status', 'view-warehouse-finances',
-        'view-all-finances', 'manage-warehouse-finances',
-        'manage-all-finances', 'create-invoices',
-    ],
+    // USER MANAGEMENT
+    'users.view',
+    'users.create',
+    'users.edit',
+    'users.delete',
+
+    // ROLE MANAGEMENT
+    'roles.view',
+    'roles.create',
+    'roles.edit',
+    'roles.assign_permissions',
+
+    // DISTRIBUTION CENTERS
+    'distribution_centers.view',
+    'distribution_centers.create',
+    'distribution_centers.edit',
+    'distribution_centers.delete',
+    'distribution_center.manage_own',
+    'distribution_center.assign_deliverers',
+
+    // ORDERS
+    'orders.view',
+    'orders.create',
+    'orders.edit',
+    'orders.delete',
+    'orders.assign',
+    'orders.view_own',
+    'orders.create_own',
+    'orders.view_assigned',
+
+    // DELIVERIES
+    'deliveries.view',
+    'deliveries.create',
+    'deliveries.edit',
+    'deliveries.delete',
+    'deliveries.assign',
+    'deliveries.view_own',
+    'deliveries.edit_own',
+    'deliveries.track_own',
+
+    // BOTTLES
+    'products.view',
+    'products.create',
+    'products.edit',
+    'products.delete',
+    'bottles.track',
+    'bottles.scan',
+    'bottles.assign',
+
+    // BOTTLE TYPES
+    'bottle_types.view',
+    'bottle_types.create',
+    'bottle_types.edit',
+    'bottle_types.delete',
+
+    // ACCESSORIES
+    'accessories.view',
+    'accessories.create',
+    'accessories.edit',
+    'accessories.delete',
+
+    // ACCESSORY TYPES
+    'accessory_types.view',
+    'accessory_types.create',
+    'accessory_types.edit',
+    'accessory_types.delete',
+
+    // SUPPLIERS
+    'suppliers.view',
+    'suppliers.create',
+    'suppliers.edit',
+    'suppliers.delete',
+    'supplier_deliveries.view',
+    'supplier_deliveries.create',
+    'supplier_deliveries.edit',
+    'supplier_deliveries.delete',
+
+    // CUSTOMERS
+    'customers.view',
+    'customers.create',
+    'customers.edit',
+    'customers.delete',
+
+    // PAYMENTS
+    'payments.view',
+    'payments.edit',
+
+    // REPORTS AND ANALYTICS
+    'reports.manage',
+
+    // GAS MANAGEMENT
+    'gas.manage',
+
+    // COMMENTS
+    'comments.view',
+    'comments.moderate',
+
+    // PROFILE
+    'profile.edit',
+
+    // HISTORY
+    'history.view_own',
+
+    // MOBILE ACCESS
+    'mobile.access',
+
+    // GEOLOCATION
+    'delivery.track_location',
 ];
