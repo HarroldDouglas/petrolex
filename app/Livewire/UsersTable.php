@@ -77,14 +77,31 @@ class UsersTable extends BaseDataTable
                 ->sortable()
                 ->searchable(),
 
+            Column::make('Points de distribution')
+            ->sortable()
+            ->searchable()
+            ->label(function ($row) {
+                return $row->centerPermissions
+                    ->map(fn ($permission) => optional($permission->distributionCenter)->name)
+                    ->filter()
+                    ->join(', ') ?: '-';
+            }),
+
             Column::make('Téléphone', 'phone_number')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Actif', 'is_active')
+            Column::make('Statut', 'is_active')
                 ->sortable()
-                ->format(fn ($value) => $value ? 'Oui' : 'Non'),
-
+                ->html()
+                ->format(function ($value, $row) {
+                    if ($value) {
+                        return '<span class="badge text-outline-success">Actif</span>';
+                    } else {
+                        return '<span class="badge text-outline-danger">Inactif</span>';
+                    }
+                }),
+            
             Column::make('Dernière connexion', 'last_login_at')
                 ->sortable()
                 ->format(function ($value) {

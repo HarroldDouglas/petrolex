@@ -11,7 +11,31 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css"
         href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
-
+<style>
+    body {
+        font-family: DejaVu Sans, sans-serif;
+        font-size: 10px;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 5px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+</style>
 @endsection
 
 @section('main-content')
@@ -45,82 +69,7 @@
                 <div class="card card-border">
                     <div class="card-body p-0">
                         <div class="table-responsive app-scroll app-datatable-default">
-                            <table class="w-100 display ticket-app-table" id="ticketdatatable">
-                                <thead>
-                                    <tr>
-                                        <th>Nom complet</th>
-                                        <th>Point de distribution</th>
-                                        <th>Téléphone</th>
-                                        <th>Fonction</th>
-                                        <th>Date</th>
-                                        <th>Statut</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for ($i = 1; $i <= 50; $i++)
-                                        <tr>
-                                            <td class="d-flex align-items-center gap-2">
-                                                <div class="h-25 w-25 d-flex-center b-r-50 overflow-hidden text-bg-primary">
-                                                    <img src="{{ asset('../assets/images/avtar/' . (($i % 9) + 1) . '.png') }}"
-                                                        alt="" class="img-fluid">
-                                                </div>
-                                                <span class="title-text mb-0">Utilisateur {{ $i }}</span>
-                                            </td>
-                                            <td>Point {{ chr(64 + (($i % 26) + 1)) }}</td>
-                                            <td>+237 {{ str_pad($i, 9, '6') }}</td>
-                                            <td>Responsable point de distribution</td>
-                                            <td>{{ date('d M,Y', strtotime("-$i days")) }}</td>
-                                            <td><span
-                                                    class="badge text-outline-{{ $i % 2 ? 'success' : 'danger' }}">{{ $i % 2 ? 'Actif' : 'Inactif' }}</span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group dropdown-icon-none">
-                                                    <button
-                                                        class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
-                                                        type="button" id="dropdownMenuButton{{ $i }}"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="ti ti-dots-vertical"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu"
-                                                        aria-labelledby="dropdownMenuButton{{ $i }}">
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('users.details', $i) }}">
-                                                                <i class="ti ti-eye text-primary me-2"></i> Détail
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                                                data-bs-target="#editUserModal"
-                                                                data-user-id="{{ $i }}">
-                                                                <i class="ti ti-edit text-success me-2"></i> Editer
-                                                            </a>
-                                                        </li>
-                                                        @if ($i % 2)
-                                                            <li>
-                                                                <a class="dropdown-item toggle-status-btn" href="#"
-                                                                    data-user-id="{{ $i }}"
-                                                                    data-status="active">
-                                                                    <i class="ti ti-ban text-warning me-2"></i> Désactiver
-                                                                </a>
-                                                            </li>
-                                                        @else
-                                                            <li>
-                                                                <a class="dropdown-item toggle-status-btn" href="#"
-                                                                    data-user-id="{{ $i }}"
-                                                                    data-status="inactive">
-                                                                    <i class="ti ti-check text-success me-2"></i> Activer
-                                                                </a>
-                                                            </li>
-                                                        @endif
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endfor
-                                </tbody>
-                            </table>
+                            <livewire:users-table />
                         </div>
                     </div>
                 </div>
