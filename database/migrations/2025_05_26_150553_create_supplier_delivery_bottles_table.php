@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('supplier_delivery_bottles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('supplier_delivery_id')->constrained()->onDelete('cascade');
-            $table->foreignId('supplier_delivery_product_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('supplier_delivery_product_type_id')
+                 ->constrained('supplier_delivery_product_types', 'id', 'prod_type_fk')
+                 ->onDelete('cascade');
             $table->foreignId('bottle_id')->constrained()->onDelete('restrict');
             $table->timestamps();
             

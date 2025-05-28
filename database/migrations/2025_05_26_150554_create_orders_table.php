@@ -1,5 +1,8 @@
 <?php
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,14 +18,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->constrained()->onDelete('restrict');
             $table->foreignId('delivery_address_id')->constrained('customer_delivery_addresses')->onDelete('restrict');
-            $table->foreignId('delivery_person_id')->nullable()->constrained()->onDelete('restrict');
+            $table->unsignedBigInteger('delivery_person_id')->nullable();
             $table->foreignId('distribution_center_id')->constrained()->onDelete('restrict');
             
             $table->string('order_number', 255)->unique();
             $table->enum('delivery_type', ['normal', 'fast'])->default('normal');
-            $table->enum('status', ['confirmed', 'ready', 'in_transit', 'delivered', 'cancelled'])->default('confirmed');
-            $table->enum('payment_status', ['not_paid', 'paid', 'refunded'])->default('paid');
-            $table->enum('payment_method', ['card', 'orange_money', 'mobile_money']);
+            $table->enum('status', OrderStatus::values())->default(OrderStatus::CONFIRMED());
+            $table->enum('payment_status', PaymentStatus::values())->default(PaymentStatus::PAID());
+            $table->enum('payment_method', PaymentMethod::values());
             
             $table->decimal('subtotal', 10, 2);
             $table->decimal('delivery_fee', 10, 2)->default(0);
@@ -35,7 +38,7 @@ return new class extends Migration
             
             // Add indexes for common queries
             $table->index(['customer_id', 'status']);
-            $table->index(['delivery_person_id', 'status']);
+            $table->index('delivery_person_id');
             $table->index(['distribution_center_id', 'status']);
             $table->index('order_date');
         });

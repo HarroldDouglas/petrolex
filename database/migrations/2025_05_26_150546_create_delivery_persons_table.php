@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('delivery_persons', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('distribution_center_id')->constrained()->onDelete('restrict');
-            $table->string('vehicle_type', 100)->nullable();
-            $table->string('vehicle_number', 100)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

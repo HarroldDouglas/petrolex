@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ProductType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,7 @@ return new class extends Migration
         Schema::create('supplier_delivery_product_types', function (Blueprint $table) {
             $table->id();
             $table->foreignId('supplier_delivery_id')->constrained()->onDelete('cascade');
-            $table->enum('product_type', ['bottle', 'accessory']);
+            $table->enum('product_type', ProductType::values());
             $table->foreignId('bottle_type_id')->nullable()->constrained()->onDelete('restrict');
             $table->foreignId('accessory_type_id')->nullable()->constrained()->onDelete('restrict');
             $table->integer('expected_quantity');

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\SupplierDeliveryStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->string('supplier_name', 255);
             $table->text('description')->nullable();
             $table->date('delivery_date');
-            $table->enum('status', ['in_progress', 'completed', 'cancelled'])->default('in_progress');
+            $table->enum('status', SupplierDeliveryStatus::values())->default('in_progress');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

@@ -5,10 +5,10 @@ namespace App\Enums;
 use Spatie\Enum\Laravel\Enum;
 
 /**
- * @method static self email()
- * @method static self phone()
+ * @method static self BOTTLE()
+ * @method static self ACCESSORY()
  */
-class LoginChannel extends Enum
+class ProductType extends Enum
 {
     /**
      * @return string[]
@@ -16,8 +16,8 @@ class LoginChannel extends Enum
     public static function labels(): array
     {
         return [
-            'email' => 'Email',
-            'phone' => 'Numéro de téléphone',
+            'BOTTLE' => 'Bouteille',
+            'ACCESSORY' => 'Accessoire',
         ];
     }
 
@@ -27,8 +27,8 @@ class LoginChannel extends Enum
     public static function values(): array
     {
         return [
-            'email' => 'email',
-            'phone' => 'phone_number',
+            'BOTTLE' => 'bottle',
+            'ACCESSORY' => 'accessory',
         ];
     }
 }

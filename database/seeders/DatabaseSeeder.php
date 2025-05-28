@@ -12,7 +12,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            UserSeeder::class,
+            RolePermissionSeeder::class,
+            Production\BottleTypeSeeder::class,
         ]);
+
+        if (app()->environment('local', 'development', 'testing')) {
+            $this->call(DevelopmentSeeder::class);
+            $this->command->info('Development data seeded successfully!');
+        }
     }
 }

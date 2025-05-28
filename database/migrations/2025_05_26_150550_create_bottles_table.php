@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\BottleStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,7 +19,7 @@ return new class extends Migration
             $table->foreignId('distribution_center_id')->constrained()->onDelete('restrict');
             $table->string('barcode', 255)->unique();
             $table->boolean('is_filled')->default(true);
-            $table->enum('status', ['in_stock', 'with_delivery_person', 'with_client', 'lost_stolen', 'returned_to_supplier'])->default('in_stock');
+            $table->enum('status', BottleStatus::values())->default('in_stock');
             $table->timestamps();
             
             // Add indexes for better performance

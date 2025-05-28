@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -72,5 +74,66 @@ class User extends Authenticatable
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * Get the customer associated with the user.
+     */
+    public function customer(): HasOne
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    /**
+     * Get the delivery person associated with the user.
+     */
+    public function deliveryPerson(): HasOne
+    {
+        return $this->hasOne(DeliveryPerson::class);
+    }
+
+    /**
+     * Get the distribution centers this user has permission to access.
+     */
+    public function centerPermissions(): HasMany
+    {
+        return $this->hasMany(UserCenterPermission::class);
+    }
+
+    /**
+     * Get the supplier deliveries managed by this user.
+     */
+    public function supplierDeliveries(): HasMany
+    {
+        return $this->hasMany(SupplierDelivery::class);
+    }
+
+    /**
+     * Get the bottle movements recorded by this user.
+     */
+    public function bottleMovements(): HasMany
+    {
+        return $this->hasMany(BottleMovement::class);
+    }
+
+    /**
+     * Check if the user is a customer.
+     */
+    public function isCustomer(): bool
+    {
+        return $this->customer()->exists();
+    }
+
+    /**
+     * Check if the user is a delivery person.
+     */
+    public function isDeliveryPerson(): bool
+    {
+        return $this->deliveryPerson()->exists();
+    }
+
+    public function isGlobal()
+    {
+        return $this->centerPermissions()->count() === 0;
     }
 }
