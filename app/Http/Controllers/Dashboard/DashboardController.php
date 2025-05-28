@@ -62,7 +62,7 @@ class DashboardController extends Controller
                 'total_amount' => 410.00,
                 'delivery_man' => 'Fouda Mireille',
                 'order_date' => '24/04/2025',
-                'status' => 'Terminée',
+                'status' => 'Annulée',
             ],
             [
                 'id' => 'CMD00123',
@@ -114,7 +114,7 @@ class DashboardController extends Controller
                 'total_amount' => 410.00,
                 'delivery_man' => 'Ngeufack Jean',
                 'order_date' => '27/04/2025',
-                'status' => 'Terminée',
+                'status' => 'Annulée',
             ],
             [
                 'id' => 'CMD00127',
@@ -140,13 +140,13 @@ class DashboardController extends Controller
                 'total_amount' => 660.00,
                 'delivery_man' => 'Ngeufack Jean',
                 'order_date' => '29/04/2025',
-                'status' => 'Terminée',
+                'status' => 'En cours',
             ],
         ];
 
         // Types de bouteilles et statuts pour les filtres
         $itemTypes = ['Bouteille 9kg', 'Bouteille 12kg'];
-        $statuses = ['En cours', 'Terminée'];
+        $statuses = ['En cours', 'Terminée', 'Annulée'];
 
         // Retourner la vue avec les données
         return view('dashboard.index', compact('orders', 'itemTypes', 'statuses'));

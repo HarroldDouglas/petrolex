@@ -118,7 +118,7 @@ return [
     UserRole::CENTER_MANAGER()->value => [
         'distribution_center.manage_own',
         'distribution_center.assign_deliverers',
-        'users.view',
+        'users.view', 'users.create', 'users.edit', 'users.delete',
         'orders.view',
         'orders.edit',
         'orders.assign',

@@ -52,7 +52,7 @@
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="warehouse_filter" class="form-label"> Point de distribution : </label>
+                                    <label for="warehouse_filter" class="form-label"> Centre de distribution : </label>
                                     <select id="warehouse_filter" name="warehouse" class="form-select">
                                         <option value="" selected>Tous</option>
                                         <option value="Point A">Point A</option>

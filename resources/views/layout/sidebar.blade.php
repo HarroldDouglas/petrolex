@@ -23,22 +23,6 @@
                 </li>
             @endcan
 
-            @canany(['users.view', 'users.create'])
-                <li>
-                    <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#users">
-                        <i class="iconoir-user"></i> Utilisateurs
-                    </a>
-                    <ul class="collapse" id="users">
-                        @can('users.view')
-                            <li><a href="{{ route('users.list') }}"> Liste</a></li>
-                        @endcan
-                        @can('users.create')
-                            <li><a href="{{ route('users.create') }}"> Nouveau</a></li>
-                        @endcan
-                    </ul>
-                </li>
-            @endcanany
-
             @canany(['suppliers.view', 'suppliers.create'])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#supply">
@@ -85,10 +69,26 @@
                 </li>
             @endcanany
 
+            @canany(['users.view', 'users.create'])
+                <li>
+                    <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#users">
+                        <i class="iconoir-user"></i> Utilisateurs
+                    </a>
+                    <ul class="collapse" id="users">
+                        @can('users.view')
+                            <li><a href="{{ route('users.list') }}"> Liste</a></li>
+                        @endcan
+                        @can('users.create')
+                            <li><a href="{{ route('users.create') }}"> Nouveau</a></li>
+                        @endcan
+                    </ul>
+                </li>
+            @endcanany
+
             @canany(['distribution_centers.view', 'distribution_centers.create'])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#point-of-sales">
-                        <i class="iconoir-network"></i> Points de distribution
+                        <i class="iconoir-network"></i> Centres dedistribution
                     </a>
                     <ul class="collapse" id="point-of-sales">
                         @can('distribution_centers.view')

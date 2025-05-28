@@ -41,7 +41,7 @@
         <!-- Filter Options-->
         <div class="row m-1">
             <div class="col-12 collapse mb-4 p-0" id="collapseFilter">
-                @livewire('dashboard.filter-component')
+                @livewire('components.filter-component')
             </div>
         </div>
 
@@ -108,7 +108,7 @@
             <div class="col-12">
                 <div class="card card-border">
                     <div class="card-header">
-                        <h4 class="card-title">Les Ventes</h4>
+                        <h4 class="card-title">Les Commandes</h4>
                     </div>
                     <div class="card-body px-0">
                         <div class="table-responsive app-scroll app-datatable-default">
@@ -145,6 +145,9 @@
                                                     $badgeClass = 'text-outline-success';
                                                     if ($order['status'] === 'En cours') {
                                                         $badgeClass = 'text-outline-warning';
+                                                    }
+                                                    if ($order['status'] === 'Annulée') {
+                                                        $badgeClass = 'text-outline-danger';
                                                     }
                                                 @endphp
                                                 <span class="badge {{ $badgeClass }}">{{ $order['status'] }}</span>
@@ -268,163 +271,3 @@
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
 
 @endsection
-
-{{--
-<tr>
-                                        <td><a href="{{ route('orders.details', 2) }}">CMD00126</a></td>
-                                        <td>Point YDE B</td>
-                                        <td>Ndongo Carine</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1 text-small">3 x
-                                                Bouteille de 9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary text-small">4 x Bouteille de
-                                                12kg</span>
-                                        </td>
-                                        <td>45 000</td>
-                                        <td>Eyoum Claire</td>
-                                        <td>23/04/2025</td>
-                                        <td><span class="badge text-outline-warning">En cours</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 2) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="{{ route('orders.details', 3) }}">CMD00127</a></td>
-                                        <td>Point YDE C</td>
-                                        <td>Mbarga Elise</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">2 x Bouteille de
-                                                9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">5 x Bouteille de 12kg</span>
-                                        </td>
-                                        <td>60 000</td>
-                                        <td>Kamga Lionel</td>
-                                        <td>24/04/2025</td>
-                                        <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 3) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="{{ route('orders.details', 4) }}">CMD00128</a></td>
-                                        <td>Point YDE D</td>
-                                        <td>Ndongmo Roger</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">4 x Bouteille de
-                                                9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">3 x Bouteille de 12kg</span>
-                                        </td>
-                                        <td>50 000</td>
-                                        <td>Fouda Mireille</td>
-                                        <td>24/04/2025</td>
-                                        <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 4) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="{{ route('orders.details', 5) }}">CMD00129</a></td>
-                                        <td>Point YDE E</td>
-                                        <td>Ekani Paul</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">5 x Bouteille de
-                                                9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">2 x Bouteille de 12kg</span>
-                                        </td>
-                                        <td>70 000</td>
-                                        <td>Tchatchoua Paul</td>
-                                        <td>25/04/2025</td>
-                                        <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 5) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="{{ route('orders.details', 6) }}">CMD00130</a></td>
-                                        <td>Point YDE F</td>
-                                        <td>Fotso Jules</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">3 x Bouteille de
-                                                9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">6 x Bouteille de 12kg</span>
-                                        </td>
-                                        <td>85 000</td>
-                                        <td>Nguefack Jean</td>
-                                        <td>25/04/2025</td>
-                                        <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 6) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="{{ route('orders.details', 7) }}">CMD00131</a></td>
-                                        <td>Point YDE F</td>
-                                        <td>Fotso Jules</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">5 x Bouteille de
-                                                9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">3 x Bouteille de 12kg</span>
-                                        </td>
-                                        <td>70 000</td>
-                                        <td>Nguefack Jean</td>
-                                        <td>26/04/2025</td>
-                                        <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 7) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="{{ route('orders.details', 8) }}">CMD00132</a></td>
-                                        <td>Point YDE F</td>
-                                        <td>Fotso Jules</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">3 x Bouteille de
-                                                9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">4 x Bouteille de
-                                                12kg</span>
-                                        </td>
-                                        <td>80 000</td>
-                                        <td>Nguefack Jean</td>
-                                        <td>27/04/2025</td>
-                                        <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 8) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="{{ route('orders.details', 9) }}">CMD00133</a></td>
-                                        <td>Point YDE F</td>
-                                        <td>Fotso Jules</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">6 x Bouteille de
-                                                9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">2 x Bouteille de
-                                                12kg</span>
-                                        </td>
-                                        <td>90 000</td>
-                                        <td>Nguefack Jean</td>
-                                        <td>28/04/2025</td>
-                                        <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 9) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="{{ route('orders.details', 10) }}">CMD00134</a></td>
-                                        <td>Point YDE F</td>
-                                        <td>Fotso Jules</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-light-secondary mb-1">8 x Bouteille de
-                                                9kg</span>
-                                            <span class="badge rounded-pill bg-light-secondary">4 x Bouteille de
-                                                12kg</span>
-                                        </td>
-                                        <td>110 000</td>
-                                        <td>Nguefack Jean</td>
-                                        <td>29/04/2025</td>
-                                        <td><span class="badge text-outline-success">Terminée</span></td>
-                                        <td>
-                                            <a href="{{ route('orders.details', 10) }}" class="btn btn-info" role="button">Détail</a>
-                                        </td>
-                                    </tr>
---}}{{--$order->id--}}

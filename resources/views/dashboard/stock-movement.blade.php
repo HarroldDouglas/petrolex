@@ -46,7 +46,7 @@
         <!-- Filter Options-->
         <div class="row m-1">
             <div class="col-12 collapse mb-4 p-0" id="collapseFilter">
-                @livewire('dashboard.filter-component')
+                @livewire('components.filter-component', ['period' => $period, 'startDate' => $startDate, 'endDate' => $endDate])
             </div>
         </div>
 
@@ -58,12 +58,12 @@
                         <div class="card ticket-card bg-light-primary">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Entrées<br>(Bouteilles)</p>
+                                    <p class="f-s-16 mb-0">Total des Entrées<br>(Bouteilles Pleines)</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="ph-bold ph-arrow-circle-down f-s-45 text-primary"></i>
                                     </div>
                                 </div>
-                                <h3 class="text-primary-dark">4500</h3>
+                                <h3 class="text-primary-dark">{{ $stats['total_entries'] }}</h3>
                             </div>
                         </div>
                     </div>
@@ -71,12 +71,12 @@
                         <div class="card ticket-card bg-light-warning">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Sorties<br>(Bouteilles)</p>
+                                    <p class="f-s-16 mb-0">Total des Sorties<br>(Bouteilles Vendues)</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="ph-bold ph-arrow-circle-up f-s-45 text-warning"></i>
                                     </div>
                                 </div>
-                                <h3 class="text-warning-dark">2000</h3>
+                                <h3 class="text-warning-dark">{{ $stats['total_exits'] }}</h3>
                             </div>
                         </div>
                     </div>
@@ -84,12 +84,12 @@
                         <div class="card ticket-card bg-light-success">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des<br>Échanges</p>
+                                    <p class="f-s-16 mb-0">Total des Échanges<br> (Bouteilles Vides)</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="ph-bold ph-arrows-left-right f-s-45 text-success"></i>
                                     </div>
                                 </div>
-                                <h3 class="text-success-dark">850</h3>
+                                <h3 class="text-success-dark">{{ $stats['total_exchanges'] }}</h3>
                             </div>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                                         <i class="ph-bold ph-package f-s-45 text-danger"></i>
                                     </div>
                                 </div>
-                                <h3 class="text-danger-dark">3350</h3>
+                                <h3 class="text-danger-dark">{{ $stats['current_stock'] }}</h3>
                             </div>
                         </div>
                     </div>
@@ -123,51 +123,20 @@
                                         <th>Date</th>
                                         <th>Type</th>
                                         <th>Produits</th>
-                                        <th>Quantité</th>
-                                        <th>Origine</th>
                                         <th>Destination</th>
                                         <th>Utilisateur</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @foreach($movements as $movement)
                                     <tr>
-                                        <td>22/04/2025 - 10:14</td>
-                                        <td><span class="badge text-outline-primary">Entrée</span></td>
-                                        <td><span class="badge rounded-pill bg-light-secondary mb-1">100 x Bouteille de
-                                                9kg</span></td>
-                                        <td>+100</td>
-                                        <td>Approvisionnement Petrolex Central</td>
-                                        <td>Point YDE A</td>
-                                        <td>Ntang Luc</td>
+                                        <td>{{ $movement['date'] }}</td>
+                                        <td><span class="badge text-outline-{{ $movement['type_class'] }}">{{ $movement['type'] }}</span></td>
+                                        <td><span class="badge rounded-pill bg-light-secondary mb-1">{{ $movement['products'] }}</span></td>
+                                        <td>{{ $movement['destination'] }}</td>
+                                        <td>{{ $movement['user'] }}</td>
                                     </tr>
-                                    <tr>
-                                        <td>22/04/2025 - 14:45</td>
-                                        <td><span class="badge text-outline-success">Échange</span></td>
-                                        <td><span class="badge rounded-pill bg-light-secondary">30 x Bouteille de
-                                                12kg</span></td>
-                                        <td>30</td>
-                                        <td>Vente</td>
-                                        <td>Point DLA B</td>
-                                        <td>Kamga Lionel</td>
-                                    </tr>
-                                    <tr>
-                                        <td>22/04/2025 - 17:15</td>
-                                        <td><span class="badge text-outline-warning">Sortie</span></td>
-                                        <td>Bouteille 12kg</td>
-                                        <td>-60</td>
-                                        <td>Ventes</td>
-                                        <td>Client final</td>
-                                        <td>Ekani Paul</td>
-                                    </tr>
-                                    <tr>
-                                        <td>22/04/2025 - 18:30</td>
-                                        <td><span class="badge text-outline-success">Échange</span></td>
-                                        <td>Bouteille 9kg</td>
-                                        <td>20</td>
-                                        <td>Vente</td>
-                                        <td>Point YDE A</td>
-                                        <td>Fouda Mireille</td>
-                                    </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -179,15 +148,8 @@
 @endsection
 
 @section('script')
-
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
-
-    <!-- data table js-->
     <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
-
-    <!-- api js -->
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
-
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
-
 @endsection

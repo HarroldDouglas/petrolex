@@ -1,16 +1,16 @@
 @extends('layout.master')
-@section('title', 'Détails du point de distribution')
+@section('title', 'Détails du centre de distribution')
 
 @section('main-content')
     <div class="container-fluid">
         <!-- Breadcrumb with actions buttons -->
         <div class="row m-1">
             <div class="col-8 p-0">
-                <h4 class="main-title">Détails du point de distribution</h4>
+                <h4 class="main-title">Détails du centre de distribution</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li><a href="{{ route('dashboard') }}" class="f-s-14 f-w-500"><i class="ph-duotone ph-stack f-s-16"></i>
                             Tableau de bord</a></li>
-                    <li><a href="{{ route('warehouses.list') }}" class="f-s-14 f-w-500">Points de distribution</a></li>
+                    <li><a href="{{ route('warehouses.list') }}" class="f-s-14 f-w-500">Centres dedistribution</a></li>
                     <li class="active"><a href="#" class="f-s-14 f-w-500">Point A</a></li>
                 </ul>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-lg-8">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title m-0">Informations du point de distribution</h5>
+                        <h5 class="card-title m-0">Informations du centre de distribution</h5>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">

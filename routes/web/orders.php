@@ -23,4 +23,4 @@ Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
     Route::delete('/{order_id}/delete', DeleteOrderController::class)->name('delete');
 });
 
-Route::post('/get-directions', [MapController::class, 'getDirections'])->name('get.directions');
+// Route::post('/get-directions', [MapController::class, 'getDirections'])->name('get.directions');
