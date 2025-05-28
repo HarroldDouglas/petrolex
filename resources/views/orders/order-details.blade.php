@@ -120,11 +120,9 @@
                                     <thead>
                                     <tr>
                                         <th scope="col" class="text-start">Détails des Articles</th>
-                                        <th scope="col">Date de Commande</th>
-                                        <th scope="col">Prix</th>
                                         <th scope="col">Quantité</th>
+                                        <th scope="col">Prix</th>
                                         <th scope="col">Total</th>
-                                        <th scope="col">Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -142,26 +140,18 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>{{ \Carbon\Carbon::createFromFormat('d/m/Y', $order['order_date'])->format('d/m/Y') }}</td>
-                                                <td class="text-success f-w-500">{{ number_format($item['price'], 2) }}</td>
                                                 <td class="f-w-600">{{ $item['quantity'] }}</td>
+                                                <td class="text-success f-w-500">{{ number_format($item['price'], 2) }}</td>
                                                 <td class="text-success f-w-500">
                                                     {{ number_format($item['price'] * $item['quantity'], 2) }}
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-success icon-btn b-r-4">
-                                                        <i class="ti ti-edit"></i> </button>
-                                                    <button type="button" class="btn btn-danger icon-btn b-r-4 delete-btn">
-                                                        <i class="ti ti-trash"></i>
-                                                    </button>
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
-                                    <tr class="text-start">
-                                        <td colspan="2" class="text-start">Sous-total</td>
-                                        <td colspan="4" class="text-center f-w-500">
+                                    <tr>
+                                        <td colspan="1" class="text-start">Sous-total</td>
+                                        <td colspan="3" class="text-end f-w-500">
                                             <strong>{{ number_format($order['total_amount'], 2) }}</strong>
                                         </td>
                                     </tr>

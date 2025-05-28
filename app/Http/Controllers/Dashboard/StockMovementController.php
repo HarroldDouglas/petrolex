@@ -68,7 +68,7 @@ class StockMovementController extends Controller
                 'type' => 'Entrée',
                 'type_class' => 'primary',
                 'products' => '100 x Bouteille de 9kg',
-                'destination' => 'Point YDE A',
+                'destination' => 'Centre YDE A',
                 'user' => 'Ntang Luc',
             ],
             [
@@ -92,7 +92,7 @@ class StockMovementController extends Controller
                 'type' => 'Échange',
                 'type_class' => 'success',
                 'products' => 'Bouteille 9kg',
-                'destination' => 'Point YDE A',
+                'destination' => 'Centre YDE A',
                 'user' => 'Fouda Mireille',
             ],
         ];

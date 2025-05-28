@@ -183,7 +183,7 @@
                                         <td><a href="#">CMD00125</a></td>
                                         <td><a href="#">TRN00432</a></td>
                                         <td>Fotso Jules</td>
-                                        <td>Point YDE A</td>
+                                        <td>Centre YDE A</td>
                                         <td>30 000</td>
                                         <td>Vente de produit</td>
                                         <td>OM</td>
@@ -205,7 +205,7 @@
                                         <td><a href="#">CMD00127</a></td>
                                         <td><a href="#">TRN00434</a></td>
                                         <td>Mbarga Elise</td>
-                                        <td>Point YDE C</td>
+                                        <td>Centre YDE C</td>
                                         <td>50 000</td>
                                         <td>Vente de produit</td>
                                         <td>Carte Bancaire</td>
@@ -216,7 +216,7 @@
                                         <td><a href="#">CMD00128</a></td>
                                         <td><a href="#">TRN00435</a></td>
                                         <td>Kamga Lionel</td>
-                                        <td>Point YDE D</td>
+                                        <td>Centre YDE D</td>
                                         <td>60 000</td>
                                         <td>Vente de produit</td>
                                         <td>OM</td>
@@ -227,7 +227,7 @@
                                         <td><a href="#">CMD00129</a></td>
                                         <td><a href="#">TRN00436</a></td>
                                         <td>Fouda Mireille</td>
-                                        <td>Point YDE E</td>
+                                        <td>Centre YDE E</td>
                                         <td>70 000</td>
                                         <td>Vente de produit</td>
                                         <td>MOMO</td>
@@ -238,7 +238,7 @@
                                         <td><a href="#">CMD00130</a></td>
                                         <td><a href="#">TRN00437</a></td>
                                         <td>Ekani Paul</td>
-                                        <td>Point YDE F</td>
+                                        <td>Centre YDE F</td>
                                         <td>80 000</td>
                                         <td>Vente de produit</td>
                                         <td>Carte Bancaire</td>

@@ -116,7 +116,7 @@
                                 <thead>
                                     <tr>
                                         <th>N° commande</th>
-                                        <th>Point de distr.</th>
+                                        <th>Centre de distr.</th>
                                         <th>Client</th>
                                         <th>Produits</th>
                                         <th>Total (CFA)</th>

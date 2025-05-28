@@ -54,7 +54,7 @@
                                 <thead>
                                     <tr>
                                         <th class="w-10">Reference</th>
-                                        <th class="w-10">Point de distr.</th>
+                                        <th class="w-10">Centre de distr.</th>
                                         <th class="w-20">Produits</th>
                                         <th class="w-5">Quantité</th>
                                         <th class="w-10">Fournisseur</th>

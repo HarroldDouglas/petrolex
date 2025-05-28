@@ -33,7 +33,7 @@
                                         <div class="d-flex-center">
                                             <span class="h-45 w-45 d-flex-center b-r-10">
                                                 <img alt="" class="img-fluid b-r-10"
-                                                    src="../assets/images/avtar/woman.jpg">
+                                                    src="{{ asset('assets/images/avtar/woman.jpg') }}">
                                             </span>
                                         </div>
                                         <div>
