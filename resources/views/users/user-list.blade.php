@@ -11,31 +11,8 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css"
         href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
-<style>
-    body {
-        font-family: DejaVu Sans, sans-serif;
-        font-size: 10px;
-    }
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 18px;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 15px;
-    }
-    th, td {
-        border: 1px solid #ddd;
-        padding: 5px;
-        text-align: left;
-    }
-    th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-    }
-</style>
+    <link rel="stylesheet" type="text/css"
+        href="{{ asset('assets/css/custom-datatable.css') }}">
 @endsection
 
 @section('main-content')
