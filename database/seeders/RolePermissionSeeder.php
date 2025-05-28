@@ -4,6 +4,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PermissionEnum;
 use App\Enums\UserRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -20,15 +21,14 @@ class RolePermissionSeeder extends Seeder
     {
         $this->resetTables();
 
-        // Load permissions and roles from config files
-        $permissions = config('permissions');
-        $roles = config('roles');
+        // Get permissions from enum instead of config
+        $permissions = PermissionEnum::values();
 
         // Create permissions
         $this->createPermissions($permissions);
 
-        // Create roles with their permissions
-        $this->createRolesWithPermissions($roles);
+        // Create roles with their permissions from enum
+        $this->createRolesWithPermissions();
 
         // Ensure super_admin has ALL permissions
         $this->assignAllPermissionsToSuperAdmin();
@@ -60,7 +60,7 @@ class RolePermissionSeeder extends Seeder
     }
 
     /**
-     * Create all permissions from config.
+     * Create all permissions from enum.
      *
      * @param  array  $permissions  List of permission names
      */
@@ -78,15 +78,16 @@ class RolePermissionSeeder extends Seeder
     }
 
     /**
-     * Create roles and assign permissions to them.
-     *
-     * @param  array  $roles  Roles with their respective permissions
+     * Create roles and assign permissions to them using enums.
      */
-    private function createRolesWithPermissions(array $roles): void
+    private function createRolesWithPermissions(): void
     {
         $this->command->info('Creating roles and assigning permissions...');
 
-        foreach ($roles as $roleName => $permissions) {
+        foreach (UserRole::cases() as $roleEnum) {
+            $roleName = $roleEnum->value;
+            $permissions = $roleEnum->permissions();
+
             $role = Role::firstOrCreate(['name' => $roleName]);
 
             if (! empty($permissions)) {
