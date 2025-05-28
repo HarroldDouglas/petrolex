@@ -4,7 +4,7 @@ use App\Enums\UserRole;
 
 return [
     UserRole::SUPER_ADMIN()->value => [
-        // Has all permissions through Gate::before implementation
+        // Will receive all permissions from config.permissions
     ],
 
     UserRole::ADMIN()->value => [

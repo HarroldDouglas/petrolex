@@ -4,6 +4,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -19,8 +20,18 @@ class RolePermissionSeeder extends Seeder
     {
         $this->resetTables();
 
-        $this->createPermissions(config('permissions'));
-        $this->createRolesWithPermissions(config('roles'));
+        // Load permissions and roles from config files
+        $permissions = config('permissions');
+        $roles = config('roles');
+
+        // Create permissions
+        $this->createPermissions($permissions);
+
+        // Create roles with their permissions
+        $this->createRolesWithPermissions($roles);
+
+        // Ensure super_admin has ALL permissions
+        $this->assignAllPermissionsToSuperAdmin();
 
         $this->command->info('Roles and permissions created successfully!');
     }
@@ -84,6 +95,28 @@ class RolePermissionSeeder extends Seeder
             } else {
                 $this->command->info("Role '{$roleName}' created without specific permissions.");
             }
+        }
+    }
+
+    /**
+     * Ensure super_admin has all permissions
+     */
+    private function assignAllPermissionsToSuperAdmin(): void
+    {
+        $this->command->info('Assigning all permissions to Super Admin...');
+
+        $superAdminRole = Role::where('name', UserRole::SUPER_ADMIN()->value)->first();
+
+        if ($superAdminRole) {
+            // Get all permissions
+            $allPermissions = Permission::all();
+
+            // Assign all permissions to super admin
+            $superAdminRole->syncPermissions($allPermissions);
+
+            $this->command->info('Super Admin now has all '.$allPermissions->count().' permissions.');
+        } else {
+            $this->command->error('Super Admin role not found!');
         }
     }
 }
