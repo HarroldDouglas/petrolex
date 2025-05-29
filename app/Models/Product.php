@@ -19,8 +19,6 @@ class Product extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'bottle_type_id',
-        'accessory_type_id',
         'product_type',
     ];
 
@@ -78,7 +76,7 @@ class Product extends Model
      */
     public function scopeBottles($query)
     {
-        return $query->where('product_type', ProductType::Bottle);
+        return $query->where('product_type', ProductType::BOTTLE());
     }
 
     /**
@@ -86,6 +84,6 @@ class Product extends Model
      */
     public function scopeAccessories($query)
     {
-        return $query->where('product_type', ProductType::Accessory);
+        return $query->where('product_type', ProductType::ACCESSORY());
     }
 }

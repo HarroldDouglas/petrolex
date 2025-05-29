@@ -26,16 +26,6 @@ class DeliveryPerson extends Model
      */
     protected $fillable = [
         'user_id',
-        'is_active',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'is_active' => 'boolean',
     ];
 
     /**
@@ -51,8 +41,20 @@ class DeliveryPerson extends Model
      */
     public function distributionCenters(): BelongsToMany
     {
-        return $this->belongsToMany(DistributionCenter::class, 'delivery_person_distribution_center')
-            ->withTimestamps();
+        return $this->belongsToMany(
+            DistributionCenter::class,
+            'user_distribution_centers',
+            'user_id',
+            'distribution_center_id',
+        )
+            ->withPivot(['is_active'])
+            ->withTimestamps()
+            ->wherePivot('is_active', true);
+    }
+
+    public function activeDistributionCenters(): BelongsToMany
+    {
+        return $this->distributionCenters()->wherePivot('is_active', true);
     }
 
     /**

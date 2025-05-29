@@ -112,53 +112,7 @@
                     </div>
                     <div class="card-body px-0">
                         <div class="table-responsive app-scroll app-datatable-default">
-                            <table class="w-100 display ticket-app-table" id="ticketdatatable">
-                                <thead>
-                                    <tr>
-                                        <th>N° commande</th>
-                                        <th>Centre de distr.</th>
-                                        <th>Client</th>
-                                        <th>Produits</th>
-                                        <th>Total (CFA)</th>
-                                        <th>Livreur</th>
-                                        <th>Date</th>
-                                        <th>Statut</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ticket_key_body">
-                                    @forEach ($orders as $order)
-                                        <tr>
-                                            <td><a href="{{ route('orders.details', $order['id']) }}">{{ $order['id'] }}</a></td>
-                                            <td>{{ $order['delivery_address'] }}</td>
-                                            <td>{{ $order['customer_name'] }}</td>
-                                            <td>
-                                                @foreach ($order['items'] as $item)
-                                                    <span class="badge rounded-pill bg-light-secondary mb-1 text-small">{{ $item['quantity'] }} x {{ $item['name'] }}</span>
-                                                @endforeach
-                                            </td>
-                                            <td>{{ number_format($order['total_amount'], 0, ',', ' ') }} CFA</td>
-                                            <td>{{ $order['delivery_man'] }}</td>
-                                            <td>{{ \Carbon\Carbon::createFromFormat('d/m/Y', $order['order_date'])->format('d/m/Y') }}</td>
-                                            <td>
-                                                @php
-                                                    $badgeClass = 'text-outline-success';
-                                                    if ($order['status'] === 'En cours') {
-                                                        $badgeClass = 'text-outline-warning';
-                                                    }
-                                                    if ($order['status'] === 'Annulée') {
-                                                        $badgeClass = 'text-outline-danger';
-                                                    }
-                                                @endphp
-                                                <span class="badge {{ $badgeClass }}">{{ $order['status'] }}</span>
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('orders.details', $order['id']) }}" class="btn btn-info" role="button">Détail</a>{{--$order->id--}}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            @livewire('dashboard.dashboard-data-table')
                         </div>
                     </div>
                 </div>

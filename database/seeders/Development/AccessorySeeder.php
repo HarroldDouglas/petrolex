@@ -4,8 +4,6 @@
 
 namespace Database\Seeders\Development;
 
-use App\Enums\ProductType;
-use App\Models\Accessory;
 use App\Models\AccessoryType;
 use App\Models\DistributionCenter;
 use App\Models\Product;
@@ -36,24 +34,8 @@ class AccessorySeeder extends Seeder
             return;
         }
 
-        $accessoryProducts = Product::where('product_type', ProductType::ACCESSORY())->get();
-
-        if ($accessoryProducts->isEmpty()) {
-            $this->command->error('No accessory products found. Run ProductSeeder first.');
-
-            return;
-        }
-
-        $productMapping = [];
-
-        foreach ($accessoryTypes as $index => $accessoryType) {
-            if (isset($accessoryProducts[$index])) {
-                $productMapping[$accessoryType->id] = $accessoryProducts[$index]->id;
-            }
-        }
-
         foreach ($centers as $center) {
-            $this->createAccessoriesForCenter($center, $accessoryTypes, $productMapping);
+            $this->createAccessoriesForCenter($center, $accessoryTypes);
         }
 
         $this->command->info('Development accessories created successfully!');
@@ -62,25 +44,19 @@ class AccessorySeeder extends Seeder
     /**
      * Create accessories for a distribution center
      */
-    private function createAccessoriesForCenter(DistributionCenter $center, $accessoryTypes, $productMapping): void
+    private function createAccessoriesForCenter(DistributionCenter $center, $accessoryTypes): void
     {
         $this->command->info("Creating accessories for {$center->name}...");
 
         foreach ($accessoryTypes as $accessoryType) {
-            if (! isset($productMapping[$accessoryType->id])) {
-                $this->command->warn("No product found for accessory type {$accessoryType->name}. Skipping.");
-                continue;
-            }
-
             $quantity = fake()->numberBetween(10, 50);
 
-            Accessory::create([
-                'product_id' => $productMapping[$accessoryType->id], // Utiliser le mapping pour trouver le bon product_id
-                'accessory_type_id' => $accessoryType->id,
-                'distribution_center_id' => $center->id,
-                'sku' => 'ACC-'.strtoupper(Str::random(6)),
-                'quantity' => $quantity,
-            ]);
+            $product = Product::factory()
+                ->accessory($accessoryType->id, $center->id, [
+                    'sku' => 'ACC-'.strtoupper(Str::random(6)),
+                    'quantity' => $quantity,
+                ])
+                ->create();
 
             $this->command->info("{$quantity} {$accessoryType->name} accessories created for {$center->name}");
         }

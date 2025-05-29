@@ -12,9 +12,10 @@ use App\Models\BottleMovement;
 use App\Models\BottleType;
 use App\Models\DeliveryPerson;
 use App\Models\DistributionCenter;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class BottleSeeder extends Seeder
 {
@@ -40,43 +41,71 @@ class BottleSeeder extends Seeder
             return;
         }
 
-        // Créer des bouteilles avec différents statuts pour chaque centre
+        // Make sure the pivot table exists and has data
+        $pivotExists = DB::table('bottle_type_distribution_center')->count() > 0;
+        if (! $pivotExists) {
+            $this->command->error('Stock data not found. Run BottleTypeDistributionCenterSeeder first.');
+
+            return;
+        }
+
         foreach ($centers as $center) {
             $this->createBottlesInStock($center, $bottleTypes);
             $this->createBottlesWithDeliveryPersons($center);
             $this->createBottlesWithClients($center);
             $this->createLostOrStolenBottles($center, $bottleTypes);
             $this->createReturnedToSupplierBottles($center, $bottleTypes);
+
+            // Update the pivot table to reflect the actual bottle counts
+            $this->updateStockCounts($center);
         }
 
         $this->command->info('Development bottles created successfully!');
     }
 
     /**
-     * Create bottles in stock for a distribution center
+     * Create bottles in stock for a distribution center based on pivot table data
      */
     private function createBottlesInStock(DistributionCenter $center, $bottleTypes): void
     {
         $this->command->info("Creating bottles in stock for {$center->name}...");
 
         foreach ($bottleTypes as $bottleType) {
-            $count = fake()->numberBetween(15, 40);
+            // Get the stock counts from the pivot table
+            $stockData = DB::table('bottle_type_distribution_center')
+                ->where('distribution_center_id', $center->id)
+                ->where('bottle_type_id', $bottleType->id)
+                ->first();
 
-            for ($i = 0; $i < $count; $i++) {
-                // 65% bottles are filled, 35% are empty
-                $isFilled = fake()->boolean(65);
-
-                Bottle::create([
-                    'product_id' => $bottleType->id,
-                    'bottle_type_id' => $bottleType->id,
-                    'distribution_center_id' => $center->id,
-                    'barcode' => 'BT'.strtoupper(Str::random(8)),
-                    'is_filled' => $isFilled,
-                    'status' => BottleStatus::IN_STOCK(),
-                ]);
+            if (! $stockData) {
+                $this->command->warn("No stock data found for {$bottleType->name} in {$center->name}. Skipping.");
+                continue;
             }
 
-            $this->command->info("{$count} {$bottleType->name} bottles created for {$center->name}");
+            $emptyCount = min($stockData->stock_empty, 40); // Limit to prevent too many records
+            $filledCount = min($stockData->stock_filled, 40); // Limit to prevent too many records
+
+            // Create empty bottles
+            for ($i = 0; $i < $emptyCount; $i++) {
+                Product::factory()
+                    ->bottle($bottleType->id, $center->id, [
+                        'is_filled' => false,
+                        'status' => BottleStatus::IN_STOCK(),
+                    ])
+                    ->create();
+            }
+
+            // Create filled bottles
+            for ($i = 0; $i < $filledCount; $i++) {
+                Product::factory()
+                    ->bottle($bottleType->id, $center->id, [
+                        'is_filled' => true,
+                        'status' => BottleStatus::IN_STOCK(),
+                    ])
+                    ->create();
+            }
+
+            $this->command->info("{$emptyCount} empty and {$filledCount} filled {$bottleType->name} bottles created for {$center->name}");
         }
     }
 
@@ -109,18 +138,16 @@ class BottleSeeder extends Seeder
                 $bottleType = $bottleTypes->random();
 
                 // Create the bottle (always filled as it is in delivery)
-                $bottle = Bottle::create([
-                    'product_id' => $bottleType->id,
-                    'bottle_type_id' => $bottleType->id,
-                    'distribution_center_id' => $center->id,
-                    'barcode' => 'BT'.strtoupper(Str::random(8)),
-                    'is_filled' => true,
-                    'status' => BottleStatus::WITH_DELIVERY_PERSON(),
-                ]);
+                $product = Product::factory()
+                    ->bottle($bottleType->id, $center->id, [
+                        'is_filled' => true,
+                        'status' => BottleStatus::WITH_DELIVERY_PERSON(),
+                    ])
+                    ->create();
 
                 // Record the movement of this bottle
                 BottleMovement::create([
-                    'bottle_id' => $bottle->id,
+                    'bottle_id' => $product->bottle->id,
                     'user_id' => $deliveryPerson->id,
                     'distribution_center_id' => $center->id,
                     'type' => BottleMovementType::ASSIGNMENT_TO_DELIVERY(),
@@ -152,7 +179,6 @@ class BottleSeeder extends Seeder
         $deliveryPersons = User::role(UserRole::DELIVERY_PERSON()->value)->get();
 
         foreach ($customers as $customer) {
-            // Chaque client a entre 0 et 3 bouteilles
             $bottleCount = fake()->numberBetween(0, 3);
 
             if ($bottleCount === 0) {
@@ -162,20 +188,18 @@ class BottleSeeder extends Seeder
             for ($i = 0; $i < $bottleCount; $i++) {
                 $bottleType = $bottleTypes->random();
 
-                $bottle = Bottle::create([
-                    'product_id' => $bottleType->id, // Association avec le produit correspondant
-                    'bottle_type_id' => $bottleType->id,
-                    'distribution_center_id' => $center->id,
-                    'barcode' => 'BT'.strtoupper(Str::random(8)),
-                    'is_filled' => true,
-                    'status' => BottleStatus::WITH_CLIENT(),
-                ]);
+                $product = Product::factory()
+                    ->bottle($bottleType->id, $center->id, [
+                        'is_filled' => true,
+                        'status' => BottleStatus::WITH_CLIENT(),
+                    ])
+                    ->create();
 
                 if ($deliveryPersons->isNotEmpty()) {
                     $deliveryPerson = $deliveryPersons->random();
 
                     BottleMovement::create([
-                        'bottle_id' => $bottle->id,
+                        'bottle_id' => $product->bottle->id,
                         'user_id' => $deliveryPerson->id,
                         'distribution_center_id' => $center->id,
                         'type' => BottleMovementType::ASSIGNMENT_TO_DELIVERY(),
@@ -184,7 +208,7 @@ class BottleSeeder extends Seeder
                     ]);
 
                     BottleMovement::create([
-                        'bottle_id' => $bottle->id,
+                        'bottle_id' => $product->bottle->id,
                         'user_id' => $customer->id,
                         'distribution_center_id' => $center->id,
                         'type' => BottleMovementType::DELIVERY_TO_CUSTOMER(),
@@ -213,17 +237,15 @@ class BottleSeeder extends Seeder
         for ($i = 0; $i < $count; $i++) {
             $bottleType = $bottleTypes->random();
 
-            $bottle = Bottle::create([
-                'product_id' => $bottleType->id,
-                'bottle_type_id' => $bottleType->id,
-                'distribution_center_id' => $center->id,
-                'barcode' => 'BT'.strtoupper(Str::random(8)),
-                'is_filled' => fake()->boolean(), // Can be empty or full
-                'status' => BottleStatus::LOST_STOLEN(),
-            ]);
+            $product = Product::factory()
+                ->bottle($bottleType->id, $center->id, [
+                    'is_filled' => fake()->boolean(),
+                    'status' => BottleStatus::LOST_STOLEN(),
+                ])
+                ->create();
 
             BottleMovement::create([
-                'bottle_id' => $bottle->id,
+                'bottle_id' => $product->bottle->id,
                 'user_id' => User::role([UserRole::MANAGER()->value, UserRole::CENTER_MANAGER()->value])->inRandomOrder()->first()->id ?? 1,
                 'distribution_center_id' => $center->id,
                 'type' => BottleMovementType::DECLARE_LOST_STOLEN(),
@@ -252,17 +274,15 @@ class BottleSeeder extends Seeder
         for ($i = 0; $i < $count; $i++) {
             $bottleType = $bottleTypes->random();
 
-            $bottle = Bottle::create([
-                'product_id' => $bottleType->id,
-                'bottle_type_id' => $bottleType->id,
-                'distribution_center_id' => $center->id,
-                'barcode' => 'BT'.strtoupper(Str::random(8)),
-                'is_filled' => false,
-                'status' => BottleStatus::RETURNED_TO_SUPPLIER(),
-            ]);
+            $product = Product::factory()
+                ->bottle($bottleType->id, $center->id, [
+                    'is_filled' => false,
+                    'status' => BottleStatus::RETURNED_TO_SUPPLIER(),
+                ])
+                ->create();
 
             BottleMovement::create([
-                'bottle_id' => $bottle->id,
+                'bottle_id' => $product->bottle->id,
                 'user_id' => User::role([UserRole::MANAGER()->value, UserRole::GAS_MANAGER()->value])->inRandomOrder()->first()->id ?? 1,
                 'distribution_center_id' => $center->id,
                 'type' => BottleMovementType::RETURN_TO_SUPPLIER(),
@@ -277,5 +297,42 @@ class BottleSeeder extends Seeder
         }
 
         $this->command->info("{$count} returned-to-supplier bottles created for {$center->name}");
+    }
+
+    /**
+     * Update the pivot table stock counts to match the actual bottle counts
+     */
+    private function updateStockCounts(DistributionCenter $center): void
+    {
+        $this->command->info("Updating stock counts for {$center->name}...");
+
+        $bottleTypes = BottleType::all();
+
+        foreach ($bottleTypes as $bottleType) {
+            // Count actual bottles in stock (not with delivery persons, clients, etc)
+            $emptyCount = \App\Models\Bottle::where('bottle_type_id', $bottleType->id)
+                ->where('is_filled', false)
+                ->where('status', BottleStatus::IN_STOCK())
+                ->where('distribution_center_id', $center->id)
+                ->count();
+
+            $filledCount = \App\Models\Bottle::where('bottle_type_id', $bottleType->id)
+                ->where('is_filled', true)
+                ->where('status', BottleStatus::IN_STOCK())
+                ->where('distribution_center_id', $center->id)
+                ->count();
+
+            // Update the pivot table
+            DB::table('bottle_type_distribution_center')
+                ->where('distribution_center_id', $center->id)
+                ->where('bottle_type_id', $bottleType->id)
+                ->update([
+                    'stock_empty' => $emptyCount,
+                    'stock_filled' => $filledCount,
+                    'updated_at' => now(),
+                ]);
+
+            $this->command->info("Updated {$bottleType->name} stock in {$center->name}: {$emptyCount} empty, {$filledCount} filled");
+        }
     }
 }

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('accessory_types', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
+            $table->decimal('price', 10, 2)->default(0.00);
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

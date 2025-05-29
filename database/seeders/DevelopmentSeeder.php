@@ -18,11 +18,13 @@ class DevelopmentSeeder extends Seeder
         $this->call(Development\DistributionCenterSeeder::class);
         $this->call(Development\UserSeeder::class);
         $this->call(Production\AccessoryTypeSeeder::class);
+        // BottleTypeSeeder is already called in main DatabaseSeeder
         $this->call(Production\ProductSeeder::class);
+        $this->call(Development\BottleTypeDistributionCenterSeeder::class);
         $this->call(Development\BottleSeeder::class);
         $this->call(Development\AccessorySeeder::class);
         $this->call(Development\OrderSeeder::class);
-        $this->call(Development\DemoDataSeeder::class);
+        // $this->call(Development\DemoDataSeeder::class);
 
         $this->command->info('===========================================');
         $this->command->info('Development Data Seeded Successfully!');

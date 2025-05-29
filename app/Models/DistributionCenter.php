@@ -40,9 +40,9 @@ class DistributionCenter extends Model
     /**
      * Get the user permissions for this center.
      */
-    public function userPermissions(): HasMany
+    public function users(): HasMany
     {
-        return $this->hasMany(UserCenterPermission::class);
+        return $this->hasMany(UserDistributionCenter::class);
     }
 
     /**
@@ -92,5 +92,12 @@ class DistributionCenter extends Model
     public function bottleMovements(): HasMany
     {
         return $this->hasMany(BottleMovement::class);
+    }
+
+    public function bottleTypeStocks(): BelongsToMany
+    {
+        return $this->belongsToMany(BottleType::class)
+            ->withPivot(['stock_empty', 'stock_filled'])
+            ->withTimestamps();
     }
 }

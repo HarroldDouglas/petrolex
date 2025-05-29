@@ -95,9 +95,9 @@ class User extends Authenticatable
     /**
      * Get the distribution centers this user has permission to access.
      */
-    public function centerPermissions(): HasMany
+    public function distributionCenters(): HasMany
     {
-        return $this->hasMany(UserCenterPermission::class);
+        return $this->hasMany(UserDistributionCenter::class);
     }
 
     /**
@@ -134,6 +134,6 @@ class User extends Authenticatable
 
     public function isGlobal()
     {
-        return $this->centerPermissions()->count() === 0;
+        return $this->distributionCenters()->count() === 0;
     }
 }

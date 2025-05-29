@@ -2,6 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserRole;
+use App\Models\Customer;
+use App\Models\CustomerDeliveryAddress;
+use App\Models\DeliveryPerson;
+use App\Models\DistributionCenter;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -95,24 +101,73 @@ class UserFactory extends Factory
     /**
      * Create a delivery person user.
      */
-    public function deliveryPerson(): self
+    public function deliveryPerson(?int $centerId = null, bool $isActive = true): static
     {
         return $this->state(function (array $attributes) {
             return [
                 'email' => 'delivery_'.Str::random(5).'@example.com',
             ];
+        })->afterCreating(function (User $user) use ($centerId, $isActive) {
+            $user->assignRole(UserRole::DELIVERY_PERSON()->value);
+
+            $deliveryPerson = DeliveryPerson::create([
+                'user_id' => $user->id,
+            ]);
+
+            if ($centerId) {
+                $deliveryPerson->distributionCenters()->sync([
+                    $centerId => [
+                        'is_active' => $isActive,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ],
+                ]);
+            } else {
+                $randomCenter = DistributionCenter::inRandomOrder()->first();
+                if ($randomCenter) {
+                    $deliveryPerson->distributionCenters()->sync([
+                        $centerId => [
+                            'is_active' => $isActive,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ],
+                    ]);
+                }
+            }
         });
     }
 
     /**
      * Create a customer user.
      */
-    public function customer(): self
+    public function customer(?float $currentBalance = null, int $addressesCount = 1): static
     {
         return $this->state(function (array $attributes) {
             return [
                 'email' => 'customer_'.Str::random(5).'@example.com',
             ];
+        })->afterCreating(function (User $user) use ($currentBalance, $addressesCount) {
+            $user->assignRole(UserRole::CUSTOMER()->value);
+
+            $customer = Customer::create([
+                'user_id' => $user->id,
+                'current_balance' => $currentBalance ?? fake()->randomFloat(2, 0, 500),
+            ]);
+
+            if ($addressesCount > 0) {
+                // First address is the default home address
+                CustomerDeliveryAddress::factory()
+                    ->for($customer)
+                    ->default()
+                    ->create();
+
+                if ($addressesCount > 1) {
+                    CustomerDeliveryAddress::factory()
+                        ->for($customer)
+                        ->count($addressesCount - 1)
+                        ->create();
+                }
+            }
         });
     }
 }

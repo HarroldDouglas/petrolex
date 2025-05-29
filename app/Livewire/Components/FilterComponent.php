@@ -24,7 +24,7 @@ class FilterComponent extends Component
         if ($user && $user->isGlobal()) {
             $this->centers = DistributionCenter::all();
         } elseif ($user) {
-            $centerIds = $user->centerPermissions()->pluck('distribution_center_id')->toArray();
+            $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
             $this->centers = DistributionCenter::whereIn('id', $centerIds)->get();
         } else {
             $this->centers = collect([]);
