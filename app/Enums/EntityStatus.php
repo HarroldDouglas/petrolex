@@ -16,13 +16,8 @@ class EntityStatus extends Enum
     public static function labels(): array
     {
         return [
-<<<<<<< HEAD
-           'ACTIVE' => 'actif',
-           'INACTIVE' => 'inactif',
-=======
             'ACTIVE' => 'Actif',
             'INACTIVE' => 'Inactif',
->>>>>>> dev
         ];
     }
 
@@ -32,7 +27,6 @@ class EntityStatus extends Enum
     public static function values(): array
     {
         return [
-<<<<<<< HEAD
             'ACTIVE' => 1,
             'INACTIVE' => 0,
         ];
@@ -46,18 +40,5 @@ class EntityStatus extends Enum
     public function isActive(): bool
     {
         return $this->equals(self::ACTIVE());
-=======
-            'ACTIVE' => 'active',
-            'INACTIVE' => 'inactive',
-        ];
-    }
-
-    public static function classes(): array
-    {
-        return [
-            'ACTIVE' => 'success',
-            'INACTIVE' => 'secondary',
-        ];
->>>>>>> dev
     }
 }

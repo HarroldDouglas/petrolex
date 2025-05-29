@@ -92,6 +92,19 @@ class UsersTable extends BaseDataTable
                 ->sortable()
                 ->searchable(),
 
+           Column::make('Fonction')
+            ->label(function ($row) {
+                return $row->roles->pluck('name')->join(', ');
+            })
+            ->sortable(fn ($query, $direction) => 
+                $query->orderBy('id', $direction) // Optional: adjust if you want actual role sorting
+            )
+            ->searchable(function (Builder $query, string $searchTerm) {
+                $query->whereHas('roles', function ($q) use ($searchTerm) {
+                    $q->where('name', 'like', "%$searchTerm%");
+                });
+            }),
+
             Column::make('Statut', 'is_active')
                 ->sortable()
                 ->html()
