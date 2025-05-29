@@ -11,8 +11,6 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css"
         href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
-    <link rel="stylesheet" type="text/css"
-        href="{{ asset('assets/css/custom-datatable.css') }}">
 @endsection
 
 @section('main-content')
