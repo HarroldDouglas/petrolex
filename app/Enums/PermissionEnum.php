@@ -9,10 +9,7 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self USERS_CREATE()
  * @method static self USERS_EDIT()
  * @method static self USERS_DELETE()
- * @method static self ROLES_VIEW()
- * @method static self ROLES_CREATE()
- * @method static self ROLES_EDIT()
- * @method static self ROLES_ASSIGN_PERMISSIONS()
+ * @method static self ROLES_MANAGE()
  * @method static self DISTRIBUTION_CENTERS_VIEW()
  * @method static self DISTRIBUTION_CENTERS_CREATE()
  * @method static self DISTRIBUTION_CENTERS_EDIT()
@@ -39,42 +36,19 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self PRODUCTS_CREATE()
  * @method static self PRODUCTS_EDIT()
  * @method static self PRODUCTS_DELETE()
- * @method static self BOTTLES_TRACK()
- * @method static self BOTTLES_SCAN()
- * @method static self BOTTLES_ASSIGN()
- * @method static self BOTTLE_TYPES_VIEW()
- * @method static self BOTTLE_TYPES_CREATE()
- * @method static self BOTTLE_TYPES_EDIT()
- * @method static self BOTTLE_TYPES_DELETE()
- * @method static self ACCESSORIES_VIEW()
- * @method static self ACCESSORIES_CREATE()
- * @method static self ACCESSORIES_EDIT()
- * @method static self ACCESSORIES_DELETE()
- * @method static self ACCESSORY_TYPES_VIEW()
- * @method static self ACCESSORY_TYPES_CREATE()
- * @method static self ACCESSORY_TYPES_EDIT()
- * @method static self ACCESSORY_TYPES_DELETE()
- * @method static self SUPPLIERS_VIEW()
- * @method static self SUPPLIERS_CREATE()
- * @method static self SUPPLIERS_EDIT()
- * @method static self SUPPLIERS_DELETE()
  * @method static self SUPPLIER_DELIVERIES_VIEW()
  * @method static self SUPPLIER_DELIVERIES_CREATE()
  * @method static self SUPPLIER_DELIVERIES_EDIT()
  * @method static self SUPPLIER_DELIVERIES_DELETE()
  * @method static self CUSTOMERS_VIEW()
- * @method static self CUSTOMERS_CREATE()
- * @method static self CUSTOMERS_EDIT()
- * @method static self CUSTOMERS_DELETE()
- * @method static self PAYMENTS_VIEW()
- * @method static self PAYMENTS_EDIT()
+ * @method static self PAYMENTS_MANAGE()
  * @method static self REPORTS_MANAGE()
  * @method static self GAS_MANAGE()
  * @method static self COMMENTS_VIEW()
- * @method static self COMMENTS_MODERATE()
+ * @method static self COMMENTS_MANAGE()
+ * @method static self MOBILE_ACCESS()
  * @method static self PROFILE_EDIT()
  * @method static self HISTORY_VIEW_OWN()
- * @method static self MOBILE_ACCESS()
  * @method static self DELIVERY_TRACK_LOCATION()
  */
 class PermissionEnum extends Enum
@@ -89,10 +63,7 @@ class PermissionEnum extends Enum
             'USERS_DELETE' => 'users.delete',
 
             // ROLE MANAGEMENT
-            'ROLES_VIEW' => 'roles.view',
-            'ROLES_CREATE' => 'roles.create',
-            'ROLES_EDIT' => 'roles.edit',
-            'ROLES_ASSIGN_PERMISSIONS' => 'roles.assign_permissions',
+            'ROLES_MANAGE' => 'roles.manage',
 
             // DISTRIBUTION CENTERS
             'DISTRIBUTION_CENTERS_VIEW' => 'distribution_centers.view',
@@ -127,33 +98,8 @@ class PermissionEnum extends Enum
             'PRODUCTS_CREATE' => 'products.create',
             'PRODUCTS_EDIT' => 'products.edit',
             'PRODUCTS_DELETE' => 'products.delete',
-            'BOTTLES_TRACK' => 'bottles.track',
-            'BOTTLES_SCAN' => 'bottles.scan',
-            'BOTTLES_ASSIGN' => 'bottles.assign',
 
-            // BOTTLE TYPES
-            'BOTTLE_TYPES_VIEW' => 'bottle_types.view',
-            'BOTTLE_TYPES_CREATE' => 'bottle_types.create',
-            'BOTTLE_TYPES_EDIT' => 'bottle_types.edit',
-            'BOTTLE_TYPES_DELETE' => 'bottle_types.delete',
-
-            // ACCESSORIES
-            'ACCESSORIES_VIEW' => 'accessories.view',
-            'ACCESSORIES_CREATE' => 'accessories.create',
-            'ACCESSORIES_EDIT' => 'accessories.edit',
-            'ACCESSORIES_DELETE' => 'accessories.delete',
-
-            // ACCESSORY TYPES
-            'ACCESSORY_TYPES_VIEW' => 'accessory_types.view',
-            'ACCESSORY_TYPES_CREATE' => 'accessory_types.create',
-            'ACCESSORY_TYPES_EDIT' => 'accessory_types.edit',
-            'ACCESSORY_TYPES_DELETE' => 'accessory_types.delete',
-
-            // SUPPLIERS
-            'SUPPLIERS_VIEW' => 'suppliers.view',
-            'SUPPLIERS_CREATE' => 'suppliers.create',
-            'SUPPLIERS_EDIT' => 'suppliers.edit',
-            'SUPPLIERS_DELETE' => 'suppliers.delete',
+            // SUPPLIERS DELIVERIES
             'SUPPLIER_DELIVERIES_VIEW' => 'supplier_deliveries.view',
             'SUPPLIER_DELIVERIES_CREATE' => 'supplier_deliveries.create',
             'SUPPLIER_DELIVERIES_EDIT' => 'supplier_deliveries.edit',
@@ -161,13 +107,9 @@ class PermissionEnum extends Enum
 
             // CUSTOMERS
             'CUSTOMERS_VIEW' => 'customers.view',
-            'CUSTOMERS_CREATE' => 'customers.create',
-            'CUSTOMERS_EDIT' => 'customers.edit',
-            'CUSTOMERS_DELETE' => 'customers.delete',
 
             // PAYMENTS
-            'PAYMENTS_VIEW' => 'payments.view',
-            'PAYMENTS_EDIT' => 'payments.edit',
+            'PAYMENTS_MANAGE' => 'payments.manage',
 
             // REPORTS AND ANALYTICS
             'REPORTS_MANAGE' => 'reports.manage',
@@ -177,19 +119,13 @@ class PermissionEnum extends Enum
 
             // COMMENTS
             'COMMENTS_VIEW' => 'comments.view',
-            'COMMENTS_MODERATE' => 'comments.moderate',
-
-            // PROFILE
-            'PROFILE_EDIT' => 'profile.edit',
-
-            // HISTORY
-            'HISTORY_VIEW_OWN' => 'history.view_own',
+            'COMMENTS_MANAGE' => 'comments.manage',
 
             // MOBILE ACCESS
             'MOBILE_ACCESS' => 'mobile.access',
-
-            // GEOLOCATION
             'DELIVERY_TRACK_LOCATION' => 'delivery.track_location',
+            'PROFILE_EDIT' => 'profile.edit',
+            'HISTORY_VIEW_OWN' => 'history.view_own',
         ];
     }
 }

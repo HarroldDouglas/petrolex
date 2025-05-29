@@ -7,7 +7,12 @@
     </div>
     <div class="app-nav" id="app-simple-bar">
         <ul class="main-nav p-0 mt-2">
-            @can('reports.manage')
+            @php
+                // Création d'une variable pour accéder facilement aux permissions
+                $permissionEnum = \App\Enums\PermissionEnum::class;
+            @endphp
+
+            @can($permissionEnum::REPORTS_MANAGE()->value)
                 <li class="no-sub">
                     <a class="" href="{{ route('dashboard') }}">
                         <i class="iconoir-view-grid"></i> Tableau de bord
@@ -15,7 +20,7 @@
                 </li>
             @endcan
 
-            @can('reports.manage')
+            @can($permissionEnum::REPORTS_MANAGE()->value)
                 <li class="no-sub">
                     <a class="" href="{{ route('stock_movement') }}">
                         <i class="iconoir-data-transfer-both"></i> Mouvement de stock
@@ -23,23 +28,23 @@
                 </li>
             @endcan
 
-            @canany(['suppliers.view', 'suppliers.create'])
+            @canany([$permissionEnum::SUPPLIER_DELIVERIES_VIEW()->value, $permissionEnum::SUPPLIER_DELIVERIES_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#supply">
                         <i class="iconoir-database-restore"></i> Approvisionnements
                     </a>
                     <ul class="collapse" id="supply">
-                        @can('suppliers.view')
+                        @can($permissionEnum::SUPPLIER_DELIVERIES_VIEW()->value)
                             <li><a href="{{ route('supplies.list') }}"> Liste</a></li>
                         @endcan
-                        @can('suppliers.create')
+                        @can($permissionEnum::SUPPLIER_DELIVERIES_CREATE()->value)
                             <li><a href="{{ route('supplies.create') }}"> Nouveau</a></li>
                         @endcan
                     </ul>
                 </li>
             @endcanany
 
-            @can('products.view')
+            @can($permissionEnum::PRODUCTS_VIEW()->value)
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#bottles">
                         <i class="iconoir-gas"></i>
@@ -52,49 +57,49 @@
                 </li>
             @endcan
 
-            @canany(['products.view', 'products.create'])
+            @canany([$permissionEnum::PRODUCTS_VIEW()->value, $permissionEnum::PRODUCTS_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#products">
                         <i class="iconoir-box-3d-point"></i>
                         Produits
                     </a>
                     <ul class="collapse" id="products">
-                        @can('products.view')
+                        @can($permissionEnum::PRODUCTS_VIEW()->value)
                             <li><a href="{{ route('products.list') }}"> Liste</a></li>
                         @endcan
-                        @can('products.create')
+                        @can($permissionEnum::PRODUCTS_CREATE()->value)
                             <li><a href="{{ route('products.create') }}"> Nouveau</a></li>
                         @endcan
                     </ul>
                 </li>
             @endcanany
 
-            @canany(['users.view', 'users.create'])
+            @canany([$permissionEnum::USERS_VIEW()->value, $permissionEnum::USERS_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#users">
                         <i class="iconoir-user"></i> Utilisateurs
                     </a>
                     <ul class="collapse" id="users">
-                        @can('users.view')
+                        @can($permissionEnum::USERS_VIEW()->value)
                             <li><a href="{{ route('users.list') }}"> Liste</a></li>
                         @endcan
-                        @can('users.create')
+                        @can($permissionEnum::USERS_CREATE()->value)
                             <li><a href="{{ route('users.create') }}"> Nouveau</a></li>
                         @endcan
                     </ul>
                 </li>
             @endcanany
 
-            @canany(['distribution_centers.view', 'distribution_centers.create'])
+            @canany([$permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value, $permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#point-of-sales">
                         <i class="iconoir-network"></i> Centres dedistribution
                     </a>
                     <ul class="collapse" id="point-of-sales">
-                        @can('distribution_centers.view')
+                        @can($permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value)
                             <li><a href="{{ route('warehouses.list') }}"> Liste</a></li>
                         @endcan
-                        @can('distribution_centers.create')
+                        @can($permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value)
                             <li><a href="{{ route('warehouses.create') }}"> Nouveau</a></li>
                         @endcan
                     </ul>

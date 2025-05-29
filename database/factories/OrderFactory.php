@@ -115,33 +115,6 @@ class OrderFactory extends Factory
     }
 
     /**
-     * Configure the order as pending
-     */
-    public function pending(): self
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'status' => OrderStatus::PENDING(),
-                'payment_status' => PaymentStatus::PENDING(),
-            ];
-        });
-    }
-
-    /**
-     * Configure the order as completed
-     */
-    public function completed(): self
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'status' => OrderStatus::COMPLETED(),
-                'payment_status' => PaymentStatus::PAID(),
-                'delivery_date' => fake()->dateTimeBetween('-2 weeks', 'now'),
-            ];
-        });
-    }
-
-    /**
      * Configure the order for fast delivery
      */
     public function fastDelivery(): self

@@ -147,14 +147,13 @@
                                                 </td>
                                             </tr>
                                         @endforeach
+                                        <tr>
+                                            <th scope="col" colspan="1" class="text-start">Sous-total</th>
+                                            <th scope="col" colspan="3" class="text-end f-w-500">
+                                                <strong>{{ number_format($order['total_amount'], 2) }}</strong>
+                                            </th>
+                                        </tr>
                                     </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <td colspan="1" class="text-start">Sous-total</td>
-                                        <td colspan="3" class="text-end f-w-500">
-                                            <strong>{{ number_format($order['total_amount'], 2) }}</strong>
-                                        </td>
-                                    </tr>
                                 </table>
                             </div>
                         </div>
