@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -98,6 +99,13 @@ class User extends Authenticatable
     public function distributionCenters(): HasMany
     {
         return $this->hasMany(UserDistributionCenter::class);
+    }
+
+    public function accessibleDistributionCenters(): BelongsToMany
+    {
+        return $this->belongsToMany(DistributionCenter::class, 'user_distribution_centers')
+            ->withPivot('is_active')
+            ->withTimestamps();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Livewire\Components;
 
 use App\Models\DistributionCenter;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -18,9 +19,9 @@ class FilterComponent extends Component
 
     public function mount()
     {
+        /** @var User $user */
         $user = Auth::user();
 
-        // replace all db request with repository called
         if ($user && $user->isGlobal()) {
             $this->centers = DistributionCenter::all();
         } elseif ($user) {

@@ -32,11 +32,12 @@ class EntityStatus extends Enum
         ];
     }
 
-    public static function classes(): array
+    public function badge(): string
     {
-        return [
-            'ACTIVE' => 'success',
-            'INACTIVE' => 'secondary',
-        ];
+        return match ($this->value) {
+            'active' => 'success',
+            'inactive' => 'danger',
+            default => 'light',
+        };
     }
 }
