@@ -27,18 +27,17 @@ class EntityStatus extends Enum
     public static function values(): array
     {
         return [
-            'ACTIVE' => 1,
-            'INACTIVE' => 0,
+            'ACTIVE' => 'active',
+            'INACTIVE' => 'inactive',
         ];
     }
 
     public function badge(): string
     {
-        return $this->isActive() ? 'success' : 'danger';
-    }
-
-    public function isActive(): bool
-    {
-        return $this->equals(self::ACTIVE());
+        return match ($this->value) {
+            'active' => 'success',
+            'inactive' => 'danger',
+            default => 'light',
+        };
     }
 }

@@ -46,7 +46,7 @@
                 <div class="card card-border">
                     <div class="card-body pt-1 px-0">
                         <div class="table-responsive app-scroll app-datatable-default">
-                            <livewire:users-table />
+                            <livewire:user-data-table />
                         </div>
                     </div>
                 </div>

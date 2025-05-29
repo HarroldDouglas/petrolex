@@ -151,7 +151,7 @@
             $(document).ready(function() {
                 // Initialize Select2 for distribution centers
                 $('#distribution_centers').select2({
-                    placeholder: 'Sélectionnez un ou plusieurs points de distribution'
+                    placeholder: 'Sélectionnez un ou plusieurs centres de distribution'
                 });
                 
                 // Show/hide distribution centers based on role selection
