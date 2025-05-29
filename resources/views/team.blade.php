@@ -593,7 +593,7 @@
                                                 <div class="team-pic">
                                   <span
                                       class="bg-secondary h-80 w-80 d-flex-center b-r-50 position-relative overflow-hidden">
-                                    <img src="{{ asset('../assets/images/avtar/woman.jpg') }}" alt="" class="img-fluid b-r-50 ">
+                                    <img src="{{ asset('{{ asset('assets/images/avtar/woman.jpg') }}') }}" alt="" class="img-fluid b-r-50 ">
                                   </span>
                                                 </div>
                                             </div>

@@ -16,7 +16,7 @@ class GetOrderDetailsController extends Controller
         $orders = [
             [
                 'id' => 'CMD00120',
-                'delivery_address' => 'Point YDE B',
+                'delivery_address' => 'Centre YDE B',
                 'customer_name' => 'Ndongo Carine',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 3, 'price' => 50.00],
@@ -29,7 +29,7 @@ class GetOrderDetailsController extends Controller
             ],
             [
                 'id' => 'CMD00121',
-                'delivery_address' => 'Point YDE C',
+                'delivery_address' => 'Centre YDE C',
                 'customer_name' => 'Mbarga Elise',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 2, 'price' => 50.00],
@@ -42,7 +42,7 @@ class GetOrderDetailsController extends Controller
             ],
             [
                 'id' => 'CMD00122',
-                'delivery_address' => 'Point YDE D',
+                'delivery_address' => 'Centre YDE D',
                 'customer_name' => 'Ndongmo Roger',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 3, 'price' => 50.00],
@@ -55,7 +55,7 @@ class GetOrderDetailsController extends Controller
             ],
             [
                 'id' => 'CMD00123',
-                'delivery_address' => 'Point YDE E',
+                'delivery_address' => 'Centre YDE E',
                 'customer_name' => 'Ekani Paul',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 5, 'price' => 50.00],
@@ -68,7 +68,7 @@ class GetOrderDetailsController extends Controller
             ],
             [
                 'id' => 'CMD00124',
-                'delivery_address' => 'Point YDE F',
+                'delivery_address' => 'Centre YDE F',
                 'customer_name' => 'Fotso Jules',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 3, 'price' => 50.00],
@@ -81,7 +81,7 @@ class GetOrderDetailsController extends Controller
             ],
             [
                 'id' => 'CMD00125',
-                'delivery_address' => 'Point YDE F',
+                'delivery_address' => 'Centre YDE F',
                 'customer_name' => 'Fotso Jules',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 5, 'price' => 50.00],
@@ -94,7 +94,7 @@ class GetOrderDetailsController extends Controller
             ],
             [
                 'id' => 'CMD00126',
-                'delivery_address' => 'Point YDE F',
+                'delivery_address' => 'Centre YDE F',
                 'customer_name' => 'Fotso Jules',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 3, 'price' => 50.00],
@@ -107,7 +107,7 @@ class GetOrderDetailsController extends Controller
             ],
             [
                 'id' => 'CMD00127',
-                'delivery_address' => 'Point YDE F',
+                'delivery_address' => 'Centre YDE F',
                 'customer_name' => 'Fotso Jules',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 6, 'price' => 50.00],
@@ -120,7 +120,7 @@ class GetOrderDetailsController extends Controller
             ],
             [
                 'id' => 'CMD00128',
-                'delivery_address' => 'Point YDE F',
+                'delivery_address' => 'Centre YDE F',
                 'customer_name' => 'Fotso Jules',
                 'items' => [
                     ['name' => 'Bouteille de 9kg', 'quantity' => 8, 'price' => 50.00],

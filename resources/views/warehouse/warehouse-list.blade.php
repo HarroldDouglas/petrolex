@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Liste des points de distribution')
+@section('title', 'Liste des centres dedistribution')
 @section('css')
     <!-- Data Table css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
@@ -10,7 +10,7 @@
         <!-- Breadcrumb start -->
         <div class="row m-1">
             <div class="col-8 p-0">
-                <h4 class="main-title"> liste des points de distribution</h4>
+                <h4 class="main-title"> liste des centres dedistribution</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
@@ -20,10 +20,10 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="f-s-14 f-w-500">Points de distribution</a>
+                        <a href="#" class="f-s-14 f-w-500">Centres dedistribution</a>
                     </li>
                     <li class="active">
-                        <a href="#" class="f-s-14 f-w-500">Liste des points de distribution</a>
+                        <a href="#" class="f-s-14 f-w-500">Liste des centres dedistribution</a>
                     </li>
                 </ul>
             </div>
@@ -433,7 +433,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un point de distribution</h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un centre de distribution</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -469,8 +469,8 @@
                                 <input type="text" class="form-control" placeholder="Latitude" id="latitude">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="Longitiude" class="form-label">Longitiude</label>
-                                <input type="text" class="form-control" placeholder="Longitiude" id="Longitiude">
+                                <label for="Longitude" class="form-label">Longitude</label>
+                                <input type="text" class="form-control" placeholder="Longitude" id="Longitude">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="storage_capacity" class="form-label">Capacité de stockage</label>

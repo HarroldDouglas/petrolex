@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Livewire\Dashboard;
+namespace App\Livewire\Components;
 
+use App\Models\DistributionCenter;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class FilterComponent extends Component
@@ -12,6 +14,22 @@ class FilterComponent extends Component
     public $startDate;
     public $endDate;
     public $warehouseId;
+    public $centers = [];
+
+    public function mount()
+    {
+        $user = Auth::user();
+
+        // replace all db request with repository called
+        if ($user && $user->isGlobal()) {
+            $this->centers = DistributionCenter::all();
+        } elseif ($user) {
+            $centerIds = $user->centerPermissions()->pluck('distribution_center_id')->toArray();
+            $this->centers = DistributionCenter::whereIn('id', $centerIds)->get();
+        } else {
+            $this->centers = collect([]);
+        }
+    }
 
     public function updatedSelectedPeriod()
     {
@@ -48,6 +66,6 @@ class FilterComponent extends Component
 
     public function render()
     {
-        return view('livewire.dashboard.filter-component');
+        return view('livewire.components.filter-component');
     }
 }

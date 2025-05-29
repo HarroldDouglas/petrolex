@@ -7,7 +7,6 @@
  * @license MIT License
  */
 
-use App\Http\Controllers\MapController;
 use App\Http\Controllers\Order\CreateOrderController;
 use App\Http\Controllers\Order\DeleteOrderController;
 use App\Http\Controllers\Order\EditOrderController;
@@ -22,5 +21,3 @@ Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
     Route::get('/{order_id}/details', GetOrderDetailsController::class)->name('details');
     Route::delete('/{order_id}/delete', DeleteOrderController::class)->name('delete');
 });
-
-Route::post('/get-directions', [MapController::class, 'getDirections'])->name('get.directions');

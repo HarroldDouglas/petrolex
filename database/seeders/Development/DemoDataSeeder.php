@@ -198,7 +198,7 @@ class DemoDataSeeder extends Seeder
         $demoDeliveryPersonUser = $deliveryPerson->user;
 
         $this->createDemoBottles($deliveryPerson, $demoCustomerUser);
-        $this->createDemoOrders($customerRecord, $demoDeliveryPersonUser);
+        $this->createDemoOrders($customerRecord, $deliveryPerson);
     }
 
     /**
@@ -238,34 +238,50 @@ class DemoDataSeeder extends Seeder
     /**
      * Create demo orders
      */
-    private function createDemoOrders($customerRecord, $demoDeliveryPersonUser): void
+    private function createDemoOrders($customerRecord, $deliveryPerson): void
     {
-        // Create pending order
-        $pendingOrder = Order::factory()
-            ->pending()
+        $defaultAddress = $customerRecord->deliveryAddresses()->where('is_default', true)->first();
+
+        if (! $defaultAddress) {
+            $this->command->error('Demo customer has no default address. Creating orders with null address.');
+        }
+
+        // Create confirmed order
+        Order::factory()
+            ->confirmed()
             ->create([
                 'customer_id' => $customerRecord->id,
-                'order_number' => 'DEMO-PEND-001',
+                'order_number' => 'DEMO-CONF-001',
+                'delivery_address_id' => $defaultAddress?->id,
             ]);
 
-        // Create processing order and assign to delivery person
-        $processingOrder = Order::factory()
+        // Create processing order
+        Order::factory()
             ->processing()
             ->create([
                 'customer_id' => $customerRecord->id,
                 'order_number' => 'DEMO-PROC-001',
+                'delivery_address_id' => $defaultAddress?->id,
+                'delivery_person_id' => $deliveryPerson->id,
             ]);
 
-        if (method_exists($processingOrder, 'assignToDeliveryPerson')) {
-            $processingOrder->assignToDeliveryPerson($demoDeliveryPersonUser->id);
-        }
-
-        // Create completed order
+        // Create delivered order
         Order::factory()
-            ->completed()
+            ->delivered()
             ->create([
                 'customer_id' => $customerRecord->id,
-                'order_number' => 'DEMO-COMP-001',
+                'order_number' => 'DEMO-DELV-001',
+                'delivery_address_id' => $defaultAddress?->id,
+                'delivery_person_id' => $deliveryPerson->id,
+            ]);
+
+        // Create cancelled order
+        Order::factory()
+            ->cancelled()
+            ->create([
+                'customer_id' => $customerRecord->id,
+                'order_number' => 'DEMO-CANC-001',
+                'delivery_address_id' => $defaultAddress?->id,
             ]);
 
         $this->command->info('Demo orders created successfully.');

@@ -33,12 +33,12 @@
                                         <div class="d-flex-center">
                                             <span class="h-45 w-45 d-flex-center b-r-10">
                                                 <img alt="" class="img-fluid b-r-10"
-                                                    src="../assets/images/avtar/woman.jpg">
+                                                    src="{{ asset('assets/images/avtar/woman.jpg') }}">
                                             </span>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">David Toukam</h6>
-                                            <p class="f-s-12 mb-0 text-secondary">directeur@petrolex.com</p>
+                                            <h6 class="mb-0">{{ auth()->user()->first_name}} {{ auth()->user()->last_name}}</h6>
+                                            <p class="f-s-12 mb-0 text-secondary">{{ auth()->user()->email }}</p>
                                         </div>
                                     </li>
 

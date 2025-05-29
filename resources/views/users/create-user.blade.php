@@ -92,18 +92,16 @@
                                                 id="phone">
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="point_vente" class="form-label">Fonction</label>
-                                            <select class="form-select" id="point_vente">
-                                                <option value="Responsable de point de distribution">Responsable de point de
-                                                    distribution</option>
-                                                <option value="Responsable Gaz">Responsable Gaz</option>
-                                                <option value="Responsable informatique">Responsable informatique</option>
-
+                                            <label for="role" class="form-label">Fonction</label>
+                                            <select class="form-select" id="role" name="role">
+                                                @foreach($allowedRoles ?? [] as $role)
+                                                    <option value="{{ $role->value }}">{{ $role->label }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="point_vente" class="form-label">Point de distribution</label>
-                                            <select class="form-select" id="point_vente">
+                                        <div class="col-md-6 mb-3 distribution-centers-container" style="display: none;">
+                                            <label for="distribution_centers" class="form-label">Centre de distribution</label>
+                                            <select class="form-select" id="distribution_centers" name="distribution_centers[]" multiple>
                                                 <option value="Point A">Point A</option>
                                                 <option value="Point B">Point B</option>
                                             </select>
@@ -112,7 +110,7 @@
                                             <div
                                                 class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
                                                 <button type="button" class="btn btn-light-danger">Annuler</button>
-                                                <button type="submit" class="btn btn-primary">Enregistrer</bu>
+                                                <button type="submit" class="btn btn-success">Enregistrer</button>
                                             </div>
                                         </div>
                                     </div>
@@ -148,4 +146,28 @@
 
         <!-- add product -->
         <script src="{{ asset('assets/js/add_product.js') }}"></script>
+        
+        <script>
+            $(document).ready(function() {
+                // Initialize Select2 for distribution centers
+                $('#distribution_centers').select2({
+                    placeholder: 'Sélectionnez un ou plusieurs points de distribution'
+                });
+                
+                // Show/hide distribution centers based on role selection
+                $('#role').on('change', function() {
+                    var selectedRole = $(this).val();
+                    
+                    // Check if selected role is CENTER_MANAGER
+                    if (selectedRole === '{{ \App\Enums\UserRole::CENTER_MANAGER()->value }}') {
+                        $('.distribution-centers-container').show();
+                    } else {
+                        $('.distribution-centers-container').hide();
+                    }
+                });
+                
+                // Trigger change on page load to handle initial state
+                $('#role').trigger('change');
+            });
+        </script>
     @endsection

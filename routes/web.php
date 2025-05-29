@@ -6,20 +6,27 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', AuthCheckController::class);
 
 /**
- * Include routes modules
+ * Include auth routes (must be outside auth middleware)
  */
 require __DIR__.'/web/auth.php';
-require __DIR__.'/web/dashboard.php';
 
-require __DIR__.'/web/admin.php';
-require __DIR__.'/web/orders.php';
-require __DIR__.'/web/users.php';
-require __DIR__.'/web/bottles.php';
-require __DIR__.'/web/products.php';
-require __DIR__.'/web/deliveries.php';
-require __DIR__.'/web/reports.php';
-require __DIR__.'/web/settings.php';
+/**
+ * All authenticated routes
+ */
+Route::middleware(['web', 'auth'])->group(function () {
+    // Dashboard routes
+    require __DIR__.'/web/dashboard.php';
 
-require __DIR__.'/web/warehouses.php';
-require __DIR__.'/web/supplies.php';
-require __DIR__.'/web/orders.php';
+    // Module routes
+    require __DIR__.'/web/admin.php';
+    require __DIR__.'/web/orders.php';
+    require __DIR__.'/web/users.php';
+    require __DIR__.'/web/bottles.php';
+    require __DIR__.'/web/products.php';
+    require __DIR__.'/web/deliveries.php';
+    require __DIR__.'/web/reports.php';
+    require __DIR__.'/web/settings.php';
+    require __DIR__.'/web/warehouses.php';
+    require __DIR__.'/web/supplies.php';
+    require __DIR__.'/web/orders.php';
+});

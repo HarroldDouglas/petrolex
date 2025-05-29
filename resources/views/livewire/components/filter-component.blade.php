@@ -3,11 +3,11 @@
         <div class="row">
             <div class="col-6">
                 <div class="form-group">
-                    <label for="warehouse_filter" class="form-label">Point de distribution :</label>
+                    <label for="warehouse_filter" class="form-label">Centre de distribution :</label>
                     <select wire:model.live="warehouseId" class="form-select">
                         <option value="">Tous</option>
-                        @foreach($warehouses ?? [] as $warehouse)
-                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @foreach($centers as $center)
+                            <option value="{{ $center->id }}">{{ $center->name }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -61,7 +61,7 @@
                                             <img src="{{ asset('../assets/images/profile-app/01.png') }}" class="w-20 h-20"
                                                 alt="instagram-check-mark">
                                         </h5>
-                                        <p>Responsable de point de distribution</p>
+                                        <p>Responsable de centre de distribution</p>
 
                                         <div class="my-2">
                                             <button type="button" class="btn btn-primary b-r-22" id="followButton"> <i
@@ -121,12 +121,12 @@
                                                 <p class="f-w-600 mb-0">Poste</p>
                                             </td>
                                             <td class="text-end">
-                                                Responsable de point de distribution
+                                                Responsable de centre de distribution
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <p class="f-w-600 mb-0">Point de distribution</p>
+                                                <p class="f-w-600 mb-0">Centre de distribution</p>
                                             </td>
                                             <td class="text-end">
                                                 Mimboman

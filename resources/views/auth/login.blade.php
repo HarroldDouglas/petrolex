@@ -36,7 +36,7 @@
                         </div>
 
                         <div id="login-form-container">
-                            <p>Suivez en temps réel les ventes, livraisons, et gestion des points de distribution,
+                            <p>Suivez en temps réel les ventes, livraisons, et gestion des centres dedistribution,
                                 connectez-vous à votre compte pour débuter svp</p>
                             @livewire('auth.login-form')
                         </div>

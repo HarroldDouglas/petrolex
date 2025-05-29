@@ -40,7 +40,7 @@
         <!-- Filter Options-->
         <div class="row m-1">
             <div class="col-12 collapse mb-4 p-0" id="collapseFilter">
-                @livewire('dashboard.filter-component')
+                @livewire('components.filter-component')
             </div>
         </div>
 
@@ -54,7 +54,7 @@
                                 <thead>
                                     <tr>
                                         <th class="w-10">Reference</th>
-                                        <th class="w-10">Point de distr.</th>
+                                        <th class="w-10">Centre de distr.</th>
                                         <th class="w-20">Produits</th>
                                         <th class="w-5">Quantité</th>
                                         <th class="w-10">Fournisseur</th>
@@ -378,7 +378,7 @@
                                 <input type="text" class="form-control" placeholder="690102030" id="phone">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="point_vente" class="form-label">Point de distribution</label>
+                                <label for="point_vente" class="form-label">Centre de distribution</label>
                                 <select class="form-select" id="point_vente">
                                     <option value="Point A">Point A</option>
                                     <option value="Point B">Point B</option>

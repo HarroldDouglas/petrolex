@@ -4,6 +4,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PermissionEnum;
+use App\Enums\UserRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -19,8 +21,17 @@ class RolePermissionSeeder extends Seeder
     {
         $this->resetTables();
 
-        $this->createPermissions(config('permissions'));
-        $this->createRolesWithPermissions(config('roles'));
+        // Get permissions from enum instead of config
+        $permissions = PermissionEnum::values();
+
+        // Create permissions
+        $this->createPermissions($permissions);
+
+        // Create roles with their permissions from enum
+        $this->createRolesWithPermissions();
+
+        // Ensure super_admin has ALL permissions
+        $this->assignAllPermissionsToSuperAdmin();
 
         $this->command->info('Roles and permissions created successfully!');
     }
@@ -49,7 +60,7 @@ class RolePermissionSeeder extends Seeder
     }
 
     /**
-     * Create all permissions from config.
+     * Create all permissions from enum.
      *
      * @param  array  $permissions  List of permission names
      */
@@ -67,15 +78,16 @@ class RolePermissionSeeder extends Seeder
     }
 
     /**
-     * Create roles and assign permissions to them.
-     *
-     * @param  array  $roles  Roles with their respective permissions
+     * Create roles and assign permissions to them using enums.
      */
-    private function createRolesWithPermissions(array $roles): void
+    private function createRolesWithPermissions(): void
     {
         $this->command->info('Creating roles and assigning permissions...');
 
-        foreach ($roles as $roleName => $permissions) {
+        foreach (UserRole::cases() as $roleEnum) {
+            $roleName = $roleEnum->value;
+            $permissions = $roleEnum->permissions();
+
             $role = Role::firstOrCreate(['name' => $roleName]);
 
             if (! empty($permissions)) {
@@ -84,6 +96,28 @@ class RolePermissionSeeder extends Seeder
             } else {
                 $this->command->info("Role '{$roleName}' created without specific permissions.");
             }
+        }
+    }
+
+    /**
+     * Ensure super_admin has all permissions
+     */
+    private function assignAllPermissionsToSuperAdmin(): void
+    {
+        $this->command->info('Assigning all permissions to Super Admin...');
+
+        $superAdminRole = Role::where('name', UserRole::SUPER_ADMIN()->value)->first();
+
+        if ($superAdminRole) {
+            // Get all permissions
+            $allPermissions = Permission::all();
+
+            // Assign all permissions to super admin
+            $superAdminRole->syncPermissions($allPermissions);
+
+            $this->command->info('Super Admin now has all '.$allPermissions->count().' permissions.');
+        } else {
+            $this->command->error('Super Admin role not found!');
         }
     }
 }

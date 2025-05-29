@@ -16,7 +16,7 @@
         <!-- Breadcrumb start -->
         <div class="row m-1">
             <div class="col-8 p-0">
-                <h4 class="main-title">Ajouter un point de distribution</h4>
+                <h4 class="main-title">Ajouter un centre de distribution</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
@@ -26,7 +26,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="f-s-14 f-w-500">Point de distribution</a>
+                        <a href="#" class="f-s-14 f-w-500">Centre de distribution</a>
                     </li>
                     <li class="active">
                         <a href="#" class="f-s-14 f-w-500">Ajouter</a>
@@ -78,9 +78,9 @@
                                                 id="latitude">
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="Longitiude" class="form-label">Longitiude</label>
-                                            <input type="text" class="form-control" placeholder="Longitiude"
-                                                id="Longitiude">
+                                            <label for="Longitude" class="form-label">Longitude</label>
+                                            <input type="text" class="form-control" placeholder="Longitude"
+                                                id="Longitude">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="storage_capacity" class="form-label">Capacité de stockage</label>

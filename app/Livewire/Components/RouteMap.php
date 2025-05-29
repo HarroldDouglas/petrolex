@@ -6,69 +6,65 @@ use Livewire\Component;
 
 class RouteMap extends Component
 {
+    public $apiKey;
+    public $pointA;
+    public $pointB;
+    public $isMapReady = false;
+
     /**
-     * Points d'origine et de destination (constantes)
+     * Demo coordinates for map route display
+     * Note: These values are for UI mockup purposes only.
+     * In the final project, these should be replaced with dynamic data.
      */
-    const POINT_A_LAT = 3.8775; // Yaoundé, point A
-    const POINT_A_LNG = 11.5468;
-    const POINT_A_NAME = 'Dépôt central Petrolex';
+    const POINT_A = [
+        'lat' => 3.8743539,
+        'lng' => 11.5412081,
+        'name' => 'OLA energy Essos',
+    ];
 
-    const POINT_B_LAT = 3.8615; // Point B (à ~2km du Point A)
-    const POINT_B_LNG = 11.5208;
-    const POINT_B_NAME = 'Centre de distribution Nlongkak';
+    const POINT_B = [
+        'lat' => 3.8626487,
+        'lng' => 11.5039655,
+        'name' => 'TotalEnergies MELEN 2',
+    ];
 
     /**
-     * Mode de transport fixé à 'driving' (voiture)
-     * Autres modes possibles (non utilisés dans l'interface):
-     * - 'DRIVING' : voiture (par défaut)
-     * - 'TWO_WHEELER' : moto
-     * - 'BICYCLING' : vélo
-     * - 'TRANSIT' : transport en commun
-     * - 'WALKING' : marche
+     * Default transport mode
      */
     public $transportMode = 'DRIVING';
 
     /**
-     * Résultats de l'itinéraire
+     * Route calculations results
      */
     public $distance = null;
     public $duration = null;
     public $steps = [];
 
     /**
-     * Paramètres de la carte
+     * Map parameters
      */
     public $defaultZoom = 13;
 
-    /**
-     * Clé API Google Maps
-     * Note importante: cette clé est utilisée uniquement pour les démonstrations et les tests
-     * Pour un environnement de production, utilisez une clé spécifique à votre domaine
-     * configurée dans vos variables d'environnement
-     */
-    protected function getGoogleMapsApiKey()
+    public function mount()
     {
-        // En production, utilisez la clé depuis les variables d'environnement
-        return config('services.google_maps.api_key', 'AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg');
+        $this->apiKey = $this->getGoogleMapsApiKey();
+        $this->pointA = self::POINT_A;
+        $this->pointB = self::POINT_B;
     }
 
-    /**
-     * Rendu du composant
-     */
+    protected function getGoogleMapsApiKey()
+    {
+        return config('services.google.maps.api_key');
+    }
+
+    public function setMapReady()
+    {
+        $this->isMapReady = true;
+        $this->dispatch('map-ready');
+    }
+
     public function render()
     {
-        return view('livewire.components.route-map', [
-            'apiKey' => $this->getGoogleMapsApiKey(),
-            'pointA' => [
-                'lat' => self::POINT_A_LAT,
-                'lng' => self::POINT_A_LNG,
-                'name' => self::POINT_A_NAME,
-            ],
-            'pointB' => [
-                'lat' => self::POINT_B_LAT,
-                'lng' => self::POINT_B_LNG,
-                'name' => self::POINT_B_NAME,
-            ],
-        ]);
+        return view('livewire.components.route-map');
     }
 }

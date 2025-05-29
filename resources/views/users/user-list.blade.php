@@ -31,11 +31,13 @@
                 </ul>
             </div>
             <div class="col-4 p-0">
-                <div class="d-flex justify-content-end">
-                    <a href="{{ route('users.create') }}" class="btn btn-success">
-                        <i class="iconoir-plus me-2"></i> Nouveau
-                    </a>
-                </div>
+                @can('users.create')
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ route('users.create') }}" class="btn btn-success">
+                            <i class="iconoir-plus me-2"></i> Nouveau
+                        </a>
+                    </div>
+                @endcan
             </div>
         </div>
 
@@ -52,68 +54,10 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un utilisateur</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form class="app-form">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Nom</label>
-                                <input type="text" class="form-control" placeholder="Nom" id="last_name">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">Prénom</label>
-                                <input type="text" class="form-control" placeholder="Prénom" id="first_name">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" placeholder="email@example.com"
-                                    id="email">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Téléphone</label>
-                                <input type="text" class="form-control" placeholder="690102030" id="phone">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="point_vente" class="form-label">Fonction</label>
-                                <select class="form-select" id="point_vente">
-                                    <option value="Responsable de point de distribution">Responsable de point de
-                                        distribution</option>
-                                    <option value="Responsable Gaz">Responsable Gaz</option>
-                                    <option value="Responsable informatique">Responsable informatique</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="point_vente" class="form-label">Point de distribution</label>
-                                <select class="form-select" id="point_vente">
-                                    <option value="Point A">Point A</option>
-                                    <option value="Point B">Point B</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="statut" class="form-label">Statut</label>
-                                <select class="form-select" id="statut">
-                                    <option value="actif">Actif</option>
-                                    <option value="inactif">Inactif</option>
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer px-4">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="button" class="btn btn-primary">Modifier</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Use reusable components for confirmation modals -->
+    <x-modals.delete-confirmation id="deleteModal" entity="l'utilisateur" />
+    <x-modals.deactivate-confirmation id="deactivateModal" entity="utilisateur" />
+    <x-modals.activate-confirmation id="activateModal" entity="utilisateur" />
 
 @endsection
 
@@ -128,4 +72,21 @@
 
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
 
+    <!-- Include reusable modal scripts -->
+    @include('components.modals.modal-scripts')
+    
+    <script>
+        $(document).ready(function() {
+            // Any page-specific script overrides or extensions can go here
+            
+            // For example, if you want to do something specific after deleting a user
+            $('.confirm-delete-btn').click(function() {
+                // Custom logic before reload
+                // For example: show a success message
+                // ...
+
+                window.location.reload();
+            });
+        });
+    </script>
 @endsection
