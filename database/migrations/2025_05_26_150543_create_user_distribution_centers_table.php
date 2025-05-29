@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_center_permissions', function (Blueprint $table) {
+        Schema::create('user_distribution_centers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('distribution_center_id')->constrained()->onDelete('cascade');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             
             $table->unique(['user_id', 'distribution_center_id']);

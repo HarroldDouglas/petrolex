@@ -17,8 +17,8 @@ class AccessoryType extends Model
      */
     protected $fillable = [
         'name',
-        'description',
         'price',
+        'description',
         'is_active',
     ];
 
@@ -28,7 +28,6 @@ class AccessoryType extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'price' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 

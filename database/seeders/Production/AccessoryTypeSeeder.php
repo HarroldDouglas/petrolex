@@ -18,22 +18,26 @@ class AccessoryTypeSeeder extends Seeder
 
         $accessoryTypes = [
             [
-                'name' => 'Tuyau de gaz standard',
+                'name' => 'Tuyau de gaz standard 5m',
+                'price' => 2500,
                 'description' => 'Tuyau flexible pour connecter la bouteille de gaz aux appareils',
                 'is_active' => true,
             ],
             [
                 'name' => 'Détendeur universel',
+                'price' => 1500,
                 'description' => 'Détendeur compatible avec la plupart des bouteilles de gaz',
                 'is_active' => true,
             ],
             [
                 'name' => 'Protection anti-chute',
+                'price' => 500,
                 'description' => 'Protection pour éviter la chute des bouteilles',
                 'is_active' => true,
             ],
             [
                 'name' => 'Adaptateur pour réchaud',
+                'price' => 2000,
                 'description' => 'Adaptateur spécifique pour connexion aux réchauds',
                 'is_active' => true,
             ],

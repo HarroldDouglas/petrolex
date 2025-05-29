@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BottleType extends Model
@@ -62,5 +63,12 @@ class BottleType extends Model
     public function supplierDeliveryProductTypes(): HasMany
     {
         return $this->hasMany(SupplierDeliveryProductType::class);
+    }
+
+    public function distributionCenterStocks(): BelongsToMany
+    {
+        return $this->belongsToMany(DistributionCenter::class)
+            ->withPivot(['stock_empty', 'stock_filled'])
+            ->withTimestamps();
     }
 }

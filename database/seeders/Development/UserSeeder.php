@@ -5,6 +5,7 @@
 namespace Database\Seeders\Development;
 
 use App\Enums\UserRole;
+use App\Models\Customer;
 use App\Models\DistributionCenter;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -112,11 +113,9 @@ class UserSeeder extends Seeder
                 ->create();
 
             $user->assignRole(UserRole::CENTER_MANAGER()->value);
-
-            // Associate the user with the center
-            if (method_exists($user, 'distributionCenters')) {
-                $user->distributionCenters()->attach($center->id, ['is_manager' => true]);
-            }
+            $user->distributionCenters()->create([
+                'distribution_center_id' => $center->id,
+            ]);
         }
 
         $this->command->info($centers->count().' center manager users created.');
@@ -136,22 +135,18 @@ class UserSeeder extends Seeder
         }
 
         foreach ($centers as $center) {
-            // Create 5 delivery persons per center
             User::factory()
-                ->deliveryPerson()
-                ->count(5)
-                ->create()
-                ->each(function ($user) use ($center) {
-                    $user->assignRole(UserRole::DELIVERY_PERSON()->value);
+                ->deliveryPerson($center->id, true)
+                ->count(4)
+                ->create();
 
-                    // Associate the user with the center
-                    if (method_exists($user, 'distributionCenters')) {
-                        $user->distributionCenters()->attach($center->id);
-                    }
-                });
+            User::factory()
+                ->deliveryPerson($center->id, false)
+                ->count(1)
+                ->create();
         }
 
-        $this->command->info($centers->count() * 5 .' delivery person users created.');
+        $this->command->info($centers->count() * 5 .' delivery persons created (4 active + 1 inactive per center).');
     }
 
     /**
@@ -161,12 +156,23 @@ class UserSeeder extends Seeder
     {
         User::factory()
             ->customer()
-            ->count(50)
-            ->create()
-            ->each(function ($user) {
-                $user->assignRole(UserRole::CUSTOMER()->value);
-            });
+            ->count(20)
+            ->create();
+        User::factory()
+            ->customer(addressesCount: 2)
+            ->count(10)
+            ->create();
 
-        $this->command->info('50 customer users created.');
+        User::factory()
+            ->customer(1000.0)
+            ->count(10)
+            ->create();
+
+        User::factory()
+            ->customer(0.0)
+            ->count(10)
+            ->create();
+
+        $this->command->info('50 customers created (30 random + 10 VIP + 10 new).');
     }
 }

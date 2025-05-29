@@ -103,6 +103,21 @@ class Order extends Model
         return $this->hasMany(BottleMovement::class);
     }
 
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Get all products associated with this order through order items.
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'order_items')
+            ->withPivot(['quantity', 'unit_price', 'total_price'])
+            ->withTimestamps();
+    }
+
     /**
      * Assign a delivery person to this order
      *

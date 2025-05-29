@@ -14,10 +14,7 @@ require __DIR__.'/web/auth.php';
  * All authenticated routes
  */
 Route::middleware(['web', 'auth'])->group(function () {
-    // Dashboard routes
     require __DIR__.'/web/dashboard.php';
-
-    // Module routes
     require __DIR__.'/web/admin.php';
     require __DIR__.'/web/orders.php';
     require __DIR__.'/web/users.php';
