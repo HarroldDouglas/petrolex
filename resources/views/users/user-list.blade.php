@@ -44,7 +44,7 @@
         <div class="row ticket-app">
             <div class="col-12">
                 <div class="card card-border">
-                    <div class="card-body p-0">
+                    <div class="card-body pt-1 px-0">
                         <div class="table-responsive app-scroll app-datatable-default">
                             <livewire:users-table />
                         </div>

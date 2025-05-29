@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Exports\UsersExport;
 use App\Models\User;
+use App\Enums\EntityStatus;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -96,9 +97,9 @@ class UsersTable extends BaseDataTable
                 ->html()
                 ->format(function ($value, $row) {
                     if ($value) {
-                        return '<span class="badge text-outline-success">Actif</span>';
+                        return '<span class="badge text-outline-'.EntityStatus::ACTIVE()->badge().'">' . EntityStatus::ACTIVE()->label . '</span>';
                     } else {
-                        return '<span class="badge text-outline-danger">Inactif</span>';
+                        return '<span class="badge text-outline-'.EntityStatus::INACTIVE()->badge().'">'.EntityStatus::INACTIVE()->label.'</span>';
                     }
                 }),
             
@@ -137,8 +138,8 @@ class UsersTable extends BaseDataTable
             SelectFilter::make('Statut', 'is_active')
                 ->options([
                     '' => 'Tous',
-                    '1' => 'Actif',
-                    '0' => 'Inactif',
+                    '1' => EntityStatus::ACTIVE()->label,
+                    '0' => EntityStatus::INACTIVE()->label,
                 ])
                 ->filter(function (Builder $builder, string $value) {
                     if ($value === '') {
