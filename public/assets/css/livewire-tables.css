@@ -157,6 +157,10 @@
     text-decoration: none;
 }
 
+/* Pour fixer le débordement de la pagination du tableau */
+.row .col-12.col-md-6.overflow-auto .pagination, .row .col-12.col-md-6.overflow-auto nav.semi-nav, .table-responsive + .row .pagination, .livewire-datatable .pagination, .overflow-auto nav{
+    height: 50px;
+}
 
 [x-data="laravellivewiretable($wire)"] .pagination .page-item.active .page-link {
     /* Style pour l'élément actif de pagination */

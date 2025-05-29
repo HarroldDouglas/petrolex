@@ -74,10 +74,6 @@ class UsersTable extends BaseDataTable
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Email', 'email')
-                ->sortable()
-                ->searchable(),
-
             Column::make('Points de distribution')
             ->sortable()
             ->searchable()
@@ -94,10 +90,14 @@ class UsersTable extends BaseDataTable
 
            Column::make('Fonction')
             ->label(function ($row) {
-                return $row->roles->pluck('name')->join(', ');
+                return $row->roles
+                    ->map(function ($role) {
+                        return \App\Enums\UserRole::from($role->name)->label;
+                    })
+                    ->join(', ');
             })
             ->sortable(fn ($query, $direction) => 
-                $query->orderBy('id', $direction) // Optional: adjust if you want actual role sorting
+                $query->orderBy('id', $direction)
             )
             ->searchable(function (Builder $query, string $searchTerm) {
                 $query->whereHas('roles', function ($q) use ($searchTerm) {
