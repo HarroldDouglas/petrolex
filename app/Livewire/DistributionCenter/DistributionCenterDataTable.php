@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 
+// TODO: we should add column rating(note moyenne), which can be calculated from the orders table
 class DistributionCenterDataTable extends BaseDataTable
 {
     protected $model = DistributionCenter::class;
@@ -86,7 +87,7 @@ class DistributionCenterDataTable extends BaseDataTable
                     );
                 }),
 
-                //TODO: create an action vue for this and restore de dropdown action menu
+            // TODO: create an action vue for this and restore de dropdown action menu
             Column::make('Actions', 'id')
                 ->format(function ($value, $row) {
                     return new HtmlString(

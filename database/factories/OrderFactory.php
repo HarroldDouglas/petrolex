@@ -6,11 +6,11 @@ use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
-use App\Enums\UserRole;
 use App\Models\Customer;
 use App\Models\CustomerDeliveryAddress;
+use App\Models\DeliveryPerson;
 use App\Models\DistributionCenter;
-use App\Models\User;
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class OrderFactory extends Factory
 {
+    protected $model = Order::class;
+
     /**
      * Define the model's default state.
      *
@@ -26,103 +28,91 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         $customer = Customer::inRandomOrder()->first();
-        $center = DistributionCenter::inRandomOrder()->first();
-        $deliveryAddress = CustomerDeliveryAddress::where('customer_id', $customer?->id)->inRandomOrder()->first();
-        $deliveryPerson = User::role(UserRole::DELIVERY_PERSON()->value)->inRandomOrder()->first();
-
-        if (! $customer || ! $center) {
-            throw new \RuntimeException('Required data missing. Make sure to run required seeders first.');
-        }
-
-        if (! $deliveryAddress) {
-            throw new \RuntimeException('No delivery addresses found for customers. Please seed customer addresses first.');
-        }
-
-        $subtotal = fake()->randomFloat(2, 50, 500);
-        $deliveryFee = fake()->randomElement([0, 10, 15, 20]);
-        $totalAmount = $subtotal + $deliveryFee;
+        $distributionCenter = DistributionCenter::inRandomOrder()->first();
+        $deliveryAddress = CustomerDeliveryAddress::where('customer_id', $customer->id)
+            ->inRandomOrder()->first() ?? CustomerDeliveryAddress::factory()->create(['customer_id' => $customer->id]);
 
         return [
             'customer_id' => $customer->id,
+            'distribution_center_id' => $distributionCenter->id,
             'delivery_address_id' => $deliveryAddress->id,
-            'delivery_person_id' => fake()->optional(0.7)->randomElement([$deliveryPerson?->id]),
-            'distribution_center_id' => $center->id,
-            'order_number' => 'ORD-'.fake()->unique()->numerify('######'),
-            'delivery_type' => fake()->randomElement(DeliveryType::values()),
-            'status' => fake()->randomElement(OrderStatus::values()),
-            'payment_method' => fake()->randomElement(PaymentMethod::values()),
-            'payment_status' => fake()->randomElement(PaymentStatus::values()),
-            'subtotal' => $subtotal,
-            'delivery_fee' => $deliveryFee,
-            'total_amount' => $totalAmount,
-            'order_date' => fake()->dateTimeBetween('-1 month', 'now'),
-            'delivery_date' => fake()->optional(0.6)->dateTimeBetween('-2 weeks', '+1 week'),
-            'notes' => fake()->optional(0.3)->sentence(),
+            'delivery_person_id' => null,
+            'order_number' => 'ORD-'.$this->faker->unique()->bothify('######'),
+            'delivery_type' => $this->faker->randomElement(DeliveryType::values()),
+            'status' => OrderStatus::CONFIRMED(),
+            'payment_status' => $this->faker->randomElement(PaymentStatus::values()),
+            'payment_method' => $this->faker->randomElement(PaymentMethod::values()),
+            'subtotal' => 0,
+            'delivery_fee' => $this->faker->randomElement([0, 500, 1000]),
+            'total_amount' => 0,
+            'order_date' => now(),
+            'delivery_date' => null,
+            'comments' => null,
+            'center_comments' => null,
+            'rating' => null,
         ];
     }
 
     /**
-     * Configure the order as confirmed
+     * Order with confirmed status
      */
-    public function confirmed(): self
+    public function confirmed(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'status' => OrderStatus::CONFIRMED(),
-                'payment_status' => PaymentStatus::PAID(),
+                'delivery_date' => null,
+                'delivery_person_id' => null,
+                'comments' => null,
+                'rating' => null,
             ];
         });
     }
 
     /**
-     * Configure the order as processing
+     * Order with processing status
      */
-    public function processing(): self
+    public function processing(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
+            $deliveryPerson = DeliveryPerson::inRandomOrder()->first();
+
             return [
                 'status' => OrderStatus::PROCESSING(),
-                'payment_status' => PaymentStatus::PAID(),
+                'delivery_date' => null,
+                'delivery_person_id' => $deliveryPerson?->id,
+                'comments' => null,
+                'rating' => null,
             ];
         });
     }
 
     /**
-     * Configure the order as delivered
+     * Order with delivered status
      */
-    public function delivered(): self
+    public function delivered(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
+            $deliveryPerson = DeliveryPerson::inRandomOrder()->first();
+
             return [
                 'status' => OrderStatus::DELIVERED(),
-                'payment_status' => PaymentStatus::PAID(),
-                'delivery_date' => fake()->dateTimeBetween('-2 weeks', 'now'),
+                'delivery_date' => now()->subDays(rand(1, 3)),
+                'delivery_person_id' => $deliveryPerson?->id,
             ];
         });
     }
 
     /**
-     * Configure the order as cancelled
+     * Order with cancelled status
      */
-    public function cancelled(): self
+    public function cancelled(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'status' => OrderStatus::CANCELLED(),
-                'notes' => fake()->sentence(),
-            ];
-        });
-    }
-
-    /**
-     * Configure the order for fast delivery
-     */
-    public function fastDelivery(): self
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'delivery_type' => 'fast',
-                'delivery_fee' => fake()->randomFloat(2, 20, 50),
+                'delivery_date' => null,
+                'delivery_person_id' => null,
             ];
         });
     }

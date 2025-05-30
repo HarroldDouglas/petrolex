@@ -231,8 +231,8 @@ class DashboardDataTable extends BaseDataTable
                 'customer.user',
                 'distributionCenter',
                 'deliveryPerson.user',
-                'orderItems.product.bottle.bottleType',
-                'orderItems.product.accessory.accessoryType',
+                'items.product.bottle.bottleType',
+                'items.product.accessory.accessoryType',
             ]);
     }
 

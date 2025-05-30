@@ -33,7 +33,9 @@ return new class extends Migration
             
             $table->timestamp('order_date')->useCurrent();
             $table->timestamp('delivery_date')->nullable();
-            $table->text('notes')->nullable();
+            $table->text('comments')->nullable()->comment('Customer comments about the order');
+            $table->text('center_comments')->nullable()->comment('Distribution center comments about the order');
+            $table->decimal('rating', 2, 1)->nullable()->comment('Customer rating from 1 to 5');
             $table->timestamps();
             
             // Add indexes for common queries

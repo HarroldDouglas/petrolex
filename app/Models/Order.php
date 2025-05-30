@@ -35,7 +35,9 @@ class Order extends Model
         'total_amount',
         'order_date',
         'delivery_date',
-        'notes',
+        'comments',
+        'center_comments',
+        'rating',
     ];
 
     /**
@@ -103,11 +105,6 @@ class Order extends Model
         return $this->hasMany(BottleMovement::class);
     }
 
-    public function orderItems(): HasMany
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
     /**
      * Get all products associated with this order through order items.
      */
@@ -131,5 +128,13 @@ class Order extends Model
         ]);
 
         return $this;
+    }
+
+    /**
+     * Check if the customer can leave a rating and comments
+     */
+    public function canBeRated(): bool
+    {
+        return in_array($this->status, [OrderStatus::DELIVERED(), OrderStatus::CANCELLED()]);
     }
 }

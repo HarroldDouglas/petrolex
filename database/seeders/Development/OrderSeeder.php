@@ -181,7 +181,7 @@ class OrderSeeder extends Seeder
                 // Get a random delivery address for this customer
                 $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
 
-                $deliveredOrders[] = Order::factory()
+                $order = Order::factory()
                     ->delivered()
                     ->create([
                         'customer_id' => $customer->id,
@@ -190,7 +190,12 @@ class OrderSeeder extends Seeder
                         'delivery_person_id' => $deliveryPerson->id,
                         'order_number' => 'ORD-'.rand(100000, 999999),
                         'order_date' => now()->subDays(rand(2, 5)),
+                        'rating' => rand(0, 100) <= 70 ? rand(30, 50) / 10 : null,
+                        'comments' => rand(0, 100) <= 70 ? fake()->realText(150) : null,
+                        'center_comments' => rand(0, 100) <= 40 ? fake()->realText(100) : null,
                     ]);
+
+                $deliveredOrders[] = $order;
             }
         }
 
@@ -240,6 +245,10 @@ class OrderSeeder extends Seeder
                     'delivery_address_id' => $deliveryAddress->id,
                     'order_number' => 'ORD-'.rand(100000, 999999),
                     'order_date' => now()->subDays(rand(5, 30)),
+                    // Add rating and comments for cancelled orders (50% chance)
+                    'rating' => rand(0, 100) <= 50 ? rand(10, 40) / 10 : null,
+                    'comments' => rand(0, 100) <= 50 ? fake()->realText(150) : null,
+                    'center_comments' => rand(0, 100) <= 60 ? fake()->realText(100) : null,
                 ]);
         }
 

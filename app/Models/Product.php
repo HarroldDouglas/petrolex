@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -30,22 +29,6 @@ class Product extends Model
     protected $casts = [
         'product_type' => ProductType::class,
     ];
-
-    /**
-     * Get the bottle type for this product.
-     */
-    public function bottleType(): BelongsTo
-    {
-        return $this->belongsTo(BottleType::class);
-    }
-
-    /**
-     * Get the accessory type for this product.
-     */
-    public function accessoryType(): BelongsTo
-    {
-        return $this->belongsTo(AccessoryType::class);
-    }
 
     /**
      * Get the bottle associated with this product.
@@ -85,5 +68,19 @@ class Product extends Model
     public function scopeAccessories($query)
     {
         return $query->where('product_type', ProductType::ACCESSORY());
+    }
+
+    public function name(): string
+    {
+        return match ($this->product_type) {
+            ProductType::BOTTLE() => $this->bottle?->bottleType?->name ?? 'Bouteille sans type',
+            ProductType::ACCESSORY() => $this->accessory?->accessoryType?->name ?? 'Accessoire sans type',
+            default => 'Produit inconnu',
+        };
+    }
+
+    public function type(): string
+    {
+        return $this->product_type->label;
     }
 }
