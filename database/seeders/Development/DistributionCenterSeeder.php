@@ -19,7 +19,11 @@ class DistributionCenterSeeder extends Seeder
         $centers = [
             [
                 'name' => 'Centre Principal',
-                'address' => '123 Rue Principale, Ville',
+                'country' => 'Cameroun',
+                'city' => 'Douala',
+                'neighborhood' => 'Bonanjo',
+                'address' => '123 Rue Principale, Douala',
+                'description' => 'Centre de distribution principal avec toutes les commodités',
                 'phone' => '+237612345678',
                 'email' => 'centre.principal@petrolex.cm',
                 'latitude' => 4.0511,
@@ -28,7 +32,11 @@ class DistributionCenterSeeder extends Seeder
             ],
             [
                 'name' => 'Centre Nord',
-                'address' => '45 Avenue Nord, Ville Nord',
+                'country' => 'Cameroun',
+                'city' => 'Yaoundé',
+                'neighborhood' => 'Bastos',
+                'address' => '45 Avenue Nord, Yaoundé',
+                'description' => 'Centre de distribution pour la région du Nord',
                 'phone' => '+237623456789',
                 'email' => 'centre.nord@petrolex.cm',
                 'latitude' => 4.0622,
@@ -37,7 +45,11 @@ class DistributionCenterSeeder extends Seeder
             ],
             [
                 'name' => 'Centre Sud',
-                'address' => '78 Avenue Sud, Ville Sud',
+                'country' => 'Cameroun',
+                'city' => 'Adamaoua',
+                'neighborhood' => 'Centre',
+                'address' => '78 Avenue Sud, Adamaoua',
+                'description' => 'Centre de distribution pour la région du Sud',
                 'phone' => '+237634567890',
                 'email' => 'centre.sud@petrolex.cm',
                 'latitude' => 4.0433,

@@ -18,7 +18,11 @@ class DistributionCenter extends Model
      */
     protected $fillable = [
         'name',
+        'country',
+        'city',
+        'neighborhood',
         'address',
+        'description',
         'latitude',
         'longitude',
         'phone',

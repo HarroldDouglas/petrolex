@@ -15,6 +15,7 @@ use App\Models\DeliveryPerson;
 use App\Models\DistributionCenter;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Database\Seeder;
 
 class OrderSeeder extends Seeder

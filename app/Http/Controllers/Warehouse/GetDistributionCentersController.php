@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Warehouse;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class GetWarehouseListController extends Controller
+class GetDistributionCentersController extends Controller
 {
     /**
      * Handle the incoming request.
      */
     public function __invoke(Request $request)
     {
-        return view('warehouse.warehouse-list');
+        return view('distribution-center.index');
     }
 }

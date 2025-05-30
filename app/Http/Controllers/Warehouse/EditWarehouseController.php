@@ -28,6 +28,6 @@ class EditWarehouseController extends Controller
             'created_at' => date('Y-m-d H:i:s', strtotime("-$warehouse_id days")),
         ];
 
-        return view('warehouse.edit-warehouse', compact('warehouse'));
+        return view('distribution-center.edit-warehouse', compact('warehouse'));
     }
 }
