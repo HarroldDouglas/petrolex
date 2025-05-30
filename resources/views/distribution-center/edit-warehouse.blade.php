@@ -10,8 +10,8 @@
                 <ul class="app-line-breadcrumbs mb-3">
                     <li><a href="{{ route('dashboard') }}" class="f-s-14 f-w-500"><i class="ph-duotone ph-stack f-s-16"></i>
                             Tableau de bord</a></li>
-                    <li><a href="{{ route('warehouses.list') }}" class="f-s-14 f-w-500">Centres dedistribution</a></li>
-                    <li><a href="{{ route('warehouses.details', $warehouse['id']) }}"
+                    <li><a href="{{ route('distribution-centers.list') }}" class="f-s-14 f-w-500">Centres dedistribution</a></li>
+                    <li><a href="{{ route('distribution-centers.details', $warehouse['id']) }}"
                             class="f-s-14 f-w-500">{{ $warehouse['name'] }}</a></li>
                     <li class="active"><a href="#" class="f-s-14 f-w-500">Modifier</a></li>
                 </ul>
@@ -84,11 +84,11 @@
 
                                 <div class="col-12 mt-3">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <a href="{{ route('warehouses.details', $warehouse['id']) }}"
+                                        <a href="{{ route('distribution-centers.details', $warehouse['id']) }}"
                                             class="btn btn-secondary">
                                             <i class="ti ti-x me-1"></i>Annuler
                                         </a>
-                                        <a href="{{ route('warehouses.details', $warehouse['id']) }}"
+                                        <a href="{{ route('distribution-centers.details', $warehouse['id']) }}"
                                             class="btn btn-success">
                                             <i class="ti ti-device-floppy me-1"></i>Enregistrer
                                         </a>

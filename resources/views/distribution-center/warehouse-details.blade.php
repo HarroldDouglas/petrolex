@@ -10,13 +10,13 @@
                 <ul class="app-line-breadcrumbs mb-3">
                     <li><a href="{{ route('dashboard') }}" class="f-s-14 f-w-500"><i class="ph-duotone ph-stack f-s-16"></i>
                             Tableau de bord</a></li>
-                    <li><a href="{{ route('warehouses.list') }}" class="f-s-14 f-w-500">Centres dedistribution</a></li>
+                    <li><a href="{{ route('distribution-centers.list') }}" class="f-s-14 f-w-500">Centres dedistribution</a></li>
                     <li class="active"><a href="#" class="f-s-14 f-w-500">Point A</a></li>
                 </ul>
             </div>
             <div class="col-4 p-0">
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('warehouses.edit', 1) }}" class="btn btn-success">
+                    <a href="{{ route('distribution-centers.edit', 1) }}" class="btn btn-success">
                         <i class="ti ti-edit me-1"></i>Modifier
                     </a>
                     <!-- Static status button for mockup -->

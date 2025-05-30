@@ -97,10 +97,10 @@
                     </a>
                     <ul class="collapse" id="point-of-sales">
                         @can($permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value)
-                            <li><a href="{{ route('warehouses.list') }}"> Liste</a></li>
+                            <li><a href="{{ route('distribution-centers.list') }}"> Liste</a></li>
                         @endcan
                         @can($permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value)
-                            <li><a href="{{ route('warehouses.create') }}"> Nouveau</a></li>
+                            <li><a href="{{ route('distribution-centers.create') }}"> Nouveau</a></li>
                         @endcan
                     </ul>
                 </li>
