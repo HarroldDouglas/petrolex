@@ -41,9 +41,18 @@
                             <li><a class="dropdown-item" href="{{ route('orders.download.invoice', ['order' => $order->id]) }}">
                                 <i class="ti ti-download me-2"></i>Télécharger la facture
                             </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#refundModal{{ $order->id }}">
+                                    <i class="ti ti-receipt-refund me-2"></i>Rembourser
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
+
+                @livewire('order.refund-form', ['order' => $order])
+
                 <a class="btn btn-info ms-2" href="{{ route('dashboard') }}">Retour à la Liste des Commandes</a>
             </div>
         </div>
@@ -317,6 +326,10 @@
         printWindow.onafterprint = function() {
             printWindow.close();
         };
+    }
+
+    function showRefundAlert() {
+        alert('Fonctionnalité de remboursement en cours de développement!');
     }
 </script>
 

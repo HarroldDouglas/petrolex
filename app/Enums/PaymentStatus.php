@@ -8,7 +8,6 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self PENDING()
  * @method static self PAID()
  * @method static self FAILED()
- * @method static self REFUNDED()
  */
 class PaymentStatus extends Enum
 {
@@ -21,7 +20,6 @@ class PaymentStatus extends Enum
             'PENDING' => 'En attente',
             'PAID' => 'Payé',
             'FAILED' => 'Échoué',
-            'REFUNDED' => 'Remboursé',
         ];
     }
 
@@ -34,7 +32,6 @@ class PaymentStatus extends Enum
             'PENDING' => 'pending',
             'PAID' => 'paid',
             'FAILED' => 'failed',
-            'REFUNDED' => 'refunded',
         ];
     }
 }
