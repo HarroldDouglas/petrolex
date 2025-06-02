@@ -29,28 +29,9 @@ class BottleDataTable extends BaseDataTable
         return 'commandes';
     }
 
-    public bool $rememberColumnSelection = true;
-    public bool $rememberFilters = true;
-    public bool $rememberSort = true;
-    public bool $rememberPerPage = true;
-
     public function configure(): void
     {
         parent::configure();
-
-        $this->setPrimaryKey('id')
-            ->setTableWrapperAttributes([
-                'class' => 'table-responsive',
-            ])
-            ->setTableAttributes([
-                'class' => 'table table-striped table-hover',
-            ])
-            ->setTheadAttributes([
-                'class' => 'table-light',
-            ])
-            ->setDefaultSort(self::DEFAULT_SORT_FIELD, self::DEFAULT_SORT_DIRECTION)
-            ->setPerPageAccepted([10, 25, 50, 100])
-            ->setPerPage(10);
     }
 
     public function columns(): array
@@ -95,48 +76,11 @@ class BottleDataTable extends BaseDataTable
             Column::make('Action', 'id')
                 ->format(function ($value, $row) {
                     return new HtmlString(
-                        '<div class="btn-group dropdown-icon-none">
-                            <button
-                                class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
-                                type="button" id="dropdownMenuButton'.$row->id.'"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ti ti-dots-vertical"></i>
-                            </button>
-                            <ul class="dropdown-menu"
-                                aria-labelledby="dropdownMenuButton'.$row->id.'">
-                                <li>
-                                    <a class="dropdown-item view-history" href="#"
-                                        data-id="'.$row->id.'" 
-                                        data-barcode="'.$row->barcode.'"
-                                        data-type="'.optional($row->bottleType)->name.'"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#historyModal">
-                                        <i class="iconoir-clock-rotate-right text-primary me-2"></i>
-                                        Historique
-                                    </a>
-                                </li>'
-                                .($row->status->value !== BottleStatus::LOST_STOLEN()->value
-                                    ? '<li>
-                                            <a class="dropdown-item mark-lost" href="#"
-                                                data-id="'.$row->id.'">
-                                                <i class="iconoir-chat-bubble-question text-danger me-2"></i>
-                                                Déclarer perdu
-                                            </a>
-                                        </li>'
-                                    : '<li>
-                                            <a class="dropdown-item mark-found" href="#"
-                                                data-id="'.$row->id.'">
-                                                <i class="iconoir-circle-spark text-success me-2"></i>
-                                                Marquer retrouvée
-                                            </a>
-                                        </li>'
-                                ).'
-                            </ul>
-                        </div>'
+                        view('components.bottle-actions', ['bottle' => $row])->render()
                     );
                 }),
-        ];
-    }
+                ];
+            }
 
     public function filters(): array
     {
@@ -167,14 +111,6 @@ class BottleDataTable extends BaseDataTable
                     $builder->whereDate('created_at', '>=', $value);
                 }),
 
-            DateRangeFilter::make('Période')
-                ->config([
-                    'locale' => 'fr',
-                    'altFormat' => 'd/m/Y',
-                ])
-                ->filter(function (Builder $builder, array $dateRange) {
-                    $builder->whereBetween('created_at', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
-                }),
         ];
     }
 
