@@ -107,80 +107,7 @@
                     <div class="card-body p-0">
                         <!-- table -->
                         <div class="table-responsive app-scroll app-datatable-default">
-                            <table class="w-100 display ticket-app-table" id="ticketdatatable">
-                                <thead>
-                                    <tr>
-                                        <th>Code-barre</th>
-                                        <th>Type de bouteille</th>
-                                        <th>Date d'enregistrement</th>
-                                        <th>État</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($bottles as $bottle)
-                                        <tr>
-                                            <td>{{ $bottle['barcode'] }}</td>
-                                            <td>{{ $bottle['type'] }}</td>
-                                            <td>{{ date('d/m/Y H:i', strtotime($bottle['created_at'])) }}</td>
-                                            <td>
-                                                @php
-                                                    $badgeClass = 'text-bg-success';
-                                                    if ($bottle['status'] === 'Vendu') {
-                                                        $badgeClass = 'text-bg-info';
-                                                    }
-                                                    if ($bottle['status'] === 'Perdu') {
-                                                        $badgeClass = 'text-bg-danger';
-                                                    }
-                                                    if ($bottle['status'] === 'En cours de livraison') {
-                                                        $badgeClass = 'text-bg-warning';
-                                                    }
-                                                @endphp
-                                                <span class="badge {{ $badgeClass }}">{{ $bottle['status'] }}</span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group dropdown-icon-none">
-                                                    <button
-                                                        class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
-                                                        type="button" id="dropdownMenuButton{{ $bottle['id'] }}"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="ti ti-dots-vertical"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu"
-                                                        aria-labelledby="dropdownMenuButton{{ $bottle['id'] }}">
-                                                        <li>
-                                                            <a class="dropdown-item view-history" href="#"
-                                                                data-id="{{ $bottle['id'] }}" data-bs-toggle="modal"
-                                                                data-bs-target="#historyModal">
-                                                                <i class="iconoir-clock-rotate-right text-primary me-2"></i>
-                                                                Historique
-                                                            </a>
-                                                        </li>
-                                                        @if ($bottle['status'] !== 'Perdu')
-                                                            <li>
-                                                                <a class="dropdown-item mark-lost" href="#"
-                                                                    data-id="{{ $bottle['id'] }}">
-                                                                    <i
-                                                                        class="iconoir-chat-bubble-question text-danger me-2"></i>
-                                                                    Déclarer perdu
-                                                                </a>
-                                                            </li>
-                                                        @else
-                                                            <li>
-                                                                <a class="dropdown-item mark-found" href="#"
-                                                                    data-id="{{ $bottle['id'] }}">
-                                                                    <i class="iconoir-circle-spark text-success me-2"></i>
-                                                                    Marquer retrouvée
-                                                                </a>
-                                                            </li>
-                                                        @endif
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            @livewire('bottle.bottle-data-table')
                         </div>
                     </div>
                 </div>
@@ -189,98 +116,8 @@
     </div>
 
     <!-- History Modal -->
-    <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="historyModalLabel">Historique de la bouteille</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <p><strong>Code-barre:</strong> <span id="bottle-barcode"></span></p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Type:</strong> <span id="bottle-type"></span></p>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Date et heure</th>
-                                    <th>Description</th>
-                                    <th>État précédent</th>
-                                    <th>État actuel</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-table-body">
-                                <!-- History records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifier un utilisateur</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form class="app-form">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Nom</label>
-                                <input type="text" class="form-control" placeholder="Nom" id="last_name">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">Prénom</label>
-                                <input type="text" class="form-control" placeholder="Prénom" id="first_name">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" placeholder="email@example.com"
-                                    id="email">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Téléphone</label>
-                                <input type="text" class="form-control" placeholder="690102030" id="phone">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="point_vente" class="form-label">Centre de distribution</label>
-                                <select class="form-select" id="point_vente">
-                                    <option value="Point A">Point A</option>
-                                    <option value="Point B">Point B</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="statut" class="form-label">Statut</label>
-                                <select class="form-select" id="statut">
-                                    <option value="actif">Actif</option>
-                                    <option value="inactif">Inactif</option>
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer px-4">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
-                    <button type="button" class="btn btn-primary">Modifier</button>
-                </div>
-            </div>
-        </div>
+    <x-modals.bottle-history id="historyModal" title="Historique de la bouteille" />
+    
 
     @endsection
 
@@ -292,82 +129,152 @@
         <script src="{{ asset('assets/js/dashboard.js') }}"></script>
         <script>
             $(document).ready(function() {
+            // Function to bind action handlers
+            function bindActionHandlers() {
                 // View history button click handler
-                $('.view-history').click(function() {
+                $(document).off('click', '.view-history').on('click', '.view-history', function(e) {
+                    e.preventDefault();
                     const bottleId = $(this).data('id');
+                    
+                    // Show loading state
+                    $('#bottle-barcode').text('Chargement...');
+                    $('#bottle-type').text('Chargement...');
+                    $('#history-table-body').html('<tr><td colspan="4" class="text-center">Chargement...</td></tr>');
 
-                    // Find bottle information
-                    const bottleData = @json($bottles).find(b => b.id == bottleId);
+                    // Fetch bottle history via AJAX
+                    $.ajax({
+                        url: "{{ route('bottles.history', ':id') }}".replace(':id', bottleId),
+                        type: 'GET',
+                        success: function(response) {
+                            // Fill modal with bottle data
+                            $('#bottle-barcode').text(response.bottle.barcode);
+                            $('#bottle-type').text(response.bottle.type);
 
-                    // Fill modal with bottle data
-                    $('#bottle-barcode').text(bottleData.barcode);
-                    $('#bottle-type').text(bottleData.type);
+                            // Clear existing history records
+                            $('#history-table-body').empty();
 
-                    // Example history data - would typically come from an API
-                    const history = [{
-                            date: '2023-06-12 08:30:00',
-                            description: 'Premier enregistrement',
-                            previous_status: null,
-                            current_status: 'En stock'
+                            // Add history records
+                            if (response.history && response.history.length > 0) {
+                                response.history.forEach(function(record) {
+                                    const date = new Date(record.moved_at).toLocaleDateString('fr-FR', {
+                                        day: '2-digit',
+                                        month: 'long',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    });
+                                    const prevStatus = record.previous_status || '----';
+
+                                    $('#history-table-body').append(`
+                                        <tr>
+                                            <td>${date}</td>
+                                            <td>${record.notes}</td>
+                                            <td>${prevStatus}</td>
+                                            <td>${response.bottle.status}</td>
+                                        </tr>
+                                    `);
+                                });
+                            } else {
+                                $('#history-table-body').append('<tr><td colspan="4" class="text-center">Aucun historique disponible</td></tr>');
+                            }
                         },
-                        {
-                            date: '2023-06-13 14:00:00',
-                            description: 'En cours de livraison',
-                            previous_status: 'En stock',
-                            current_status: 'En cours de livraison'
-                        },
-                        {
-                            date: '2023-06-13 15:00:00',
-                            description: 'Livré chez le client',
-                            previous_status: 'En cours de livraison',
-                            current_status: 'Livré'
-                        },
-                        {
-                            date: '2023-06-14 17:00:00',
-                            description: 'Retourné au fournisseur',
-                            previous_status: 'Livré',
-                            current_status: 'En stock'
+                        error: function() {
+                            $('#history-table-body').html('<tr><td colspan="4" class="text-center text-danger">Erreur lors du chargement de l\'historique</td></tr>');
                         }
-                    ];
-
-                    // Clear existing history records
-                    $('#history-table-body').empty();
-
-                    // Add history records
-                    history.forEach(function(record) {
-                        const date = new Date(record.date).toLocaleDateString('fr-FR', {
-                            day: '2-digit',
-                            month: 'long',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-                        const prevStatus = record.previous_status || '----';
-
-                        $('#history-table-body').append(`
-                        <tr>
-                            <td>${date}</td>
-                            <td>${record.description}</td>
-                            <td>${prevStatus}</td>
-                            <td>${record.current_status}</td>
-                        </tr>
-                    `);
                     });
                 });
 
                 // Mark as lost button click handler
-                $('.mark-lost').click(function() {
+                $(document).off('click', '.mark-lost').on('click', '.mark-lost', function(e) {
+                    e.preventDefault();
+                    const bottleId = $(this).data('id');
+                    
                     if (confirm('Êtes-vous sûr de vouloir déclarer cette bouteille comme perdue?')) {
-                        alert('La bouteille a été marquée comme perdue.');
+                        $.ajax({
+                            url: "{{ route('bottles.mark-lost', ':id') }}".replace(':id', bottleId),
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                alert('La bouteille a été marquée comme perdue.');
+                                
+                                // Use the correct method for Laravel Livewire Tables
+                                refreshLivewireTable(bottleId);
+                            },
+                            error: function() {
+                                alert('Erreur lors de la mise à jour du statut.');
+                            }
+                        });
                     }
                 });
 
                 // Mark as found button click handler
-                $('.mark-found').click(function() {
+                $(document).off('click', '.mark-found').on('click', '.mark-found', function(e) {
+                    e.preventDefault();
+                    const bottleId = $(this).data('id');
+                    
                     if (confirm('Êtes-vous sûr de vouloir marquer cette bouteille comme retrouvée?')) {
-                        alert('La bouteille a été marquée comme retrouvée.');
+                        $.ajax({
+                            url: "{{ route('bottles.mark-found', ':id') }}".replace(':id', bottleId),
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                alert('La bouteille a été marquée comme retrouvée.');
+                                
+                                // Use the correct method for Laravel Livewire Tables
+                                refreshLivewireTable(bottleId);
+                            },
+                            error: function() {
+                                alert('Erreur lors de la mise à jour du statut.');
+                            }
+                        });
                     }
                 });
+            }
+
+            // Function to refresh Livewire table - specifically for Laravel Livewire Tables
+            function refreshLivewireTable(bottleId = null) {
+                
+                if (typeof window.Livewire !== 'undefined') {
+                    if (window.Livewire.dispatch) {
+                        window.Livewire.dispatch('refreshDatatable');
+                        window.Livewire.dispatch('bottleStatusUpdated', { bottleId: bottleId });
+                    }
+                }
+               
+            }
+
+            // Initial binding
+            bindActionHandlers();
+
+            document.addEventListener('livewire:load', function () {
+                console.log('Livewire loaded');
+                bindActionHandlers();
             });
+
+            document.addEventListener('livewire:navigated', function () {
+                console.log('Livewire navigated');
+                bindActionHandlers();
+            });
+
+            // Listen for custom refresh events
+            window.addEventListener('refreshDatatable', function() {
+                console.log('Custom refresh event received');
+                bindActionHandlers();
+            });
+
+            document.addEventListener('livewire:update', function() {
+                console.log('Livewire component updated');
+                bindActionHandlers();
+            });
+
+            window.addEventListener('refresh-datatable', function() {
+                console.log('Laravel Livewire Tables refresh event');
+                bindActionHandlers();
+            });
+        });           
         </script>
     @endsection
