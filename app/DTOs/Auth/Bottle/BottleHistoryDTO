@@ -1,0 +1,19 @@
+<?php
+
+namespace App\DTOs\Bottle;
+
+use App\Enums\BottleMovementType;
+use App\Models\Bottle;
+
+class BottleHistoryDTO
+{
+    public function __construct(
+        public readonly Bottle $bottle,
+        public readonly BottleMovementType $type,
+        public readonly string $moved_at,
+        public readonly ?string $from_location,
+        public readonly ?string $to_location,
+        public readonly ?string $user,
+        public readonly ?string $notes,
+    ) {}
+}

@@ -15,6 +15,4 @@ Route::middleware('auth')->group(function () {
     Route::get('bottles', GetBottleListController::class)->name('bottles.list');
     Route::get('bottles/types', GetBottlesTypesController::class)->name('bottles.types');
     Route::get('bottles/history/{bottle_id}', GetBottleHistoryController::class)->name('bottles.history');
-    Route::post('/bottles/{id}/mark-found', MarkBottleFoundController::class)->name('bottles.mark-found');
-    Route::post('/bottles/{id}/mark-lost', MarkBottleLostController::class)->name('bottles.mark-lost');
 });

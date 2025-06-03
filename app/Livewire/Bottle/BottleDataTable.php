@@ -26,14 +26,9 @@ class BottleDataTable extends BaseDataTable
 
     protected function getExportFileName(): string
     {
-        return 'commandes';
+        return 'bouteilles';
     }
-
-    public function configure(): void
-    {
-        parent::configure();
-    }
-
+    
     public function columns(): array
     {
         return [
@@ -80,8 +75,7 @@ class BottleDataTable extends BaseDataTable
                     );
                 }),
                 ];
-            }
-
+    }
     public function filters(): array
     {
         return [
@@ -121,7 +115,6 @@ class BottleDataTable extends BaseDataTable
             'bottleType',
             ]);
     }
-
     protected function customMapAttributes()
     {
         return [
