@@ -2,67 +2,120 @@
 
 namespace App\Livewire\Components;
 
-use App\Models\DistributionCenter;
+use App\Enums\PeriodFilterStats;
 use App\Models\User;
+use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class FilterComponent extends Component
 {
-    public $selectedPeriod = '';
-    public $showCustomDate = false;
-    public $startDate;
-    public $endDate;
-    public $warehouseId;
+    public string $scope = '';
+    public string $selectedPeriod = '';
+    public bool $showCustomDate = false;
+    public ?string $startDate = null;
+    public ?string $endDate = null;
+    public ?string $distributionCenterId = '';
     public $centers = [];
 
-    public function mount()
+    private DistributionCenterRepositoryInterface $distributionCenterRepository;
+
+    public function boot(DistributionCenterRepositoryInterface $distributionCenterRepository)
+    {
+        $this->distributionCenterRepository = $distributionCenterRepository;
+    }
+
+    public function mount(string $scope): void
+    {
+        $this->scope = $scope;
+        $this->selectedPeriod = PeriodFilterStats::default();
+        $this->loadUserCenters();
+        $this->initializeDateRange();
+        $this->dispatchFiltersChanged();
+    }
+
+    private function loadUserCenters(): void
     {
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user && $user->isGlobal()) {
-            $this->centers = DistributionCenter::all();
+        if ($user?->isGlobal()) {
+            $this->centers = $this->distributionCenterRepository->getAll();
         } elseif ($user) {
             $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
-            $this->centers = DistributionCenter::whereIn('id', $centerIds)->get();
+            $this->centers = $this->distributionCenterRepository->getByIds($centerIds);
         } else {
             $this->centers = collect([]);
         }
     }
 
-    public function updatedSelectedPeriod()
+    private function initializeDateRange(): void
+    {
+        Log::debug('FilterComponent: Initializing date range', ['selectedPeriod' => $this->selectedPeriod]);
+        $this->calculateDateRange();
+    }
+
+    public function updatedSelectedPeriod(): void
+    {
+        $this->handlePeriodChange();
+    }
+
+    public function updatedDistributionCenterId(): void
+    {
+        $this->dispatchFiltersChanged();
+    }
+
+    public function updatedStartDate(): void
+    {
+        if ($this->showCustomDate) {
+            $this->dispatchFiltersChanged();
+        }
+    }
+
+    public function updatedEndDate(): void
+    {
+        if ($this->showCustomDate) {
+            $this->dispatchFiltersChanged();
+        }
+    }
+
+    private function handlePeriodChange(): void
     {
         $this->showCustomDate = ($this->selectedPeriod === 'custom');
 
         if (! $this->showCustomDate) {
-            switch ($this->selectedPeriod) {
-                case '1week':
-                    $this->startDate = Carbon::now()->subWeek()->format('Y-m-d');
-                    break;
-                case '2weeks':
-                    $this->startDate = Carbon::now()->subWeeks(2)->format('Y-m-d');
-                    break;
-                case '1month':
-                    $this->startDate = Carbon::now()->subMonth()->format('Y-m-d');
-                    break;
-                case '2months':
-                    $this->startDate = Carbon::now()->subMonths(2)->format('Y-m-d');
-                    break;
-                case '3months':
-                    $this->startDate = Carbon::now()->subMonths(3)->format('Y-m-d');
-                    break;
-                default:
-                    $this->startDate = null;
-            }
-            $this->endDate = Carbon::now()->format('Y-m-d');
+            $this->calculateDateRange();
         }
 
-        $this->dispatch('dateUpdated', [
-            'start' => $this->startDate,
-            'end' => $this->endDate,
-        ]);
+        $this->dispatchFiltersChanged();
+    }
+
+    private function calculateDateRange(): void
+    {
+        $now = Carbon::now();
+
+        $this->startDate = match ($this->selectedPeriod) {
+            '1week' => $now->copy()->subWeek()->format('Y-m-d'),
+            '2weeks' => $now->copy()->subWeeks(2)->format('Y-m-d'),
+            '1month' => $now->copy()->subMonth()->format('Y-m-d'),
+            '2months' => $now->copy()->subMonths(2)->format('Y-m-d'),
+            '3months' => $now->copy()->subMonths(3)->format('Y-m-d'),
+            default => null,
+        };
+
+        $this->endDate = $now->format('Y-m-d');
+    }
+
+    private function dispatchFiltersChanged(): void
+    {
+        $this->dispatch(
+            "filters-changed-{$this->scope}",
+            startDate: $this->startDate,
+            endDate: $this->endDate,
+            distributionCenterId: $this->distributionCenterId,
+        );
     }
 
     public function render()

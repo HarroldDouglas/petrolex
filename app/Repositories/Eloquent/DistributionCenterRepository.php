@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Repositories\Eloquent;
+
+use App\Models\DistributionCenter;
+use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
+
+class DistributionCenterRepository implements DistributionCenterRepositoryInterface
+{
+    /**
+     * Get all distribution centers.
+     *
+     * @return Collection<int, DistributionCenter>
+     */
+    public function getAll(): Collection
+    {
+        return DistributionCenter::all();
+    }
+
+    /**
+     * Get distribution centers by IDs.
+     *
+     * @param  array<int>  $ids
+     * @return Collection<int, DistributionCenter>
+     */
+    public function getByIds(array $ids): Collection
+    {
+        return DistributionCenter::whereIn('id', $ids)->get();
+    }
+}
