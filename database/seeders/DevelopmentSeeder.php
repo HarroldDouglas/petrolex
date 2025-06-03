@@ -24,6 +24,7 @@ class DevelopmentSeeder extends Seeder
         $this->call(Development\BottleSeeder::class);
         $this->call(Development\AccessorySeeder::class);
         $this->call(Development\OrderSeeder::class);
+        $this->call(Development\SupplierDeliverySeeder::class);
         // $this->call(Development\DemoDataSeeder::class);
 
         $this->command->info('===========================================');

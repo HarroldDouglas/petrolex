@@ -34,4 +34,17 @@ class SupplierDeliveryStatus extends Enum
             'CANCELLED' => 'cancelled',
         ];
     }
+
+    /**
+     * Get the CSS class for the badge
+     */
+    public function badge(): string
+    {
+        return match ($this->value) {
+            'in_progress' => 'text-outline-warning',
+            'completed' => 'text-outline-success',
+            'cancelled' => 'text-outline-danger',
+            default => 'text-outline-secondary',
+        };
+    }
 }
