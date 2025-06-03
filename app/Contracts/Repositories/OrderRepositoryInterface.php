@@ -9,20 +9,20 @@ interface OrderRepositoryInterface
     /**
      * Calculate total revenue from delivered orders
      */
-    public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?string $warehouseId = null): string;
+    public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): string;
 
     /**
      * Count pending orders
      */
-    public function countPendingOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?string $warehouseId = null): int;
+    public function countPendingOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int;
 
     /**
      * Count delivered orders
      */
-    public function countDeliveredOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?string $warehouseId = null): int;
+    public function countDeliveredOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int;
 
     /**
      * Count canceled orders
      */
-    public function countCanceledOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?string $warehouseId = null): int;
+    public function countCanceledOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int;
 }

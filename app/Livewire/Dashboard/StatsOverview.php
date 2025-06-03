@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Models\User;
 use App\Services\Dashboard\DashboardStatsService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -26,19 +28,38 @@ class StatsOverview extends Component
     }
 
     #[On('filters-changed-dashboard')]
-    public function handleFiltersChanged(?string $startDate = null, ?string $endDate = null, ?string $warehouseId = null): void
+    public function handleFiltersChanged(?string $startDate = null, ?string $endDate = null, ?string $distributionCenterId = null): void
     {
-        $this->loadStats($startDate, $endDate, $warehouseId);
+        $this->loadStats($startDate, $endDate, $distributionCenterId);
     }
 
-    private function loadStats(?string $startDate = null, ?string $endDate = null, ?string $warehouseId = null): void
+    private function loadStats(?string $startDate = null, ?string $endDate = null, ?string $distributionCenterId = null): void
     {
-        $stats = $this->statsService->getStats($startDate, $endDate, $warehouseId);
+        if ($distributionCenterId === null || $distributionCenterId === '') {
+            /** @var User|null $user */
+            $user = Auth::user();
+            if ($user) {
+                $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
 
-        $this->revenue = $stats['revenue'];
-        $this->pendingOrders = $stats['pendingOrders'];
-        $this->deliveredOrders = $stats['deliveredOrders'];
-        $this->canceledOrders = $stats['canceledOrders'];
+                if (! empty($centerIds)) {
+                    $stats = $this->statsService->getStatsByMultipleCenters($startDate, $endDate, $centerIds);
+
+                    $this->revenue = $stats->revenue;
+                    $this->pendingOrders = $stats->pendingOrders;
+                    $this->deliveredOrders = $stats->deliveredOrders;
+                    $this->canceledOrders = $stats->canceledOrders;
+
+                    return;
+                }
+            }
+        }
+
+        $stats = $this->statsService->getStats($startDate, $endDate, $distributionCenterId);
+
+        $this->revenue = $stats->revenue;
+        $this->pendingOrders = $stats->pendingOrders;
+        $this->deliveredOrders = $stats->deliveredOrders;
+        $this->canceledOrders = $stats->canceledOrders;
     }
 
     public function render()
