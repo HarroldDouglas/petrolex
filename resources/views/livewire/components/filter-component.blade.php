@@ -3,8 +3,8 @@
         <div class="row">
             <div class="col-6">
                 <div class="form-group">
-                    <label for="warehouse_filter" class="form-label">Centre de distribution :</label>
-                    <select wire:model.live="warehouseId" class="form-select">
+                    <label for="distribution_center_filter" class="form-label">Centre de distribution :</label>
+                    <select wire:model.live="distributionCenterId" class="form-select">
                         <option value="">Tous</option>
                         @foreach($centers as $center)
                             <option value="{{ $center->id }}">{{ $center->name }}</option>

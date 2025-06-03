@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Components;
 
-use App\Models\DistributionCenter;
+use App\Enums\PeriodFilterStats;
 use App\Models\User;
+use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -12,17 +13,24 @@ use Livewire\Component;
 class FilterComponent extends Component
 {
     public string $scope = '';
-    public string $selectedPeriod = '1week'; // Valeur par défaut
+    public string $selectedPeriod = '';
     public bool $showCustomDate = false;
     public ?string $startDate = null;
     public ?string $endDate = null;
-    public ?string $warehouseId = '';
+    public ?string $distributionCenterId = '';
     public $centers = [];
-    public string $eventName = 'filters-changed';
+
+    private DistributionCenterRepositoryInterface $distributionCenterRepository;
+
+    public function boot(DistributionCenterRepositoryInterface $distributionCenterRepository)
+    {
+        $this->distributionCenterRepository = $distributionCenterRepository;
+    }
 
     public function mount(string $scope): void
     {
         $this->scope = $scope;
+        $this->selectedPeriod = PeriodFilterStats::default();
         $this->loadUserCenters();
         $this->initializeDateRange();
         $this->dispatchFiltersChanged();
@@ -34,10 +42,10 @@ class FilterComponent extends Component
         $user = Auth::user();
 
         if ($user?->isGlobal()) {
-            $this->centers = DistributionCenter::all();
+            $this->centers = $this->distributionCenterRepository->getAll();
         } elseif ($user) {
             $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
-            $this->centers = DistributionCenter::whereIn('id', $centerIds)->get();
+            $this->centers = $this->distributionCenterRepository->getByIds($centerIds);
         } else {
             $this->centers = collect([]);
         }
@@ -54,24 +62,20 @@ class FilterComponent extends Component
         $this->handlePeriodChange();
     }
 
-    public function updatedWarehouseId(): void
+    public function updatedDistributionCenterId(): void
     {
         $this->dispatchFiltersChanged();
     }
 
-    public function updatedStartDate($value): void
+    public function updatedStartDate(): void
     {
-        Log::debug('FilterComponent: startDate updated', ['value' => $value]);
-
         if ($this->showCustomDate) {
             $this->dispatchFiltersChanged();
         }
     }
 
-    public function updatedEndDate($value): void
+    public function updatedEndDate(): void
     {
-        Log::debug('FilterComponent: endDate updated', ['value' => $value]);
-
         if ($this->showCustomDate) {
             $this->dispatchFiltersChanged();
         }
@@ -106,18 +110,11 @@ class FilterComponent extends Component
 
     private function dispatchFiltersChanged(): void
     {
-        Log::debug('FilterComponent: Emitting event', [
-            'eventName' => "filters-changed-{$this->scope}",
-            'startDate' => $this->startDate,
-            'endDate' => $this->endDate,
-            'warehouseId' => $this->warehouseId,
-        ]);
-
         $this->dispatch(
             "filters-changed-{$this->scope}",
             startDate: $this->startDate,
             endDate: $this->endDate,
-            warehouseId: $this->warehouseId,
+            distributionCenterId: $this->distributionCenterId,
         );
     }
 

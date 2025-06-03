@@ -43,4 +43,12 @@ class PeriodFilterStats extends Enum
             'CUSTOM' => 'custom',
         ];
     }
+
+    /**
+     * Get the default value for the enum.
+     */
+    public static function default(): string
+    {
+        return self::ONE_WEEK()->value;
+    }
 }

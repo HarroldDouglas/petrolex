@@ -142,6 +142,8 @@ class User extends Authenticatable
 
     public function isGlobal()
     {
-        return $this->distributionCenters()->count() === 0;
+        $totalDistributionCenters = DistributionCenter::count();
+
+        return $this->distributionCenters()->count() === $totalDistributionCenters;
     }
 }
