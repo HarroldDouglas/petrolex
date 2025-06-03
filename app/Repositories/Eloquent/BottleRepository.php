@@ -22,24 +22,4 @@ class BottleRepository implements BottleRepositoryInterface
         return Bottle::findOrFail($id);
     }
 
-    public function getBottleHistory($bottleId): Collection
-    {
-        return BottleMovement::where('bottle_id', $bottleId)
-                            ->orderBy('created_at', 'desc')
-                            ->with('user')
-                            ->get();
-    }
-
-    public function markBottleAsFound($bottleId): void
-    {
-        $bottle = Bottle::findOrFail($bottleId);
-        $bottle->status = BottleStatus::RETURNED_TO_SUPPLIER()->value;
-        $bottle->save();
-    }
-    public function markBottleAsLost($bottleId): void
-    {
-        $bottle = Bottle::findOrFail($bottleId);
-        $bottle->status = BottleStatus::LOST_STOLEN()->value;
-        $bottle->save();
-    }
 }

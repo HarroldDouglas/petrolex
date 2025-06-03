@@ -25,22 +25,4 @@ class BottleService
         return $this->bottleRepository->findOrFail($id);
     }
 
-    public function getBottleHistory($bottleId): array
-    {
-        $bottle = $this->bottleRepository->findOrFail($bottleId);
-        $historyRecords = $this->bottleRepository->getBottleHistory($bottleId);
-        
-        return array_map(function ($history) use ($bottle) {
-            return new BottleHistoryDTO(
-                bottle: $bottle,
-                type: $history->type,
-                moved_at: $history->movement_date,
-                from_location: $history->from_location,
-                to_location: $history->to_location,
-                user: $history->user?->name,
-                notes: $history->notes
-            );
-        }, $historyRecords->all());
-    }
-    
 }

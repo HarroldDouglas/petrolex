@@ -14,5 +14,4 @@ Route::middleware('auth')->group(function () {
     Route::get('bottles/types/edit/{bottle_id}', EditBottleTypeController::class)->name('bottles.types.edit');
     Route::get('bottles', GetBottleListController::class)->name('bottles.list');
     Route::get('bottles/types', GetBottlesTypesController::class)->name('bottles.types');
-    Route::get('bottles/history/{bottle_id}', GetBottleHistoryController::class)->name('bottles.history');
 });
