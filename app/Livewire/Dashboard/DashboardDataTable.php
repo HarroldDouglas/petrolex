@@ -26,30 +26,6 @@ class DashboardDataTable extends BaseDataTable
         return 'commandes';
     }
 
-    public bool $rememberColumnSelection = true;
-    public bool $rememberFilters = true;
-    public bool $rememberSort = true;
-    public bool $rememberPerPage = true;
-
-    public function configure(): void
-    {
-        parent::configure();
-
-        $this->setPrimaryKey('id')
-            ->setTableWrapperAttributes([
-                'class' => 'table-responsive',
-            ])
-            ->setTableAttributes([
-                'class' => 'table table-striped table-hover',
-            ])
-            ->setTheadAttributes([
-                'class' => 'table-light',
-            ])
-            ->setDefaultSort(self::DEFAULT_SORT_FIELD, self::DEFAULT_SORT_DIRECTION)
-            ->setPerPageAccepted([10, 25, 50, 100])
-            ->setPerPage(10);
-    }
-
     public function columns(): array
     {
         return [
@@ -234,45 +210,5 @@ class DashboardDataTable extends BaseDataTable
                 'items.product.bottle.bottleType',
                 'items.product.accessory.accessoryType',
             ]);
-    }
-
-    protected function customMapAttributes()
-    {
-        return [
-            'customer_name' => function ($row) {
-                return optional($row->customer)->user->name ?? '-';
-            },
-            'distribution_center_name' => function ($row) {
-                return optional($row->distributionCenter)->name ?? '-';
-            },
-            'delivery_person_name' => function ($row) {
-                return optional($row->deliveryPerson)->user->name ?? '-';
-            },
-            'products' => function ($row) {
-                $products = $row->products;
-                if ($products->isEmpty()) {
-                    return '-';
-                }
-
-                $productNames = [];
-                foreach ($products as $product) {
-                    $productName = '';
-                    if ($product->product_type == ProductType::BOTTLE()) {
-                        $productName = optional($product->bottleType)->name ?? 'Bouteille';
-                    } elseif ($product->product_type == ProductType::ACCESSORY()) {
-                        $productName = optional($product->accessoryType)->name ?? 'Accessoire';
-                    }
-
-                    if ($productName) {
-                        $productNames[] = $productName.' (x'.$product->pivot->quantity.')';
-                    }
-                }
-
-                return implode(', ', $productNames);
-            },
-            'status_formatted' => function ($row) {
-                return $row->status->label;
-            },
-        ];
     }
 }
