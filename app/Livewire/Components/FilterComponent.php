@@ -6,23 +6,34 @@ use App\Models\DistributionCenter;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class FilterComponent extends Component
 {
-    public $selectedPeriod = '';
-    public $showCustomDate = false;
-    public $startDate;
-    public $endDate;
-    public $warehouseId;
+    public string $scope = '';
+    public string $selectedPeriod = '1week'; // Valeur par défaut
+    public bool $showCustomDate = false;
+    public ?string $startDate = null;
+    public ?string $endDate = null;
+    public ?string $warehouseId = '';
     public $centers = [];
+    public string $eventName = 'filters-changed';
 
-    public function mount()
+    public function mount(string $scope): void
+    {
+        $this->scope = $scope;
+        $this->loadUserCenters();
+        $this->initializeDateRange();
+        $this->dispatchFiltersChanged();
+    }
+
+    private function loadUserCenters(): void
     {
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user && $user->isGlobal()) {
+        if ($user?->isGlobal()) {
             $this->centers = DistributionCenter::all();
         } elseif ($user) {
             $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
@@ -32,37 +43,82 @@ class FilterComponent extends Component
         }
     }
 
-    public function updatedSelectedPeriod()
+    private function initializeDateRange(): void
+    {
+        Log::debug('FilterComponent: Initializing date range', ['selectedPeriod' => $this->selectedPeriod]);
+        $this->calculateDateRange();
+    }
+
+    public function updatedSelectedPeriod(): void
+    {
+        $this->handlePeriodChange();
+    }
+
+    public function updatedWarehouseId(): void
+    {
+        $this->dispatchFiltersChanged();
+    }
+
+    public function updatedStartDate($value): void
+    {
+        Log::debug('FilterComponent: startDate updated', ['value' => $value]);
+
+        if ($this->showCustomDate) {
+            $this->dispatchFiltersChanged();
+        }
+    }
+
+    public function updatedEndDate($value): void
+    {
+        Log::debug('FilterComponent: endDate updated', ['value' => $value]);
+
+        if ($this->showCustomDate) {
+            $this->dispatchFiltersChanged();
+        }
+    }
+
+    private function handlePeriodChange(): void
     {
         $this->showCustomDate = ($this->selectedPeriod === 'custom');
 
         if (! $this->showCustomDate) {
-            switch ($this->selectedPeriod) {
-                case '1week':
-                    $this->startDate = Carbon::now()->subWeek()->format('Y-m-d');
-                    break;
-                case '2weeks':
-                    $this->startDate = Carbon::now()->subWeeks(2)->format('Y-m-d');
-                    break;
-                case '1month':
-                    $this->startDate = Carbon::now()->subMonth()->format('Y-m-d');
-                    break;
-                case '2months':
-                    $this->startDate = Carbon::now()->subMonths(2)->format('Y-m-d');
-                    break;
-                case '3months':
-                    $this->startDate = Carbon::now()->subMonths(3)->format('Y-m-d');
-                    break;
-                default:
-                    $this->startDate = null;
-            }
-            $this->endDate = Carbon::now()->format('Y-m-d');
+            $this->calculateDateRange();
         }
 
-        $this->dispatch('dateUpdated', [
-            'start' => $this->startDate,
-            'end' => $this->endDate,
+        $this->dispatchFiltersChanged();
+    }
+
+    private function calculateDateRange(): void
+    {
+        $now = Carbon::now();
+
+        $this->startDate = match ($this->selectedPeriod) {
+            '1week' => $now->copy()->subWeek()->format('Y-m-d'),
+            '2weeks' => $now->copy()->subWeeks(2)->format('Y-m-d'),
+            '1month' => $now->copy()->subMonth()->format('Y-m-d'),
+            '2months' => $now->copy()->subMonths(2)->format('Y-m-d'),
+            '3months' => $now->copy()->subMonths(3)->format('Y-m-d'),
+            default => null,
+        };
+
+        $this->endDate = $now->format('Y-m-d');
+    }
+
+    private function dispatchFiltersChanged(): void
+    {
+        Log::debug('FilterComponent: Emitting event', [
+            'eventName' => "filters-changed-{$this->scope}",
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
+            'warehouseId' => $this->warehouseId,
         ]);
+
+        $this->dispatch(
+            "filters-changed-{$this->scope}",
+            startDate: $this->startDate,
+            endDate: $this->endDate,
+            warehouseId: $this->warehouseId,
+        );
     }
 
     public function render()

@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Contracts\Repositories\TokenRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Eloquent\OrderRepository;
 use App\Repositories\Eloquent\TokenRepositoryEloquent;
 use App\Repositories\Eloquent\UserEloquentRepository;
 use Illuminate\Contracts\Support\DeferrableProvider;
@@ -16,6 +18,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
      */
     public array $bindings = [
         UserRepositoryInterface::class => UserEloquentRepository::class,
+        OrderRepositoryInterface::class => OrderRepository::class,
         TokenRepositoryInterface::class => TokenRepositoryEloquent::class,
     ];
 
