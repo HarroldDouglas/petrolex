@@ -10,12 +10,12 @@
                         <div class="col-md-6">
                             <p><strong>Code-barre:</strong> <span id="bottle-barcode">{{$bottle?->barcode}}</span></p>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 text-end">
                             <p><strong>État:</strong> <span id="bottle-status">{{ $bottle?->status?->label }}</span></p>
                         </div>
                     </div>
-
-                    <div class="table-responsive">
+                    <div class="row">
+                        <div class="table-responsive">
                           <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -23,8 +23,6 @@
                                     <th>Centre de distribution</th>
                                     <th>Type</th>
                                     <th>Note</th>
-                                    <th>Livreur</th>
-                                    <th>Client</th>
                                 </tr>
                             </thead>
                             <tbody id="history-table-body">
@@ -34,10 +32,6 @@
                                         <td>{{ $history->distributionCenter?->name ?? '-' }}</td>
                                         <td>{{ $history->type->label }}</td>
                                         <td>{{ $history->notes }}</td>
-                                        <td>{{ $history->deliveryPerson ? $history->deliveryPerson?->user?->first_name ." ". $history->deliveryPerson?->user?->last_name
-                                                : "-"}}
-                                        </td>
-                                        <td>{{ $history->customer ? $history->customer?->first_name." ".$history->customer?->last_name : "-" }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -46,6 +40,7 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
                     </div>
                 </div>
                 <div class="modal-footer">
