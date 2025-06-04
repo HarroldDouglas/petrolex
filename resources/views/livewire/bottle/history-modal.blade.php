@@ -1,8 +1,8 @@
-<div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+<div class="modal fade" id="{{ $modalId  }}" tabindex="-1" aria-labelledby="{{ $modalId  }}Label" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="historyModalLabel">Historique de la bouteille</h5>
+                    <h5 class="modal-title" id="historyModalLabel">{{$title}}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -26,7 +26,7 @@
                                 </tr>
                             </thead>
                             <tbody id="history-table-body">
-                                @forelse($bottleHistory as $history)
+                                @forelse($this->bottleHistory as $history)
                                     <tr>
                                         <td>{{ \Carbon\Carbon::parse($history->movement_date)->format('d/m/Y \à H:i') }}</td>
                                         <td>{{ $history->distributionCenter?->name ?? '-' }}</td>

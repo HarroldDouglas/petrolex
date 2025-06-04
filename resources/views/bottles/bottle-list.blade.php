@@ -117,8 +117,7 @@
     </div>
 
     <!-- History Modal -->
-    @livewire('bottle.history-modal', 
-        ['id' => "historyModal", 'title' => "Historique de la bouteille"])
+    @livewire('bottle.history-modal')
 @endsection
 
 @section('script')
