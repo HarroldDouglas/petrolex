@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\BottleStatus;
 use App\Models\Bottle;
 use App\Models\BottleMovement;
 use \Illuminate\Database\Eloquent\Collection;
@@ -30,4 +31,13 @@ class BottleRepository implements BottleRepositoryInterface
             ->orderBy('created_at', 'desc')
             ->get();
     }
+
+    public function changeStatus($bottleId, BottleStatus $status): void{
+        $bottle = $this->find($bottleId);
+        if($status === BottleStatus::LOST_STOLEN()->value) {
+            //Add Stock Movement Stolen
+        }
+        $bottle->update(['status'=> $status->value]);
+    }
+       
 }

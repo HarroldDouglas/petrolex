@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
+use App\Enums\BottleStatus;
 use \Illuminate\Database\Eloquent\Collection;
 use App\Models\Bottle;
 
@@ -16,4 +17,6 @@ interface BottleRepositoryInterface
     public function find(int $id): ?Bottle;
 
     public function getBottleHistory($bottleId): Collection;
+
+    public function changeStatus($bottleId, BottleStatus $status): void;
 }
