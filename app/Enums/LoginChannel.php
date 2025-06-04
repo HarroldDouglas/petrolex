@@ -5,8 +5,8 @@ namespace App\Enums;
 use Spatie\Enum\Laravel\Enum;
 
 /**
- * @method static self email()
- * @method static self phone()
+ * @method static self EMAIL()
+ * @method static self PHONE()
  */
 class LoginChannel extends Enum
 {

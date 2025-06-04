@@ -25,7 +25,7 @@ class TokenRepositoryEloquent implements TokenRepositoryInterface
     {
         $token = PersonalAccessToken::findToken($tokenId);
 
-        if ($token && $token->tokenable_id === $user->id) {
+        if ($token && $token->tokenable instanceof User && $token->tokenable->id === $user->id) {
             $token->delete();
         }
     }
