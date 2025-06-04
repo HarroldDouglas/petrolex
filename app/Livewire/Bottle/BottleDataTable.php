@@ -3,7 +3,6 @@
 namespace App\Livewire\Bottle;
 
 use App\Enums\BottleStatus;
-use App\Enums\ProductType;
 use App\Models\Bottle;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,7 +16,6 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 class BottleDataTable extends BaseDataTable
 {
     protected $model = Bottle::class;
-
     protected const DEFAULT_SORT_FIELD = 'created_at';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
 
@@ -131,5 +129,10 @@ class BottleDataTable extends BaseDataTable
             return $row->barcode ?? '-';
             },
         ];
+    }
+
+    public function showBottleHistory($bottleId)
+    {
+        $this->dispatch('showBottleHistory', $bottleId);
     }
 }

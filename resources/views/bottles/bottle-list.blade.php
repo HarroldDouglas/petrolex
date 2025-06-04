@@ -117,15 +117,14 @@
     </div>
 
     <!-- History Modal -->
-    <x-modals.bottle-history id="historyModal" title="Historique de la bouteille" />
-    
+    @livewire('bottle.history-modal', 
+        ['id' => "historyModal", 'title' => "Historique de la bouteille"])
+@endsection
 
-    @endsection
-
-    @section('script')
-        <!-- slick-file -->
-        <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
-        <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
-        <script src="{{ asset('assets/js/ticket.js') }}"></script>
-        <script src="{{ asset('assets/js/dashboard.js') }}"></script>
-    @endsection
+@section('script')
+    <!-- slick-file -->
+    <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/ticket.js') }}"></script>
+    <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+@endsection

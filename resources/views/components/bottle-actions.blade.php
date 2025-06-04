@@ -4,6 +4,7 @@
     <button
         class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
         type="button" id="dropdownMenuButton{{ $bottle->id }}"
+        wire:click="$dispatch('showBottleHistory', { bottleId: {{ $bottle->id }} })"
         data-bs-toggle="dropdown" aria-expanded="false">
         <i class="ti ti-dots-vertical"></i>
     </button>
