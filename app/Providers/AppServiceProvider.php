@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Enums\UserRole;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use App\Contracts\Repositories\StockMovementRepositoryInterface;
+use App\Repositories\Eloquent\StockMovementRepository; // <--- THIS IS CORRECT
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(StockMovementRepositoryInterface::class, StockMovementRepository::class);
+        // ... other bindings
     }
 
     /**

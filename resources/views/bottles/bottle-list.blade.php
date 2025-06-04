@@ -40,7 +40,7 @@
         <!-- Filter Options-->
         <div class="row m-1">
             <div class="col-12 collapse mb-4 p-0" id="collapseFilter">
-                @livewire('components.filter-component')
+                @livewire('components.filter-component', ['scope' => 'bottles'])
             </div>
         </div>
 

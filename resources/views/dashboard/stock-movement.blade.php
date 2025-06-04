@@ -46,13 +46,14 @@
         <!-- Filter Options-->
         <div class="row m-1">
             <div class="col-12 collapse mb-4 p-0" id="collapseFilter">
-                @livewire('components.filter-component', ['period' => $period, 'startDate' => $startDate, 'endDate' => $endDate])
+                @livewire('components.filter-component', ['scope' => 'stockmovement']){{--['period' => $period, 'startDate' => $startDate, 'endDate' => $endDate]--}}
             </div>
         </div>
 
         <!-- Stock Movement Stats -->
         <div class="row ticket-app">
-            <div class="col-lg-12">
+            @livewire('dashboard.stats-stock-movement')
+            {{--<div class="col-lg-12">
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="card ticket-card bg-light-primary">
@@ -107,7 +108,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>--}}
 
             <!-- Movements Table -->
             <div class="col-12">
