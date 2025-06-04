@@ -46,7 +46,7 @@
                         <div class="card ticket-card bg-light-primary">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0"> <span class="text-primary-dark">3</span> Produits Actifs</p>
+                                    <p class="f-s-16 mb-0"> <span class="text-primary-dark">{{$productStats->activeCount}}</span> Produits Actifs</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="iconoir-check-circle f-s-45 text-primary"></i>
                                     </div>
@@ -58,7 +58,7 @@
                         <div class="card ticket-card bg-light-danger">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0"> <span class="text-danger-dark">4</span> Produits Inactifs</p>
+                                    <p class="f-s-16 mb-0"> <span class="text-danger-dark">{{$productStats->inactiveCount}}</span> Produits Inactifs</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="iconoir-minus-square-dashed f-s-45"></i>
                                     </div>

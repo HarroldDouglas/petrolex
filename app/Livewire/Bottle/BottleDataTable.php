@@ -3,14 +3,12 @@
 namespace App\Livewire\Bottle;
 
 use App\Enums\BottleStatus;
-use App\Enums\ProductType;
 use App\Models\Bottle;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
-use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
@@ -28,7 +26,7 @@ class BottleDataTable extends BaseDataTable
     {
         return 'bouteilles';
     }
-    
+
     public function columns(): array
     {
         return [
@@ -74,8 +72,9 @@ class BottleDataTable extends BaseDataTable
                         view('components.bottle-actions', ['bottle' => $row])->render()
                     );
                 }),
-                ];
+        ];
     }
+
     public function filters(): array
     {
         return [
@@ -112,23 +111,24 @@ class BottleDataTable extends BaseDataTable
     {
         return Bottle::query()
             ->with([
-            'bottleType',
+                'bottleType',
             ]);
     }
+
     protected function customMapAttributes()
     {
         return [
             'bottle_type_name' => function ($row) {
-            return optional($row->bottleType)->name ?? '-';
+                return optional($row->bottleType)->name ?? '-';
             },
             'status_formatted' => function ($row) {
-            return $row->status->label ?? '-';
+                return $row->status->label ?? '-';
             },
             'created_at_formatted' => function ($row) {
-            return $row->created_at ? $row->created_at->format('d/m/Y') : '-';
+                return $row->created_at ? $row->created_at->format('d/m/Y') : '-';
             },
             'barcode' => function ($row) {
-            return $row->barcode ?? '-';
+                return $row->barcode ?? '-';
             },
         ];
     }
