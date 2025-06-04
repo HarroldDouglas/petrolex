@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
+use \Illuminate\Database\Eloquent\Collection;
 use App\Models\Bottle;
 
 interface BottleRepositoryInterface
@@ -12,5 +13,7 @@ interface BottleRepositoryInterface
      * @param  int  $id  The ID of the bottle to find
      * @return Bottle The found bottle instance
      */
-    public function findOrFail(int $id): ?Bottle;
+    public function find(int $id): ?Bottle;
+
+    public function getBottleHistory($bottleId): Collection;
 }

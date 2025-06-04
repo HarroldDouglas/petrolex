@@ -15,7 +15,6 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 class BottleDataTable extends BaseDataTable
 {
     protected $model = Bottle::class;
-
     protected const DEFAULT_SORT_FIELD = 'created_at';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
 
@@ -131,5 +130,9 @@ class BottleDataTable extends BaseDataTable
                 return $row->barcode ?? '-';
             },
         ];
+    }
+    public function showBottleHistory($bottleId)
+    {
+        $this->dispatch('showBottleHistory', $bottleId);
     }
 }
