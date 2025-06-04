@@ -2,6 +2,7 @@
 @section('title', 'Liste des bouteilles')
 @section('css')
     <!-- Data Table css-->
+
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
 @endsection
@@ -40,7 +41,7 @@
         <!-- Filter Options-->
         <div class="row m-1">
             <div class="col-12 collapse mb-4 p-0" id="collapseFilter">
-                @livewire('components.filter-component')
+                @livewire('components.filter-component', ['scope' => 'bottle'])
             </div>
         </div>
 
