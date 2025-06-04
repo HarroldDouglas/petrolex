@@ -15,14 +15,14 @@ class HistoryModal extends Component
 
     protected $listeners = [
         'showBottleHistory' => 'showHistory',
-        'closeModal' => 'closeModal'
+        'closeModal' => 'closeModal',
     ];
 
     public function showHistory($bottleId)
     {
         $this->bottleId = $bottleId;
         $this->bottle = Bottle::find($bottleId);
-        
+
         if ($this->bottle) {
             $this->bottleHistory = $this->loadBottleHistory($bottleId);
             $this->showModal = true;
@@ -40,12 +40,12 @@ class HistoryModal extends Component
     private function loadBottleHistory($bottleId)
     {
         return BottleMovement::where('bottle_id', $bottleId)
-             ->with(['bottle', 'distributionCenter', 'deliveryPerson.user',
+            ->with(['bottle', 'distributionCenter', 'deliveryPerson.user',
                 'customer', 'user'])
-             ->select('bottle_id', 'distribution_center_id', 'delivery_person_id',
-                        'customer_id', 'user_id', 'movement_date', 'notes', 'type', 'created_at')
-             ->orderBy('created_at', 'desc')
-             ->get();
+            ->select('bottle_id', 'distribution_center_id', 'delivery_person_id',
+                'customer_id', 'user_id', 'movement_date', 'notes', 'type', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
     }
 
