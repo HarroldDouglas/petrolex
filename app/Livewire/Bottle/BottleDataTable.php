@@ -131,7 +131,6 @@ class BottleDataTable extends BaseDataTable
             },
         ];
     }
-
     public function showBottleHistory($bottleId)
     {
         $this->dispatch('showBottleHistory', $bottleId);
