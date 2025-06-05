@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Bottle;
 
-use App\Models\Bottle;
 use App\Services\Bottle\BottleService;
 use Livewire\Component;
 
@@ -19,15 +18,15 @@ class HistoryModal extends Component
         'showBottleHistory' => 'showHistory',
         'closeModal' => 'closeModal',
     ];
-  
+
     public function showHistory($bottleId)
     {
         $bottleService = app(BottleService::class);
         $this->bottleId = $bottleId;
         $this->bottle = $bottleService->find($bottleId);
-        
+
         if ($this->bottle) {
-           $this->bottleHistory = $bottleService->getBottleHistory($bottleId);
+            $this->bottleHistory = $bottleService->getBottleHistory($bottleId);
             $this->showModal = true;
         }
     }
@@ -39,7 +38,7 @@ class HistoryModal extends Component
         $this->bottleHistory = [];
         $this->bottleId = null;
     }
-    
+
     public function render()
     {
         return view('livewire.bottle.history-modal');

@@ -5,9 +5,13 @@ namespace App\Services\Order;
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
+use App\Enums\OrderStatus;
 use App\Enums\ProductType;
+use App\Exceptions\OrderNotFoundException;
+use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
@@ -137,5 +141,43 @@ class OrderService
         }
 
         return "accessory-{$accessoryType->id}";
+    }
+
+    /**
+     * Cancel an order
+     *
+     * @throws \Exception
+     */
+    public function cancelOrder(int $orderId): bool
+    {
+        try {
+            $order = $this->orderRepository->getById($orderId);
+
+            if (! $order->canBeCancelled()) {
+                throw new \Exception('Cette commande ne peut pas être annulée');
+            }
+
+            DB::beginTransaction();
+
+            try {
+                $result = $this->orderRepository->updateStatus($order, OrderStatus::CANCELLED());
+
+                if ($result) {
+                    DB::commit();
+
+                    return true;
+                }
+
+                DB::rollBack();
+
+                return false;
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (OrderNotFoundException $e) {
+            throw $e;
+        }
     }
 }

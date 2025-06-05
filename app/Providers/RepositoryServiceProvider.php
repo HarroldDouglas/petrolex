@@ -28,7 +28,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
         TokenRepositoryInterface::class => TokenRepositoryEloquent::class,
         DistributionCenterRepositoryInterface::class => DistributionCenterRepository::class,
         ProductRepositoryInterface::class => ProductRepository::class,
-        BottleRepositoryInterface::class => BottleRepository::class
+        BottleRepositoryInterface::class => BottleRepository::class,
     ];
 
     /**
