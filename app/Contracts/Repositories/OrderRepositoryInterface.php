@@ -2,10 +2,16 @@
 
 namespace App\Contracts\Repositories;
 
+use App\Models\Order;
 use Carbon\Carbon;
 
 interface OrderRepositoryInterface
 {
+    /**
+     * Get order with detailed relationships
+     */
+    public function getWithDetails(int $orderId): ?Order;
+
     /**
      * Calculate total revenue from delivered orders
      */

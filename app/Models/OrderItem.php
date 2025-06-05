@@ -46,6 +46,14 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
+    public function productType(): ProductType
+    {
+        /** @var Product $product */
+        $product = $this->product;
+
+        return $product->product_type;
+    }
+
     /**
      * Get the product for this item.
      */

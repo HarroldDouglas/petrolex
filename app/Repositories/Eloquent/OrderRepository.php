@@ -11,6 +11,21 @@ use Illuminate\Database\Eloquent\Builder;
 class OrderRepository implements OrderRepositoryInterface
 {
     /**
+     * Get order with all necessary relationships loaded
+     */
+    public function getWithDetails(int $orderId): ?Order
+    {
+        return Order::with([
+            'customer',
+            'deliveryAddress',
+            'distributionCenter',
+            'deliveryPerson',
+            'items.product.bottle.bottleType',
+            'items.product.accessory.accessoryType',
+        ])->find($orderId);
+    }
+
+    /**
      * Create a base query builder with common filters
      */
     private function createBaseQuery(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): Builder
