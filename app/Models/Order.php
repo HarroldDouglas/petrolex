@@ -148,4 +148,15 @@ class Order extends Model
             OrderStatus::PROCESSING(),
         ]);
     }
+
+    /**
+     * Check if the delivery person can be changed for this order
+     */
+    public function canChangeDeliveryPerson(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::CONFIRMED(),
+            OrderStatus::PROCESSING(),
+        ]);
+    }
 }
