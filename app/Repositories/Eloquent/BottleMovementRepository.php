@@ -4,18 +4,14 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\BottleMovement;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
-class BottleMovementRepository implements BottleMovementRepositoryInterface
-{
-    public function __construct(
-        protected BottleMovement $model
-    ) {}
 
+class BottleMovementRepository extends BaseEloquentRepository implements BottleMovementRepositoryInterface
+{
     /**
      * Create a new bottle movement
      */
     public function create(array $data): BottleMovement
     {
-        return $this->model->create($data);
+        return BottleMovement::create($data);
     }
-
 }

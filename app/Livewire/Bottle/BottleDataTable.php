@@ -131,6 +131,7 @@ class BottleDataTable extends BaseDataTable
             },
         ];
     }
+
     public function showBottleHistory($bottleId)
     {
         $this->dispatch('showBottleHistory', $bottleId);
@@ -139,7 +140,7 @@ class BottleDataTable extends BaseDataTable
     public function changeBottleStatus($bottleId, $status)
     {
         $bottleService = app(BottleService::class);
-         
+
         $bottle = $bottleService->find($bottleId);
         if ($bottle) {
             $bottleService->updateStatus($bottleId, BottleStatus::from($status));
@@ -147,5 +148,4 @@ class BottleDataTable extends BaseDataTable
             session()->flash('success', 'Le status de la bouteille a été modifié avec succès!');
         }
     }
-    
 }

@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Contracts\Repositories\TokenRepositoryInterface;
-use App\Models\BottleMovement;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
 use App\Repositories\Contracts\BottleRepositoryInterface;
 use App\Repositories\Contracts\DistributionCenterRepositoryInterface;

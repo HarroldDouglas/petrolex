@@ -20,6 +20,7 @@ class CreateBottleMovementDTO
         public readonly ?int $orderId = null,
         public readonly bool $declaredByCustomer = false,
     ) {}
+
     public function toArray(): array
     {
         return [
