@@ -2,8 +2,8 @@
 
 namespace App\Services\Dashboard;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\DTOs\Dashboard\StatsDTO;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use Carbon\Carbon;
 
 class DashboardStatsService

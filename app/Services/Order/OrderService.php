@@ -2,7 +2,6 @@
 
 namespace App\Services\Order;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
 use App\Enums\OrderStatus;
@@ -10,6 +9,7 @@ use App\Enums\ProductType;
 use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
