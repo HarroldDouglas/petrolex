@@ -137,4 +137,15 @@ class Order extends Model
     {
         return in_array($this->status, [OrderStatus::DELIVERED(), OrderStatus::CANCELLED()]);
     }
+
+    /**
+     * Check if this order can be cancelled
+     */
+    public function canBeCancelled(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::CONFIRMED(),
+            OrderStatus::PROCESSING(),
+        ]);
+    }
 }

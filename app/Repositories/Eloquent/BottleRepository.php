@@ -4,8 +4,8 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Bottle;
 use App\Models\BottleMovement;
-use \Illuminate\Database\Eloquent\Collection;
 use App\Repositories\Contracts\BottleRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BottleRepository implements BottleRepositoryInterface

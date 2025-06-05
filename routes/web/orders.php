@@ -7,6 +7,7 @@
  * @license MIT License
  */
 
+use App\Http\Controllers\Order\CancelOrderController;
 use App\Http\Controllers\Order\CreateOrderController;
 use App\Http\Controllers\Order\GetOrderDetailsController;
 use App\Http\Controllers\Order\GetOrderListController;
@@ -17,6 +18,7 @@ Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
     Route::get('/', GetOrderListController::class)->name('list');
     Route::get('/create', CreateOrderController::class)->name('create');
     Route::get('/{order}/details', GetOrderDetailsController::class)->name('details');
+    Route::patch('/{order}/cancel', CancelOrderController::class)->name('cancel');
 
     Route::get('/{order}/print/ticket', [PrintOrderController::class, 'printTicket'])
         ->name('print.ticket');

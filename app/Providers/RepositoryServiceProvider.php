@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
-use App\Contracts\Repositories\TokenRepositoryInterface;
 use App\Repositories\Contracts\BottleRepositoryInterface;
 use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
+use App\Repositories\Contracts\TokenRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Eloquent\BottleRepository;
 use App\Repositories\Eloquent\DistributionCenterRepository;
@@ -28,7 +28,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
         TokenRepositoryInterface::class => TokenRepositoryEloquent::class,
         DistributionCenterRepositoryInterface::class => DistributionCenterRepository::class,
         ProductRepositoryInterface::class => ProductRepository::class,
-        BottleRepositoryInterface::class => BottleRepository::class
+        BottleRepositoryInterface::class => BottleRepository::class,
     ];
 
     /**
