@@ -15,9 +15,5 @@ class BottleStatusUpdated
         public Bottle $bottle,
         public string $status,
         public ?int $userId = null,
-    ) {
-        $this->bottle = $bottle;
-        $this->status = $status;
-        $this->userId = $userId ?? auth()->id();
-    }
+    ) {}
 }
