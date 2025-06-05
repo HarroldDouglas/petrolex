@@ -76,8 +76,8 @@ class OtpService implements OtpServiceInterface
     public function determineChannel(string $identifier): LoginChannel
     {
         return filter_var($identifier, FILTER_VALIDATE_EMAIL)
-            ? LoginChannel::email()
-            : LoginChannel::phone();
+            ? LoginChannel::EMAIL()
+            : LoginChannel::PHONE();
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Contracts\Repositories\TokenRepositoryInterface;
 use App\Models\User;
+use App\Repositories\Contracts\TokenRepositoryInterface;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class TokenRepositoryEloquent implements TokenRepositoryInterface
@@ -25,7 +25,7 @@ class TokenRepositoryEloquent implements TokenRepositoryInterface
     {
         $token = PersonalAccessToken::findToken($tokenId);
 
-        if ($token && $token->tokenable_id === $user->id) {
+        if ($token && $token->tokenable instanceof User && $token->tokenable->id === $user->id) {
             $token->delete();
         }
     }

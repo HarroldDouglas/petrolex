@@ -18,7 +18,7 @@ class Order extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'customer_id',
@@ -136,5 +136,27 @@ class Order extends Model
     public function canBeRated(): bool
     {
         return in_array($this->status, [OrderStatus::DELIVERED(), OrderStatus::CANCELLED()]);
+    }
+
+    /**
+     * Check if this order can be cancelled
+     */
+    public function canBeCancelled(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::CONFIRMED(),
+            OrderStatus::PROCESSING(),
+        ]);
+    }
+
+    /**
+     * Check if the delivery person can be changed for this order
+     */
+    public function canChangeDeliveryPerson(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::CONFIRMED(),
+            OrderStatus::PROCESSING(),
+        ]);
     }
 }

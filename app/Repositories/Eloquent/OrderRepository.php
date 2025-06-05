@@ -2,14 +2,30 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
 use App\Enums\OrderStatus;
+use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 class OrderRepository implements OrderRepositoryInterface
 {
+    /**
+     * Get order with all necessary relationships loaded
+     */
+    public function getWithDetails(int $orderId): ?Order
+    {
+        return Order::with([
+            'customer',
+            'deliveryAddress',
+            'distributionCenter',
+            'deliveryPerson',
+            'items.product.bottle.bottleType',
+            'items.product.accessory.accessoryType',
+        ])->find($orderId);
+    }
+
     /**
      * Create a base query builder with common filters
      */
@@ -74,5 +90,29 @@ class OrderRepository implements OrderRepositoryInterface
         return $this->createBaseQuery($startDate, $endDate, $distributionCenterIds)
             ->where('status', OrderStatus::CANCELLED()->value)
             ->count();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getById(int $id): Order
+    {
+        $order = Order::find($id);
+
+        if (! $order) {
+            throw OrderNotFoundException::forId($id);
+        }
+
+        return $order;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function updateStatus(Order $order, OrderStatus $status): bool
+    {
+        $order->status = $status;
+
+        return $order->save();
     }
 }

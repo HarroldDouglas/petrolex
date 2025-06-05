@@ -13,7 +13,7 @@ class AccessoryType extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -53,5 +53,20 @@ class AccessoryType extends Model
     public function supplierDeliveryProductTypes(): HasMany
     {
         return $this->hasMany(SupplierDeliveryProductType::class);
+    }
+
+    /**
+     * Get stock quantity for a specific accessory type across specified distribution centers
+     *
+     * @param  array|null  $distributionCenterIds  Array of distribution center IDs to filter by
+     * @return int Total quantity across specified centers
+     */
+    public function getStockForType(?array $distributionCenterIds = null): int
+    {
+        return $this->accessories()
+            ->when($distributionCenterIds, function ($query) use ($distributionCenterIds) {
+                $query->whereIn('distribution_center_id', $distributionCenterIds);
+            })
+            ->sum('quantity');
     }
 }

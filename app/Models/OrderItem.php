@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BottleOrderType;
+use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +15,7 @@ class OrderItem extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'order_id',
@@ -45,6 +46,14 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
+    public function productType(): ProductType
+    {
+        /** @var Product $product */
+        $product = $this->product;
+
+        return $product->product_type;
+    }
+
     /**
      * Get the product for this item.
      */
@@ -55,11 +64,17 @@ class OrderItem extends Model
 
     public function isBottle(): bool
     {
-        return $this->product->productable_type === Bottle::class;
+        /** @var Product $product */
+        $product = $this->product;
+
+        return $product->product_type === ProductType::BOTTLE();
     }
 
     public function isAccessory(): bool
     {
-        return $this->product->productable_type === Accessory::class;
+        /** @var Product $product */
+        $product = $this->product;
+
+        return $product->product_type === ProductType::ACCESSORY();
     }
 }

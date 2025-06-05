@@ -3,27 +3,31 @@
 namespace App\Http\Controllers\Order;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Services\Order\OrderService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class GetOrderDetailsController extends Controller
 {
+    public function __construct(
+        private OrderService $orderService
+    ) {}
+
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, Order $order)
+    public function __invoke(Request $request, int $orderId): View
     {
-        // let's load the necessary relationships for the order
-        $order->load([
-            'customer',
-            'deliveryAddress',
-            'distributionCenter',
-            'deliveryPerson',
-            'items.product',
-            'items.product.bottle',
-            'items.product.accessory',
-        ]);
+        $orderDetails = $this->orderService->getOrderWithGroupedItems($orderId);
 
-        return view('orders.order-details', compact('order'));
+        if (! $orderDetails) {
+            abort(Response::HTTP_NOT_FOUND, 'Commande introuvable');
+        }
+
+        return view('orders.order-details', [
+            'order' => $orderDetails->order,
+            'groupedItems' => $orderDetails->groupedItems,
+        ]);
     }
 }

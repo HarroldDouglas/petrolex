@@ -2,7 +2,7 @@
 
 namespace App\Services\Dashboard;
 
-use App\Contracts\Repositories\StockMovementRepositoryInterface;
+use App\Repositories\Contracts\StockMovementRepositoryInterface;
 use App\DTOs\Dashboard\StockMovementStatsDTO;
 use Carbon\Carbon;
 

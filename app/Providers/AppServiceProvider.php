@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Enums\UserRole;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use App\Contracts\Repositories\StockMovementRepositoryInterface;
+use App\Repositories\Contracts\StockMovementRepositoryInterface;
 use App\Repositories\Eloquent\StockMovementRepository; // <--- THIS IS CORRECT
 
 class AppServiceProvider extends ServiceProvider

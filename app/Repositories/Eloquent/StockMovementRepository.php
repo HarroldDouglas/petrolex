@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Contracts\Repositories\StockMovementRepositoryInterface;
+use App\Repositories\Contracts\StockMovementRepositoryInterface;
 use App\Enums\BottleStatus;
 use App\Models\Bottle;
 use Carbon\Carbon;

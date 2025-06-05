@@ -15,7 +15,7 @@ class SupplierDeliveryProductType extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'supplier_delivery_id',
@@ -75,7 +75,7 @@ class SupplierDeliveryProductType extends Model
      */
     public function scopeBottles($query)
     {
-        return $query->where('product_type', ProductType::Bottle);
+        return $query->where('product_type', ProductType::BOTTLE());
     }
 
     /**
@@ -83,6 +83,6 @@ class SupplierDeliveryProductType extends Model
      */
     public function scopeAccessories($query)
     {
-        return $query->where('product_type', ProductType::Accessory);
+        return $query->where('product_type', ProductType::ACCESSORY());
     }
 }
