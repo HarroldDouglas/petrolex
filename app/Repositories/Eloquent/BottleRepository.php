@@ -32,11 +32,8 @@ class BottleRepository implements BottleRepositoryInterface
             ->get();
     }
 
-    public function changeStatus($bottleId, BottleStatus $status): void{
+    public function updateStatus($bottleId, BottleStatus $status): void{
         $bottle = $this->find($bottleId);
-        if($status === BottleStatus::LOST_STOLEN()->value) {
-            //Add Stock Movement Stolen
-        }
         $bottle->update(['status'=> $status->value]);
     }
        

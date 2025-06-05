@@ -18,5 +18,5 @@ interface BottleRepositoryInterface
 
     public function getBottleHistory($bottleId): Collection;
 
-    public function changeStatus($bottleId, BottleStatus $status): void;
+    public function updateStatus($bottleId, BottleStatus $status): void;
 }

@@ -139,11 +139,12 @@ class BottleDataTable extends BaseDataTable
     public function changeBottleStatus($bottleId, $status)
     {
         $bottleService = app(BottleService::class);
+         
         $bottle = $bottleService->find($bottleId);
         if ($bottle) {
-            $bottleService->changeStatus($bottleId, BottleStatus::from($status));
+            $bottleService->updateStatus($bottleId, BottleStatus::from($status));
             $this->dispatch('refreshDatatable');
-            session()->flash('success', 'Le status de la bouteille a chnagé avec succès!');
+            session()->flash('success', 'Le status de la bouteille a été modifié avec succès!');
         }
     }
     
