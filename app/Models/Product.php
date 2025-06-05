@@ -54,22 +54,6 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    /**
-     * Scope a query to only include bottle products.
-     */
-    public function scopeBottles($query)
-    {
-        return $query->where('product_type', ProductType::BOTTLE());
-    }
-
-    /**
-     * Scope a query to only include accessory products.
-     */
-    public function scopeAccessories($query)
-    {
-        return $query->where('product_type', ProductType::ACCESSORY());
-    }
-
     public function name(): string
     {
         return match ($this->product_type) {

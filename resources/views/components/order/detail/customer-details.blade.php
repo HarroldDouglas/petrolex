@@ -1,0 +1,27 @@
+<div class="col-lg-6">
+    <div class="card order-details-card">
+        <div class="card-header">
+            <h5>Détails du Client</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <h6 class="f-w-600 text-dark"><i class="ti ti-file-invoice text-secondary f-s-18 me-2"></i>Client</h6>
+                <div class="text-end">
+                    <p>{{ $order->customer->user->first_name }} {{ $order->customer->user->last_name }}</p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-3">
+                <h6 class="f-w-600 text-dark"><i class="ti ti-mail f-s-18 text-secondary me-2"></i>Email</h6>
+                <div class="text-end">
+                    <p>{{ $order->customer->user->email }}</p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-3">
+                <h6 class="f-w-600 text-dark"><i class="ti ti-device-mobile f-s-18 text-secondary me-2"></i>Contact</h6>
+                <div class="text-end">
+                    <p>{{ $order->customer->user->phone ?? 'Aucun numéro' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
