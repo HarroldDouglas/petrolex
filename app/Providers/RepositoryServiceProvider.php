@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use App\Contracts\Repositories\OrderRepositoryInterface;
-use App\Contracts\Repositories\TokenRepositoryInterface;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
 use App\Repositories\Contracts\BottleRepositoryInterface;
 use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
+use App\Repositories\Contracts\TokenRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Eloquent\BottleMovementRepository;
 use App\Repositories\Eloquent\BottleRepository;

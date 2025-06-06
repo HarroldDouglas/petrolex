@@ -3,11 +3,11 @@
 namespace Tests\Unit\Services;
 
 use App\Constants\AuthConstants;
-use App\Contracts\Repositories\TokenRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
 use App\DTOs\Auth\LoginCredentialsDTO;
 use App\DTOs\Auth\TokenDTO;
 use App\Models\User;
+use App\Repositories\Contracts\TokenRepositoryInterface;
 use App\Services\Auth\AuthenticationService;
 use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 use Illuminate\Auth\AuthenticationException;

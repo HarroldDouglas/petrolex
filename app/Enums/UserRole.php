@@ -55,12 +55,12 @@ class UserRole extends Enum
      */
     public function permissions(): array
     {
-        $allPermissions = PermissionEnum::values(); // Récupérer toutes les permissions existantes
+        $allPermissions = PermissionEnum::values();
 
         return match ($this->value) {
             'super_admin' => $allPermissions,
             'admin' => array_filter($allPermissions, function ($permission) {
-                // L'admin a tous les droits sauf gérer les rôles et les supplier_deliveries
+                // Admin has all permissions except managing roles and supplier deliveries
                 return ! in_array($permission, [
                     PermissionEnum::ROLES_MANAGE()->value,
                     PermissionEnum::SUPPLIER_DELIVERIES_CREATE()->value,
@@ -68,7 +68,7 @@ class UserRole extends Enum
                 ]);
             }),
             'manager' => array_filter($allPermissions, function ($permission) {
-                // Le manager peut tout faire sauf gérer les utilisateurs et les centres
+                // Manager can do everything except manage users and distribution centers
                 $restrictedPermissions = [
                     PermissionEnum::USERS_CREATE()->value,
                     PermissionEnum::USERS_EDIT()->value,
@@ -96,26 +96,31 @@ class UserRole extends Enum
                 PermissionEnum::GAS_MANAGE()->value,
             ],
             'center_manager' => [
-                // Gestion de son centre
+                // Distribution Center manager
                 PermissionEnum::DISTRIBUTION_CENTER_MANAGE_OWN()->value,
                 PermissionEnum::DISTRIBUTION_CENTER_ASSIGN_DELIVERERS()->value,
-                // Permissions sur les commandes
+                // Permissions on orders
                 PermissionEnum::ORDERS_VIEW()->value,
                 PermissionEnum::ORDERS_CREATE()->value,
                 PermissionEnum::ORDERS_EDIT()->value,
                 PermissionEnum::ORDERS_ASSIGN()->value,
-                // Permissions sur les livraisons
+                // Permissions on Users
+                PermissionEnum::USERS_VIEW()->value,
+                PermissionEnum::USERS_CREATE()->value,
+                PermissionEnum::USERS_EDIT()->value,
+                PermissionEnum::USERS_DELETE()->value,
+                // Permissions on deliveries
                 PermissionEnum::DELIVERIES_VIEW()->value,
                 PermissionEnum::DELIVERIES_CREATE()->value,
                 PermissionEnum::DELIVERIES_EDIT()->value,
                 PermissionEnum::DELIVERIES_ASSIGN()->value,
-                // Permissions sur les livraisons fournisseurs
+                // Permissions on supplier deliveries
                 PermissionEnum::SUPPLIER_DELIVERIES_VIEW()->value,
                 PermissionEnum::SUPPLIER_DELIVERIES_CREATE()->value,
                 PermissionEnum::SUPPLIER_DELIVERIES_EDIT()->value,
-                // Permissions sur les clients
+                // Permissions on customers
                 PermissionEnum::CUSTOMERS_VIEW()->value,
-                // Rapports
+                // Reports
                 PermissionEnum::REPORTS_MANAGE()->value,
             ],
             'delivery_person' => [

@@ -3,10 +3,10 @@
 namespace App\Services\Auth;
 
 use App\Constants\AuthConstants;
-use App\Contracts\Repositories\TokenRepositoryInterface;
 use App\DTOs\Auth\LoginCredentialsDTO;
 use App\DTOs\Auth\TokenDTO;
 use App\Models\User;
+use App\Repositories\Contracts\TokenRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 use Illuminate\Auth\AuthenticationException;

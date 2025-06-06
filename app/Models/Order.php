@@ -38,6 +38,10 @@ class Order extends Model
         'comments',
         'center_comments',
         'rating',
+        'confirmed_at',
+        'processing_at',
+        'cancelled_at',
+        'delivered_at',
     ];
 
     /**
@@ -55,6 +59,10 @@ class Order extends Model
         'payment_status' => PaymentStatus::class,
         'payment_method' => PaymentMethod::class,
         'delivery_type' => DeliveryType::class,
+        'confirmed_at' => 'datetime',
+        'processing_at' => 'datetime',
+        'cancelled_at' => 'datetime',
+        'delivered_at' => 'datetime',
     ];
 
     /**
@@ -136,5 +144,27 @@ class Order extends Model
     public function canBeRated(): bool
     {
         return in_array($this->status, [OrderStatus::DELIVERED(), OrderStatus::CANCELLED()]);
+    }
+
+    /**
+     * Check if this order can be cancelled
+     */
+    public function canBeCancelled(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::CONFIRMED(),
+            OrderStatus::PROCESSING(),
+        ]);
+    }
+
+    /**
+     * Check if the delivery person can be changed for this order
+     */
+    public function canChangeDeliveryPerson(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::CONFIRMED(),
+            OrderStatus::PROCESSING(),
+        ]);
     }
 }

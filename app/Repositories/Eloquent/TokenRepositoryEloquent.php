@@ -2,8 +2,8 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Contracts\Repositories\TokenRepositoryInterface;
 use App\Models\User;
+use App\Repositories\Contracts\TokenRepositoryInterface;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class TokenRepositoryEloquent implements TokenRepositoryInterface
