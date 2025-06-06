@@ -4,7 +4,6 @@ namespace App\Livewire\BottleType;
 
 use App\DTOs\BottleType\CreateBottleTypeDTO;
 use App\Services\BottleType\BottleTypeService;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
