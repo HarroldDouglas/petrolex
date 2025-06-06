@@ -179,7 +179,7 @@
             </div>
             <div class="total-row">
                 <div class="total-label">Frais de livraison:</div>
-                <div class="total-value">{{ number_format($order->delivery_fee ?? 0, 0, ',', ' ') }} FCFA</div>
+                <div class="total-value">{{ $order->delivery_fee }} FCFA</div>
             </div>
             @if(($order->discount ?? 0) > 0)
             <div class="total-row">

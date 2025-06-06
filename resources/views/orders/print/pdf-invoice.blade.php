@@ -136,18 +136,18 @@
         <div class="client-info">
             <h3>Facturé à:</h3>
             <p>
-                <strong>{{ $order->customer->name ?? 'Client' }}</strong><br>
-                {{ $order->customer->address ?? 'Adresse non disponible' }}<br>
-                {{ $order->customer->phone ?? 'Téléphone non disponible' }}<br>
-                {{ $order->customer->email ?? 'Email non disponible' }}
+                <strong>{{ $order->customer?->name ?? 'Client' }}</strong><br>
+                {{ $order->customer?->address ?? $order->delivery_address ?? 'Adresse non disponible' }}<br>
+                {{ $order->customer?->phone ?? 'Téléphone non disponible' }}<br>
+                {{ $order->customer?->email ?? 'Email non disponible' }}
             </p>
         </div>
         <div class="invoice-info">
             <h3>Détails de la facture:</h3>
             <p>
-                <strong>N° Facture:</strong> {{ $order->order_number }}<br>
-                <strong>Date:</strong> {{ $order->created_at ? $order->created_at->format('d/m/Y') : date('d/m/Y') }}<br>
-                <strong>Statut:</strong> {{ $order->status->label ?? 'En cours' }}
+                <strong>N° Facture:</strong> {{ $order->order_number ?? $order->reference ?? $order->id }}<br>
+                <strong>Date:</strong> {{ $order->order_date ? $order->order_date->format('d/m/Y') : ($order->created_at ? $order->created_at->format('d/m/Y') : date('d/m/Y')) }}<br>
+                <strong>Statut:</strong> {{ $order->status?->label ?? $order->status?->name ?? 'En cours' }}
             </p>
         </div>
     </div>
@@ -181,7 +181,7 @@
             </div>
             <div class="total-row">
                 <span class="total-label">Frais de livraison:</span>
-                <span class="total-value">{{ number_format($order->delivery_fee ?? 0, 0, ',', ' ') }} FCFA</span>
+                <span class="total-value">{{ $order->delivery_fee }} FCFA</span>
             </div>
             @if(($order->discount ?? 0) > 0)
             <div class="total-row">
@@ -198,8 +198,14 @@
 
     <div class="payment-info">
         <h3>Informations de paiement</h3>
-        <p><strong>Méthode de paiement:</strong> {{ $order->payment_method->label ?? 'Espèces' }}</p>
-        <p><strong>Statut du paiement:</strong> {{ $order->payment_status->label ?? 'Payé' }}</p>
+        <p><strong>Méthode de paiement:</strong> {{ $order->payment_method?->label ?? ($order->payment_method ?? 'Espèces') }}</p>
+        <p><strong>Statut du paiement:</strong> {{ $order->payment_status?->label ?? ($order->payment_status ?? 'Payé') }}</p>
+        @if($order->delivery_date)
+        <p><strong>Date de livraison:</strong> {{ $order->delivery_date->format('d/m/Y H:i') }}</p>
+        @endif
+        @if($order->delivery_person)
+        <p><strong>Livreur:</strong> {{ $order->delivery_person->name ?? 'Non assigné' }}</p>
+        @endif
     </div>
 
     <div class="footer">
