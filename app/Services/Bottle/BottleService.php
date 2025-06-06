@@ -14,10 +14,7 @@ class BottleService
     public function __construct(
         private BottleRepositoryInterface $bottleRepository,
         private BottleMovementRepositoryInterface $bottleMovementRepository,
-    ) {
-        $this->bottleRepository = $bottleRepository;
-        $this->bottleMovementRepository = $bottleMovementRepository;
-    }
+    ) {}
 
     /**
      * Find a bottle by its ID
