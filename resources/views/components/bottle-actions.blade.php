@@ -4,7 +4,6 @@
     <button
         class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
         type="button" id="dropdownMenuButton{{ $bottle->id }}"
-        wire:click="$dispatch('showBottleHistory', { bottleId: {{ $bottle->id }} })"
         data-bs-toggle="dropdown" aria-expanded="false">
         <i class="ti ti-dots-vertical"></i>
     </button>
@@ -16,6 +15,7 @@
                 data-barcode="{{ $bottle->barcode }}"
                 data-type="{{ optional($bottle->bottleType)->name }}"
                 data-bs-toggle="modal"
+                wire:click="$dispatch('showBottleHistory', { bottleId: {{ $bottle->id }} })"
                 data-bs-target="#historyModal">
                 <i class="iconoir-clock-rotate-right text-primary me-2"></i>
                 Historique
@@ -24,6 +24,8 @@
         @if($bottle->status->value !== \App\Enums\BottleStatus::LOST_STOLEN()->value)
             <li>
                 <a class="dropdown-item mark-lost" href="#"
+                    wire:click.prevent="changeBottleStatus({{ $bottle->id }}, 
+                        '{{ \App\Enums\BottleStatus::LOST_STOLEN()->value }}')"
                     data-id="{{ $bottle->id }}">
                     <i class="iconoir-chat-bubble-question text-danger me-2"></i>
                     Déclarer perdu

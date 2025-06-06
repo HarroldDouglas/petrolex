@@ -2,18 +2,12 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Models\Bottle;
+use App\Enums\BottleStatus;
 use Illuminate\Database\Eloquent\Collection;
 
-interface BottleRepositoryInterface
+interface BottleRepositoryInterface extends baseRepositoryInterface
 {
-    /**
-     * Find a bottle by its ID or throw an exception if not found.
-     *
-     * @param  int  $id  The ID of the bottle to find
-     * @return Bottle The found bottle instance
-     */
-    public function find(int $id): ?Bottle;
-
     public function getBottleHistory($bottleId): Collection;
+
+    public function updateStatus($bottleId, BottleStatus $status): void;
 }

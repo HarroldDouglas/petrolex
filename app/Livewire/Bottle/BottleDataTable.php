@@ -4,6 +4,7 @@ namespace App\Livewire\Bottle;
 
 use App\Enums\BottleStatus;
 use App\Models\Bottle;
+use App\Services\Bottle\BottleService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
@@ -18,7 +19,6 @@ class BottleDataTable extends BaseDataTable
     protected const DEFAULT_SORT_FIELD = 'created_at';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
 
-    // Add listener for component refresh
     protected $listeners = ['refreshComponent' => '$refresh'];
 
     protected function getExportFileName(): string
@@ -135,5 +135,17 @@ class BottleDataTable extends BaseDataTable
     public function showBottleHistory($bottleId)
     {
         $this->dispatch('showBottleHistory', $bottleId);
+    }
+
+    public function changeBottleStatus($bottleId, $status)
+    {
+        $bottleService = app(BottleService::class);
+
+        $bottle = $bottleService->find($bottleId);
+        if ($bottle) {
+            $bottleService->updateStatus($bottleId, BottleStatus::from($status));
+            $this->dispatch('refreshDatatable');
+            session()->flash('success', 'Le status de la bouteille a été modifié avec succès!');
+        }
     }
 }
