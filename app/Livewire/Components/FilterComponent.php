@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class FilterComponent extends Component
@@ -53,7 +52,6 @@ class FilterComponent extends Component
 
     private function initializeDateRange(): void
     {
-        Log::debug('FilterComponent: Initializing date range', ['selectedPeriod' => $this->selectedPeriod]);
         $this->calculateDateRange();
     }
 

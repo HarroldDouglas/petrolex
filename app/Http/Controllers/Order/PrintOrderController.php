@@ -2,61 +2,58 @@
 
 namespace App\Http\Controllers\Order;
 
-use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Http\Requests\Order\PrintOrderRequest;
+use App\Services\Order\OrderService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PrintOrderController extends Controller
 {
-    /**
-     * Afficher le ticket d'impression simple
-     */
-    public function printTicket(Order $order)
-    {
-        // just for mock-up, we will get the first order with status PROCESSING or COMPLETED
-        $order = $this->fakeOrderForDemo();
+    public function __construct(
+        private OrderService $orderService
+    ) {}
 
-        return view('orders.print.ticket', compact('order'));
-    }
-
-    private function fakeOrderForDemo(): Order
+    public function __invoke(PrintOrderRequest $request, int $orderId): View
     {
-        // This method is just a placeholder for the mock-up.
-        // In a real application, you would fetch the order from the database.
-        return Order::where('status', OrderStatus::PROCESSING())
-            ->orWhere('status', OrderStatus::DELIVERED())
-            ->first()
-            ->load([
-                'customer',
-                'deliveryAddress',
-                'distributionCenter',
-                'deliveryPerson',
-                'items.product',
-                'items.product.bottle',
-                'items.product.accessory',
-            ]);
+        $orderDetails = $this->orderService->getOrderWithGroupedItems($orderId);
+
+        if (! $orderDetails) {
+            abort(Response::HTTP_NOT_FOUND, 'Commande introuvable');
+        }
+
+        $withStub = $request->boolean('withStub');
+
+        $view = $withStub ? 'orders.print.ticket-with-stub' : 'orders.print.ticket';
+
+        return view($view, [
+            'order' => $orderDetails->order,
+            'groupedItems' => $orderDetails->groupedItems,
+        ]);
     }
 
     /**
-     * Afficher le ticket d'impression avec souche
+     * Download the order invoice as PDF
      */
-    public function printTicketWithStub(Order $order)
+    public function downloadPdf(int $orderId)
     {
-        $order = $this->fakeOrderForDemo();
+        $orderDetails = $this->orderService->getOrderWithGroupedItems($orderId);
 
-        return view('orders.print.ticket-with-stub', compact('order'));
-    }
+        if (! $orderDetails) {
+            abort(SymfonyResponse::HTTP_NOT_FOUND, 'Commande introuvable');
+        }
 
-    /**
-     * Générer le PDF du ticket (optionnel)
-     */
-    public function downloadPdf(Order $order)
-    {
-        $order = $this->fakeOrderForDemo();
+        $data = [
+            'order' => $orderDetails->order,
+            'groupedItems' => $orderDetails->groupedItems,
+        ];
 
-        $pdf = app('dompdf.wrapper');
-        $pdf->loadView('orders.print.ticket-with-stub', compact('order'));
+        $pdf = PDF::loadView('orders.print.pdf-invoice', $data);
 
-        return $pdf->download('commande-'.$order->order_number.'.pdf');
+        $filename = 'facture-'.($orderDetails->order->order_number ?? $orderDetails->order->id).'.pdf';
+
+        return $pdf->download($filename);
     }
 }
