@@ -26,16 +26,16 @@ class CreateBottleMovement
     {
         try {
             $notes = null;
-            $movementType = BottleStatus::IN_STOCK()->value;
-            if ($event->status === BottleStatus::IN_STOCK()->value) {
+            $movementType = BottleStatus::IN_STOCK();
+            if ($event->status === BottleStatus::IN_STOCK()) {
                 $movementType = BottleMovementType::SUPPLIER_DELIVERY();
-            } elseif ($event->status === BottleStatus::LOST_STOLEN()->value) {
+            } elseif ($event->status === BottleStatus::LOST_STOLEN()) {
                 $movementType = BottleMovementType::DECLARE_LOST_STOLEN();
-            } elseif ($event->status === BottleStatus::WITH_DELIVERY_PERSON()->value) {
+            } elseif ($event->status === BottleStatus::WITH_DELIVERY_PERSON()) {
                 $movementType = BottleMovementType::ASSIGNMENT_TO_DELIVERY();
-            } elseif ($event->status === BottleStatus::WITH_CLIENT()->value) {
+            } elseif ($event->status === BottleStatus::WITH_CLIENT()) {
                 $movementType = BottleMovementType::DELIVERY_TO_CUSTOMER();
-            } elseif ($event->status === BottleStatus::RETURNED_TO_SUPPLIER()->value) {
+            } elseif ($event->status === BottleStatus::RETURNED_TO_SUPPLIER()) {
                 $movementType = BottleMovementType::RETURN_TO_SUPPLIER();
             }
 
