@@ -3,7 +3,7 @@
 namespace App\Services\Bottle;
 
 use App\Enums\BottleStatus;
-use App\Events\BottleStatusUpdated;
+use App\Events\BottleStatusUpdatedEvent;
 use App\Models\Bottle;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
 use App\Repositories\Contracts\BottleRepositoryInterface;
@@ -38,7 +38,7 @@ class BottleService
         $this->bottleRepository->updateStatus($bottleId, $status);
         $bottle = $this->bottleRepository->find($bottleId);
         if ($bottle) {
-            event(new BottleStatusUpdated(
+            event(new BottleStatusUpdatedEvent(
                 bottle: $bottle,
                 status: $status,
                 userId: auth()->id()

@@ -5,12 +5,12 @@ namespace App\Listeners;
 use App\DTOs\BottleMovement\CreateBottleMovementDTO;
 use App\Enums\BottleMovementType;
 use App\Enums\BottleStatus;
-use App\Events\BottleStatusUpdated;
+use App\Events\BottleStatusUpdatedEvent;
 use App\Repositories\Eloquent\BottleMovementRepository;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class CreateBottleMovement
+class CreateBottleMovementListener
 {
     use InteractsWithQueue;
 
@@ -22,7 +22,7 @@ class CreateBottleMovement
     /**
      * Handle the event.
      */
-    public function handle(BottleStatusUpdated $event): void
+    public function handle(BottleStatusUpdatedEvent $event): void
     {
         try {
             $notes = null;
@@ -60,7 +60,7 @@ class CreateBottleMovement
         }
     }
 
-    public function failed(BottleStatusUpdated $event, \Throwable $exception): void
+    public function failed(BottleStatusUpdatedEvent $event, \Throwable $exception): void
     {
         Log::error('CreateBottleMovement listener failed', [
             'bottle_id' => $event->bottle->id,
