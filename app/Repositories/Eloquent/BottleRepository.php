@@ -2,22 +2,18 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\BottleStatus;
 use App\Models\Bottle;
 use App\Models\BottleMovement;
 use App\Repositories\Contracts\BottleRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class BottleRepository implements BottleRepositoryInterface
+class BottleRepository extends BaseEloquentRepository implements BottleRepositoryInterface
 {
-    /**
-     * Find a bottle by ID or fail
-     *
-     * @throws ModelNotFoundException
-     */
-    public function find(int $id): ?Bottle
+    public function __construct(Bottle $bottle)
     {
-        return Bottle::findOrFail($id);
+        $this->model = $bottle;
     }
 
     public function getBottleHistory($bottleId): Collection
@@ -29,5 +25,15 @@ class BottleRepository implements BottleRepositoryInterface
                 'customer_id', 'user_id', 'movement_date', 'notes', 'type', 'created_at')
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    public function updateStatus($bottleId, BottleStatus $status): void
+    {
+        $bottle = Bottle::find($bottleId);
+
+        if (! $bottle) {
+            throw new ModelNotFoundException("Bottle with ID {$bottleId} not found.");
+        }
+        $bottle->update(['status' => $status->value]);
     }
 }

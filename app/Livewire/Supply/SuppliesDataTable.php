@@ -74,15 +74,6 @@ class SuppliesDataTable extends BaseDataTable
                     return new HtmlString($html ?: '-');
                 }),
 
-            Column::make('Quantité', 'id')
-                ->format(function ($value, $row) {
-                    return $row->productTypes->sum('expected_quantity');
-                }),
-
-            Column::make('Fournisseur', 'supplier_name')
-                ->sortable()
-                ->searchable(),
-
             Column::make('Date', 'delivery_date')
                 ->sortable()
                 ->format(fn ($value) => $value->format('d M,Y H:i')),

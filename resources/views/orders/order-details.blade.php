@@ -99,8 +99,6 @@
 
 @section('script')
 
-<!-- js-->
-<script src="{{ asset('assets/js/orders_details.js') }}"></script>
 <!-- leaflet js -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -121,5 +119,4 @@
     }
 </script>
 
-{{--@stack('scripts')--}}
 @endsection
