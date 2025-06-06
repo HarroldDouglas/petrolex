@@ -83,24 +83,27 @@ class CreateBottleTypeForm extends Component
 
     public function save()
     {
-        Log::info('saving Bottle Type in Livewire Compnent', [$this->validate()]);
         $validated = $this->validate();
-        Log::info('after validation Bottle Type in Livewire Compnent');
-        $bottleTypeService = app(BottleTypeService::class);
-        $bottleTypeDTO = new CreateBottleTypeDTO(
-            name: $validated['name'],
-            capacity: $validated['capacity'],
-            content_price: $validated['content_price'],
-            bottle_with_content_price: $validated['bottle_with_content_price'],
-            is_active: $validated['is_active'],
-            description: $this->description,
-            height: $this->height ? (float) $this->height : null,
-            width: $this->width ? (float) $this->width : null,
-            radius: $this->radius ? (float) $this->radius : null
-        );
-        $bottleTypeService->create($bottleTypeDTO);
-        $this->dispatch('success', message: 'Type de bouteille créé avec succès.');
-        redirect()->route('bottles.types');
+        try {
+            $bottleTypeService = app(BottleTypeService::class);
+            $bottleTypeDTO = new CreateBottleTypeDTO(
+                name: $validated['name'],
+                capacity: $validated['capacity'],
+                content_price: $validated['content_price'],
+                bottle_with_content_price: $validated['bottle_with_content_price'],
+                is_active: $validated['is_active'],
+                description: $this->description,
+                height: $this->height ? (float) $this->height : null,
+                width: $this->width ? (float) $this->width : null,
+                radius: $this->radius ? (float) $this->radius : null
+            );
+            $bottleTypeService->create($bottleTypeDTO);
+            $this->dispatch('success', message: 'Type de bouteille créé avec succès.');
+            redirect()->route('bottles.types');
+        } catch (\Throwable $th) {
+            $this->dispatch('error', message: $th->getMessage());
+            throw $th;
+        }
     }
 
     public function render()
