@@ -118,7 +118,11 @@
     <div class="invoice-container" id="printable">
         <div class="header">
             <div>
-                <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo Petrolex" class="logo">
+                @if(file_exists(public_path('assets/images/logos/logo.png')))
+                    <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo Petrolex" class="logo">
+                @else
+                    <h2>PETROLEX SARL</h2>
+                @endif
             </div>
             <div class="company-info">
                 <h3>PETROLEX SARL</h3>
@@ -135,18 +139,40 @@
             <div class="client-info">
                 <h4>Facturé à:</h4>
                 <p>
-                    <strong>{{ $order->customer->name ?? 'Client' }}</strong><br>
-                    {{ $order->customer->address ?? 'Adresse non disponible' }}<br>
-                    {{ $order->customer->phone ?? 'Téléphone non disponible' }}<br>
-                    {{ $order->customer->email ?? 'Email non disponible' }}
+                    <strong>{{ $order->customer?->user->first_name }} {{ $order->customer?->user->last_name }}</strong><br>
+                    @if($order->delivery_address_id && $order->deliveryAddress)
+                        {{ $order->deliveryAddress->address }}<br>
+                        @if($order->deliveryAddress->neighborhood)
+                            {{ $order->deliveryAddress->neighborhood }},
+                        @endif
+                        {{ $order->deliveryAddress->city ?? 'Yaoundé' }}<br>
+                        {{ $order->deliveryAddress->country ?? 'Cameroun' }}<br>
+                        <strong>Tél:</strong> {{ $order->deliveryAddress->phone ?? ($order->customer?->phone ?? 'Non disponible') }}
+                        @if($order->deliveryAddress->contact_name)
+                        <br><strong>Contact:</strong> {{ $order->deliveryAddress->contact_name }}
+                        @endif
+                        @if($order->customer?->email)
+                        <br><strong>Email:</strong> {{ $order->customer->email }}
+                        @endif
+                    @else
+                        {{ $order->delivery_address ?? $order->customer?->address ?? 'Adresse non disponible' }}<br>
+                        <strong>Tél:</strong> {{ $order->customer?->phone ?? 'Non disponible' }}
+                        @if($order->customer?->email)
+                        <br><strong>Email:</strong> {{ $order->customer->email }}
+                        @endif
+                    @endif
                 </p>
+                @if($order->comments)
+                    <p><strong>Instructions:</strong> {{ $order->comments }}</p>
+                @endif
             </div>
             <div class="invoice-info">
                 <h4>Détails de la facture:</h4>
                 <p>
-                    <strong>N° Facture:</strong> {{ $order->reference }}<br>
-                    <strong>Date:</strong> {{ $order->created_at->format('d/m/Y') }}<br>
-                    <strong>Statut:</strong> {{ $order->status->name ?? 'En cours' }}
+                    <strong>N° Facture:</strong> {{ $order->order_number ?? $order->reference ?? $order->id }}<br>
+                    <strong>Date:</strong> {{ $order->order_date ? $order->order_date->format('d/m/Y') : ($order->created_at ? $order->created_at->format('d/m/Y') : date('d/m/Y')) }}<br>
+                    <strong>Statut:</strong> {{ $order->status?->label ?? $order->status?->name ?? 'En cours' }}<br>
+                    <strong>Type de livraison:</strong> {{ $order->delivery_type?->label ?? 'Standard' }}
                 </p>
             </div>
         </div>
@@ -175,7 +201,7 @@
         <div class="totals">
             <div class="total-row">
                 <div class="total-label">Sous-total:</div>
-                <div class="total-value">{{ number_format($order->subtotal ?? 0, 0, ',', ' ') }} FCFA</div>
+                <div class="total-value">{{ number_format($order->items_total_price ?? $order->subtotal ?? 0, 0, ',', ' ') }} FCFA</div>
             </div>
             <div class="total-row">
                 <div class="total-label">Frais de livraison:</div>
@@ -195,8 +221,8 @@
 
         <div class="payment-info">
             <h4>Informations de paiement</h4>
-            <p><strong>Méthode de paiement:</strong> {{ $order->payment_method ?? 'Espèces' }}</p>
-            <p><strong>Statut du paiement:</strong> {{ $order->payment_status ?? 'Payé' }}</p>
+            <p><strong>Méthode de paiement:</strong> {{ $order->payment_method->label }}</p>
+            <p><strong>Statut du paiement:</strong> {{ $order->payment_status->label }}</p>
         </div>
 
         <div class="footer">

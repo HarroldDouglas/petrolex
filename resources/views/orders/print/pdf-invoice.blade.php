@@ -136,18 +136,41 @@
         <div class="client-info">
             <h3>Facturé à:</h3>
             <p>
-                <strong>{{ $order->customer?->name ?? 'Client' }}</strong><br>
-                {{ $order->customer?->address ?? $order->delivery_address ?? 'Adresse non disponible' }}<br>
-                {{ $order->customer?->phone ?? 'Téléphone non disponible' }}<br>
-                {{ $order->customer?->email ?? 'Email non disponible' }}
+                <strong>{{ $order->customer?->user->first_name }} {{ $order->customer?->user->last_name }}</strong><br>
+                @if($order->delivery_address_id && $order->deliveryAddress)
+                    {{ $order->deliveryAddress->address }}<br>
+                    @if($order->deliveryAddress->neighborhood)
+                        {{ $order->deliveryAddress->neighborhood }},
+                    @endif
+                    {{ $order->deliveryAddress->city ?? 'Yaoundé' }}<br>
+                    {{ $order->deliveryAddress->country ?? 'Cameroun' }}<br>
+                    <strong>Tél:</strong> {{ $order->deliveryAddress->phone ?? ($order->customer?->phone ?? 'Non disponible') }}
+                    @if($order->deliveryAddress->contact_name)
+                        <br><strong>Contact:</strong> {{ $order->deliveryAddress->contact_name }}
+                    @endif
+                    @if($order->customer?->email)
+                        <br><strong>Email:</strong> {{ $order->customer->email }}
+                    @endif
+                @else
+                    {{ $order->delivery_address ?? $order->customer?->address ?? 'Adresse non disponible' }}<br>
+                    <strong>Tél:</strong> {{ $order->customer?->phone ?? 'Non disponible' }}
+                    @if($order->customer?->email)
+                    <br><strong>Email:</strong> {{ $order->customer->email }}
+                    @endif
+                @endif
             </p>
+            @if($order->comments)
+                <p><strong>Instructions:</strong> {{ $order->comments }}</p>
+            @endif
         </div>
+
         <div class="invoice-info">
             <h3>Détails de la facture:</h3>
             <p>
                 <strong>N° Facture:</strong> {{ $order->order_number ?? $order->reference ?? $order->id }}<br>
                 <strong>Date:</strong> {{ $order->order_date ? $order->order_date->format('d/m/Y') : ($order->created_at ? $order->created_at->format('d/m/Y') : date('d/m/Y')) }}<br>
-                <strong>Statut:</strong> {{ $order->status?->label ?? $order->status?->name ?? 'En cours' }}
+                <strong>Statut:</strong> {{ $order->status?->label ?? $order->status?->name ?? 'En cours' }}<br>
+                <strong>Type de livraison:</strong> {{ $order->delivery_type?->label ?? 'Standard' }}
             </p>
         </div>
     </div>

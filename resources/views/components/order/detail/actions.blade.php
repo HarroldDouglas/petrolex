@@ -40,15 +40,15 @@
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header justify-content-center">
                     <h5 class="modal-title" id="cancelOrderModalLabel">Confirmation d'annulation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body text-center">
                     <p class="mb-0">Êtes-vous sûr de vouloir annuler cette commande ? Cette action est irréversible.
                     </p>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                     <form action="{{ route('orders.cancel', $order) }}" method="POST" class="d-inline">
                         @csrf
