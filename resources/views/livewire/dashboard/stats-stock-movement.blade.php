@@ -6,7 +6,7 @@
             icon="arrow-circle-down"
             title="Total des Entrées"
             subtitle="(Bouteilles Pleines)"
-            :value="$totalEntries"
+            :value="$fullBottles"
         />
         
         <x-dashboard.stat-block
@@ -33,7 +33,7 @@
             icon="package"
             title="Stock Actuel"
             subtitle="(Bouteilles pleines / vides)"
-            :value="$currentStock . ' / ' .$totalStock"
+            :value="$fullBottles . ' / ' .$emptyBottles"
         />
     </div>
 </div>

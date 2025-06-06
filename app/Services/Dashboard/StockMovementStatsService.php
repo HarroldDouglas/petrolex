@@ -8,11 +8,9 @@ use Carbon\Carbon;
 
 class StockMovementStatsService
 {
-    private StockMovementRepositoryInterface $stockMovementRepository;
-
-    public function __construct(StockMovementRepositoryInterface $stockMovementRepository)
+    public function __construct(private StockMovementRepositoryInterface $stockMovementRepository)
     {
-        $this->stockMovementRepository = $stockMovementRepository;
+        // Plus besoin de déclarer la propriété ici, ni de l'affecter explicitement
     }
 
     public function getStockStats(?string $startDate = null, ?string $endDate = null, ?string $distributionCenterId = null): StockMovementStatsDTO
@@ -22,18 +20,16 @@ class StockMovementStatsService
 
         $distributionCenterIds = $distributionCenterId ? [$distributionCenterId] : null;
 
-        $totalEntries = $this->stockMovementRepository->calculateTotalEntries($startDateCarbon, $endDateCarbon, $distributionCenterIds);
         $totalExits = $this->stockMovementRepository->calculateTotalExits($startDateCarbon, $endDateCarbon, $distributionCenterIds);
         $totalExchanges = $this->stockMovementRepository->calculateTotalExchanges($startDateCarbon, $endDateCarbon, $distributionCenterIds);
-        $currentStock = $this->stockMovementRepository->calculateCurrentStock($distributionCenterIds);
-        $totalStock = $this->stockMovementRepository->calculateTotalStock($distributionCenterIds); // Assuming total stock is the same as current stock
+        $fullBottles = $this->stockMovementRepository->calculateFullBottles($startDateCarbon, $endDateCarbon, $distributionCenterIds);
+        $emptyBottles = $this->stockMovementRepository->calculateEmptyBottles($startDateCarbon, $endDateCarbon, $distributionCenterIds);
 
         return new StockMovementStatsDTO(
-            totalEntries: $totalEntries,
             totalExits: $totalExits,
             totalExchanges: $totalExchanges,
-            currentStock: $currentStock,
-            totalStock: $totalStock
+            fullBottles: $fullBottles,
+            emptyBottles: $emptyBottles
         );
     }
 
@@ -42,18 +38,15 @@ class StockMovementStatsService
         $startDateCarbon = $startDate ? Carbon::parse($startDate) : null;
         $endDateCarbon = $endDate ? Carbon::parse($endDate) : null;
 
-        $totalEntries = $this->stockMovementRepository->calculateTotalEntries($startDateCarbon, $endDateCarbon, $distributionCenterIds);
         $totalExits = $this->stockMovementRepository->calculateTotalExits($startDateCarbon, $endDateCarbon, $distributionCenterIds);
         $totalExchanges = $this->stockMovementRepository->calculateTotalExchanges($startDateCarbon, $endDateCarbon, $distributionCenterIds);
-        $currentStock = $this->stockMovementRepository->calculateCurrentStock($distributionCenterIds);
-        $totalStock = $this->stockMovementRepository->calculateTotalStock($distributionCenterIds);
-
+        $fullBottles = $this->stockMovementRepository->calculateFullBottles($startDateCarbon, $endDateCarbon, $distributionCenterIds);
+        $emptyBottles = $this->stockMovementRepository->calculateEmptyBottles($startDateCarbon, $endDateCarbon, $distributionCenterIds);
         return new StockMovementStatsDTO(
-            totalEntries: $totalEntries,
             totalExits: $totalExits,
             totalExchanges: $totalExchanges,
-            currentStock: $currentStock,
-            totalStock: $totalStock
+            fullBottles: $fullBottles,
+            emptyBottles: $emptyBottles
         );
     }
 }

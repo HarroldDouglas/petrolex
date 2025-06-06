@@ -30,15 +30,6 @@ class StockMovementRepository implements StockMovementRepositoryInterface
 
         return $query;
     }
-    /**
-     * Calculate total entries of bottles
-     */
-    public function calculateTotalEntries(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
-    {
-        return $this->createBaseQuery($startDate, $endDate, $centerIds)
-            ->where('status', BottleStatus::IN_STOCK()->value)
-            ->count(); // Assuming 'quantity' is the column that holds the number of bottles
-    }
 
     /**
      * Calculate total exits of bottles
@@ -60,27 +51,27 @@ class StockMovementRepository implements StockMovementRepositoryInterface
                 BottleStatus::WITH_DELIVERY_PERSON()->value,
                 BottleStatus::WITH_CLIENT()->value,
             ])
-            ->count(); // Assuming 'quantity' is the column that holds the number of bottles
+            ->count();
     }
 
     /**
-     * Calculate current stock of bottles
+     * Calculate the total number of full bottles.
      */
-    public function calculateCurrentStock(?array $centerIds = null): int
+    public function calculateFullBottles(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
     {
-        $totalEntries = $this->calculateTotalEntries(null, null, $centerIds); // Get all entries
-        $totalExits = $this->calculateTotalExits(null, null, $centerIds); // Get all exits
-
-        return $totalEntries - $totalExits;
+        return $this->createBaseQuery($startDate, $endDate, $centerIds)
+            ->where('is_filled', true)
+            ->count();
     }
 
     /**
-     * Calculate total stock of bottles
+     * Calculate the total number of empty bottles.
      */
-    public function calculateTotalStock(?array $centerIds = null): int
+    public function calculateEmptyBottles(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
     {
-        return $this->createBaseQuery(null, null, $centerIds)
-            ->count(); // Assuming 'quantity' is the column that holds the number of bottles
+        return $this->createBaseQuery($startDate, $endDate, $centerIds)
+            ->where('is_filled', false)
+            ->count();
     }
 
 }
