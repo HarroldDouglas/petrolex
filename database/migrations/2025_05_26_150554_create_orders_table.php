@@ -36,6 +36,10 @@ return new class extends Migration
             $table->text('comments')->nullable()->comment('Customer comments about the order');
             $table->text('center_comments')->nullable()->comment('Distribution center comments about the order');
             $table->decimal('rating', 2, 1)->nullable()->comment('Customer rating from 1 to 5');
+            $table->timestamp('confirmed_at')->nullable();
+            $table->timestamp('processing_at')->nullable(); 
+            $table->timestamp('delivered_at')->nullable();
+            $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
             
             // Add indexes for common queries
