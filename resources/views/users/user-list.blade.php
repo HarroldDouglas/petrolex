@@ -61,9 +61,7 @@
 @section('script')
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
 
-    <!-- data table js-->
-    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
-
+    <script src="{{ asset('assets/js/sweet_alert_confirm_actions.js') }}" defer></script>
     <!-- api js -->
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
 

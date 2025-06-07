@@ -148,6 +148,3 @@
 
 <!-- sweetalert js-->
 <script src="{{ asset('assets/vendor/sweetalert/sweetalert.js') }}" defer></script>
-
-<!-- js -->
-<script src="{{ asset('assets/js/sweet_alert.js') }}" defer></script>

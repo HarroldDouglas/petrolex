@@ -16,7 +16,14 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" onclick="toggleUser{{ $user->id }}(); return false;">
+            <a class="dropdown-item" href="#" onclick="confirmAction({
+                method: 'toggleUserStatus',
+                parameters: [{{ $user->id }}],
+                title: 'Changer le statut',
+                text: 'Voulez-vous vraiment {{ $user->is_active ? 'désactiver' : 'activer' }} l\'utilisateur {{$user->full_name}} ?',
+                icon: 'question',
+                confirmText: '{{ $user->is_active ? 'Oui, désactiver' : 'Oui, activer' }}'
+            }); return false;">
                 @if ($user->is_active)
                     <i class="ti ti-ban text-warning me-2"></i> Désactiver
                 @else
@@ -25,27 +32,20 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" onclick="deleteUser{{ $user->id }}(); return false;">
+            <a class="dropdown-item" href="#" onclick="confirmDelete({
+                method: 'deleteUser',
+                parameters: [{{ $user->id }}],
+                title: 'Supprimer l\'utilisateur',
+                text: 'Vous êtes sur le point de supprimer définitivement cet utilisateur.',
+                entityName: 'Utilisateur: {{ str_replace("'", "\\'", $user->full_name) }} ({{ $user->email ?: $user->phone_number }})',
+                id: {{ $user->id }}
+            }); return false;">
                 <i class="ti ti-trash text-danger me-2"></i> Supprimer
             </a>
         </li>
     </ul>
 </div>
 
-{{-- Composants Sweet Alert --}}
-<x-sweet-alert-confirm 
-    title="Changer le statut"
-    text="Voulez-vous vraiment {{ $user->is_active ? 'désactiver' : 'activer' }} cet utilisateur ?"
-    icon="question"
-    confirmText="{{ $user->is_active ? 'Oui, désactiver' : 'Oui, activer' }}"
-    method="toggleUserStatus"
-    :parameters="[$user->id]"
-    functionName="toggleUser{{ $user->id }}" />
-
-<x-sweet-alert-delete 
-    title="Supprimer l'utilisateur"
-    text="Vous êtes sur le point de supprimer définitivement cet utilisateur."
-    entityName="Utilisateur: {{ $user->name }} ({{ $user->email }})"
-    method="deleteUser"
-    :parameters="[$user->id]"
-    functionName="deleteUser{{ $user->id }}" />
+{{-- Composants Sweet Alert -- Ils sont maintenant inclus une seule fois dans la page principale --}}
+{{-- Ces composants ne sont plus nécessaires ici car les fonctions sont définies ailleurs --}}
+{{-- et appelées directement dans les événements onclick ci-dessus --}}

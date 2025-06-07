@@ -15,7 +15,7 @@ use App\Repositories\Eloquent\DistributionCenterRepository;
 use App\Repositories\Eloquent\OrderRepository;
 use App\Repositories\Eloquent\ProductRepository;
 use App\Repositories\Eloquent\TokenRepositoryEloquent;
-use App\Repositories\Eloquent\UserEloquentRepository;
+use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,7 +25,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
      * @var array<class-string, class-string>
      */
     public array $bindings = [
-        UserRepositoryInterface::class => UserEloquentRepository::class,
+        UserRepositoryInterface::class => UserRepository::class,
         OrderRepositoryInterface::class => OrderRepository::class,
         TokenRepositoryInterface::class => TokenRepositoryEloquent::class,
         DistributionCenterRepositoryInterface::class => DistributionCenterRepository::class,

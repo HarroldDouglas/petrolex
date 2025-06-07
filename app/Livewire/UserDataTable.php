@@ -2,12 +2,15 @@
 
 namespace App\Livewire;
 
+use App\DTOs\User\UpdateUserDTO;
 use App\Enums\EntityStatus;
 use App\Models\DistributionCenter;
 use App\Models\User;
+use App\Services\User\UserService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
@@ -191,34 +194,72 @@ class UserDataTable extends BaseDataTable
         ];
     }
 
-    // TODO: appeler le service, c'était juste pour les tests
     public function toggleUserStatus($userId)
     {
-        $status = 'activé';
-        $name = 'Douglas';
-        session()->flash('success', "L'utilisateur a été {$status} avec succès.");
+        try {
+            $userService = app(UserService::class);
+            $user = $userService->find($userId);
+            $currentStatus = $user->is_active;
+            $newStatus = ! $currentStatus;
 
-        $this->dispatch('show-notification', [
-            'type' => 'success',
-            'title' => 'Statut modifié !',
-            'message' => "L'utilisateur {$name} a été {$status} avec succès.",
-            'timer' => 3000,
-        ]);
+            $updateDto = new UpdateUserDTO(
+                is_active: $newStatus
+            );
+
+            $result = $userService->update($user, $updateDto);
+
+            if ($result) {
+                $status = $newStatus ? 'activé' : 'désactivé';
+                $name = $user->full_name;
+
+                session()->flash('success', "L'utilisateur a été {$status} avec succès.");
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Statut modifié !',
+                    'message' => "L'utilisateur {$name} a été {$status} avec succès.",
+                    'timer' => 3000,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error toggling user status: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la modification du statut de l'utilisateur.",
+                'timer' => 3000,
+            ]);
+        }
     }
 
-    // TODO: appeler le service, c'était juste pour les tests
     public function deleteUser($userId)
     {
-        $userName = 'Test';
-        $name = 'Douglas';
+        try {
+            $userService = app(UserService::class);
+            $user = $userService->find($userId);
+            $name = $user->full_name;
+            $result = $userService->delete($user);
 
-        session()->flash('success', "L'utilisateur {$userName} a été supprimé avec succès.");
+            if ($result) {
+                session()->flash('success', "L'utilisateur {$name} a été supprimé avec succès.");
 
-        $this->dispatch('show-notification', [
-            'type' => 'success',
-            'title' => 'Utilisateur supprimé !',
-            'message' => "L'utilisateur {$name} a été supprimé définitivement.",
-            'timer' => 3000,
-        ]);
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Utilisateur supprimé !',
+                    'message' => "L'utilisateur {$name} a été supprimé définitivement.",
+                    'timer' => 3000,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error deleting user: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la suppression de l'utilisateur.",
+                'timer' => 3000,
+            ]);
+        }
     }
 }
