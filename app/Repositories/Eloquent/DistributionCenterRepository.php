@@ -23,4 +23,12 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
     {
         return DistributionCenter::whereIn('id', $ids)->get();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function findWithRelation(int $id): ?DistributionCenter
+    {
+        return DistributionCenter::with(['bottleTypeStocks'])->find($id);
+    }
 }

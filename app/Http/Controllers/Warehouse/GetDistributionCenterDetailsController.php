@@ -3,16 +3,20 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
+use App\Services\DistributionCenter\DistributionCenterService;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class GetDistributionCenterDetailsController extends Controller
 {
+    public function __construct(private DistributionCenterService $service) {}
+
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request, int $centerId): View
+    public function __invoke(Request $request, int $centerId)
     {
-        return view('distribution-center.details');
+        $distributionCenter = $this->service->findWithRelation($centerId);
+
+        return view('distribution-center.details', compact('distributionCenter'));
     }
 }

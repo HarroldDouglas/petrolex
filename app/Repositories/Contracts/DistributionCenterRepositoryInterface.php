@@ -14,4 +14,9 @@ interface DistributionCenterRepositoryInterface extends baseRepositoryInterface
      * @return Collection<int, DistributionCenter>
      */
     public function getByIds(array $ids): Collection;
+
+    /**
+     * Find a distribution center by ID with its related bottle types.
+     */
+    public function findWithRelation(int $id): ?DistributionCenter;
 }

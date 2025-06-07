@@ -33,4 +33,12 @@ class DistributionCenterService
     {
         return $this->distributionCenterRepository->find($id);
     }
+
+    /**
+     * Find a distribution center by ID.
+     */
+    public function findWithRelation(int $id): ?DistributionCenter
+    {
+        return $this->distributionCenterRepository->findWithRelation($id);
+    }
 }
