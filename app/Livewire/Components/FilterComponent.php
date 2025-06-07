@@ -41,7 +41,7 @@ class FilterComponent extends Component
         $user = Auth::user();
 
         if ($user?->isGlobal()) {
-            $this->centers = $this->distributionCenterRepository->getAll();
+            $this->centers = $this->distributionCenterRepository->all();
         } elseif ($user) {
             $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
             $this->centers = $this->distributionCenterRepository->getByIds($centerIds);

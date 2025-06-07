@@ -5,25 +5,27 @@
     <div class="container-fluid">
         <!-- Breadcrumb with actions buttons -->
         <div class="row m-1">
-            <div class="col-8 p-0">
-                <h4 class="main-title">Détails du centre de distribution</h4>
+            <div class="col-6 p-0">
+                <h4 class="main-title">Ajouter un centre de distribution</h4>
                 <ul class="app-line-breadcrumbs mb-3">
-                    <li><a href="{{ route('dashboard') }}" class="f-s-14 f-w-500"><i class="ph-duotone ph-stack f-s-16"></i>
-                            Tableau de bord</a></li>
-                    <li><a href="{{ route('distribution-centers.list') }}" class="f-s-14 f-w-500">Centres dedistribution</a></li>
-                    <li class="active"><a href="#" class="f-s-14 f-w-500">Point A</a></li>
+                    <li class="">
+                        <a href="#" class="f-s-14 f-w-500">
+                            <span>
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Centre de distribution
+                            </span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="#" class="f-s-14 f-w-500">Ajouter</a>
+                    </li>
                 </ul>
             </div>
-            <div class="col-4 p-0">
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('distribution-centers.edit', 1) }}" class="btn btn-success">
-                        <i class="ti ti-edit me-1"></i>Modifier
+
+            <div class="col-6 p-0">
+                <div class="d-flex justify-content-end text-primary-dark">
+                    <a type="button" class="btn btn-success btn-md mb-2" href="{{ route('distribution-centers.list') }}">
+                        <i class="ti ti-arrow-left"></i> Retourner à la liste des centres de distribution
                     </a>
-                    <!-- Static status button for mockup -->
-                    <a href="#" class="btn btn-danger">
-                        <i class="ti ti-ban me-1"></i>Désactiver
-                    </a>
-                    <!-- The activate button would appear instead if status was inactive, but this is just a mockup -->
                 </div>
             </div>
         </div>

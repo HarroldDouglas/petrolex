@@ -1,19 +1,9 @@
 @extends('layout.master')
-@section('title', 'Créer un centre de distribution')
-@section('css')
-    <!-- filepond css -->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/filepond/filepond.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendor/filepond/image-preview.min.css') }}">
+@section('title', 'Modifier le centre de distribution')
 
-    <!-- editor css -->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/trumbowyg/trumbowyg.min.css') }}">
-
-    <!-- select2 css -->
-    <link rel="stylesheet" href="{{ asset('assets/vendor/select/select2.min.css') }}">
-@endsection
 @section('main-content')
     <div class="container-fluid">
-        <!-- Breadcrumb start -->
+        <!-- Breadcrumb -->
         <div class="row m-1">
             <div class="col-6 p-0">
                 <h4 class="main-title">Ajouter un centre de distribution</h4>
@@ -39,18 +29,18 @@
                 </div>
             </div>
         </div>
-        <!-- Breadcrumb end -->
 
-        <!-- Add Distribution Center start -->
         <div class="row">
-            <div class="col-lg-12 col-xxl-10">
-                <div class="card">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title m-0">Informations du centre de distribution</h5>
+                    </div>
                     <div class="card-body">
-                        @livewire('distribution-center.create-distribution-center')
+                        @livewire('distribution-center.edit-distribution-center', ['distributionCenter' => $distributionCenter])
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Add Distribution Center end -->
     </div>
 @endsection

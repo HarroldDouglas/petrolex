@@ -93,7 +93,7 @@
             @canany([$permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value, $permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#point-of-sales">
-                        <i class="iconoir-network"></i> Centres dedistribution
+                        <i class="iconoir-network"></i> Centres de distribution
                     </a>
                     <ul class="collapse" id="point-of-sales">
                         @can($permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value)

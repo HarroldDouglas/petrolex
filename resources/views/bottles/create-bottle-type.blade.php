@@ -32,18 +32,13 @@
                                 <input type="text" class="form-control" id="type_name" placeholder="Ex: Bouteille 6kg"
                                     required>
                             </div>
-                            <div class="col-md-4">
-                                <label for="bottle_price" class="form-label">Prix de la bouteille vide</label>
-                                <input type="number" class="form-control" id="bottle_price" placeholder="Ex: 7000"
-                                    required>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="bottle_capacity_price" class="form-label">Prix de la contenance</label>
+                            <div class="col-md-6">
+                                <label for="bottle_capacity_price" class="form-label">Prix de la recharge</label>
                                 <input type="number" class="form-control" id="bottle_capacity_price" placeholder="Ex: 8500"
                                     required>
                             </div>
-                            <div class="col-md-4">
-                                <label for="bottle_price" class="form-label">Prix de la bouteille pleine</label>
+                            <div class="col-md-6">
+                                <label for="bottle_price" class="form-label">Prix de la consigne + recharge</label>
                                 <input type="number" class="form-control" id="bottle_price" placeholder="Ex: 25000"
                                     required>
                             </div>

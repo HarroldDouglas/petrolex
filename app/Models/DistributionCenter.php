@@ -28,6 +28,7 @@ class DistributionCenter extends Model
         'phone',
         'email',
         'is_active',
+        'storage_capacity',
     ];
 
     /**

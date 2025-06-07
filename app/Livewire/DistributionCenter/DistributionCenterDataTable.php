@@ -48,6 +48,10 @@ class DistributionCenterDataTable extends BaseDataTable
     public function columns(): array
     {
         return [
+            Column::make('ID', 'id')
+                ->sortable()
+                ->deselected(),
+
             Column::make('Nom', 'name')
                 ->sortable()
                 ->searchable(),
@@ -87,14 +91,12 @@ class DistributionCenterDataTable extends BaseDataTable
                     );
                 }),
 
-            // TODO: create an action vue for this and restore de dropdown action menu
-            Column::make('Actions', 'id')
-                ->format(function ($value, $row) {
-                    return new HtmlString(
-                        '<a href="'.route('distribution-centers.edit', $row->id).'" class="btn btn-sm btn-primary me-1"><i class="bi bi-pencil"></i> Modifier</a>'.
-                        '<a href="'.route('distribution-centers.details', $row->id).'" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Détails</a>'
-                    );
-                }),
+            Column::make('Actions')
+                ->label(
+                    function ($row) {
+                        return view('components.distribution-center-actions', ['distributionCenter' => $row]);
+                    }
+                ),
         ];
     }
 

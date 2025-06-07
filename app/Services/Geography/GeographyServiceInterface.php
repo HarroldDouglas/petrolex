@@ -10,22 +10,12 @@ interface GeographyServiceInterface
     public function getCountries(): array;
 
     /**
-     * Get regions for a specific country
-     */
-    public function getRegions(string $countryCode): array;
-
-    /**
      * Get cities for a specific region
      */
-    public function getCities(string $countryCode, string $regionId): array;
+    public function getCities(string $countryCode): array;
 
     /**
-     * Get districts for a specific city
+     * Get neighborhoods for a specific city
      */
-    public function getDistricts(string $countryCode, string $cityId): array;
-
-    /**
-     * Search cities by name
-     */
-    public function searchCities(string $countryCode, string $query): array;
+    public function getNeighborhoods(string $city): array;
 }

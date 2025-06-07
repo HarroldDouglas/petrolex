@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
-class OrderNotFoundException extends EntityNotFoundException
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+class OrderNotFoundException extends ModelNotFoundException
 {
     /**
      * Get the default error message.
