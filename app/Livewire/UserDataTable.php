@@ -24,30 +24,6 @@ class UserDataTable extends BaseDataTable
         return 'utilisateurs';
     }
 
-    public bool $rememberColumnSelection = true;
-    public bool $rememberFilters = true;
-    public bool $rememberSort = true;
-    public bool $rememberPerPage = true;
-
-    public function configure(): void
-    {
-        parent::configure();
-
-        $this->setPrimaryKey('id')
-            ->setTableWrapperAttributes([
-                'class' => 'table-responsive',
-            ])
-            ->setTableAttributes([
-                'class' => 'table table-striped table-hover',
-            ])
-            ->setTheadAttributes([
-                'class' => 'table-light',
-            ])
-            ->setDefaultSort(self::DEFAULT_SORT_FIELD, self::DEFAULT_SORT_DIRECTION)
-            ->setPerPageAccepted([10, 25, 50, 100])
-            ->setPerPage(10);
-    }
-
     public function builder(): Builder
     {
         return User::query()
@@ -213,5 +189,36 @@ class UserDataTable extends BaseDataTable
                     $builder->whereDate('created_at', '>=', $value);
                 }),
         ];
+    }
+
+    // TODO: appeler le service, c'était juste pour les tests
+    public function toggleUserStatus($userId)
+    {
+        $status = 'activé';
+        $name = 'Douglas';
+        session()->flash('success', "L'utilisateur a été {$status} avec succès.");
+
+        $this->dispatch('show-notification', [
+            'type' => 'success',
+            'title' => 'Statut modifié !',
+            'message' => "L'utilisateur {$name} a été {$status} avec succès.",
+            'timer' => 3000,
+        ]);
+    }
+
+    // TODO: appeler le service, c'était juste pour les tests
+    public function deleteUser($userId)
+    {
+        $userName = 'Test';
+        $name = 'Douglas';
+
+        session()->flash('success', "L'utilisateur {$userName} a été supprimé avec succès.");
+
+        $this->dispatch('show-notification', [
+            'type' => 'success',
+            'title' => 'Utilisateur supprimé !',
+            'message' => "L'utilisateur {$name} a été supprimé définitivement.",
+            'timer' => 3000,
+        ]);
     }
 }

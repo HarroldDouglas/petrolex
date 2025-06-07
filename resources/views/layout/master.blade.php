@@ -53,7 +53,7 @@
     </div>
 </body>
 
-<x-sweet-alert />
+<x-sweet-alert-notification />
 
 <!-- scripts start-->
 @include('layout.script')
