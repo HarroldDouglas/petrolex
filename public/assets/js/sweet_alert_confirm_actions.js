@@ -38,35 +38,36 @@ function confirmAction(params) {
     });
 }
 
-function confirmDelete(params) {
-    const deleteId = params.id || "";
+function confirmActionWithInput(params) {
+    const actionId = params.id || "";
     const methodName = params.method || "";
     const methodParams = params.parameters || [];
-    const confirmWordValue = params.confirmWord || "supprimer";
-    const titleValue = params.title || "Supprimer l'élément";
+    const confirmWordValue = params.confirmWord || "confirmer";
+    const titleValue = params.title || "Confirmation avec saisie";
     const textValue =
-        params.text ||
-        "Vous êtes sur le point de supprimer définitivement cet élément.";
+        params.text || "Vous êtes sur le point d'effectuer une action importante.";
     const entityNameValue = params.entityName || "";
-    const confirmTextValue = params.confirmText || "Supprimer définitivement";
+    const confirmTextValue = params.confirmText || "Confirmer l'action";
     const cancelTextValue = params.cancelText || "Annuler";
+    const actionInProgressText = params.actionInProgressText || "Action en cours...";
+    const iconValue = params.icon || "warning";
+    const confirmButtonIcon = params.confirmButtonIcon || "ti ti-check";
 
-    const uniqueInputId = "deleteConfirmInput_" + deleteId;
+    const uniqueInputId = "confirmActionInput_" + actionId;
 
     Swal.fire({
         title: titleValue,
         html: `
             <p class="mb-3">${textValue}</p>
-            ${entityNameValue ? `<p class="fw-bold text-danger mb-3">${entityNameValue}</p>` : ""}
+            ${entityNameValue ? `<p class="fw-bold ${iconValue === "warning" ? "text-warning" : "text-info"} mb-3">${entityNameValue}</p>` : ""}
             <p class="mb-3">Tapez <strong>"${confirmWordValue}"</strong> pour confirmer :</p>
             <input type="text" id="${uniqueInputId}" class="form-control" placeholder="Tapez "${confirmWordValue}" pour confirmer">
         `,
-        icon: "warning",
+        icon: iconValue,
         showCancelButton: true,
         confirmButtonColor: "#198754",
         cancelButtonColor: "#6c757d",
-        confirmButtonText:
-            '<i class="ti ti-trash me-1"></i>' + confirmTextValue,
+        confirmButtonText: `<i class="${confirmButtonIcon} me-1"></i>${confirmTextValue}`,
         cancelButtonText: '<i class="ti ti-x me-1"></i>' + cancelTextValue,
         reverseButtons: true,
         focusCancel: true,
@@ -83,7 +84,7 @@ function confirmDelete(params) {
                 confirmWordValue.toLowerCase()
             ) {
                 Swal.showValidationMessage(
-                    `Vous devez taper "${confirmWordValue}" pour confirmer la suppression`,
+                    `Vous devez taper "${confirmWordValue}" pour confirmer l'action`,
                 );
                 return false;
             }
@@ -109,7 +110,7 @@ function confirmDelete(params) {
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
-                title: "Suppression en cours...",
+                title: actionInProgressText,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 showConfirmButton: false,

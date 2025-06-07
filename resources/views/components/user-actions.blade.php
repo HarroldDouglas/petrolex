@@ -32,12 +32,17 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" onclick="confirmDelete({
+            <a class="dropdown-item" href="#" onclick="confirmActionWithInput({
                 method: 'deleteUser',
                 parameters: [{{ $user->id }}],
                 title: 'Supprimer l\'utilisateur',
                 text: 'Vous êtes sur le point de supprimer définitivement cet utilisateur.',
+                confirmWord: 'supprimer',
                 entityName: 'Utilisateur: {{ str_replace("'", "\\'", $user->full_name) }} ({{ $user->email ?: $user->phone_number }})',
+                icon: 'warning',
+                confirmText: 'Supprimer définitivement',
+                confirmButtonIcon: 'ti ti-trash',
+                actionInProgressText: 'Suppression en cours...',
                 id: {{ $user->id }}
             }); return false;">
                 <i class="ti ti-trash text-danger me-2"></i> Supprimer
@@ -45,7 +50,3 @@
         </li>
     </ul>
 </div>
-
-{{-- Composants Sweet Alert -- Ils sont maintenant inclus une seule fois dans la page principale --}}
-{{-- Ces composants ne sont plus nécessaires ici car les fonctions sont définies ailleurs --}}
-{{-- et appelées directement dans les événements onclick ci-dessus --}}

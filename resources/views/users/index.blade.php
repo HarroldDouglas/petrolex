@@ -65,5 +65,5 @@
     <!-- api js -->
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
 
-    <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/apexcharts/timelinechart/moment.min.js') }}"></script>
 @endsection

@@ -131,16 +131,15 @@ return [
         ],
 
         'user-dynamic' => [
-            'driver' => 'monolog',
-            'handler' => StreamHandler::class,
-            'with' => [
-                'stream' => function () {
-                    $date = now()->format('Y-m-d');
-
-                    return storage_path("logs/user-{$date}.log");
-                },
-            ],
+            'driver' => 'daily',
+            'path' => storage_path('logs/user.log'),
             'level' => 'info',
+            'days' => 14,
+            'formatter' => \Monolog\Formatter\LineFormatter::class,
+            'formatter_with' => [
+                'format' => "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n",
+                'dateFormat' => 'Y-m-d H:i:s',
+            ],
         ],
     ],
 ];

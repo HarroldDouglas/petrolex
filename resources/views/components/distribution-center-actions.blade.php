@@ -20,17 +20,35 @@
         </li>
         @if ($distributionCenter->is_active)
             <li>
-                <a class="dropdown-item toggle-status-btn" href="#"
-                    data-distribution-center-id="{{ $distributionCenter->id }}"
-                    data-status="active">
+                <a class="dropdown-item" href="#" onclick="confirmActionWithInput({
+                    method: 'toggleDistributionCenterStatus',
+                    parameters: [{{ $distributionCenter->id }}],
+                    title: 'Désactiver le centre de distribution',
+                    text: 'Vous êtes sur le point de désactiver ce centre de distribution. Cette action affectera toutes les fonctionnalités associées.',
+                    confirmWord: 'desactiver',
+                    entityName: 'Centre: {{ str_replace("'", "\\'", $distributionCenter->name) }}',
+                    icon: 'warning',
+                    confirmText: 'Oui, désactiver',
+                    confirmButtonIcon: 'ti ti-ban',
+                    actionInProgressText: 'Désactivation en cours...'
+                }); return false;">
                     <i class="ti ti-ban text-warning me-2"></i> Désactiver
                 </a>
             </li>
         @else
             <li>
-                <a class="dropdown-item toggle-status-btn" href="#"
-                    data-distribution-center-id="{{ $distributionCenter->id }}"
-                    data-status="inactive">
+                <a class="dropdown-item" href="#" onclick="confirmActionWithInput({
+                    method: 'toggleDistributionCenterStatus',
+                    parameters: [{{ $distributionCenter->id }}],
+                    title: 'Activer le centre de distribution',
+                    text: 'Vous êtes sur le point d\'activer ce centre de distribution.',
+                    confirmWord: 'activer',
+                    entityName: 'Centre: {{ str_replace("'", "\\'", $distributionCenter->name) }}',
+                    icon: 'info',
+                    confirmText: 'Oui, activer',
+                    confirmButtonIcon: 'ti ti-check',
+                    actionInProgressText: 'Activation en cours...'
+                }); return false;">
                     <i class="ti ti-check text-success me-2"></i> Activer
                 </a>
             </li>
