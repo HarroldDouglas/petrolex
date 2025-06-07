@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('contact_name')->nullable();
             $table->boolean('is_default')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -26,6 +26,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->float('storage_capacity')->nullable()->comment('Capacité maximale de stockage');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

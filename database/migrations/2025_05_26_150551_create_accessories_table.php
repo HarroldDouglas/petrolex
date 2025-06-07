@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('sku', 255)->nullable()->unique();
             $table->integer('quantity')->default(1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

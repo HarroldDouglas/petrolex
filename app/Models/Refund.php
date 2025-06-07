@@ -4,11 +4,29 @@ namespace App\Models;
 
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $order_id
+ * @property int $user_id
+ * @property float $amount
+ * @property string $reason
+ * @property string|null $notes
+ * @property Carbon $refund_date
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class Refund extends Model
 {
+    use HasFactory;
+    use SoftDeletes;
+
     protected $fillable = [
         'order_id',
         'initiated_by',

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('distribution_center_id')->constrained()->onDelete('cascade');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->unique(['user_id', 'distribution_center_id']);
         });
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_center_permissions');
+        Schema::dropIfExists('user_distribution_centers');
     }
 };
