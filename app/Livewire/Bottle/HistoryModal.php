@@ -2,41 +2,32 @@
 
 namespace App\Livewire\Bottle;
 
-use App\Services\Bottle\BottleService;
+use App\Models\Bottle;
+use App\Models\BottleMovement;
 use Livewire\Component;
 
 class HistoryModal extends Component
 {
-    public string $modalId = 'historyModal';
-    public string $title = 'Historique de la bouteille';
-    public $showModal = false;
+    public $modalId = 'bottleHistoryModal';
+    public $title = 'Historique de la bouteille';
     public $bottle = null;
     public $bottleHistory = [];
-    public $bottleId = null;
 
-    protected $listeners = [
-        'showBottleHistory' => 'showHistory',
-        'closeModal' => 'closeModal',
-    ];
+    protected $listeners = ['showBottleHistory'];
 
-    public function showHistory($bottleId)
+    // Add parameter name to match the named parameter in the dispatch
+    public function showBottleHistory($bottleId)
     {
-        $bottleService = app(BottleService::class);
-        $this->bottleId = $bottleId;
-        $this->bottle = $bottleService->find($bottleId);
+        $this->bottle = Bottle::find($bottleId);
 
         if ($this->bottle) {
-            $this->bottleHistory = $bottleService->getBottleHistory($bottleId);
-            $this->showModal = true;
-        }
-    }
+            $this->bottleHistory = BottleMovement::where('bottle_id', $bottleId)
+                ->with(['distributionCenter'])
+                ->orderBy('movement_date', 'desc')
+                ->get();
 
-    public function closeModal()
-    {
-        $this->showModal = false;
-        $this->bottle = null;
-        $this->bottleHistory = [];
-        $this->bottleId = null;
+            $this->dispatch('show-bottle-history');
+        }
     }
 
     public function render()

@@ -61,7 +61,7 @@
 @section('script')
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
 
-    <script src="{{ asset('assets/js/sweet_alert_confirm_actions.js') }}" defer></script>
+    <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
     <!-- api js -->
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
 

@@ -134,7 +134,8 @@ class BottleDataTable extends BaseDataTable
 
     public function showBottleHistory($bottleId)
     {
-        $this->dispatch('showBottleHistory', $bottleId);
+        // Changed from direct parameter to named parameter array
+        $this->dispatch('showBottleHistory', bottleId: $bottleId);
     }
 
     public function changeBottleStatus($bottleId, $status)

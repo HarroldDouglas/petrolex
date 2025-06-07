@@ -5,10 +5,6 @@
     'message' => session('success') ?? session('error') ?? '',
 ])
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/vendor/notifications/toastify.min.css') }}">
-@endpush
-
 @if($message)
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -31,13 +27,3 @@
     });
 </script>
 @endif
-
-@push('scripts')
-    <script src="{{ asset('assets/vendor/notifications/toastify-js.js') }}"></script>
-
-    <!-- sweetalert js-->
-    <script src="{{ asset('assets/vendor/sweetalert/sweetalert.js') }}"></script>
-
-    <!-- js -->
-    <script src="{{ asset('assets/js/sweet_alert.js') }}"></script>
-@endpush

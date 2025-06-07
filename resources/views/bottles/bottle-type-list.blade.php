@@ -76,7 +76,7 @@
                                                 @if ($type['status'] === 'Actif')
                                                     <button type="button" class="btn btn-warning btn-sm change-status"
                                                         data-id="{{ $type['id'] }}" data-action="deactivate">
-                                                        <i class="iconoir-cancel"></i> Désactiver
+                                                        <i class="iconoir-xmark"></i> Désactiver
                                                     </button>
                                                 @else
                                                     <button type="button" class="btn btn-success btn-sm change-status"
