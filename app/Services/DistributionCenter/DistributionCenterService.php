@@ -67,6 +67,7 @@ class DistributionCenterService
      */
     public function find(string $id): ?DistributionCenter
     {
+        /** @var DistributionCenter|null */
         return $this->distributionCenterRepository->find($id);
     }
 

@@ -51,8 +51,8 @@
                         Bouteilles
                     </a>
                     <ul class="collapse" id="bottles">
-                        <li><a href="{{ route('bottles.list') }}"> Liste</a></li>
-                        <li><a href="{{ route('bottles.types') }}"> Types</a></li>
+                        <li><a href="{{ route('bottles.index') }}"> Liste</a></li>
+                        <li><a href="{{ route('bottles.types.index') }}"> Types</a></li>
                     </ul>
                 </li>
             @endcan

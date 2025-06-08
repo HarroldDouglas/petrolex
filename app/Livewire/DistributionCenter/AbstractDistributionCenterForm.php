@@ -31,6 +31,7 @@ abstract class AbstractDistributionCenterForm extends Component
 
     public function rules()
     {
+        // @phpstan-ignore-next-line
         return $this->customRequest()->rules();
     }
 

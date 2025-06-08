@@ -92,6 +92,7 @@ class UserService
      */
     public function find(int $id): ?User
     {
+        /** @var User|null */
         return $this->userRepository->find($id);
     }
 }
