@@ -1,4 +1,5 @@
-<div class="modal fade" id="{{ $modalId  }}" tabindex="-1" aria-labelledby="{{ $modalId  }}Label" aria-hidden="true">
+<div>
+    <div wire:ignore.self class="modal fade" id="{{ $modalId }}" tabindex="-1" aria-labelledby="{{ $modalId }}Label" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -48,4 +49,16 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+    @push('scripts')
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('showBottleHistory', () => {
+                const modal = new bootstrap.Modal(document.getElementById('{{ $modalId }}'));
+                modal.show();
+            });
+        });
+    </script>
+    @endpush
 </div>

@@ -3,410 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket de Commande avec Souche - {{ $order->order_number ?? 'CMD-2024-001' }}</title>
+    <title>Facture - {{ $order->reference }}</title>
     <style>
-        * {
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            color: #333;
+            background-color: #fff;
+        }
+        .invoice-container {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
             box-sizing: border-box;
         }
-
-        body {
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            line-height: 1.4;
-            color: #000;
-        }
-
-        .page {
-            width: 80mm;
-            margin: 0 auto;
-            background: white;
-        }
-
-        .ticket-section {
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-
-        .separator {
-            text-align: center;
-            margin: 20px 0;
-            border-bottom: 2px dashed #000;
-            position: relative;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .separator::after {
-            content: attr(data-text);
-            background: white;
-            padding: 0 10px;
-            position: absolute;
-            left: 50%;
-            top: -8px;
-            transform: translateX(-50%);
-        }
-
-        .stub-title {
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding: 5px;
-            border: 2px solid #000;
-            background: #f0f0f0;
-        }
-
         .header {
-            text-align: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
         }
-
-        .company-name {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .logo {
+            max-width: 200px;
+            height: auto;
         }
-
         .company-info {
-            font-size: 10px;
-            margin-bottom: 3px;
-        }
-
-        .order-info {
-            margin-bottom: 15px;
-        }
-
-        .order-number {
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-        }
-
-        .label {
-            font-weight: bold;
-        }
-
-        .customer-section, .delivery-section {
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #000;
-            padding-bottom: 10px;
-        }
-
-        .section-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-decoration: underline;
-        }
-
-        .items-section {
-            margin-bottom: 15px;
-        }
-
-        .items-header {
-            border-bottom: 1px solid #000;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-        }
-
-        .item-name {
-            flex: 1;
-        }
-
-        .item-qty {
-            width: 30px;
-            text-align: center;
-        }
-
-        .item-price {
-            width: 50px;
             text-align: right;
         }
-
-        .total-section {
-            border-top: 2px solid #000;
-            padding-top: 10px;
-            margin-bottom: 15px;
+        .invoice-title {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #2c3e50;
         }
-
-        .total-row {
+        .invoice-details {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 3px;
+            margin-bottom: 30px;
         }
-
-        .grand-total {
-            font-weight: bold;
-            font-size: 14px;
-            border-top: 1px solid #000;
-            padding-top: 5px;
-            margin-top: 5px;
+        .client-info, .invoice-info {
+            width: 48%;
         }
-
-        .footer {
-            text-align: center;
-            font-size: 10px;
-            margin-top: 15px;
-            border-top: 1px dashed #000;
-            padding-top: 10px;
+        .invoice-info {
+            text-align: right;
         }
-
-        .status {
-            text-align: center;
-            font-weight: bold;
-            margin: 10px 0;
-            padding: 5px;
-            border: 1px solid #000;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
         }
-
-        .signature-section {
-            margin-top: 20px;
-            border: 1px solid #000;
+        th, td {
             padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
         }
-
-        .signature-box {
-            margin-top: 10px;
-            border: 1px solid #000;
-            height: 40px;
+        thead th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .totals {
+            margin-top: 30px;
+            text-align: right;
+        }
+        .total-row {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: #666;
+            justify-content: flex-end;
+            margin: 5px 0;
         }
-
-        .instructions {
-            background: #f9f9f9;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 15px 0;
-            font-size: 10px;
+        .total-label {
+            width: 150px;
+            font-weight: bold;
+            text-align: left;
         }
-
-        .delivery-receipt {
-            background: #fff;
+        .total-value {
+            width: 100px;
+            text-align: right;
         }
-
-        .customer-copy {
-            background: #f8f8f8;
+        .grand-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #2c3e50;
         }
-
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        .payment-info {
+            margin: 30px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
         @media print {
             body {
-                margin: 0;
-            }
-            .page {
-                width: 100%;
-                margin: 0;
-            }
-            .separator {
-                page-break-after: avoid;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
     </style>
 </head>
 <body>
-    <div class="page">
-        
-        <!-- DÉCHARGE LIVREUR -->
-        <div class="ticket-section delivery-receipt">
-            <div class="stub-title">📋 DÉCHARGE LIVREUR</div>
-            
-            <div class="header">
-                <div class="company-name">DELIVERY EXPRESS</div>
-                <div class="company-info">Service de livraison rapide</div>
-                <div class="company-info">Tél: +33 1 23 45 67 89</div>
+    <div class="invoice-container" id="printable">
+        <div class="header">
+            <div>
+                @if(file_exists(public_path('assets/images/logos/logo.png')))
+                    <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo Petrolex" class="logo">
+                @else
+                    <h2>PETROLEX SARL</h2>
+                @endif
             </div>
-
-            <div class="order-number">
-                COMMANDE N° {{ $order->order_number ?? 'CMD-2024-001' }}
-            </div>
-
-            <div class="order-info">
-                <div class="info-row">
-                    <span class="label">Date:</span>
-                    <span>{{ $order->order_date ? $order->order_date->format('d/m/Y H:i') : '15/01/2024 14:30' }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Type:</span>
-                    <span>{{ $order->delivery_type === 'fast' ? 'Express' : 'Standard' }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Total:</span>
-                    <span class="label">{{ number_format($order->total_amount ?? 39.00, 2) }}€</span>
-                </div>
-            </div>
-
-            <div class="customer-section">
-                <div class="section-title">CLIENT</div>
-                <div>{{ $order->customer->name ?? 'Jean Dupont' }}</div>
-                <div>{{ $order->customer->phone ?? '+33 6 12 34 56 78' }}</div>
-            </div>
-
-            <div class="delivery-section">
-                <div class="section-title">ADRESSE DE LIVRAISON</div>
-                <div>{{ $order->deliveryAddress->address ?? '123 Rue de la Paix' }}</div>
-                <div>{{ ($order->deliveryAddress->postal_code ?? '75001') . ' ' . ($order->deliveryAddress->city ?? 'Paris') }}</div>
-            </div>
-
-            <div class="signature-section">
-                <div class="section-title">SIGNATURES</div>
-                <div style="margin-bottom: 10px;">
-                    <div style="margin-bottom: 5px;"><strong>Livreur:</strong> {{ $order->deliveryPerson->name ?? '________________' }}</div>
-                    <div class="signature-box">Signature du livreur</div>
-                </div>
-                <div>
-                    <div style="margin-bottom: 5px;"><strong>Client:</strong> ________________</div>
-                    <div class="signature-box">Signature du client</div>
-                </div>
-            </div>
-
-            <div class="instructions">
-                <strong>INSTRUCTIONS:</strong><br>
-                ✓ Livraison effectuée le: ___/___/_____ à ___h___<br>
-                ✓ Colis remis en main propre: ☐ Oui ☐ Non<br>
-                ✓ Commentaires: _________________________
+            <div class="company-info">
+                <h3>PETROLEX SARL</h3>
+                <p>123 Avenue du Pétrole<br>
+                Douala, Cameroun<br>
+                Tél: +237 233 123 456<br>
+                Email: contact@petrolex.cm</p>
             </div>
         </div>
 
-        <div class="separator" data-text="✂️ DÉTACHER ICI - SOUCHE CLIENT ✂️"></div>
+        <h1 class="invoice-title">FACTURE</h1>
 
-        <!-- SOUCHE CLIENT -->
-        <div class="ticket-section customer-copy">
-            <div class="stub-title">📄 SOUCHE CLIENT</div>
-            
-            <div class="header">
-                <div class="company-name">DELIVERY EXPRESS</div>
-                <div class="company-info">Service de livraison rapide</div>
-                <div class="company-info">Tél: +33 1 23 45 67 89</div>
-                <div class="company-info">www.delivery-express.fr</div>
-            </div>
-
-            <div class="order-number">
-                COMMANDE N° {{ $order->order_number ?? 'CMD-2024-001' }}
-            </div>
-
-            <div class="order-info">
-                <div class="info-row">
-                    <span class="label">Date:</span>
-                    <span>{{ $order->order_date ? $order->order_date->format('d/m/Y H:i') : '15/01/2024 14:30' }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Type:</span>
-                    <span>{{ $order->delivery_type === 'fast' ? 'Livraison Express' : 'Livraison Standard' }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Statut:</span>
-                    <span>{{ $order->status ?? 'Confirmée' }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Paiement:</span>
-                    <span>{{ $order->payment_method ?? 'Carte Bancaire' }}</span>
-                </div>
-            </div>
-
-            <div class="status">
-                {{ $order->payment_status ?? 'PAYÉ' }}
-            </div>
-
-            <div class="customer-section">
-                <div class="section-title">CLIENT</div>
-                <div>{{ $order->customer->name ?? 'Jean Dupont' }}</div>
-                <div>{{ $order->customer->phone ?? '+33 6 12 34 56 78' }}</div>
-                <div>{{ $order->customer->email ?? 'jean.dupont@email.com' }}</div>
-            </div>
-
-            <div class="delivery-section">
-                <div class="section-title">LIVRAISON</div>
-                <div>{{ $order->deliveryAddress->address ?? '123 Rue de la Paix' }}</div>
-                <div>{{ ($order->deliveryAddress->postal_code ?? '75001') . ' ' . ($order->deliveryAddress->city ?? 'Paris') }}</div>
-                @if($order->deliveryAddress->additional_info ?? 'Appartement 4B')
-                    <div>{{ $order->deliveryAddress->additional_info ?? 'Appartement 4B' }}</div>
-                @endif
-                @if($order->delivery_date)
-                    <div><strong>Livraison prévue:</strong> {{ $order->delivery_date->format('d/m/Y H:i') }}</div>
+        <div class="invoice-details">
+            <div class="client-info">
+                <h4>Facturé à:</h4>
+                <p>
+                    <strong>{{ $order->customer?->user->first_name }} {{ $order->customer?->user->last_name }}</strong><br>
+                    @if($order->delivery_address_id && $order->deliveryAddress)
+                        {{ $order->deliveryAddress->address }}<br>
+                        @if($order->deliveryAddress->neighborhood)
+                            {{ $order->deliveryAddress->neighborhood }},
+                        @endif
+                        {{ $order->deliveryAddress->city ?? 'Yaoundé' }}<br>
+                        {{ $order->deliveryAddress->country ?? 'Cameroun' }}<br>
+                        <strong>Tél:</strong> {{ $order->deliveryAddress->phone ?? ($order->customer?->phone ?? 'Non disponible') }}
+                        @if($order->deliveryAddress->contact_name)
+                        <br><strong>Contact:</strong> {{ $order->deliveryAddress->contact_name }}
+                        @endif
+                        @if($order->customer?->email)
+                        <br><strong>Email:</strong> {{ $order->customer->email }}
+                        @endif
+                    @else
+                        {{ $order->delivery_address ?? $order->customer?->address ?? 'Adresse non disponible' }}<br>
+                        <strong>Tél:</strong> {{ $order->customer?->phone ?? 'Non disponible' }}
+                        @if($order->customer?->email)
+                        <br><strong>Email:</strong> {{ $order->customer->email }}
+                        @endif
+                    @endif
+                </p>
+                @if($order->comments)
+                    <p><strong>Instructions:</strong> {{ $order->comments }}</p>
                 @endif
             </div>
-
-            <div class="items-section">
-                <div class="section-title">ARTICLES COMMANDÉS</div>
-                <div class="items-header">
-                    <div class="item-row">
-                        <span class="item-name">Article</span>
-                        <span class="item-qty">Qté</span>
-                        <span class="item-price">Prix</span>
-                    </div>
-                </div>
-                
-                <!-- Articles statiques pour demo -->
-                <div class="item-row">
-                    <span class="item-name">Pizza Margherita</span>
-                    <span class="item-qty">2</span>
-                    <span class="item-price">24,00€</span>
-                </div>
-                <div class="item-row">
-                    <span class="item-name">Coca Cola 33cl</span>
-                    <span class="item-qty">2</span>
-                    <span class="item-price">5,00€</span>
-                </div>
-                <div class="item-row">
-                    <span class="item-name">Tiramisu</span>
-                    <span class="item-qty">1</span>
-                    <span class="item-price">6,50€</span>
-                </div>
+            <div class="invoice-info">
+                <h4>Détails de la facture:</h4>
+                <p>
+                    <strong>N° Facture:</strong> {{ $order->order_number ?? $order->reference ?? $order->id }}<br>
+                    <strong>Date:</strong> {{ $order->order_date ? $order->order_date->format('d/m/Y') : ($order->created_at ? $order->created_at->format('d/m/Y') : date('d/m/Y')) }}<br>
+                    <strong>Statut:</strong> {{ $order->status?->label ?? $order->status?->name ?? 'En cours' }}<br>
+                    <strong>Type de livraison:</strong> {{ $order->delivery_type?->label ?? 'Standard' }}
+                </p>
             </div>
+        </div>
 
-            <div class="total-section">
-                <div class="total-row">
-                    <span>Sous-total:</span>
-                    <span>{{ number_format($order->subtotal ?? 35.50, 2) }}€</span>
-                </div>
-                <div class="total-row">
-                    <span>Frais de livraison:</span>
-                    <span>{{ number_format($order->delivery_fee ?? 3.50, 2) }}€</span>
-                </div>
-                <div class="total-row grand-total">
-                    <span>TOTAL:</span>
-                    <span>{{ number_format($order->total_amount ?? 39.00, 2) }}€</span>
-                </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Quantité</th>
+                    <th>Prix unitaire</th>
+                    <th>Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($groupedItems as $groupedItem)
+                    <tr>
+                        <td>{{ $groupedItem->displayName }}</td>
+                        <td>{{ $groupedItem->groupedQuantity }}</td>
+                        <td>{{ number_format($groupedItem->getUnitPrice(), 0, ',', ' ') }} FCFA</td>
+                        <td>{{ number_format($groupedItem->groupedTotalPrice, 0, ',', ' ') }} FCFA</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <div class="total-row">
+                <div class="total-label">Sous-total:</div>
+                <div class="total-value">{{ number_format($order->items_total_price ?? $order->subtotal ?? 0, 0, ',', ' ') }} FCFA</div>
             </div>
-
-            @if($order->comments ?? 'Sonner à l\'interphone SVP')
-                <div class="delivery-section">
-                    <div class="section-title">COMMENTAIRES</div>
-                    <div>{{ $order->comments ?? 'Sonner à l\'interphone SVP' }}</div>
-                </div>
+            <div class="total-row">
+                <div class="total-label">Frais de livraison:</div>
+                <div class="total-value">{{ $order->delivery_fee }} FCFA</div>
+            </div>
+            @if(($order->discount ?? 0) > 0)
+            <div class="total-row">
+                <div class="total-label">Réduction:</div>
+                <div class="total-value">{{ number_format($order->discount ?? 0, 0, ',', ' ') }} FCFA</div>
+            </div>
             @endif
-
-            <div class="footer">
-                <div>Merci pour votre commande !</div>
-                <div>Conservez cette souche comme preuve d'achat</div>
-                <div>{{ now()->format('d/m/Y H:i:s') }}</div>
+            <div class="total-row grand-total">
+                <div class="total-label">TOTAL:</div>
+                <div class="total-value">{{ number_format($order->total_amount ?? 0, 0, ',', ' ') }} FCFA</div>
             </div>
+        </div>
+
+        <div class="payment-info">
+            <h4>Informations de paiement</h4>
+            <p><strong>Méthode de paiement:</strong> {{ $order->payment_method->label }}</p>
+            <p><strong>Statut du paiement:</strong> {{ $order->payment_status->label }}</p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Merci pour votre confiance! Pour toute question concernant cette facture, veuillez nous contacter.</strong></p>
+            <p><strong>PETROLEX SARL | RC: RC/DLA/2020/B/1234 | NIU: M012345678901</strong></p>
         </div>
     </div>
 
     <script>
-        // Auto-print when page loads
         window.onload = function() {
-            window.print();
-        }
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
     </script>
 </body>
 </html>

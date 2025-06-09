@@ -6,7 +6,6 @@ use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Log Channel
@@ -51,7 +50,6 @@ return [
     */
 
     'channels' => [
-
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', env('LOG_STACK', 'single')),
@@ -132,6 +130,16 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'user-dynamic' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/user.log'),
+            'level' => 'info',
+            'days' => 14,
+            'formatter' => \Monolog\Formatter\LineFormatter::class,
+            'formatter_with' => [
+                'format' => "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n",
+                'dateFormat' => 'Y-m-d H:i:s',
+            ],
+        ],
     ],
-
 ];

@@ -6,16 +6,11 @@ use App\Models\DistributionCenter;
 use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-class DistributionCenterRepository implements DistributionCenterRepositoryInterface
+class DistributionCenterRepository extends BaseEloquentRepository implements DistributionCenterRepositoryInterface
 {
-    /**
-     * Get all distribution centers.
-     *
-     * @return Collection<int, DistributionCenter>
-     */
-    public function getAll(): Collection
+    public function __construct(DistributionCenter $model)
     {
-        return DistributionCenter::all();
+        parent::__construct($model);
     }
 
     /**
@@ -27,5 +22,13 @@ class DistributionCenterRepository implements DistributionCenterRepositoryInterf
     public function getByIds(array $ids): Collection
     {
         return DistributionCenter::whereIn('id', $ids)->get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function findWithRelation(int $id): ?DistributionCenter
+    {
+        return DistributionCenter::with(['bottleTypeStocks'])->find($id);
     }
 }

@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseEloquentRepository implements baseRepositoryInterface
 {
-    /**
-     * The Eloquent model instance
-     */
-    protected Model $model;
+    public function __construct(
+        protected Model $model
+    ) {}
 
     /**
      * {@inheritDoc}

@@ -5,15 +5,8 @@ namespace App\Repositories\Contracts;
 use App\Models\DistributionCenter;
 use Illuminate\Database\Eloquent\Collection;
 
-interface DistributionCenterRepositoryInterface
+interface DistributionCenterRepositoryInterface extends baseRepositoryInterface
 {
-    /**
-     * Get all distribution centers.
-     *
-     * @return Collection<int, DistributionCenter>
-     */
-    public function getAll(): Collection;
-
     /**
      * Get distribution centers by IDs.
      *
@@ -21,4 +14,9 @@ interface DistributionCenterRepositoryInterface
      * @return Collection<int, DistributionCenter>
      */
     public function getByIds(array $ids): Collection;
+
+    /**
+     * Find a distribution center by ID with its related bottle types.
+     */
+    public function findWithRelation(int $id): ?DistributionCenter;
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DeliveryStatus;
 use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
@@ -10,10 +11,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $customer_id
+ * @property int|null $delivery_person_id
+ * @property int|null $customer_delivery_address_id
+ * @property OrderStatus $status
+ * @property DeliveryStatus $delivery_status
+ * @property DeliveryType $delivery_type
+ * @property PaymentStatus $payment_status
+ * @property PaymentMethod $payment_method
+ * @property float $total_amount
+ * @property float $total_paid
+ * @property string|null $note
+ * @property Carbon|null $delivered_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class Order extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

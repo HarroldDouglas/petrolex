@@ -28,6 +28,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamp('movement_date')->useCurrent();
             $table->timestamps();
+            $table->softDeletes();
             
             // Add indexes for better performance
             $table->index(['bottle_id', 'movement_date']);

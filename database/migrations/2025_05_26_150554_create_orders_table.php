@@ -41,6 +41,7 @@ return new class extends Migration
             $table->timestamp('delivered_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             // Add indexes for common queries
             $table->index(['customer_id', 'status']);

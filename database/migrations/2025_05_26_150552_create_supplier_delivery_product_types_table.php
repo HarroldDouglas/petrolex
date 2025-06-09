@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('bottles_out_quantity')->default(0);
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

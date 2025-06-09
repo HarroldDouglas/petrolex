@@ -203,7 +203,7 @@ class UserSeeder extends Seeder
         $distributionCenters = DistributionCenter::all();
 
         DB::transaction(function () use ($adminUser, $distributionCenters) {
-            UserDistributionCenter::where('user_id', $adminUser->id)->delete();
+            UserDistributionCenter::where('user_id', $adminUser->id)->forceDelete();
 
             $records = $distributionCenters->map(function ($center) use ($adminUser) {
                 return [

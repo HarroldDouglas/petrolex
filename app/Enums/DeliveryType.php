@@ -31,4 +31,23 @@ class DeliveryType extends Enum
             'FAST' => 'fast',
         ];
     }
+
+    /**
+     * Get the delivery fees for each type.
+     */
+    public static function fees(): array
+    {
+        return [
+            'normal' => 500,
+            'fast' => 1000,
+        ];
+    }
+
+    /**
+     * Get the fee for this delivery type instance.
+     */
+    public function fee(): int
+    {
+        return static::fees()[$this->value];
+    }
 }

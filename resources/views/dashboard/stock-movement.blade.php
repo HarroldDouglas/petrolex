@@ -58,7 +58,7 @@
                         <div class="card ticket-card bg-light-primary">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Entrées<br>(Bouteilles Pleines)</p>
+                                    <p class="f-s-16 mb-0">Total des Entrées<br>(Consignes Pleines)</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="ph-bold ph-arrow-circle-down f-s-45 text-primary"></i>
                                     </div>
@@ -71,7 +71,7 @@
                         <div class="card ticket-card bg-light-warning">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Bouteilles <br>Pleines Vendues</p>
+                                    <p class="f-s-16 mb-0">Total des Consignes <br>Pleines Vendues</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="ph-bold ph-arrow-circle-up f-s-45 text-warning"></i>
                                     </div>
@@ -97,7 +97,7 @@
                         <div class="card ticket-card bg-light-danger">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Stock Actuel<br>(Bouteilles pleines / vides)</p>
+                                    <p class="f-s-16 mb-0">Stock Actuel<br>(Consignes pleines / vides)</p>
                                     <div class="h-40 w-40 d-flex-center">
                                         <i class="ph-bold ph-package f-s-45 text-danger"></i>
                                     </div>

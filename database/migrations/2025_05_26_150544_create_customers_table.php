@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('current_balance', 12, 2)->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

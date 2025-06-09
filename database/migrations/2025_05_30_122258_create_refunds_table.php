@@ -25,6 +25,7 @@ return new class () extends Migration {
             $table->timestamp('initiated_at')->useCurrent();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique('order_id');
             $table->index('status');

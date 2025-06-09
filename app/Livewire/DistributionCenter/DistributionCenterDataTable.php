@@ -2,9 +2,12 @@
 
 namespace App\Livewire\DistributionCenter;
 
+use App\DTOs\DistributionCenter\UpdateDistributionCenterDTO;
 use App\Models\DistributionCenter;
+use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 
@@ -48,6 +51,10 @@ class DistributionCenterDataTable extends BaseDataTable
     public function columns(): array
     {
         return [
+            Column::make('ID', 'id')
+                ->sortable()
+                ->deselected(),
+
             Column::make('Nom', 'name')
                 ->sortable()
                 ->searchable(),
@@ -87,14 +94,12 @@ class DistributionCenterDataTable extends BaseDataTable
                     );
                 }),
 
-            // TODO: create an action vue for this and restore de dropdown action menu
-            Column::make('Actions', 'id')
-                ->format(function ($value, $row) {
-                    return new HtmlString(
-                        '<a href="'.route('distribution-centers.edit', $row->id).'" class="btn btn-sm btn-primary me-1"><i class="bi bi-pencil"></i> Modifier</a>'.
-                        '<a href="'.route('distribution-centers.details', $row->id).'" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Détails</a>'
-                    );
-                }),
+            Column::make('Actions')
+                ->label(
+                    function ($row) {
+                        return view('components.distribution-center-actions', ['distributionCenter' => $row]);
+                    }
+                ),
         ];
     }
 
@@ -110,5 +115,48 @@ class DistributionCenterDataTable extends BaseDataTable
                 return $row->is_active ? 'Actif' : 'Inactif';
             },
         ];
+    }
+
+    /**
+     * Toggle the active status of a distribution center
+     */
+    public function toggleDistributionCenterStatus($distributionCenterId)
+    {
+        try {
+            $distributionCenterService = app(DistributionCenterService::class);
+            $distributionCenter = $distributionCenterService->find($distributionCenterId);
+
+            $currentStatus = $distributionCenter->is_active;
+            $newStatus = ! $currentStatus;
+
+            $updateDto = new UpdateDistributionCenterDTO(
+                is_active: $newStatus
+            );
+
+            $result = $distributionCenterService->update($distributionCenter, $updateDto);
+
+            if ($result) {
+                $status = $newStatus ? 'activé' : 'désactivé';
+                $name = $distributionCenter->name;
+
+                session()->flash('success', "Le centre de distribution a été {$status} avec succès.");
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Statut modifié !',
+                    'message' => "Le centre de distribution {$name} a été {$status} avec succès.",
+                    'timer' => 3000,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error toggling distribution center status: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la modification du statut du centre de distribution.",
+                'timer' => 3000,
+            ]);
+        }
     }
 }

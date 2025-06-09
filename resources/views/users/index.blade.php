@@ -54,39 +54,16 @@
         </div>
     </div>
 
-    <!-- Use reusable components for confirmation modals -->
-    <x-modals.delete-confirmation id="deleteModal" entity="l'utilisateur" />
-    <x-modals.deactivate-confirmation id="deactivateModal" entity="utilisateur" />
-    <x-modals.activate-confirmation id="activateModal" entity="utilisateur" />
-
 @endsection
+
+<x-sweet-alert-notification-listener />
 
 @section('script')
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
 
-    <!-- data table js-->
-    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
-
+    <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
     <!-- api js -->
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
 
-    <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
-
-    <!-- Include reusable modal scripts -->
-    @include('components.modals.modal-scripts')
-    
-    <script>
-        $(document).ready(function() {
-            // Any page-specific script overrides or extensions can go here
-            
-            // For example, if you want to do something specific after deleting a user
-            $('.confirm-delete-btn').click(function() {
-                // Custom logic before reload
-                // For example: show a success message
-                // ...
-
-                window.location.reload();
-            });
-        });
-    </script>
+    <script src="{{ asset('assets/vendor/apexcharts/timelinechart/moment.min.js') }}"></script>
 @endsection
