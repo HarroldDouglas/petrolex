@@ -74,7 +74,7 @@
                 </div>
                 <form action="#" method="POST">
                     @csrf
-                    @method('PATCH')
+                    @method('GET')
                     <div class="modal-body" style="text-align: left;">
                         <div class="mb-3">
                             <label class="form-label">Livreur actuel</label>
