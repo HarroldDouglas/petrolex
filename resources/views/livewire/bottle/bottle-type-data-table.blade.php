@@ -1,0 +1,10 @@
+<div>
+    <x-livewire-tables::wrapper>
+        <x-livewire-tables::table
+            :columns="$columns"
+            :rows="$rows"
+            :filter-view="$filterView"
+            :footer-view="$footerView"
+        />
+    </x-livewire-tables::wrapper>
+</div>

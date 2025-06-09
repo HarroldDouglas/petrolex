@@ -42,58 +42,7 @@
                     <div class="card-body p-0">
                         <!-- table -->
                         <div class="table-responsive app-scroll app-datatable-default">
-                            <table class="w-100 display ticket-app-table" id="ticketdatatable">
-                                <thead>
-                                    <tr>
-                                        <th>Nom du type</th>
-                                        <th>Date d'enregistrement</th>
-                                        <th>État</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($bottleTypes as $type)
-                                        <tr>
-                                            <td>{{ $type['name'] }}</td>
-                                            <td>{{ date('d/m/Y H:i', strtotime($type['created_at'])) }}</td>
-                                            <td>
-                                                @php
-                                                    $badgeClass =
-                                                        $type['status'] === 'Actif'
-                                                            ? 'text-bg-success'
-                                                            : 'text-bg-danger';
-                                                @endphp
-                                                <span class="badge {{ $badgeClass }}">{{ $type['status'] }}</span>
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('bottles.types.edit', $type['id']) }}"
-                                                    class="btn btn-info btn-sm edit-type" data-id="{{ $type['id'] }}"
-                                                    data-bs-toggle="modal" data-bs-target="#editTypeModal"
-                                                    data-name="{{ $type['name'] }}">
-                                                    <i class="iconoir-edit"></i> Modifier
-                                                </a>
-
-                                                @if ($type['status'] === 'Actif')
-                                                    <button type="button" class="btn btn-warning btn-sm change-status"
-                                                        data-id="{{ $type['id'] }}" data-action="deactivate">
-                                                        <i class="iconoir-xmark"></i> Désactiver
-                                                    </button>
-                                                @else
-                                                    <button type="button" class="btn btn-success btn-sm change-status"
-                                                        data-id="{{ $type['id'] }}" data-action="activate">
-                                                        <i class="iconoir-check-circle"></i> Activer
-                                                    </button>
-                                                @endif
-
-                                                <button type="button" class="btn btn-danger btn-sm delete-type"
-                                                    data-id="{{ $type['id'] }}">
-                                                    <i class="iconoir-trash"></i> Supprimer
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            @livewire('bottle.bottle-type-data-table')
                         </div>
                     </div>
                 </div>
