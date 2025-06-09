@@ -27,11 +27,8 @@ class ServiceServiceProvider extends ServiceProvider implements DeferrableProvid
         AuthenticationServiceInterface::class => AuthenticationService::class,
         SmsServiceInterface::class => TwilioService::class,
         PermissionServiceInterface::class => PermissionService::class,
-<<<<<<< HEAD
         StockMovementRepositoryInterface::class=>StockMovementRepository::class,
-=======
         GeographyServiceInterface::class => StaticGeographyService::class,
->>>>>>> dev
     ];
 
     /**

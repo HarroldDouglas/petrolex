@@ -38,7 +38,7 @@ class StockMovementRepository implements StockMovementRepositoryInterface
     {
         return $this->createBaseQuery($startDate, $endDate, $centerIds)
             ->where('status', BottleStatus::WITH_CLIENT()->value)
-            ->count(); // Assuming 'quantity' is the column that holds the number of bottles
+            ->count();
     }
 
     /**

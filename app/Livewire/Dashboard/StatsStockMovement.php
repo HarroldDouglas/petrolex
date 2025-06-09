@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Dashboard;
 
-use App\Contracts\Repositories\StockMovementRepositoryInterface;
+use App\Repositories\Contracts\StockMovementRepositoryInterface;
 use App\Services\Dashboard\StockMovementStatsService;
 use App\DTOs\Dashboard\StockMovementStatsDTO;
 use Carbon\Carbon;
@@ -34,7 +34,7 @@ class StatsStockMovement extends Component
     public function handleFiltersChanged(
         ?string $startDate = null,
         ?string $endDate = null,
-        ?string $distributionCenterId = null
+        ?string $distributionCenterId = null 
     ): void {
         $this->loadStockStats($startDate, $endDate, $distributionCenterId);
     }
@@ -44,23 +44,26 @@ class StatsStockMovement extends Component
         ?string $endDate = null,
         ?string $distributionCenterId = null
     ): void {
-        $stats = null;
+        $effectiveDistributionCenterIds = null;
 
-        if ($distributionCenterId === null || $distributionCenterId === '') {
+        if ($distributionCenterId !== null && $distributionCenterId !== '') {
+            $effectiveDistributionCenterIds = [$distributionCenterId];
+        } else {
             /** @var User|null $user */
             $user = Auth::user();
             if ($user) {
-                $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
-
-                if (!empty($centerIds)) {
-                    $stats = $this->stockStatsService->getStockStatsByMultipleCenters($startDate, $endDate, $centerIds);
+                $userCenterIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
+                if (!empty($userCenterIds)) {
+                    $effectiveDistributionCenterIds = $userCenterIds;
                 }
             }
         }
-
-        if ($stats === null) {
-            $stats = $this->stockStatsService->getStockStats($startDate, $endDate, $distributionCenterId);
-        }
+        
+        $stats = $this->stockStatsService->getStockStats(
+            startDate: $startDate,
+            endDate: $endDate,
+            distributionCenterIds: $effectiveDistributionCenterIds
+        );
 
         $this->totalExits = $stats->totalExits;
         $this->totalExchanges = $stats->totalExchanges;
