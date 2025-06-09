@@ -233,7 +233,7 @@
 
     <div class="footer">
         <p><strong>Merci pour votre confiance! Pour toute question concernant cette facture, veuillez nous contacter.</strong></p>
-        <p><strong>PETROLEX SARL | RC: RC/DLA/2020/B/1234 | NIU: M012345678901</strong></p>
+        <p><strong>PETROLEX CAMEROUN SA | RC: RC/DLA/2020/B/1234 | NIU: M012345678901</strong></p>
     </div>
 </body>
 </html>
