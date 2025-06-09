@@ -57,32 +57,28 @@
         </div>
         <div class="col-md-4">
             <label for="height" class="form-label">Hauteur</label>
-            <input type="number" class="form-control @error('height') is-invalid @enderror" 
-                id="height" wire:model.live.debounce.500ms="height" placeholder="Ex: 30">
+            <input type="number" class="form-control @error('height') is-invalid @enderror" id="height" wire:model="height" placeholder="Ex: 30">
             @error('height')
                 <div class="invalid-feedback">{{ __($message) }}</div>
             @enderror
         </div>
         <div class="col-md-4">
             <label for="width" class="form-label">Largeur</label>
-            <input type="number" class="form-control @error('width') is-invalid @enderror" 
-                id="width" wire:model.live.debounce.500ms="width" placeholder="Ex: 30">
+            <input type="number" class="form-control @error('width') is-invalid @enderror" id="width" wire:model="width" placeholder="Ex: 30">
             @error('width')
                 <div class="invalid-feedback">{{ __($message) }}</div>
             @enderror
         </div>
         <div class="col-md-4">
             <label for="radius" class="form-label">Rayon</label>
-            <input type="number" class="form-control @error('radius') is-invalid @enderror" 
-                id="radius" wire:model.live.debounce.500ms="radius" placeholder="Ex: 15">
+            <input type="number" class="form-control @error('radius') is-invalid @enderror" id="radius" wire:model="radius" placeholder="Ex: 15">
             @error('radius')
                 <div class="invalid-feedback">{{ __($message) }}</div>
             @enderror
         </div>
         <div class="col-md-8">
             <label for="is_active" class="form-label">Statut <span class="text-danger">*</span></label>
-            <select class="form-select @error('is_active') is-invalid @enderror" 
-                id="is_active" wire:model="is_active">
+            <select class="form-select @error('is_active') is-invalid @enderror" id="is_active" wire:model="is_active">
                 <option value="1" selected>Actif</option>
                 <option value="0">Inactif</option>
             </select>

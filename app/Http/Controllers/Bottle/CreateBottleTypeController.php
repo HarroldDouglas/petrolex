@@ -12,6 +12,6 @@ class CreateBottleTypeController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return view('bottle-types.create-bottle-type');
+        return view('bottles.create-bottle-type');
     }
 }
