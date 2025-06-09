@@ -12,7 +12,7 @@
                 <h4 class="main-title">Détails du produit</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
-                        <a href="{{ route('products.list') }}" class="f-s-14 f-w-500">
+                        <a href="{{ route('accessories.index') }}" class="f-s-14 f-w-500">
                             <span>
                                 <i class="ph-duotone ph-stack f-s-16"></i> Produits
                             </span>
@@ -25,7 +25,7 @@
             </div>
             <div class="col-4 p-0">
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('products.edit', 1) }}" class="btn btn-success">
+                    <a href="{{ route('accessories.edit', 1) }}" class="btn btn-success">
                         <i class="ti ti-edit"></i> Modifier
                     </a>
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal"
@@ -163,7 +163,7 @@
             $('#confirmDeleteBtn').click(function() {
                 if ($('#confirmText').val().toLowerCase() === 'supprimer') {
                     alert('Produit supprimé avec succès.');
-                    window.location.href = "{{ route('products.list') }}";
+                    window.location.href = "{{ route('accessories.index') }}";
                 }
             });
         });

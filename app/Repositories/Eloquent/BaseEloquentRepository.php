@@ -2,11 +2,11 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Repositories\Contracts\baseRepositoryInterface;
+use App\Repositories\Contracts\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseEloquentRepository implements baseRepositoryInterface
+abstract class BaseEloquentRepository implements BaseRepositoryInterface
 {
     public function __construct(
         protected Model $model
@@ -31,9 +31,11 @@ abstract class BaseEloquentRepository implements baseRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function update(Model $model, array $attributes): bool
+    public function update(Model $model, array $attributes): Model
     {
-        return $model->update($attributes);
+        $model->update($attributes);
+
+        return $model;
     }
 
     /**

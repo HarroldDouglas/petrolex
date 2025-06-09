@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Product;
+namespace App\Livewire\Accessory;
 
 use App\Enums\EntityStatus;
 use App\Models\AccessoryType;
@@ -12,7 +12,7 @@ use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\NumberFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
-class ProductDataTable extends BaseDataTable
+class AccessoryDataTable extends BaseDataTable
 {
     protected $model = AccessoryType::class;
 
@@ -70,7 +70,7 @@ class ProductDataTable extends BaseDataTable
             Column::make('Actions', 'id')
                 ->format(
                     function ($value, $row) {
-                        return view('product.products-actions', ['product' => $row]);
+                        return view('accessories.actions', ['product' => $row]);
                     }
                 ),
         ];

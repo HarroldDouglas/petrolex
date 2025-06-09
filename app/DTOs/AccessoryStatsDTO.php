@@ -2,7 +2,7 @@
 
 namespace App\DTOs;
 
-class ProductStatsDTO
+class AccessoryStatsDTO
 {
     public function __construct(
         public readonly int $activeCount,

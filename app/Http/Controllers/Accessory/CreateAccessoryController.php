@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Product;
+namespace App\Http\Controllers\Accessory;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class CreateProductController extends Controller
+class CreateAccessoryController extends Controller
 {
     /**
      * Handle the incoming request.
      */
     public function __invoke(Request $request)
     {
-        return view('product.create-product');
+        return view('accessories.create');
     }
 }

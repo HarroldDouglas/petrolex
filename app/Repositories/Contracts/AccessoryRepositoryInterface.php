@@ -5,7 +5,7 @@ namespace App\Repositories\Contracts;
 use App\Models\AccessoryType;
 use Illuminate\Database\Eloquent\Collection;
 
-interface ProductRepositoryInterface
+interface AccessoryRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Get all active products

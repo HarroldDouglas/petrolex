@@ -93,10 +93,10 @@ class PermissionEnum extends Enum
             'DELIVERIES_EDIT_OWN' => 'deliveries.edit_own',
             'DELIVERIES_TRACK_OWN' => 'deliveries.track_own',
 
-            // BOTTLES
+            // PRODUCTS
             'PRODUCTS_VIEW' => 'products.view',
             'PRODUCTS_CREATE' => 'products.create',
-            'PRODUCTS_EDIT' => 'products.edit',
+            'PRODUCTS_EDIT' => 'accessories.edit',
             'PRODUCTS_DELETE' => 'products.delete',
 
             // SUPPLIERS DELIVERIES

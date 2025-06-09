@@ -6,7 +6,7 @@ use App\Enums\BottleStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
-interface BottleRepositoryInterface extends baseRepositoryInterface
+interface BottleRepositoryInterface extends BaseRepositoryInterface
 {
     public function getBottleHistory($bottleId): Collection;
 
