@@ -6,10 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $customer_id
+ * @property string $address
+ * @property string $city
+ * @property string $country
+ * @property string|null $instructions
+ * @property bool $is_default
+ * @property bool $is_active
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class CustomerDeliveryAddress extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +36,9 @@ class CustomerDeliveryAddress extends Model
         'customer_id',
         'label',
         'address',
+        'neighborhood',
+        'city',
+        'country',
         'latitude',
         'longitude',
         'phone',

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->boolean('is_filled')->default(true);
             $table->enum('status', BottleStatus::values())->default('in_stock');
             $table->timestamps();
+            $table->softDeletes();
             
             // Add indexes for better performance
             $table->index(['distribution_center_id', 'bottle_type_id', 'status']);

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->enum('product_type', ProductType::values());
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index('product_type');
         });

@@ -24,7 +24,9 @@ return new class extends Migration
             $table->string('phone', 20)->nullable();
             $table->string('email', 255)->nullable();
             $table->boolean('is_active')->default(true);
+            $table->float('storage_capacity')->nullable()->comment('Capacité maximale de stockage');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

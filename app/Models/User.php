@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -25,6 +26,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  */
 class User extends Authenticatable
 {
@@ -33,6 +35,7 @@ class User extends Authenticatable
     use HasFactory;
     use HasRoles;
     use Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

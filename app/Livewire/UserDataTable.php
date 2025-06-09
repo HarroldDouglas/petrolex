@@ -2,12 +2,15 @@
 
 namespace App\Livewire;
 
+use App\DTOs\User\UpdateUserDTO;
 use App\Enums\EntityStatus;
 use App\Models\DistributionCenter;
 use App\Models\User;
+use App\Services\User\UserService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
@@ -22,30 +25,6 @@ class UserDataTable extends BaseDataTable
     protected function getExportFileName(): string
     {
         return 'utilisateurs';
-    }
-
-    public bool $rememberColumnSelection = true;
-    public bool $rememberFilters = true;
-    public bool $rememberSort = true;
-    public bool $rememberPerPage = true;
-
-    public function configure(): void
-    {
-        parent::configure();
-
-        $this->setPrimaryKey('id')
-            ->setTableWrapperAttributes([
-                'class' => 'table-responsive',
-            ])
-            ->setTableAttributes([
-                'class' => 'table table-striped table-hover',
-            ])
-            ->setTheadAttributes([
-                'class' => 'table-light',
-            ])
-            ->setDefaultSort(self::DEFAULT_SORT_FIELD, self::DEFAULT_SORT_DIRECTION)
-            ->setPerPageAccepted([10, 25, 50, 100])
-            ->setPerPage(10);
     }
 
     public function builder(): Builder
@@ -213,5 +192,74 @@ class UserDataTable extends BaseDataTable
                     $builder->whereDate('created_at', '>=', $value);
                 }),
         ];
+    }
+
+    public function toggleUserStatus($userId)
+    {
+        try {
+            $userService = app(UserService::class);
+            $user = $userService->find($userId);
+            $currentStatus = $user->is_active;
+            $newStatus = ! $currentStatus;
+
+            $updateDto = new UpdateUserDTO(
+                is_active: $newStatus
+            );
+
+            $result = $userService->update($user, $updateDto);
+
+            if ($result) {
+                $status = $newStatus ? 'activé' : 'désactivé';
+                $name = $user->full_name;
+
+                session()->flash('success', "L'utilisateur a été {$status} avec succès.");
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Statut modifié !',
+                    'message' => "L'utilisateur {$name} a été {$status} avec succès.",
+                    'timer' => 3000,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error toggling user status: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la modification du statut de l'utilisateur.",
+                'timer' => 3000,
+            ]);
+        }
+    }
+
+    public function deleteUser($userId)
+    {
+        try {
+            $userService = app(UserService::class);
+            $user = $userService->find($userId);
+            $name = $user->full_name;
+            $result = $userService->delete($user);
+
+            if ($result) {
+                session()->flash('success', "L'utilisateur {$name} a été supprimé avec succès.");
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Utilisateur supprimé !',
+                    'message' => "L'utilisateur {$name} a été supprimé définitivement.",
+                    'timer' => 3000,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error deleting user: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la suppression de l'utilisateur.",
+                'timer' => 3000,
+            ]);
+        }
     }
 }

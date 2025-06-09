@@ -17,6 +17,7 @@
         "laravel/ui": "^4.6",
         "livewire/livewire": "^3.6",
         "spatie/laravel-activitylog": "^4.10",
+        "spatie/laravel-data": "^4.15",
         "spatie/laravel-enum": "^3.2",
         "spatie/laravel-permission": "^6.18",
         "twilio/sdk": "^8.6"

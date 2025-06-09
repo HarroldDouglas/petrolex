@@ -6,6 +6,8 @@ use App\Services\Auth\AuthenticationService;
 use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 use App\Services\Auth\Contracts\OtpServiceInterface;
 use App\Services\Auth\OtpService;
+use App\Services\Geography\GeographyServiceInterface;
+use App\Services\Geography\StaticGeographyService;
 use App\Services\Permissions\PermissionService;
 use App\Services\Permissions\PermissionServiceInterface;
 use App\Services\SMS\SmsServiceInterface;
@@ -25,7 +27,11 @@ class ServiceServiceProvider extends ServiceProvider implements DeferrableProvid
         AuthenticationServiceInterface::class => AuthenticationService::class,
         SmsServiceInterface::class => TwilioService::class,
         PermissionServiceInterface::class => PermissionService::class,
+<<<<<<< HEAD
         StockMovementRepositoryInterface::class=>StockMovementRepository::class,
+=======
+        GeographyServiceInterface::class => StaticGeographyService::class,
+>>>>>>> dev
     ];
 
     /**

@@ -6,10 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $address
+ * @property string $city
+ * @property string $country
+ * @property string|null $phone
+ * @property string|null $email
+ * @property bool $is_active
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class DistributionCenter extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +44,7 @@ class DistributionCenter extends Model
         'phone',
         'email',
         'is_active',
+        'storage_capacity',
     ];
 
     /**
@@ -100,8 +117,32 @@ class DistributionCenter extends Model
 
     public function bottleTypeStocks(): BelongsToMany
     {
-        return $this->belongsToMany(BottleType::class)
-            ->withPivot(['stock_empty', 'stock_filled'])
+        return $this->belongsToMany(BottleType::class, 'bottle_type_distribution_center')
+            ->withPivot('stock_empty', 'stock_filled')
             ->withTimestamps();
+    }
+
+    /**
+     * Get the total number of empty bottles in stock.
+     */
+    public function getTotalEmptyBottlesAttribute(): int
+    {
+        return $this->bottleTypeStocks()->sum('stock_empty');
+    }
+
+    /**
+     * Get the total number of filled bottles in stock.
+     */
+    public function getTotalFilledBottlesAttribute(): int
+    {
+        return $this->bottleTypeStocks()->sum('stock_filled');
+    }
+
+    /**
+     * Get the total number of bottles (empty + filled) in stock.
+     */
+    public function getTotalBottlesAttribute(): int
+    {
+        return $this->total_empty_bottles + $this->total_filled_bottles;
     }
 }

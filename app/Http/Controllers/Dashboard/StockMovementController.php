@@ -73,7 +73,7 @@ class StockMovementController extends Controller
             ],
             [
                 'date' => '22/04/2025 - 14:45',
-                'type' => 'Échange',
+                'type' => 'Recharge',
                 'type_class' => 'success',
                 'products' => '30 x Bouteille de 12kg',
                 'destination' => 'Point DLA B',
@@ -89,7 +89,7 @@ class StockMovementController extends Controller
             ],
             [
                 'date' => '22/04/2025 - 18:30',
-                'type' => 'Échange',
+                'type' => 'Recharge',
                 'type_class' => 'success',
                 'products' => 'Bouteille 9kg',
                 'destination' => 'Centre YDE A',

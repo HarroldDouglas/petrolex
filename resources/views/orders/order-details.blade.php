@@ -101,22 +101,4 @@
 
 <!-- leaflet js -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    function printOrder(orderId, withStub = true) {
-        const url = withStub 
-            ? `/orders/${orderId}/print/ticket-with-stub`
-            : `/orders/${orderId}/print/ticket`;
-        
-        const printWindow = window.open(url, '_blank', 'width=800,height=600');
-        
-        printWindow.onafterprint = function() {
-            printWindow.close();
-        };
-    }
-
-    function showRefundAlert() {
-        alert('Fonctionnalité de remboursement en cours de développement!');
-    }
-</script>
-
 @endsection

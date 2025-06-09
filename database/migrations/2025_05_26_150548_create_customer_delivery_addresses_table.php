@@ -14,14 +14,18 @@ return new class extends Migration
         Schema::create('customer_delivery_addresses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->string('label', 255);
-            $table->text('address');
+            $table->string('label');
+            $table->string('address');
+            $table->string('neighborhood')->nullable();
+            $table->string('city')->nullable();
+            $table->string('country')->default('Cameroun');
             $table->decimal('latitude', 10, 8)->nullable();
-            $table->decimal('longitude', 11, 8)->nullable();
-            $table->string('phone', 20)->nullable();
-            $table->string('contact_name', 255)->nullable();
+            $table->decimal('longitude', 10, 8)->nullable();
+            $table->string('phone')->nullable();
+            $table->string('contact_name')->nullable();
             $table->boolean('is_default')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

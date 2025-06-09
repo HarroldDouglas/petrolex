@@ -17,6 +17,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class OrderSeeder extends Seeder
 {

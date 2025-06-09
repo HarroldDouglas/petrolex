@@ -20,11 +20,8 @@ Route::group(['prefix' => 'orders', 'as' => 'orders.'], function () {
     Route::get('/{order}/details', GetOrderDetailsController::class)->name('details');
     Route::patch('/{order}/cancel', CancelOrderController::class)->name('cancel');
 
-    Route::get('/{order}/print/ticket', [PrintOrderController::class, 'printTicket'])
+    Route::get('/{order}/print', PrintOrderController::class)
         ->name('print.ticket');
-
-    Route::get('/{order}/print/ticket-with-stub', [PrintOrderController::class, 'printTicketWithStub'])
-        ->name('print.ticket-with-stub');
 
     Route::get('/{order}/download/invoice', [PrintOrderController::class, 'downloadPdf'])
         ->name('download.invoice');

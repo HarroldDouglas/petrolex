@@ -23,6 +23,7 @@ return new class extends Migration
             $table->enum('status', SupplierDeliveryStatus::values())->default('in_progress');
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

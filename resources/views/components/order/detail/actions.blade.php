@@ -11,7 +11,8 @@
             <li><a class="dropdown-item text-success" href="#" onclick="printOrder({{ $order->id }})">
                     <i class="ti ti-printer me-2"></i>Imprimer la facture
                 </a></li>
-            <li><a class="dropdown-item text-success" href="{{ route('orders.download.invoice', ['order' => $order->id]) }}">
+            <li><a class="dropdown-item text-success"
+                    href="{{ route('orders.download.invoice', ['order' => $order->id]) }}">
                     <i class="ti ti-download me-2"></i>Télécharger la facture
                 </a></li>
 
@@ -39,15 +40,15 @@
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header justify-content-center">
                     <h5 class="modal-title" id="cancelOrderModalLabel">Confirmation d'annulation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body text-center">
                     <p class="mb-0">Êtes-vous sûr de vouloir annuler cette commande ? Cette action est irréversible.
                     </p>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                     <form action="{{ route('orders.cancel', $order) }}" method="POST" class="d-inline">
                         @csrf
@@ -62,8 +63,9 @@
 
 
 <!-- Modal pour changer de livreur -->
-@if($order->canChangeDeliveryPerson())
-    <div class="modal fade" id="changeDeliveryPersonModal" tabindex="-1" aria-labelledby="changeDeliveryPersonModalLabel" aria-hidden="true">
+@if ($order->canChangeDeliveryPerson())
+    <div class="modal fade" id="changeDeliveryPersonModal" tabindex="-1"
+        aria-labelledby="changeDeliveryPersonModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -72,11 +74,13 @@
                 </div>
                 <form action="#" method="POST">
                     @csrf
-                    @method('PATCH')
+                    @method('GET')
                     <div class="modal-body" style="text-align: left;">
                         <div class="mb-3">
                             <label class="form-label">Livreur actuel</label>
-                            <input type="text" class="form-control" value="{{ $order->deliveryPerson ? $order->deliveryPerson->name : 'Kelvin Ngoh' }}" readonly>
+                            <input type="text" class="form-control"
+                                value="{{ $order->deliveryPerson ? $order->deliveryPerson->name : 'Kelvin Ngoh' }}"
+                                readonly>
                         </div>
                         <div class="mb-3">
                             <label for="delivery_person_id" class="form-label">Nouveau livreur</label>
@@ -102,3 +106,23 @@
         </div>
     </div>
 @endif
+
+@push('scripts')
+    <script>
+        function printOrder(orderId, withStub = true) {
+            const url = `/orders/${orderId}/print?withStub=${withStub}`;
+
+            const printWindow = window.open(url, '_blank', 'width=800,height=600');
+
+            printWindow.onload = function() {
+                setTimeout(function() {
+                    printWindow.print();
+                }, 500);
+            };
+
+            printWindow.onafterprint = function() {
+                printWindow.close();
+            };
+        }
+    </script>
+@endpush

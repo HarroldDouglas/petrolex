@@ -42,10 +42,7 @@ class OrderFactory extends Factory
             'payment_status' => $this->faker->randomElement(PaymentStatus::values()),
             'payment_method' => $this->faker->randomElement(PaymentMethod::values()),
             'subtotal' => $this->faker->randomFloat(2, 1000, 10000),
-            'delivery_fee' => match ($deliveryType) {
-                DeliveryType::NORMAL() => 500,
-                DeliveryType::FAST() => 1000,
-            },
+            'delivery_fee' => $deliveryType->fee(),
             'total_amount' => 0,
             'order_date' => $orderDate,
             'delivery_date' => null,
@@ -85,10 +82,7 @@ class OrderFactory extends Factory
                 'processing_at' => null,
                 'delivered_at' => null,
                 'cancelled_at' => null,
-                'delivery_fee' => match ($deliveryType) {
-                    DeliveryType::NORMAL() => 500,
-                    DeliveryType::FAST() => 1000,
-                },
+                'delivery_fee' => $deliveryType->fee(),
             ];
         });
     }
@@ -124,10 +118,7 @@ class OrderFactory extends Factory
                 'processing_at' => $processingAt,
                 'delivered_at' => null,
                 'cancelled_at' => null,
-                'delivery_fee' => match ($deliveryType) {
-                    DeliveryType::NORMAL() => 500,
-                    DeliveryType::FAST() => 1000,
-                },
+                'delivery_fee' => $deliveryType->fee(),
             ];
         });
     }
@@ -171,10 +162,7 @@ class OrderFactory extends Factory
                 'processing_at' => $processingAt,
                 'delivered_at' => $deliveredAt,
                 'cancelled_at' => null,
-                'delivery_fee' => match ($deliveryType) {
-                    DeliveryType::NORMAL() => 500,
-                    DeliveryType::FAST() => 1000,
-                },
+                'delivery_fee' => $deliveryType->fee(),
             ];
         });
     }
@@ -210,10 +198,7 @@ class OrderFactory extends Factory
                 'processing_at' => null,
                 'delivered_at' => null,
                 'cancelled_at' => $cancelledAt,
-                'delivery_fee' => match ($deliveryType) {
-                    DeliveryType::NORMAL() => 500,
-                    DeliveryType::FAST() => 1000,
-                },
+                'delivery_fee' => $deliveryType->fee(),
             ];
         });
     }
@@ -252,10 +237,7 @@ class OrderFactory extends Factory
                 'processing_at' => $processingAt,
                 'delivered_at' => null,
                 'cancelled_at' => $cancelledAt,
-                'delivery_fee' => match ($deliveryType) {
-                    DeliveryType::NORMAL() => 500,
-                    DeliveryType::FAST() => 1000,
-                },
+                'delivery_fee' => $deliveryType->fee(),
             ];
         });
     }

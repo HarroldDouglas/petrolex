@@ -19,6 +19,7 @@ return new class extends Migration
                  ->onDelete('cascade');
             $table->foreignId('bottle_id')->constrained()->onDelete('restrict');
             $table->timestamps();
+            $table->softDeletes();
             
             // Ensure each bottle can only be associated once with a delivery
             $table->unique(['supplier_delivery_id', 'bottle_id']);
