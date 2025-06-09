@@ -12,6 +12,8 @@ use App\Services\SMS\SmsServiceInterface;
 use App\Services\SMS\TwilioService;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Contracts\StockMovementRepositoryInterface;
+use App\Repositories\Eloquent\StockMovementRepository;
 
 class ServiceServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -23,6 +25,7 @@ class ServiceServiceProvider extends ServiceProvider implements DeferrableProvid
         AuthenticationServiceInterface::class => AuthenticationService::class,
         SmsServiceInterface::class => TwilioService::class,
         PermissionServiceInterface::class => PermissionService::class,
+        StockMovementRepositoryInterface::class=>StockMovementRepository::class,
     ];
 
     /**
