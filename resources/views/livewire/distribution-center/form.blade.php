@@ -51,19 +51,19 @@
                 @error('email') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
-                <label for="latitude" class="form-label">Latitude</label>
-                <input type="text" class="form-control" placeholder="Latitude" id="latitude" wire:model.live="latitude">
-                @error('latitude') <span class="text-danger">{{ $message }}</span> @enderror
+                <label for="storage_capacity" class="form-label">Capacité de stockage</label>
+                <input type="number" class="form-control" placeholder="Capacité de stockage" id="storage_capacity" wire:model.live="storage_capacity">
+                @error('storage_capacity') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
                 <label for="longitude" class="form-label">Longitude</label>
                 <input type="text" class="form-control" placeholder="Longitude" id="longitude" wire:model.live="longitude">
                 @error('longitude') <span class="text-danger">{{ $message }}</span> @enderror
-            </div>
+            </div>            
             <div class="col-md-6 mb-3">
-                <label for="storage_capacity" class="form-label">Capacité de stockage</label>
-                <input type="number" class="form-control" placeholder="Capacité de stockage" id="storage_capacity" wire:model.live="storage_capacity">
-                @error('storage_capacity') <span class="text-danger">{{ $message }}</span> @enderror
+                <label for="latitude" class="form-label">Latitude</label>
+                <input type="text" class="form-control" placeholder="Latitude" id="latitude" wire:model.live="latitude">
+                @error('latitude') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
                 <label for="statut" class="form-label">Statut</label>
