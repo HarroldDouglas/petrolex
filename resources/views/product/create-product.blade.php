@@ -92,9 +92,9 @@
                                     <a href="{{ route('products.list') }}" class="btn btn-secondary">
                                         <i class="ti ti-x"></i> Annuler
                                     </a>
-                                    <button type="submit" class="btn btn-success">
+                                    <a href="{{ route('products.list') }}" class="btn btn-success">
                                         <i class="ti ti-device-floppy"></i> Enregistrer le produit
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </form>

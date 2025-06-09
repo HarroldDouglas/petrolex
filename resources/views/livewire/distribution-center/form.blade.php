@@ -80,7 +80,9 @@
             </div>
             <div class="col-12">
                 <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
-                    <button type="button" class="btn btn-light-danger">Annuler</button>
+                    <a href="{{ route('distribution-centers.list') }}" class="btn btn-light-danger">
+                        Annuler
+                    </a>
                     <button type="submit" class="btn btn-success">Enregistrer</button>
                 </div>
             </div>
