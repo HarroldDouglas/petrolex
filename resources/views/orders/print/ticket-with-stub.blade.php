@@ -121,15 +121,15 @@
                 @if(file_exists(public_path('assets/images/logos/logo.png')))
                     <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo Petrolex" class="logo">
                 @else
-                    <h2>PETROLEX SARL</h2>
+                    <h2>PETROLEX CAMEROUN SA</h2>
                 @endif
             </div>
             <div class="company-info">
-                <h3>PETROLEX SARL</h3>
-                <p>123 Avenue du Pétrole<br>
+                <h3>PETROLEX CAMEROUN SA</h3>
+                <p>Bonapriso, Rue D. Savio, face centre PROMED<br>
                 Douala, Cameroun<br>
-                Tél: +237 233 123 456<br>
-                Email: contact@petrolex.cm</p>
+                Tél : 237 233402714<br>
+                Email : petrolex@petrolex.net</p>
             </div>
         </div>
 
@@ -227,7 +227,7 @@
 
         <div class="footer">
             <p><strong>Merci pour votre confiance! Pour toute question concernant cette facture, veuillez nous contacter.</strong></p>
-            <p><strong>PETROLEX SARL | RC: RC/DLA/2020/B/1234 | NIU: M012345678901</strong></p>
+            <p><strong>PETROLEX CAMEROUN SA | RC: RC/DLA/2020/B/1234 | NIU: M012345678901</strong></p>
         </div>
     </div>
 

@@ -51,6 +51,7 @@ class CreateUserController extends Controller
                 UserRole::ACCOUNTANT(),
                 UserRole::GAS_MANAGER(),
                 UserRole::CENTER_MANAGER(),
+                UserRole::DELIVERY_PERSON(),
             ];
         }
 

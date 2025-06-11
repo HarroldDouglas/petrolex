@@ -94,14 +94,14 @@
                         <h5 class="card-title">Stock de bouteilles</h5>
                         <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
                             <div>
-                                <h6 class="mb-0">Bouteilles vides</h6>
+                                <h6 class="mb-0">Consignes</h6>
                                 <p class="text-muted small mb-0">Disponibles en stock</p>
                             </div>
                             <h3>{{ $distributionCenter->total_empty_bottles }}</h3>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="mb-0">Bouteilles pleines</h6>
+                                <h6 class="mb-0">Consignes + Recharges</h6>
                                 <p class="text-muted small mb-0">Disponibles en stock</p>
                             </div>
                             <h3>{{ $distributionCenter->total_filled_bottles }}</h3>

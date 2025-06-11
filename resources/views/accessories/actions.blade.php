@@ -13,7 +13,7 @@
                 <i class="iconoir-edit text-info me-2"></i> Modifier
             </a>
         </li>
-        @if ($product->status === 'Actif')
+        @if ($product->is_active)
             <li>
                 <a class="dropdown-item change-status" href="#"
                     data-id="{{ $product->id }}"

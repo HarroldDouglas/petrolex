@@ -118,14 +118,14 @@
 <body>
     <div class="header">
         <div class="logo-container">
-            <h2>PETROLEX SARL</h2>
+            <h2>PETROLEX CAMEROUN SA</h2>
         </div>
         <div class="company-info">
             <p>
-                123 Avenue du Pétrole<br>
+                Bonapriso, Rue D. Savio, face centre PROMED<br>
                 Douala, Cameroun<br>
-                Tél: +237 233 123 456<br>
-                Email: contact@petrolex.cm
+                Tél : 237 233402714<br>
+                Email : petrolex@petrolex.net
             </p>
         </div>
     </div>
@@ -233,7 +233,7 @@
 
     <div class="footer">
         <p><strong>Merci pour votre confiance! Pour toute question concernant cette facture, veuillez nous contacter.</strong></p>
-        <p><strong>PETROLEX SARL | RC: RC/DLA/2020/B/1234 | NIU: M012345678901</strong></p>
+        <p><strong>PETROLEX CAMEROUN SA | RC: RC/DLA/2020/B/1234 | NIU: M012345678901</strong></p>
     </div>
 </body>
 </html>
