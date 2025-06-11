@@ -14,6 +14,13 @@ class BottleTypeService
 
     public function create(CreateBottleTypeDTO $data): BottleType
     {
-        return $this->bottleRepository->create($data->toArray());
+        /** @var BottleType $bottleType */
+        $bottleType = $this->bottleRepository->create($data->toArray());
+
+        if ($data->bottleTypeCityPrices) {
+            $bottleType->cityPrices()->createMany($data->bottleTypeCityPrices);
+        }
+
+        return $bottleType;
     }
 }

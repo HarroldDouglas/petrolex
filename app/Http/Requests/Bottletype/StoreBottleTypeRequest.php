@@ -18,10 +18,9 @@ class StoreBottleTypeRequest extends FormRequest
             'name' => ['required', 'string', 'max:255',
                 Rule::unique('bottle_types', 'name'),
             ],
+            'description' => ['nullable', 'string', 'min:3'],
+            'weight' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'numeric', 'min:0'],
-            'height' => ['nullable', 'numeric', 'min:0'],
-            'width' => ['nullable', 'numeric', 'min:0'],
-            'radius' => ['nullable', 'numeric', 'min:0'],
             'content_price' => ['required', 'numeric', 'min:0'],
             'bottle_with_content_price' => ['required', 'numeric', 'min:0', 'gt:content_price'],
             'is_active' => ['required', 'boolean'],
@@ -41,25 +40,23 @@ class StoreBottleTypeRequest extends FormRequest
             'name.unique' => 'Ce nom de type de bouteille existe déjà.',
             'name.max' => 'Ce nom de type de bouteille ne doit pas dépasser 255 caractères.',
 
+            'weight.required' => 'Le poids est requis.',
+            'weight.numeric' => 'Le poids doit être un nombre.',
+            'weight.min' => 'Le poids doit être au moins 0.',
+
             'capacity.required' => 'La capacité est requise.',
             'capacity.numeric' => 'La capacité doit être un nombre.',
             'capacity.min' => 'La capacité doit être au moins 0.',
 
-            'height.numeric' => 'La hauteur doit être un nombre.',
-            'height.min' => 'La hauteur doit être au moins 0.',
+            'content_price.required' => 'Le prix de la recharge est requis.',
+            'content_price.numeric' => 'Le prix de la recharge doit être un nombre.',
+            'content_price.min' => 'Le prix de la recharge doit être au moins 0.',
 
-            'width.numeric' => 'La largeur doit être un nombre.',
-            'width.min' => 'La largeur doit être au moins 0.',
+            'bottle_with_content_price.required' => 'Le prix de la consigne avec recharge est requis.',
+            'bottle_with_content_price.numeric' => 'Le prix de la consigne avec recharge doit être un nombre.',
+            'bottle_with_content_price.min' => 'Le prix de la consigne avec recharge doit être au moins 0.',
+            'bottle_with_content_price.gt' => 'Le prix de la consigne avec recharge doit être supérieur au prix du contenu.',
 
-            'radius.numeric' => 'Le rayon doit être un nombre.',
-            'radius.min' => 'Le rayon doit être au moins 0.',
-
-            'content_price.numeric' => 'Le prix du contenu doit être un nombre.',
-            'content_price.min' => 'Le prix du contenu doit être au moins 0.',
-
-            'bottle_with_content_price.numeric' => 'Le prix de la bouteille avec contenu doit être un nombre.',
-            'bottle_with_content_price.min' => 'Le prix de la bouteille avec contenu doit être au moins 0.',
-            'bottle_with_content_price.gt' => 'Le prix de la bouteille avec contenu doit être supérieur au prix du contenu.',
             'is_active.boolean' => 'Le statut doit être vrai ou faux.',
         ];
     }

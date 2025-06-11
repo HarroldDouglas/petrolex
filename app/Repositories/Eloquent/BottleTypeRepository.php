@@ -7,11 +7,8 @@ use App\Repositories\Contracts\BottleTypeRepositoryInterface;
 
 class BottleTypeRepository extends BaseEloquentRepository implements BottleTypeRepositoryInterface
 {
-    /**
-     * Create a new bottle movement
-     */
-    public function create(array $data): BottleType
+    public function __construct(BottleType $model)
     {
-        return BottleType::create($data);
+        parent::__construct($model);
     }
 }
