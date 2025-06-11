@@ -1,17 +1,7 @@
 <div>
     <form class="row app-form g-3" wire:submit.prevent="save">
         @csrf
-        @if ($errors->any())
-            <div class="col-12">
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ __($error) }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-        @endif
+        
         <div class="col-md-6">
             <label for="weight" class="form-label">Poids</label>
             <input type="number" class="form-control @error('weight') is-invalid @enderror" 
