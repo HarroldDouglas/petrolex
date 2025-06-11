@@ -113,7 +113,7 @@
                                     <td>
                                         <input type="number" class="form-control  
                                             @error('cityPrices.'.$index.'.content_price') is-invalid @enderror" 
-                                            wire:model="cityPrices.{{ $index }}.content_price" 
+                                            wire:model.live.debounce.500ms="cityPrices.{{ $index }}.content_price" 
                                             placeholder="Prix de la recharge">
                                             @error('cityPrices.'.$index.'.content_price')
                                                 <div class="invalid-feedback">{{ __($message) }}</div>
@@ -122,7 +122,7 @@
                                     <td>
                                         <input type="number" class="form-control 
                                             @error('cityPrices.'.$index.'.content_with_bottle_price') is-invalid @enderror" 
-                                            wire:model="cityPrices.{{ $index }}.content_with_bottle_price" 
+                                            wire:model.live.debounce.500ms="cityPrices.{{ $index }}.content_with_bottle_price" 
                                             placeholder="Prix complet">
                                         @error('cityPrices.'.$index.'.content_with_bottle_price')
                                             <div class="invalid-feedback">{{ __($message) }}</div>
