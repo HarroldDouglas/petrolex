@@ -65,56 +65,67 @@ abstract class BaseModelWithMedia extends Model implements HasMedia
 
     public function addMultipleImages(array $files): array
     {
-        return DB::transaction(function () use ($files) {
-            Log::info('Starting addMultipleImages in transaction', [
-                'files_count' => count($files),
-                'model_id' => $this->id,
-            ]);
+        Log::info('Starting addMultipleImages process', [
+            'files_count' => count($files),
+            'model_id' => $this->id,
+        ]);
 
-            $results = [];
+        $results = [];
 
-            foreach ($files as $index => $file) {
-                if ($file instanceof UploadedFile) {
-                    try {
-                        $media = $this->addMedia($file)
-                            ->usingName($this->getImageIdentifier().' - Image '.($index + 1))
-                            ->preservingOriginal()  // Préserver le fichier original pour éviter des problèmes
-                            ->toMediaCollection('images');
+        // Clé pour éviter les problèmes de nettoyage automatique entre les ajouts
+        $now = now()->format('YmdHis');
 
-                        $results[] = $media;
+        foreach ($files as $index => $file) {
+            if ($file instanceof UploadedFile) {
+                try {
+                    // Utiliser une collection temporaire unique pour chaque image
+                    $tempCollectionName = "images_{$now}_{$index}";
 
-                        Log::info("Successfully added image {$index}", [
-                            'media_id' => $media->id,
-                            'media_name' => $media->name,
-                        ]);
+                    // Ajouter le média à une collection temporaire unique
+                    $media = $this->addMedia($file)
+                        ->usingName($this->getImageIdentifier().' - Image '.($index + 1))
+                        ->preservingOriginal()
+                        ->toMediaCollection($tempCollectionName);
 
-                    } catch (\Exception $e) {
-                        Log::error("Failed to add image {$index}", [
-                            'error' => $e->getMessage(),
-                            'file_name' => $file->getClientOriginalName(),
-                        ]);
-                        throw $e; // Force rollback de la transaction
-                    }
+                    // Puis modifier directement en base de données pour utiliser la collection cible
+                    DB::table('media')
+                        ->where('id', $media->id)
+                        ->update(['collection_name' => 'images']);
+
+                    // Rafraîchir l'objet média
+                    $media = $media->fresh();
+
+                    $results[] = $media;
+
+                    Log::info("Successfully added image {$index}", [
+                        'media_id' => $media->id,
+                        'media_name' => $media->name,
+                        'collection' => $media->collection_name,
+                    ]);
+
+                } catch (\Exception $e) {
+                    Log::error("Failed to add image {$index}", [
+                        'error' => $e->getMessage(),
+                        'file_name' => $file->getClientOriginalName(),
+                    ]);
+                    throw $e;
                 }
             }
+        }
 
-            // Assurez-vous que les modifications sont persistées
-            DB::commit();
+        // Vérification après l'ajout
+        $mediaCount = DB::table('media')
+            ->where('model_type', get_class($this))
+            ->where('model_id', $this->id)
+            ->where('collection_name', 'images')
+            ->count();
 
-            // Vérification double après l'ajout
-            $mediaCount = DB::table('media')
-                ->where('model_type', get_class($this))
-                ->where('model_id', $this->id)
-                ->where('collection_name', 'images')
-                ->count();
+        Log::info('Completed addMultipleImages process', [
+            'total_processed' => count($results),
+            'media_count_in_db' => $mediaCount,
+        ]);
 
-            Log::info('Completed addMultipleImages transaction', [
-                'total_processed' => count($results),
-                'media_count_in_db' => $mediaCount,
-            ]);
-
-            return $results;
-        });
+        return $results;
     }
 
     public function addSingleImage(UploadedFile $file, ?string $name = null): ?Media

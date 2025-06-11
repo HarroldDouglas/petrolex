@@ -57,14 +57,14 @@
         </div>
 
         <!-- Affichage des images existantes en mode édition -->
-        @if(isset($existingImages) && count($existingImages) > 0)
+        @if(!empty($existingImages))
             <div class="col-md-12 mt-4">
                 <h5>Images existantes</h5>
                 <div class="row">
                     @foreach($existingImages as $image)
                     <div class="col-md-3 mb-3">
                         <div class="card h-100">
-                            <img src="{{ $image['medium'] }}" class="card-img-top" alt="{{ $image['name'] }}">
+                            <img src="{{ $image['url'] }}" class="card-img-top" alt="{{ $image['name'] }}">
                             <div class="card-body">
                                 <h6 class="card-title">{{ $image['name'] }}</h6>
                                 <p class="card-text">

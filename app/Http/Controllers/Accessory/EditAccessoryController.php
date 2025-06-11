@@ -20,7 +20,6 @@ class EditAccessoryController extends Controller
     public function __invoke(Request $request, int $accessoryTypeId): View
     {
         $accessoryType = $this->accessoryTypeService->find($accessoryTypeId);
-        dd($accessoryType);
 
         return view('accessories.edit', compact('accessoryType'));
     }
