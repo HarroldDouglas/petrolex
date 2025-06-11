@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Bottle;
 
+use App\DTOs\BottleType\BottleTypeCityPriceDTO;
 use App\DTOs\BottleType\CreateBottleTypeDTO;
 use App\Http\Requests\Bottletype\StoreBottleTypeRequest;
 use App\Models\DistributionCenter;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class CreateBottleTypeForm extends AbstractBottleTypeForm
 {
@@ -26,9 +28,19 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
         $validatedData = $this->validate();
         $validatedData['cityPrices'] = $this->cityPrices;
         try {
+            $bottleTypeCityPrices = array_map(
+                fn ($cityPrice) => new BottleTypeCityPriceDTO(
+                    bottle_type_id: null,
+                    city: $cityPrice['city'],
+                    content_price: (float) $cityPrice['content_price'],
+                    content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
+                ), $validatedData['cityPrices']);
+
+            Log::info('bottleTypeCityPrices', [$bottleTypeCityPrices]);
+
             $bottleTypeDTO = new CreateBottleTypeDTO(
                 name: $validatedData['name'],
-                bottleTypeCityPrices: $validatedData['cityPrices'],
+                bottleTypeCityPrices: $bottleTypeCityPrices,
                 capacity: $validatedData['capacity'],
                 content_price: $validatedData['content_price'],
                 bottle_with_content_price: $validatedData['bottle_with_content_price'],

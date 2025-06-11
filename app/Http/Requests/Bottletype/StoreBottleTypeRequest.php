@@ -24,6 +24,13 @@ class StoreBottleTypeRequest extends FormRequest
             'content_price' => ['required', 'numeric', 'min:0'],
             'bottle_with_content_price' => ['required', 'numeric', 'min:0', 'gt:content_price'],
             'is_active' => ['required', 'boolean'],
+
+            'cityPrices' => ['nullable', 'array'],
+            'cityPrices.*.city' => ['required_with:cityPrices', 'string', 'max:255'],
+            'cityPrices.*.content_price' => ['required_with:cityPrices', 'numeric', 'min:0'],
+            'cityPrices.*.content_with_bottle_price' => ['required_with:cityPrices', 'numeric',
+                'min:0', 'gte:cityPrices.*.content_price'],
+
         ];
     }
 
@@ -58,6 +65,19 @@ class StoreBottleTypeRequest extends FormRequest
             'bottle_with_content_price.gt' => 'Le prix de la consigne avec recharge doit être supérieur au prix du contenu.',
 
             'is_active.boolean' => 'Le statut doit être vrai ou faux.',
+
+            'cityPrices.*.city.required_with' => 'Le nom de la ville est requis.',
+            'cityPrices.*.city.string' => 'Le nom de la ville doit être une chaîne de caractères.',
+            'cityPrices.*.city.max' => 'Le nom de la ville ne doit pas dépasser 255 caractères.',
+
+            'cityPrices.*.content_price.required_with' => 'Le prix de la recharge est requis pour chaque ville.',
+            'cityPrices.*.content_price.numeric' => 'Le prix de la recharge doit être un nombre.',
+            'cityPrices.*.content_price.min' => 'Le prix de la recharge doit être au moins 0.',
+
+            'cityPrices.*.content_with_bottle_price.required_with' => 'Le prix avec consigne est requis pour chaque ville.',
+            'cityPrices.*.content_with_bottle_price.numeric' => 'Le prix avec consigne doit être un nombre.',
+            'cityPrices.*.content_with_bottle_price.min' => 'Le prix avec consigne doit être au moins 0.',
+            'cityPrices.*.content_with_bottle_price.gte' => 'Le prix avec consigne doit être supérieur ou égal au prix de la recharge.',
         ];
     }
 }

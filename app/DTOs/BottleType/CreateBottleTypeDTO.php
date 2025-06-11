@@ -7,13 +7,13 @@ use App\DTOs\BaseDTO;
 class CreateBottleTypeDTO extends BaseDTO
 {
     public function __construct(
-        public string $name,
-        public ?array $bottleTypeCityPrices,
-        public string $capacity,
-        public float $content_price,
-        public float $bottle_with_content_price,
-        public bool $is_active,
-        public ?string $description,
-        public ?float $weight,
+        public readonly string $name,
+        public readonly ?array $bottleTypeCityPrices,
+        public readonly string $capacity,
+        public readonly float $content_price,
+        public readonly float $bottle_with_content_price,
+        public readonly bool $is_active,
+        public readonly ?string $description,
+        public readonly ?float $weight,
     ) {}
 }

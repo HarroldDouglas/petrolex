@@ -40,12 +40,4 @@ class BottleTypeCityPrice extends Model
     {
         return $this->belongsTo(BottleType::class);
     }
-
-    /**
-     * Get the price difference between content with bottle and content only.
-     */
-    public function getBottlePriceAttribute(): float
-    {
-        return $this->content_with_bottle_price - $this->content_price;
-    }
 }
