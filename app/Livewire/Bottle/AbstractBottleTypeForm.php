@@ -13,8 +13,6 @@ abstract class AbstractBottleTypeForm extends Component
 
     public $name;
     public $weight;
-    public $height;
-    public $radius;
     public $capacity;
     public $content_price;
     public $bottle_with_content_price;
