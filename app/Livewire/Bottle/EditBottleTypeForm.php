@@ -10,7 +10,7 @@ use App\Models\BottleTypeCityPrice;
 use App\Models\DistributionCenter;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 
 class EditBottleTypeForm extends AbstractBottleTypeForm
 {
@@ -20,10 +20,9 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
     public function mount(BottleType $bottleType)
     {
         $this->bottleType = $bottleType;
-        $this->availableCities = DistributionCenter::distinct()
-            ->pluck('city')
-            ->toArray();
-
+        $this->availableCities = $this->geographyService
+            ->getCities(Config::get('geography.authorized-countries.CM.name', []));
+        
         $this->loadBottleTypeData();
     }
 
@@ -60,7 +59,6 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
     public function save()
     {
         $validatedData = $this->validate();
-        $validatedData['cityPrices'] = $this->cityPrices;
 
         try {
             $bottleTypeCityPrices = array_map(

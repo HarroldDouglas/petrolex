@@ -7,15 +7,15 @@ use App\DTOs\BottleType\CreateBottleTypeDTO;
 use App\Http\Requests\Bottletype\StoreBottleTypeRequest;
 use App\Models\DistributionCenter;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 
 class CreateBottleTypeForm extends AbstractBottleTypeForm
 {
     public function mount()
     {
-        $this->availableCities = DistributionCenter::distinct()
-            ->pluck('city')
-            ->toArray();
+        $this->availableCities = $this->geographyService
+            ->getCities(Config::get('geography.authorized-countries.CM.name', []));
+        
     }
 
     protected function customRequest(): FormRequest
@@ -26,7 +26,6 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
     public function save()
     {
         $validatedData = $this->validate();
-        $validatedData['cityPrices'] = $this->cityPrices;
         try {
             $bottleTypeCityPrices = array_map(
                 fn ($cityPrice) => new BottleTypeCityPriceDTO(
