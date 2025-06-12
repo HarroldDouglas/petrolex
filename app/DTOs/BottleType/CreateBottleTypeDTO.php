@@ -8,6 +8,7 @@ class CreateBottleTypeDTO extends BaseDTO
 {
     public function __construct(
         public readonly string $name,
+        /** @var BottleTypeCityPriceDTO[]|null */
         public readonly ?array $bottleTypeCityPrices,
         public readonly string $capacity,
         public readonly float $content_price,
