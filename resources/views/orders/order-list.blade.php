@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Ticket')
+@section('title', 'Commandes')
 @section('css')
     <!-- slick css -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick.css') }}">
@@ -14,40 +14,36 @@
         <!-- Breadcrumb start -->
         <div class="row m-1">
             <div class="col-8 p-0">
-                <h4 class="main-title">Accueil</h4>
+                <h4 class="main-title">Commandes</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
                             <span>
-                                <i class="ph-duotone  ph-stack f-s-16"></i> Tableau de bord
+                                <i class="ph-duotone  ph-stack f-s-16"></i> Mes Commandes
                             </span>
                         </a>
                     </li>
                 </ul>
             </div>
-            <!-- Filter -->
-            <div class="col-4 p-0">
-                <div class="d-flex justify-content-end text-primary-dark">
-                    <a type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" role="button"
-                        aria-expanded="false" aria-controls="collapseFilter"
-                        class="waves-effect btn text-primary-dark bg-white btn-md mb-2">
-                        <i class="ti ti-chevron-down"></i> Filtrer
-                    </a>
-                </div>
-            </div>
-        </div>
         <!-- Breadcrumb end -->
-
-        <!-- Filter Options-->
-        <div class="row m-1">
-            <div class="col-12 collapse mb-4 p-0" id="collapseFilter">
-                @livewire('components.filter-component', ['scope' => 'dashboard'])
-            </div>
-        </div>
 
         <!-- Ticket start -->
         <div class="row ticket-app">
-            @livewire('dashboard.stats-overview')
+
+            <!-- ticket table-->
+            <div class="col-12">
+                <div class="card card-border">
+                    <div class="card-header">
+                        <h4 class="card-title">Les Commandes</h4>
+                    </div>
+                    <div class="card-body px-0">
+                        <div class="table-responsive app-scroll app-datatable-default">
+                            @livewire('dashboard.dashboard-data-table')
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ticket table end -->
         </div>
         <!-- Ticket end -->
     </div>

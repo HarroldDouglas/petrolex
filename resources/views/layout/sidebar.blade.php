@@ -20,6 +20,14 @@
                 </li>
             @endcan
 
+            @canany([$permissionEnum::ORDERS_VIEW()->value])
+                <li class="no-sub">
+                    <a class="" href="{{ route('orders.list') }}">
+                        <i class="iconoir-cart-alt"></i> Mes Commandes
+                    </a>
+                </li>
+            @endcanany
+
             @can($permissionEnum::REPORTS_MANAGE()->value)
                 <li class="no-sub">
                     <a class="" href="{{ route('stock_movement') }}">
