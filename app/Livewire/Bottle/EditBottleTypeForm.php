@@ -72,8 +72,6 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
                 ), $validatedData['cityPrices']
             );
 
-            Log::info('bottleTypeCityPrices for update', [$bottleTypeCityPrices]);
-
             $bottleTypeDTO = new UpdateBottleTypeDTO(
                 id: $this->bottleType->id,
                 name: $validatedData['name'],

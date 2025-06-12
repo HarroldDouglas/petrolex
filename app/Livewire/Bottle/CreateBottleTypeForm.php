@@ -36,8 +36,6 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
                     content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
                 ), $validatedData['cityPrices']);
 
-            Log::info('bottleTypeCityPrices', [$bottleTypeCityPrices]);
-
             $bottleTypeDTO = new CreateBottleTypeDTO(
                 name: $validatedData['name'],
                 bottleTypeCityPrices: $bottleTypeCityPrices,
