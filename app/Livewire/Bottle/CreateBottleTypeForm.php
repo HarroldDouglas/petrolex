@@ -2,68 +2,61 @@
 
 namespace App\Livewire\Bottle;
 
+use App\DTOs\BottleType\BottleTypeCityPriceDTO;
+use App\DTOs\BottleType\CreateBottleTypeDTO;
+use App\Http\Requests\Bottletype\StoreBottleTypeRequest;
 use App\Models\DistributionCenter;
-use Livewire\Component;
-use Livewire\WithFileUploads;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
-class CreateBottleTypeForm extends Component
+class CreateBottleTypeForm extends AbstractBottleTypeForm
 {
-    use WithFileUploads;
-
-    // Base bottle type information
-    public $type_name;
-    public $bottle_capacity_price;
-    public $bottle_price;
-    public $product_images;
-    public $description;
-
-    // City-specific pricing
-    public $cityPrices = [];
-    public $availableCities = [];
-    public $selectedCity = '';
-
     public function mount()
     {
-        // Load all available cities from distribution centers
         $this->availableCities = DistributionCenter::distinct()
             ->pluck('city')
             ->toArray();
     }
 
-    public function addCityPrice()
+    protected function customRequest(): FormRequest
     {
-        if (! $this->selectedCity || in_array($this->selectedCity, array_column($this->cityPrices, 'city'))) {
-            return;
-        }
-
-        $this->cityPrices[] = [
-            'city' => $this->selectedCity,
-            'refill_price' => '',
-            'full_price' => '',
-            'id' => uniqid(),
-        ];
-
-        $this->selectedCity = '';
-    }
-
-    public function removeCityPrice($index)
-    {
-        unset($this->cityPrices[$index]);
-        $this->cityPrices = array_values($this->cityPrices);
+        return new StoreBottleTypeRequest;
     }
 
     public function save()
     {
-        // This is just a placeholder for future implementation
-        // In a real implementation, we would validate and save the data to the database
+        $validatedData = $this->validate();
+        $validatedData['cityPrices'] = $this->cityPrices;
+        try {
+            $bottleTypeCityPrices = array_map(
+                fn ($cityPrice) => new BottleTypeCityPriceDTO(
+                    bottle_type_id: null,
+                    city: $cityPrice['city'],
+                    content_price: (float) $cityPrice['content_price'],
+                    content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
+                ), $validatedData['cityPrices']);
 
-        $this->dispatch('bottle-type-created', [
-            'message' => 'Type de bouteille créé avec succès!',
-        ]);
-    }
+            Log::info('bottleTypeCityPrices', [$bottleTypeCityPrices]);
 
-    public function render()
-    {
-        return view('livewire.bottle.create-bottle-type-form');
+            $bottleTypeDTO = new CreateBottleTypeDTO(
+                name: $validatedData['name'],
+                bottleTypeCityPrices: $bottleTypeCityPrices,
+                capacity: $validatedData['capacity'],
+                content_price: $validatedData['content_price'],
+                bottle_with_content_price: $validatedData['bottle_with_content_price'],
+                is_active: $validatedData['is_active'],
+                description: $validatedData['description'],
+                weight: $validatedData['weight'] ? (float) $validatedData['weight'] : null,
+            );
+
+            $this->bottleTypeService->create($bottleTypeDTO);
+
+            session()->flash('success', 'Type de bouteille créé avec succès!');
+
+            return redirect()->route('bottles.types.index');
+        } catch (\Throwable $th) {
+            session()->flash('error', $th->getMessage());
+            throw $th;
+        }
     }
 }
