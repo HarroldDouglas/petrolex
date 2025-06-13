@@ -60,13 +60,16 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
         $validatedData = $this->validate();
 
         try {
+            /** @var array<int, BottleTypeCityPriceDTO> */
             $bottleTypeCityPrices = array_map(
-                fn ($cityPrice) => new BottleTypeCityPriceDTO(
+                /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
+                fn (array $cityPrice): BottleTypeCityPriceDTO => new BottleTypeCityPriceDTO(
                     bottle_type_id: $this->bottleType->id,
                     city: $cityPrice['city'],
                     content_price: (float) $cityPrice['content_price'],
                     content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
-                ), $validatedData['cityPrices']
+                ), 
+                $validatedData['cityPrices']
             );
 
             $bottleTypeDTO = new UpdateBottleTypeDTO(
