@@ -2,4 +2,4 @@
 
 namespace App\Repositories\Contracts;
 
-interface BottleTypeRepositoryInterface extends baseRepositoryInterface {}
+interface BottleTypeRepositoryInterface extends BaseRepositoryInterface {}
