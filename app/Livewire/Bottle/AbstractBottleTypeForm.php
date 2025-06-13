@@ -29,8 +29,8 @@ abstract class AbstractBottleTypeForm extends Component
     protected $bottleTypeService;
     protected $geographyService;
 
-    public function boot(BottleTypeService $bottleTypeService, 
-    StaticGeographyService $geographyService)
+    public function boot(BottleTypeService $bottleTypeService,
+        StaticGeographyService $geographyService)
     {
         $this->bottleTypeService = $bottleTypeService;
         $this->geographyService = $geographyService;

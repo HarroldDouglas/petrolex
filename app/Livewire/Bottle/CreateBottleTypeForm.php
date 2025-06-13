@@ -5,7 +5,6 @@ namespace App\Livewire\Bottle;
 use App\DTOs\BottleType\BottleTypeCityPriceDTO;
 use App\DTOs\BottleType\CreateBottleTypeDTO;
 use App\Http\Requests\Bottletype\StoreBottleTypeRequest;
-use App\Models\DistributionCenter;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Config;
 
@@ -14,8 +13,8 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
     public function mount()
     {
         $this->availableCities = $this->geographyService
-            ->getCities(Config::get('geography.authorized-countries.CM.name', []));
-        
+            ->getCities(Config::get('geography.authorized-countries.CM.name'));
+
     }
 
     protected function customRequest(): FormRequest

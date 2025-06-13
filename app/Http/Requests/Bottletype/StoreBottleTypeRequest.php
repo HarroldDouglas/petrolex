@@ -8,5 +8,4 @@ class StoreBottleTypeRequest extends BaseBottleTypeRequest
     {
         return true;
     }
-
 }

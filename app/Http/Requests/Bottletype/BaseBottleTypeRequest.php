@@ -7,7 +7,6 @@ use Illuminate\Validation\Rule;
 
 abstract class BaseBottleTypeRequest extends FormRequest
 {
-
     public function rules(): array
     {
         return [
@@ -74,10 +73,10 @@ abstract class BaseBottleTypeRequest extends FormRequest
             'cityPrices.*.content_price.numeric' => 'Le prix de la recharge doit être un nombre.',
             'cityPrices.*.content_price.min' => 'Le prix de la recharge doit être au moins 0.',
 
-            'cityPrices.*.content_with_bottle_price.required_with' => 'Le prix avec consigne est requis pour chaque ville.',
-            'cityPrices.*.content_with_bottle_price.numeric' => 'Le prix avec consigne doit être un nombre.',
-            'cityPrices.*.content_with_bottle_price.min' => 'Le prix avec consigne doit être au moins 0.',
-            'cityPrices.*.content_with_bottle_price.gte' => 'Le prix avec consigne doit être supérieur ou égal au prix de la recharge.',
+            'cityPrices.*.content_with_bottle_price.required_with' => 'Le prix de la consigne avec recharge est requis pour chaque ville.',
+            'cityPrices.*.content_with_bottle_price.numeric' => 'Le prix de la consigne avec recharge doit être un nombre.',
+            'cityPrices.*.content_with_bottle_price.min' => 'Le prix de la consigne avec recharge doit être au moins 0.',
+            'cityPrices.*.content_with_bottle_price.gte' => 'Le prix de la consigne avec recharge doit être supérieur ou égal au prix de la recharge.',
         ];
     }
 }

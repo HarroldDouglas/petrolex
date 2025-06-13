@@ -4,10 +4,9 @@ namespace App\Livewire\Bottle;
 
 use App\DTOs\BottleType\BottleTypeCityPriceDTO;
 use App\DTOs\BottleType\UpdateBottleTypeDTO;
-use App\Http\Requests\Bottletype\UpdateBottleTypeRequest; // Create this or use Store
+use App\Http\Requests\Bottletype\UpdateBottleTypeRequest;
 use App\Models\BottleType;
 use App\Models\BottleTypeCityPrice;
-use App\Models\DistributionCenter;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
@@ -21,8 +20,8 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
     {
         $this->bottleType = $bottleType;
         $this->availableCities = $this->geographyService
-            ->getCities(Config::get('geography.authorized-countries.CM.name', []));
-        
+            ->getCities(Config::get('geography.authorized-countries.CM.name'));
+
         $this->loadBottleTypeData();
     }
 
@@ -36,24 +35,24 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
         $this->is_active = $this->bottleType->is_active;
         $this->description = $this->bottleType->description;
         $this->weight = $this->bottleType->weight;
-        
+
         /** @var Collection<int, BottleTypeCityPrice> $cityPrices */
         $cityPrices = $this->bottleType->cityPrices()->get();
 
         $this->cityPrices = $cityPrices->map(function ($cityPrice) {
-                return [
-                    'id' => $cityPrice->id,
-                    'city' => $cityPrice->city,
-                    'content_price' => $cityPrice->content_price,
-                    'content_with_bottle_price' => $cityPrice->content_with_bottle_price,
-                ];
-            })
+            return [
+                'id' => $cityPrice->id,
+                'city' => $cityPrice->city,
+                'content_price' => $cityPrice->content_price,
+                'content_with_bottle_price' => $cityPrice->content_with_bottle_price,
+            ];
+        })
             ->toArray();
     }
 
     protected function customRequest(): FormRequest
     {
-        return new UpdateBottleTypeRequest;
+        return new UpdateBottleTypeRequest($this->bottleType->id);
     }
 
     public function save()

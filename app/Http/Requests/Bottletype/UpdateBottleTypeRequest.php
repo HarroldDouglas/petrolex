@@ -6,6 +6,15 @@ use Illuminate\Validation\Rule;
 
 class UpdateBottleTypeRequest extends BaseBottleTypeRequest
 {
+    /**
+     * Constructor
+     */
+    public function __construct(protected $bottleTypeId)
+    {
+        parent::__construct();
+        $this->bottleTypeId = $bottleTypeId;
+    }
+
     public function authorize(): bool
     {
         return true;
@@ -23,12 +32,12 @@ class UpdateBottleTypeRequest extends BaseBottleTypeRequest
 
     protected function nameRules(): array
     {
-        // To Do : ensure name is unique except for the current bottle type being updated
         return [
             'required',
             'string',
             'max:255',
-            //Rule::unique('bottle_types', 'name')->ignore($this->name),
+            Rule::unique('bottle_types', 'name')
+                ->ignore($this->bottleTypeId),
         ];
     }
 }
