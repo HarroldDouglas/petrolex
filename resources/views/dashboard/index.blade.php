@@ -50,6 +50,13 @@
             @livewire('dashboard.stats-overview')
         </div>
         <!-- Ticket end -->
+
+        <!-- Graphs start -->
+        <div class="row mt-4">
+            @livewire('dashboard.dashboard-graphs')
+        </div>
+        <!-- Graphs end -->
+
     </div>
 @endsection
 
@@ -61,5 +68,8 @@
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
 
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
+    
+    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/datatable/datatable2/dataTables.buttons.min.js') }}"></script>
 
 @endsection
