@@ -23,8 +23,8 @@ class StockMovementStatsService
         ?string $endDate = null,
         ?array $distributionCenterIds = null
     ): StockMovementStatsDTO {
-        $startDateCarbon = $startDate ? Carbon::parse($startDate) : Carbon::now()->subDays(7);
-        $endDateCarbon = $endDate ? Carbon::parse($endDate) : Carbon::now();
+        $startDateCarbon = $startDate ? Carbon::parse($startDate) : null;
+        $endDateCarbon = $endDate ? Carbon::parse($endDate) : null;
         $effectiveDistributionCenterIds = (is_array($distributionCenterIds) && count($distributionCenterIds) === 0)
             ? null
             : $distributionCenterIds;

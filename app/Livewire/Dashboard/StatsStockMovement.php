@@ -4,6 +4,7 @@ namespace App\Livewire\Dashboard;
 
 use App\Models\User;
 use App\Services\Dashboard\StockMovementStatsService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -25,7 +26,10 @@ class StatsStockMovement extends Component
 
     public function mount(): void
     {
-        $this->loadStockStats();
+        $endDate = Carbon::now()->format('Y-m-d');
+        $startDate = Carbon::now()->subDays(7)->format('Y-m-d');
+        
+        $this->loadStockStats($startDate, $endDate);
     }
 
     #[On('filters-changed-stock-movement')]
