@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('capacity', 50);
             $table->decimal('height', 8, 2)->nullable();
-            $table->decimal('width', 8, 2)->nullable();
+            $table->decimal('weight', 8, 2)->nullable();
             $table->decimal('radius', 8, 2)->nullable();
             $table->decimal('content_price', 10, 2);
             $table->decimal('bottle_with_content_price', 10, 2);

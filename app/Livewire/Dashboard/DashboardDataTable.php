@@ -163,6 +163,16 @@ class DashboardDataTable extends BaseDataTable
 
     public function filters(): array
     {
+        $statusOptions = [];
+        $labels = OrderStatus::labels();
+        $values = OrderStatus::values();
+
+        foreach ($labels as $key => $label) {
+            if (isset($values[$key])) {
+                $statusOptions[$values[$key]] = $label;
+            }
+        }
+
         return [
             TextFilter::make('N° Commande')
                 ->config(['placeholder' => 'Rechercher un numéro...'])
@@ -171,7 +181,7 @@ class DashboardDataTable extends BaseDataTable
                 }),
 
             SelectFilter::make('Statut')
-                ->options(array_merge(['' => 'Tous'] + OrderStatus::labels()))
+                ->options(array_merge(['' => 'Tous'], $statusOptions))
                 ->filter(function (Builder $builder, string $value) {
                     if ($value === '') {
                         return $builder;

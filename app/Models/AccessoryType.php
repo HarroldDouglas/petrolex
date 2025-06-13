@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -18,7 +17,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
  */
-class AccessoryType extends Model
+class AccessoryType extends BaseModelWithMedia
 {
     use HasFactory;
     use SoftDeletes;
@@ -81,5 +80,20 @@ class AccessoryType extends Model
                 $query->whereIn('distribution_center_id', $distributionCenterIds);
             })
             ->sum('quantity');
+    }
+
+    public function requiresMainImage(): bool
+    {
+        return false;
+    }
+
+    public function supportsMultipleImages(): bool
+    {
+        return true;
+    }
+
+    public function getImageIdentifier(): string
+    {
+        return $this->name ?? 'Accessory Type #'.$this->id;
     }
 }

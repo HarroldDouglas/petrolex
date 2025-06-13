@@ -13,7 +13,7 @@ Route::middleware('auth')->group(function () {
         Route::prefix('types')->name('types.')->group(function () {
             Route::get('/', GetBottlesTypesController::class)->name('index');
             Route::get('/create', CreateBottleTypeController::class)->name('create');
-            Route::get('/edit/{bottle_id}', EditBottleTypeController::class)->name('edit');
+            Route::get('/edit/{bottleType}', EditBottleTypeController::class)->name('edit');
         });
     });
 });

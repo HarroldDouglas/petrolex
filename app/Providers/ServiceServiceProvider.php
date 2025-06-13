@@ -2,20 +2,24 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\StockMovementRepositoryInterface;
+use App\Repositories\Eloquent\StockMovementRepository;
 use App\Services\Auth\AuthenticationService;
 use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 use App\Services\Auth\Contracts\OtpServiceInterface;
 use App\Services\Auth\OtpService;
+use App\Services\BaseServiceForEntity;
+use App\Services\BaseServiceForEntityInterface;
 use App\Services\Geography\GeographyServiceInterface;
 use App\Services\Geography\StaticGeographyService;
 use App\Services\Permissions\PermissionService;
 use App\Services\Permissions\PermissionServiceInterface;
+use App\Services\Shared\Media\MediaServiceInterface;
+use App\Services\Shared\Media\SpatieMediaService;
 use App\Services\SMS\SmsServiceInterface;
 use App\Services\SMS\TwilioService;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Contracts\StockMovementRepositoryInterface;
-use App\Repositories\Eloquent\StockMovementRepository;
 
 class ServiceServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -27,8 +31,10 @@ class ServiceServiceProvider extends ServiceProvider implements DeferrableProvid
         AuthenticationServiceInterface::class => AuthenticationService::class,
         SmsServiceInterface::class => TwilioService::class,
         PermissionServiceInterface::class => PermissionService::class,
-        StockMovementRepositoryInterface::class=>StockMovementRepository::class,
+        StockMovementRepositoryInterface::class => StockMovementRepository::class,
+        BaseServiceForEntityInterface::class => BaseServiceForEntity::class,
         GeographyServiceInterface::class => StaticGeographyService::class,
+        MediaServiceInterface::class => SpatieMediaService::class,
     ];
 
     /**

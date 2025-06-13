@@ -2,76 +2,126 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\BottleOrderType;
+use App\Models\DistributionCenter;
+use App\Models\Order;
+use App\Models\SupplierDelivery;
 use App\Repositories\Contracts\StockMovementRepositoryInterface;
-use App\Enums\BottleStatus;
-use App\Models\Bottle;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 
 class StockMovementRepository implements StockMovementRepositoryInterface
 {
     /**
-     * Create a base query builder with common filters
+     * Calculate total sold bottles with content (full bottles sold)
      */
-    private function createBaseQuery(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): Builder
+    public function calculateTotalSoldBottles(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
     {
-        $query = Bottle::query();
+        $query = Order::query();
 
         if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [
+            $query->whereBetween('order_date', [
                 $startDate->startOfDay(),
                 $endDate->endOfDay(),
             ]);
         }
 
-        if ($distributionCenterIds && count($distributionCenterIds) > 0) {
-            $query->whereIn('distribution_center_id', $distributionCenterIds);
+        if ($centerIds && count($centerIds) > 0) {
+            $query->whereIn('distribution_center_id', $centerIds);
         }
 
-        return $query;
+        // Get orders and count the bottles sold with content
+        return $query->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->where('order_items.bottle_type', BottleOrderType::BOTTLE_WITH_CONTENT()->value)
+            ->sum('order_items.quantity');
     }
 
     /**
-     * Calculate total exits of bottles
-     */
-    public function calculateTotalExits(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
-    {
-        return $this->createBaseQuery($startDate, $endDate, $centerIds)
-            ->where('status', BottleStatus::WITH_CLIENT()->value)
-            ->count();
-    }
-
-    /**
-     * Calculate total exchanges of bottles
+     * Calculate total refills/exchanges (content only)
      */
     public function calculateTotalExchanges(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
     {
-        return $this->createBaseQuery($startDate, $endDate, $centerIds)
-            ->where('status', [
-                BottleStatus::WITH_DELIVERY_PERSON()->value,
-                BottleStatus::WITH_CLIENT()->value,
-            ])
-            ->count();
+        $query = Order::query();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('order_date', [
+                $startDate->startOfDay(),
+                $endDate->endOfDay(),
+            ]);
+        }
+
+        if ($centerIds && count($centerIds) > 0) {
+            $query->whereIn('distribution_center_id', $centerIds);
+        }
+
+        // Get content only exchanges/refills
+        return $query->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->where('order_items.bottle_type', BottleOrderType::CONTENT()->value)
+            ->sum('order_items.quantity');
     }
 
     /**
-     * Calculate the total number of full bottles.
+     * Calculate the total number of full bottles in current stock.
      */
     public function calculateFullBottles(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
     {
-        return $this->createBaseQuery($startDate, $endDate, $centerIds)
-            ->where('is_filled', true)
-            ->count();
+        $total = 0;
+
+        $query = DistributionCenter::query();
+
+        if ($centerIds && count($centerIds) > 0) {
+            $query->whereIn('id', $centerIds);
+        }
+
+        $centers = $query->get();
+
+        foreach ($centers as $center) {
+            $total += $center->getTotalFilledBottlesAttribute();
+        }
+
+        return $total;
     }
 
     /**
-     * Calculate the total number of empty bottles.
+     * Calculate the total number of empty bottles in current stock.
      */
     public function calculateEmptyBottles(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
     {
-        return $this->createBaseQuery($startDate, $endDate, $centerIds)
-            ->where('is_filled', false)
-            ->count();
+        $total = 0;
+
+        $query = DistributionCenter::query();
+
+        if ($centerIds && count($centerIds) > 0) {
+            $query->whereIn('id', $centerIds);
+        }
+
+        $centers = $query->get();
+
+        foreach ($centers as $center) {
+            $total += $center->getTotalEmptyBottlesAttribute();
+        }
+
+        return $total;
     }
 
+    /**
+     * Calculate the total number of bottles supplied (entries)
+     */
+    public function calculateTotalSupplied(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $centerIds = null): int
+    {
+        $query = SupplierDelivery::query();
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('supply_date', [
+                $startDate->startOfDay(),
+                $endDate->endOfDay(),
+            ]);
+        }
+
+        if ($centerIds && count($centerIds) > 0) {
+            $query->whereIn('distribution_center_id', $centerIds);
+        }
+
+        return $query->join('supplier_delivery_product_types', 'supplier_deliveries.id', '=', 'supplier_delivery_product_types.supplier_delivery_id')
+            ->sum('supplier_delivery_product_types.expected_quantity');
+    }
 }

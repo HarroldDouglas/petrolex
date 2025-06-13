@@ -6,7 +6,7 @@
             icon="arrow-circle-down"
             title="Total des Entrées"
             subtitle="(Bouteilles Pleines)"
-            :value="$fullBottles"
+            :value="$totalSupplied"
         />
         
         <x-dashboard.stat-block
@@ -15,7 +15,7 @@
             icon="arrow-circle-up"
             title="Total des Bouteilles"
             subtitle="Pleines Vendues"
-            :value="$totalExits"
+            :value="$totalSoldBottles"
         />
         
         <x-dashboard.stat-block

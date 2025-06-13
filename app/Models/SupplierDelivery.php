@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $invoice_number
  * @property string|null $supplier_name
  * @property string|null $notes
- * @property Carbon $delivery_date
+ * @property Carbon $supply_date
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -39,7 +39,7 @@ class SupplierDelivery extends Model
         'delivery_number',
         'supplier_name',
         'description',
-        'delivery_date',
+        'supply_date',
         'status',
         'notes',
     ];
@@ -50,7 +50,7 @@ class SupplierDelivery extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'delivery_date' => 'date',
+        'supply_date' => 'date',
         'status' => SupplierDeliveryStatus::class,
     ];
 

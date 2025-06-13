@@ -48,21 +48,6 @@
         <!-- Ticket start -->
         <div class="row ticket-app">
             @livewire('dashboard.stats-overview')
-
-            <!-- ticket table-->
-            <div class="col-12">
-                <div class="card card-border">
-                    <div class="card-header">
-                        <h4 class="card-title">Les Commandes</h4>
-                    </div>
-                    <div class="card-body px-0">
-                        <div class="table-responsive app-scroll app-datatable-default">
-                            @livewire('dashboard.dashboard-data-table')
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- ticket table end -->
         </div>
         <!-- Ticket end -->
     </div>
