@@ -2,30 +2,74 @@
 
 namespace App\Services\Shared\Media;
 
+use App\DTOs\ImageDataDTO;
 use App\DTOs\ModelWithImagesDTO;
+use App\Models\BaseModelWithMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 interface MediaServiceInterface
 {
-    public function attachMedia(Model $model, UploadedFile|array $files, string $collection = 'default'): array;
+    /**
+     * Attach media to a model
+     *
+     * @param  UploadedFile|UploadedFile[]  $files
+     * @return array<Media>
+     */
+    public function attachMedia(BaseModelWithMedia $model, UploadedFile|array $files, string $collection = 'images'): array;
 
-    public function detachMedia(Model $model, int $mediaId): bool;
+    /**
+     * Detach media from a model
+     */
+    public function detachMedia(BaseModelWithMedia $model, int $mediaId): bool;
 
-    public function replaceMedia(Model $model, UploadedFile|array $files, string $collection = 'default'): array;
+    /**
+     * Replace all media in a collection
+     *
+     * @param  UploadedFile|UploadedFile[]  $files
+     * @return array<Media>
+     */
+    public function replaceMedia(BaseModelWithMedia $model, UploadedFile|array $files, string $collection = 'images'): array;
 
-    public function getModelMediaData(Model $model): ?ModelWithImagesDTO;
+    /**
+     * Get media data for a model
+     */
+    public function getModelMediaData(BaseModelWithMedia $model): ?ModelWithImagesDTO;
 
-    public function getAllImagesForModel(Model $model): array;
+    /**
+     * Get all images for a model
+     *
+     * @return array<ImageDataDTO>
+     */
+    public function getAllImagesForModel(BaseModelWithMedia $model): array;
 
-    public function clearMediaCollection(Model $model, string $collection): bool;
+    /**
+     * Clear a media collection for a model
+     */
+    public function clearMediaCollection(BaseModelWithMedia $model, string $collection): bool;
 
-    // Mehods for handling different image strategies
-    public function handleMainWithMultipleStrategy(Model $model, ?UploadedFile $mainImage, array $images): void;
+    /**
+     * Handle media strategy for models with main image and multiple images
+     *
+     * @param  UploadedFile[]  $images
+     */
+    public function handleMainWithMultipleStrategy(BaseModelWithMedia $model, ?UploadedFile $mainImage, array $images): void;
 
-    public function handleMainImageStrategy(Model $model, UploadedFile $mainImage): void;
+    /**
+     * Handle media strategy for models with main image only
+     */
+    public function handleMainImageStrategy(BaseModelWithMedia $model, UploadedFile $mainImage): void;
 
-    public function handleMultipleImagesOnlyStrategy(Model $model, array $data): void;
+    /**
+     * Handle media strategy for models with multiple images only
+     *
+     * @param  UploadedFile[]  $images
+     */
+    public function handleMultipleImagesOnlyStrategy(BaseModelWithMedia $model, array $images): void;
 
-    public function handleSingleImageStrategy(Model $model, UploadedFile $image): void;
+    /**
+     * Handle media strategy for models with a single image
+     */
+    public function handleSingleImageStrategy(BaseModelWithMedia $model, UploadedFile $image): void;
 }

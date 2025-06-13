@@ -2,6 +2,7 @@
 
 namespace App\DTOs;
 
+use App\Models\BaseModelWithMedia;
 use Illuminate\Database\Eloquent\Model;
 
 class ModelWithImagesDTO
@@ -15,11 +16,11 @@ class ModelWithImagesDTO
         public readonly array $images,
     ) {}
 
-    public static function fromModel(Model $model): self
+    public static function fromModel(BaseModelWithMedia $model): self
     {
         $mainImage = ImageDataDTO::fromMedia($model->main_image ?? null);
 
-        $images = $model->images?->map(fn ($media) => ImageDataDTO::fromMedia($media))->toArray() ?? [];
+        $images = $model->getMedia('images')->map(fn ($media) => ImageDataDTO::fromMedia($media))->toArray();
 
         return new self($model, $mainImage, $images);
     }

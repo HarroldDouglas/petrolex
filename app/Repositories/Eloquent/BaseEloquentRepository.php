@@ -59,6 +59,8 @@ abstract class BaseEloquentRepository implements BaseRepositoryInterface
      */
     public function paginate(int $perPage = 15, array $columns = ['*']): Collection
     {
-        return $this->model->paginate($perPage, $columns);
+        $paginator = $this->model->paginate($perPage, $columns);
+
+        return new Collection($paginator->items());
     }
 }

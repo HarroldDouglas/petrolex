@@ -5,7 +5,7 @@ namespace App\Services;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-interface BaseServiceInterface
+interface BaseServiceForEntityInterface
 {
     public function create(array $data): Model;
 
@@ -15,7 +15,7 @@ interface BaseServiceInterface
 
     public function delete(Model $model): bool;
 
-    public function getAll(array $filters = [], array $with = []): Collection;
+    public function getAll(): Collection;
 
-    public function paginate(int $perPage = 15, array $filters = [], array $with = []): mixed;
+    public function paginate(int $perPage = 15): mixed;
 }

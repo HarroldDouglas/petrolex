@@ -8,7 +8,7 @@ use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 
-abstract class BaseServiceWithMedia extends BaseService implements HasMediaServiceInterface
+abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasMediaServiceInterface
 {
     public function __construct(
         protected BaseRepositoryInterface $baseRepository,
@@ -138,7 +138,9 @@ abstract class BaseServiceWithMedia extends BaseService implements HasMediaServi
     }
 
     /**
-     * @return string[] //should retourn just images fields to not consider
+     * should retourn just images fields to not consider when filtering data for model
+     *
+     * @return string[]
      */
     abstract protected function getMediaFields(): array;
 }

@@ -36,12 +36,16 @@ abstract class AbstractAccessoryTypeForm extends Component
 
     public function rules()
     {
-        return $this->customRequest()->rules();
+        $request = $this->customRequest();
+
+        return method_exists($request, 'rules') ? $request->rules() : [];
     }
 
     public function messages()
     {
-        return $this->customRequest()->messages();
+        $request = $this->customRequest();
+
+        return method_exists($request, 'messages') ? $request->messages() : [];
     }
 
     /**

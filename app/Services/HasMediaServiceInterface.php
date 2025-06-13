@@ -5,7 +5,7 @@ namespace App\Services;
 use App\DTOs\ModelWithImagesDTO;
 use Illuminate\Database\Eloquent\Model;
 
-interface HasMediaServiceInterface extends BaseServiceInterface
+interface HasMediaServiceInterface extends BaseServiceForEntityInterface
 {
     public function createWithMedia(array $data): Model;
 

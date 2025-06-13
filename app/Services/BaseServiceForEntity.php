@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-abstract class BaseService implements BaseServiceInterface
+abstract class BaseServiceForEntity implements BaseServiceForEntityInterface
 {
     public function __construct(
         protected BaseRepositoryInterface $repository
@@ -45,14 +45,14 @@ abstract class BaseService implements BaseServiceInterface
         });
     }
 
-    public function getAll(array $filters = [], array $with = []): Collection
+    public function getAll(): Collection
     {
-        return $this->repository->all($filters, $with);
+        return $this->repository->all();
     }
 
-    public function paginate(int $perPage = 15, array $filters = [], array $with = []): mixed
+    public function paginate(int $perPage = 15): mixed
     {
-        return $this->repository->paginate($perPage, $filters, $with);
+        return $this->repository->paginate($perPage);
     }
 
     protected function executeInTransaction(callable $callback): mixed
