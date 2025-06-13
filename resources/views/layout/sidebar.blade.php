@@ -8,7 +8,6 @@
     <div class="app-nav" id="app-simple-bar">
         <ul class="main-nav p-0 mt-2">
             @php
-                // Création d'une variable pour accéder facilement aux permissions
                 $permissionEnum = \App\Enums\PermissionEnum::class;
             @endphp
 
@@ -67,16 +66,16 @@
 
             @canany([$permissionEnum::PRODUCTS_VIEW()->value, $permissionEnum::PRODUCTS_CREATE()->value])
                 <li>
-                    <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#products">
+                    <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#accessories">
                         <i class="iconoir-box-3d-point"></i>
-                        Produits
+                        Accessoires
                     </a>
-                    <ul class="collapse" id="products">
+                    <ul class="collapse" id="accessories">
                         @can($permissionEnum::PRODUCTS_VIEW()->value)
-                            <li><a href="{{ route('products.list') }}"> Liste</a></li>
+                            <li><a href="{{ route('accessories.index') }}"> Liste</a></li>
                         @endcan
                         @can($permissionEnum::PRODUCTS_CREATE()->value)
-                            <li><a href="{{ route('products.create') }}"> Nouveau</a></li>
+                            <li><a href="{{ route('accessories.create') }}"> Nouveau</a></li>
                         @endcan
                     </ul>
                 </li>

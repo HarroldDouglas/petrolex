@@ -5,7 +5,7 @@ namespace App\Repositories\Contracts;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-interface baseRepositoryInterface
+interface BaseRepositoryInterface
 {
     /**
      * Create a new instance
@@ -24,7 +24,7 @@ interface baseRepositoryInterface
     /**
      * Update a model
      */
-    public function update(Model $model, array $attributes): bool;
+    public function update(Model $model, array $attributes): Model;
 
     /**
      * Delete a model
@@ -35,4 +35,9 @@ interface baseRepositoryInterface
      * Get all records
      */
     public function all(array $columns = ['*']): Collection;
+
+    /**
+     * Get records with pagination
+     */
+    public function paginate(int $perPage = 15, array $columns = ['*']): Collection;
 }

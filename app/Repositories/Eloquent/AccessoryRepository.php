@@ -3,11 +3,16 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\AccessoryType;
-use App\Repositories\Contracts\ProductRepositoryInterface;
+use App\Repositories\Contracts\AccessoryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-class ProductRepository implements ProductRepositoryInterface
+class AccessoryRepository extends BaseEloquentRepository implements AccessoryRepositoryInterface
 {
+    public function __construct(AccessoryType $model)
+    {
+        $this->model = $model;
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -9,13 +9,7 @@
         aria-labelledby="dropdownMenuButton{{ $product->id }}">
         <li>
             <a class="dropdown-item"
-                href="{{ route('products.details', $product->id) }}">
-                <i class="ti ti-eye text-primary me-2"></i> Détails
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item"
-                href="{{ route('products.edit', $product->id) }}">
+                href="{{ route('accessories.edit', $product->id) }}">
                 <i class="iconoir-edit text-info me-2"></i> Modifier
             </a>
         </li>
