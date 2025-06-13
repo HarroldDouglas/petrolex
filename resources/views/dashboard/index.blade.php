@@ -68,8 +68,5 @@
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
 
     <script src="{{ asset('assets/vendor/moment/moment.min.js') }}"></script>
-    
-    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/datatable2/dataTables.buttons.min.js') }}"></script>
 
 @endsection
