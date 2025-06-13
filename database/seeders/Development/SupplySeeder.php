@@ -40,7 +40,7 @@ class SupplySeeder extends Seeder
             ->count(5)
             ->create([
                 'status' => SupplierDeliveryStatus::PENDING(),
-                'delivery_date' => null, // Pas de date de livraison car en attente
+                'supply_date' => null, // Pas de date de livraison car en attente
                 'comments' => function () {
                     $possibleComments = [
                         'Commande en attente de confirmation du fournisseur.',
@@ -69,7 +69,7 @@ class SupplySeeder extends Seeder
             ->count(3)
             ->create([
                 'status' => SupplierDeliveryStatus::PARTIALLY_DELIVERED(),
-                'delivery_date' => now()->subDays(rand(1, 7)), // Livraison récente
+                'supply_date' => now()->subDays(rand(1, 7)), // Livraison récente
                 'comments' => function () {
                     $possibleComments = [
                         'Livraison partielle effectuée. Reste à livrer programmé pour la semaine prochaine.',
@@ -98,7 +98,7 @@ class SupplySeeder extends Seeder
             ->count(7)
             ->create([
                 'status' => SupplierDeliveryStatus::COMPLETED(),
-                'delivery_date' => now()->subDays(rand(10, 60)), // Livraison plus ancienne
+                'supply_date' => now()->subDays(rand(10, 60)), // Livraison plus ancienne
                 'comments' => function () {
                     $possibleComments = [
                         'Livraison complète reçue et vérifiée.',
@@ -128,7 +128,7 @@ class SupplySeeder extends Seeder
             ->count(2)
             ->create([
                 'status' => SupplierDeliveryStatus::CANCELLED(),
-                'delivery_date' => null, // Pas de livraison car annulée
+                'supply_date' => null, // Pas de livraison car annulée
                 'comments' => function () {
                     $possibleComments = [
                         'Commande annulée suite à un retard excessif du fournisseur.',

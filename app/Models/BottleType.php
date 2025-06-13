@@ -36,9 +36,10 @@ class BottleType extends Model
      */
     protected $fillable = [
         'name',
+        'description',
         'capacity',
         'height',
-        'width',
+        'weight',
         'radius',
         'content_price',
         'bottle_with_content_price',
@@ -52,7 +53,7 @@ class BottleType extends Model
      */
     protected $casts = [
         'height' => 'decimal:2',
-        'width' => 'decimal:2',
+        'weight' => 'decimal:2',
         'radius' => 'decimal:2',
         'content_price' => 'decimal:2',
         'bottle_with_content_price' => 'decimal:2',
@@ -88,5 +89,10 @@ class BottleType extends Model
         return $this->belongsToMany(DistributionCenter::class)
             ->withPivot(['stock_empty', 'stock_filled'])
             ->withTimestamps();
+    }
+
+    public function cityPrices(): HasMany
+    {
+        return $this->hasMany(BottleTypeCityPrice::class);
     }
 }

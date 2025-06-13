@@ -24,14 +24,14 @@ class DistributionCenterService
      *
      * @param  DistributionCenter  $distributionCenter  The distribution center to update
      * @param  UpdateDistributionCenterDTO  $dto  Data Transfer Object containing the updated distribution center data
-     * @return bool Whether the update was successful
+     * @return DistributionCenter Whether the update was successful
      */
-    public function update(DistributionCenter $distributionCenter, UpdateDistributionCenterDTO $dto): bool
+    public function update(DistributionCenter $distributionCenter, UpdateDistributionCenterDTO $dto): DistributionCenter
     {
         $attributes = $dto->toArrayFiltered();
 
         if (empty($attributes)) {
-            return true;
+            return $distributionCenter;
         }
 
         $originalValues = $distributionCenter->only(array_keys($attributes));
@@ -39,6 +39,7 @@ class DistributionCenterService
         DB::beginTransaction();
 
         try {
+            /** @var DistributionCenter */
             $result = $this->distributionCenterRepository->update($distributionCenter, $attributes);
 
             if ($result) {

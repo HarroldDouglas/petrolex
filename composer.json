@@ -19,6 +19,7 @@
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-data": "^4.15",
         "spatie/laravel-enum": "^3.2",
+        "spatie/laravel-medialibrary": "^11.13",
         "spatie/laravel-permission": "^6.18",
         "twilio/sdk": "^8.6"
     },

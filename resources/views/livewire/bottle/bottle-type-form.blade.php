@@ -1,0 +1,141 @@
+<div>
+    <form class="row app-form g-3" wire:submit.prevent="save">
+        @csrf
+        
+        <div class="col-md-6">
+            <label for="weight" class="form-label">Poids</label>
+            <input type="number" class="form-control @error('weight') is-invalid @enderror" 
+            id="weight" placeholder="Ex: 6" wire:model.live.debounce.500ms="weight">
+            @error('weight')
+            <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-6">
+            <label for="capacity" class="form-label">Capacité</label>
+            <input type="number" class="form-control @error('capacity') is-invalid @enderror" 
+            id="capacity" placeholder="Ex: 50" wire:model.live.debounce.500ms="capacity">
+            @error('capacity')
+            <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-12">
+            <label for="name" class="form-label">Nom du type de bouteille à ajouter</label>
+            <input type="text" class="form-control @error('name') is-invalid @enderror" 
+            id="name" placeholder="Ex: Bouteille 6kg" wire:model.live.debounce.500ms="name">
+            @error('name')
+            <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-6">
+            <label for="content_price" class="form-label">Prix de la recharge</label>
+            <input type="number" class="form-control @error('content_price') is-invalid @enderror" 
+                id="content_price" placeholder="Ex: 8500"
+                wire:model.live.debounce.500ms="content_price">
+            @error('content_price')
+                <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-6">
+            <label for="bottle_with_content_price" class="form-label">Prix de la consigne + recharge</label>
+            <input type="number" class="form-control @error('bottle_with_content_price') is-invalid @enderror" 
+                id="bottle_with_content_price" placeholder="Ex: 25000"
+                wire:model.live.debounce.500ms="bottle_with_content_price">
+            @error('bottle_with_content_price')
+                <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-12">
+            <label for="product_images" class="form-label">Images du produit</label>
+            <input type="file" class="form-control @error('product_images') is-invalid @enderror" id="product_images"
+                wire:model="product_images">
+            @error('product_images')
+                <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-12">
+            <label for="description" class="form-label">Description du produit</label>
+            <textarea class="form-control @error('description') is-invalid @enderror"
+             id="description" rows="3" placeholder="Entrez la description ici" 
+                wire:model.live.debounce.500ms="description"></textarea>
+        </div>
+        
+        <!-- City-Specific Pricing Section -->
+        <div class="col-md-12 mt-4">
+            <h5 class="mb-3">Prix spécifiques par ville</h5>
+            
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <select class="form-select" wire:model="selectedCity">
+                        <option value="">Sélectionner une ville</option>
+                        @foreach($availableCities as $city)
+                            <option value="{{ $city }}">{{ $city }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-primary w-100" wire:click="addCityPrice">
+                        <i class="ti ti-plus"></i> Ajouter un prix spécifique
+                    </button>
+                </div>
+            </div>
+            
+            @if(count($cityPrices) > 0)
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Ville</th>
+                                <th>Prix de la recharge</th>
+                                <th>Prix de la consigne + recharge</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($cityPrices as $index => $cityPrice)
+                                <tr>
+                                    <td>{{ $cityPrice['city'] }}</td>
+                                    <td>
+                                        <input type="number" class="form-control  
+                                            @error('cityPrices.'.$index.'.content_price') is-invalid @enderror" 
+                                            wire:model.live.debounce.500ms="cityPrices.{{ $index }}.content_price" 
+                                            placeholder="Prix de la recharge">
+                                            @error('cityPrices.'.$index.'.content_price')
+                                                <div class="invalid-feedback">{{ __($message) }}</div>
+                                            @enderror
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control 
+                                            @error('cityPrices.'.$index.'.content_with_bottle_price') is-invalid @enderror" 
+                                            wire:model.live.debounce.500ms="cityPrices.{{ $index }}.content_with_bottle_price" 
+                                            placeholder="Prix complet">
+                                        @error('cityPrices.'.$index.'.content_with_bottle_price')
+                                            <div class="invalid-feedback">{{ __($message) }}</div>
+                                        @enderror
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger" 
+                                            wire:click="removeCityPrice({{ $index }})">
+                                            <i class="ti ti-trash"></i> Supprimer
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+        
+        <div class="col-md-12 mt-4">
+            <button type="submit" class="btn btn-success">
+                <i class="ti ti-device-floppy"></i> Enregistrer
+            </button>
+        </div>
+    </form>
+</div>
