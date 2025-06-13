@@ -3,6 +3,7 @@
 namespace App\Livewire\Bottle;
 
 use App\Services\BottleType\BottleTypeService;
+use App\Services\Geography\StaticGeographyService;
 use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
@@ -26,10 +27,13 @@ abstract class AbstractBottleTypeForm extends Component
     public bool $is_active = true;
 
     protected $bottleTypeService;
+    protected $geographyService;
 
-    public function boot(BottleTypeService $bottleTypeService)
+    public function boot(BottleTypeService $bottleTypeService,
+        StaticGeographyService $geographyService)
     {
         $this->bottleTypeService = $bottleTypeService;
+        $this->geographyService = $geographyService;
     }
 
     public function addCityPrice()

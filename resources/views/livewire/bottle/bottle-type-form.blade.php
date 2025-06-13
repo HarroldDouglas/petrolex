@@ -134,7 +134,7 @@
         
         <div class="col-md-12 mt-4">
             <button type="submit" class="btn btn-success">
-                <i class="ti ti-device-floppy"></i> Créer
+                <i class="ti ti-device-floppy"></i> Enregistrer
             </button>
         </div>
     </form>

@@ -3,9 +3,9 @@
 namespace App\Services\BottleType;
 
 use App\DTOs\BottleType\CreateBottleTypeDTO;
+use App\DTOs\BottleType\UpdateBottleTypeDTO;
 use App\Models\BottleType;
 use App\Repositories\Contracts\BottleTypeRepositoryInterface;
-use Illuminate\Support\Facades\Log;
 
 class BottleTypeService
 {
@@ -19,12 +19,27 @@ class BottleTypeService
         $bottleType = $this->bottleRepository->create($data->toArray());
 
         if ($data->bottleTypeCityPrices) {
-            Log::info('Creating city prices for bottle type', [
-                'bottle_type_id' => $bottleType->id,
-                'city_prices' => $data->bottleTypeCityPrices,
-            ]);
             $bottleType->cityPrices()->createMany(
                 array_map(fn ($dto) => $dto->toArray(), $data->bottleTypeCityPrices)
+            );
+        }
+
+        return $bottleType;
+    }
+
+    public function update(int $bottleTypeId, UpdateBottleTypeDTO $data): BottleType
+    {
+        /** @var BottleType $bottleType */
+        $bottleType = $this->bottleRepository->find($bottleTypeId);
+        $this->bottleRepository->update($bottleType,
+            $data->toArray());
+
+        $bottleType->cityPrices()?->delete();
+
+        if (! empty($data->bottleTypeCityPrices)) {
+            $bottleType->cityPrices()->createMany(
+                array_map(fn ($dto) => $dto->toArray(),
+                    $data->bottleTypeCityPrices)
             );
         }
 
