@@ -9,10 +9,9 @@ use Illuminate\Http\Request;
 
 class EditAccessoryController extends Controller
 {
-    public function __construct(private readonly AccessoryTypeService $accessoryTypeService)
-    {
-        // You can inject services here if needed
-    }
+    public function __construct(
+        private readonly AccessoryTypeService $accessoryTypeService
+    ) {}
 
     /**
      * Handle the incoming request.

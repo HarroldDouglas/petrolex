@@ -35,4 +35,9 @@ interface BaseRepositoryInterface
      * Get all records
      */
     public function all(array $columns = ['*']): Collection;
+
+    /**
+     * Get records with pagination
+     */
+    public function paginate(int $perPage = 15, array $columns = ['*']): Collection;
 }

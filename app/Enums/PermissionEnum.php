@@ -96,7 +96,7 @@ class PermissionEnum extends Enum
             // PRODUCTS
             'PRODUCTS_VIEW' => 'products.view',
             'PRODUCTS_CREATE' => 'products.create',
-            'PRODUCTS_EDIT' => 'accessories.edit',
+            'PRODUCTS_EDIT' => 'products.edit',
             'PRODUCTS_DELETE' => 'products.delete',
 
             // SUPPLIERS DELIVERIES

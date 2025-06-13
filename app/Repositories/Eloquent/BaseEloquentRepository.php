@@ -53,4 +53,12 @@ abstract class BaseEloquentRepository implements BaseRepositoryInterface
     {
         return $this->model->all($columns);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function paginate(int $perPage = 15, array $columns = ['*']): Collection
+    {
+        return $this->model->paginate($perPage, $columns);
+    }
 }

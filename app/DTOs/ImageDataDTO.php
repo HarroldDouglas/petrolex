@@ -28,16 +28,4 @@ class ImageDataDTO extends BaseDTO
             name: $media->name
         );
     }
-
-    public function toArray(): array
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'url' => $this->url,
-            'thumb' => $this->thumb,
-            'medium' => $this->medium,
-            'large' => $this->large,
-        ];
-    }
 }

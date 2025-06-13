@@ -67,9 +67,6 @@
                             <img src="{{ $image['url'] }}" class="card-img-top" alt="{{ $image['name'] }}">
                             <div class="card-body">
                                 <h6 class="card-title">{{ $image['name'] }}</h6>
-                                <p class="card-text">
-                                    <small class="text-muted">{{ $image['collection'] }}</small>
-                                </p>
                                 <button type="button" class="btn btn-sm btn-danger" 
                                     wire:click="removeImage({{ $image['id'] }})"
                                     wire:loading.attr="disabled">

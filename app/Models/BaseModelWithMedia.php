@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -21,12 +19,10 @@ abstract class BaseModelWithMedia extends Model implements HasMedia
         foreach ($collections as $collectionName) {
             if ($collectionName === 'main_image') {
                 $this->addMediaCollection('main_image')
-                    ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-                    ->singleFile(true);
+                    ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
             } elseif ($collectionName === 'images') {
                 $this->addMediaCollection('images')
-                    ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
-                    ->singleFile(false);
+                    ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
             }
         }
     }
@@ -61,71 +57,6 @@ abstract class BaseModelWithMedia extends Model implements HasMedia
         return $this->addMedia($file)
             ->usingName($name ?? 'Main Image')
             ->toMediaCollection('main_image');
-    }
-
-    public function addMultipleImages(array $files): array
-    {
-        Log::info('Starting addMultipleImages process', [
-            'files_count' => count($files),
-            'model_id' => $this->id,
-        ]);
-
-        $results = [];
-
-        // Clé pour éviter les problèmes de nettoyage automatique entre les ajouts
-        $now = now()->format('YmdHis');
-
-        foreach ($files as $index => $file) {
-            if ($file instanceof UploadedFile) {
-                try {
-                    // Utiliser une collection temporaire unique pour chaque image
-                    $tempCollectionName = "images_{$now}_{$index}";
-
-                    // Ajouter le média à une collection temporaire unique
-                    $media = $this->addMedia($file)
-                        ->usingName($this->getImageIdentifier().' - Image '.($index + 1))
-                        ->preservingOriginal()
-                        ->toMediaCollection($tempCollectionName);
-
-                    // Puis modifier directement en base de données pour utiliser la collection cible
-                    DB::table('media')
-                        ->where('id', $media->id)
-                        ->update(['collection_name' => 'images']);
-
-                    // Rafraîchir l'objet média
-                    $media = $media->fresh();
-
-                    $results[] = $media;
-
-                    Log::info("Successfully added image {$index}", [
-                        'media_id' => $media->id,
-                        'media_name' => $media->name,
-                        'collection' => $media->collection_name,
-                    ]);
-
-                } catch (\Exception $e) {
-                    Log::error("Failed to add image {$index}", [
-                        'error' => $e->getMessage(),
-                        'file_name' => $file->getClientOriginalName(),
-                    ]);
-                    throw $e;
-                }
-            }
-        }
-
-        // Vérification après l'ajout
-        $mediaCount = DB::table('media')
-            ->where('model_type', get_class($this))
-            ->where('model_id', $this->id)
-            ->where('collection_name', 'images')
-            ->count();
-
-        Log::info('Completed addMultipleImages process', [
-            'total_processed' => count($results),
-            'media_count_in_db' => $mediaCount,
-        ]);
-
-        return $results;
     }
 
     public function addSingleImage(UploadedFile $file, ?string $name = null): ?Media

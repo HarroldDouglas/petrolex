@@ -3,7 +3,9 @@
 namespace App\Livewire\Accessory;
 
 use App\Services\Accessory\AccessoryTypeService;
+use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -15,14 +17,21 @@ abstract class AbstractAccessoryTypeForm extends Component
     public $price = '';
     public $description = '';
     public $is_active = true;
-    public $images = [];
+    /** @var UploadedFile[] */
+    public array $images = [];
 
     /** @var AccessoryTypeService */
     protected $accessoryTypeService;
 
-    public function boot(AccessoryTypeService $accessoryTypeService)
-    {
+    /** @var MediaServiceInterface */
+    protected $mediaService;
+
+    public function boot(
+        AccessoryTypeService $accessoryTypeService,
+        MediaServiceInterface $mediaService,
+    ) {
         $this->accessoryTypeService = $accessoryTypeService;
+        $this->mediaService = $mediaService;
     }
 
     public function rules()

@@ -5,14 +5,16 @@ namespace App\Services\Accessory;
 use App\DTOs\AccessoryStatsDTO;
 use App\Models\AccessoryType;
 use App\Repositories\Contracts\AccessoryRepositoryInterface;
-use App\Services\BaseService;
+use App\Services\BaseServiceWithMedia;
+use App\Services\Shared\Media\MediaServiceInterface;
 
-class AccessoryTypeService extends BaseService
+class AccessoryTypeService extends BaseServiceWithMedia
 {
     public function __construct(
-        private readonly AccessoryRepositoryInterface $accessoryRepository
+        private readonly AccessoryRepositoryInterface $accessoryRepository,
+        protected MediaServiceInterface $mediaService,
     ) {
-        parent::__construct($accessoryRepository);
+        parent::__construct($accessoryRepository, $mediaService);
     }
 
     /**
@@ -37,5 +39,10 @@ class AccessoryTypeService extends BaseService
     protected function getModel(): string
     {
         return AccessoryType::class;
+    }
+
+    protected function getMediaFields(): array
+    {
+        return ['images'];
     }
 }

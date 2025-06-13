@@ -94,7 +94,6 @@ class AccessoryType extends BaseModelWithMedia
 
     public function getImageIdentifier(): string
     {
-
         return $this->name ?? 'Accessory Type #'.$this->id;
     }
 }
