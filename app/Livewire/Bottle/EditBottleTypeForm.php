@@ -39,15 +39,20 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
         /** @var Collection<int, BottleTypeCityPrice> $cityPrices */
         $cityPrices = $this->bottleType->cityPrices()->get();
 
-        $this->cityPrices = $cityPrices->map(function ($cityPrice) {
-            return [
-                'id' => $cityPrice->id,
-                'city' => $cityPrice->city,
-                'content_price' => $cityPrice->content_price,
-                'content_with_bottle_price' => $cityPrice->content_with_bottle_price,
-            ];
-        })
-            ->toArray();
+        /** @var array<int, BottleTypeCityPriceDTO> $cityPriceDTOs */
+        $cityPriceDTOs = $cityPrices->map(
+            function (BottleTypeCityPrice $cityPrice): BottleTypeCityPriceDTO {
+                return new BottleTypeCityPriceDTO(
+                    bottle_type_id: $cityPrice->bottle_type_id,
+                    city: $cityPrice->city,
+                    content_price: (float) $cityPrice->content_price,
+                    content_with_bottle_price: (float) $cityPrice->content_with_bottle_price
+                );
+            }
+        )->toArray();
+
+        $this->cityPrices = $cityPriceDTOs;
+
     }
 
     protected function customRequest(): FormRequest
@@ -68,7 +73,7 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
                     city: $cityPrice['city'],
                     content_price: (float) $cityPrice['content_price'],
                     content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
-                ), 
+                ),
                 $validatedData['cityPrices']
             );
 
