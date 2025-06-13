@@ -52,62 +52,7 @@
 
         <!-- Stock Movement Stats -->
         <div class="row ticket-app">
-            <div class="col-lg-12">
-                <div class="row">
-                    <div class="col-lg-3">
-                        <div class="card ticket-card bg-light-primary">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Entrées<br>(Consignes Pleines)</p>
-                                    <div class="h-40 w-40 d-flex-center">
-                                        <i class="ph-bold ph-arrow-circle-down f-s-45 text-primary"></i>
-                                    </div>
-                                </div>
-                                <h3 class="text-primary-dark">{{ $stats['total_entries'] }}</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="card ticket-card bg-light-warning">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Consignes <br>Pleines Vendues</p>
-                                    <div class="h-40 w-40 d-flex-center">
-                                        <i class="ph-bold ph-arrow-circle-up f-s-45 text-warning"></i>
-                                    </div>
-                                </div>
-                                <h3 class="text-warning-dark">{{ $stats['total_exits'] }}</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="card ticket-card bg-light-success">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des Recharges<br> ___</p>
-                                    <div class="h-40 w-40 d-flex-center">
-                                        <i class="ph-bold ph-arrows-left-right f-s-45 text-success"></i>
-                                    </div>
-                                </div>
-                                <h3 class="text-success-dark">{{ $stats['total_exchanges'] }}</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="card ticket-card bg-light-danger">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Stock Actuel<br>(Consignes pleines / vides)</p>
-                                    <div class="h-40 w-40 d-flex-center">
-                                        <i class="ph-bold ph-package f-s-45 text-danger"></i>
-                                    </div>
-                                </div>
-                                <h3 class="text-danger-dark">{{ $stats['current_stock'] }} / 2000</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @livewire('dashboard.stats-stock-movement')
 
             <!-- Movements Table -->
             <div class="col-12">

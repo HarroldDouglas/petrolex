@@ -160,7 +160,7 @@ class SupplierDeliverySeeder extends Seeder
             'delivery_number' => $this->generateDeliveryNumber(),
             'supplier_name' => $this->getRandomSupplierName(),
             'description' => "Supply for {$center->name}",
-            'delivery_date' => Carbon::now()->subDays(rand(1, 30)),
+            'supply_date' => Carbon::now()->subDays(rand(1, 30)),
             'status' => $status->value,
             'notes' => $this->getNotesForStatus($status),
         ]);
