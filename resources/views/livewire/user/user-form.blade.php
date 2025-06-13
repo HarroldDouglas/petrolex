@@ -1,0 +1,112 @@
+<div>
+    <form wire:submit.prevent="save" class="app-form">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="last_name" class="form-label">Nom</label>
+                <input type="text" 
+                       class="form-control @error('last_name') is-invalid @enderror" 
+                       placeholder="Nom" 
+                       id="last_name"
+                       wire:model.live.debounce.500ms="last_name">
+                @error('last_name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label for="first_name" class="form-label">Prénom</label>
+                <input type="text" 
+                       class="form-control @error('first_name') is-invalid @enderror" 
+                       placeholder="Prénom" 
+                       id="first_name"
+                       wire:model.live.debounce.500ms="first_name">
+                @error('first_name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" 
+                       class="form-control @error('email') is-invalid @enderror" 
+                       placeholder="email@example.com"
+                       id="email"
+                       wire:model.live.debounce.500ms="email">
+                @error('email')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label for="phone" class="form-label">Téléphone</label>
+                <input type="text" 
+                       class="form-control @error('phone') is-invalid @enderror" 
+                       placeholder="690102030"
+                       id="phone"
+                       wire:model.live.debounce.500ms="phone">
+                @error('phone')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label for="role" class="form-label">Fonction</label>
+
+                <select class="form-select @error('role') is-invalid @enderror" 
+                        id="role" 
+                        wire:model.live.debounce.500ms.live="role">
+                    <option value="">Sélectionner une fonction</option>
+                    @foreach($allowedRoles as $roleKey => $roleValue)
+                        <option value="{{ $roleKey }}">{{ $roleValue }}</option>
+                    @endforeach
+                </select>
+                @error('role')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <div class="input-group">
+                    <input type="{{ $showPassword ? 'text' : 'password' }}"
+                           class="form-control @error('password') is-invalid @enderror"
+                           placeholder="Mot de passe"
+                           id="password"
+                           wire:model.live.debounce.500ms="password">
+                    <button class="btn btn-outline-secondary" type="button" wire:click="$toggle('showPassword')">
+                        <i class="ti ti-{{ $showPassword ? 'eye-off' : 'eye' }}"></i>
+                    </button>
+                    @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            @if($showDistributionCenters)
+                <div class="col-md-6 mb-3">
+                    <label for="distribution_centers" class="form-label">Centre de distribution</label>
+                    <select class="form-select @error('distribution_centers') is-invalid @enderror" 
+                            id="distribution_centers" 
+                            wire:model.live.debounce.500ms="distribution_centers" 
+                            multiple>
+                        @foreach($availableDistributionCenters as $centerKey => $centerValue)
+                            <option value="{{ $centerKey }}">{{ $centerValue }}</option>
+                        @endforeach
+                    </select>
+                    @error('distribution_centers')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <div class="form-text">Maintenez Ctrl (Cmd sur Mac) pour sélectionner plusieurs options.</div>
+                </div>
+            @endif
+            <div class="col-12">
+                <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
+                    <a href="{{ route('users.list') }}" class="btn btn-light-danger">
+                        Annuler
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

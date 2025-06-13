@@ -71,52 +71,7 @@
                     <div class="card-body">
                         <div class="app-product-section">
                             <div>
-                                <form class="app-form">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="last_name" class="form-label">Nom</label>
-                                            <input type="text" class="form-control" placeholder="Nom" id="last_name">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="first_name" class="form-label">Prénom</label>
-                                            <input type="text" class="form-control" placeholder="Prénom" id="first_name">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="email" class="form-label">Email</label>
-                                            <input type="text" class="form-control" placeholder="email@example.com"
-                                                id="email">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="phone" class="form-label">Téléphone</label>
-                                            <input type="text" class="form-control" placeholder="690102030"
-                                                id="phone">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="role" class="form-label">Fonction</label>
-                                            <select class="form-select" id="role" name="role">
-                                                @foreach($allowedRoles ?? [] as $role)
-                                                    <option value="{{ $role->value }}">{{ $role->label }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3 distribution-centers-container" style="display: none;">
-                                            <label for="distribution_centers" class="form-label">Centre de distribution</label>
-                                            <select class="form-select" id="distribution_centers" name="distribution_centers[]" multiple>
-                                                <option value="Point A">Point A</option>
-                                                <option value="Point B">Point B</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-12">
-                                            <div
-                                                class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
-                                                <a href="{{ route('users.list') }}" class="btn btn-light-danger">
-                                                    Annuler
-                                                </a>
-                                                <button type="submit" class="btn btn-success">Enregistrer</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                                @livewire('user.create-user-form')
                             </div>
 
                         </div>

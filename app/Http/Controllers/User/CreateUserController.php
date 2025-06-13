@@ -17,13 +17,7 @@ class CreateUserController extends Controller
     {
         $this->authorize('users.create');
 
-        // Get authenticated user role
-        $authUser = Auth::user();
-        $allowedRoles = $this->getAllowedRolesToCreate();
-
-        return view('users.create-user', [
-            'allowedRoles' => $allowedRoles,
-        ]);
+        return view('users.create-user');
     }
 
     /**
@@ -31,6 +25,7 @@ class CreateUserController extends Controller
      *
      * @return array
      */
+    //ToDo: remove this function
     private function getAllowedRolesToCreate()
     {
         $authUser = Auth::user();

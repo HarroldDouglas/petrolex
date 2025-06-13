@@ -2,7 +2,9 @@
 
 namespace App\Services\User;
 
+use App\DTOs\User\CreateUserDTO;
 use App\DTOs\User\UpdateUserDTO;
+use App\Events\UserCreatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
 use App\Models\User;
@@ -14,6 +16,26 @@ class UserService
     public function __construct(
         private readonly UserRepositoryInterface $userRepository
     ) {}
+
+    public function create(CreateUserDTO $dto): User
+    {
+        DB::beginTransaction();
+        
+        try {
+            /** @var User $user */
+            $user = $this->userRepository->create($dto);
+            
+            UserCreatedEvent::dispatch($user);
+            
+            DB::commit();
+            
+            return $user;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
 
     /**
      * Update a user's information
