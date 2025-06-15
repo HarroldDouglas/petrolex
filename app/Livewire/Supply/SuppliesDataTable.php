@@ -20,7 +20,7 @@ class SuppliesDataTable extends BaseDataTable
 {
     protected $model = SupplierDelivery::class;
 
-    protected const DEFAULT_SORT_FIELD = 'delivery_date';
+    protected const DEFAULT_SORT_FIELD = 'supply_date';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
 
     protected function getExportFileName(): string
@@ -74,7 +74,7 @@ class SuppliesDataTable extends BaseDataTable
                     return new HtmlString($html ?: '-');
                 }),
 
-            Column::make('Date', 'delivery_date')
+            Column::make('Date', 'supply_date')
                 ->sortable()
                 ->format(fn ($value) => $value->format('d M,Y H:i')),
 
@@ -179,7 +179,7 @@ class SuppliesDataTable extends BaseDataTable
                     'locale' => 'fr',
                 ])
                 ->filter(function (Builder $builder, string $value) {
-                    $builder->whereDate('delivery_date', '>=', $value);
+                    $builder->whereDate('supply_date', '>=', $value);
                 }),
 
             DateRangeFilter::make('Période')
@@ -188,7 +188,7 @@ class SuppliesDataTable extends BaseDataTable
                     'altFormat' => 'd/m/Y',
                 ])
                 ->filter(function (Builder $builder, array $dateRange) {
-                    $builder->whereBetween('delivery_date', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
+                    $builder->whereBetween('supply_date', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
                 }),
         ];
     }

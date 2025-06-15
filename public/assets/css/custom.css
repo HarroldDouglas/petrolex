@@ -1,52 +1,54 @@
-:root, .default, body, html {
-        --primary: 0,137,183 !important;
-    }
+:root,
+.default,
+body,
+html {
+    --primary: 0, 137, 183 !important;
+}
 
-    .btn-primary,
-    .bg-primary,
-    [class*="btn-primary"],
-    [class*="bg-primary"] {
-        background-color: rgb(var(--primary)) !important;
-        border-color: rgb(var(--primary)) !important;
-    }
+.btn-primary,
+.bg-primary,
+[class*="btn-primary"],
+[class*="bg-primary"] {
+    background-color: rgb(var(--primary)) !important;
+    border-color: rgb(var(--primary)) !important;
+}
 
-    .text-primary,
-    [class*="text-primary"] {
-        color: rgb(var(--primary)) !important;
-    }
+.text-primary,
+[class*="text-primary"] {
+    color: rgb(var(--primary)) !important;
+}
 
-    .btn-primary:hover,
-    .btn-primary:focus,
-    .btn-primary:active {
-        background-color: rgba(var(--primary), 0.85) !important;
-        border-color: rgba(var(--primary), 0.85) !important;
-    }
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: rgba(var(--primary), 0.85) !important;
+    border-color: rgba(var(--primary), 0.85) !important;
+}
 
-    .form-check-input:checked {
-        background-color: rgb(var(--primary)) !important;
-        border-color: rgb(var(--primary)) !important;
-    }
+.form-check-input:checked {
+    background-color: rgb(var(--primary)) !important;
+    border-color: rgb(var(--primary)) !important;
+}
 
-    .link-primary {
-        color: rgb(var(--primary)) !important;
-    }
+.link-primary {
+    color: rgb(var(--primary)) !important;
+}
 
-    .border-primary {
-        border-color: rgb(var(--primary)) !important;
-    }
+.border-primary {
+    border-color: rgb(var(--primary)) !important;
+}
 
-    nav .app-logo .logo img {
-        width: 65px !important;
-    }
-    .semi-nav .app-logo .logo img {
-        width: 35px !important;
-    }
+nav .app-logo .logo img {
+    width: 65px !important;
+}
+.semi-nav .app-logo .logo img {
+    width: 35px !important;
+}
 
-    .app-logo {
-        display: flex;
-        justify-content: center;
-    }
-
+.app-logo {
+    display: flex;
+    justify-content: center;
+}
 
 /* Global Form Styles */
 input:focus,
@@ -100,7 +102,7 @@ button:focus,
     color: rgb(var(--primary)) !important;
 }
 .card-border {
-    border: solid 2px white!important;
+    border: solid 2px white !important;
 }
 
 td a {
@@ -114,7 +116,7 @@ td a {
 }
 
 header.header-main .container-fluid .header-left .header-toggle {
-  background-color: white!important;
+    background-color: white !important;
 }
 
 /* Form control overrides */
@@ -159,7 +161,8 @@ header.header-main .container-fluid .header-left .header-toggle {
     border-color: var(--bs-dark) !important;
     color: var(--bs-dark) !important;
 }
-.app-form .form-select.is-invalid, .app-form .form-control.is-invalid {
+.app-form .form-select.is-invalid,
+.app-form .form-control.is-invalid {
     border-color: rgba(var(--danger), 1) !important;
 }
 
@@ -174,4 +177,9 @@ header.header-main .container-fluid .header-left .header-toggle {
         color: var(--bs-dark) !important;
         opacity: 0.65;
     }
+}
+
+.required::after {
+    content: " *";
+    color: red;
 }

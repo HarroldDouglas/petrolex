@@ -2,14 +2,16 @@
 
 namespace App\Livewire\Bottle;
 
+use App\DTOs\BottleType\UpdateBottleTypeDTO;
 use App\Models\BottleType;
 use App\Services\Bottle\BottleTypeService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
 class BottleTypeDataTable extends BaseDataTable
@@ -40,7 +42,7 @@ class BottleTypeDataTable extends BaseDataTable
             Column::make('Hauteur', 'height')
                 ->sortable(),
 
-            Column::make('Largeur', 'width')
+            Column::make('Poids', 'weight')
                 ->sortable(),
 
             Column::make('Rayon', 'radius')
@@ -57,6 +59,7 @@ class BottleTypeDataTable extends BaseDataTable
                 ->format(function ($value) {
                     $badgeClass = $value ? 'text-bg-success' : 'text-bg-danger';
                     $text = $value ? 'Oui' : 'Non';
+
                     return new HtmlString('<span class="badge '.$badgeClass.'">'.e($text).'</span>');
                 }),
 
@@ -105,7 +108,7 @@ class BottleTypeDataTable extends BaseDataTable
 
     public function builder(): Builder
     {
-        return BottleType::query(); 
+        return BottleType::query();
     }
 
     protected function customMapAttributes()
@@ -117,10 +120,9 @@ class BottleTypeDataTable extends BaseDataTable
             'created_at_formatted' => function ($row) {
                 return $row->created_at ? $row->created_at->format('d/m/Y H:i') : '-';
             },
-            
         ];
     }
-    
+
     /**
      * Dispatches an event to show the edit modal for a specific bottle type.
      */
@@ -130,34 +132,81 @@ class BottleTypeDataTable extends BaseDataTable
     }
 
     /**
-     * Handles the deletion of a bottle type.
-     */
-    public function deleteBottleType(int $bottleTypeId)
-    {
-        try {
-            app(\App\Services\Bottle\BottleTypeService::class)->deleteBottleType($bottleTypeId);
-
-            session()->flash('success', 'Type de bouteille supprimé avec succès!');
-            $this->dispatch('refreshComponent');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Erreur lors de la suppression du type de bouteille.');
-        }
-    }
-
-    /**
      * Toggles the active status of a bottle type.
      */
     public function toggleBottleTypeStatus(int $bottleTypeId, bool $isActive)
     {
         try {
-            $bottleTypeService = app(\App\Services\Bottle\BottleTypeService::class);
-            $bottleTypeService->updateActiveStatus($bottleTypeId, $isActive);
+            $bottleTypeService = app(BottleTypeService::class);
+            /** @var BottleType $bottleType */
+            $bottleType = $bottleTypeService->find($bottleTypeId);
 
-            session()->flash('success', 'Statut du type de bouteille modifié avec succès!');
-            $this->dispatch('refreshComponent');
+            $updateDto = new UpdateBottleTypeDTO(
+                is_active: $isActive
+            );
+
+            $result = $bottleTypeService->update($bottleType, $updateDto->toArrayFiltered());
+
+            if ($result) {
+                $status = $isActive ? 'activé' : 'désactivé';
+                $name = $bottleType->name;
+
+                session()->flash('success', "Le type de bouteille a été {$status} avec succès.");
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Statut modifié !',
+                    'message' => "Le type de bouteille {$name} a été {$status} avec succès.",
+                    'timer' => 3000,
+                ]);
+
+                $this->dispatch('refreshComponent');
+            }
         } catch (\Exception $e) {
-            session()->flash('error', 'Erreur lors de la modification du statut.');
+            Log::error('Error toggling bottle type status: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la modification du statut du type de bouteille.",
+                'timer' => 3000,
+            ]);
         }
     }
 
+    /**
+     * Handles the deletion of a bottle type.
+     */
+    public function deleteBottleType(int $bottleTypeId)
+    {
+        try {
+            $bottleTypeService = app(BottleTypeService::class);
+            /** @var BottleType */
+            $bottleType = $bottleTypeService->find($bottleTypeId);
+            $name = $bottleType->name;
+            $result = $bottleTypeService->delete($bottleType);
+
+            if ($result) {
+                session()->flash('success', "Le type de bouteille {$name} a été supprimé avec succès.");
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Type de bouteille supprimé !',
+                    'message' => "Le type de bouteille {$name} a été supprimé définitivement.",
+                    'timer' => 3000,
+                ]);
+
+                $this->dispatch('refreshComponent');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error deleting bottle type: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la suppression du type de bouteille.",
+                'timer' => 3000,
+            ]);
+        }
+    }
 }

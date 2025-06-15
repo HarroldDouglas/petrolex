@@ -52,77 +52,12 @@
 
 @endsection
 
+<x-sweet-alert-notification-listener />
+
 @section('script')
     <!-- slick-file -->
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            // Form submission handler
-            $('#createTypeForm').submit(function(e) {
-                e.preventDefault();
-                const typeName = $('#type_name').val();
-
-                // Ici vous pourriez faire un appel AJAX pour sauvegarder les données
-                // Pour l'exemple, nous affichons juste un message
-                alert(`Type de bouteille "${typeName}" créé avec succès.`);
-
-                // Reset form and collapse
-                $('#type_name').val('');
-                $('#collapseForm').collapse('hide');
-            });
-
-            // Edit button click handler
-            $('.edit-type').click(function() {
-                const typeId = $(this).data('id');
-                const typeName = $(this).data('name');
-
-                $('#edit_type_id').val(typeId);
-                $('#edit_type_name').val(typeName);
-            });
-
-            // Save edit button click handler
-            $('#saveTypeEdit').click(function() {
-                const typeId = $('#edit_type_id').val();
-                const typeName = $('#edit_type_name').val();
-
-                // Ici vous pourriez faire un appel AJAX pour sauvegarder les modifications
-                // Pour l'exemple, nous affichons juste un message
-                alert(`Type de bouteille #${typeId} modifié en "${typeName}".`);
-
-                // Close modal
-                $('#editTypeModal').modal('hide');
-            });
-
-            // Change status button click handler
-            $('.change-status').click(function() {
-                const typeId = $(this).data('id');
-                const action = $(this).data('action');
-                const statusText = action === 'activate' ? 'activé' : 'désactivé';
-
-                if (confirm(
-                        `Êtes-vous sûr de vouloir ${action === 'activate' ? 'activer' : 'désactiver'} ce type de bouteille?`
-                    )) {
-                    // Ici vous pourriez faire un appel AJAX pour changer le statut
-                    // Pour l'exemple, nous affichons juste un message
-                    alert(`Le type de bouteille a été ${statusText}.`);
-                }
-            });
-
-            // Delete button click handler
-            $('.delete-type').click(function() {
-                const typeId = $(this).data('id');
-
-                if (confirm(
-                        'Êtes-vous sûr de vouloir supprimer ce type de bouteille? Cette action est irréversible.'
-                    )) {
-                    // Ici vous pourriez faire un appel AJAX pour supprimer le type
-                    // Pour l'exemple, nous affichons juste un message
-                    alert(`Le type de bouteille a été supprimé.`);
-                }
-            });
-        });
-    </script>
+    <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
 @endsection

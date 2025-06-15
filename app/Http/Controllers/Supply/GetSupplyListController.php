@@ -12,6 +12,6 @@ class GetSupplyListController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return view('supplies.supply-list');
+        return view('supplies.index');
     }
 }
