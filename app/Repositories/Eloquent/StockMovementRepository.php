@@ -31,7 +31,7 @@ class StockMovementRepository implements StockMovementRepositoryInterface
 
         // Get orders and count the bottles sold with content
         return $query->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->where('order_items.bottle_type', BottleOrderType::BOTTLE_WITH_CONTENT()->value)
+            ->where('order_items.bottle_type', BottleOrderType::FULL()->value)
             ->sum('order_items.quantity');
     }
 
@@ -55,7 +55,7 @@ class StockMovementRepository implements StockMovementRepositoryInterface
 
         // Get content only exchanges/refills
         return $query->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->where('order_items.bottle_type', BottleOrderType::CONTENT()->value)
+            ->where('order_items.bottle_type', BottleOrderType::RECHARGE()->value)
             ->sum('order_items.quantity');
     }
 

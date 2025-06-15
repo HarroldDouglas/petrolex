@@ -15,17 +15,20 @@ class DashboardStatsService
         $this->orderRepository = $orderRepository;
     }
 
-    public function getStats(?string $startDate = null, ?string $endDate = null, ?string $distributionCenterId = null): StatsDTO
-    {
+    public function getStats(
+        ?string $startDate = null,
+        ?string $endDate = null,
+        string|array|null $distributionCenterIds = null
+    ): StatsDTO {
         $startDateCarbon = $startDate ? Carbon::parse($startDate) : null;
         $endDateCarbon = $endDate ? Carbon::parse($endDate) : null;
 
-        $distributionCenterIds = $distributionCenterId ? [$distributionCenterId] : null;
+        $centerIds = $this->normalizeCenterIds($distributionCenterIds);
 
-        $revenue = $this->orderRepository->calculateRevenue($startDateCarbon, $endDateCarbon, $distributionCenterIds);
-        $pendingOrders = $this->orderRepository->countPendingOrders($startDateCarbon, $endDateCarbon, $distributionCenterIds);
-        $deliveredOrders = $this->orderRepository->countDeliveredOrders($startDateCarbon, $endDateCarbon, $distributionCenterIds);
-        $canceledOrders = $this->orderRepository->countCanceledOrders($startDateCarbon, $endDateCarbon, $distributionCenterIds);
+        $revenue = $this->orderRepository->calculateRevenue($startDateCarbon, $endDateCarbon, $centerIds);
+        $pendingOrders = $this->orderRepository->countPendingOrders($startDateCarbon, $endDateCarbon, $centerIds);
+        $deliveredOrders = $this->orderRepository->countDeliveredOrders($startDateCarbon, $endDateCarbon, $centerIds);
+        $canceledOrders = $this->orderRepository->countCanceledOrders($startDateCarbon, $endDateCarbon, $centerIds);
 
         return new StatsDTO(
             revenue: $revenue,
@@ -35,21 +38,23 @@ class DashboardStatsService
         );
     }
 
-    public function getStatsByMultipleCenters(?string $startDate = null, ?string $endDate = null, array $distributionCenterIds = []): StatsDTO
+    /**
+     * Normalise les IDs de centres de distribution
+     */
+    private function normalizeCenterIds(string|array|null $distributionCenterIds): ?array
     {
-        $startDateCarbon = $startDate ? Carbon::parse($startDate) : null;
-        $endDateCarbon = $endDate ? Carbon::parse($endDate) : null;
+        if ($distributionCenterIds === null || $distributionCenterIds === '') {
+            return null;
+        }
 
-        $revenue = $this->orderRepository->calculateRevenue($startDateCarbon, $endDateCarbon, $distributionCenterIds);
-        $pendingOrders = $this->orderRepository->countPendingOrders($startDateCarbon, $endDateCarbon, $distributionCenterIds);
-        $deliveredOrders = $this->orderRepository->countDeliveredOrders($startDateCarbon, $endDateCarbon, $distributionCenterIds);
-        $canceledOrders = $this->orderRepository->countCanceledOrders($startDateCarbon, $endDateCarbon, $distributionCenterIds);
+        if (is_string($distributionCenterIds)) {
+            return [$distributionCenterIds];
+        }
 
-        return new StatsDTO(
-            revenue: $revenue,
-            pendingOrders: $pendingOrders,
-            deliveredOrders: $deliveredOrders,
-            canceledOrders: $canceledOrders
-        );
+        if (is_array($distributionCenterIds) && empty($distributionCenterIds)) {
+            return null;
+        }
+
+        return $distributionCenterIds;
     }
 }

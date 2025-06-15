@@ -289,8 +289,8 @@ class OrderSeeder extends Seeder
 
         foreach ($selectedTypes as $bottleType) {
             $bottleOrderType = rand(1, 100) <= 40
-                ? BottleOrderType::BOTTLE_WITH_CONTENT()
-                : BottleOrderType::CONTENT();
+                ? BottleOrderType::FULL()
+                : BottleOrderType::RECHARGE();
 
             $maxQuantity = min($bottleType->pivot->stock_filled, 3);
             $quantity = rand(1, $maxQuantity);
@@ -325,8 +325,8 @@ class OrderSeeder extends Seeder
     private function createBottleOrderItem(Order $order, BottleType $bottleType, int $quantity, BottleOrderType $bottleOrderType): void
     {
         $unitPrice = match ($bottleOrderType) {
-            BottleOrderType::BOTTLE_WITH_CONTENT() => $bottleType->bottle_with_content_price,
-            BottleOrderType::CONTENT() => $bottleType->content_price,
+            BottleOrderType::FULL() => $bottleType->bottle_with_content_price,
+            BottleOrderType::RECHARGE() => $bottleType->content_price,
         };
 
         // Find available bottles (IN_STOCK + not linked to active order)

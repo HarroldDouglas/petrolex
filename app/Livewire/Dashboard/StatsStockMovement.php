@@ -32,7 +32,7 @@ class StatsStockMovement extends Component
         $this->loadStockStats($startDate, $endDate);
     }
 
-    #[On('filters-changed-stock-movement')]
+    #[On('filters-changed-dashboard')]
     public function handleFiltersChanged(
         ?string $startDate = null,
         ?string $endDate = null,

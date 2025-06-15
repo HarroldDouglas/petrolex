@@ -5,8 +5,8 @@ namespace App\Enums;
 use Spatie\Enum\Laravel\Enum;
 
 /**
- * @method static self BOTTLE_WITH_CONTENT()
- * @method static self CONTENT()
+ * @method static self FULL()
+ * @method static self RECHARGE()
  */
 class BottleOrderType extends Enum
 {
@@ -16,8 +16,8 @@ class BottleOrderType extends Enum
     public static function labels(): array
     {
         return [
-            'BOTTLE_WITH_CONTENT' => 'Bouteille avec recharge',
-            'CONTENT' => 'Recharge',
+            'FULL' => 'Bouteille avec recharge',
+            'RECHARGE' => 'Recharge',
         ];
     }
 
@@ -27,8 +27,8 @@ class BottleOrderType extends Enum
     public static function values(): array
     {
         return [
-            'BOTTLE_WITH_CONTENT' => 'bottle_with_content',
-            'CONTENT' => 'content',
+            'FULL' => 'bottle_with_content',
+            'RECHARGE' => 'content',
         ];
     }
 }
