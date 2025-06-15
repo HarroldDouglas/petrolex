@@ -28,7 +28,7 @@ class StatsStockMovement extends Component
     {
         $endDate = Carbon::now()->format('Y-m-d');
         $startDate = Carbon::now()->subDays(7)->format('Y-m-d');
-        
+
         $this->loadStockStats($startDate, $endDate);
     }
 

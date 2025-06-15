@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dashboard;
+namespace App\Livewire\Order;
 
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
@@ -9,12 +9,11 @@ use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
-class DashboardDataTable extends BaseDataTable
+class OrderDataTable extends BaseDataTable
 {
     protected $model = Order::class;
 
@@ -190,16 +189,7 @@ class DashboardDataTable extends BaseDataTable
                     return $builder->where('status', $value);
                 }),
 
-            DateFilter::make('Date après')
-                ->config([
-                    'placeholder' => 'Date minimum',
-                    'locale' => 'fr',
-                ])
-                ->filter(function (Builder $builder, string $value) {
-                    $builder->whereDate('order_date', '>=', $value);
-                }),
-
-            DateRangeFilter::make('Période')
+            DateRangeFilter::make('Période de date de commande')
                 ->config([
                     'locale' => 'fr',
                     'altFormat' => 'd/m/Y',

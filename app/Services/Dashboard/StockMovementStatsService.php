@@ -12,10 +12,10 @@ class StockMovementStatsService
 
     /**
      * Get stock statistics for the specified period and distribution centers
-     * 
-     * @param string|null $startDate Start date of the period in string format
-     * @param string|null $endDate End date of the period in string format
-     * @param array|null $distributionCenterIds Array of distribution center IDs to filter by
+     *
+     * @param  string|null  $startDate  Start date of the period in string format
+     * @param  string|null  $endDate  End date of the period in string format
+     * @param  array|null  $distributionCenterIds  Array of distribution center IDs to filter by
      * @return StockMovementStatsDTO DTO containing the stock movement statistics
      */
     public function getStockStats(
