@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
+use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
@@ -85,11 +85,11 @@ class BottleTypeDataTable extends BaseDataTable
                     $builder->where('name', 'like', '%'.$value.'%');
                 }),
 
-            SelectFilter::make('Actif')
+            SelectFilter::make('Status')
                 ->options([
                     '' => 'Tous',
-                    '1' => 'Oui',
-                    '0' => 'Non',
+                    '1' => 'Actif',
+                    '0' => 'Inactif',
                 ])
                 ->filter(function (Builder $builder, string $value) {
                     if ($value !== '') {
@@ -97,11 +97,13 @@ class BottleTypeDataTable extends BaseDataTable
                     }
                 }),
 
-            // You might add a date range filter if useful
-            DateFilter::make('Créé après')
-                ->config(['placeholder' => 'Date minimum', 'locale' => 'fr'])
-                ->filter(function (Builder $builder, string $value) {
-                    $builder->whereDate('created_at', '>=', $value);
+            DateRangeFilter::make('Période de date de création')
+                ->config([
+                    'locale' => 'fr',
+                    'altFormat' => 'd/m/Y',
+                ])
+                ->filter(function (Builder $builder, array $dateRange) {
+                    $builder->whereBetween('created_at', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
                 }),
         ];
     }

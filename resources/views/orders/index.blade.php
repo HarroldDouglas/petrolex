@@ -38,7 +38,7 @@
                     </div>
                     <div class="card-body px-0">
                         <div class="table-responsive app-scroll app-datatable-default">
-                            @livewire('dashboard.dashboard-data-table')
+                            @livewire('order.order-data-table')
                         </div>
                     </div>
                 </div>
