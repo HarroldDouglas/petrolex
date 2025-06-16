@@ -2,22 +2,21 @@
 
 namespace App\Livewire\User;
 
-use App\DTOs\User\CreateUserDTO;
-use App\Services\User\UserService;
+use App\Enums\UserRole;
 use App\Services\DistributionCenter\DistributionCenterService;
-use Livewire\Component;
-use Illuminate\Validation\ValidationException;
-use \App\Enums\UserRole;
+use App\Services\User\UserService;
 use Illuminate\Foundation\Http\FormRequest;
+use Livewire\Component;
 
 abstract class AbstractUserForm extends Component
 {
     public string $first_name = '';
     public string $last_name = '';
     public string $email = '';
-    public string $phone = '';
+    public string $phone_number = '';
     public string $role = '';
     public string $password = '';
+    public bool $is_active = true;
     public $distribution_centers = [];
     public bool $showDistributionCenters = false;
     public bool $showPassword = false;
@@ -48,6 +47,7 @@ abstract class AbstractUserForm extends Component
         // @phpstan-ignore-next-line
         return $this->customRequest()->rules();
     }
+
     public function messages()
     {
         return $this->customRequest()->messages();
@@ -58,10 +58,24 @@ abstract class AbstractUserForm extends Component
      */
     abstract protected function customRequest(): FormRequest;
 
-    public function updatedRole()
+    public function toggleDistributionCenters()
     {
-        $this->showDistributionCenters = $this->role === UserRole::CENTER_MANAGER()->value;
+        $allowedRoles = [
+            UserRole::CENTER_MANAGER()->value,
+            UserRole::DELIVERY_PERSON()->value,
+        ];
+        $this->showDistributionCenters = in_array($this->role, $allowedRoles);
     }
+
+    public function updated($propertyName)
+    {
+        if (in_array($propertyName, ['role'])) {
+            $this->toggleDistributionCenters();
+        }
+
+        $this->validateOnly($propertyName);
+    }
+
     abstract public function save();
 
     public function render()

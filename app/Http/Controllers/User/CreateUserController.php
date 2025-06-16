@@ -17,7 +17,7 @@ class CreateUserController extends Controller
     {
         $this->authorize('users.create');
 
-        return view('users.create-user');
+        return view('users.create');
     }
 
     /**
@@ -25,7 +25,7 @@ class CreateUserController extends Controller
      *
      * @return array
      */
-    //ToDo: remove this function
+    // ToDo: remove this function
     private function getAllowedRolesToCreate()
     {
         $authUser = Auth::user();

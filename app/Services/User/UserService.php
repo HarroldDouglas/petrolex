@@ -20,22 +20,21 @@ class UserService
     public function create(CreateUserDTO $dto): User
     {
         DB::beginTransaction();
-        
+
         try {
             /** @var User $user */
-            $user = $this->userRepository->create($dto);
-            
-            UserCreatedEvent::dispatch($user);
-            
+            $user = $this->userRepository->create($dto->toUserArray());
+
+            UserCreatedEvent::dispatch($user, $dto->role->value, $dto->distribution_centers);
+
             DB::commit();
-            
+
             return $user;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
     }
-
 
     /**
      * Update a user's information

@@ -3,16 +3,36 @@
 namespace App\DTOs\User;
 
 use App\DTOs\BaseDTO;
+use App\Enums\UserRole;
+use Spatie\Enum\Laravel\Casts\EnumCast;
+use Spatie\LaravelData\Attributes\WithCast;
 
 class CreateUserDTO extends BaseDTO
 {
     public function __construct(
-        public ?string $first_name = null,
-        public ?string $last_name = null,
-        public ?string $email = null,
-        public ?string $phone_number = null,
-        public ?string $password = null,
-        public ?string $address = null,
-        public ?bool $is_active = null,
+        public ?string $first_name,
+        public ?string $last_name,
+        public ?string $email,
+        public ?string $phone_number,
+        public ?string $password,
+        public ?string $address,
+        public ?bool $is_active,
+        #[WithCast(EnumCast::class, type: UserRole::class)]
+        public UserRole $role,
+        /** @var array<int> $distribution_centers */
+        public ?array $distribution_centers = []
     ) {}
+
+    public function toUserArray(): array
+    {
+        return [
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'email' => $this->email,
+            'phone_number' => $this->phone_number,
+            'password' => $this->password,
+            'address' => $this->address,
+            'is_active' => $this->is_active,
+        ];
+    }
 }

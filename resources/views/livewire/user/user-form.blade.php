@@ -9,7 +9,7 @@
                        id="last_name"
                        wire:model.live.debounce.500ms="last_name">
                 @error('last_name')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ __($message) }}</div>
                 @enderror
             </div>
             
@@ -38,32 +38,17 @@
             </div>
             
             <div class="col-md-6 mb-3">
-                <label for="phone" class="form-label">Téléphone</label>
+                <label for="phone_number" class="form-label">Téléphone</label>
                 <input type="text" 
-                       class="form-control @error('phone') is-invalid @enderror" 
+                       class="form-control @error('phone_number') is-invalid @enderror" 
                        placeholder="690102030"
-                       id="phone"
-                       wire:model.live.debounce.500ms="phone">
-                @error('phone')
+                       id="phone_number"
+                       wire:model.live.debounce.500ms="phone_number">
+                @error('phone_number')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
             
-            <div class="col-md-6 mb-3">
-                <label for="role" class="form-label">Fonction</label>
-
-                <select class="form-select @error('role') is-invalid @enderror" 
-                        id="role" 
-                        wire:model.live.debounce.500ms.live="role">
-                    <option value="">Sélectionner une fonction</option>
-                    @foreach($allowedRoles as $roleKey => $roleValue)
-                        <option value="{{ $roleKey }}">{{ $roleValue }}</option>
-                    @endforeach
-                </select>
-                @error('role')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
             <div class="col-md-6 mb-3">
                 <label for="password" class="form-label">Mot de passe</label>
                 <div class="input-group">
@@ -79,6 +64,33 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="is_active" class="form-label">Statut</label>
+                <select class="form-select @error('is_active') is-invalid @enderror" 
+                        id="is_active"
+                        wire:model.live.debounce.500ms="is_active">
+                    <option value="{{ \App\Enums\EntityStatus::active()->value }}" selected>{{ \App\Enums\EntityStatus::active()->label }}</option>
+                    <option value="{{ \App\Enums\EntityStatus::inactive()->value }}">{{ \App\Enums\EntityStatus::inactive()->label }}</option>
+                </select>
+                @error('is_active')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="role" class="form-label">Fonction</label>
+
+                <select class="form-select @error('role') is-invalid @enderror" 
+                        id="role" 
+                        wire:model.live.debounce.500ms.live="role">
+                    <option value="">Sélectionner une fonction</option>
+                    @foreach($allowedRoles as $roleKey => $roleValue)
+                        <option value="{{ $roleKey }}">{{ $roleValue }}</option>
+                    @endforeach
+                </select>
+                @error('role')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             @if($showDistributionCenters)
                 <div class="col-md-6 mb-3">

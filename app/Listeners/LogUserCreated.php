@@ -16,9 +16,9 @@ class LogUserCreated
 
         Log::channel('user-dynamic')
             ->info("User created: {$user->full_name} (ID: {$user->id})", [
-            'user_id' => $user->id,
-            'user_full_name' => $user->full_name,
-            'created_at' => now()->toDateTimeString(),
-        ]);
+                'user_id' => $user->id,
+                'user_full_name' => $user->full_name,
+                'created_at' => now()->toDateTimeString(),
+            ]);
     }
 }

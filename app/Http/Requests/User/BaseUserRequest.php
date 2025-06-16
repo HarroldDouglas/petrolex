@@ -2,20 +2,24 @@
 
 namespace App\Http\Requests\User;
 
+use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 abstract class BaseUserRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|max:255',
-            'phone' => 'required|string|max:20',
-            'role' => 'required|exists:roles,id',
-            'distribution_centers' => 'nullable|array',
-            'distribution_centers.*' => 'exists:distribution_centers,id'
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email', 'max:255'],
+            'phone_number' => ['required', 'string', 'max:20'],
+            'password' => ['nullable', 'string', 'min:8'],
+            'role' => ['required', Rule::in(UserRole::values())],
+            'distribution_centers' => ['nullable', 'array'],
+            'distribution_centers.*' => ['exists:distribution_centers,id'],
+            'is_active' => ['required', 'boolean'],
         ];
     }
 
@@ -32,13 +36,16 @@ abstract class BaseUserRequest extends FormRequest
             'email.email' => 'L\'email doit être une adresse email valide.',
             'email.unique' => 'Cet email est déjà utilisé.',
             'email.max' => 'L\'email ne doit pas dépasser 255 caractères.',
-            'phone.required' => 'Le téléphone est obligatoire.',
-            'phone.string' => 'Le téléphone doit être une chaîne de caractères.',
-            'phone.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'phone_number.required' => 'Le téléphone est obligatoire.',
+            'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
+            'phone_number.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
+            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'role.enum' => 'Le rôle sélectionné n\'est pas valide.',
             'role.required' => 'Le rôle est obligatoire.',
-            'role.exists' => 'Le rôle sélectionné n\'existe pas.',
             'distribution_centers.array' => 'Les centres de distribution doivent être un tableau.',
-            'distribution_centers.*.exists' => 'Un ou plusieurs centres de distribution sélectionnés n\'existent pas.'
+            'distribution_centers.*.exists' => 'Un ou plusieurs centres de distribution sélectionnés n\'existent pas.',
+            'is_active.required' => 'Le statut est obligatoire.',
         ];
     }
 }

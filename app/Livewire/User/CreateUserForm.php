@@ -2,16 +2,14 @@
 
 namespace App\Livewire\User;
 
-use App\DTOs\BottleType\UserDTO;
-use App\DTOs\BottleType\CreateBottleTypeDTO;
 use App\DTOs\User\CreateUserDTO;
+use App\Enums\UserRole;
 use App\Http\Requests\User\StoreUserRequest;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateUserForm extends AbstractUserForm
 {
-
     protected function customRequest(): FormRequest
     {
         return new StoreUserRequest;
@@ -19,23 +17,25 @@ class CreateUserForm extends AbstractUserForm
 
     public function save()
     {
+        $validatedData = $this->validate();
         try {
-            
-            $this->validate();
 
-            $dto = CreateUserDTO::from([
-                'first_name' => $this->first_name,
-                'last_name' => $this->last_name,
-                'email' => $this->email,
-                'phone' => $this->phone,
-                'role' => $this->role,
-                'distribution_centers' => $this->showDistributionCenters ?: null
-            ]);
+            $dto = new CreateUserDTO(
+                first_name: $validatedData['first_name'],
+                last_name: $validatedData['last_name'],
+                email: $validatedData['email'],
+                phone_number: $validatedData['phone_number'],
+                password: $validatedData['password'],
+                address: $validatedData['address'] ?? null,
+                is_active: $validatedData['is_active'] ?? true,
+                role: UserRole::from($validatedData['role']),
+                distribution_centers: $validatedData['distribution_centers'] ?? []
+            );
 
-            $user = $this->userService->createUser($dto);
+            $user = $this->userService->create($dto);
 
             session()->flash('success', 'Utilisateur créé avec succès!');
-            
+
             return redirect()->route('users.list');
 
         } catch (ValidationException $e) {
