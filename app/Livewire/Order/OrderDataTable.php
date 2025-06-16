@@ -4,12 +4,16 @@ namespace App\Livewire\Order;
 
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
+use App\Models\DistributionCenter;
 use App\Models\Order;
+use App\Models\User;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
+use Rappasoft\LaravelLivewireTables\Views\Filters\MultiSelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
@@ -160,6 +164,30 @@ class OrderDataTable extends BaseDataTable
         ];
     }
 
+    /**
+     * Get authorized distribution center options for the current user
+     */
+    protected function getDistributionCenterOptions(): array
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (! $user) {
+            return ['' => 'Tous'];
+        }
+
+        $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
+        $centers = DistributionCenter::whereIn('id', $centerIds)->orderBy('name')->get();
+
+        $options = ['' => 'Tous'];
+
+        foreach ($centers as $center) {
+            $options[$center->id] = $center->name;
+        }
+
+        return $options;
+    }
+
     public function filters(): array
     {
         $statusOptions = [];
@@ -173,20 +201,58 @@ class OrderDataTable extends BaseDataTable
         }
 
         return [
+            SelectFilter::make('Centre de distribution')
+                ->options($this->getDistributionCenterOptions())
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder;
+                    }
+
+                    return $builder->where('distribution_center_id', $value);
+                }),
+
+            SelectFilter::make('Type de bouteille')
+                ->options([
+                    '' => 'Tous les types',
+                    'full' => 'Incluant consignes + recharges',
+                    'recharge' => 'Incluant recharges',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder;
+                    }
+
+                    if ($value === 'full') {
+                        // orders having at least one full bottle
+                        return $builder->whereHas('items', function (Builder $query) {
+                            $query->where('bottle_type', 'bottle_with_content');
+                        });
+                    }
+
+                    if ($value === 'recharge') {
+                        // orders having at least one recharge
+                        return $builder->whereHas('items', function (Builder $query) {
+                            $query->where('bottle_type', 'content');
+                        });
+                    }
+
+                    return $builder;
+                }),
+
             TextFilter::make('N° Commande')
                 ->config(['placeholder' => 'Rechercher un numéro...'])
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('order_number', 'like', '%'.$value.'%');
                 }),
 
-            SelectFilter::make('Statut')
-                ->options(array_merge(['' => 'Tous'], $statusOptions))
-                ->filter(function (Builder $builder, string $value) {
-                    if ($value === '') {
+            MultiSelectFilter::make('Statut')
+                ->options($statusOptions)
+                ->filter(function (Builder $builder, array $values) {
+                    if (empty($values)) {
                         return $builder;
                     }
 
-                    return $builder->where('status', $value);
+                    return $builder->whereIn('status', $values);
                 }),
 
             DateRangeFilter::make('Période de date de commande')

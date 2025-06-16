@@ -17,15 +17,18 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->foreignId('bottle_type_id')->constrained()->onDelete('restrict');
             $table->foreignId('distribution_center_id')->constrained()->onDelete('restrict');
+            $table->foreignId('marked_lost_by_user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('barcode', 255)->unique();
             $table->boolean('is_filled')->default(true);
             $table->enum('status', BottleStatus::values())->default('in_stock');
             $table->timestamps();
+            $table->timestamp('marked_lost_at')->nullable();
             $table->softDeletes();
             
             // Add indexes for better performance
             $table->index(['distribution_center_id', 'bottle_type_id', 'status']);
             $table->index('status');
+            $table->index('marked_lost_by_user_id');
         });
     }
 

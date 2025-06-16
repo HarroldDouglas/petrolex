@@ -15,6 +15,10 @@ class StatsOverview extends Component
     public int $deliveredOrders = 0;
     public int $canceledOrders = 0;
 
+    public ?string $currentStartDate = null;
+    public ?string $currentEndDate = null;
+    public ?string $currentDistributionCenterId = null;
+
     private DashboardStatsService $statsService;
 
     public function boot(DashboardStatsService $statsService): void
@@ -24,42 +28,126 @@ class StatsOverview extends Component
 
     public function mount(): void
     {
+        $this->setDefaultFilters();
         $this->loadStats();
     }
 
     #[On('filters-changed-dashboard')]
     public function handleFiltersChanged(?string $startDate = null, ?string $endDate = null, ?string $distributionCenterId = null): void
     {
-        $this->loadStats($startDate, $endDate, $distributionCenterId);
+        $this->currentStartDate = $startDate ?: $this->getDefaultStartDate();
+        $this->currentEndDate = $endDate ?: $this->getDefaultEndDate();
+        $this->currentDistributionCenterId = $distributionCenterId;
+
+        $this->loadStats();
     }
 
-    private function loadStats(?string $startDate = null, ?string $endDate = null, ?string $distributionCenterId = null): void
+    private function setDefaultFilters(): void
     {
-        if ($distributionCenterId === null || $distributionCenterId === '') {
-            /** @var User|null $user */
-            $user = Auth::user();
-            if ($user) {
-                $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
+        $this->currentStartDate = $this->getDefaultStartDate();
+        $this->currentEndDate = $this->getDefaultEndDate();
+        $this->currentDistributionCenterId = null;
+    }
 
-                if (! empty($centerIds)) {
-                    $stats = $this->statsService->getStatsByMultipleCenters($startDate, $endDate, $centerIds);
+    private function getDefaultStartDate(): string
+    {
+        return now()->subDays(7)->format('Y-m-d');
+    }
 
-                    $this->revenue = $stats->revenue;
-                    $this->pendingOrders = $stats->pendingOrders;
-                    $this->deliveredOrders = $stats->deliveredOrders;
-                    $this->canceledOrders = $stats->canceledOrders;
+    private function getDefaultEndDate(): string
+    {
+        return now()->format('Y-m-d');
+    }
 
-                    return;
-                }
-            }
+    private function loadStats(): void
+    {
+        $distributionCenterIds = $this->resolveDistributionCenterIds();
+
+        $stats = $this->statsService->getStats(
+            $this->currentStartDate,
+            $this->currentEndDate,
+            $distributionCenterIds
+        );
+
+        $this->updateStats($stats);
+    }
+
+    private function resolveDistributionCenterIds(): string|array|null
+    {
+        if ($this->currentDistributionCenterId && $this->currentDistributionCenterId !== '') {
+            return $this->currentDistributionCenterId;
         }
+        /** @var User|null $user */
+        $user = Auth::user();
 
-        $stats = $this->statsService->getStats($startDate, $endDate, $distributionCenterId);
+        return $user
+            ?->distributionCenters()
+            ->pluck('distribution_center_id')
+            ->toArray() ?: null;
+    }
 
+    private function updateStats($stats): void
+    {
         $this->revenue = $stats->revenue;
         $this->pendingOrders = $stats->pendingOrders;
         $this->deliveredOrders = $stats->deliveredOrders;
         $this->canceledOrders = $stats->canceledOrders;
+    }
+
+    public function getRevenueUrlProperty(): string
+    {
+        return '/orders?'.http_build_query([
+            'table-filters' => [
+                'centre_de_distribution' => $this->currentDistributionCenterId ?? '',
+                'statut' => ['delivered'],
+                'période_de_date_de_commande' => [
+                    'minDate' => $this->currentStartDate,
+                    'maxDate' => $this->currentEndDate,
+                ],
+            ],
+        ]);
+    }
+
+    public function getPendingOrdersUrlProperty(): string
+    {
+        return '/orders?'.http_build_query([
+            'table-filters' => [
+                'centre_de_distribution' => $this->currentDistributionCenterId ?? '',
+                'statut' => ['confirmed', 'in_progress'],
+                'période_de_date_de_commande' => [
+                    'minDate' => $this->currentStartDate,
+                    'maxDate' => $this->currentEndDate,
+                ],
+            ],
+        ]);
+    }
+
+    public function getDeliveredOrdersUrlProperty(): string
+    {
+        return '/orders?'.http_build_query([
+            'table-filters' => [
+                'centre_de_distribution' => $this->currentDistributionCenterId ?? '',
+                'statut' => ['delivered'],
+                'période_de_date_de_commande' => [
+                    'minDate' => $this->currentStartDate,
+                    'maxDate' => $this->currentEndDate,
+                ],
+            ],
+        ]);
+    }
+
+    public function getCanceledOrdersUrlProperty(): string
+    {
+        return '/orders?'.http_build_query([
+            'table-filters' => [
+                'centre_de_distribution' => $this->currentDistributionCenterId ?? '',
+                'statut' => ['cancelled'],
+                'période_de_date_de_commande' => [
+                    'minDate' => $this->currentStartDate,
+                    'maxDate' => $this->currentEndDate,
+                ],
+            ],
+        ]);
     }
 
     public function render()

@@ -156,6 +156,36 @@ class SuppliesDataTable extends BaseDataTable
                     return $builder->where('distribution_center_id', $value);
                 }),
 
+            SelectFilter::make('Type de livraison')
+                ->options([
+                    '' => 'Tous types',
+                    'has_bottles' => 'Incluant des bouteilles',
+                    'only_bottles' => 'Uniquement des bouteilles',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder;
+                    }
+
+                    if ($value === 'has_bottles') {
+                        // supplies with at least one bottle
+                        return $builder->whereHas('productTypes', function (Builder $query) {
+                            $query->where('product_type', 'bottle');
+                        });
+                    }
+
+                    if ($value === 'only_bottles') {
+                        // supplies with only bottles and no other product types
+                        return $builder->whereDoesntHave('productTypes', function (Builder $query) {
+                            $query->where('product_type', '!=', 'bottle');
+                        })->whereHas('productTypes', function (Builder $query) {
+                            $query->where('product_type', 'bottle');
+                        });
+                    }
+
+                    return $builder;
+                }),
+
             TextFilter::make('Reference')
                 ->config(['placeholder' => 'Rechercher une référence...'])
                 ->filter(function (Builder $builder, string $value) {

@@ -29,12 +29,12 @@ class OrderRepository implements OrderRepositoryInterface
     /**
      * Create a base query builder with common filters
      */
-    private function createBaseQuery(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): Builder
+    private function createBaseStatsQuery(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): Builder
     {
         $query = Order::query();
 
         if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [
+            $query->whereBetween('order_date', [
                 $startDate->startOfDay(),
                 $endDate->endOfDay(),
             ]);
@@ -52,7 +52,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): string
     {
-        $revenue = $this->createBaseQuery($startDate, $endDate, $distributionCenterIds)
+        $revenue = $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
             ->where('status', OrderStatus::DELIVERED()->value)
             ->sum('total_amount');
 
@@ -64,7 +64,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function countPendingOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int
     {
-        return $this->createBaseQuery($startDate, $endDate, $distributionCenterIds)
+        return $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
             ->whereIn('status', [
                 OrderStatus::CONFIRMED()->value,
                 OrderStatus::PROCESSING()->value,
@@ -77,7 +77,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function countDeliveredOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int
     {
-        return $this->createBaseQuery($startDate, $endDate, $distributionCenterIds)
+        return $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
             ->where('status', OrderStatus::DELIVERED()->value)
             ->count();
     }
@@ -87,7 +87,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function countCanceledOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int
     {
-        return $this->createBaseQuery($startDate, $endDate, $distributionCenterIds)
+        return $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
             ->where('status', OrderStatus::CANCELLED()->value)
             ->count();
     }

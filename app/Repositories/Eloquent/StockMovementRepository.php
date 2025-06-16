@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Enums\BottleOrderType;
+use App\Enums\SupplierDeliveryStatus;
 use App\Models\DistributionCenter;
 use App\Models\Order;
 use App\Models\SupplierDelivery;
@@ -31,7 +32,7 @@ class StockMovementRepository implements StockMovementRepositoryInterface
 
         // Get orders and count the bottles sold with content
         return $query->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->where('order_items.bottle_type', BottleOrderType::BOTTLE_WITH_CONTENT()->value)
+            ->where('order_items.bottle_type', BottleOrderType::FULL()->value)
             ->sum('order_items.quantity');
     }
 
@@ -55,7 +56,7 @@ class StockMovementRepository implements StockMovementRepositoryInterface
 
         // Get content only exchanges/refills
         return $query->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->where('order_items.bottle_type', BottleOrderType::CONTENT()->value)
+            ->where('order_items.bottle_type', BottleOrderType::RECHARGE()->value)
             ->sum('order_items.quantity');
     }
 
@@ -120,6 +121,8 @@ class StockMovementRepository implements StockMovementRepositoryInterface
         if ($centerIds && count($centerIds) > 0) {
             $query->whereIn('distribution_center_id', $centerIds);
         }
+
+        $query->where('status', SupplierDeliveryStatus::COMPLETED()->value);
 
         return $query->join('supplier_delivery_product_types', 'supplier_deliveries.id', '=', 'supplier_delivery_product_types.supplier_delivery_id')
             ->sum('supplier_delivery_product_types.expected_quantity');
