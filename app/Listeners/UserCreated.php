@@ -20,7 +20,7 @@ class UserCreated
         $user->assignRole($role);
         $user->accessibleDistributionCenters()->sync($distribution_centers);
         if ($role === UserRole::DELIVERY_PERSON()->value) {
-            $user->deliveryPerson()->create(['current_balance' => 0]);
+            $user->deliveryPerson()->create();
         } elseif ($role === UserRole::CUSTOMER()->value) {
             $user->customer()->create(['current_balance' => 0]);
         }
