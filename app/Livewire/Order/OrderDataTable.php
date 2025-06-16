@@ -211,6 +211,34 @@ class OrderDataTable extends BaseDataTable
                     return $builder->where('distribution_center_id', $value);
                 }),
 
+            SelectFilter::make('Type de bouteille')
+                ->options([
+                    '' => 'Tous les types',
+                    'full' => 'Incluant consignes + recharges',
+                    'recharge' => 'Incluant recharges',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder;
+                    }
+
+                    if ($value === 'full') {
+                        // orders having at least one full bottle
+                        return $builder->whereHas('items', function (Builder $query) {
+                            $query->where('bottle_type', 'bottle_with_content');
+                        });
+                    }
+
+                    if ($value === 'recharge') {
+                        // orders having at least one recharge
+                        return $builder->whereHas('items', function (Builder $query) {
+                            $query->where('bottle_type', 'content');
+                        });
+                    }
+
+                    return $builder;
+                }),
+
             TextFilter::make('N° Commande')
                 ->config(['placeholder' => 'Rechercher un numéro...'])
                 ->filter(function (Builder $builder, string $value) {

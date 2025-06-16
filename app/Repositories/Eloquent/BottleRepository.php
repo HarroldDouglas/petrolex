@@ -62,12 +62,17 @@ class BottleRepository extends BaseEloquentRepository implements BottleRepositor
 
     /**
      * Count bottles with in_stock status
+     * This count is independent of date range as it reflects current status
      */
     public function countInStockBottles(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int
     {
-        return $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
-            ->where('status', BottleStatus::IN_STOCK()->value)
-            ->count();
+        $query = Bottle::query();
+
+        if (! empty($distributionCenterIds)) {
+            $query->whereIn('distribution_center_id', $distributionCenterIds);
+        }
+
+        return $query->where('status', BottleStatus::IN_STOCK()->value)->count();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Enums\BottleOrderType;
+use App\Enums\SupplierDeliveryStatus;
 use App\Models\DistributionCenter;
 use App\Models\Order;
 use App\Models\SupplierDelivery;
@@ -120,6 +121,8 @@ class StockMovementRepository implements StockMovementRepositoryInterface
         if ($centerIds && count($centerIds) > 0) {
             $query->whereIn('distribution_center_id', $centerIds);
         }
+
+        $query->where('status', SupplierDeliveryStatus::COMPLETED()->value);
 
         return $query->join('supplier_delivery_product_types', 'supplier_deliveries.id', '=', 'supplier_delivery_product_types.supplier_delivery_id')
             ->sum('supplier_delivery_product_types.expected_quantity');
