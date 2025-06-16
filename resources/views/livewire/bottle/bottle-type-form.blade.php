@@ -3,7 +3,7 @@
         @csrf
         
         <div class="col-md-6">
-            <label for="weight" class="form-label">Poids</label>
+            <label for="weight" class="form-label required">Poids (En Kg)</label>
             <input type="number" class="form-control @error('weight') is-invalid @enderror" 
             id="weight" placeholder="Ex: 6" wire:model.live.debounce.500ms="weight">
             @error('weight')
@@ -12,7 +12,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="capacity" class="form-label">Capacité</label>
+            <label for="capacity" class="form-label required">Capacité (en Litre)</label>
             <input type="number" class="form-control @error('capacity') is-invalid @enderror" 
             id="capacity" placeholder="Ex: 50" wire:model.live.debounce.500ms="capacity">
             @error('capacity')
@@ -21,16 +21,16 @@
         </div>
 
         <div class="col-md-12">
-            <label for="name" class="form-label">Nom du type de bouteille à ajouter</label>
+            <label for="name" class="form-label required">Nom du type de bouteille à ajouter</label>
             <input type="text" class="form-control @error('name') is-invalid @enderror" 
-            id="name" placeholder="Ex: Bouteille 6kg" wire:model.live.debounce.500ms="name">
+            id="name" placeholder="Ex: Bouteille 6kg" wire:model.live.debounce.500ms="name" readonly>
             @error('name')
             <div class="invalid-feedback">{{ __($message) }}</div>
             @enderror
         </div>
 
         <div class="col-md-6">
-            <label for="content_price" class="form-label">Prix de la recharge</label>
+            <label for="content_price" class="form-label required">Prix de la recharge</label>
             <input type="number" class="form-control @error('content_price') is-invalid @enderror" 
                 id="content_price" placeholder="Ex: 8500"
                 wire:model.live.debounce.500ms="content_price">
@@ -40,7 +40,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="bottle_with_content_price" class="form-label">Prix de la consigne + recharge</label>
+            <label for="bottle_with_content_price" class="form-label required">Prix de la consigne + recharge</label>
             <input type="number" class="form-control @error('bottle_with_content_price') is-invalid @enderror" 
                 id="bottle_with_content_price" placeholder="Ex: 25000"
                 wire:model.live.debounce.500ms="bottle_with_content_price">
@@ -134,7 +134,7 @@
         
         <div class="col-md-12 mt-4">
             <button type="submit" class="btn btn-success">
-                <i class="ti ti-device-floppy"></i> Créer
+                <i class="ti ti-device-floppy"></i> Enregistrer
             </button>
         </div>
     </form>

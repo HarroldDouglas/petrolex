@@ -17,8 +17,7 @@ use Illuminate\Support\Carbon;
  * @property float $bottle_with_content_price
  * @property float $bottle_only_price
  * @property float $deposit_price
- * @property int $weight_empty
- * @property int $weight_filled
+ * @property int $weight
  * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at

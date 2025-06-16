@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
@@ -20,7 +19,7 @@ class SuppliesDataTable extends BaseDataTable
 {
     protected $model = SupplierDelivery::class;
 
-    protected const DEFAULT_SORT_FIELD = 'delivery_date';
+    protected const DEFAULT_SORT_FIELD = 'supply_date';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
 
     protected function getExportFileName(): string
@@ -74,7 +73,7 @@ class SuppliesDataTable extends BaseDataTable
                     return new HtmlString($html ?: '-');
                 }),
 
-            Column::make('Date', 'delivery_date')
+            Column::make('Date', 'supply_date')
                 ->sortable()
                 ->format(fn ($value) => $value->format('d M,Y H:i')),
 
@@ -157,6 +156,36 @@ class SuppliesDataTable extends BaseDataTable
                     return $builder->where('distribution_center_id', $value);
                 }),
 
+            SelectFilter::make('Type de livraison')
+                ->options([
+                    '' => 'Tous types',
+                    'has_bottles' => 'Incluant des bouteilles',
+                    'only_bottles' => 'Uniquement des bouteilles',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder;
+                    }
+
+                    if ($value === 'has_bottles') {
+                        // supplies with at least one bottle
+                        return $builder->whereHas('productTypes', function (Builder $query) {
+                            $query->where('product_type', 'bottle');
+                        });
+                    }
+
+                    if ($value === 'only_bottles') {
+                        // supplies with only bottles and no other product types
+                        return $builder->whereDoesntHave('productTypes', function (Builder $query) {
+                            $query->where('product_type', '!=', 'bottle');
+                        })->whereHas('productTypes', function (Builder $query) {
+                            $query->where('product_type', 'bottle');
+                        });
+                    }
+
+                    return $builder;
+                }),
+
             TextFilter::make('Reference')
                 ->config(['placeholder' => 'Rechercher une référence...'])
                 ->filter(function (Builder $builder, string $value) {
@@ -173,22 +202,13 @@ class SuppliesDataTable extends BaseDataTable
                     return $builder->where('status', $value);
                 }),
 
-            DateFilter::make('Date après')
-                ->config([
-                    'placeholder' => 'Date minimum',
-                    'locale' => 'fr',
-                ])
-                ->filter(function (Builder $builder, string $value) {
-                    $builder->whereDate('delivery_date', '>=', $value);
-                }),
-
-            DateRangeFilter::make('Période')
+            DateRangeFilter::make('Période de date de livraison')
                 ->config([
                     'locale' => 'fr',
                     'altFormat' => 'd/m/Y',
                 ])
                 ->filter(function (Builder $builder, array $dateRange) {
-                    $builder->whereBetween('delivery_date', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
+                    $builder->whereBetween('supply_date', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
                 }),
         ];
     }

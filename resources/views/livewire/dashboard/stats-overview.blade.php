@@ -7,6 +7,7 @@
             title="Chiffre d'affaires"
             subtitle="(en CFA)"
             :value="$revenue"
+            :url="$this->revenueUrl"
         />
         
         <x-dashboard.stat-block
@@ -16,6 +17,7 @@
             title="Commandes"
             subtitle="en attente"
             :value="$pendingOrders"
+            :url="$this->pendingOrdersUrl"
         />
         
         <x-dashboard.stat-block
@@ -25,6 +27,7 @@
             title="Commandes"
             subtitle="livrées"
             :value="$deliveredOrders"
+            :url="$this->deliveredOrdersUrl"
         />
         
         <x-dashboard.stat-block
@@ -34,6 +37,7 @@
             title="Commandes"
             subtitle="annulées"
             :value="$canceledOrders"
+            :url="$this->canceledOrdersUrl"
         />
     </div>
 </div>

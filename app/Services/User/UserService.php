@@ -20,14 +20,14 @@ class UserService
      *
      * @param  User  $user  The user to update
      * @param  UpdateUserDTO  $dto  Data Transfer Object containing the updated user data
-     * @return bool Whether the update was successful
+     * @return User The updated user model
      */
-    public function update(User $user, UpdateUserDTO $dto): bool
+    public function update(User $user, UpdateUserDTO $dto): User
     {
         $attributes = $dto->toArrayFiltered();
 
         if (empty($attributes)) {
-            return true;
+            return $user;
         }
 
         $originalValues = $user->only(array_keys($attributes));
@@ -35,6 +35,7 @@ class UserService
         DB::beginTransaction();
 
         try {
+            /** @var User */
             $result = $this->userRepository->update($user, $attributes);
 
             if ($result) {

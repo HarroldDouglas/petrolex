@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('delivery_number', 255)->unique();
             $table->string('supplier_name', 255);
             $table->text('description')->nullable();
-            $table->date('delivery_date');
+            $table->date('supply_date');
             $table->enum('status', SupplierDeliveryStatus::values())->default('in_progress');
             $table->text('notes')->nullable();
             $table->timestamps();

@@ -5,7 +5,7 @@ namespace App\Repositories\Contracts;
 use App\Models\DistributionCenter;
 use Illuminate\Database\Eloquent\Collection;
 
-interface DistributionCenterRepositoryInterface extends baseRepositoryInterface
+interface DistributionCenterRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Get distribution centers by IDs.
