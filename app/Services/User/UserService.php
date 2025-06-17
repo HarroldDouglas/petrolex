@@ -25,7 +25,7 @@ class UserService
             /** @var User $user */
             $user = $this->userRepository->create($dto->toUserArray());
 
-            UserCreatedEvent::dispatch($user, $dto->role->value, $dto->distribution_centers);
+            UserCreatedEvent::dispatch($user, $dto->role->value, $dto->distribution_center_ids);
 
             DB::commit();
 

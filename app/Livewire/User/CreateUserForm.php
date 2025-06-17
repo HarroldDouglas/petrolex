@@ -17,6 +17,7 @@ class CreateUserForm extends AbstractUserForm
 
     public function save()
     {
+
         $validatedData = $this->validate();
         try {
 
@@ -29,7 +30,7 @@ class CreateUserForm extends AbstractUserForm
                 address: $validatedData['address'] ?? null,
                 is_active: $validatedData['is_active'] ?? true,
                 role: UserRole::from($validatedData['role']),
-                distribution_centers: $validatedData['distribution_centers'] ?? []
+                distribution_center_ids: $validatedData['distribution_center_ids'] ?? []
             );
 
             $user = $this->userService->create($dto);

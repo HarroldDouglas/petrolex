@@ -17,10 +17,10 @@ class CreateUserDTO extends BaseDTO
         public ?string $password,
         public ?string $address,
         public ?bool $is_active,
-        #[WithCast(EnumCast::class, type: UserRole::class)]
+        #[WithCast(EnumCast::class)]
         public UserRole $role,
-        /** @var array<int> $distribution_centers */
-        public ?array $distribution_centers = []
+        /** @var array<int> $distribution_center_ids */
+        public ?array $distribution_center_ids = []
     ) {}
 
     public function toUserArray(): array

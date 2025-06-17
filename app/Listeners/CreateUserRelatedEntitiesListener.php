@@ -6,7 +6,7 @@ use App\Enums\UserRole;
 use App\Events\UserCreatedEvent;
 use Illuminate\Support\Facades\Log;
 
-class UserCreated
+class CreateUserRelatedEntitiesListener
 {
     /**
      * Handle the event.
@@ -14,11 +14,11 @@ class UserCreated
     public function handle(UserCreatedEvent $event): void
     {
         $user = $event->user;
-        $distribution_centers = $event->distribution_centers;
+        $distribution_center_ids = $event->distribution_center_ids;
         $role = $event->role;
 
         $user->assignRole($role);
-        $user->accessibleDistributionCenters()->sync($distribution_centers);
+        $user->accessibleDistributionCenters()->sync($distribution_center_ids);
         if ($role === UserRole::DELIVERY_PERSON()->value) {
             $user->deliveryPerson()->create();
         } elseif ($role === UserRole::CUSTOMER()->value) {

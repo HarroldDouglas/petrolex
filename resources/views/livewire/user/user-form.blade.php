@@ -94,16 +94,16 @@
             </div>
             @if($showDistributionCenters)
                 <div class="col-md-6 mb-3">
-                    <label for="distribution_centers" class="form-label">Centre de distribution</label>
-                    <select class="form-select @error('distribution_centers') is-invalid @enderror" 
-                            id="distribution_centers" 
-                            wire:model.live.debounce.500ms="distribution_centers" 
+                    <label for="distribution_center_ids" class="form-label">Centre de distribution</label>
+                    <select class="form-select @error('distribution_center_ids') is-invalid @enderror" 
+                            id="distribution_center_ids" 
+                            wire:model.live.debounce.500ms="distribution_center_ids" 
                             multiple>
                         @foreach($availableDistributionCenters as $centerKey => $centerValue)
                             <option value="{{ $centerKey }}">{{ $centerValue }}</option>
                         @endforeach
                     </select>
-                    @error('distribution_centers')
+                    @error('distribution_center_ids')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                     <div class="form-text">Maintenez Ctrl (Cmd sur Mac) pour sélectionner plusieurs options.</div>

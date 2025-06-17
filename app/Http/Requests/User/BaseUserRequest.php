@@ -17,8 +17,8 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number' => ['required', 'string', 'max:20'],
             'password' => ['nullable', 'string', 'min:8'],
             'role' => ['required', Rule::in(UserRole::values())],
-            'distribution_centers' => ['nullable', 'array'],
-            'distribution_centers.*' => ['exists:distribution_centers,id'],
+            'distribution_center_ids' => ['nullable', 'array'],
+            'distribution_center_ids.*' => ['exists:distribution_centers,id'],
             'is_active' => ['required', 'boolean'],
         ];
     }
@@ -43,8 +43,8 @@ abstract class BaseUserRequest extends FormRequest
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'role.enum' => 'Le rôle sélectionné n\'est pas valide.',
             'role.required' => 'Le rôle est obligatoire.',
-            'distribution_centers.array' => 'Les centres de distribution doivent être un tableau.',
-            'distribution_centers.*.exists' => 'Un ou plusieurs centres de distribution sélectionnés n\'existent pas.',
+            'distribution_center_ids.array' => 'Les centres de distribution doivent être un tableau.',
+            'distribution_center_ids.*.exists' => 'Un ou plusieurs centres de distribution sélectionnés n\'existent pas.',
             'is_active.required' => 'Le statut est obligatoire.',
         ];
     }

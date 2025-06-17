@@ -17,7 +17,7 @@ abstract class AbstractUserForm extends Component
     public string $role = '';
     public string $password = '';
     public bool $is_active = true;
-    public $distribution_centers = [];
+    public $distribution_center_ids = [];
     public bool $showDistributionCenters = false;
     public bool $showPassword = false;
 

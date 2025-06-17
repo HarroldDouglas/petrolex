@@ -17,6 +17,6 @@ class UserCreatedEvent
     public function __construct(
         public User $user,
         public string $role,
-        public array $distribution_centers,
+        public array $distribution_center_ids,
     ) {}
 }
