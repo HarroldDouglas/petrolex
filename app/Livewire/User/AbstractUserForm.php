@@ -6,6 +6,8 @@ use App\Enums\UserRole;
 use App\Services\DistributionCenter\DistributionCenterService;
 use App\Services\User\UserService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 abstract class AbstractUserForm extends Component
@@ -22,18 +24,30 @@ abstract class AbstractUserForm extends Component
     public bool $showPassword = false;
 
     public $allowedRoles = [];
-    public $availableDistributionCenters = [];
+    public array $availableDistributionCenters = [];
 
     protected $userService;
     protected $distributionCenterService;
+
+    #[On('distribution-centers:selection-changed')]
+    public function handleDistributionCentersUpdate($data): void
+    {
+        Log::info('Distribution centers updated', [
+            'selected' => $data['selected'] ?? [],
+        ]);
+        $this->distribution_center_ids = $data['selected'] ?? [];
+    }
 
     public function mount(): void
     {
         $this->allowedRoles = UserRole::toArray();
 
         $this->availableDistributionCenters = $this->distributionCenterService->getAll()
-            ->pluck('name', 'id')
-            ->toArray();
+                ->map(fn($center) => [
+                    'id' => $center->id,
+                    'name' => $center->name,
+                ])
+                ->toArray();
     }
 
     public function boot(UserService $userService, DistributionCenterService $distributionCenterService)
