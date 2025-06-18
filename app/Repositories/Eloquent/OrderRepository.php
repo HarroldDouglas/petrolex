@@ -135,7 +135,7 @@ class OrderRepository implements OrderRepositoryInterface
         string $aggregationColumn,
         string $aggregationType
     ): Collection {
-        $query = $this->createBaseQuery(
+        $query = $this->createBaseStatsQuery(
             Carbon::parse($startDate), 
             Carbon::parse($endDate),
             is_string($distributionCenterId) ? [$distributionCenterId] : $distributionCenterId 

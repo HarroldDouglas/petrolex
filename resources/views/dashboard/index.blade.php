@@ -49,9 +49,6 @@
         <div class="row ticket-app">
             @livewire('dashboard.stats-overview')
         </div>
-        <div class="row ticket-app">
-            @livewire('dashboard.stats-stock-movement')
-        </div>
         <!-- Ticket end -->
 
         <!-- Graphs start -->
