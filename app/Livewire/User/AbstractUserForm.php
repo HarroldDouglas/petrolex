@@ -32,10 +32,7 @@ abstract class AbstractUserForm extends Component
     #[On('distribution-centers:selection-changed')]
     public function handleDistributionCentersUpdate($data): void
     {
-        Log::info('Distribution centers updated', [
-            'selected' => $data['selected'] ?? [],
-        ]);
-        $this->distribution_center_ids = $data['selected'] ?? [];
+        $this->distribution_center_ids = $data['selectedOptions'] ?? [];
     }
 
     public function mount(): void
@@ -62,6 +59,21 @@ abstract class AbstractUserForm extends Component
     public function messages()
     {
         return $this->customRequest()->messages();
+    }
+
+    protected function validateDistributionCenters(): void
+    {
+        if (! $this->showDistributionCenters) {
+            return;
+        }
+        if (count($this->distribution_center_ids) == 0) {
+            $errorMessage = 'Veuillez sélectionner au moins un centre de distribution.';
+            $this->addError('distribution_center_ids', $errorMessage);
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'distribution_center_ids' => [$errorMessage],
+            ]);
+        }
     }
 
     /**

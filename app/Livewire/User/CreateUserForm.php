@@ -7,8 +7,6 @@ use App\Enums\UserRole;
 use App\Http\Requests\User\StoreUserRequest;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\On;
 
 class CreateUserForm extends AbstractUserForm
 {
@@ -19,11 +17,8 @@ class CreateUserForm extends AbstractUserForm
 
     public function save()
     {
-        Log::info('Before Validation', [
-            'distribution_center_ids' => $this->distribution_center_ids
-        ]);
         $validatedData = $this->validate();
-        Log::info('Validation');
+        $this->validateDistributionCenters();
         try {
             $dto = new CreateUserDTO(
                 first_name: $validatedData['first_name'],

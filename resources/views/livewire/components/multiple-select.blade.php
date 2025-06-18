@@ -1,7 +1,7 @@
 <div>
     <div wire:ignore>
     <select 
-        class="form-control select2 @error('selectedOptions') is-invalid @enderror""
+        class="form-control select2 {{ $hasErrors ? 'is-invalid' : '' }}"
         multiple
         x-init="
             $nextTick(() => {
@@ -16,6 +16,11 @@
                     let data = $(this).val();
                     @this.call('updateSelection', data);
                 });
+
+                // Initialize with any existing values
+                if (@js($selectedOptions).length > 0) {
+                    select2.val(@js($selectedOptions)).trigger('change');
+                }
             });
         "
     >

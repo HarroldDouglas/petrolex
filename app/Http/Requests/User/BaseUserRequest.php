@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 abstract class BaseUserRequest extends FormRequest
@@ -18,7 +19,16 @@ abstract class BaseUserRequest extends FormRequest
             'password' => ['nullable', 'string', 'min:8'],
             'role' => ['required', Rule::in(UserRole::values())],
             'distribution_center_ids' => ['nullable', 'array'],
-            'distribution_center_ids.*' => ['exists:distribution_centers,id'],
+            'distribution_center_ids.*' => [
+                Rule::requiredIf(function () {
+                    $role = $this->input('role');
+                    return in_array($role, [
+                        UserRole::CENTER_MANAGER()->value,
+                        UserRole::DELIVERY_PERSON()->value,
+                    ]);
+                }),
+                'exists:distribution_centers,id',
+            ],
             'is_active' => ['required', 'boolean'],
         ];
     }

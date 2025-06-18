@@ -1,5 +1,6 @@
 <div>
     <form wire:submit.prevent="save" class="app-form">
+    
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="last_name" class="form-label">Nom</label>
@@ -21,7 +22,7 @@
                        id="first_name"
                        wire:model.live.debounce.500ms="first_name">
                 @error('first_name')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ __($message) }}</div>
                 @enderror
             </div>
             
@@ -33,7 +34,7 @@
                        id="email"
                        wire:model.live.debounce.500ms="email">
                 @error('email')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ __($message) }}</div>
                 @enderror
             </div>
             
@@ -45,7 +46,7 @@
                        id="phone_number"
                        wire:model.live.debounce.500ms="phone_number">
                 @error('phone_number')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ __($message) }}</div>
                 @enderror
             </div>
             
@@ -61,7 +62,7 @@
                         <i class="ti ti-{{ $showPassword ? 'eye-off' : 'eye' }}"></i>
                     </button>
                     @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ __($message) }}</div>
                     @enderror
                 </div>
             </div>
@@ -74,7 +75,7 @@
                     <option value="{{ \App\Enums\EntityStatus::inactive()->value }}">{{ \App\Enums\EntityStatus::inactive()->label }}</option>
                 </select>
                 @error('is_active')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <div class="invalid-feedback">{{ __($message) }}</div>
                 @enderror
             </div>
             <div class="col-md-6 mb-3">
@@ -95,25 +96,22 @@
             @if($showDistributionCenters)
                 <div class="col-md-6 mb-3">
                     
-                    <div wire:ignore>
-                         @if($showDistributionCenters)
-                                <label for="distribution_center_ids" class="form-label">Centre de distribution</label>
-                                <div>
-                                    <livewire:multiple-select
-                                        :options="$availableDistributionCenters"
-                                        :parent-event="'distribution-centers:selection-changed'"
-                                        :selected-options="$distribution_center_ids ?? []"
-                                        :wire:key="'distribution-centers-select'"
-                                    />
-                                </div>
-                                @error('distribution_center_ids')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                        @endif
-                    </div>
-                    @error('distribution_center_ids')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    @if($showDistributionCenters)
+                        <label for="distribution_center_ids" class="form-label">Centre de distribution</label>
+                        <div>
+                            <livewire:multiple-select
+                                :options="$availableDistributionCenters"
+                                :parent-event="'distribution-centers:selection-changed'"
+                                :selected-options="$distribution_center_ids ?? []"
+                                :wire:key="'distribution-centers-select'"
+                                :has-errors="$errors->has('distribution_center_ids')"
+                            />
+                        </div>
+                        @error('distribution_center_ids')
+                            <span class="text-danger text-sm d-block">{{ $message }}</span>
+                        @enderror
+                    @endif
+                
                 </div>
             @endif
             <div class="col-12">
