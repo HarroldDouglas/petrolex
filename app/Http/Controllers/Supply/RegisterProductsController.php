@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\SupplierDeliveryRepositoryInterface;
 use Illuminate\Http\Request;
 
-class ScanBottlesController extends Controller
+class RegisterProductsController extends Controller
 {
     protected SupplierDeliveryRepositoryInterface $supplierDeliveryRepository;
 
@@ -15,9 +15,6 @@ class ScanBottlesController extends Controller
         $this->supplierDeliveryRepository = $supplierDeliveryRepository;
     }
 
-    /**
-     * Handle the incoming request.
-     */
     public function __invoke(Request $request, $supply_id)
     {
         $supply = $this->supplierDeliveryRepository->getWithProducts($supply_id);
@@ -26,7 +23,7 @@ class ScanBottlesController extends Controller
             abort(404, 'Approvisionnement non trouvé');
         }
 
-        return view('supplies.scan-bottles', [
+        return view('supplies.register-products', [
             'supply' => $supply,
         ]);
     }

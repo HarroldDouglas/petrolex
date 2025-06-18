@@ -17,9 +17,10 @@ return new class extends Migration
             $table->foreignId('distribution_center_id')->constrained()->onDelete('restrict');
             $table->foreignId('user_id')->constrained()->onDelete('restrict');
             $table->string('delivery_number', 255)->unique();
-            $table->string('supplier_name', 255);
+            $table->string('title', 255)->nullable();
+            $table->string('supplier_name', 255)->nullable();
             $table->text('description')->nullable();
-            $table->date('supply_date');
+            $table->datetime('supply_date');
             $table->enum('status', SupplierDeliveryStatus::values())->default('in_progress');
             $table->text('notes')->nullable();
             $table->timestamps();

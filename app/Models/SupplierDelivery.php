@@ -37,6 +37,7 @@ class SupplierDelivery extends Model
         'distribution_center_id',
         'user_id',
         'delivery_number',
+        'title',
         'supplier_name',
         'description',
         'supply_date',
@@ -50,7 +51,7 @@ class SupplierDelivery extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'supply_date' => 'date',
+        'supply_date' => 'datetime',
         'status' => SupplierDeliveryStatus::class,
     ];
 
@@ -92,5 +93,51 @@ class SupplierDelivery extends Model
     public function bottleMovements(): HasMany
     {
         return $this->hasMany(BottleMovement::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($supplierDelivery) {
+            $supplierDelivery->setDefaultValues();
+        });
+    }
+
+    /**
+     * Set default values for empty fields
+     */
+    private function setDefaultValues(): void
+    {
+        if (empty($this->delivery_number)) {
+            $this->delivery_number = self::generateDeliveryNumber();
+        }
+
+        if (empty($this->supplier_name)) {
+            $this->supplier_name = 'PETROLEX';
+        }
+    }
+
+    /**
+     * Generate a unique delivery number
+     */
+    public static function generateDeliveryNumber(): string
+    {
+        $prefix = 'SUP';
+        $year = now()->format('Y');
+        $month = now()->format('m');
+
+        $lastDelivery = self::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastDelivery && preg_match('/(\d+)$/', $lastDelivery->delivery_number, $matches)) {
+            $nextNumber = (int) $matches[1] + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return sprintf('%s-%s%s-%04d', $prefix, $year, $month, $nextNumber);
     }
 }

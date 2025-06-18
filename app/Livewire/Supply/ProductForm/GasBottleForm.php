@@ -1,0 +1,160 @@
+<?php
+
+namespace App\Livewire\Supply\ProductForm;
+
+use App\Enums\ProductType;
+use App\Http\Requests\Supply\RegisterGasBottleRequest;
+use App\Models\SupplierDelivery;
+use App\Models\SupplierDeliveryProductType;
+use App\Repositories\Contracts\BottleTypeRepositoryInterface;
+use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
+use Livewire\Component;
+
+class GasBottleForm extends Component
+{
+    public $showForm = false;
+    public $selectedBottleType = '';
+    public $incomingQuantity = '';
+    public $outgoingQuantity = '';
+    public $usedBottleTypes = [];
+    public $bottleTypes = [];
+    public $isEditing = false;
+    public $editProductId = null;
+    public $supplierDelivery;
+    public $editProductData = null;
+
+    protected $listeners = ['products-updated' => 'updateUsedTypes'];
+
+    public function boot(BottleTypeRepositoryInterface $bottleTypeRepository)
+    {
+        $this->bottleTypes = $bottleTypeRepository->all()
+            ->map(fn ($type) => ['id' => $type->id, 'name' => $type->name])
+            ->toArray();
+    }
+
+    public function mount(SupplierDelivery $supplierDelivery, $editProductId = null, $editProductData = null)
+    {
+        $this->supplierDelivery = $supplierDelivery;
+
+        $this->updateUsedTypes();
+
+        if ($editProductId && $editProductData) {
+            $this->processEditData($editProductId, $editProductData);
+        }
+    }
+
+    #[On('close-gas-form')]
+    public function closeForm()
+    {
+        $this->showForm = false;
+    }
+
+    protected function rules()
+    {
+        return $this->customRequest()->rules();
+    }
+
+    protected function messages()
+    {
+        return $this->customRequest()->messages();
+    }
+
+    protected function customRequest()
+    {
+        return new RegisterGasBottleRequest;
+    }
+
+    private function processEditData($productId, $productData)
+    {
+        $this->resetValidation();
+        $this->resetErrorBag();
+
+        $this->isEditing = true;
+        $this->editProductId = $productId;
+
+        $this->incomingQuantity = $productData['incomingQuantity'] ?? '';
+        $this->outgoingQuantity = $productData['outgoingQuantity'] ?? '';
+
+        if (isset($productData['detail'])) {
+            $this->selectedBottleType = (string) $productData['detail'];
+        }
+
+        $this->showForm = true;
+    }
+
+    #[On('edit-gas-bottle')]
+    public function editProduct($productId, $productData)
+    {
+        try {
+            $this->processEditData($productId, $productData);
+        } catch (\Exception $e) {
+            Log::error("Exception in editProduct: {$e->getMessage()}");
+        }
+    }
+
+    public function save()
+    {
+        $validatedData = $this->validate();
+
+        try {
+            if (! $this->supplierDelivery) {
+                throw new \Exception('Aucun approvisionnement trouvé');
+            }
+
+            if ($this->isEditing && $this->editProductId) {
+                $product = SupplierDeliveryProductType::findOrFail($this->editProductId);
+                $product->update([
+                    'bottle_type_id' => $validatedData['selectedBottleType'],
+                    'expected_quantity' => $validatedData['incomingQuantity'],
+                    'bottles_out_quantity' => $validatedData['outgoingQuantity'] ?? 0,
+                ]);
+
+                session()->flash('success', 'Produit mis à jour avec succès!');
+            } else {
+                SupplierDeliveryProductType::create([
+                    'supplier_delivery_id' => $this->supplierDelivery->id,
+                    'product_type' => ProductType::BOTTLE()->value,
+                    'bottle_type_id' => $validatedData['selectedBottleType'],
+                    'accessory_type_id' => null,
+                    'expected_quantity' => $validatedData['incomingQuantity'],
+                    'bottles_out_quantity' => $validatedData['outgoingQuantity'] ?? 0,
+                ]);
+
+                session()->flash('success', 'Produit ajouté avec succès!');
+            }
+
+            $this->updateUsedTypes();
+            $this->resetForm();
+            $this->dispatch('product-registered');
+
+        } catch (\Exception $e) {
+            Log::error('Error saving gas bottle product: '.$e->getMessage());
+            session()->flash('error', 'Erreur lors de l\'enregistrement: '.$e->getMessage());
+        }
+    }
+
+    public function updateUsedTypes($products = null)
+    {
+        $this->usedBottleTypes = $this->supplierDelivery->productTypes()
+            ->where('product_type', ProductType::BOTTLE()->value)
+            ->pluck('bottle_type_id')
+            ->toArray();
+    }
+
+    private function resetForm()
+    {
+        $this->selectedBottleType = '';
+        $this->incomingQuantity = '';
+        $this->outgoingQuantity = '';
+        $this->resetErrorBag();
+        $this->showForm = false;
+        $this->isEditing = false;
+        $this->editProductId = null;
+    }
+
+    public function render()
+    {
+        return view('livewire.supply.product-form.gas-bottle-form');
+    }
+}

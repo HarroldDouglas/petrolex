@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Services\Supply\SupplyDeliveryService;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -19,6 +20,10 @@ class ScanBottles extends Component
     public $supplyTitle;
     public $supplyDate;
 
+    // Variables for product selection
+    public $availableProducts = [];
+    public $selectedProductId = null;
+
     public $isIncomingMode = true;  // Default to incoming mode
     public $scannedIncoming = 0;
     public $scannedOutgoing = 0;
@@ -26,7 +31,14 @@ class ScanBottles extends Component
     public $incomingBottles = [];
     public $outgoingBottles = [];
 
-    public function mount($supplyId, $productId, $bottleType, $quantity, $outgoingQuantity = 10, $supplyTitle = null, $supplyDate = null)
+    protected $supplyDeliveryService;
+
+    public function boot(SupplyDeliveryService $supplyDeliveryService)
+    {
+        $this->supplyDeliveryService = $supplyDeliveryService;
+    }
+
+    public function mount($supplyId, $productId = null, $bottleType = null, $quantity = 0, $outgoingQuantity = 10, $supplyTitle = null, $supplyDate = null)
     {
         $this->supplyId = $supplyId;
         $this->productId = $productId;
@@ -36,10 +48,72 @@ class ScanBottles extends Component
         $this->supplyTitle = $supplyTitle ?? 'Approvisionnement';
         $this->supplyDate = $supplyDate;
 
+        // Load available products from this supply
+        $this->loadAvailableProducts();
+
+        // Set the selected product if available
+        if ($productId && ! $this->selectedProductId) {
+            $this->selectedProductId = $productId;
+            $this->updateSelectedProduct();
+        }
+
         // Initialize tracking arrays
         $this->incomingBottles = [];
         $this->outgoingBottles = [];
         $this->updateActiveBottles();
+    }
+
+    public function loadAvailableProducts()
+    {
+        if (! $this->supplyId) {
+            $this->availableProducts = [];
+
+            return;
+        }
+
+        // Utiliser le service pour récupérer les bouteilles associées à cet approvisionnement
+        $bottles = $this->supplyDeliveryService->getBottlesForDelivery($this->supplyId);
+
+        $this->availableProducts = $bottles->map(function ($bottle) {
+            $incomingDone = ($bottle->incoming_scanned >= $bottle->quantity);
+            $outgoingDone = ($bottle->outgoing_scanned >= $bottle->outgoing_quantity);
+
+            return [
+                'id' => $bottle->product_id,
+                'bottle_type_id' => $bottle->bottle_type_id,
+                'bottle_type_name' => $bottle->bottleType ? $bottle->bottleType->name : 'Inconnu',
+                'quantity' => $bottle->quantity,
+                'incoming_scanned' => $bottle->incoming_scanned ?? 0,
+                'outgoing_quantity' => $bottle->outgoing_quantity ?? 0,
+                'outgoing_scanned' => $bottle->outgoing_scanned ?? 0,
+                'incoming_done' => $incomingDone,
+                'outgoing_done' => $outgoingDone,
+            ];
+        })->toArray();
+    }
+
+    public function updateSelectedProduct()
+    {
+        if (! $this->selectedProductId || empty($this->availableProducts)) {
+            return;
+        }
+
+        // Find the selected product in available products
+        $selectedProduct = collect($this->availableProducts)->firstWhere('id', $this->selectedProductId);
+
+        if ($selectedProduct) {
+            $this->productId = $selectedProduct['id'];
+            $this->bottleType = $selectedProduct['bottle_type_name'];
+            $this->quantity = $selectedProduct['quantity'];
+            $this->outgoingQuantity = $selectedProduct['outgoing_quantity'];
+            $this->scannedIncoming = $selectedProduct['incoming_scanned'];
+            $this->scannedOutgoing = $selectedProduct['outgoing_scanned'];
+
+            // Reset bottles arrays and update active bottles
+            $this->incomingBottles = []; // In a real app, you would fetch these from the database
+            $this->outgoingBottles = []; // In a real app, you would fetch these from the database
+            $this->updateActiveBottles();
+        }
     }
 
     public function toggleManualForm()
@@ -58,9 +132,9 @@ class ScanBottles extends Component
         $this->showManualForm = false;
     }
 
-    public function toggleMode()
+    public function changeMode($mode)
     {
-        $this->isIncomingMode = ! $this->isIncomingMode;
+        $this->isIncomingMode = ($mode === 'incoming');
         $this->selectedBottles = []; // Reset selection when toggling mode
         $this->updateActiveBottles();
     }
@@ -75,12 +149,6 @@ class ScanBottles extends Component
             $this->bottles = $this->outgoingBottles;
             $this->scanned = $this->scannedOutgoing;
         }
-    }
-
-    #[On('barcode-scanned')]
-    public function handleScannedBarcode($data)
-    {
-        $this->addBottle($data['barcode']);
     }
 
     public function addBottle($barcode)
@@ -118,6 +186,8 @@ class ScanBottles extends Component
                 session()->flash('warning', 'Vous avez atteint la quantité maximale de bouteilles sortantes à scanner.');
             }
         }
+
+        // In a real app, you would save this data to the database
     }
 
     public function toggleSelect($id)

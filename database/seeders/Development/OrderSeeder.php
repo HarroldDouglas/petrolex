@@ -7,7 +7,8 @@ namespace Database\Seeders\Development;
 use App\Enums\BottleMovementType;
 use App\Enums\BottleOrderType;
 use App\Enums\BottleStatus;
-use App\Enums\DeliveryType;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Models\Accessory;
 use App\Models\Bottle;
 use App\Models\BottleType;
@@ -548,7 +549,7 @@ class OrderSeeder extends Seeder
     private function addAccessoriesToOrder(Order $order): void
     {
         $accessories = Accessory::whereHas('product')
-            ->where('distribution_center_id', $order->distribution_center_id)
+            ->where('distribution_center_id', $order->distribution_center)
             ->where('quantity', '>', 0)
             ->with(['product', 'accessoryType'])
             ->get();
@@ -657,13 +658,54 @@ class OrderSeeder extends Seeder
         $order->refresh();
 
         $subtotal = $order->items->sum('total_price');
-        $deliveryFee = $order->delivery_type == DeliveryType::FAST() ? 1000 : 0;
+        $deliveryFee = $order->delivery_type->fee();
+        $totalAmount = $subtotal + $deliveryFee;
 
         $order->update([
             'subtotal' => $subtotal,
             'delivery_fee' => $deliveryFee,
-            'total_amount' => $subtotal + $deliveryFee,
+            'total_amount' => $totalAmount,
         ]);
+
+        $this->createOrderPayment($order, $totalAmount);
+    }
+
+    /**
+     * Create payment record for an order
+     */
+    private function createOrderPayment(Order $order, float $totalAmount): void
+    {
+        // Generate a random payment reference
+        $paymentReference = 'PAY-'.strtoupper(substr(md5(uniqid()), 0, 10));
+        $paymentStatus = PaymentStatus::PAID();
+
+        // Determine payment method randomly
+        $paymentMethods = PaymentMethod::cases();
+        $paymentMethod = $paymentMethods[array_rand($paymentMethods)];
+
+        // Determine payment date
+        $paymentDate = match ($paymentStatus->value) {
+            'paid' => $order->order_date,
+            'pending', 'failed' => null,
+            default => null,
+        };
+
+        // Create payment record
+        $payment = \App\Models\OrderPayment::create([
+            'order_id' => $order->id,
+            'payment_reference' => $paymentReference,
+            'payment_status' => $paymentStatus,
+            'payment_method' => $paymentMethod,
+            'amount_paid' => $paymentStatus == PaymentStatus::PAID() ? $totalAmount : 0,
+            'amount_due' => $paymentStatus == PaymentStatus::PAID() ? 0 : $totalAmount,
+            'payment_date' => $paymentDate,
+            'payment_notes' => null,
+        ]);
+
+        // Si la commande est annulée et qu'elle avait été payée, on crée un remboursement
+        if ($order->status->value === 'cancelled' && $paymentStatus == PaymentStatus::PAID()) {
+            $this->createRefundForCancelledOrder($order, $totalAmount);
+        }
     }
 
     /**
@@ -749,12 +791,8 @@ class OrderSeeder extends Seeder
                 return;
             }
 
-            // Décrémenter le compteur approprié
             if ($bottle->is_filled) {
                 $newFilledCount = max(0, $pivotData->stock_filled - 1);
-
-                // Log pour déboguer
-                Log::info("Décrémentation du stock de bouteilles pleines: {$pivotData->stock_filled} -> {$newFilledCount} pour {$bottle->bottleType->name} dans le centre #{$bottle->distribution_center_id}");
 
                 DB::table('bottle_type_distribution_center')
                     ->where('distribution_center_id', $bottle->distribution_center_id)
@@ -765,9 +803,6 @@ class OrderSeeder extends Seeder
                     ]);
             } else {
                 $newEmptyCount = max(0, $pivotData->stock_empty - 1);
-
-                // Log pour déboguer
-                Log::info("Décrémentation du stock de bouteilles vides: {$pivotData->stock_empty} -> {$newEmptyCount} pour {$bottle->bottleType->name} dans le centre #{$bottle->distribution_center_id}");
 
                 DB::table('bottle_type_distribution_center')
                     ->where('distribution_center_id', $bottle->distribution_center_id)
@@ -780,5 +815,45 @@ class OrderSeeder extends Seeder
         }
         // Si la bouteille revient en stock, il faudrait incrémenter le compteur
         // Ce cas n'est pas géré ici car dans ce seeder nous ne retournons pas les bouteilles en stock
+    }
+
+    /**
+     * Create refund record for a cancelled order
+     */
+    private function createRefundForCancelledOrder(Order $order, float $totalAmount): void
+    {
+        $refundAmount = $totalAmount;
+        $initiatedBy = \App\Models\User::role('admin')->inRandomOrder()->first()?->id
+            ?? \App\Models\User::role('center_manager')->inRandomOrder()->first()?->id
+            ?? 1;
+
+        $orderDate = $order->order_date;
+        $cancelledAt = $orderDate->copy()->addHours(rand(1, 72));
+        $cancelledAt = $cancelledAt->min(now()->subHours(1));
+        $order->update([
+            'cancelled_at' => $cancelledAt,
+        ]);
+
+        $completedAt = $cancelledAt->copy()->addHours(rand(1, 24));
+        $completedAt = $completedAt->min(now());
+
+        \App\Models\Refund::create([
+            'order_id' => $order->id,
+            'initiated_by' => $initiatedBy,
+            'refund_method' => PaymentMethod::cases()[array_rand(PaymentMethod::cases())],
+            'refund_identifier' => 'REF-'.strtoupper(substr(md5(uniqid()), 0, 8)),
+            'status' => PaymentStatus::PAID(),
+            'amount' => $refundAmount,
+            'reason' => 'Commande annulée par le client',
+            'notes' => 'Remboursement automatique suite à annulation',
+            'initiated_at' => $cancelledAt,
+            'completed_at' => $completedAt,
+        ]);
+
+        $order->cancelled_by = $initiatedBy;
+        $order->cancelled_reason = rand(0, 1) ? 'Demande du client ' : 'Problème technique au centre';
+        $order->save();
+
+        Log::info("Remboursement créé pour commande #{$order->order_number} d'un montant de {$refundAmount} CFA");
     }
 }

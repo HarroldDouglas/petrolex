@@ -18,7 +18,7 @@ class AccessoryRepository extends BaseEloquentRepository implements AccessoryRep
      */
     public function getActiveProducts(): Collection
     {
-        return AccessoryType::where('is_active', true)->get();
+        return $this->model::where('is_active', true)->get();
     }
 
     /**
@@ -26,6 +26,6 @@ class AccessoryRepository extends BaseEloquentRepository implements AccessoryRep
      */
     public function getInactiveProducts(): Collection
     {
-        return AccessoryType::where('is_active', false)->get();
+        return $this->model::where('is_active', false)->get();
     }
 }

@@ -67,7 +67,7 @@ class OrderDataTable extends BaseDataTable
                     return trim(($user->first_name ?? '').' '.($user->last_name ?? '')) ?: '-';
                 }),
 
-            Column::make('Produits', 'id')
+            /*Column::make('Produits', 'id')
                 ->format(function ($value, $row) {
                     $orderItems = $row->items;
                     if ($orderItems->isEmpty()) {
@@ -106,11 +106,27 @@ class OrderDataTable extends BaseDataTable
                     }
 
                     return new HtmlString($html ?: '-');
-                }),
+                }),*/
 
             Column::make('Total (CFA)', 'total_amount')
                 ->sortable()
                 ->format(fn ($value) => number_format($value, 0, ',', ' ').' CFA'),
+
+            Column::make('Réf. Paiement', 'id')
+                ->searchable(function (Builder $query, string $searchTerm) {
+                    return $query->whereHas('payment', function (Builder $q) use ($searchTerm) {
+                        $q->where('payment_reference', 'like', '%'.$searchTerm.'%');
+                    });
+                })
+                ->format(function ($value, $row) {
+                    if ($row->payment) {
+                        return new HtmlString(
+                            '<span class="d-block">'.e($row->payment->payment_reference).'</span>'
+                        );
+                    }
+
+                    return '-';
+                }),
 
             Column::make('Livreur', 'delivery_person_id')
                 ->sortable()
@@ -275,6 +291,7 @@ class OrderDataTable extends BaseDataTable
                 'deliveryPerson.user',
                 'items.product.bottle.bottleType',
                 'items.product.accessory.accessoryType',
+                'payment',
             ]);
     }
 }
