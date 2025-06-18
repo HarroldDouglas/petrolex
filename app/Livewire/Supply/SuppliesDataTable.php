@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
@@ -20,7 +19,7 @@ class SuppliesDataTable extends BaseDataTable
 {
     protected $model = SupplierDelivery::class;
 
-    protected const DEFAULT_SORT_FIELD = 'delivery_date';
+    protected const DEFAULT_SORT_FIELD = 'supply_date';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
 
     protected function getExportFileName(): string
@@ -35,7 +34,7 @@ class SuppliesDataTable extends BaseDataTable
                 ->sortable()
                 ->searchable()
                 ->format(function ($value, $row) {
-                    return new HtmlString('<a href="'.route('supplies.details', $row->id).'">'.$value.'</a>');
+                    return new HtmlString('<a href="'.route('supplies.edit', $row->id).'">'.$value.'</a>');
                 }),
 
             Column::make('Centre de distr.', 'distribution_center_id')
@@ -74,7 +73,7 @@ class SuppliesDataTable extends BaseDataTable
                     return new HtmlString($html ?: '-');
                 }),
 
-            Column::make('Date', 'delivery_date')
+            Column::make('Date', 'supply_date')
                 ->sortable()
                 ->format(fn ($value) => $value->format('d M,Y H:i')),
 
@@ -88,34 +87,7 @@ class SuppliesDataTable extends BaseDataTable
 
             Column::make('Actions', 'id')
                 ->format(function ($value, $row) {
-                    $html = '<div class="btn-group dropdown-icon-none">
-                                <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
-                                    type="button" id="dropdownMenuButton'.$row->id.'" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <i class="ti ti-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton'.$row->id.'">
-                                    <li>
-                                        <a class="dropdown-item" href="'.route('supplies.details', $row->id).'">
-                                            <i class="ti ti-eye text-primary me-2"></i> Détail
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="'.route('supplies.edit', $row->id).'">
-                                            <i class="ti ti-edit text-success me-2"></i> Editer
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item delete-btn" href="#" 
-                                           data-id="'.$row->id.'" 
-                                           data-reference="'.$row->delivery_number.'">
-                                            <i class="ti ti-trash text-danger me-2"></i> Supprimer
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>';
-
-                    return new HtmlString($html);
+                    return new HtmlString(view('components.supply-actions', ['supply' => $row])->render());
                 }),
         ];
     }
@@ -157,6 +129,36 @@ class SuppliesDataTable extends BaseDataTable
                     return $builder->where('distribution_center_id', $value);
                 }),
 
+            SelectFilter::make('Type de livraison')
+                ->options([
+                    '' => 'Tous types',
+                    'has_bottles' => 'Incluant des bouteilles',
+                    'only_bottles' => 'Uniquement des bouteilles',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder;
+                    }
+
+                    if ($value === 'has_bottles') {
+                        // supplies with at least one bottle
+                        return $builder->whereHas('productTypes', function (Builder $query) {
+                            $query->where('product_type', 'bottle');
+                        });
+                    }
+
+                    if ($value === 'only_bottles') {
+                        // supplies with only bottles and no other product types
+                        return $builder->whereDoesntHave('productTypes', function (Builder $query) {
+                            $query->where('product_type', '!=', 'bottle');
+                        })->whereHas('productTypes', function (Builder $query) {
+                            $query->where('product_type', 'bottle');
+                        });
+                    }
+
+                    return $builder;
+                }),
+
             TextFilter::make('Reference')
                 ->config(['placeholder' => 'Rechercher une référence...'])
                 ->filter(function (Builder $builder, string $value) {
@@ -173,22 +175,13 @@ class SuppliesDataTable extends BaseDataTable
                     return $builder->where('status', $value);
                 }),
 
-            DateFilter::make('Date après')
-                ->config([
-                    'placeholder' => 'Date minimum',
-                    'locale' => 'fr',
-                ])
-                ->filter(function (Builder $builder, string $value) {
-                    $builder->whereDate('delivery_date', '>=', $value);
-                }),
-
-            DateRangeFilter::make('Période')
+            DateRangeFilter::make('Période de date de livraison')
                 ->config([
                     'locale' => 'fr',
                     'altFormat' => 'd/m/Y',
                 ])
                 ->filter(function (Builder $builder, array $dateRange) {
-                    $builder->whereBetween('delivery_date', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
+                    $builder->whereBetween('supply_date', [$dateRange['minDate'].' 00:00:00', $dateRange['maxDate'].' 23:59:59']);
                 }),
         ];
     }

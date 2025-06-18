@@ -4,8 +4,6 @@ namespace Database\Factories;
 
 use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
-use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
 use App\Models\Customer;
 use App\Models\CustomerDeliveryAddress;
 use App\Models\DeliveryPerson;
@@ -39,8 +37,6 @@ class OrderFactory extends Factory
             'order_number' => 'ORD-'.$this->faker->unique()->bothify('######'),
             'delivery_type' => $deliveryType,
             'status' => OrderStatus::CONFIRMED(),
-            'payment_status' => $this->faker->randomElement(PaymentStatus::values()),
-            'payment_method' => $this->faker->randomElement(PaymentMethod::values()),
             'subtotal' => $this->faker->randomFloat(2, 1000, 10000),
             'delivery_fee' => $deliveryType->fee(),
             'total_amount' => 0,

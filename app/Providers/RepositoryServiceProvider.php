@@ -8,6 +8,7 @@ use App\Repositories\Contracts\BottleRepositoryInterface;
 use App\Repositories\Contracts\BottleTypeRepositoryInterface;
 use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Repositories\Contracts\SupplierDeliveryRepositoryInterface;
 use App\Repositories\Contracts\TokenRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Eloquent\AccessoryRepository;
@@ -16,6 +17,7 @@ use App\Repositories\Eloquent\BottleRepository;
 use App\Repositories\Eloquent\BottleTypeRepository;
 use App\Repositories\Eloquent\DistributionCenterRepository;
 use App\Repositories\Eloquent\OrderRepository;
+use App\Repositories\Eloquent\SupplierDeliveryRepository;
 use App\Repositories\Eloquent\TokenRepositoryEloquent;
 use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Contracts\Support\DeferrableProvider;
@@ -35,6 +37,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
         BottleRepositoryInterface::class => BottleRepository::class,
         BottleMovementRepositoryInterface::class => BottleMovementRepository::class,
         BottleTypeRepositoryInterface::class => BottleTypeRepository::class,
+        SupplierDeliveryRepositoryInterface::class => SupplierDeliveryRepository::class,
     ];
 
     /**

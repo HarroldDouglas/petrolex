@@ -1,0 +1,38 @@
+@php
+    use App\Enums\SupplierDeliveryStatus;
+    
+    // Check if the supply isn't completed or cancelled
+    $isEditable = !in_array($supply->status->value, [
+        SupplierDeliveryStatus::COMPLETED()->value, 
+        SupplierDeliveryStatus::CANCELLED()->value
+    ]);
+@endphp
+
+<div class="btn-group dropdown-icon-none">
+    @if ($isEditable)
+        <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
+                type="button" id="dropdownMenuButton{{ $supply->id }}" data-bs-toggle="dropdown"
+                aria-expanded="false">
+            <i class="ti ti-dots-vertical"></i>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $supply->id }}">
+            <li>
+                <a class="dropdown-item" href="{{ route('supplies.edit', $supply->id) }}">
+                    <i class="ti ti-edit text-success me-2"></i> Editer
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item delete-btn" href="#" 
+                   data-id="{{ $supply->id }}" 
+                   data-reference="{{ $supply->delivery_number }}">
+                    <i class="ti ti-trash text-danger me-2"></i> Supprimer
+                </a>
+            </li>
+        </ul>
+    @else
+        <button class="btn btn-light-secondary icon-btn w-30 h-30 me-0" disabled
+                type="button" title="Action non disponible">
+            <i class="ti ti-lock"></i>
+        </button>
+    @endif
+</div>

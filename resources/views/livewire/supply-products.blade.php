@@ -35,8 +35,10 @@
                         <select class="form-select" id="bottleType" wire:model="selectedBottleType">
                             <option value="">Sélectionner un type</option>
                             @foreach ($bottleTypes as $type)
-                                @if (!in_array($type, $usedBottleTypes ?? []) || ($isEditing && $selectedBottleType == $type))
-                                    <option value="{{ $type }}">{{ $type }}</option>
+                                @if (!in_array($type['id'], $usedBottleTypes ?? []) || ($isEditing && $selectedBottleType == $type['id']))
+                                    <option value="{{ $type['id'] }}" {{ $selectedBottleType == $type['id'] ? 'selected' : '' }}>
+                                        {{ $type['name'] }}
+                                    </option>
                                 @endif
                             @endforeach
                         </select>

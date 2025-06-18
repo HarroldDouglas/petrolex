@@ -112,6 +112,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get only active distribution centers
+     */
+    public function activeDistributionCenters(): BelongsToMany
+    {
+        return $this->accessibleDistributionCenters()
+            ->wherePivot('is_active', true)
+            ->orderBy('name');
+    }
+
+    /**
      * Get the supplier deliveries managed by this user.
      */
     public function supplierDeliveries(): HasMany

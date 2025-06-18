@@ -1,20 +1,23 @@
 <?php
 
-namespace App\Livewire\Dashboard;
+namespace App\Livewire\Order;
 
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
+use App\Models\DistributionCenter;
 use App\Models\Order;
+use App\Models\User;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
+use Rappasoft\LaravelLivewireTables\Views\Filters\MultiSelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
-class DashboardDataTable extends BaseDataTable
+class OrderDataTable extends BaseDataTable
 {
     protected $model = Order::class;
 
@@ -64,7 +67,7 @@ class DashboardDataTable extends BaseDataTable
                     return trim(($user->first_name ?? '').' '.($user->last_name ?? '')) ?: '-';
                 }),
 
-            Column::make('Produits', 'id')
+            /*Column::make('Produits', 'id')
                 ->format(function ($value, $row) {
                     $orderItems = $row->items;
                     if ($orderItems->isEmpty()) {
@@ -103,11 +106,27 @@ class DashboardDataTable extends BaseDataTable
                     }
 
                     return new HtmlString($html ?: '-');
-                }),
+                }),*/
 
             Column::make('Total (CFA)', 'total_amount')
                 ->sortable()
                 ->format(fn ($value) => number_format($value, 0, ',', ' ').' CFA'),
+
+            Column::make('Réf. Paiement', 'id')
+                ->searchable(function (Builder $query, string $searchTerm) {
+                    return $query->whereHas('payment', function (Builder $q) use ($searchTerm) {
+                        $q->where('payment_reference', 'like', '%'.$searchTerm.'%');
+                    });
+                })
+                ->format(function ($value, $row) {
+                    if ($row->payment) {
+                        return new HtmlString(
+                            '<span class="d-block">'.e($row->payment->payment_reference).'</span>'
+                        );
+                    }
+
+                    return '-';
+                }),
 
             Column::make('Livreur', 'delivery_person_id')
                 ->sortable()
@@ -139,9 +158,10 @@ class DashboardDataTable extends BaseDataTable
             Column::make('Statut', 'status')
                 ->sortable()
                 ->format(function ($value) {
+                    //TODO: move this into the OrderStatus class
                     $badgeClass = match ($value) {
-                        OrderStatus::CONFIRMED() => 'bg-primary',
-                        OrderStatus::PROCESSING() => 'bg-info',
+                        OrderStatus::CONFIRMED() => 'bg-dark',
+                        OrderStatus::PROCESSING() => 'bg-primary',
                         OrderStatus::DELIVERED() => 'bg-success',
                         OrderStatus::CANCELLED() => 'bg-danger',
                         default => 'bg-secondary',
@@ -161,6 +181,30 @@ class DashboardDataTable extends BaseDataTable
         ];
     }
 
+    /**
+     * Get authorized distribution center options for the current user
+     */
+    protected function getDistributionCenterOptions(): array
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (! $user) {
+            return ['' => 'Tous'];
+        }
+
+        $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
+        $centers = DistributionCenter::whereIn('id', $centerIds)->orderBy('name')->get();
+
+        $options = ['' => 'Tous'];
+
+        foreach ($centers as $center) {
+            $options[$center->id] = $center->name;
+        }
+
+        return $options;
+    }
+
     public function filters(): array
     {
         $statusOptions = [];
@@ -174,32 +218,61 @@ class DashboardDataTable extends BaseDataTable
         }
 
         return [
+            SelectFilter::make('Centre de distribution')
+                ->options($this->getDistributionCenterOptions())
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder;
+                    }
+
+                    return $builder->where('distribution_center_id', $value);
+                }),
+
+            SelectFilter::make('Type de bouteille')
+                ->options([
+                    '' => 'Tous les types',
+                    'full' => 'Incluant consignes + recharges',
+                    'recharge' => 'Incluant recharges',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder;
+                    }
+
+                    if ($value === 'full') {
+                        // orders having at least one full bottle
+                        return $builder->whereHas('items', function (Builder $query) {
+                            $query->where('bottle_type', 'bottle_with_content');
+                        });
+                    }
+
+                    if ($value === 'recharge') {
+                        // orders having at least one recharge
+                        return $builder->whereHas('items', function (Builder $query) {
+                            $query->where('bottle_type', 'content');
+                        });
+                    }
+
+                    return $builder;
+                }),
+
             TextFilter::make('N° Commande')
                 ->config(['placeholder' => 'Rechercher un numéro...'])
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('order_number', 'like', '%'.$value.'%');
                 }),
 
-            SelectFilter::make('Statut')
-                ->options(array_merge(['' => 'Tous'], $statusOptions))
-                ->filter(function (Builder $builder, string $value) {
-                    if ($value === '') {
+            MultiSelectFilter::make('Statut')
+                ->options($statusOptions)
+                ->filter(function (Builder $builder, array $values) {
+                    if (empty($values)) {
                         return $builder;
                     }
 
-                    return $builder->where('status', $value);
+                    return $builder->whereIn('status', $values);
                 }),
 
-            DateFilter::make('Date après')
-                ->config([
-                    'placeholder' => 'Date minimum',
-                    'locale' => 'fr',
-                ])
-                ->filter(function (Builder $builder, string $value) {
-                    $builder->whereDate('order_date', '>=', $value);
-                }),
-
-            DateRangeFilter::make('Période')
+            DateRangeFilter::make('Période de date de commande')
                 ->config([
                     'locale' => 'fr',
                     'altFormat' => 'd/m/Y',
@@ -219,6 +292,7 @@ class DashboardDataTable extends BaseDataTable
                 'deliveryPerson.user',
                 'items.product.bottle.bottleType',
                 'items.product.accessory.accessoryType',
+                'payment',
             ]);
     }
 }

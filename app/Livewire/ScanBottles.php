@@ -2,78 +2,197 @@
 
 namespace App\Livewire;
 
+use App\Enums\ProductType;
+use App\Enums\SupplierDeliveryBottleMovementType;
+use App\Models\Bottle;
+use App\Models\Product;
+use App\Models\SupplierDelivery;
+use App\Models\SupplierDeliveryBottle;
+use App\Models\SupplierDeliveryProductType;
+use App\Services\Supply\SupplyDeliveryService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ScanBottles extends Component
 {
+    public SupplierDelivery $supply;
+    public ?SupplierDeliveryProductType $selectedProductType = null;
+
     public $supplyId;
+    public $selectedProductId = null;
     public $productId;
     public $bottleType;
-    public $quantity;
-    public $scanned = 0;
-    public $bottles = [];
+    public $quantity = 0;
+    public $outgoingQuantity = 0;
     public $manualBarcode = '';
     public $showManualForm = false;
     public $selectedBottles = [];
     public $supplyTitle;
     public $supplyDate;
 
-    public $isIncomingMode = true;  // Default to incoming mode
-    public $scannedIncoming = 0;
-    public $scannedOutgoing = 0;
-    public $outgoingQuantity = 10; // Default outgoing quantity
-    public $incomingBottles = [];
-    public $outgoingBottles = [];
+    public $isIncomingMode = true;
+    public $availableProducts = [];
+    public $bottles = [];
+    public $scanned = 0;
 
-    public function mount($supplyId, $productId, $bottleType, $quantity, $outgoingQuantity = 10, $supplyTitle = null, $supplyDate = null)
+    protected $listeners = [
+        'bottleAdded' => '$refresh',
+        'barcodeScanned' => 'processBarcode',
+    ];
+    protected $supplyDeliveryService;
+
+    protected $rules = [
+        'manualBarcode' => 'required|string|min:3',
+    ];
+
+    public function boot(SupplyDeliveryService $supplyDeliveryService)
     {
-        $this->supplyId = $supplyId;
-        $this->productId = $productId;
-        $this->bottleType = $bottleType;
-        $this->quantity = $quantity;
-        $this->outgoingQuantity = $outgoingQuantity;
-        $this->supplyTitle = $supplyTitle ?? 'Approvisionnement';
-        $this->supplyDate = $supplyDate;
-
-        // Initialize tracking arrays
-        $this->incomingBottles = [];
-        $this->outgoingBottles = [];
-        $this->updateActiveBottles();
+        $this->supplyDeliveryService = $supplyDeliveryService;
     }
 
-    public function toggleManualForm()
+    public function mount(SupplierDelivery $supply)
     {
-        $this->showManualForm = ! $this->showManualForm;
+        $this->supply = $supply;
+        $this->supplyId = $supply->id;
+        $this->supplyTitle = $supply->delivery_number ?? 'Approvisionnement';
+        $this->supplyDate = $supply->supply_date;
+
+        $this->loadAvailableProducts();
+
+        if (! empty($this->availableProducts)) {
+            $this->selectedProductId = $this->availableProducts[0]['id'];
+            $this->updateSelectedProduct();
+        }
     }
 
-    public function addManualBarcode()
+    public function loadAvailableProducts()
     {
-        $this->validate([
-            'manualBarcode' => 'required|string|min:3',
-        ]);
+        if (! $this->supply) {
+            $this->availableProducts = [];
 
-        $this->addBottle($this->manualBarcode);
-        $this->manualBarcode = '';
-        $this->showManualForm = false;
+            return;
+        }
+
+        $this->availableProducts = $this->supply->productTypes()
+            ->with(['bottleType', 'deliveryBottles'])
+            ->where('product_type', ProductType::BOTTLE())
+            ->get()
+            ->map(function (SupplierDeliveryProductType $product) {
+                return [
+                    'id' => $product->id,
+                    'bottle_type_id' => $product->bottle_type_id,
+                    'bottle_type_name' => $product->bottleType ? $product->bottleType->name : 'Inconnu',
+                    'quantity' => $product->expected_quantity,
+                    'incoming_scanned' => $product->incoming_scanned_count,
+                    'outgoing_quantity' => $product->bottles_out_quantity,
+                    'outgoing_scanned' => $product->outgoing_scanned_count,
+                    'incoming_done' => $product->incoming_done,
+                    'outgoing_done' => $product->outgoing_done,
+                ];
+            })->toArray();
     }
 
-    public function toggleMode()
+    public function updateSelectedProduct()
     {
-        $this->isIncomingMode = ! $this->isIncomingMode;
-        $this->selectedBottles = []; // Reset selection when toggling mode
-        $this->updateActiveBottles();
+        if (! $this->selectedProductId) {
+            $this->selectedProductType = null;
+            $this->productId = null;
+            $this->bottleType = null;
+            $this->quantity = 0;
+            $this->outgoingQuantity = 0;
+            $this->bottles = [];
+
+            return;
+        }
+
+        $this->selectedProductType = SupplierDeliveryProductType::find($this->selectedProductId);
+
+        foreach ($this->availableProducts as $product) {
+            if ($product['id'] == $this->selectedProductId) {
+                $this->productId = $product['id'];
+                $this->bottleType = $product['bottle_type_name'];
+                $this->quantity = $product['quantity'];
+                $this->outgoingQuantity = $product['outgoing_quantity'];
+
+                $this->loadBottles();
+                break;
+            }
+        }
     }
 
-    private function updateActiveBottles()
+    public function loadBottles()
     {
-        // Update the active bottles based on the current mode
+        if (! $this->selectedProductType) {
+            $this->bottles = [];
+            $this->scanned = 0;
+
+            return;
+        }
+
+        $query = SupplierDeliveryBottle::where('supplier_delivery_product_type_id', $this->selectedProductType->id);
+
         if ($this->isIncomingMode) {
-            $this->bottles = $this->incomingBottles;
-            $this->scanned = $this->scannedIncoming;
+            $query->incoming();
         } else {
-            $this->bottles = $this->outgoingBottles;
-            $this->scanned = $this->scannedOutgoing;
+            $query->outgoing();
+        }
+
+        $bottleRecords = $query->with('bottle')->get();
+
+        $this->bottles = $bottleRecords->map(function ($record) {
+            return [
+                'id' => $record->id,
+                'barcode' => $record->bottle->barcode,
+                'timestamp' => $record->created_at,
+            ];
+        })->toArray();
+
+        $this->scanned = count($this->bottles);
+        $this->selectedBottles = [];
+    }
+
+    public function processBarcode($data)
+    {
+        $barcode = $data['barcode'] ?? null;
+
+        if (! $barcode) {
+            $this->dispatch('scanError', 'Code-barres vide ou invalide');
+
+            return;
+        }
+
+        if (! $this->productId) {
+            $this->dispatch('scanError', 'Veuillez d\'abord sélectionner un type de bouteille');
+
+            return;
+        }
+
+        try {
+            $product = Product::create([
+                'product_type' => ProductType::BOTTLE(),
+            ]);
+
+            $bottle = new Bottle([
+                'bottle_type_id' => $this->bottleTypeId,
+                'barcode' => $barcode,
+            ]);
+
+            $product->bottle()->save($bottle);
+
+            $this->bottles[] = [
+                'id' => $bottle->id,
+                'barcode' => $barcode,
+                'timestamp' => now(),
+            ];
+
+            $this->scanned = count($this->bottles);
+
+            $this->dispatch('bottleAdded', ['barcode' => $barcode]);
+
+        } catch (\Exception $e) {
+            $this->dispatch('scanError', 'Erreur lors du traitement du code-barres: '.$e->getMessage());
         }
     }
 
@@ -83,66 +202,104 @@ class ScanBottles extends Component
         $this->addBottle($data['barcode']);
     }
 
+    public function toggleManualForm()
+    {
+        $this->showManualForm = ! $this->showManualForm;
+        $this->manualBarcode = '';
+    }
+
+    public function addManualBarcode()
+    {
+        $this->validate();
+        $this->addBottle($this->manualBarcode);
+        $this->manualBarcode = '';
+        $this->showManualForm = false;
+    }
+
+    public function updatedIsIncomingMode()
+    {
+        $this->selectedBottles = [];
+        $this->loadBottles();
+
+        Log::debug('Mode changed via updatedIsIncomingMode', [
+            'isIncomingMode' => $this->isIncomingMode,
+            'bottleCount' => count($this->bottles),
+        ]);
+    }
+
     public function addBottle($barcode)
     {
-        if ($this->isIncomingMode) {
-            // Add to incoming bottles
-            if ($this->scannedIncoming < $this->quantity) {
-                $this->incomingBottles[] = [
-                    'id' => count($this->incomingBottles) + 1,
-                    'barcode' => $barcode,
-                    'timestamp' => now()->format('Y-m-d H:i:s'),
-                ];
+        if (! $this->selectedProductType) {
+            session()->flash('error', 'Veuillez d\'abord sélectionner un type de bouteille.');
 
-                $this->scannedIncoming++;
-                $this->bottles = $this->incomingBottles;
-                $this->scanned = $this->scannedIncoming;
-                $this->dispatch('bottleAdded');
-            } else {
-                session()->flash('warning', 'Vous avez atteint la quantité maximale de bouteilles entrantes à scanner.');
-            }
-        } else {
-            // Add to outgoing bottles
-            if ($this->scannedOutgoing < $this->outgoingQuantity) {
-                $this->outgoingBottles[] = [
-                    'id' => count($this->outgoingBottles) + 1,
-                    'barcode' => $barcode,
-                    'timestamp' => now()->format('Y-m-d H:i:s'),
-                ];
-
-                $this->scannedOutgoing++;
-                $this->bottles = $this->outgoingBottles;
-                $this->scanned = $this->scannedOutgoing;
-                $this->dispatch('bottleAdded');
-            } else {
-                session()->flash('warning', 'Vous avez atteint la quantité maximale de bouteilles sortantes à scanner.');
-            }
+            return;
         }
-    }
 
-    public function toggleSelect($id)
-    {
-        if (in_array($id, $this->selectedBottles)) {
-            $this->selectedBottles = array_diff($this->selectedBottles, [$id]);
-        } else {
-            $this->selectedBottles[] = $id;
+        $movementType = $this->isIncomingMode ?
+            SupplierDeliveryBottleMovementType::INCOMING() :
+            SupplierDeliveryBottleMovementType::OUTGOING();
+
+        $maxAllowed = $this->isIncomingMode ? $this->quantity : $this->outgoingQuantity;
+        $currentCount = $this->isIncomingMode ?
+            $this->selectedProductType->incoming_scanned_count :
+            $this->selectedProductType->outgoing_scanned_count;
+
+        if ($currentCount >= $maxAllowed) {
+            $direction = $this->isIncomingMode ? 'entrantes' : 'sortantes';
+            session()->flash('warning', "Vous avez atteint la quantité maximale de bouteilles {$direction} à scanner.");
+
+            return;
         }
-    }
 
-    public function selectAll()
-    {
-        // Get IDs of bottles in the current mode
-        $bottleIds = array_column($this->bottles, 'id');
+        try {
+            DB::beginTransaction();
 
-        // Check if all bottles are already selected
-        $allSelected = count(array_intersect($bottleIds, $this->selectedBottles)) === count($bottleIds);
+            $bottle = Bottle::where('barcode', $barcode)->first();
 
-        if ($allSelected) {
-            // Deselect all
-            $this->selectedBottles = array_values(array_diff($this->selectedBottles, $bottleIds));
-        } else {
-            // Select all (make sure we don't have duplicates)
-            $this->selectedBottles = array_values(array_unique(array_merge($this->selectedBottles, $bottleIds)));
+            if (! $bottle && $this->isIncomingMode) {
+                $product = Product::create([
+                    'product_type' => ProductType::BOTTLE(),
+                ]);
+                $bottle = Bottle::create([
+                    'barcode' => $barcode,
+                    'product_id' => $product->id,
+                    'bottle_type_id' => $this->selectedProductType->bottle_type_id,
+                    'distribution_center_id' => $this->supply->distribution_center_id,
+                ]);
+            } elseif (! $bottle) {
+                session()->flash('error', "Bouteille avec code {$barcode} non trouvée dans le système.");
+
+                return;
+            }
+
+            $existingBottle = SupplierDeliveryBottle::where('supplier_delivery_product_type_id', $this->selectedProductType->id)
+                ->where('bottle_id', $bottle->id)
+                ->where('movement_type', $movementType)
+                ->first();
+
+            if ($existingBottle) {
+                $direction = $this->isIncomingMode ? 'entrante' : 'sortante';
+                session()->flash('warning', "Cette bouteille a déjà été scannée comme {$direction} pour cet approvisionnement.");
+
+                return;
+            }
+
+            SupplierDeliveryBottle::create([
+                'supplier_delivery_product_type_id' => $this->selectedProductType->id,
+                'bottle_id' => $bottle->id,
+                'movement_type' => $movementType,
+            ]);
+
+            DB::commit();
+
+            $this->loadBottles();
+            $this->loadAvailableProducts();
+
+            session()->flash('message', "Bouteille {$barcode} ajoutée avec succès.");
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            session()->flash('error', "Erreur lors de l'ajout de la bouteille: ".$e->getMessage());
         }
     }
 
@@ -152,24 +309,32 @@ class ScanBottles extends Component
             return;
         }
 
-        if ($this->isIncomingMode) {
-            $this->incomingBottles = array_filter($this->incomingBottles, function ($bottle) {
-                return ! in_array($bottle['id'], $this->selectedBottles);
-            });
-            $this->scannedIncoming = count($this->incomingBottles);
-            $this->bottles = $this->incomingBottles;
-            $this->scanned = $this->scannedIncoming;
-        } else {
-            $this->outgoingBottles = array_filter($this->outgoingBottles, function ($bottle) {
-                return ! in_array($bottle['id'], $this->selectedBottles);
-            });
-            $this->scannedOutgoing = count($this->outgoingBottles);
-            $this->bottles = $this->outgoingBottles;
-            $this->scanned = $this->scannedOutgoing;
-        }
+        try {
+            DB::beginTransaction();
 
-        $this->selectedBottles = [];
-        session()->flash('message', 'Les bouteilles sélectionnées ont été supprimées.');
+            SupplierDeliveryBottle::whereIn('id', $this->selectedBottles)->delete();
+
+            DB::commit();
+
+            $this->selectedBottles = [];
+            $this->loadBottles();
+            $this->loadAvailableProducts();
+
+            session()->flash('message', 'Les bouteilles sélectionnées ont été supprimées.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            session()->flash('error', 'Erreur lors de la suppression: '.$e->getMessage());
+        }
+    }
+
+    public function selectAll()
+    {
+        if (count($this->selectedBottles) === count($this->bottles)) {
+            $this->selectedBottles = [];
+        } else {
+            $this->selectedBottles = collect($this->bottles)->pluck('id')->toArray();
+        }
     }
 
     public function render()

@@ -5,12 +5,12 @@ namespace App\Models;
 use App\Enums\DeliveryStatus;
 use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
-use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -22,10 +22,7 @@ use Illuminate\Support\Carbon;
  * @property OrderStatus $status
  * @property DeliveryStatus $delivery_status
  * @property DeliveryType $delivery_type
- * @property PaymentStatus $payment_status
- * @property PaymentMethod $payment_method
  * @property float $total_amount
- * @property float $total_paid
  * @property string|null $note
  * @property Carbon|null $delivered_at
  * @property Carbon $created_at
@@ -50,8 +47,6 @@ class Order extends Model
         'order_number',
         'delivery_type',
         'status',
-        'payment_status',
-        'payment_method',
         'subtotal',
         'delivery_fee',
         'total_amount',
@@ -63,6 +58,8 @@ class Order extends Model
         'confirmed_at',
         'processing_at',
         'cancelled_at',
+        'cancelled_by',
+        'cancelled_reason',
         'delivered_at',
     ];
 
@@ -78,8 +75,6 @@ class Order extends Model
         'order_date' => 'datetime',
         'delivery_date' => 'datetime',
         'status' => OrderStatus::class,
-        'payment_status' => PaymentStatus::class,
-        'payment_method' => PaymentMethod::class,
         'delivery_type' => DeliveryType::class,
         'confirmed_at' => 'datetime',
         'processing_at' => 'datetime',
@@ -117,6 +112,14 @@ class Order extends Model
     public function distributionCenter(): BelongsTo
     {
         return $this->belongsTo(DistributionCenter::class);
+    }
+
+    /**
+     * Get the payment information for the order.
+     */
+    public function payment(): HasOne
+    {
+        return $this->hasOne(OrderPayment::class);
     }
 
     /**
@@ -188,5 +191,47 @@ class Order extends Model
             OrderStatus::CONFIRMED(),
             OrderStatus::PROCESSING(),
         ]);
+    }
+
+    /**
+     * Get payment status through the payment relation
+     */
+    public function getPaymentStatusAttribute()
+    {
+        return $this->payment ? $this->payment->payment_status : null;
+    }
+
+    /**
+     * Get payment method through the payment relation
+     */
+    public function getPaymentMethodAttribute()
+    {
+        return $this->payment ? $this->payment->payment_method : null;
+    }
+
+    /**
+     * Get all refunds associated with this order.
+     */
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(Refund::class);
+    }
+
+    /**
+     * Check if this order has been refunded.
+     */
+    public function hasRefunds(): bool
+    {
+        return $this->refunds()->exists();
+    }
+
+    /**
+     * Get the total amount refunded for this order.
+     */
+    public function getTotalRefundedAmount(): float
+    {
+        return $this->refunds()
+            ->where('status', PaymentStatus::PAID())
+            ->sum('amount');
     }
 }

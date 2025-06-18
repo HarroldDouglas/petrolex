@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -18,7 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $invoice_number
  * @property string|null $supplier_name
  * @property string|null $notes
- * @property Carbon $delivery_date
+ * @property Carbon $supply_date
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -37,9 +38,10 @@ class SupplierDelivery extends Model
         'distribution_center_id',
         'user_id',
         'delivery_number',
+        'title',
         'supplier_name',
         'description',
-        'delivery_date',
+        'supply_date',
         'status',
         'notes',
     ];
@@ -50,7 +52,7 @@ class SupplierDelivery extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'delivery_date' => 'date',
+        'supply_date' => 'datetime',
         'status' => SupplierDeliveryStatus::class,
     ];
 
@@ -81,9 +83,12 @@ class SupplierDelivery extends Model
     /**
      * Get the bottles included in this delivery.
      */
-    public function bottles(): HasMany
+    public function bottles(): HasManyThrough
     {
-        return $this->hasMany(SupplierDeliveryBottle::class);
+        return $this->hasManyThrough(
+            SupplierDeliveryBottle::class,
+            SupplierDeliveryProductType::class
+        );
     }
 
     /**
@@ -92,5 +97,51 @@ class SupplierDelivery extends Model
     public function bottleMovements(): HasMany
     {
         return $this->hasMany(BottleMovement::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($supplierDelivery) {
+            $supplierDelivery->setDefaultValues();
+        });
+    }
+
+    /**
+     * Set default values for empty fields
+     */
+    private function setDefaultValues(): void
+    {
+        if (empty($this->delivery_number)) {
+            $this->delivery_number = self::generateDeliveryNumber();
+        }
+
+        if (empty($this->supplier_name)) {
+            $this->supplier_name = 'PETROLEX';
+        }
+    }
+
+    /**
+     * Generate a unique delivery number
+     */
+    public static function generateDeliveryNumber(): string
+    {
+        $prefix = 'SUP';
+        $year = now()->format('Y');
+        $month = now()->format('m');
+
+        $lastDelivery = self::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastDelivery && preg_match('/(\d+)$/', $lastDelivery->delivery_number, $matches)) {
+            $nextNumber = (int) $matches[1] + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return sprintf('%s-%s%s-%04d', $prefix, $year, $month, $nextNumber);
     }
 }

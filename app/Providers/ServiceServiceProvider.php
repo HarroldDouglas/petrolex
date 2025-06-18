@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\StockMovementRepositoryInterface;
+use App\Repositories\Eloquent\StockMovementRepository;
 use App\Services\Auth\AuthenticationService;
 use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 use App\Services\Auth\Contracts\OtpServiceInterface;
@@ -29,6 +31,7 @@ class ServiceServiceProvider extends ServiceProvider implements DeferrableProvid
         AuthenticationServiceInterface::class => AuthenticationService::class,
         SmsServiceInterface::class => TwilioService::class,
         PermissionServiceInterface::class => PermissionService::class,
+        StockMovementRepositoryInterface::class => StockMovementRepository::class,
         BaseServiceForEntityInterface::class => BaseServiceForEntity::class,
         GeographyServiceInterface::class => StaticGeographyService::class,
         MediaServiceInterface::class => SpatieMediaService::class,

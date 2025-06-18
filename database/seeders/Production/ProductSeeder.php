@@ -20,7 +20,7 @@ class ProductSeeder extends Seeder
     {
         $this->command->info('Creating products...');
 
-        $this->createBottleProducts();
+        // $this->createBottleProducts();
         $this->createAccessoryProducts();
 
         $this->command->info('Products created successfully!');

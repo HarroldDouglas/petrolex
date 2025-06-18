@@ -22,18 +22,10 @@
             @canany([$permissionEnum::ORDERS_VIEW()->value])
                 <li class="no-sub">
                     <a class="" href="{{ route('orders.list') }}">
-                        <i class="iconoir-cart-alt"></i> Mes Commandes
+                        <i class="iconoir-cart-alt"></i> {{ auth()->user()->role == \App\Enums\UserRole::CENTER_MANAGER() ? 'Mes Commandes' : 'Commandes' }}
                     </a>
                 </li>
             @endcanany
-
-            @can($permissionEnum::REPORTS_MANAGE()->value)
-                <li class="no-sub">
-                    <a class="" href="{{ route('stock_movement') }}">
-                        <i class="iconoir-data-transfer-both"></i> Mouvement de stock
-                    </a>
-                </li>
-            @endcan
 
             @canany([$permissionEnum::SUPPLIER_DELIVERIES_VIEW()->value, $permissionEnum::SUPPLIER_DELIVERIES_CREATE()->value])
                 <li>

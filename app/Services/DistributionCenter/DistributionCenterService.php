@@ -6,7 +6,10 @@ use App\DTOs\DistributionCenter\CreateDistributionCenterDTO;
 use App\DTOs\DistributionCenter\UpdateDistributionCenterDTO;
 use App\Events\DistributionCenterUpdatedEvent;
 use App\Models\DistributionCenter;
+use App\Models\User;
 use App\Repositories\Contracts\DistributionCenterRepositoryInterface;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DistributionCenterService
@@ -88,5 +91,27 @@ class DistributionCenterService
     public function findWithRelation(int $id): ?DistributionCenter
     {
         return $this->distributionCenterRepository->findWithRelation($id);
+    }
+
+    /**
+     * Get distribution centers for current authenticated user
+     */
+    public static function getForCurrentUser(): Collection
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return collect();
+        }
+
+        return self::getForUser($user);
+    }
+
+    /**
+     * Get distribution centers for specific user
+     */
+    public static function getForUser(User $user): Collection
+    {
+        return $user->activeDistributionCenters()->get();
     }
 }

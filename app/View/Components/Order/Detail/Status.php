@@ -80,6 +80,8 @@ class Status extends Component
                 'color' => 'danger',
                 'date' => $this->order->cancelled_at,
                 'completed' => true,
+                'is_cancelled' => true,
+                'order' => $this->order,
             ];
         }
 

@@ -64,6 +64,13 @@
                                     </small>
                                 </div>
                             @endif
+
+                            {{-- Special content for cancelled step --}}
+                            @if ($step['key'] === 'cancelled' && isset($step['is_cancelled']) && isset($step['order']))
+                                <div class="mt-3">
+                                    <x-order.detail.cancellation-info :order="$step['order']" />
+                                </div>
+                            @endif
                         </div>
                     </li>
                 @endforeach

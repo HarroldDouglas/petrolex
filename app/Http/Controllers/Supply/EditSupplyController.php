@@ -3,15 +3,20 @@
 namespace App\Http\Controllers\Supply;
 
 use App\Http\Controllers\Controller;
+use App\Models\SupplierDelivery;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class EditSupplyController extends Controller
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, int $supplyId): View
     {
-        return view('supplies.supply-edit');
+        // TODO: replace with a service
+        $supply = SupplierDelivery::findOrFail($supplyId);
+
+        return view('supplies.edit', compact('supply'));
     }
 }

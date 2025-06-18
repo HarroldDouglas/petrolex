@@ -1,8 +1,6 @@
 <?php
 
 use App\Enums\OrderStatus;
-use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -24,8 +22,6 @@ return new class extends Migration
             $table->string('order_number', 255)->unique();
             $table->enum('delivery_type', ['normal', 'fast'])->default('normal');
             $table->enum('status', OrderStatus::values())->default(OrderStatus::CONFIRMED());
-            $table->enum('payment_status', PaymentStatus::values())->default(PaymentStatus::PAID());
-            $table->enum('payment_method', PaymentMethod::values());
             
             $table->decimal('subtotal', 10, 2);
             $table->decimal('delivery_fee', 10, 2)->default(0);
@@ -39,7 +35,11 @@ return new class extends Migration
             $table->timestamp('confirmed_at')->nullable();
             $table->timestamp('processing_at')->nullable(); 
             $table->timestamp('delivered_at')->nullable();
+
             $table->timestamp('cancelled_at')->nullable();
+            
+            $table->unsignedBigInteger('cancelled_by')->nullable()->comment('User ID who cancelled the order');
+            $table->text('cancelled_reason')->nullable()->comment('Reason for order cancellation');
             $table->timestamps();
             $table->softDeletes();
             

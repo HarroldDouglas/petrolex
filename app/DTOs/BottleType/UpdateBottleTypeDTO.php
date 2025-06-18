@@ -7,15 +7,15 @@ use App\DTOs\BaseDTO;
 class UpdateBottleTypeDTO extends BaseDTO
 {
     public function __construct(
-        public readonly int $id,
-        public readonly string $name,
+        public readonly ?int $id = null,
+        public readonly ?string $name = null,
         /** @var BottleTypeCityPriceDTO[]|null */
-        public readonly ?array $bottleTypeCityPrices,
-        public readonly string $capacity,
-        public readonly float $content_price,
-        public readonly float $bottle_with_content_price,
-        public readonly bool $is_active,
-        public readonly ?string $description,
-        public readonly ?float $weight,
+        public readonly ?array $bottleTypeCityPrices = null,
+        public readonly ?string $capacity = null,
+        public readonly ?float $content_price = null,
+        public readonly ?float $bottle_with_content_price = null,
+        public readonly ?bool $is_active = null,
+        public readonly ?string $description = null,
+        public readonly ?float $weight = null,
     ) {}
 }

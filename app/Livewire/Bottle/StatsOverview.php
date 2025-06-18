@@ -37,14 +37,11 @@ class StatsOverview extends Component
     {
         $distributionCenterIds = [];
 
-        if ($distributionCenterId === null || $distributionCenterId === '' || $distributionCenterId === 'all') {
+        if (empty($distributionCenterId)) {
             /** @var User|null $user */
             $user = Auth::user();
             if ($user) {
                 $distributionCenterIds = $user->accessibleDistributionCenters()->pluck('distribution_center_id')->toArray();
-                if (empty($distributionCenterIds)) {
-                    $distributionCenterIds = [-1];
-                }
             }
         } else {
             $distributionCenterIds = [$distributionCenterId];

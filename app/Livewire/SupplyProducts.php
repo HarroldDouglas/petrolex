@@ -2,6 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Enums\ProductType;
+use App\Http\Requests\Supply\RegisterAccessoryRequest;
+use App\Http\Requests\Supply\RegisterGasBottleRequest;
+use App\Repositories\Contracts\AccessoryRepositoryInterface;
+use App\Repositories\Contracts\BottleTypeRepositoryInterface;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 
 class SupplyProducts extends Component
@@ -19,36 +25,60 @@ class SupplyProducts extends Component
     public $editProductId = null;
     public $usedBottleTypes = [];
     public $usedAccessoryTypes = [];
+    public $bottleTypes = [];
+    public $accessoryTypes = [];
+    protected BottleTypeRepositoryInterface $bottleTypeRepository;
+    protected AccessoryRepositoryInterface $accessoryRepository;
 
-    public $bottleTypes = [
-        'Bouteille de 6KG',
-        'Bouteille de 9KG',
-        'Bouteille de 12KG',
-        'Bouteille de 15KG',
-    ];
+    public function boot(
+        BottleTypeRepositoryInterface $bottleTypeRepository,
+        AccessoryRepositoryInterface $accessoryRepository,
+    ) {
+        $this->bottleTypeRepository = $bottleTypeRepository;
+        $this->accessoryRepository = $accessoryRepository;
+    }
 
-    public $accessoryTypes = [
-        'Détenteur',
-        'Tuyau de gaz',
-        'Brûleur',
-        'Vanne',
-        'Régulateur de pression',
-    ];
+    public function mount()
+    {
+        $this->bottleTypes = $this->bottleTypeRepository->all()->map(function ($type) {
+            return [
+                'id' => $type->id,
+                'name' => $type->name,
+            ];
+        })->toArray();
+        $this->accessoryTypes = $this->accessoryRepository->getActiveProducts()->map(function ($type) {
+            return [
+                'id' => $type->id,
+                'name' => $type->name,
+            ];
+        })->toArray();
+        $this->updateUsedTypes();
+    }
 
     public function registerGasBottle()
     {
-        $this->validate([
-            'selectedBottleType' => 'required',
-            'quantity' => 'required|numeric|min:1',
-            'outgoingQuantity' => 'required|numeric|min:0|lte:quantity',
-        ]);
+        $validator = Validator::make(
+            [
+                'selectedBottleType' => $this->selectedBottleType,
+                'quantity' => $this->quantity,
+                'outgoingQuantity' => $this->outgoingQuantity,
+            ],
+            (new RegisterGasBottleRequest)->rules(),
+            (new RegisterGasBottleRequest)->messages()
+        );
+
+        if ($validator->fails()) {
+            $this->setErrorBag($validator->errors());
+
+            return;
+        }
 
         if ($this->isEditing) {
             $this->updateProduct();
         } else {
             $this->products[] = [
                 'id' => count($this->products) + 1,
-                'type' => 'Bouteilles',
+                'type' => ProductType::BOTTLE()->value,
                 'detail' => $this->selectedBottleType,
                 'quantity' => $this->quantity,
                 'outgoingQuantity' => $this->outgoingQuantity,
@@ -63,17 +93,27 @@ class SupplyProducts extends Component
 
     public function registerAccessory()
     {
-        $this->validate([
-            'accessoryName' => 'required',
-            'accessoryQuantity' => 'required|numeric|min:1',
-        ]);
+        $validator = Validator::make(
+            [
+                'accessoryName' => $this->accessoryName,
+                'accessoryQuantity' => $this->accessoryQuantity,
+            ],
+            (new RegisterAccessoryRequest)->rules(),
+            (new RegisterAccessoryRequest)->messages()
+        );
+
+        if ($validator->fails()) {
+            $this->setErrorBag($validator->errors());
+
+            return;
+        }
 
         if ($this->isEditing) {
             $this->updateProduct();
         } else {
             $this->products[] = [
                 'id' => count($this->products) + 1,
-                'type' => 'Accessoires',
+                'type' => ProductType::ACCESSORY()->value,
                 'detail' => $this->accessoryName,
                 'quantity' => $this->accessoryQuantity,
                 'outgoingQuantity' => 0,
@@ -92,9 +132,9 @@ class SupplyProducts extends Component
         $this->usedAccessoryTypes = [];
 
         foreach ($this->products as $product) {
-            if ($product['type'] === 'Bouteilles') {
+            if ($product['type'] === ProductType::BOTTLE()->value) {
                 $this->usedBottleTypes[] = $product['detail'];
-            } elseif ($product['type'] === 'Accessoires') {
+            } elseif ($product['type'] === ProductType::ACCESSORY()->value) {
                 $this->usedAccessoryTypes[] = $product['detail'];
             }
         }
@@ -110,7 +150,7 @@ class SupplyProducts extends Component
             $this->isEditing = true;
             $this->editProductId = $id;
 
-            if ($product['type'] === 'Bouteilles') {
+            if ($product['type'] === ProductType::BOTTLE()->value) {
                 $this->selectedBottleType = $product['detail'];
                 $this->quantity = $product['quantity'];
                 $this->outgoingQuantity = $product['outgoingQuantity'] ?? 0;
@@ -132,7 +172,7 @@ class SupplyProducts extends Component
         if ($productIndex !== false) {
             $product = $this->products[$productIndex];
 
-            if ($product['type'] === 'Bouteilles') {
+            if ($product['type'] === ProductType::BOTTLE()->value) {
                 $this->products[$productIndex]['detail'] = $this->selectedBottleType;
                 $this->products[$productIndex]['quantity'] = $this->quantity;
                 $this->products[$productIndex]['outgoingQuantity'] = $this->outgoingQuantity;
@@ -229,11 +269,6 @@ class SupplyProducts extends Component
         }
 
         return false;
-    }
-
-    public function mount()
-    {
-        $this->updateUsedTypes();
     }
 
     public function render()

@@ -34,4 +34,26 @@ class PaymentStatus extends Enum
             'FAILED' => 'failed',
         ];
     }
+
+    /**
+     * Get the CSS class for the status badge
+     *
+     * @return string
+     */
+    public static function badgeClasses(): array
+    {
+        return [
+            'pending' => 'bg-warning',
+            'paid' => 'bg-success',
+            'failed' => 'bg-danger',
+        ];
+    }
+
+    /**
+     * Get the badge class for this payment status instance
+     */
+    public function badgeClass(): string
+    {
+        return static::badgeClasses()[$this->value] ?? 'bg-secondary';
+    }
 }
