@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+// TODO: Move database request to repository and call service instead of repository
+
 class GasBottleForm extends Component
 {
     public $showForm = false;
@@ -73,11 +75,11 @@ class GasBottleForm extends Component
         $this->isEditing = true;
         $this->editProductId = $productId;
 
-        $this->incomingQuantity = $productData['incomingQuantity'] ?? '';
-        $this->outgoingQuantity = $productData['outgoingQuantity'] ?? '';
+        $this->incomingQuantity = $productData['expected_quantity'] ?? '';
+        $this->outgoingQuantity = $productData['bottles_out_quantity'] ?? 0;
 
-        if (isset($productData['detail'])) {
-            $this->selectedBottleType = (string) $productData['detail'];
+        if (isset($productData['bottle_type_id'])) {
+            $this->selectedBottleType = (string) $productData['bottle_type_id'];
         }
 
         $this->showForm = true;

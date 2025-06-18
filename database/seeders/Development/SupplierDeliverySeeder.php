@@ -275,7 +275,6 @@ class SupplierDeliverySeeder extends Seeder
         Bottle $bottle
     ): void {
         SupplierDeliveryBottle::create([
-            'supplier_delivery_id' => $delivery->id,
             'supplier_delivery_product_type_id' => $productType->id,
             'bottle_id' => $bottle->id,
         ]);

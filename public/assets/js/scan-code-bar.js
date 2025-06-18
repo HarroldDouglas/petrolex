@@ -1,14 +1,14 @@
 // Prevent duplicate declaration by checking if the module already exists
-if (typeof window.BarcodeScannerModule === 'undefined') {
-    console.log('Initializing BarcodeScannerModule');
+if (typeof window.BarcodeScannerModule === "undefined") {
+    console.log("Initializing BarcodeScannerModule");
 
-    window.BarcodeScannerModule = (function() {
+    window.BarcodeScannerModule = (function () {
         let isProcessing = false;
         let lastBarcode = null;
         let lastScanTime = 0;
 
         function createScannerUI() {
-            console.log('Creating scanner UI');
+            console.log("Creating scanner UI");
             const scannerContainer = document.createElement("div");
             scannerContainer.id = "scanner-container";
             scannerContainer.style.position = "fixed";
@@ -49,7 +49,9 @@ if (typeof window.BarcodeScannerModule === 'undefined') {
             closeButton.style.border = "none";
             closeButton.style.cursor = "pointer";
             closeButton.addEventListener("click", function () {
-                console.log('Close button clicked, stopping Quagga and removing scanner UI');
+                console.log(
+                    "Close button clicked, stopping Quagga and removing scanner UI",
+                );
                 Quagga.stop();
                 removeScannerFromDOM();
             });
@@ -59,70 +61,80 @@ if (typeof window.BarcodeScannerModule === 'undefined') {
         }
 
         function removeScannerFromDOM() {
-            console.log('Attempting to remove scanner from DOM');
+            console.log("Attempting to remove scanner from DOM");
             const container = document.getElementById("scanner-container");
             if (container && document.body.contains(container)) {
-                console.log('Scanner container found, removing it');
+                console.log("Scanner container found, removing it");
                 document.body.removeChild(container);
-                console.log('Scanner container removed successfully');
+                console.log("Scanner container removed successfully");
             } else {
-                console.log('Scanner container not found or not in DOM');
+                console.log("Scanner container not found or not in DOM");
             }
         }
 
         function handleBarcodeDetection(result) {
-            console.log('Barcode detected:', result.codeResult.code);
+            console.log("Barcode detected:", result.codeResult.code);
             const barcode = result.codeResult.code;
             const currentTime = new Date().getTime();
 
-            if (isProcessing || (lastBarcode === barcode && currentTime - lastScanTime < 2000)) {
-                console.log('Ignoring duplicate scan or processing in progress');
+            if (
+                isProcessing ||
+                (lastBarcode === barcode && currentTime - lastScanTime < 2000)
+            ) {
+                console.log(
+                    "Ignoring duplicate scan or processing in progress",
+                );
                 return;
             }
 
-            console.log('Processing barcode:', barcode);
+            console.log("Processing barcode:", barcode);
             isProcessing = true;
             lastBarcode = barcode;
             lastScanTime = currentTime;
 
             if (barcode) {
                 // Stop Quagga first
-                console.log('Stopping Quagga');
+                console.log("Stopping Quagga");
                 try {
                     Quagga.stop();
-                    console.log('Quagga stopped successfully');
+                    console.log("Quagga stopped successfully");
                 } catch (e) {
-                    console.error('Error stopping Quagga:', e);
+                    console.error("Error stopping Quagga:", e);
                 }
 
                 // Then remove the UI
-                console.log('Removing scanner UI');
+                console.log("Removing scanner UI");
                 removeScannerFromDOM();
 
                 try {
-                    console.log('Dispatching barcode to Livewire');
-                    Livewire.dispatch("barcode-scanned", [{
-                        barcode: barcode,
-                    }]);
-                    console.log('Dispatch complete');
+                    console.log("Dispatching barcode to Livewire");
+                    Livewire.dispatch("barcode-scanned", [
+                        {
+                            barcode: barcode,
+                        },
+                    ]);
+                    console.log("Dispatch complete");
                 } catch (error) {
-                    console.error('Error dispatching to Livewire:', error);
-                    alert("Erreur lors du traitement du code-barres: " + error.message);
+                    console.error("Error dispatching to Livewire:", error);
+                    alert(
+                        "Erreur lors du traitement du code-barres: " +
+                            error.message,
+                    );
                 } finally {
-                    console.log('Resetting processing flag');
+                    console.log("Resetting processing flag");
                     setTimeout(() => {
                         isProcessing = false;
-                        console.log('Processing flag reset');
+                        console.log("Processing flag reset");
                     }, 500);
                 }
             } else {
-                console.log('No valid barcode detected');
+                console.log("No valid barcode detected");
                 isProcessing = false;
             }
         }
 
         function initializeQuagga(scannerViewport) {
-            console.log('Initializing Quagga');
+            console.log("Initializing Quagga");
             const quaggaConfig = {
                 inputStream: {
                     name: "Live",
@@ -166,11 +178,11 @@ if (typeof window.BarcodeScannerModule === 'undefined') {
 
             Quagga.init(quaggaConfig, function (err) {
                 if (err) {
-                    console.error('Error initializing Quagga:', err);
+                    console.error("Error initializing Quagga:", err);
                     removeScannerFromDOM();
                     return;
                 }
-                console.log('Quagga initialized successfully, starting Quagga');
+                console.log("Quagga initialized successfully, starting Quagga");
                 Quagga.start();
             });
 
@@ -178,21 +190,21 @@ if (typeof window.BarcodeScannerModule === 'undefined') {
         }
 
         return {
-            init: function() {
-                console.log('Scanner initialization started');
+            init: function () {
+                console.log("Scanner initialization started");
                 const ui = createScannerUI();
                 document.body.appendChild(ui.container);
-                console.log('Scanner UI added to DOM');
+                console.log("Scanner UI added to DOM");
                 initializeQuagga(ui.viewport);
-            }
+            },
         };
     })();
 
     // Define the global function that's called from the blade file
-    window.initBarcodeScanner = function() {
-        console.log('initBarcodeScanner called');
+    window.initBarcodeScanner = function () {
+        console.log("initBarcodeScanner called");
         window.BarcodeScannerModule.init();
     };
 } else {
-    console.log('BarcodeScannerModule already exists, not reinitializing');
+    console.log("BarcodeScannerModule already exists, not reinitializing");
 }

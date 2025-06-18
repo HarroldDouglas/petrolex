@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\SupplierDeliveryBottleMovementType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,12 +12,17 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property int $supplier_delivery_id
  * @property int $supplier_delivery_product_type_id
  * @property int $bottle_id
+ * @property string $movement_type
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property-read SupplierDeliveryProductType $bottleType
+ * @property-read Bottle $bottle
+ *
+ * @method static Builder|static incoming()
+ * @method static Builder|static outgoing()
  */
 class SupplierDeliveryBottle extends Model
 {
@@ -28,18 +35,10 @@ class SupplierDeliveryBottle extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'supplier_delivery_id',
         'supplier_delivery_product_type_id',
         'bottle_id',
+        'movement_type',
     ];
-
-    /**
-     * Get the supplier delivery this bottle belongs to.
-     */
-    public function supplierDelivery(): BelongsTo
-    {
-        return $this->belongsTo(SupplierDelivery::class);
-    }
 
     /**
      * Get the supplier delivery bottle type this bottle belongs to.
@@ -55,5 +54,21 @@ class SupplierDeliveryBottle extends Model
     public function bottle(): BelongsTo
     {
         return $this->belongsTo(Bottle::class);
+    }
+
+    /**
+     * Scope a query to only include incoming bottles.
+     */
+    public function scopeIncoming(Builder $query): Builder
+    {
+        return $query->where('movement_type', SupplierDeliveryBottleMovementType::INCOMING()->value);
+    }
+
+    /**
+     * Scope a query to only include outgoing bottles.
+     */
+    public function scopeOutgoing(Builder $query): Builder
+    {
+        return $query->where('movement_type', SupplierDeliveryBottleMovementType::OUTGOING()->value);
     }
 }

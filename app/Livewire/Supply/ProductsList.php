@@ -8,6 +8,7 @@ use App\Models\SupplierDeliveryProductType;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
+// TODO: Move database request to repository and call service instead of repository
 class ProductsList extends Component
 {
     public $products = [];
@@ -21,130 +22,215 @@ class ProductsList extends Component
     public function mount(?SupplierDelivery $supplierDelivery = null)
     {
         $this->supplierDelivery = $supplierDelivery;
-        $this->formatProductsForView();
+        $this->loadProducts();
     }
 
     /**
-     * Transformer les objets SupplierDeliveryProductType en format attendu par la vue
+     * Load and format products for display
      */
-    protected function formatProductsForView()
+    public function loadProducts(): void
     {
-        $this->products = [];
+        $this->products = collect();
 
         if (! $this->supplierDelivery) {
             return;
         }
 
-        foreach ($this->supplierDelivery->productTypes as $product) {
-            $formattedProduct = [
-                'id' => $product->id,
-                'type' => $product->product_type->value,
-            ];
+        $this->products = $this->supplierDelivery->productTypes
+            ->map(fn ($product) => $this->formatProduct($product))
+            ->all();
+    }
 
-            if ($product->product_type->value === ProductType::BOTTLE()->value) {
-                $formattedProduct['detail'] = $product->bottle_type_id;
-                $formattedProduct['detail_name'] = $product->bottleType ? $product->bottleType->name : 'Type inconnu';
-                $formattedProduct['incomingQuantity'] = $product->expected_quantity;
-                $formattedProduct['outgoingQuantity'] = $product->bottles_out_quantity;
-                $formattedProduct['quantity'] = $product->expected_quantity;
-            } else {
-                $formattedProduct['detail'] = $product->accessory_type_id;
-                $formattedProduct['detail_name'] = $product->accessoryType ? $product->accessoryType->name : 'Type inconnu';
-                $formattedProduct['quantity'] = $product->expected_quantity;
-                $formattedProduct['incomingQuantity'] = $product->expected_quantity;
-                $formattedProduct['outgoingQuantity'] = 0;
-            }
+    /**
+     * Format a product based on its type
+     */
+    private function formatProduct(SupplierDeliveryProductType $product): array
+    {
+        $baseProduct = [
+            'id' => $product->id,
+            'product_type' => $product->product_type->value,
+            'expected_quantity' => $product->expected_quantity,
+        ];
 
-            $this->products[] = $formattedProduct;
+        return match ($product->product_type->value) {
+            ProductType::BOTTLE()->value => $this->formatBottleProduct($product, $baseProduct),
+            ProductType::ACCESSORY()->value => $this->formatAccessoryProduct($product, $baseProduct),
+            default => $baseProduct
+        };
+    }
+
+    /**
+     * Format a bottle product
+     */
+    private function formatBottleProduct(SupplierDeliveryProductType $product, array $baseProduct): array
+    {
+        return array_merge($baseProduct, [
+            'bottle_type_id' => $product->bottle_type_id,
+            'bottle_type_name' => $product->bottleType?->name ?? 'Unknown type',
+            'bottles_out_quantity' => $product->bottles_out_quantity,
+        ]);
+    }
+
+    /**
+     * Format an accessory product
+     */
+    private function formatAccessoryProduct(SupplierDeliveryProductType $product, array $baseProduct): array
+    {
+        return array_merge($baseProduct, [
+            'accessory_type_id' => $product->accessory_type_id,
+            'accessory_type_name' => $product->accessoryType?->name ?? 'Unknown type',
+        ]);
+    }
+
+    /**
+     * Refresh the product list
+     */
+    public function refreshProducts(): void
+    {
+        // Avoid recursive calls
+        if ($this->isRefreshing()) {
+            return;
+        }
+
+        $this->startRefresh();
+
+        try {
+            $this->supplierDelivery = $this->supplierDelivery
+                ->fresh(['productTypes.bottleType', 'productTypes.accessoryType']);
+            $this->loadProducts();
+            $this->dispatch('products-updated', $this->products);
+        } finally {
+            $this->endRefresh();
+        }
+    }
+
+    // Locking system to avoid multiple refreshes
+    private static $refreshing = false;
+
+    private function isRefreshing(): bool
+    {
+        return self::$refreshing;
+    }
+
+    private function startRefresh(): void
+    {
+        self::$refreshing = true;
+    }
+
+    private function endRefresh(): void
+    {
+        self::$refreshing = false;
+    }
+
+    /**
+     * Edit a product
+     */
+    public function editProduct(int $productId): void
+    {
+        $product = $this->findProduct($productId);
+
+        if (! $product) {
+            session()->flash('error', 'Product not found');
+
+            return;
+        }
+
+        $eventName = match ($product['product_type']) {
+            ProductType::BOTTLE()->value => 'set-gas-bottle-form',
+            ProductType::ACCESSORY()->value => 'set-accessory-form',
+            default => null
+        };
+
+        if ($eventName) {
+            $this->dispatch($eventName, $productId, $product);
         }
     }
 
     /**
-     * Rafraîchir les produits à partir de la base de données
+     * Confirm product deletion
      */
-    public function refreshProducts()
+    public function confirmDeleteProduct(int $productId): void
     {
-        static $refreshing = false;
-        if ($refreshing) {
-            return;
-        }
-
-        $refreshing = true;
-
-        try {
-            $this->supplierDelivery = $this->supplierDelivery->fresh(['productTypes.bottleType', 'productTypes.accessoryType']);
-            $this->formatProductsForView();
-        } finally {
-            $refreshing = false;
-        }
-    }
-
-    public function editProduct(int $id)
-    {
-        $productIndex = $this->findProductIndex($id);
-        if ($productIndex !== false) {
-            $product = $this->products[$productIndex];
-
-            if ($product['type'] === ProductType::BOTTLE()->value) {
-                $this->dispatch('set-gas-bottle-form', $id, $product);
-            } else {
-                $this->dispatch('set-accessory-form', $id, $product);
-            }
-        }
-    }
-
-    public function confirmDeleteProduct($id)
-    {
-        $this->productToDelete = $id;
+        $this->productToDelete = $productId;
         $this->dispatch('show-delete-modal');
     }
 
-    public function deleteProduct()
+    /**
+     * Delete the confirmed product
+     */
+    public function deleteProduct(): void
     {
-        if ($this->productToDelete) {
-            $this->removeProduct($this->productToDelete);
+        if (! $this->productToDelete) {
+            return;
+        }
+
+        try {
+            $deleted = SupplierDeliveryProductType::find($this->productToDelete)?->delete();
+
+            if ($deleted) {
+                session()->flash('success', 'Product successfully deleted');
+                $this->refreshProducts();
+            } else {
+                session()->flash('error', 'Unable to delete product');
+            }
+        } catch (\Exception $e) {
+            Log::error("Error deleting product ID {$this->productToDelete}: {$e->getMessage()}");
+            session()->flash('error', 'Error during deletion');
+        } finally {
             $this->productToDelete = null;
             $this->dispatch('hide-delete-modal');
         }
     }
 
-    public function removeProduct($productId)
+    /**
+     * Scan bottles for a product
+     */
+    public function scanBottles(int $productId)
     {
-        try {
-            $deleted = SupplierDeliveryProductType::find($productId)?->delete();
+        $product = $this->findProduct($productId);
 
-            if ($deleted) {
-                $this->dispatch('product-registered');
-            }
-        } catch (\Exception $e) {
-            Log::error("Erreur lors de la suppression du produit : {$e->getMessage()}");
-            session()->flash('error', 'Erreur lors de la suppression du produit : '.$e->getMessage());
+        if (! $product || $product['product_type'] !== ProductType::BOTTLE()->value) {
+            session()->flash('error', 'Bottle product not found');
+
+            return;
         }
+
+        return redirect()->route('supplies.scan-bottles', [
+            'supply_id' => $this->supplierDelivery->id,
+            'type_id' => $product['bottle_type_id'],
+        ]);
     }
 
-    public function scanBottles($id)
+    /**
+     * Find a product by its ID
+     */
+    private function findProduct(int $productId): ?array
     {
-        $productIndex = $this->findProductIndex($id);
-        if ($productIndex !== false) {
-            $product = $this->products[$productIndex];
-            $bottleType = $product['detail'];
-
-            return redirect()->route('supplies.scan-bottles', [
-                'supply_id' => $this->supplierDelivery->id,
-                'type_id' => $bottleType,
-            ]);
-        }
+        return collect($this->products)->firstWhere('id', $productId);
     }
 
-    private function findProductIndex($id)
+    /**
+     * Get product display name
+     */
+    public function getProductDisplayName(array $product): string
     {
-        foreach ($this->products as $index => $product) {
-            if ($product['id'] == $id) {
-                return $index;
-            }
-        }
+        return match ($product['product_type'] ?? null) {
+            ProductType::BOTTLE()->value => $product['bottle_type_name'] ?? 'Unknown bottle type',
+            ProductType::ACCESSORY()->value => $product['accessory_type_name'] ?? 'Unknown accessory type',
+            default => 'Unknown product'
+        };
+    }
 
-        return false;
+    /**
+     * Get product type display value
+     */
+    public function getProductTypeDisplay(array $product): string
+    {
+        return match ($product['product_type'] ?? null) {
+            ProductType::BOTTLE()->value => 'bottle',
+            ProductType::ACCESSORY()->value => 'accessory',
+            default => 'unknown'
+        };
     }
 
     public function render()

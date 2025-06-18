@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -82,9 +83,12 @@ class SupplierDelivery extends Model
     /**
      * Get the bottles included in this delivery.
      */
-    public function bottles(): HasMany
+    public function bottles(): HasManyThrough
     {
-        return $this->hasMany(SupplierDeliveryBottle::class);
+        return $this->hasManyThrough(
+            SupplierDeliveryBottle::class,
+            SupplierDeliveryProductType::class
+        );
     }
 
     /**

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+// TODO: Move database request to repository and call service instead of repository
 class AccessoryForm extends Component
 {
     public $selectedAccessoryType = '';
@@ -79,22 +80,11 @@ class AccessoryForm extends Component
 
         $this->isEditing = true;
         $this->editProductId = $productId;
+        $this->accessoryQuantity = $productData['expected_quantity'] ?? '';
 
-        $this->accessoryQuantity = $productData['quantity'] ?? '';
-
-        if (isset($productData['detail'])) {
-            $this->selectedAccessoryType = is_array($productData['detail'])
-                ? (string) ($productData['detail'][0] ?? '')
-                : (string) $productData['detail'];
+        if (isset($productData['accessory_type_id'])) {
+            $this->selectedAccessoryType = (string) $productData['accessory_type_id'];
         }
-
-        Log::info('AccessoryForm processEditData:', [
-            'selectedAccessoryType' => $this->selectedAccessoryType,
-            'usedAccessoryTypes' => $this->usedAccessoryTypes,
-            'isEditing' => $this->isEditing,
-            'accessoryType_2_in_used' => in_array(2, $this->usedAccessoryTypes ?? []),
-            'condition_for_id_2' => ! in_array(2, $this->usedAccessoryTypes ?? []) || ($this->isEditing && $this->selectedAccessoryType == 2),
-        ]);
 
         $this->showForm = true;
     }

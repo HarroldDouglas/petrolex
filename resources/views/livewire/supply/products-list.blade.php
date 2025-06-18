@@ -21,26 +21,29 @@
                         </thead>
                         <tbody>
                             @foreach ($products as $product)
+                                @php
+                                    $productType = $this->getProductTypeDisplay($product);
+                                @endphp
                                 <tr>
                                     <td>
-                                        <span class="badge {{ $product['type'] === 'bottle' ? 'bg-primary' : 'bg-secondary' }}">
-                                            <i class="{{ $product['type'] === 'bottle' ? 'iconoir-cylinder' : 'ti ti-tool' }} me-1"></i>
-                                            {{ $product['type'] === 'bottle' ? 'Bouteille' : 'Accessoire' }}
+                                        <span class="badge {{ $productType === 'bottle' ? 'bg-primary' : 'bg-secondary' }}">
+                                            <i class="{{ $productType === 'bottle' ? 'iconoir-cylinder' : 'ti ti-tool' }} me-1"></i>
+                                            {{ $productType === 'bottle' ? 'Bouteille' : 'Accessoire' }}
                                         </span>
                                     </td>
                                     <td>
-                                        <strong>{{ $product['detail_name'] ?? $product['detail'] }}</strong>
+                                        <strong>{{ $this->getProductDisplayName($product) }}</strong>
                                     </td>
                                     <td>
-                                        @if($product['type'] === 'bottle')
-                                            <span class="badge bg-success fs-6">{{ $product['incomingQuantity'] ?? 0 }}</span>
+                                        @if($productType === 'bottle')
+                                            <span class="badge bg-success fs-6">{{ $product['expected_quantity'] ?? 0 }}</span>
                                         @else
-                                            <span class="badge bg-success fs-6">{{ $product['quantity'] ?? 0 }}</span>
+                                            <span class="badge bg-success fs-6">{{ $product['expected_quantity'] ?? 0 }}</span>
                                         @endif
                                     </td>
                                     <td>
-                                        @if($product['type'] === 'bottle')
-                                            <span class="badge bg-warning fs-6">{{ $product['outgoingQuantity'] ?? 0 }}</span>
+                                        @if($productType === 'bottle')
+                                            <span class="badge bg-warning fs-6">{{ $product['bottles_out_quantity'] ?? 0 }}</span>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
@@ -57,7 +60,7 @@
                                                     title="Supprimer">
                                                 <i class="ti ti-trash"></i>
                                             </button>
-                                            @if($product['type'] === 'bottle')
+                                            @if($productType === 'bottle')
                                                 <button wire:click="scanBottles({{ $product['id'] }})" 
                                                         class="btn btn-outline-info"
                                                         title="Scanner les bouteilles">
