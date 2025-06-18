@@ -34,7 +34,7 @@ class SuppliesDataTable extends BaseDataTable
                 ->sortable()
                 ->searchable()
                 ->format(function ($value, $row) {
-                    return new HtmlString('<a href="'.route('supplies.details', $row->id).'">'.$value.'</a>');
+                    return new HtmlString('<a href="'.route('supplies.edit', $row->id).'">'.$value.'</a>');
                 }),
 
             Column::make('Centre de distr.', 'distribution_center_id')
@@ -87,34 +87,7 @@ class SuppliesDataTable extends BaseDataTable
 
             Column::make('Actions', 'id')
                 ->format(function ($value, $row) {
-                    $html = '<div class="btn-group dropdown-icon-none">
-                                <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
-                                    type="button" id="dropdownMenuButton'.$row->id.'" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <i class="ti ti-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton'.$row->id.'">
-                                    <li>
-                                        <a class="dropdown-item" href="'.route('supplies.details', $row->id).'">
-                                            <i class="ti ti-eye text-primary me-2"></i> Détail
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="'.route('supplies.edit', $row->id).'">
-                                            <i class="ti ti-edit text-success me-2"></i> Editer
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item delete-btn" href="#" 
-                                           data-id="'.$row->id.'" 
-                                           data-reference="'.$row->delivery_number.'">
-                                            <i class="ti ti-trash text-danger me-2"></i> Supprimer
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>';
-
-                    return new HtmlString($html);
+                    return new HtmlString(view('components.supply-actions', ['supply' => $row])->render());
                 }),
         ];
     }
