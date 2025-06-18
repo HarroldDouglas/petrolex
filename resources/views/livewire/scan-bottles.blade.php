@@ -22,6 +22,11 @@
 
     <div class="card">
         <div class="card-header">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>NB:</strong> L'approvisionnement ne sera considéré comme terminé uniquement lorsque toutes les bouteilles (entrantes et sortantes) auront été scannées.
+                Tant que l'approvisionnement n'est pas terminé, aucune bouteille enregistrée ne sera active ou disponible et ne seront donc pas utilisées pour les commandes/livraison.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
             <div class="d-flex justify-content-between align-items-center">
                 <h5>Scan des codes-barres</h5>
                 <span class="badge bg-primary">{{ $supplyTitle }} -
