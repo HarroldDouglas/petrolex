@@ -132,7 +132,7 @@ class ForgotPasswordForm extends Component
             $otpService = app(OtpServiceInterface::class);
 
             if (! $otpService->verifyOtp($this->identifier, $this->otp)) {
-                ('Invalid OTP provided', [
+                Log::warning('Invalid OTP provided', [
                     'identifier' => $this->identifier,
                 ]);
                 $this->error = __('auth.invalid_otp');
