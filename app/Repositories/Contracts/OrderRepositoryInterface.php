@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 interface OrderRepositoryInterface
 {
@@ -52,4 +53,22 @@ interface OrderRepositoryInterface
      * Count canceled orders
      */
     public function countCanceledOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int;
+
+    /**
+     * Récupère les données agrégées d'ordres par jour pour une période donnée.
+     *
+     * @param string $startDate La date de début (format Y-m-d).
+     * @param string $endDate La date de fin (format Y-m-d).
+     * @param string|array|null $distributionCenterId L'ID du centre de distribution, un tableau d'IDs, ou null pour tous.
+     * @param string $aggregationColumn La colonne à agréger (ex: 'total_amount', '*').
+     * @param string $aggregationType Le type d'agrégation (ex: 'SUM', 'COUNT').
+     * @return \Illuminate\Support\Collection Collection de résultats (chaque élément: ['date' => 'Y-m-d', 'value_total' => float/int]).
+     */
+    public function getAggregatedOrdersByDay(
+        string $startDate,
+        string $endDate,
+        string|array|null $distributionCenterId,
+        string $aggregationColumn,
+        string $aggregationType
+    ): Collection;
 }

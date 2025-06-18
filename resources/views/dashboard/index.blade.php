@@ -49,10 +49,14 @@
         <div class="row ticket-app">
             @livewire('dashboard.stats-overview')
         </div>
-        <div class="row ticket-app">
-            @livewire('dashboard.stats-stock-movement')
-        </div>
         <!-- Ticket end -->
+
+        <!-- Graphs start -->
+        <div class="row mt-4">
+            @livewire('dashboard.dashboard-graphs')
+        </div>
+        <!-- Graphs end -->
+
     </div>
 @endsection
 

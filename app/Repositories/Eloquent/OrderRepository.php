@@ -8,6 +8,8 @@ use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -114,5 +116,39 @@ class OrderRepository implements OrderRepositoryInterface
         $order->status = $status;
 
         return $order->save();
+    }
+
+    /**
+     * Récupère les données agrégées d'ordres par jour pour une période donnée.
+     *
+     * @param string $startDate La date de début (format Y-m-d).
+     * @param string $endDate La date de fin (format Y-m-d).
+     * @param string|array|null $distributionCenterId L'ID du centre de distribution, un tableau d'IDs, ou null pour tous.
+     * @param string $aggregationColumn La colonne à agréger (ex: 'total_amount', '*').
+     * @param string $aggregationType Le type d'agrégation (ex: 'SUM', 'COUNT').
+     * @return \Illuminate\Support\Collection Collection de résultats (chaque élément: ['date' => 'Y-m-d', 'value_total' => float/int]).
+     */
+    public function getAggregatedOrdersByDay(
+        string $startDate,
+        string $endDate,
+        string|array|null $distributionCenterId,
+        string $aggregationColumn,
+        string $aggregationType
+    ): Collection {
+        $query = $this->createBaseStatsQuery(
+            Carbon::parse($startDate), 
+            Carbon::parse($endDate),
+            is_string($distributionCenterId) ? [$distributionCenterId] : $distributionCenterId 
+        );
+
+        $selectClause = DB::raw("DATE(order_date) as date, {$aggregationType}({$aggregationColumn}) as value_total");
+
+        $results = $query
+            ->select($selectClause)
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return $results;
     }
 }

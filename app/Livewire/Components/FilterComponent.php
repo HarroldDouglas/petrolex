@@ -113,6 +113,7 @@ class FilterComponent extends Component
             startDate: $this->startDate,
             endDate: $this->endDate,
             distributionCenterId: $this->distributionCenterId,
+            selectedPeriod: $this->selectedPeriod,
         );
     }
 
