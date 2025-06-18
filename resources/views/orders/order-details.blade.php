@@ -29,7 +29,7 @@
                     <x-order.detail.actions :order="$order"/>
                 <!-- Customer Details end -->
 
-                <a class="btn btn-info ms-2" href="{{ route('dashboard') }}">Retour à la Liste des Commandes</a>
+                <a class="btn btn-info ms-2" href="{{ route('orders.list') }}">Retour à la Liste des Commandes</a>
             </div>
         </div>
         <!-- Breadcrumb end -->

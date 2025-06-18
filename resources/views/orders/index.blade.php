@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title', 'Commandes')
+@section('title', auth()->user()->role == \App\Enums\UserRole::CENTER_MANAGER() ? 'Mes Commandes' : 'Commandes')
 @section('css')
     <!-- slick css -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/slick/slick.css') }}">
@@ -14,12 +14,12 @@
         <!-- Breadcrumb start -->
         <div class="row m-1">
             <div class="col-8 p-0">
-                <h4 class="main-title">Commandes</h4>
+                <h4 class="main-title">{{ auth()->user()->role == \App\Enums\UserRole::CENTER_MANAGER() ? 'Mes Commandes' : 'Commandes' }}</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
                             <span>
-                                <i class="ph-duotone  ph-stack f-s-16"></i> Mes Commandes
+                                <i class="ph-duotone  ph-stack f-s-16"></i> {{ auth()->user()->role == \App\Enums\UserRole::CENTER_MANAGER() ? 'Mes Commandes' : 'Commandes' }}
                             </span>
                         </a>
                     </li>
@@ -34,7 +34,7 @@
             <div class="col-12">
                 <div class="card card-border">
                     <div class="card-header">
-                        <h4 class="card-title">Les Commandes</h4>
+                        <h4 class="card-title">{{ auth()->user()->role == \App\Enums\UserRole::CENTER_MANAGER() ? 'Mes Commandes' : 'Les Commandes' }}</h4>
                     </div>
                     <div class="card-body px-0">
                         <div class="table-responsive app-scroll app-datatable-default">

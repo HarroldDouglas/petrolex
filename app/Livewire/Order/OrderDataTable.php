@@ -158,9 +158,10 @@ class OrderDataTable extends BaseDataTable
             Column::make('Statut', 'status')
                 ->sortable()
                 ->format(function ($value) {
+                    //TODO: move this into the OrderStatus class
                     $badgeClass = match ($value) {
-                        OrderStatus::CONFIRMED() => 'bg-primary',
-                        OrderStatus::PROCESSING() => 'bg-info',
+                        OrderStatus::CONFIRMED() => 'bg-dark',
+                        OrderStatus::PROCESSING() => 'bg-primary',
                         OrderStatus::DELIVERED() => 'bg-success',
                         OrderStatus::CANCELLED() => 'bg-danger',
                         default => 'bg-secondary',
