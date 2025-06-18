@@ -97,20 +97,18 @@
                     
                     <div wire:ignore>
                          @if($showDistributionCenters)
-                            <div class="col-md-6 mb-3">
                                 <label for="distribution_center_ids" class="form-label">Centre de distribution</label>
                                 <div>
                                     <livewire:multiple-select
-                                        :items="$availableDistributionCenters"
+                                        :options="$availableDistributionCenters"
                                         :parent-event="'distribution-centers:selection-changed'"
-                                        :selected-items="$distribution_center_ids ?? []"
-                                        :wire:key="'multiple-select-'.uniqid()"
+                                        :selected-options="$distribution_center_ids ?? []"
+                                        :wire:key="'distribution-centers-select'"
                                     />
                                 </div>
                                 @error('distribution_center_ids')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                            </div>
                         @endif
                     </div>
                     @error('distribution_center_ids')

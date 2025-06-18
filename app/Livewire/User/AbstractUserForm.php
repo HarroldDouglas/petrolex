@@ -43,11 +43,8 @@ abstract class AbstractUserForm extends Component
         $this->allowedRoles = UserRole::toArray();
 
         $this->availableDistributionCenters = $this->distributionCenterService->getAll()
-                ->map(fn($center) => [
-                    'id' => $center->id,
-                    'name' => $center->name,
-                ])
-                ->toArray();
+            ->pluck('name', 'id')
+            ->toArray();
     }
 
     public function boot(UserService $userService, DistributionCenterService $distributionCenterService)

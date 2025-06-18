@@ -1,34 +1,46 @@
 <?php
 namespace App\Livewire;
 
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\Attributes\Reactive;
 
 class MultipleSelect extends Component
 {
     #[Reactive]
-    public array $items = [];
+    public array $options = [];
     
-    public array $selected = [];
-    
-    public string $parentEvent;
+    public array $selectedOptions = [];
 
-    public function mount(array $items = [], string $parentEvent = null, array $selectedItems = []): void
+    public string $parentEvent = "options:selection-changed";
+
+    public function mount(array $options = [], string $parentEvent, 
+        array $selectedOptions = []): void
     {
-        $this->items = $items;
-        $this->selected = $selectedItems;
-        $this->parentEvent = $parentEvent ?? 'items:selection-changed';
+        $this->options = $options;
+        $this->selectedOptions = $selectedOptions;
+        $this->parentEvent = $parentEvent ?? 'options:selection-changed';
     }
 
+    public function rules(): array
+    {
+        return [
+            'selectedOptions' => 'required|array|min:1',
+            'selectedOptions.*' => 'integer|exists:distribution_centers,id'
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'selectedOptions.required' => 'Please select at least one option.',
+            'selectedOptions.min' => 'Please select at least one option.',
+            'selectedOptions.*.exists' => 'One or more selected options are invalid.',
+        ];
+    }
     public function updateSelection($values): void
     {
-        $this->selected = $values;
-        Log::info('MultipleSelect updated', [
-            'selected' => $this->selected,
-            'parent_event' => $this->parentEvent,
-        ]);
-        $this->dispatch($this->parentEvent, ['selected' => $values]);
+        $this->validate();
+        $this->selectedOptions = $values ?? [];
+        $this->dispatch($this->parentEvent, ['selectedOptions' => $values]);
     }
 
     public function render()
