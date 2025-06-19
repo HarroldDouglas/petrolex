@@ -35,12 +35,10 @@ class UserService extends BaseServiceWithMedia
         DB::beginTransaction();
         try {
             if ($attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
-                ('Creating user with media', [
-                    'attributes' => $attributes,
-                ]);
                 /** @var User $user */
                 $user = parent::createWithMedia($attributes);
             } else {
+
                 /** @var User $user */
                 $user = parent::create($attributes);
             }
