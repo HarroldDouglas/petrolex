@@ -4,6 +4,7 @@ namespace App\Livewire\Supply\ProductForm;
 
 use App\Enums\ProductType;
 use App\Http\Requests\Supply\RegisterGasBottleRequest;
+use App\Models\BottleType;
 use App\Models\SupplierDelivery;
 use App\Models\SupplierDeliveryProductType;
 use App\Repositories\Contracts\BottleTypeRepositoryInterface;
@@ -23,7 +24,7 @@ class GasBottleForm extends Component
     public $bottleTypes = [];
     public $isEditing = false;
     public $editProductId = null;
-    public $supplierDelivery;
+    public SupplierDelivery $supplierDelivery;
     public $editProductData = null;
 
     protected $listeners = ['products-updated' => 'updateUsedTypes'];
@@ -31,7 +32,7 @@ class GasBottleForm extends Component
     public function boot(BottleTypeRepositoryInterface $bottleTypeRepository)
     {
         $this->bottleTypes = $bottleTypeRepository->all()
-            ->map(fn ($type) => ['id' => $type->id, 'name' => $type->name])
+            ->map(fn (BottleType $type) => ['id' => $type->id, 'name' => $type->name])
             ->toArray();
     }
 

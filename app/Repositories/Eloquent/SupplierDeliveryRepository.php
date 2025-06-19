@@ -18,6 +18,7 @@ class SupplierDeliveryRepository extends BaseEloquentRepository implements Suppl
      */
     public function getBottlesForDelivery(int $deliveryId): Collection
     {
+        /** @var SupplierDelivery $delivery */
         $delivery = $this->model->findOrFail($deliveryId);
 
         return $delivery->bottles()
@@ -30,6 +31,7 @@ class SupplierDeliveryRepository extends BaseEloquentRepository implements Suppl
      */
     public function getWithProducts(int $id): ?SupplierDelivery
     {
+        /** @var SupplierDelivery|null */
         return $this->model::with(['productTypes'])
             ->find($id);
     }

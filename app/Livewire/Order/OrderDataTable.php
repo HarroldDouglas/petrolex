@@ -4,12 +4,11 @@ namespace App\Livewire\Order;
 
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
-use App\Models\DistributionCenter;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
@@ -157,18 +156,9 @@ class OrderDataTable extends BaseDataTable
 
             Column::make('Statut', 'status')
                 ->sortable()
-                ->format(function ($value) {
-                    //TODO: move this into the OrderStatus class
-                    $badgeClass = match ($value) {
-                        OrderStatus::CONFIRMED() => 'bg-dark',
-                        OrderStatus::PROCESSING() => 'bg-primary',
-                        OrderStatus::DELIVERED() => 'bg-success',
-                        OrderStatus::CANCELLED() => 'bg-danger',
-                        default => 'bg-secondary',
-                    };
-
+                ->format(function (OrderStatus $value) {
                     return new HtmlString(
-                        '<span class="badge '.$badgeClass.'">'.e($value->label).'</span>'
+                        '<span class="badge '.$value->getBadgeClass().'">'.e($value->label).'</span>'
                     );
                 }),
 
@@ -186,15 +176,7 @@ class OrderDataTable extends BaseDataTable
      */
     protected function getDistributionCenterOptions(): array
     {
-        /** @var User|null $user */
-        $user = Auth::user();
-
-        if (! $user) {
-            return ['' => 'Tous'];
-        }
-
-        $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
-        $centers = DistributionCenter::whereIn('id', $centerIds)->orderBy('name')->get();
+        $centers = DistributionCenterService::getForCurrentUser();
 
         $options = ['' => 'Tous'];
 
@@ -285,7 +267,7 @@ class OrderDataTable extends BaseDataTable
 
     public function builder(): Builder
     {
-        return Order::query()
+        $query = Order::query()
             ->with([
                 'customer.user',
                 'distributionCenter',
@@ -294,5 +276,14 @@ class OrderDataTable extends BaseDataTable
                 'items.product.accessory.accessoryType',
                 'payment',
             ]);
+
+        $centers = DistributionCenterService::getForCurrentUser();
+        $centerIds = $centers->pluck('id')->toArray();
+
+        if (! empty($centerIds)) {
+            $query->whereIn('distribution_center_id', $centerIds);
+        }
+
+        return $query;
     }
 }

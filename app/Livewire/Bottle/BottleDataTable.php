@@ -4,9 +4,9 @@ namespace App\Livewire\Bottle;
 
 use App\Enums\BottleStatus;
 use App\Models\Bottle;
-use App\Models\DistributionCenter;
 use App\Models\User;
 use App\Services\Bottle\BottleService;
+use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -96,35 +96,22 @@ class BottleDataTable extends BaseDataTable
         ];
     }
 
-    /**
-     * Get authorized distribution center options for the current user
-     */
-    protected function getDistributionCenterOptions(): array
-    {
-        /** @var User|null $user */
-        $user = Auth::user();
-
-        if (! $user) {
-            return ['' => 'Tous'];
-        }
-
-        $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
-        $centers = DistributionCenter::whereIn('id', $centerIds)->orderBy('name')->get();
-
-        $options = ['' => 'Tous'];
-
-        foreach ($centers as $center) {
-            $options[$center->id] = $center->name;
-        }
-
-        return $options;
-    }
-
     public function filters(): array
     {
         return [
-            SelectFilter::make('Centre de distribution')
-                ->options($this->getDistributionCenterOptions())
+            SelectFilter::make('Centre de distribution', 'distribution_center')
+                ->options((function () {
+
+                    $centers = DistributionCenterService::getForCurrentUser();
+
+                    $options = ['' => 'Tous les centres'];
+
+                    foreach ($centers as $center) {
+                        $options[$center->id] = $center->name;
+                    }
+
+                    return $options;
+                })())
                 ->filter(function (Builder $builder, string $value) {
                     if ($value === '') {
                         return $builder;

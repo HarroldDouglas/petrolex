@@ -5,10 +5,11 @@ namespace App\Repositories\Contracts;
 use App\Enums\OrderStatus;
 use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
+use App\Models\Refund;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
-interface OrderRepositoryInterface
+interface OrderRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Get order with all necessary relationships loaded
@@ -35,6 +36,14 @@ interface OrderRepositoryInterface
     public function updateStatus(Order $order, OrderStatus $status): bool;
 
     /**
+     * Get the most recent paid refund for an order
+     *
+     * @param  Order  $order  The order to get the refund for
+     * @return Refund|null The most recent paid refund or null if none exists
+     */
+    public function getLatestPaidRefund(Order $order): ?Refund;
+
+    /**
      * Calculate total revenue from delivered orders
      */
     public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): string;
@@ -57,11 +66,11 @@ interface OrderRepositoryInterface
     /**
      * Récupère les données agrégées d'ordres par jour pour une période donnée.
      *
-     * @param string $startDate La date de début (format Y-m-d).
-     * @param string $endDate La date de fin (format Y-m-d).
-     * @param string|array|null $distributionCenterId L'ID du centre de distribution, un tableau d'IDs, ou null pour tous.
-     * @param string $aggregationColumn La colonne à agréger (ex: 'total_amount', '*').
-     * @param string $aggregationType Le type d'agrégation (ex: 'SUM', 'COUNT').
+     * @param  string  $startDate  La date de début (format Y-m-d).
+     * @param  string  $endDate  La date de fin (format Y-m-d).
+     * @param  string|array|null  $distributionCenterId  L'ID du centre de distribution, un tableau d'IDs, ou null pour tous.
+     * @param  string  $aggregationColumn  La colonne à agréger (ex: 'total_amount', '*').
+     * @param  string  $aggregationType  Le type d'agrégation (ex: 'SUM', 'COUNT').
      * @return \Illuminate\Support\Collection Collection de résultats (chaque élément: ['date' => 'Y-m-d', 'value_total' => float/int]).
      */
     public function getAggregatedOrdersByDay(

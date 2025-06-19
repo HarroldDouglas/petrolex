@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Enums\PeriodFilterStats;
+use App\Services\Dashboard\DashboardGraphService;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use App\Services\Dashboard\DashboardGraphService;
-use App\Enums\PeriodFilterStats;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth; 
 
 class DashboardGraphs extends Component
 {
@@ -22,8 +22,8 @@ class DashboardGraphs extends Component
                 'borderWidth' => 2,
                 'tension' => 0.4,
                 'fill' => false,
-                ]
-            ]
+            ],
+        ],
     ];
     public array $ordersGraphData = [
         'labels' => [],
@@ -36,8 +36,8 @@ class DashboardGraphs extends Component
                 'borderWidth' => 2,
                 'tension' => 0.4,
                 'fill' => false,
-            ]
-        ]
+            ],
+        ],
     ];
 
     private DashboardGraphService $graphService;
@@ -66,7 +66,7 @@ class DashboardGraphs extends Component
                 '1month' => $now->copy()->subMonth()->format('Y-m-d'),
                 '2months' => $now->copy()->subMonths(2)->format('Y-m-d'),
                 '3months' => $now->copy()->subMonths(3)->format('Y-m-d'),
-                default => $now->copy()->subMonth()->format('Y-m-d'), 
+                default => $now->copy()->subMonth()->format('Y-m-d'),
             };
             $finalEndDate = $now->format('Y-m-d');
         }
@@ -78,8 +78,8 @@ class DashboardGraphs extends Component
             $finalEndDate = $now->format('Y-m-d');
         }
 
-        $revenueStats = (object)['labels' => [], 'data' => []];
-        $ordersStats = (object)['labels' => [], 'data' => []];
+        $revenueStats = (object) ['labels' => [], 'data' => []];
+        $ordersStats = (object) ['labels' => [], 'data' => []];
 
         if ($distributionCenterId === null || $distributionCenterId === '') {
             $user = Auth::user();
@@ -96,8 +96,8 @@ class DashboardGraphs extends Component
                     $ordersStats = (object)['labels' => [], 'data' => []];
                 }**/
             } else {
-                $revenueStats = (object)['labels' => [], 'data' => []];
-                $ordersStats = (object)['labels' => [], 'data' => []];
+                $revenueStats = (object) ['labels' => [], 'data' => []];
+                $ordersStats = (object) ['labels' => [], 'data' => []];
             }
         } else {
             $revenueStats = $this->graphService->getRevenueByDay($finalStartDate, $finalEndDate, $distributionCenterId);
@@ -111,8 +111,8 @@ class DashboardGraphs extends Component
                 'data' => $revenueStats->data,
                 'borderColor' => '#4e73df',
                 'tension' => 0.4,
-                'fill' => false
-            ]]
+                'fill' => false,
+            ]],
         ];
 
         $this->ordersGraphData = [
@@ -120,13 +120,13 @@ class DashboardGraphs extends Component
             'datasets' => [[
                 'label' => 'Commandes',
                 'data' => $ordersStats->data,
-                'backgroundColor' => '#36b9cc'
-            ]]
+                'backgroundColor' => '#36b9cc',
+            ]],
         ];
     }
 
     #[On('filters-changed-dashboard')]
-    public function handleFiltersChanged(?string $startDate = null, ?string $endDate = null, ?string $distributionCenterId = null, string $selectedPeriod = null): void
+    public function handleFiltersChanged(?string $startDate = null, ?string $endDate = null, ?string $distributionCenterId = null, ?string $selectedPeriod = null): void
     {
         $this->loadGraphDataByFilters($selectedPeriod, $startDate, $endDate, $distributionCenterId);
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+// TODO: make this use baseServiceForEntity
 class DistributionCenterService
 {
     public function __construct(private DistributionCenterRepositoryInterface $distributionCenterRepository) {}

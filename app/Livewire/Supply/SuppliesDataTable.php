@@ -13,7 +13,6 @@ use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
-use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
 class SuppliesDataTable extends BaseDataTable
 {
@@ -157,12 +156,6 @@ class SuppliesDataTable extends BaseDataTable
                     }
 
                     return $builder;
-                }),
-
-            TextFilter::make('Reference')
-                ->config(['placeholder' => 'Rechercher une référence...'])
-                ->filter(function (Builder $builder, string $value) {
-                    $builder->where('delivery_number', 'like', '%'.$value.'%');
                 }),
 
             SelectFilter::make('Statut')

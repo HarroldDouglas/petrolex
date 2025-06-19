@@ -195,18 +195,28 @@ class Order extends Model
 
     /**
      * Get payment status through the payment relation
+     *
+     * @return mixed
      */
     public function getPaymentStatusAttribute()
     {
-        return $this->payment ? $this->payment->payment_status : null;
+        /** @var \App\Models\OrderPayment|null $payment */
+        $payment = $this->payment;
+
+        return $payment ? $payment->payment_status : null;
     }
 
     /**
      * Get payment method through the payment relation
+     *
+     * @return mixed
      */
     public function getPaymentMethodAttribute()
     {
-        return $this->payment ? $this->payment->payment_method : null;
+        /** @var \App\Models\OrderPayment|null $payment */
+        $payment = $this->payment;
+
+        return $payment ? $payment->payment_method : null;
     }
 
     /**
