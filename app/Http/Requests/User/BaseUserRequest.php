@@ -4,7 +4,6 @@ namespace App\Http\Requests\User;
 
 use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 abstract class BaseUserRequest extends FormRequest
@@ -16,12 +15,14 @@ abstract class BaseUserRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email', 'max:255'],
             'phone_number' => ['required', 'string', 'max:20'],
-            'password' => ['nullable', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8'],
             'role' => ['required', Rule::in(UserRole::values())],
+            'image' => ['nullable', 'image', 'max:2048'],
             'distribution_center_ids' => ['nullable', 'array'],
             'distribution_center_ids.*' => [
                 Rule::requiredIf(function () {
                     $role = $this->input('role');
+
                     return in_array($role, [
                         UserRole::CENTER_MANAGER()->value,
                         UserRole::DELIVERY_PERSON()->value,
@@ -53,6 +54,8 @@ abstract class BaseUserRequest extends FormRequest
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'role.enum' => 'Le rôle sélectionné n\'est pas valide.',
             'role.required' => 'Le rôle est obligatoire.',
+            'image.image' => 'L\'image doit être un fichier image valide.',
+            'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
             'distribution_center_ids.array' => 'Les centres de distribution doivent être un tableau.',
             'distribution_center_ids.*.exists' => 'Un ou plusieurs centres de distribution sélectionnés n\'existent pas.',
             'is_active.required' => 'Le statut est obligatoire.',

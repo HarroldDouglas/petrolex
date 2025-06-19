@@ -2,51 +2,82 @@
 
 namespace App\Services\User;
 
-use App\DTOs\User\CreateUserDTO;
-use App\DTOs\User\UpdateUserDTO;
 use App\Events\UserCreatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Services\BaseServiceWithMedia;
+use App\Services\Shared\Media\MediaServiceInterface;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-class UserService
+class UserService extends BaseServiceWithMedia
 {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository
-    ) {}
+        private readonly UserRepositoryInterface $userRepository,
+        protected MediaServiceInterface $mediaService,
+    ) {
+        parent::__construct($userRepository, $mediaService);
+    }
 
-    public function create(CreateUserDTO $dto): User
+    /**
+     * Create a new user with associated media
+     *
+     * @param  array  $attributes  Data Transfer Object containing user data
+     * @return User The created user model
+     *
+     * @throws \Exception If the creation fails
+     */
+    public function createWithMedia(array $attributes): User
     {
         DB::beginTransaction();
-
         try {
-            /** @var User $user */
-            $user = $this->userRepository->create($dto->toUserArray());
+            if ($attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
+                ('Creating user with media', [
+                    'attributes' => $attributes,
+                ]);
+                /** @var User $user */
+                $user = parent::createWithMedia($attributes);
+            } else {
+                /** @var User $user */
+                $user = parent::create($attributes);
+            }
 
-            UserCreatedEvent::dispatch($user, $dto->role->value, $dto->distribution_center_ids);
+            UserCreatedEvent::dispatch(
+                $user,
+                $attributes['role'],
+                $attributes['distribution_center_ids']
+            );
 
             DB::commit();
 
             return $user;
         } catch (\Exception $e) {
+            Log::error('User creation failed', [
+                'message' => $e->getMessage(),
+                'attributes' => $attributes,
+                'trace' => $e->getTraceAsString(),
+            ]);
             DB::rollBack();
             throw $e;
         }
+
     }
 
     /**
      * Update a user's information
      *
      * @param  User  $user  The user to update
-     * @param  UpdateUserDTO  $dto  Data Transfer Object containing the updated user data
+     * @param  array  $attributes  The attributes to update
      * @return User The updated user model
      */
-    public function update(User $user, UpdateUserDTO $dto): User
+    public function update(Model $user, array $attributes): Model
     {
-        $attributes = $dto->toArrayFiltered();
-
+        if (! $user instanceof User) {
+            throw new \InvalidArgumentException('Expected User model');
+        }
         if (empty($attributes)) {
             return $user;
         }
@@ -84,7 +115,7 @@ class UserService
      * @param  User  $user  The user to delete
      * @return bool Whether the deletion was successful
      */
-    public function delete(User $user): bool
+    public function delete(Model $user): bool
     {
         DB::beginTransaction();
 
@@ -104,6 +135,11 @@ class UserService
         }
     }
 
+    protected function getMediaFields(): array
+    {
+        return ['image'];
+    }
+
     /**
      * Find a user by their ID
      *
@@ -116,5 +152,10 @@ class UserService
     {
         /** @var User|null */
         return $this->userRepository->find($id);
+    }
+
+    protected function getModel(): string
+    {
+        return User::class;
     }
 }

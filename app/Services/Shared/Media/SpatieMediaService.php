@@ -5,6 +5,7 @@ namespace App\Services\Shared\Media;
 use App\DTOs\ImageDataDTO;
 use App\DTOs\ModelWithImagesDTO;
 use App\Models\BaseModelWithMedia;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
@@ -13,7 +14,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function attachMedia(BaseModelWithMedia $model, UploadedFile|array $files, string $collection = 'images'): array
+    public function attachMedia(BaseModelWithMedia|User $model, UploadedFile|array $files, string $collection = 'images'): array
     {
         $validFiles = is_array($files) ? $files : [$files];
 
@@ -41,7 +42,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function detachMedia(BaseModelWithMedia $model, int $mediaId): bool
+    public function detachMedia(BaseModelWithMedia|User $model, int $mediaId): bool
     {
         try {
             $media = $model->getMedia('images')->firstWhere('id', $mediaId);
@@ -65,7 +66,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function replaceMedia(BaseModelWithMedia $model, UploadedFile|array $files, string $collection = 'images'): array
+    public function replaceMedia(BaseModelWithMedia|User $model, UploadedFile|array $files, string $collection = 'images'): array
     {
         $this->clearMediaCollection($model, $collection);
 
@@ -75,7 +76,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function getModelMediaData(BaseModelWithMedia $model): ?ModelWithImagesDTO
+    public function getModelMediaData(BaseModelWithMedia|User $model): ?ModelWithImagesDTO
     {
         $model->load('media');
 
@@ -85,7 +86,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function getAllImagesForModel(BaseModelWithMedia $model): array
+    public function getAllImagesForModel(BaseModelWithMedia|User $model): array
     {
         $model->load('media');
 
@@ -101,7 +102,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function clearMediaCollection(BaseModelWithMedia $model, string $collection): bool
+    public function clearMediaCollection(BaseModelWithMedia|User $model, string $collection): bool
     {
         try {
             $model->clearMediaCollection($collection);
@@ -121,7 +122,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function handleMainWithMultipleStrategy(BaseModelWithMedia $model, ?UploadedFile $mainImage, array $images): void
+    public function handleMainWithMultipleStrategy(BaseModelWithMedia|User $model, ?UploadedFile $mainImage, array $images): void
     {
         if ($mainImage) {
             $this->replaceMedia($model, $mainImage, 'main_image');
@@ -135,7 +136,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function handleMainImageStrategy(BaseModelWithMedia $model, UploadedFile $mainImage): void
+    public function handleMainImageStrategy(BaseModelWithMedia|User $model, UploadedFile $mainImage): void
     {
         $this->replaceMedia($model, $mainImage, 'main_image');
     }
@@ -143,7 +144,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function handleMultipleImagesOnlyStrategy(BaseModelWithMedia $model, array $images): void
+    public function handleMultipleImagesOnlyStrategy(BaseModelWithMedia|User $model, array $images): void
     {
         $this->attachMedia($model, $images, 'images');
     }
@@ -151,7 +152,7 @@ class SpatieMediaService implements MediaServiceInterface
     /**
      * {@inheritDoc}
      */
-    public function handleSingleImageStrategy(BaseModelWithMedia $model, UploadedFile $image): void
+    public function handleSingleImageStrategy(BaseModelWithMedia|User $model, UploadedFile $image): void
     {
         $this->replaceMedia($model, $image, 'images');
     }

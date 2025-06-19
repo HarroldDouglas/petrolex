@@ -11,6 +11,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -28,12 +30,13 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
  */
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
     use HasApiTokens;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
     use HasRoles;
+    use InteractsWithMedia;
     use Notifiable;
     use SoftDeletes;
 
@@ -158,5 +161,20 @@ class User extends Authenticatable
         $totalDistributionCenters = DistributionCenter::count();
 
         return $this->distributionCenters()->count() === $totalDistributionCenters;
+    }
+
+    public function requiresMainImage(): bool
+    {
+        return false;
+    }
+
+    public function supportsMultipleImages(): bool
+    {
+        return false;
+    }
+
+    public function getImageIdentifier(): string
+    {
+        return $this->name ?? 'User #'.$this->id;
     }
 }

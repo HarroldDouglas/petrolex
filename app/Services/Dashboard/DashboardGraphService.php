@@ -17,9 +17,9 @@ class DashboardGraphService
     /**
      * Récupère les données de chiffre d'affaires par jour pour une période et un/des centre(s) de distribution donnés.
      *
-     * @param string $startDate La date de début de la période (format Y-m-d).
-     * @param string $endDate La date de fin de la période (format Y-m-d).
-     * @param string|array|null $distributionCenterId L'ID du centre de distribution, un tableau d'IDs, ou null pour tous.
+     * @param  string  $startDate  La date de début de la période (format Y-m-d).
+     * @param  string  $endDate  La date de fin de la période (format Y-m-d).
+     * @param  string|array|null  $distributionCenterId  L'ID du centre de distribution, un tableau d'IDs, ou null pour tous.
      * @return object Un objet contenant les 'labels' (dates formatées) et 'data' (revenus par jour).
      */
     public function getRevenueByDay(string $startDate, string $endDate, string|array|null $distributionCenterId = null): object
@@ -28,18 +28,19 @@ class DashboardGraphService
             $startDate,
             $endDate,
             $distributionCenterId,
-            'total_amount', 
-            'SUM'           
+            'total_amount',
+            'SUM'
         );
-        return $this->formatGraphData($startDate, $endDate, $results, 'float'); 
+
+        return $this->formatGraphData($startDate, $endDate, $results, 'float');
     }
 
     /**
      * Récupère le nombre de commandes par jour pour une période et un/des centre(s) de distribution donnés.
      *
-     * @param string $startDate La date de début de la période (format Y-m-d).
-     * @param string $endDate La date de fin de la période (format Y-m-d).
-     * @param string|array|null $distributionCenterId L'ID du centre de distribution, un tableau d'IDs, ou null pour tous.
+     * @param  string  $startDate  La date de début de la période (format Y-m-d).
+     * @param  string  $endDate  La date de fin de la période (format Y-m-d).
+     * @param  string|array|null  $distributionCenterId  L'ID du centre de distribution, un tableau d'IDs, ou null pour tous.
      * @return object Un objet contenant les 'labels' (dates formatées) et 'data' (nombre de commandes par jour).
      */
     public function getOrdersByDay(string $startDate, string $endDate, string|array|null $distributionCenterId = null): object
@@ -48,20 +49,17 @@ class DashboardGraphService
             $startDate,
             $endDate,
             $distributionCenterId,
-            '*',    
+            '*',
             'COUNT'
         );
-        return $this->formatGraphData($startDate, $endDate, $results, 'int'); 
+
+        return $this->formatGraphData($startDate, $endDate, $results, 'int');
     }
 
     /**
      * Formate les résultats bruts du repository pour les graphiques.
      *
-     * @param string $startDate
-     * @param string $endDate
-     * @param \Illuminate\Support\Collection $results
-     * @param string $valueType 'int' ou 'float' pour caster la valeur agrégée.
-     * @return object
+     * @param  string  $valueType  'int' ou 'float' pour caster la valeur agrégée.
      */
     private function formatGraphData(string $startDate, string $endDate, \Illuminate\Support\Collection $results, string $valueType = 'float'): object
     {
@@ -79,6 +77,6 @@ class DashboardGraphService
             $data[] = ($valueType === 'int') ? (int) $value : (float) $value;
         }
 
-        return (object)['labels' => $labels, 'data' => $data];
+        return (object) ['labels' => $labels, 'data' => $data];
     }
 }

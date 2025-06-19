@@ -4,14 +4,17 @@ namespace App\Livewire\User;
 
 use App\Enums\UserRole;
 use App\Services\DistributionCenter\DistributionCenterService;
+use App\Services\Shared\Media\MediaServiceInterface;
 use App\Services\User\UserService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\UploadedFile;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 abstract class AbstractUserForm extends Component
 {
+    use WithFileUploads;
     public string $first_name = '';
     public string $last_name = '';
     public string $email = '';
@@ -19,6 +22,9 @@ abstract class AbstractUserForm extends Component
     public string $role = '';
     public string $password = '';
     public bool $is_active = true;
+
+    /** @var array|UploadedFile */
+    public $image = null;
     public $distribution_center_ids = [];
     public bool $showDistributionCenters = false;
     public bool $showPassword = false;
@@ -28,6 +34,9 @@ abstract class AbstractUserForm extends Component
 
     protected $userService;
     protected $distributionCenterService;
+
+    /** @var MediaServiceInterface */
+    protected $mediaService;
 
     #[On('distribution-centers:selection-changed')]
     public function handleDistributionCentersUpdate($data): void
@@ -44,10 +53,12 @@ abstract class AbstractUserForm extends Component
             ->toArray();
     }
 
-    public function boot(UserService $userService, DistributionCenterService $distributionCenterService)
+    public function boot(
+        UserService $userService, DistributionCenterService $distributionCenterService, MediaServiceInterface $mediaService)
     {
         $this->userService = $userService;
         $this->distributionCenterService = $distributionCenterService;
+        $this->mediaService = $mediaService;
     }
 
     public function rules()

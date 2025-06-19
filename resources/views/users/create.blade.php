@@ -33,54 +33,11 @@
         </div>
         <!-- Breadcrumb end -->
 
-        <!-- Add Product start -->
-        <div class="row">
-            <div class="col-lg-3">
-                <div class="card order-details-card">
-                    <div class="card-body">
-                        <div class="profile-container">
-                            <div class="image-details">
-                                <div class="profile-image" style="background-image: url(/build/assets/28-DUtk996K.jpg);">
-                                </div>
-                                <div class="profile-pic">
-                                    <div class="avatar-upload">
-                                        <div class="avatar-edit">
-                                            <input type="file" id="imageUpload" accept=".png')}}, .jpg')}}, .jpeg">
-                                            <label for="imageUpload"><i class="ti ti-photo-heart"></i></label>
-                                        </div>
-                                        <div class="avatar-preview">
-                                            <div id="imgPreview">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="person-details">
-                                <h5 class="f-w-600">Photo de profil
-                                    <img src="{{ asset('../assets/images/profile-app/01.png') }}" class="w-20 h-20"
-                                        alt="instagram-check-mark">
-                                </h5>
-                                <p>Ajouter une photo de profil</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-9 col-xxl-9">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="app-product-section">
-                            <div>
-                                @livewire('user.create-user-form')
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <!-- Add Product end -->
-        </div>
+        <!-- Add User start -->
+        
+             @livewire('user.create-user-form')
+            <!-- Add User end -->
+        
     @endsection
 
     @section('script')

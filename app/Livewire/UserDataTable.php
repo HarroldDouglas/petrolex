@@ -206,7 +206,7 @@ class UserDataTable extends BaseDataTable
                 is_active: $newStatus
             );
 
-            $result = $userService->update($user, $updateDto);
+            $result = $userService->update($user, $updateDto->toArrayFiltered());
 
             if ($result) {
                 $status = $newStatus ? 'activé' : 'désactivé';

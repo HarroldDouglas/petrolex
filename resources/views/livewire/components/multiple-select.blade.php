@@ -32,9 +32,4 @@
         @endforeach
     </select>
     </div>
-     @error('selectedOptions')
-        <div class="invalid-feedback d-block">
-            {{ $message }}
-        </div>
-    @enderror
 </div>
