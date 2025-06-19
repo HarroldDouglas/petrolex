@@ -10,6 +10,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * SupplierDeliveryProductType model represents a product type in a supplier delivery.
+ *
+ * @property int $id
+ * @property int $supplier_delivery_id
+ * @property ProductType $product_type
+ * @property int|null $bottle_type_id
+ * @property int|null $accessory_type_id
+ * @property int $expected_quantity
+ * @property int $bottles_out_quantity
+ * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\AccessoryType|null $accessoryType
+ * @property-read \App\Models\BottleType|null $bottleType
+ * @property-read \App\Models\SupplierDelivery $supplierDelivery
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $deliveryBottles
+ * @property-read int|null $incoming_scanned_count
+ * @property-read int|null $outgoing_scanned_count
+ * @property-read bool $incoming_done
+ */
 class SupplierDeliveryProductType extends Model
 {
     use HasFactory;

@@ -4,10 +4,10 @@ namespace App\Livewire\Supply\ProductForm;
 
 use App\Enums\ProductType;
 use App\Http\Requests\Supply\RegisterAccessoryRequest;
+use App\Models\AccessoryType;
 use App\Models\SupplierDelivery;
 use App\Models\SupplierDeliveryProductType;
 use App\Repositories\Contracts\AccessoryRepositoryInterface;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -22,7 +22,7 @@ class AccessoryForm extends Component
     public $usedAccessoryTypes = [];
     public $isEditing = false;
     public $editProductId = null;
-    public $supplierDelivery;
+    public SupplierDelivery $supplierDelivery;
     public $editProductData = null;
 
     protected $listeners = [
@@ -32,7 +32,9 @@ class AccessoryForm extends Component
     public function boot(AccessoryRepositoryInterface $accessoryRepository)
     {
         $this->accessoryTypes = $accessoryRepository->getActiveProducts()
-            ->map(fn ($type) => ['id' => $type->id, 'name' => $type->name])
+            ->map(function (AccessoryType $type) {
+                return ['id' => $type->id, 'name' => $type->name];
+            })
             ->toArray();
     }
 
@@ -56,7 +58,7 @@ class AccessoryForm extends Component
         return $this->customRequest()->messages();
     }
 
-    protected function customRequest(): FormRequest
+    protected function customRequest(): RegisterAccessoryRequest
     {
         return new RegisterAccessoryRequest;
     }

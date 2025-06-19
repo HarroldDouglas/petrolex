@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Enums\ProductType;
 use App\Http\Requests\Supply\RegisterAccessoryRequest;
 use App\Http\Requests\Supply\RegisterGasBottleRequest;
+use App\Models\AccessoryType;
+use App\Models\BottleType;
 use App\Repositories\Contracts\AccessoryRepositoryInterface;
 use App\Repositories\Contracts\BottleTypeRepositoryInterface;
 use Illuminate\Support\Facades\Validator;
@@ -40,13 +42,13 @@ class SupplyProducts extends Component
 
     public function mount()
     {
-        $this->bottleTypes = $this->bottleTypeRepository->all()->map(function ($type) {
+        $this->bottleTypes = $this->bottleTypeRepository->all()->map(function (BottleType $type) {
             return [
                 'id' => $type->id,
                 'name' => $type->name,
             ];
         })->toArray();
-        $this->accessoryTypes = $this->accessoryRepository->getActiveProducts()->map(function ($type) {
+        $this->accessoryTypes = $this->accessoryRepository->getActiveProducts()->map(function (AccessoryType $type) {
             return [
                 'id' => $type->id,
                 'name' => $type->name,

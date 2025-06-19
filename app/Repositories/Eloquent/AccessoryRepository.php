@@ -14,18 +14,24 @@ class AccessoryRepository extends BaseEloquentRepository implements AccessoryRep
     }
 
     /**
-     * {@inheritDoc}
+     * Get all active products
+     *
+     * @return Collection<AccessoryType>
      */
     public function getActiveProducts(): Collection
     {
+        /** @var Collection<AccessoryType> */
         return $this->model::where('is_active', true)->get();
     }
 
     /**
-     * {@inheritDoc}
+     * Get all inactive products
+     *
+     * @return Collection<AccessoryType>
      */
     public function getInactiveProducts(): Collection
     {
+        /** @var Collection<AccessoryType> */
         return $this->model::where('is_active', false)->get();
     }
 }

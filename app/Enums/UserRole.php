@@ -106,9 +106,6 @@ class UserRole extends Enum
                 PermissionEnum::ORDERS_ASSIGN()->value,
                 // Permissions on Users
                 PermissionEnum::USERS_VIEW()->value,
-                PermissionEnum::USERS_CREATE()->value,
-                PermissionEnum::USERS_EDIT()->value,
-                PermissionEnum::USERS_DELETE()->value,
                 // Permissions on deliveries
                 PermissionEnum::DELIVERIES_VIEW()->value,
                 PermissionEnum::DELIVERIES_CREATE()->value,
