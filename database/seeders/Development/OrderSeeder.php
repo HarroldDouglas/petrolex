@@ -675,13 +675,12 @@ class OrderSeeder extends Seeder
      */
     private function createOrderPayment(Order $order, float $totalAmount): void
     {
-        // Generate a random payment reference
-        $paymentReference = 'PAY-'.strtoupper(substr(md5(uniqid()), 0, 10));
-        $paymentStatus = PaymentStatus::PAID();
-
-        // Determine payment method randomly
+        // Generate a payment reference based on payment method
         $paymentMethods = PaymentMethod::cases();
         $paymentMethod = $paymentMethods[array_rand($paymentMethods)];
+
+        $paymentReference = $this->generatePaymentReference($paymentMethod, $order->order_date);
+        $paymentStatus = PaymentStatus::PAID();
 
         // Determine payment date
         $paymentDate = match ($paymentStatus->value) {
@@ -706,6 +705,65 @@ class OrderSeeder extends Seeder
         if ($order->status->value === 'cancelled' && $paymentStatus == PaymentStatus::PAID()) {
             $this->createRefundForCancelledOrder($order, $totalAmount);
         }
+    }
+
+    /**
+     * Generate payment reference based on payment method
+     */
+    private function generatePaymentReference(PaymentMethod $paymentMethod, $paymentDate): string
+    {
+        return match ($paymentMethod) {
+            PaymentMethod::ORANGE_MONEY() => $this->generateOrangeMoneyReference($paymentDate),
+            PaymentMethod::MOBILE_MONEY() => $this->generateMobileMoneyReference(),
+            PaymentMethod::CREDIT_CARD() => $this->generateCreditCardReference(),
+            default => 'PAY-'.strtoupper(substr(md5(uniqid()), 0, 10))
+        };
+    }
+
+    /**
+     * Generate Orange Money reference
+     * Format: PP250620.X.YAZ
+     * where 25 = year (2025), 06 = month (June), 20 = day
+     * X is a number between 1000-9999
+     * Y is uppercase French alphabet letters
+     * Z is a number between 10000-99999
+     */
+    private function generateOrangeMoneyReference($paymentDate): string
+    {
+        $dateFormat = $paymentDate->format('ymd'); // Example: 250620
+        $randomNumber = rand(1000, 9999); // X part
+
+        // Generate Y part (random uppercase French letter)
+        $frenchAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomLetter = $frenchAlphabet[rand(0, strlen($frenchAlphabet) - 1)];
+
+        $randomDigits = rand(10000, 99999); // Z part
+
+        return "PP{$dateFormat}.{$randomNumber}.{$randomLetter}{$randomDigits}";
+    }
+
+    /**
+     * Generate Mobile Money reference
+     * Format: Long number (11 digits)
+     */
+    private function generateMobileMoneyReference(): string
+    {
+        // Generate a random 11-digit number
+        return (string) rand(10000000000, 99999999999);
+    }
+
+    /**
+     * Generate Credit Card reference
+     * Format: VISA-PUR @ X-Y
+     * where X is an 8-digit number
+     * and Y is a 15-digit number
+     */
+    private function generateCreditCardReference(): string
+    {
+        $firstNumber = rand(10000000, 99999999); // X part (8 digits)
+        $secondNumber = rand(100000000000000, 999999999999999); // Y part (15 digits)
+
+        return "VISA-PUR @ {$firstNumber}-{$secondNumber}";
     }
 
     /**
