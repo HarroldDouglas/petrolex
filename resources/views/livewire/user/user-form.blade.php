@@ -6,9 +6,7 @@
                 <div class="card order-details-card">
                     <div class="card-body">
                         <div class="profile-container">
-                            <div class="image-details">
-                                <div class="profile-image" style="background-image: url(/build/assets/28-DUtk996K.jpg);">
-                                </div>
+                            <div class="image-details h-200">
                                 <div class="profile-pic">
                                     <div class="avatar-upload">
                                         <div class="avatar-edit">
@@ -18,32 +16,14 @@
                                             <label for="image"><i class="ti ti-photo-heart"></i></label>
                                         </div>
                                         <div class="avatar-preview">
-                                            
-                                            <div class="avatar-preview" 
-                                                @if ($image)
-                                                    style="
-                                                        background-image: url(
-                                                            @if(is_string($image))
-                                                                {{ asset('storage/' . $image) }}
-                                                            @else
-                                                                {{ $image->temporaryUrl() }}
-                                                            @endif
-                                                        );
-                                                        background-size: cover;
-                                                        background-position: center;
-                                                        width: 100px;
-                                                        height: 100px;
-                                                    "
-                                                @endif
-                                            >
-                                            </div>
+                                            <div class="avatar-preview" style="{{ $this->imagePreviewStyle }}"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="person-details">
                                 <h5 class="f-w-600">Photo de profil
-                                    <img src="{{ asset('../assets/images/profile-app/01.png') }}" class="w-20 h-20"
+                                    <img src="{{ asset('assets/images/profile-app/01.png') }}" class="w-20 h-20"
                                         alt="instagram-check-mark">
                                 </h5>
                                 <p>Ajouter une photo de profil</p>
@@ -171,10 +151,12 @@
                             <div class="col-12">
                                 <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
                                     <a href="{{ route('users.list') }}" class="btn btn-light-danger">
-                                        Annuler
+                                        <i class="ti ti-x"></i> Annuler
                                     </a>
-                                    <button type="submit" class="btn btn-success">
+                                    <button type="submit" class="btn btn-success" wire:loading.attr="disabled">
+                                        <i class="ti ti-device-floppy"></i> 
                                         Enregistrer
+                                        <span wire:loading wire:target="submit">...</span>
                                     </button>
                                 </div>
                             </div>

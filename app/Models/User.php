@@ -175,6 +175,6 @@ class User extends Authenticatable implements HasMedia
 
     public function getImageIdentifier(): string
     {
-        return $this->name ?? 'User #'.$this->id;
+        return $this->fullame ?? 'User #'.$this->id;
     }
 }

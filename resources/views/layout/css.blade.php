@@ -34,7 +34,6 @@
 
 <link rel="stylesheet" href="{{ asset('assets/css/force-livewire-pagination.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/livewire-tables.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/multiple-select.css') }}">
 <!-- Toatify css-->
 <link rel="stylesheet" href="{{ asset('assets/vendor/notifications/toastify.min.css') }}">
 @vite(['public/assets/scss/style.scss'])

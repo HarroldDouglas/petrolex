@@ -72,6 +72,21 @@ abstract class AbstractUserForm extends Component
         return $this->customRequest()->messages();
     }
 
+    public function getImagePreviewStyleProperty(): string
+    {
+        if ($this->image) {
+            if (is_string($this->image)) {
+                $url = asset('storage/'.$this->image);
+            } else {
+                $url = $this->image->temporaryUrl();
+            }
+
+            return "background-image: url('{$url}');";
+        }
+
+        return '';
+    }
+
     protected function validateDistributionCenters(): void
     {
         if (! $this->showDistributionCenters) {

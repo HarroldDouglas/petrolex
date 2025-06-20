@@ -38,7 +38,6 @@ class UserService extends BaseServiceWithMedia
                 /** @var User $user */
                 $user = parent::createWithMedia($attributes);
             } else {
-
                 /** @var User $user */
                 $user = parent::create($attributes);
             }
@@ -73,6 +72,7 @@ class UserService extends BaseServiceWithMedia
      */
     public function update(Model $user, array $attributes): Model
     {
+        /** @var User $user */
         if (! $user instanceof User) {
             throw new \InvalidArgumentException('Expected User model');
         }
