@@ -23,7 +23,7 @@ abstract class AbstractUserForm extends Component
     public string $password = '';
     public bool $is_active = true;
 
-    /** @var array|UploadedFile */
+    /** @var UploadedFile|null */
     public $image = null;
     public $distribution_center_ids = [];
     public bool $showDistributionCenters = false;
@@ -76,14 +76,14 @@ abstract class AbstractUserForm extends Component
     {
         if ($this->image) {
             if (is_string($this->image)) {
-                $url = asset('storage/'.$this->image);
-            } else {
+                $url = asset('storage/' . $this->image);
+            } elseif ($this->image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
                 $url = $this->image->temporaryUrl();
+            } else {
+                return '';
             }
-
             return "background-image: url('{$url}');";
         }
-
         return '';
     }
 
