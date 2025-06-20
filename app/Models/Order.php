@@ -288,29 +288,4 @@ class Order extends Model
 
         return true;
     }
-
-    /**
-     * Get the bottle scan progress (percentage)
-     */
-    public function getBottleScanProgressAttribute(): int
-    {
-        if (! $this->hasBottleItems()) {
-            return 100;
-        }
-
-        /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
-        $bottleItems = $this->items()->whereHas('product', function ($query) {
-            $query->where('product_type', ProductType::BOTTLE());
-        })->get();
-
-        $totalBottles = 0;
-        $scannedBottles = 0;
-
-        foreach ($bottleItems as $item) {
-            $totalBottles += $item->quantity;
-            $scannedBottles += $item->scanned_bottles_count;
-        }
-
-        return $totalBottles > 0 ? (int) (($scannedBottles / $totalBottles) * 100) : 0;
-    }
 }
