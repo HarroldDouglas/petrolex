@@ -40,18 +40,4 @@ class CreateUserDTO extends BaseDTO
             'image' => $this->image ? $this->image->getClientOriginalName() : null,
         ];
     }
-
-    // TODO remove this function
-    public function toUserArray(): array
-    {
-        return [
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-            'phone_number' => $this->phone_number,
-            'password' => $this->password,
-            'address' => $this->address,
-            'is_active' => $this->is_active,
-        ];
-    }
 }

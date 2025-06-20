@@ -19,38 +19,4 @@ class CreateUserController extends Controller
 
         return view('users.create');
     }
-
-    /**
-     * Get the roles that the authenticated user is allowed to create
-     *
-     * @return array
-     */
-    // ToDo: remove this function
-    private function getAllowedRolesToCreate()
-    {
-        $authUser = Auth::user();
-
-        // If the authenticated user is a center manager, they can only create delivery persons
-        if ($authUser->hasRole(UserRole::CENTER_MANAGER()->value)) {
-            return [
-                UserRole::DELIVERY_PERSON(),
-            ];
-        }
-
-        // If the user is super admin or admin, they can create all roles except super admin and customer
-        if ($authUser->hasRole(UserRole::SUPER_ADMIN()->value) ||
-            $authUser->hasRole(UserRole::ADMIN()->value)) {
-            return [
-                UserRole::ADMIN(),
-                UserRole::MANAGER(),
-                UserRole::ACCOUNTANT(),
-                UserRole::GAS_MANAGER(),
-                UserRole::CENTER_MANAGER(),
-                UserRole::DELIVERY_PERSON(),
-            ];
-        }
-
-        // Default: empty array if no roles are allowed
-        return [];
-    }
 }

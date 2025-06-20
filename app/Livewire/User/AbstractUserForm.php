@@ -76,14 +76,16 @@ abstract class AbstractUserForm extends Component
     {
         if ($this->image) {
             if (is_string($this->image)) {
-                $url = asset('storage/' . $this->image);
+                $url = asset('storage/'.$this->image);
             } elseif ($this->image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
                 $url = $this->image->temporaryUrl();
             } else {
                 return '';
             }
+
             return "background-image: url('{$url}');";
         }
+
         return '';
     }
 
