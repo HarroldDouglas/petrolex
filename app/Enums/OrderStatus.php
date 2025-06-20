@@ -37,4 +37,18 @@ class OrderStatus extends Enum
             'CANCELLED' => 'cancelled',
         ];
     }
+
+    /**
+     * Get the badge CSS class for the status
+     */
+    public function getBadgeClass(): string
+    {
+        return match ($this) {
+            self::CONFIRMED() => 'bg-dark',
+            self::PROCESSING() => 'bg-primary',
+            self::DELIVERED() => 'bg-success',
+            self::CANCELLED() => 'bg-danger',
+            default => 'bg-secondary',
+        };
+    }
 }

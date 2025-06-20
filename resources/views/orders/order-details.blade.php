@@ -1,8 +1,8 @@
 @extends('layout.master')
 @section('title', 'Détails de la Commande')
 @section('css')
-<!-- leaflet css -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <!-- leaflet css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 @endsection
 
 @section('main-content')
@@ -14,9 +14,9 @@
                 <ul class="app-line-breadcrumbs mb-3">
                     <li class="">
                         <a href="#" class="f-s-14 f-w-500">
-                      <span>
-                        <i class="ph-duotone ph-stack f-s-16"></i> Commandes
-                      </span>
+                            <span>
+                                <i class="ph-duotone ph-stack f-s-16"></i> Commandes
+                            </span>
                         </a>
                     </li>
                     <li class="active">
@@ -26,7 +26,7 @@
             </div>
             <div class="col mt-3 mb-3 text-end">
                 <!-- Customer Details start -->
-                    <x-order.detail.actions :order="$order"/>
+                <x-order.detail.actions :order="$order" />
                 <!-- Customer Details end -->
 
                 <a class="btn btn-info ms-2" href="{{ route('orders.list') }}">Retour à la Liste des Commandes</a>
@@ -37,7 +37,7 @@
         @if ($order)
             <!-- Order Details start -->
             <div class="row order-details">
-                
+
                 <div class="col-12 mb-3">
                     <div class="collapse" id="collapseMap">
                         <div class="card card-body">
@@ -45,6 +45,16 @@
                         </div>
                     </div>
                 </div>
+
+                @if ($order->canScanBottles())
+                    <div class="collapse mt-3" id="collapseScanBottles">
+                        <div class="card card-body border border-primary">
+                            <h5 class="card-title mb-3">Scanner les bouteilles de la commande</h5>
+                            @livewire('order.order-scan-bottles', ['order' => $order])
+                        </div>
+                    </div>
+                @endif
+
                 <div class="col-xxl-8 mt-3">
                     <div class="row">
                         <!-- Order Details start -->
@@ -55,19 +65,22 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between">
-                                        <h6 class="f-w-600 text-dark"><i class="ti ti-calendar f-s-18 me-2 text-secondary"></i>Date</h6>
+                                        <h6 class="f-w-600 text-dark"><i
+                                                class="ti ti-calendar f-s-18 me-2 text-secondary"></i>Date</h6>
                                         <div class="text-end">
                                             <p>{{ $order->order_date->format('d/m/Y') }}</p>
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-between mt-3">
-                                        <h6 class="f-w-600 text-dark"><i class="ti ti-credit-card f-s-18 me-2"></i>Paiement</h6>
+                                        <h6 class="f-w-600 text-dark"><i class="ti ti-credit-card f-s-18 me-2"></i>Paiement
+                                        </h6>
                                         <div class="text-end">
                                             <p>{{ $order->payment_method->label }}</p>
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-between mt-3">
-                                        <h6 class="f-w-600 text-dark"><i class="ti ti-truck-delivery f-s-18 me-2"></i>Livraison</h6>
+                                        <h6 class="f-w-600 text-dark"><i
+                                                class="ti ti-truck-delivery f-s-18 me-2"></i>Livraison</h6>
                                         <div class="text-end">
                                             <p>{{ $order->delivery_type->label }}</p>
                                         </div>
@@ -78,16 +91,16 @@
                         <!-- Order Details end -->
 
                         <!-- Customer Details start -->
-                            <x-order.detail.customer-details :order="$order"/>
+                        <x-order.detail.customer-details :order="$order" />
                         <!-- Customer Details end -->
                     </div>
 
                     <!-- Order start -->
-                    <x-order.detail.list-table :order="$order" :groupedItems="$groupedItems"/>
+                    <x-order.detail.list-table :order="$order" :groupedItems="$groupedItems" />
                     <!-- Order end -->
 
                 </div>
-                <x-order.detail.status :order="$order"/>
+                <x-order.detail.status :order="$order" />
             </div>
             <!-- Order Details end -->
         @else
@@ -99,6 +112,6 @@
 
 @section('script')
 
-<!-- leaflet js -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- leaflet js -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 @endsection

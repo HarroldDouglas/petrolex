@@ -5,7 +5,7 @@
 @section('breadcrumb-title', 'Scanner')
 
 @section('tab-content')
-    @livewire('scan-bottles', [
+    @livewire('supply.scan-bottles', [
         'supply' => $supply
     ])
 @endsection

@@ -89,8 +89,8 @@ class DashboardGraphs extends Component
             } elseif ($user) {
                 /**$centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
                 if (!empty($centerIds)) {
-                    $revenueStats = $this->graphService->getRevenueByDayForMultipleCenters($finalStartDate, $finalEndDate, $centerIds);
-                    $ordersStats = $this->graphService->getOrdersByDayForMultipleCenters($finalStartDate, $finalEndDate, $centerIds);
+                    $revenueStats = $this->graphService->getRevenueByDay($finalStartDate, $finalEndDate, $centerIds);
+                    $ordersStats = $this->graphService->getOrdersByDay($finalStartDate, $finalEndDate, $centerIds);
                 } else {
                     $revenueStats = (object)['labels' => [], 'data' => []];
                     $ordersStats = (object)['labels' => [], 'data' => []];

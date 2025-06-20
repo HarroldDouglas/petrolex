@@ -5,6 +5,8 @@ namespace App\View\Components\Order\Detail;
 use App\Models\Order;
 use App\Models\Refund;
 use App\Models\User;
+use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
@@ -18,10 +20,16 @@ class CancellationInfo extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct(Order $order)
-    {
+    public function __construct(
+        Order $order,
+        UserRepositoryInterface $userRepository,
+        OrderRepositoryInterface $orderRepository
+    ) {
+
         if ($order->cancelled_by) {
-            $user = User::find($order->cancelled_by);
+            $user = $userRepository->find($order->cancelled_by);
+
+            /** @var User|null $user */
             $this->user = $user;
         }
 
@@ -30,10 +38,7 @@ class CancellationInfo extends Component
 
         // Get refund information if available
         if ($order->hasRefunds()) {
-            $this->refund = $order->refunds()
-                ->where('status', \App\Enums\PaymentStatus::PAID())
-                ->latest()
-                ->first();
+            $this->refund = $orderRepository->getLatestPaidRefund($order);
         }
     }
 

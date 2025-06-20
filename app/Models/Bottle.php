@@ -19,6 +19,10 @@ use Illuminate\Support\Carbon;
  * @property string $barcode
  * @property bool $is_filled
  * @property BottleStatus $status
+ * @property Product $product
+ * @property BottleType $bottleType
+ * @property DistributionCenter $distribution_center
+ * @property-read int $movements_count
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at

@@ -9,6 +9,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * OrderPayment model represents the payment details for an order.
+ *
+ * * @property int $id
+ * @property int $order_id
+ * @property string $payment_reference
+ * @property PaymentStatus $payment_status
+ * @property PaymentMethod $payment_method
+ * @property float $amount_paid
+ * @property float $amount_due
+ * @property \Illuminate\Support\Carbon|null $payment_date
+ * @property string|null $payment_notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ */
 class OrderPayment extends Model
 {
     use HasFactory;

@@ -104,4 +104,13 @@ class BottleRepository extends BaseEloquentRepository implements BottleRepositor
             ->where('status', BottleStatus::LOST_STOLEN()->value)
             ->count();
     }
+
+    /**
+     * Find a bottle by its barcode
+     */
+    public function findByBarcode(string $barcode): ?Bottle
+    {
+        /** @var Bottle|null */
+        return $this->model->where('barcode', $barcode)->first();
+    }
 }

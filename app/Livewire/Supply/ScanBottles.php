@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Supply;
 
 use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryBottleMovementType;
 use App\Models\Bottle;
+use App\Models\BottleType;
 use App\Models\Product;
 use App\Models\SupplierDelivery;
 use App\Models\SupplierDeliveryBottle;
@@ -80,10 +81,13 @@ class ScanBottles extends Component
             ->where('product_type', ProductType::BOTTLE())
             ->get()
             ->map(function (SupplierDeliveryProductType $product) {
+                /** @var BottleType */
+                $bottleType = $product->bottleType;
+
                 return [
                     'id' => $product->id,
                     'bottle_type_id' => $product->bottle_type_id,
-                    'bottle_type_name' => $product->bottleType ? $product->bottleType->name : 'Inconnu',
+                    'bottle_type_name' => $bottleType->name,
                     'quantity' => $product->expected_quantity,
                     'incoming_scanned' => $product->incoming_scanned_count,
                     'outgoing_quantity' => $product->bottles_out_quantity,
@@ -175,12 +179,12 @@ class ScanBottles extends Component
             ]);
 
             $bottle = new Bottle([
-                'bottle_type_id' => $this->bottleTypeId,
+                'bottle_type_id' => $this->selectedProductType->bottleType->id,
                 'barcode' => $barcode,
             ]);
 
             $product->bottle()->save($bottle);
-
+            /** @var Bottle $bottle */
             $this->bottles[] = [
                 'id' => $bottle->id,
                 'barcode' => $barcode,
@@ -339,6 +343,6 @@ class ScanBottles extends Component
 
     public function render()
     {
-        return view('livewire.scan-bottles');
+        return view('livewire.supply.scan-bottles');
     }
 }

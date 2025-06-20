@@ -38,7 +38,7 @@ class PaymentStatus extends Enum
     /**
      * Get the CSS class for the status badge
      *
-     * @return string
+     * @return string[]
      */
     public static function badgeClasses(): array
     {

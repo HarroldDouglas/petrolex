@@ -5,10 +5,11 @@ namespace App\Repositories\Contracts;
 use App\Enums\OrderStatus;
 use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
+use App\Models\Refund;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
-interface OrderRepositoryInterface
+interface OrderRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Get order with all necessary relationships loaded
@@ -33,6 +34,14 @@ interface OrderRepositoryInterface
      * @return bool Success status
      */
     public function updateStatus(Order $order, OrderStatus $status): bool;
+
+    /**
+     * Get the most recent paid refund for an order
+     *
+     * @param  Order  $order  The order to get the refund for
+     * @return Refund|null The most recent paid refund or null if none exists
+     */
+    public function getLatestPaidRefund(Order $order): ?Refund;
 
     /**
      * Calculate total revenue from delivered orders

@@ -13,6 +13,10 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property ProductType $product_type
+ * @property Bottle|null $bottle
+ * @property Accessory|null $accessory
+ * @property-read int $order_items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $orderItems
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at

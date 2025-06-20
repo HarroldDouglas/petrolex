@@ -3,22 +3,29 @@
 namespace App\Repositories\Eloquent;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
+use App\Models\Refund;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class OrderRepository implements OrderRepositoryInterface
+class OrderRepository extends BaseEloquentRepository implements OrderRepositoryInterface
 {
+    public function __construct(Order $model)
+    {
+        parent::__construct($model);
+    }
+
     /**
      * Get order with all necessary relationships loaded
      */
     public function getWithDetails(int $orderId): ?Order
     {
-        return Order::with([
+        $order = $this->model::with([
             'customer',
             'deliveryAddress',
             'distributionCenter',
@@ -26,6 +33,23 @@ class OrderRepository implements OrderRepositoryInterface
             'items.product.bottle.bottleType',
             'items.product.accessory.accessoryType',
         ])->find($orderId);
+
+        /** @var Order|null $order */
+        return $order;
+    }
+
+    /**
+     * Get the most recent paid refund for an order
+     */
+    public function getLatestPaidRefund(Order $order): ?Refund
+    {
+        $refund = $order->refunds()
+            ->where('status', PaymentStatus::PAID())
+            ->latest()
+            ->first();
+
+        /** @var Refund|null $refund */
+        return $refund;
     }
 
     /**

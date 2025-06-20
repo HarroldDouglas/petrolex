@@ -4,11 +4,14 @@ namespace App\Livewire;
 
 use App\DTOs\User\UpdateUserDTO;
 use App\Enums\EntityStatus;
+use App\Enums\PermissionEnum;
 use App\Models\DistributionCenter;
 use App\Models\User;
+use App\Services\DistributionCenter\DistributionCenterService;
 use App\Services\User\UserService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -29,8 +32,31 @@ class UserDataTable extends BaseDataTable
 
     public function builder(): Builder
     {
-        return User::query()
+        $query = User::query()
             ->with(['roles', 'accessibleDistributionCenters']);
+
+        $centers = DistributionCenterService::getForCurrentUser();
+        $centerIds = $centers->pluck('id')->toArray();
+        $allCenters = DistributionCenter::count();
+
+        if (! empty($centerIds)) {
+            // If user doesn't have access to all centers, only show users of their centers
+            if ($centers->count() < $allCenters) {
+                $query->whereHas('accessibleDistributionCenters', function ($subQ) use ($centerIds) {
+                    $subQ->whereIn('distribution_centers.id', $centerIds);
+                });
+            } else {
+                // User has access to all centers, show all users including global users
+                $query->where(function ($q) use ($centerIds) {
+                    $q->whereHas('accessibleDistributionCenters', function ($subQ) use ($centerIds) {
+                        $subQ->whereIn('distribution_centers.id', $centerIds);
+                    })
+                        ->orWhereDoesntHave('accessibleDistributionCenters');
+                });
+            }
+        }
+
+        return $query;
     }
 
     public function columns(): array
@@ -116,9 +142,14 @@ class UserDataTable extends BaseDataTable
             Column::make('Actions')
                 ->label(
                     function ($row) {
-                        return view('components.user-actions', ['user' => $row]);
+                        if (Auth::user()->can(PermissionEnum::USERS_EDIT()->value)) {
+                            return view('components.user-actions', ['user' => $row]);
+                        } else {
+                            return '<i class="bi bi-lock-fill text-secondary"></i>';
+                        }
                     }
-                ),
+                )
+                ->html(),
         ];
     }
 
@@ -146,14 +177,20 @@ class UserDataTable extends BaseDataTable
 
             SelectFilter::make('Centre de distribution', 'distribution_center')
                 ->options((function () {
+                    $centers = DistributionCenterService::getForCurrentUser();
+                    $allCenters = DistributionCenter::count();
+
                     $options = ['' => 'Tous les centres'];
-                    $options['global'] = 'Global';
 
-                    $centers = DistributionCenter::orderBy('name')
-                        ->pluck('name', 'id')
-                        ->toArray();
+                    if ($centers->count() >= $allCenters) {
+                        $options['global'] = 'Global';
+                    }
 
-                    return $options + $centers;
+                    foreach ($centers as $center) {
+                        $options[$center->id] = $center->name;
+                    }
+
+                    return $options;
                 })())
                 ->filter(function (Builder $builder, string $value) {
                     if ($value === '') {
