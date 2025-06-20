@@ -8,6 +8,7 @@ use App\Models\AccessoryType;
 use App\Models\BottleType;
 use App\Models\DistributionCenter;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -18,7 +19,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_type' => fake()->randomElement(ProductType::values()),
+            'product_category_id' => ProductCategory::inRandomOrder()->first()->id,
         ];
     }
 
@@ -27,9 +28,14 @@ class ProductFactory extends Factory
      */
     public function bottle(?int $bottleTypeId = null, ?int $distributionCenterId = null, array $bottleAttributes = []): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes) use ($bottleTypeId) {
+            $bottleType = $bottleTypeId ? BottleType::find($bottleTypeId) : BottleType::inRandomOrder()->first();
+            $productCategory = ProductCategory::where('product_type', ProductType::BOTTLE())
+                ->where('product_type_id', $bottleType->id)
+                ->first();
+
             return [
-                'product_type' => ProductType::BOTTLE(),
+                'product_category_id' => $productCategory->id,
             ];
         })->afterCreating(function (Product $product) use ($bottleTypeId, $distributionCenterId, $bottleAttributes) {
             $bottleType = $bottleTypeId ? BottleType::find($bottleTypeId) : BottleType::inRandomOrder()->first();
@@ -50,9 +56,14 @@ class ProductFactory extends Factory
 
     public function accessory(?int $accessoryTypeId = null, ?int $distributionCenterId = null, array $accessoryAttributes = []): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes) use ($accessoryTypeId) {
+            $accessoryType = $accessoryTypeId ? AccessoryType::find($accessoryTypeId) : AccessoryType::inRandomOrder()->first();
+            $productCategory = ProductCategory::where('product_type', ProductType::ACCESSORY())
+                ->where('product_type_id', $accessoryType->id)
+                ->first();
+
             return [
-                'product_type' => ProductType::ACCESSORY(),
+                'product_category_id' => $productCategory->id,
             ];
         })->afterCreating(function (Product $product) use ($accessoryTypeId, $distributionCenterId, $accessoryAttributes) {
             $accessoryType = $accessoryTypeId ? AccessoryType::find($accessoryTypeId) : AccessoryType::inRandomOrder()->first();

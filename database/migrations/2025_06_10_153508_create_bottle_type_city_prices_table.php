@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        //TODO: rename this by product_city_prices, bottle_type_id will become product_category_id
         Schema::create('bottle_type_city_prices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bottle_type_id')->constrained('bottle_types')->onDelete('cascade');

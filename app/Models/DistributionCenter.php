@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property int $id
@@ -115,10 +116,29 @@ class DistributionCenter extends Model
         return $this->hasMany(BottleMovement::class);
     }
 
+    /**
+     * Get the product categories for this distribution center.
+     */
+    public function productCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductCategory::class, 'product_category_distribution_center')
+            ->using(ProductCategoryDistributionCenter::class)
+            ->withPivot(['stock_empty', 'stock_filled'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the bottle types with stock information for this distribution center.
+     * This maintains backward compatibility while working with the new product_category structure.
+     */
     public function bottleTypeStocks(): BelongsToMany
     {
-        return $this->belongsToMany(BottleType::class, 'bottle_type_distribution_center')
-            ->withPivot('stock_empty', 'stock_filled')
+        // We need to join through ProductCategory since the direct relationship no longer exists
+        return $this->belongsToMany(BottleType::class, 'product_category_distribution_center', 'distribution_center_id', 'product_category_id')
+            ->join('product_categories', 'product_category_distribution_center.product_category_id', '=', 'product_categories.id')
+            ->where('product_categories.product_type', 'bottle')
+            ->where('product_categories.product_type_id', '=', DB::raw('bottle_types.id'))
+            ->withPivot(['stock_empty', 'stock_filled'])
             ->withTimestamps();
     }
 

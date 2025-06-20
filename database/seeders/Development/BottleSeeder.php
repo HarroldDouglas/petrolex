@@ -6,12 +6,14 @@ namespace Database\Seeders\Development;
 
 use App\Enums\BottleMovementType;
 use App\Enums\BottleStatus;
+use App\Enums\ProductType;
 use App\Enums\UserRole;
 use App\Models\Bottle;
 use App\Models\BottleMovement;
 use App\Models\BottleType;
 use App\Models\DistributionCenter;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -41,15 +43,15 @@ class BottleSeeder extends Seeder
         }
 
         // Make sure the pivot table exists and has data
-        $pivotExists = DB::table('bottle_type_distribution_center')->count() > 0;
+        $pivotExists = DB::table('product_category_distribution_center')->count() > 0;
         if (! $pivotExists) {
-            $this->command->error('Stock data not found. Run BottleTypeDistributionCenterSeeder first.');
+            $this->command->error('Stock data not found. Run ProductCategoryDistributionCenterSeeder first.');
 
             return;
         }
 
         foreach ($centers as $center) {
-            // Seul BottleSeeder crée des bouteilles IN_STOCK, LOST_STOLEN, et RETURNED_TO_SUPPLIER
+            // Only BottleSeeder creates IN_STOCK, LOST_STOLEN, and RETURNED_TO_SUPPLIER bottles
             $this->createBottlesInStock($center, $bottleTypes);
             $this->createLostOrStolenBottles($center, $bottleTypes);
             $this->createReturnedToSupplierBottles($center, $bottleTypes);
@@ -62,12 +64,12 @@ class BottleSeeder extends Seeder
     }
 
     /**
-     * Récupère et affiche les statistiques détaillées des stocks pour un centre
+     * Get and display detailed stock statistics for a center
      */
     private function displayStockStatistics(DistributionCenter $center, $bottleTypes): void
     {
         $this->command->line('--------------------------------------------------');
-        $this->command->line("STATISTIQUES DE STOCK POUR: {$center->name}");
+        $this->command->line("STOCK STATISTICS FOR: {$center->name}");
         $this->command->line('--------------------------------------------------');
 
         $totalPivotEmpty = 0;
@@ -76,66 +78,78 @@ class BottleSeeder extends Seeder
         $totalActualFilled = 0;
 
         foreach ($bottleTypes as $bottleType) {
-            // Récupérer les valeurs du pivot
+            // Get pivot values
             $pivotValues = $this->getPivotStockValues($center->id, $bottleType->id);
             $pivotEmpty = $pivotValues['empty'];
             $pivotFilled = $pivotValues['filled'];
 
-            // Récupérer les valeurs réelles (calculées à partir de la table des bouteilles)
+            // Get actual values (calculated from the bottles table)
             $actualValues = $this->getActualStockValues($center->id, $bottleType->id);
             $actualEmpty = $actualValues['empty'];
             $actualFilled = $actualValues['filled'];
 
-            // Calculer les différences
+            // Calculate differences
             $emptyDiff = $actualEmpty - $pivotEmpty;
             $filledDiff = $actualFilled - $pivotFilled;
 
-            // Formater les différences
+            // Format differences
             $emptyDiffFormatted = $this->formatDifference($emptyDiff);
             $filledDiffFormatted = $this->formatDifference($filledDiff);
 
-            // Mettre à jour les totaux
+            // Update totals
             $totalPivotEmpty += $pivotEmpty;
             $totalPivotFilled += $pivotFilled;
             $totalActualEmpty += $actualEmpty;
             $totalActualFilled += $actualFilled;
 
-            // Afficher les statistiques pour ce type de bouteille
+            // Display statistics for this bottle type
             $this->command->line("{$bottleType->name}:");
-            $this->command->line("  - PIVOT   : {$pivotEmpty} vides, {$pivotFilled} pleines");
-            $this->command->line("  - BOTTLES : {$actualEmpty} vides {$emptyDiffFormatted}, {$actualFilled} pleines {$filledDiffFormatted}");
+            $this->command->line("  - PIVOT   : {$pivotEmpty} empty, {$pivotFilled} filled");
+            $this->command->line("  - BOTTLES : {$actualEmpty} empty {$emptyDiffFormatted}, {$actualFilled} filled {$filledDiffFormatted}");
 
             if ($emptyDiff !== 0 || $filledDiff !== 0) {
-                $this->command->warn("  ⚠️ DIFFÉRENCE DÉTECTÉE pour {$bottleType->name} dans {$center->name}");
+                $this->command->warn("  ⚠️ DIFFERENCE DETECTED for {$bottleType->name} in {$center->name}");
             }
         }
 
-        // Afficher les totaux
+        // Display totals
         $totalEmptyDiff = $totalActualEmpty - $totalPivotEmpty;
         $totalFilledDiff = $totalActualFilled - $totalPivotFilled;
         $totalEmptyDiffFormatted = $this->formatDifference($totalEmptyDiff);
         $totalFilledDiffFormatted = $this->formatDifference($totalFilledDiff);
 
         $this->command->line('--------------------------------------------------');
-        $this->command->line('TOTAUX:');
-        $this->command->line("  - PIVOT   : {$totalPivotEmpty} vides, {$totalPivotFilled} pleines, Total: ".($totalPivotEmpty + $totalPivotFilled));
-        $this->command->line("  - BOTTLES : {$totalActualEmpty} vides {$totalEmptyDiffFormatted}, {$totalActualFilled} pleines {$totalFilledDiffFormatted}, Total: ".($totalActualEmpty + $totalActualFilled).' '.$this->formatDifference($totalEmptyDiff + $totalFilledDiff));
+        $this->command->line('TOTALS:');
+        $this->command->line("  - PIVOT   : {$totalPivotEmpty} empty, {$totalPivotFilled} filled, Total: ".($totalPivotEmpty + $totalPivotFilled));
+        $this->command->line("  - BOTTLES : {$totalActualEmpty} empty {$totalEmptyDiffFormatted}, {$totalActualFilled} filled {$totalFilledDiffFormatted}, Total: ".($totalActualEmpty + $totalActualFilled).' '.$this->formatDifference($totalEmptyDiff + $totalFilledDiff));
 
         if ($totalEmptyDiff !== 0 || $totalFilledDiff !== 0) {
-            $this->command->warn("  ⚠️ DIFFÉRENCE TOTALE DÉTECTÉE pour {$center->name}");
+            $this->command->warn("  ⚠️ TOTAL DIFFERENCE DETECTED for {$center->name}");
         }
 
         $this->command->line('--------------------------------------------------');
     }
 
     /**
-     * Récupère les valeurs de stock depuis la table pivot
+     * Get stock values from the pivot table
      */
     private function getPivotStockValues(int $centerId, int $bottleTypeId): array
     {
-        $stockData = DB::table('bottle_type_distribution_center')
+        // Find the product category for this bottle type
+        $productCategory = ProductCategory::where('product_type', ProductType::BOTTLE())
+            ->where('product_type_id', $bottleTypeId)
+            ->first();
+
+        if (! $productCategory) {
+            return [
+                'empty' => 0,
+                'filled' => 0,
+            ];
+        }
+
+        $stockData = DB::table('product_category_distribution_center')
             ->where('distribution_center_id', $centerId)
-            ->where('bottle_type_id', $bottleTypeId)
+            ->where('product_category_id', $productCategory->id)
             ->first();
 
         return [
@@ -145,7 +159,7 @@ class BottleSeeder extends Seeder
     }
 
     /**
-     * Récupère les valeurs de stock actuelles en comptant les bouteilles
+     * Get current stock values by counting bottles
      */
     private function getActualStockValues(int $centerId, int $bottleTypeId): array
     {
@@ -168,12 +182,12 @@ class BottleSeeder extends Seeder
     }
 
     /**
-     * Formate une différence pour l'affichage
+     * Format a difference for display
      */
     private function formatDifference(int $diff): string
     {
         if ($diff === 0) {
-            return '(identique)';
+            return '(identical)';
         }
 
         $sign = $diff > 0 ? '+' : '';
@@ -188,16 +202,26 @@ class BottleSeeder extends Seeder
     {
         $this->command->info("Creating bottles in stock for {$center->name}...");
 
-        // Compteurs pour les logs
+        // Counters for logs
         $totalEmptyCount = 0;
         $totalFilledCount = 0;
         $bottleTypeCounts = [];
 
         foreach ($bottleTypes as $bottleType) {
+            // Find the product category for this bottle type
+            $productCategory = ProductCategory::where('product_type', ProductType::BOTTLE())
+                ->where('product_type_id', $bottleType->id)
+                ->first();
+
+            if (! $productCategory) {
+                $this->command->warn("No product category found for bottle type {$bottleType->name}. Skipping.");
+                continue;
+            }
+
             // Get the stock counts from the pivot table
-            $stockData = DB::table('bottle_type_distribution_center')
+            $stockData = DB::table('product_category_distribution_center')
                 ->where('distribution_center_id', $center->id)
-                ->where('bottle_type_id', $bottleType->id)
+                ->where('product_category_id', $productCategory->id)
                 ->first();
 
             if (! $stockData) {
@@ -220,13 +244,13 @@ class BottleSeeder extends Seeder
                     ])
                     ->create();
 
-                // Ajout d'un mouvement pour l'entrée en stock
+                // Add a movement for stock entry
                 BottleMovement::create([
                     'bottle_id' => $product->bottle->id,
                     'user_id' => User::role([UserRole::MANAGER()->value, UserRole::CENTER_MANAGER()->value])->inRandomOrder()->first()->id ?? 1,
                     'distribution_center_id' => $center->id,
                     'type' => BottleMovementType::SUPPLIER_DELIVERY(),
-                    'notes' => 'Bouteille vide reçue du fournisseur et mise en stock',
+                    'notes' => 'Empty bottle received from supplier and put in stock',
                     'created_at' => now()->subDays(rand(5, 60)),
                 ]);
             }
@@ -240,13 +264,13 @@ class BottleSeeder extends Seeder
                     ])
                     ->create();
 
-                // Ajout d'un mouvement pour l'entrée en stock
+                // Add a movement for stock entry
                 BottleMovement::create([
                     'bottle_id' => $product->bottle->id,
                     'user_id' => User::role([UserRole::MANAGER()->value, UserRole::CENTER_MANAGER()->value])->inRandomOrder()->first()->id ?? 1,
                     'distribution_center_id' => $center->id,
                     'type' => BottleMovementType::SUPPLIER_DELIVERY(),
-                    'notes' => 'Bouteille pleine reçue du fournisseur et mise en stock',
+                    'notes' => 'Filled bottle received from supplier and put in stock',
                     'created_at' => now()->subDays(rand(5, 60)),
                 ]);
             }
@@ -276,27 +300,27 @@ class BottleSeeder extends Seeder
                 ])
                 ->create();
 
-            // D'abord, on crée l'entrée en stock (état initial)
+            // First, create the stock entry (initial state)
             BottleMovement::create([
                 'bottle_id' => $product->bottle->id,
                 'user_id' => User::role([UserRole::MANAGER()->value, UserRole::CENTER_MANAGER()->value])->inRandomOrder()->first()->id ?? 1,
                 'distribution_center_id' => $center->id,
                 'type' => BottleMovementType::SUPPLIER_DELIVERY(),
-                'notes' => 'Bouteille reçue du fournisseur et mise en stock',
+                'notes' => 'Bottle received from supplier and put in stock',
                 'created_at' => now()->subMonths(rand(6, 12)),
             ]);
 
-            // Ensuite, on enregistre la perte/vol (état final)
+            // Then, record the loss/theft (final state)
             BottleMovement::create([
                 'bottle_id' => $product->bottle->id,
                 'user_id' => User::role([UserRole::MANAGER()->value, UserRole::CENTER_MANAGER()->value])->inRandomOrder()->first()->id ?? 1,
                 'distribution_center_id' => $center->id,
                 'type' => BottleMovementType::DECLARE_LOST_STOLEN(),
                 'notes' => fake()->randomElement([
-                    'Bouteille déclarée perdue lors du dernier inventaire',
-                    'Bouteille non retrouvée après livraison',
-                    'Signalée comme volée par le client',
-                    'Disparition constatée au dépôt',
+                    'Bottle declared lost during last inventory',
+                    'Bottle not found after delivery',
+                    'Reported as stolen by customer',
+                    'Disappearance noticed at depot',
                 ]),
                 'created_at' => now()->subMonths(rand(1, 6)),
             ]);
@@ -319,32 +343,32 @@ class BottleSeeder extends Seeder
 
             $product = Product::factory()
                 ->bottle($bottleType->id, $center->id, [
-                    'is_filled' => false, // Ces bouteilles sont toujours vides
+                    'is_filled' => false, // These bottles are always empty
                     'status' => BottleStatus::RETURNED_TO_SUPPLIER(),
                 ])
                 ->create();
 
-            // D'abord, on crée l'entrée en stock (état initial)
+            // First, create the stock entry (initial state)
             BottleMovement::create([
                 'bottle_id' => $product->bottle->id,
                 'user_id' => User::role([UserRole::MANAGER()->value, UserRole::CENTER_MANAGER()->value])->inRandomOrder()->first()->id ?? 1,
                 'distribution_center_id' => $center->id,
                 'type' => BottleMovementType::SUPPLIER_DELIVERY(),
-                'notes' => 'Bouteille reçue du fournisseur et mise en stock',
+                'notes' => 'Bottle received from supplier and put in stock',
                 'created_at' => now()->subMonths(rand(6, 12)),
             ]);
 
-            // Ensuite, on enregistre le retour au fournisseur (état final)
+            // Then, record the return to supplier (final state)
             BottleMovement::create([
                 'bottle_id' => $product->bottle->id,
                 'user_id' => User::role([UserRole::MANAGER()->value, UserRole::GAS_MANAGER()->value])->inRandomOrder()->first()->id ?? 1,
                 'distribution_center_id' => $center->id,
                 'type' => BottleMovementType::RETURN_TO_SUPPLIER(),
                 'notes' => fake()->randomElement([
-                    'Bouteille défectueuse retournée au fournisseur',
-                    'Bouteille avec valve endommagée',
-                    'Retournée pour cause de corrosion',
-                    'Bouteille trop ancienne, retournée pour renouvellement',
+                    'Defective bottle returned to supplier',
+                    'Bottle with damaged valve',
+                    'Returned due to corrosion',
+                    'Too old bottle, returned for renewal',
                 ]),
                 'created_at' => now()->subMonths(rand(1, 3)),
             ]);
@@ -363,20 +387,29 @@ class BottleSeeder extends Seeder
         $bottleTypes = BottleType::all();
 
         foreach ($bottleTypes as $bottleType) {
-            // Récupérer les valeurs actuelles dans la table pivot
+            // Find the product category for this bottle type
+            $productCategory = ProductCategory::where('product_type', ProductType::BOTTLE())
+                ->where('product_type_id', $bottleType->id)
+                ->first();
+
+            if (! $productCategory) {
+                continue;
+            }
+
+            // Get current values in pivot table
             $pivotValues = $this->getPivotStockValues($center->id, $bottleType->id);
             $oldEmptyCount = $pivotValues['empty'];
             $oldFilledCount = $pivotValues['filled'];
 
-            // Récupérer les valeurs actuelles des bouteilles
+            // Get current bottle values
             $actualValues = $this->getActualStockValues($center->id, $bottleType->id);
             $emptyCount = $actualValues['empty'];
             $filledCount = $actualValues['filled'];
 
             // Update the pivot table
-            DB::table('bottle_type_distribution_center')
+            DB::table('product_category_distribution_center')
                 ->where('distribution_center_id', $center->id)
-                ->where('bottle_type_id', $bottleType->id)
+                ->where('product_category_id', $productCategory->id)
                 ->update([
                     'stock_empty' => $emptyCount,
                     'stock_filled' => $filledCount,

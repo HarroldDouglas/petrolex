@@ -68,7 +68,7 @@ class BottleType extends Model
     }
 
     /**
-     * Get the bottles of this type.
+     * Get the bottles for the bottle type.
      */
     public function bottles(): HasMany
     {
@@ -76,16 +76,19 @@ class BottleType extends Model
     }
 
     /**
-     * Get the supplier delivery product types for this bottle type.
+     * Get the supplier delivery product types for this accessory type.
      */
     public function supplierDeliveryProductTypes(): HasMany
     {
         return $this->hasMany(SupplierDeliveryProductType::class);
     }
 
-    public function distributionCenterStocks(): BelongsToMany
+    /**
+     * Get the distribution centers that have this bottle type.
+     */
+    public function distributionCenters(): BelongsToMany
     {
-        return $this->belongsToMany(DistributionCenter::class)
+        return $this->belongsToMany(DistributionCenter::class, 'product_category_distribution_center')
             ->withPivot(['stock_empty', 'stock_filled'])
             ->withTimestamps();
     }
