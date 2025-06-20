@@ -7,6 +7,7 @@ use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -74,6 +75,43 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Get the bottle mappings for this order item.
+     */
+    public function orderItemBottles(): HasMany
+    {
+        return $this->hasMany(OrderItemBottle::class);
+    }
+
+    /**
+     * Get the bottles associated with this order item.
+     */
+    public function bottles()
+    {
+        return $this->belongsToMany(Bottle::class, 'order_item_bottles')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the number of bottles scanned for this order item.
+     */
+    public function getScannedBottlesCountAttribute()
+    {
+        return $this->orderItemBottles()->count();
+    }
+
+    /**
+     * Check if all bottles have been scanned for this order item.
+     */
+    public function areAllBottlesScanned(): bool
+    {
+        if (! $this->isBottle()) {
+            return true;
+        }
+
+        return $this->scanned_bottles_count >= $this->quantity;
     }
 
     public function isBottle(): bool
