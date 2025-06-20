@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Livewire\Order;
+namespace App\Livewire;
 
-use App\Enums\ProductType;
-use App\Models\Bottle;
+use App\Exceptions\BottleScanException;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderItemBottle;
-use Illuminate\Support\Facades\DB;
+use App\Services\Order\OrderBottleScanService;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class OrderScanBottles extends Component
 {
     public Order $order;
-    public $selectedBottleTypeId = null;
-    public $bottleTypes = [];
-    public $scannedBottles = [];
-    public $manualBarcode = '';
-    public $showManualForm = false;
-    public $selectedBottles = [];
-    public $totalBottlesForType = 0;
-    public $scannedBottlesForType = 0;
+    public ?int $selectedBottleTypeId = null;
+    public array $bottleTypes = [];
+    public array $scannedBottles = [];
+    public string $manualBarcode = '';
+    public bool $showManualForm = false;
+    public array $selectedBottles = [];
+    public int $totalBottlesForType = 0;
+    public int $scannedBottlesForType = 0;
 
     protected $listeners = [
         'bottleScanned' => '$refresh',
@@ -30,6 +30,13 @@ class OrderScanBottles extends Component
     protected $rules = [
         'manualBarcode' => 'required|string|min:3',
     ];
+
+    protected OrderBottleScanService $bottleScanService;
+
+    public function boot(OrderBottleScanService $bottleScanService)
+    {
+        $this->bottleScanService = $bottleScanService;
+    }
 
     public function mount(Order $order)
     {
@@ -42,54 +49,28 @@ class OrderScanBottles extends Component
         }
     }
 
-    public function loadBottleTypes()
+    public function loadBottleTypes(): void
     {
-        if (! $this->order) {
+        if (! isset($this->order->id)) {
             $this->bottleTypes = [];
 
             return;
         }
 
-        $bottleItems = $this->order->items()
-            ->whereHas('product', function ($query) {
-                $query->where('product_type', ProductType::BOTTLE());
-            })
-            ->with(['product.bottle.bottleType'])
-            ->get();
+        $orderItems = $this->bottleScanService->getOrderItemsGroupedByBottleType($this->order);
 
-        // Regrouper par type de bouteille
-        $groupedItems = [];
-        foreach ($bottleItems as $item) {
-            $bottleType = $item->product->bottle->bottleType;
-            $bottleTypeId = $bottleType->id;
-
-            if (! isset($groupedItems[$bottleTypeId])) {
-                $groupedItems[$bottleTypeId] = [
-                    'bottle_type' => $bottleType,
-                    'total_quantity' => 0,
-                    'scanned_quantity' => 0,
-                ];
-            }
-
-            $groupedItems[$bottleTypeId]['total_quantity'] += $item->quantity;
-            $groupedItems[$bottleTypeId]['scanned_quantity'] += $item->orderItemBottles()->count();
-        }
-
-        // Transformer en tableau pour la vue
-        $this->bottleTypes = collect($groupedItems)->map(function ($item) {
-            $isComplete = $item['scanned_quantity'] >= $item['total_quantity'];
-
+        $this->bottleTypes = $orderItems->map(function (OrderItem $orderItem): array {
             return [
-                'id' => $item['bottle_type']->id,
-                'name' => $item['bottle_type']->name,
-                'total_quantity' => $item['total_quantity'],
-                'scanned_quantity' => $item['scanned_quantity'],
-                'is_complete' => $isComplete,
+                'id' => $orderItem->product->bottle->bottle_type_id,
+                'name' => $orderItem->product->bottle->bottleType->name,
+                'total_quantity' => $orderItem->quantity,
+                'scanned_quantity' => $orderItem->orderItemBottles->count(),
+                'is_complete' => $orderItem->orderItemBottles->count() >= $orderItem->quantity,
             ];
         })->values()->toArray();
     }
 
-    public function updateSelectedBottleType()
+    public function updateSelectedBottleType(): void
     {
         if (! $this->selectedBottleTypeId) {
             $this->scannedBottles = [];
@@ -110,7 +91,7 @@ class OrderScanBottles extends Component
         $this->loadScannedBottles();
     }
 
-    public function loadScannedBottles()
+    public function loadScannedBottles(): void
     {
         if (! $this->selectedBottleTypeId) {
             $this->scannedBottles = [];
@@ -118,33 +99,26 @@ class OrderScanBottles extends Component
             return;
         }
 
-        // Récupérer toutes les bouteilles scannées pour ce type de bouteille
-        $orderItems = $this->order->items()->whereHas('product.bottle', function ($query) {
-            $query->where('bottle_type_id', $this->selectedBottleTypeId);
-        })->pluck('id')->toArray();
+        $orderItemBottles = $this->bottleScanService->getScannedBottlesByType($this->order, $this->selectedBottleTypeId);
 
-        $orderItemBottles = OrderItemBottle::whereIn('order_item_id', $orderItems)
-            ->with('bottle')
-            ->get();
-
-        $this->scannedBottles = $orderItemBottles->map(function ($orderItemBottle) {
+        $this->scannedBottles = $orderItemBottles->map(function (OrderItemBottle $orderItemBottle): array {
             return [
                 'id' => $orderItemBottle->bottle->id,
                 'barcode' => $orderItemBottle->bottle->barcode,
-                'timestamp' => $orderItemBottle->created_at->format('Y-m-d H:i:s'),
+                'timestamp' => $orderItemBottle->created_at,
             ];
         })->toArray();
 
         $this->selectedBottles = [];
     }
 
-    public function toggleManualForm()
+    public function toggleManualForm(): void
     {
         $this->showManualForm = ! $this->showManualForm;
         $this->manualBarcode = '';
     }
 
-    public function addManualBarcode()
+    public function addManualBarcode(): void
     {
         $this->validate();
         $this->processBarcode(['barcode' => $this->manualBarcode]);
@@ -152,135 +126,74 @@ class OrderScanBottles extends Component
         $this->showManualForm = false;
     }
 
-    public function processBarcode($data)
+    public function processBarcode(array $data): void
     {
         $barcode = $data['barcode'] ?? null;
 
         if (! $barcode) {
-            $this->dispatch('scanError', 'Code-barres vide ou invalide');
+            $this->dispatch('scanError', ['message' => 'Code-barres vide ou invalide']);
 
             return;
         }
 
         if (! $this->selectedBottleTypeId) {
-            $this->dispatch('scanError', 'Veuillez d\'abord sélectionner un type de bouteille');
+            $this->dispatch('scanError', ['message' => 'Veuillez d\'abord sélectionner un type de bouteille']);
 
             return;
         }
 
         if ($this->scannedBottlesForType >= $this->totalBottlesForType) {
-            $this->dispatch('scanError', 'Vous avez atteint la quantité maximale de bouteilles à scanner pour ce type');
+            $this->dispatch('scanError', ['message' => 'Vous avez atteint la quantité maximale de bouteilles à scanner pour ce type']);
 
             return;
         }
 
         try {
-            DB::beginTransaction();
-
-            // Vérifier si la bouteille existe déjà
-            $bottle = Bottle::where('barcode', $barcode)->first();
-
-            if (! $bottle) {
-                session()->flash('error', "Bouteille avec code {$barcode} non trouvée dans le système.");
-                DB::rollBack();
-
-                return;
-            }
-
-            // Vérifier si le type de bouteille correspond
-            if ($bottle->bottle_type_id !== (int) $this->selectedBottleTypeId) {
-                session()->flash('error', 'Cette bouteille est de type incorrect pour cet élément de commande.');
-                DB::rollBack();
-
-                return;
-            }
-
-            // Vérifier si la bouteille a déjà été scannée pour cette commande
-            $alreadyScanned = OrderItemBottle::whereHas('orderItem', function ($query) {
-                $query->where('order_id', $this->order->id);
-            })->whereHas('bottle', function ($query) use ($bottle) {
-                $query->where('id', $bottle->id);
-            })->exists();
-
-            if ($alreadyScanned) {
-                session()->flash('warning', 'Cette bouteille a déjà été scannée pour cette commande.');
-                DB::rollBack();
-
-                return;
-            }
-
-            // Trouver un OrderItem approprié pour cette bouteille
-            $orderItem = $this->order->items()
-                ->whereHas('product.bottle', function ($query) use ($bottle) {
-                    $query->where('bottle_type_id', $bottle->bottle_type_id);
-                })
-                ->get()
-                ->filter(function ($item) {
-                    return $item->scanned_bottles_count < $item->quantity;
-                })
-                ->first();
-
-            if (! $orderItem) {
-                session()->flash('error', 'Aucun élément de commande disponible pour ce type de bouteille.');
-                DB::rollBack();
-
-                return;
-            }
-
-            // Associer la bouteille à l'élément de commande
-            OrderItemBottle::create([
-                'order_item_id' => $orderItem->id,
-                'bottle_id' => $bottle->id,
-            ]);
-
-            DB::commit();
+            $orderItem = $this->bottleScanService->scanBottle($this->order, $barcode);
+            session()->flash('message', 'Bouteille scannée avec succès');
 
             $this->loadBottleTypes();
             $this->updateSelectedBottleType();
 
-            session()->flash('message', "Bouteille {$barcode} ajoutée avec succès.");
-
-            // Dispatch un événement pour l'animation
             $this->dispatch('bottleScanned', ['barcode' => $barcode]);
-
+        } catch (BottleScanException $e) {
+            session()->flash('error', $e->getMessage());
+            $this->dispatch('scanError', ['message' => $e->getMessage()]);
         } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('error', "Erreur lors de l'ajout de la bouteille: ".$e->getMessage());
+            Log::error('Erreur inattendue lors du scan', [
+                'exception' => $e->getMessage(),
+                'order_id' => $this->order->id,
+                'barcode' => $barcode,
+            ]);
+            session()->flash('error', 'Une erreur est survenue lors du scan de la bouteille.');
+            $this->dispatch('scanError', ['message' => 'Une erreur est survenue lors du scan de la bouteille.']);
         }
     }
 
-    public function removeSelected()
+    public function removeSelected(): void
     {
         if (empty($this->selectedBottles)) {
             return;
         }
 
         try {
-            DB::beginTransaction();
-
-            foreach ($this->selectedBottles as $bottleId) {
-                OrderItemBottle::whereHas('orderItem', function ($query) {
-                    $query->where('order_id', $this->order->id);
-                })->whereHas('bottle', function ($query) use ($bottleId) {
-                    $query->where('id', $bottleId);
-                })->delete();
-            }
-
-            DB::commit();
-
-            $this->selectedBottles = [];
-            $this->loadBottleTypes();
-            $this->updateSelectedBottleType();
-
+            $this->bottleScanService->removeBottles($this->order, $this->selectedBottles);
             session()->flash('message', 'Les bouteilles sélectionnées ont été supprimées.');
 
+            $this->selectedBottles = [];
+            $this->loadScannedBottles();
+            $this->loadBottleTypes();
         } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('error', 'Erreur lors de la suppression: '.$e->getMessage());
+            Log::error('Erreur lors de la suppression des bouteilles', [
+                'exception' => $e->getMessage(),
+                'order_id' => $this->order->id,
+                'bottle_ids' => $this->selectedBottles,
+            ]);
+            session()->flash('error', 'Erreur lors de la suppression des bouteilles: '.$e->getMessage());
         }
     }
 
-    public function selectAll()
+    public function selectAll(): void
     {
         if (count($this->selectedBottles) === count($this->scannedBottles)) {
             $this->selectedBottles = [];

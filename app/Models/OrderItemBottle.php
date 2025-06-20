@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
+ * This model represent bottle that has been scanned for an order, so the bottle has been associated with an order item.
+ *
  * @property int $id
  * @property int $order_item_id
  * @property int $bottle_id
+ * @property OrderItem $orderItem
+ * @property Bottle $bottle
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  */
@@ -20,7 +24,7 @@ class OrderItemBottle extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'order_item_id',

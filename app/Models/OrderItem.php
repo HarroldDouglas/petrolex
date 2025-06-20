@@ -18,6 +18,11 @@ use Illuminate\Support\Carbon;
  * @property int $quantity
  * @property float $unit_price
  * @property float $total_price
+ * @property BottleOrderType|null $bottle_type
+ * @property Order $order
+ * @property Product $product
+ * @property-read int $scanned_bottles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItemBottle> $orderItemBottles
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at

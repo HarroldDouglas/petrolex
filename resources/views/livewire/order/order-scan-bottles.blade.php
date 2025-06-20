@@ -262,7 +262,6 @@
                 }
             }
 
-            // Animation lorsqu'une bouteille est scannée
             document.addEventListener('livewire:initialized', () => {
                 Livewire.on('bottleScanned', (event) => {
                     const progressBar = document.querySelector('.progress-bar');
@@ -274,6 +273,28 @@
                             progressBar.classList.remove('progress-bar-animated');
                         }, 1000);
                     }
+                });
+                
+                Livewire.on('scanError', (data) => {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+                    alertDiv.style.zIndex = '9999';
+                    alertDiv.style.maxWidth = '80%';
+                    alertDiv.innerHTML = `
+                        ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    
+                    document.body.appendChild(alertDiv);
+                    
+                    setTimeout(() => {
+                        alertDiv.classList.remove('show');
+                        setTimeout(() => {
+                            if (document.body.contains(alertDiv)) {
+                                document.body.removeChild(alertDiv);
+                            }
+                        }, 150);
+                    }, 5000);
                 });
             });
         </script>

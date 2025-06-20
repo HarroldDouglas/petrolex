@@ -2,14 +2,15 @@
 
 namespace App\Services\Order;
 
-use App\Enums\OrderStatus;
 use App\Exceptions\BottleScanException;
 use App\Models\Bottle;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\OrderItemBottle;
 use App\Repositories\Contracts\BottleRepositoryInterface;
 use App\Repositories\Contracts\OrderItemBottleRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -31,7 +32,7 @@ class OrderBottleScanService
     {
         $order = $this->orderRepository->getWithDetails($orderId);
 
-        if (! $order || ! $this->canScanBottles($order)) {
+        if (! $order || ! $order->canScanBottles()) {
             return null;
         }
 
@@ -39,26 +40,24 @@ class OrderBottleScanService
     }
 
     /**
-     * Checks if an order is eligible for bottle scanning.
+     * Gets order items grouped by bottle type with scan status.
      *
-     * @param  Order  $order  The order to check.
-     * @return bool True if the order can be scanned, false otherwise.
+     * @param  Order  $order  The order for which to retrieve items.
+     * @return Collection<int, OrderItem> Collection of OrderItems grouped by bottle type
      */
-    public function canScanBottles(Order $order): bool
+    public function getOrderItemsGroupedByBottleType(Order $order): Collection
     {
-        // Uniquement les commandes confirmées avec des bouteilles sont éligibles
-        return $order->status === OrderStatus::CONFIRMED() && $order->hasBottleItems();
-    }
-
-    /**
-     * Gets all bottle types with their scan status for a given order.
-     *
-     * @param  Order  $order  The order for which to retrieve bottle types.
-     * @return array An array of bottle types with their scan status.
-     */
-    public function getBottleTypesWithScanStatus(Order $order): array
-    {
-        return $this->orderItemBottleRepository->getBottleTypesWithScanStatus($order);
+        return $order->items()
+            ->whereHas('product.bottle')
+            ->with(['product.bottle.bottleType'])
+            ->withCount('orderItemBottles')
+            ->get()
+            ->groupBy('product.bottle.bottle_type_id')
+            ->map(function (Collection $items) {
+                // Return the first item from each group since they all share the same bottle type
+                return $items->first();
+            })
+            ->values();
     }
 
     /**
@@ -66,32 +65,11 @@ class OrderBottleScanService
      *
      * @param  Order  $order  The order containing the bottles.
      * @param  int  $bottleTypeId  The ID of the bottle type.
-     * @return Collection A collection of scanned bottles.
+     * @return Collection<int, OrderItemBottle> Collection of OrderItemBottle models with related bottle data
      */
     public function getScannedBottlesByType(Order $order, int $bottleTypeId): Collection
     {
-        // Récupérer les IDs des éléments de commande pour ce type de bouteille
-        $orderItems = $order->items()
-            ->whereHas('product.bottle', function ($query) use ($bottleTypeId) {
-                $query->where('bottle_type_id', $bottleTypeId);
-            })
-            ->pluck('id')
-            ->toArray();
-
-        if (empty($orderItems)) {
-            return collect();
-        }
-
-        // Récupérer les bouteilles associées à ces éléments de commande
-        return DB::table('bottles')
-            ->join('order_item_bottles', 'bottles.id', '=', 'order_item_bottles.bottle_id')
-            ->whereIn('order_item_bottles.order_item_id', $orderItems)
-            ->select(
-                'bottles.id',
-                'bottles.barcode',
-                'order_item_bottles.created_at as timestamp'
-            )
-            ->get();
+        return $this->orderItemBottleRepository->getOrderItemBottlesByBottleType($order, $bottleTypeId);
     }
 
     /**
@@ -99,61 +77,59 @@ class OrderBottleScanService
      *
      * @param  Order  $order  The order to which the bottle belongs.
      * @param  string  $barcode  The barcode of the bottle to scan.
-     * @return array An associative array containing 'scanned_count' and 'total_count' for the affected order item.
+     * @return OrderItem The order item that was updated with the scanned bottle.
      *
      * @throws BottleScanException If the bottle cannot be scanned due to various reasons.
      */
-    public function scanBottle(Order $order, string $barcode): array
+    public function scanBottle(Order $order, string $barcode): OrderItem
     {
         DB::beginTransaction();
         try {
             $bottle = $this->bottleRepository->findByBarcode($barcode);
 
             if (! $bottle) {
-                throw new BottleScanException('Bouteille non trouvée.');
+                throw new BottleScanException('Bottle not found.');
             }
 
             if ($this->orderItemBottleRepository->isBottleAlreadyScanned($bottle, $order)) {
-                throw new BottleScanException('Cette bouteille a déjà été scannée pour cette commande.');
+                throw new BottleScanException('This bottle has already been scanned for this order.');
             }
 
             $orderItem = $this->orderItemBottleRepository->findOrderItemForBottle($order, $bottle);
 
             if (! $orderItem) {
-                throw new BottleScanException('Aucun article correspondant pour cette bouteille dans la commande.');
+                throw new BottleScanException('No matching order item for this bottle in the order.');
             }
 
             $success = $this->orderItemBottleRepository->associateBottle($orderItem, $bottle);
 
             if (! $success) {
-                throw new BottleScanException('Erreur lors de l\'enregistrement de la bouteille.');
+                throw new BottleScanException('Error saving the bottle.');
             }
 
             DB::commit();
 
             // Refresh the order item to get the updated scanned_bottles_count
             $orderItem->refresh();
+            $orderItem->loadCount('orderItemBottles');
 
-            return [
-                'scanned_count' => $orderItem->scanned_bottles_count,
-                'total_count' => $orderItem->quantity,
-            ];
+            return $orderItem;
 
         } catch (BottleScanException $e) {
             DB::rollback();
-            Log::warning('Échec du scan de bouteille: '.$e->getMessage(), [
+            Log::warning('Bottle scan failed: '.$e->getMessage(), [
                 'order_id' => $order->id,
                 'barcode' => $barcode,
             ]);
             throw $e; // Re-throw the specific exception
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Erreur inattendue lors du scan de bouteille', [
+            Log::error('Unexpected error during bottle scanning', [
                 'error' => $e->getMessage(),
                 'order_id' => $order->id,
                 'barcode' => $barcode,
             ]);
-            throw new BottleScanException('Une erreur inattendue s\'est produite lors du scan de la bouteille.', 0, $e);
+            throw new BottleScanException('An unexpected error occurred while scanning the bottle.', 0, $e);
         }
     }
 
@@ -173,13 +149,13 @@ class OrderBottleScanService
 
             if (! $success) {
                 // This scenario might mean a deeper issue or a business rule violation
-                throw new \RuntimeException('Impossible de supprimer les bouteilles de la commande. Vérifiez la logique du repository ou l\'intégrité des données.');
+                throw new \RuntimeException('Unable to remove bottles from order. Check repository logic or data integrity.');
             }
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Erreur lors de la suppression des bouteilles', [
+            Log::error('Error removing bottles', [
                 'error' => $e->getMessage(),
                 'order_id' => $order->id,
                 'bottle_ids' => $bottleIds,

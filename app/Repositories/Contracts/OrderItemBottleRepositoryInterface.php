@@ -3,8 +3,10 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Bottle;
+use App\Models\BottleType;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderItemBottle;
 use Illuminate\Database\Eloquent\Collection;
 
 interface OrderItemBottleRepositoryInterface extends BaseRepositoryInterface
@@ -30,9 +32,18 @@ interface OrderItemBottleRepositoryInterface extends BaseRepositoryInterface
     public function getBottlesByOrder(Order $order): Collection;
 
     /**
-     * Get bottle types and their scan completion status for an order
+     * Get bottle types for an order
+     *
+     * @return Collection<int, BottleType> Collection of BottleType models
      */
-    public function getBottleTypesWithScanStatus(Order $order): array;
+    public function getBottleTypesByOrder(Order $order): Collection;
+
+    /**
+     * Get OrderItemBottles for a specific bottle type in an order with eager loaded bottle relationship
+     *
+     * @return Collection<int, OrderItemBottle> Collection of OrderItemBottle models with bottle relationship
+     */
+    public function getOrderItemBottlesByBottleType(Order $order, int $bottleTypeId): Collection;
 
     /**
      * Check if a bottle is already scanned for a specific order

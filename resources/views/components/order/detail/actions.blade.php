@@ -8,7 +8,7 @@
                 <li><a class="dropdown-item" href="#" data-bs-toggle="collapse" data-bs-target="#collapseScanBottles"
                         aria-expanded="false" aria-controls="collapseScanBottles">
                         <i class="ti ti-scan me-2"></i>Scanner les bouteilles
-                        <span class="badge bg-{{ $order->allBottlesScanned() ? 'success' : 'warning' }} ms-1">
+                        <span class="badge bg-{{ $order->areAllBottlesScanned() ? 'success' : 'warning' }} ms-1">
                             {{ $order->bottle_scan_progress }}%
                         </span>
                     </a>

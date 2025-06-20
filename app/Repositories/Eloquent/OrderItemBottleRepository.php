@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Enums\ProductType;
 use App\Models\Bottle;
+use App\Models\BottleType;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderItemBottle;
@@ -67,45 +68,20 @@ class OrderItemBottleRepository extends BaseEloquentRepository implements OrderI
     }
 
     /**
-     * Get bottle types and their scan completion status for an order
+     * Get bottle types for an order
+     *
+     * @return Collection<int, BottleType> Collection of BottleType models
      */
-    public function getBottleTypesWithScanStatus(Order $order): array
+    public function getBottleTypesByOrder(Order $order): Collection
     {
-        $result = [];
-
-        // Get all bottle order items for this order
-        $bottleItems = $order->items()
-            ->whereHas('product', function ($query) {
-                $query->where('product_type', ProductType::BOTTLE());
-            })
-            ->with(['product.bottle.bottleType'])
-            ->get();
-
-        // Group by bottle type
-        foreach ($bottleItems as $item) {
-            $bottleType = $item->product->bottle->bottleType;
-            $bottleTypeId = $bottleType->id;
-
-            if (! isset($result[$bottleTypeId])) {
-                $result[$bottleTypeId] = [
-                    'bottle_type' => $bottleType,
-                    'total_quantity' => 0,
-                    'scanned_quantity' => 0,
-                    'is_complete' => false,
-                ];
-            }
-
-            $result[$bottleTypeId]['total_quantity'] += $item->quantity;
-            $result[$bottleTypeId]['scanned_quantity'] += $item->orderItemBottles()->count();
-        }
-
-        // Set completion status for each bottle type
-        foreach ($result as $key => $value) {
-            $result[$key]['is_complete'] =
-                $value['scanned_quantity'] >= $value['total_quantity'];
-        }
-
-        return array_values($result);
+        return BottleType::whereIn('id', function ($query) use ($order) {
+            $query->select('bottles.bottle_type_id')
+                ->from('products')
+                ->join('order_items', 'products.id', '=', 'order_items.product_id')
+                ->join('bottles', 'products.id', '=', 'bottles.product_id')
+                ->where('order_items.order_id', $order->id)
+                ->where('products.product_type', ProductType::BOTTLE());
+        })->get();
     }
 
     /**
@@ -153,18 +129,42 @@ class OrderItemBottleRepository extends BaseEloquentRepository implements OrderI
      */
     public function findOrderItemForBottle(Order $order, Bottle $bottle): ?OrderItem
     {
-        // Get the bottle type
         $bottleTypeId = $bottle->bottle_type_id;
 
-        // Find an order item with this bottle type that needs scanning
+        /** @var OrderItem|null */
         return $order->items()
             ->whereHas('product.bottle', function ($query) use ($bottleTypeId) {
                 $query->where('bottle_type_id', $bottleTypeId);
             })
             ->get()
-            ->filter(function ($item) {
+            ->filter(function (OrderItem $item) {
                 return $item->scanned_bottles_count < $item->quantity;
             })
             ->first();
+    }
+
+    /**
+     * Get OrderItemBottles for a specific bottle type in an order with eager loaded bottle relationship
+     *
+     * @return Collection<int, OrderItemBottle> Collection of OrderItemBottle models with bottle relationship
+     */
+    public function getOrderItemBottlesByBottleType(Order $order, int $bottleTypeId): Collection
+    {
+        $orderItemIds = $order->items()
+            ->whereHas('product.bottle', function ($query) use ($bottleTypeId) {
+                $query->where('bottle_type_id', $bottleTypeId);
+            })
+            ->pluck('id')
+            ->toArray();
+
+        if (empty($orderItemIds)) {
+            return collect();
+        }
+
+        /** @var Collection<int, OrderItemBottle> */
+        return $this->model
+            ->with('bottle')
+            ->whereIn('order_item_id', $orderItemIds)
+            ->get();
     }
 }

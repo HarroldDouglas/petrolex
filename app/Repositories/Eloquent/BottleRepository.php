@@ -110,6 +110,7 @@ class BottleRepository extends BaseEloquentRepository implements BottleRepositor
      */
     public function findByBarcode(string $barcode): ?Bottle
     {
+        /** @var Bottle|null */
         return $this->model->where('barcode', $barcode)->first();
     }
 }

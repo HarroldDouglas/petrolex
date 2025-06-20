@@ -269,12 +269,13 @@ class Order extends Model
     /**
      * Check if all bottles for this order have been scanned
      */
-    public function allBottlesScanned(): bool
+    public function areAllBottlesScanned(): bool
     {
         if (! $this->hasBottleItems()) {
             return true;
         }
 
+        /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
         $bottleItems = $this->items()->whereHas('product', function ($query) {
             $query->where('product_type', ProductType::BOTTLE());
         })->get();
@@ -297,6 +298,7 @@ class Order extends Model
             return 100;
         }
 
+        /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
         $bottleItems = $this->items()->whereHas('product', function ($query) {
             $query->where('product_type', ProductType::BOTTLE());
         })->get();
