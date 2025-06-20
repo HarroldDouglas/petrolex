@@ -63,7 +63,6 @@ abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasM
     protected function processMediaWithStrategy(Model $model, array $data): void
     {
         $strategy = $this->getMediaStrategy();
-
         match ($strategy) {
             'main_only' => $this->mediaService->handleMainImageStrategy(
                 $model,
