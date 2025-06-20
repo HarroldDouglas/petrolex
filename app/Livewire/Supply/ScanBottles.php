@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Supply;
 
 use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryBottleMovementType;
@@ -343,6 +343,6 @@ class ScanBottles extends Component
 
     public function render()
     {
-        return view('livewire.scan-bottles');
+        return view('livewire.supply.scan-bottles');
     }
 }

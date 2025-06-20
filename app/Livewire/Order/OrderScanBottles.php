@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Order;
 
 use App\Exceptions\BottleScanException;
 use App\Models\Order;
+use App\Models\OrderBottleScans;
 use App\Models\OrderItem;
-use App\Models\OrderItemBottle;
 use App\Services\Order\OrderBottleScanService;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -64,8 +64,8 @@ class OrderScanBottles extends Component
                 'id' => $orderItem->product->bottle->bottle_type_id,
                 'name' => $orderItem->product->bottle->bottleType->name,
                 'total_quantity' => $orderItem->quantity,
-                'scanned_quantity' => $orderItem->orderItemBottles->count(),
-                'is_complete' => $orderItem->orderItemBottles->count() >= $orderItem->quantity,
+                'scanned_quantity' => $orderItem->orderBottleScans->count(),
+                'is_complete' => $orderItem->orderBottleScans->count() >= $orderItem->quantity,
             ];
         })->values()->toArray();
     }
@@ -99,13 +99,13 @@ class OrderScanBottles extends Component
             return;
         }
 
-        $orderItemBottles = $this->bottleScanService->getScannedBottlesByType($this->order, $this->selectedBottleTypeId);
+        $orderBottleScans = $this->bottleScanService->getScannedBottlesByType($this->order, $this->selectedBottleTypeId);
 
-        $this->scannedBottles = $orderItemBottles->map(function (OrderItemBottle $orderItemBottle): array {
+        $this->scannedBottles = $orderBottleScans->map(function (OrderBottleScans $orderBottleScan): array {
             return [
-                'id' => $orderItemBottle->bottle->id,
-                'barcode' => $orderItemBottle->bottle->barcode,
-                'timestamp' => $orderItemBottle->created_at,
+                'id' => $orderBottleScan->bottle->id,
+                'barcode' => $orderBottleScan->bottle->barcode,
+                'timestamp' => $orderBottleScan->created_at,
             ];
         })->toArray();
 

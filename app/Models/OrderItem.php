@@ -22,7 +22,7 @@ use Illuminate\Support\Carbon;
  * @property Order $order
  * @property Product $product
  * @property-read int $scanned_bottles_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItemBottle> $orderItemBottles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderBottleScans> $orderBottleScans
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -85,9 +85,9 @@ class OrderItem extends Model
     /**
      * Get the bottle mappings for this order item.
      */
-    public function orderItemBottles(): HasMany
+    public function orderBottleScans(): HasMany
     {
-        return $this->hasMany(OrderItemBottle::class);
+        return $this->hasMany(OrderBottleScans::class);
     }
 
     /**
@@ -95,7 +95,7 @@ class OrderItem extends Model
      */
     public function bottles()
     {
-        return $this->belongsToMany(Bottle::class, 'order_item_bottles')
+        return $this->belongsToMany(Bottle::class, 'order_bottle_scans')
             ->withTimestamps();
     }
 
@@ -104,7 +104,7 @@ class OrderItem extends Model
      */
     public function getScannedBottlesCountAttribute()
     {
-        return $this->orderItemBottles()->count();
+        return $this->orderBottleScans()->count();
     }
 
     /**

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  */
-class OrderItemBottle extends Model
+class OrderBottleScans extends Model
 {
     use HasFactory;
 

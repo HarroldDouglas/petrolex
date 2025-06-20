@@ -59,7 +59,7 @@
                 <button type="button" class="btn btn-primary me-2" id="scanButton">
                     <i class="ti ti-scan me-1"></i>Scanner
                 </button>
-                <button type="button" class="btn btn-dark" wire:click="toggleManualForm">
+                <button type="button" class="btn btn-dark d-none" wire:click="toggleManualForm">
                     <i class="ti ti-keyboard me-1"></i>Manuel
                 </button>
             </div>
@@ -143,8 +143,9 @@
 
     @push('scripts')
         <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+        <script src="{{ asset('assets/js/scan-code-bar.js') }}"></script>
         <script>
-            document.addEventListener('livewire:initialized', function () {
+            document.addEventListener('livewire:initialized', function() {
                 initScanButton();
                 
                 // Réinitialiser le bouton de scan à chaque mise à jour du composant
@@ -162,103 +163,11 @@
             }
 
             function scanButtonClickHandler() {
-                // Créer un div modal pour le scanner
-                const scannerContainer = document.createElement('div');
-                scannerContainer.id = 'scanner-container';
-                scannerContainer.style.position = 'fixed';
-                scannerContainer.style.top = '0';
-                scannerContainer.style.left = '0';
-                scannerContainer.style.width = '100%';
-                scannerContainer.style.height = '100%';
-                scannerContainer.style.backgroundColor = 'rgba(0,0,0,0.8)';
-                scannerContainer.style.zIndex = '9999';
-                scannerContainer.style.display = 'flex';
-                scannerContainer.style.flexDirection = 'column';
-                scannerContainer.style.justifyContent = 'center';
-                scannerContainer.style.alignItems = 'center';
-
-                // Créer l'interface du scanner
-                scannerContainer.innerHTML = `
-                    <div style="position: relative; width: 80%; max-width: 640px;">
-                        <div id="scanner-close-btn" style="position: absolute; top: 10px; right: 10px; color: white; font-size: 24px; cursor: pointer; z-index: 10000;">
-                            <i class="ti ti-x"></i>
-                        </div>
-                        <div id="interactive" class="viewport" style="width: 100%; height: 300px; background: #000; overflow: hidden;"></div>
-                        <div style="text-align: center; margin-top: 10px; color: white;">
-                            Positionnez le code-barres dans le cadre
-                        </div>
-                    </div>
-                `;
-
-                document.body.appendChild(scannerContainer);
-
-                // Fermer le scanner quand on clique sur le bouton de fermeture
-                document.getElementById('scanner-close-btn').addEventListener('click', function() {
-                    closeScannerModal();
-                });
-
-                // Initialiser le scanner
-                Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: document.querySelector('#interactive'),
-                        constraints: {
-                            width: 640,
-                            height: 480,
-                            facingMode: "environment"
-                        },
-                    },
-                    decoder: {
-                        readers: [
-                            "code_128_reader",
-                            "ean_reader",
-                            "ean_8_reader",
-                            "code_39_reader",
-                            "code_39_vin_reader",
-                            "codabar_reader",
-                            "upc_reader",
-                            "upc_e_reader",
-                            "i2of5_reader"
-                        ],
-                        multiple: false,
-                    },
-                    locate: true
-                }, function(err) {
-                    if (err) {
-                        console.error(err);
-                        alert("Erreur d'initialisation du scanner: " + err);
-                        closeScannerModal();
-                        return;
-                    }
-                    console.log("Scanner démarré");
-                    Quagga.start();
-                });
-
-                // Traiter les codes-barres scannés
-                Quagga.onDetected(function(result) {
-                    const code = result.codeResult.code;
-                    console.log("Code détecté:", code);
-                    
-                    // Dispatcher l'événement au composant Livewire
-                    if (code) {
-                        @this.processBarcode({barcode: code});
-                        
-                        // Ajouter un effet visuel de succès
-                        const viewport = document.querySelector('#interactive');
-                        viewport.classList.add('scan-success');
-                        setTimeout(() => {
-                            viewport.classList.remove('scan-success');
-                        }, 500);
-                        
-                        // Fermer le scanner après le scan réussi
-                        closeScannerModal();
-                    }
-                });
-
-                function closeScannerModal() {
-                    Quagga.stop();
-                    document.body.removeChild(scannerContainer);
+                if (typeof window.initBarcodeScanner === 'function') {
+                    window.initBarcodeScanner();
+                } else {
+                    console.error("La fonction initBarcodeScanner n'est pas disponible");
+                    alert("Erreur: La fonction de scan n'est pas disponible");
                 }
             }
 
@@ -275,6 +184,7 @@
                     }
                 });
                 
+                // Écouteur pour les erreurs de scan
                 Livewire.on('scanError', (data) => {
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
@@ -297,6 +207,15 @@
                     }, 5000);
                 });
             });
+
+            // Ajouter un écouteur d'événement pour récupérer le barcode détecté par scan-code-bar.js
+            document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('barcode-detected', function(e) {
+                    const barcode = e.detail.barcode;
+                    console.log("Barcode détecté et transmis à Livewire:", barcode);
+                    @this.processBarcode({barcode: barcode});
+                });
+            });
         </script>
 
         <style>
@@ -308,11 +227,6 @@
                 0% { opacity: 1; }
                 50% { opacity: 0.5; background: rgba(0, 255, 0, 0.5); }
                 100% { opacity: 1; }
-            }
-            
-            .viewport canvas, .viewport video {
-                width: 100%;
-                height: auto;
             }
         </style>
     @endpush

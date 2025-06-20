@@ -5,10 +5,10 @@ namespace App\Services\Order;
 use App\Exceptions\BottleScanException;
 use App\Models\Bottle;
 use App\Models\Order;
+use App\Models\OrderBottleScans;
 use App\Models\OrderItem;
-use App\Models\OrderItemBottle;
 use App\Repositories\Contracts\BottleRepositoryInterface;
-use App\Repositories\Contracts\OrderItemBottleRepositoryInterface;
+use App\Repositories\Contracts\OrderBottleScanRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +18,7 @@ class OrderBottleScanService
 {
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
-        private OrderItemBottleRepositoryInterface $orderItemBottleRepository,
+        private OrderBottleScanRepositoryInterface $orderBottleScanRepository,
         private BottleRepositoryInterface $bottleRepository
     ) {}
 
@@ -50,7 +50,7 @@ class OrderBottleScanService
         return $order->items()
             ->whereHas('product.bottle')
             ->with(['product.bottle.bottleType'])
-            ->withCount('orderItemBottles')
+            ->withCount('orderBottleScans')
             ->get()
             ->groupBy('product.bottle.bottle_type_id')
             ->map(function (Collection $items) {
@@ -65,11 +65,11 @@ class OrderBottleScanService
      *
      * @param  Order  $order  The order containing the bottles.
      * @param  int  $bottleTypeId  The ID of the bottle type.
-     * @return Collection<int, OrderItemBottle> Collection of OrderItemBottle models with related bottle data
+     * @return Collection<int, OrderBottleScans> Collection of OrderBottleScans models with related bottle data
      */
     public function getScannedBottlesByType(Order $order, int $bottleTypeId): Collection
     {
-        return $this->orderItemBottleRepository->getOrderItemBottlesByBottleType($order, $bottleTypeId);
+        return $this->orderBottleScanRepository->getOrderBottleScansByBottleType($order, $bottleTypeId);
     }
 
     /**
@@ -91,17 +91,17 @@ class OrderBottleScanService
                 throw new BottleScanException('Bottle not found.');
             }
 
-            if ($this->orderItemBottleRepository->isBottleAlreadyScanned($bottle, $order)) {
+            if ($this->orderBottleScanRepository->isBottleAlreadyScanned($bottle, $order)) {
                 throw new BottleScanException('This bottle has already been scanned for this order.');
             }
 
-            $orderItem = $this->orderItemBottleRepository->findOrderItemForBottle($order, $bottle);
+            $orderItem = $this->orderBottleScanRepository->findOrderItemForBottle($order, $bottle);
 
             if (! $orderItem) {
                 throw new BottleScanException('No matching order item for this bottle in the order.');
             }
 
-            $success = $this->orderItemBottleRepository->associateBottle($orderItem, $bottle);
+            $success = $this->orderBottleScanRepository->associateBottle($orderItem, $bottle);
 
             if (! $success) {
                 throw new BottleScanException('Error saving the bottle.');
@@ -111,7 +111,7 @@ class OrderBottleScanService
 
             // Refresh the order item to get the updated scanned_bottles_count
             $orderItem->refresh();
-            $orderItem->loadCount('orderItemBottles');
+            $orderItem->loadCount('orderBottleScans');
 
             return $orderItem;
 
@@ -145,7 +145,7 @@ class OrderBottleScanService
     {
         DB::beginTransaction();
         try {
-            $success = $this->orderItemBottleRepository->removeBottlesFromOrder($order, $bottleIds);
+            $success = $this->orderBottleScanRepository->removeBottlesFromOrder($order, $bottleIds);
 
             if (! $success) {
                 // This scenario might mean a deeper issue or a business rule violation

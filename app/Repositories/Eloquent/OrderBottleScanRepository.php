@@ -6,14 +6,14 @@ use App\Enums\ProductType;
 use App\Models\Bottle;
 use App\Models\BottleType;
 use App\Models\Order;
+use App\Models\OrderBottleScans;
 use App\Models\OrderItem;
-use App\Models\OrderItemBottle;
-use App\Repositories\Contracts\OrderItemBottleRepositoryInterface;
+use App\Repositories\Contracts\OrderBottleScanRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-class OrderItemBottleRepository extends BaseEloquentRepository implements OrderItemBottleRepositoryInterface
+class OrderBottleScanRepository extends BaseEloquentRepository implements OrderBottleScanRepositoryInterface
 {
-    public function __construct(OrderItemBottle $model)
+    public function __construct(OrderBottleScans $model)
     {
         parent::__construct($model);
     }
@@ -61,8 +61,8 @@ class OrderItemBottleRepository extends BaseEloquentRepository implements OrderI
     {
         return Bottle::whereIn('id', function ($query) use ($order) {
             $query->select('bottle_id')
-                ->from('order_item_bottles')
-                ->join('order_items', 'order_item_bottles.order_item_id', '=', 'order_items.id')
+                ->from('order_bottle_scans')
+                ->join('order_items', 'order_bottle_scans.order_item_id', '=', 'order_items.id')
                 ->where('order_items.order_id', $order->id);
         })->get();
     }
@@ -144,11 +144,11 @@ class OrderItemBottleRepository extends BaseEloquentRepository implements OrderI
     }
 
     /**
-     * Get OrderItemBottles for a specific bottle type in an order with eager loaded bottle relationship
+     * Get OrderBottleScans for a specific bottle type in an order with eager loaded bottle relationship
      *
-     * @return Collection<int, OrderItemBottle> Collection of OrderItemBottle models with bottle relationship
+     * @return Collection<int, OrderBottleScans> Collection of OrderBottleScans models with bottle relationship
      */
-    public function getOrderItemBottlesByBottleType(Order $order, int $bottleTypeId): Collection
+    public function getOrderBottleScansByBottleType(Order $order, int $bottleTypeId): Collection
     {
         $orderItemIds = $order->items()
             ->whereHas('product.bottle', function ($query) use ($bottleTypeId) {
@@ -161,7 +161,7 @@ class OrderItemBottleRepository extends BaseEloquentRepository implements OrderI
             return collect();
         }
 
-        /** @var Collection<int, OrderItemBottle> */
+        /** @var Collection<int, OrderBottleScans> */
         return $this->model
             ->with('bottle')
             ->whereIn('order_item_id', $orderItemIds)
