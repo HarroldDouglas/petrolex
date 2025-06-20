@@ -5,6 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+//TODO: instead of product_id, create a product_categories table, and replace product_id
 return new class extends Migration
 {
     /**

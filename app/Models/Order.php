@@ -6,6 +6,7 @@ use App\Enums\DeliveryStatus;
 use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -243,5 +244,48 @@ class Order extends Model
         return $this->refunds()
             ->where('status', PaymentStatus::PAID())
             ->sum('amount');
+    }
+
+    /**
+     * Check if this order has bottle items that need scanning
+     */
+    public function hasBottleItems(): bool
+    {
+        return $this->items()
+            ->whereHas('product', function ($query) {
+                $query->where('product_type', ProductType::BOTTLE());
+            })
+            ->exists();
+    }
+
+    /**
+     * Check if this order is eligible for bottle scanning
+     */
+    public function canScanBottles(): bool
+    {
+        return $this->status === OrderStatus::CONFIRMED() && $this->hasBottleItems();
+    }
+
+    /**
+     * Check if all bottles for this order have been scanned
+     */
+    public function areAllBottlesScanned(): bool
+    {
+        if (! $this->hasBottleItems()) {
+            return true;
+        }
+
+        /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
+        $bottleItems = $this->items()->whereHas('product', function ($query) {
+            $query->where('product_type', ProductType::BOTTLE());
+        })->get();
+
+        foreach ($bottleItems as $item) {
+            if (! $item->areAllBottlesScanned()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

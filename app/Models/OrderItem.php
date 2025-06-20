@@ -7,6 +7,7 @@ use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -17,6 +18,11 @@ use Illuminate\Support\Carbon;
  * @property int $quantity
  * @property float $unit_price
  * @property float $total_price
+ * @property BottleOrderType|null $bottle_type
+ * @property Order $order
+ * @property Product $product
+ * @property-read int $scanned_bottles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderBottleScans> $orderBottleScans
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -74,6 +80,43 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Get the bottle mappings for this order item.
+     */
+    public function orderBottleScans(): HasMany
+    {
+        return $this->hasMany(OrderBottleScans::class);
+    }
+
+    /**
+     * Get the bottles associated with this order item.
+     */
+    public function bottles()
+    {
+        return $this->belongsToMany(Bottle::class, 'order_bottle_scans')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the number of bottles scanned for this order item.
+     */
+    public function getScannedBottlesCountAttribute()
+    {
+        return $this->orderBottleScans()->count();
+    }
+
+    /**
+     * Check if all bottles have been scanned for this order item.
+     */
+    public function areAllBottlesScanned(): bool
+    {
+        if (! $this->isBottle()) {
+            return true;
+        }
+
+        return $this->scanned_bottles_count >= $this->quantity;
     }
 
     public function isBottle(): bool
