@@ -130,3 +130,9 @@ function confirmActionWithInput(params) {
         }
     });
 }
+
+window.addEventListener('close-loading-swal', event => {
+    if (Swal.isVisible()) {
+        Swal.close();
+    }
+});
