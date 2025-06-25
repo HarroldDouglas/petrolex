@@ -26,7 +26,7 @@
                                             </h6>
                                             <p class="f-w-500 m-0 text-muted f-s-13">Type:
                                                 <span class="text-secondary">
-                                                    {{ $item->orderItem->product->type() }}
+                                                    {{ $item->orderItem->productCategory->product_type }}
                                                 </span>
                                             </p>
                                             @if ($item->isBottle() && $item->orderItem->bottle_type)

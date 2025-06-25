@@ -30,8 +30,8 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
             'deliveryAddress',
             'distributionCenter',
             'deliveryPerson',
-            'items.product.bottle.bottleType',
-            'items.product.accessory.accessoryType',
+            'items.productCategory',
+            'payment',
         ])->find($orderId);
 
         /** @var Order|null $order */

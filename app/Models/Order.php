@@ -252,7 +252,7 @@ class Order extends Model
     public function hasBottleItems(): bool
     {
         return $this->items()
-            ->whereHas('product', function ($query) {
+            ->whereHas('productCategory', function ($query) {
                 $query->where('product_type', ProductType::BOTTLE());
             })
             ->exists();
@@ -276,7 +276,7 @@ class Order extends Model
         }
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
-        $bottleItems = $this->items()->whereHas('product', function ($query) {
+        $bottleItems = $this->items()->whereHas('productCategory', function ($query) {
             $query->where('product_type', ProductType::BOTTLE());
         })->get();
 

@@ -17,6 +17,16 @@ class DistributionCenterService
 {
     public function __construct(private DistributionCenterRepositoryInterface $distributionCenterRepository) {}
 
+    /**
+     * Get all distribution centers.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAll()
+    {
+        return $this->distributionCenterRepository->all();
+    }
+
     public function create(CreateDistributionCenterDTO $dto): DistributionCenter
     {
         /** @var DistributionCenter */

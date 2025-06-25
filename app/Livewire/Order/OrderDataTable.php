@@ -66,7 +66,7 @@ class OrderDataTable extends BaseDataTable
                     return trim(($user->first_name ?? '').' '.($user->last_name ?? '')) ?: '-';
                 }),
 
-            Column::make('Produits', 'id')
+            /*Column::make('Produits', 'id')
                 ->format(function ($value, $row) {
                     $orderItems = $row->items;
                     if ($orderItems->isEmpty()) {
@@ -77,16 +77,14 @@ class OrderDataTable extends BaseDataTable
                     $groupedProducts = [];
 
                     foreach ($orderItems as $orderItem) {
-                        $productCategory = $orderItem->productCategory;
+                        $product = $orderItem->product;
                         $productName = '';
                         $quantity = $orderItem->quantity;
 
-                        if ($productCategory->product_type == ProductType::BOTTLE()) {
-                            $bottleType = \App\Models\BottleType::find($productCategory->product_type_id);
-                            $productName = $bottleType->name ?? 'Bouteille';
-                        } elseif ($productCategory->product_type == ProductType::ACCESSORY()) {
-                            $accessoryType = \App\Models\AccessoryType::find($productCategory->product_type_id);
-                            $productName = $accessoryType->name ?? 'Accessoire';
+                        if ($product->product_type == ProductType::BOTTLE()) {
+                            $productName = optional($product->bottle->bottleType)->name ?? 'Bouteille';
+                        } elseif ($product->product_type == ProductType::ACCESSORY()) {
+                            $productName = optional($product->accessory->accessoryType)->name ?? 'Accessoire';
                         }
 
                         if ($productName) {
@@ -107,7 +105,7 @@ class OrderDataTable extends BaseDataTable
                     }
 
                     return new HtmlString($html ?: '-');
-                }),
+                }),*/
 
             Column::make('Total (CFA)', 'total_amount')
                 ->sortable()

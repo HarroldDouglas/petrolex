@@ -7,6 +7,8 @@ use App\DTOs\Order\OrderDetailsDTO;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Exceptions\OrderNotFoundException;
+use App\Models\AccessoryType;
+use App\Models\BottleType;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\Contracts\OrderRepositoryInterface;
@@ -47,9 +49,9 @@ class OrderService
     public function groupOrderItems(Collection $items): Collection
     {
         return $items->groupBy(function ($item) {
-            $product = $item->product;
+            $productCategory = $item->productCategory;
 
-            return match ($product->product_type) {
+            return match ($productCategory->product_type) {
                 ProductType::BOTTLE() => $this->getBottleGroupingKey($item),
                 ProductType::ACCESSORY() => $this->getAccessoryGroupingKey($item),
                 default => 'unknown-'.$item->id,
@@ -74,9 +76,9 @@ class OrderService
      */
     private function getDisplayName($item): string
     {
-        $product = $item->product;
+        $productCategory = $item->productCategory;
 
-        return match ($product->product_type) {
+        return match ($productCategory->product_type) {
             ProductType::BOTTLE() => $this->getBottleDisplayName($item),
             ProductType::ACCESSORY() => $this->getAccessoryDisplayName($item),
             default => 'Produit inconnu',
@@ -88,14 +90,14 @@ class OrderService
      */
     private function getBottleDisplayName($item): string
     {
-        $bottle = $item->product->bottle;
-        $bottleType = $bottle?->bottleType;
+        $productCategory = $item->productCategory;
+        $bottleType = BottleType::find($productCategory->product_type_id); // TODO: use a repository or service to get the bottle type
 
         if (! $bottleType) {
             return 'Bouteille inconnue';
         }
 
-        $option = $item->unit_price === $bottleType->exchange_price ? 'Recharge' : 'Complète';
+        $option = $item->bottle_type?->label;
 
         return "{$bottleType->name} ({$option})";
     }
@@ -105,8 +107,8 @@ class OrderService
      */
     private function getAccessoryDisplayName($item): string
     {
-        $accessory = $item->product->accessory;
-        $accessoryType = $accessory?->accessoryType;
+        $productCategory = $item->productCategory;
+        $accessoryType = AccessoryType::find($productCategory->product_type_id); // TODO: use a repository or service to get the accessory type
 
         return $accessoryType?->name ?? 'Accessoire inconnu';
     }
@@ -116,15 +118,14 @@ class OrderService
      */
     private function getBottleGroupingKey($item): string
     {
-        $product = $item->product;
-        $bottle = $product->bottle;
-        $bottleType = $bottle?->bottleType;
+        $productCategory = $item->productCategory;
+        $bottleTypeId = $productCategory->product_type_id;
 
-        if (! $bottleType) {
+        if (! $bottleTypeId) {
             return 'bottle-unknown-'.$item->id;
         }
 
-        return "bottle-{$bottleType->id}-price-{$item->unit_price}";
+        return "bottle-{$bottleTypeId}-price-{$item->unit_price}";
     }
 
     /**
@@ -132,15 +133,14 @@ class OrderService
      */
     private function getAccessoryGroupingKey($item): string
     {
-        $product = $item->product;
-        $accessory = $product->accessory;
-        $accessoryType = $accessory?->accessoryType;
+        $productCategory = $item->productCategory;
+        $accessoryTypeId = $productCategory->product_type_id;
 
-        if (! $accessoryType) {
+        if (! $accessoryTypeId) {
             return 'accessory-unknown-'.$item->id;
         }
 
-        return "accessory-{$accessoryType->id}";
+        return "accessory-{$accessoryTypeId}";
     }
 
     /**

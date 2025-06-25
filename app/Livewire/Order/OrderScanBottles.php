@@ -3,6 +3,7 @@
 namespace App\Livewire\Order;
 
 use App\Exceptions\BottleScanException;
+use App\Models\BottleType;
 use App\Models\Order;
 use App\Models\OrderBottleScans;
 use App\Models\OrderItem;
@@ -60,14 +61,21 @@ class OrderScanBottles extends Component
         $orderItems = $this->bottleScanService->getOrderItemsGroupedByBottleType($this->order);
 
         $this->bottleTypes = $orderItems->map(function (OrderItem $orderItem): array {
+            $bottleTypeId = $orderItem->productCategory->product_type_id;
+            $bottleType = BottleType::find($bottleTypeId); // TODO:: use a repository or service to get the bottle type
+
+            if (! $bottleType) {
+                return [];
+            }
+
             return [
-                'id' => $orderItem->product->bottle->bottle_type_id,
-                'name' => $orderItem->product->bottle->bottleType->name,
+                'id' => $bottleTypeId,
+                'name' => $bottleType->name,
                 'total_quantity' => $orderItem->quantity,
                 'scanned_quantity' => $orderItem->orderBottleScans->count(),
                 'is_complete' => $orderItem->orderBottleScans->count() >= $orderItem->quantity,
             ];
-        })->values()->toArray();
+        })->filter()->values()->toArray();
     }
 
     public function updateSelectedBottleType(): void
