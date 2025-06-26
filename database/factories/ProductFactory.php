@@ -118,19 +118,11 @@ class ProductFactory extends Factory
                 $bottleTypeId,
                 BottleType::class
             );
-        })->afterCreating(function (Product $product) use ($bottleTypeId, $distributionCenterId, $bottleAttributes) {
-            $bottleType = $this->resolveProductTypeModel(
-                $product,
-                ProductType::BOTTLE(),
-                $bottleTypeId,
-                BottleType::class
-            );
-
+        })->afterCreating(function (Product $product) use ($distributionCenterId, $bottleAttributes) {
             $distributionCenter = $distributionCenterId ?: DistributionCenter::inRandomOrder()->first()->id;
 
             $defaultAttributes = [
                 'product_id' => $product->id,
-                'bottle_type_id' => $bottleType->id,
                 'distribution_center_id' => $distributionCenter,
                 'barcode' => 'BT'.strtoupper(Str::random(8)),
                 'is_filled' => fake()->boolean(65),

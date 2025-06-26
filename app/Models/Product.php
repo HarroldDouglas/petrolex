@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,6 +13,8 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
+ * @property int $product_category_id
+ * @property ProductCategory $productCategory
  * @property ProductType $product_type
  * @property Bottle|null $bottle
  * @property Accessory|null $accessory
@@ -32,17 +35,24 @@ class Product extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'product_type',
+        'product_category_id',
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
+     * Get the product category associated with this product.
      */
-    protected $casts = [
-        'product_type' => ProductType::class,
-    ];
+    public function productCategory(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class);
+    }
+
+    /**
+     * Get the product type via the product category.
+     */
+    public function getProductTypeAttribute(): ProductType
+    {
+        return $this->productCategory->product_type;
+    }
 
     /**
      * Get the bottle associated with this product.
@@ -71,8 +81,8 @@ class Product extends Model
     public function name(): string
     {
         return match ($this->product_type) {
-            ProductType::BOTTLE() => $this->bottle?->bottleType?->name ?? 'Bouteille sans type',
-            ProductType::ACCESSORY() => $this->accessory?->accessoryType?->name ?? 'Accessoire sans type',
+            ProductType::BOTTLE() => $this->productCategory?->name ?? 'Bouteille sans type',
+            ProductType::ACCESSORY() => $this->productCategory?->name ?? 'Accessoire sans type',
             default => 'Produit inconnu',
         };
     }
@@ -89,7 +99,7 @@ class Product extends Model
     {
         return match ($this->product_type) {
             ProductType::BOTTLE() => $this->getBottlePrice(),
-            ProductType::ACCESSORY() => $this->accessory?->accessoryType?->price ?? '0',
+            ProductType::ACCESSORY() => $this->getAccessoryPrice(),
             default => '0',
         };
     }
@@ -99,12 +109,10 @@ class Product extends Model
      */
     private function getBottlePrice(): string
     {
-        /** @var Bottle */
-        $bottle = $this->bottle;
         /** @var BottleType */
-        $bottleType = $bottle?->bottleType;
+        $bottleType = $this->productCategory->productType;
 
-        if (! $bottle || ! $bottleType) {
+        if (! $bottleType) {
             return '0';
         }
 
@@ -115,12 +123,23 @@ class Product extends Model
     }
 
     /**
+     * Helper method to get accessory price
+     */
+    private function getAccessoryPrice(): string
+    {
+        /** @var AccessoryType */
+        $accessoryType = $this->productCategory->productType;
+
+        return $accessoryType?->price ?? '0';
+    }
+
+    /**
      * Get the stock quantity of the product.
      */
     public function stock(): int
     {
         return match ($this->product_type) {
-            ProductType::BOTTLE() => $this->bottle?->quantity ?? 0,
+            ProductType::BOTTLE() => $this->bottle ? 1 : 0,
             ProductType::ACCESSORY() => $this->accessory?->quantity ?? 0,
             default => 0,
         };

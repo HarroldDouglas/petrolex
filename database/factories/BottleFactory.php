@@ -38,7 +38,6 @@ class BottleFactory extends Factory
 
         return [
             'product_id' => $product->id,
-            'bottle_type_id' => $bottleType->id,
             'distribution_center_id' => $distributionCenter->id,
             'barcode' => fake()->unique()->ean13(),
             'is_filled' => fake()->boolean(80), // 80% chance of being filled

@@ -260,7 +260,7 @@ class SupplierDeliverySeeder extends Seeder
         DistributionCenter $center,
         int $limit
     ): Collection {
-        return Bottle::where('bottle_type_id', $bottleType->id)
+        return Bottle::ofBottleType($bottleType->id)
             ->where('distribution_center_id', $center->id)
             ->take($limit)
             ->get();

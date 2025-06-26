@@ -19,7 +19,6 @@ class BottleTypeCityPrice extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'bottle_type_id',
         'city',
         'content_price',
         'content_with_bottle_price',

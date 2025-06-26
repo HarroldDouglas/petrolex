@@ -122,7 +122,7 @@ class AccessoryForm extends Component
                 SupplierDeliveryProductType::create([
                     'supplier_delivery_id' => $this->supplierDelivery->id,
                     'product_type' => ProductType::ACCESSORY()->value,
-                    'bottle_type_id' => null,
+                    'bottle_type_id' => null, // TODO: update this table to have product_type_id instead of bottle_type_id & accessory_type_id
                     'accessory_type_id' => $validatedData['selectedAccessoryType'],
                     'expected_quantity' => $validatedData['accessoryQuantity'],
                     'bottles_out_quantity' => 0,

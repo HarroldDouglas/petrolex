@@ -146,13 +146,13 @@ class OrderSeeder extends Seeder
      */
     private function getActualStockValues(int $centerId, int $bottleTypeId): array
     {
-        $emptyCount = Bottle::where('bottle_type_id', $bottleTypeId)
+        $emptyCount = Bottle::ofBottleType($bottleTypeId)
             ->where('is_filled', false)
             ->where('status', BottleStatus::IN_STOCK())
             ->where('distribution_center_id', $centerId)
             ->count();
 
-        $filledCount = Bottle::where('bottle_type_id', $bottleTypeId)
+        $filledCount = Bottle::ofBottleType($bottleTypeId)
             ->where('is_filled', true)
             ->where('status', BottleStatus::IN_STOCK())
             ->where('distribution_center_id', $centerId)
@@ -683,7 +683,7 @@ class OrderSeeder extends Seeder
         }
 
         // Find available bottles
-        $availableBottles = Bottle::where('bottle_type_id', $bottleType->id)
+        $availableBottles = Bottle::ofBottleType($bottleType->id)
             ->where('distribution_center_id', $order->distribution_center_id)
             ->where('is_filled', true)
             ->where('status', BottleStatus::IN_STOCK())
