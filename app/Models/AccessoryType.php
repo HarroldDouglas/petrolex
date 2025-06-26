@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * @property int $id
@@ -17,9 +21,11 @@ use Illuminate\Support\Carbon;
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
  */
-class AccessoryType extends BaseModelWithMedia
+class AccessoryType extends Model implements HasMedia
 {
     use HasFactory;
+    use HasMediaCollections;
+    use InteractsWithMedia;
     use SoftDeletes;
 
     /**

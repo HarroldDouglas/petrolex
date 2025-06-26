@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +13,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -35,8 +35,8 @@ class User extends Authenticatable implements HasMedia
     use HasApiTokens;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+    use HasMediaCollections;
     use HasRoles;
-    use InteractsWithMedia;
     use Notifiable;
     use SoftDeletes;
 
