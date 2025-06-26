@@ -1,64 +1,110 @@
 <?php
 
-// database/seeders/Development/AccessorySeeder.php
-
 namespace Database\Seeders\Development;
 
-use App\Models\AccessoryType;
-use App\Models\DistributionCenter;
-use App\Models\Product;
+use App\Models\ProductCategoryDistributionCenter;
+use Database\Factories\ProductFactory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class AccessorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    private ProductFactory $productFactory;
+
     public function run(): void
     {
         $this->command->info('Creating accessories for development...');
 
-        $accessoryTypes = AccessoryType::all();
-        $centers = DistributionCenter::all();
+        $distCenterStocks = $this->getDistributionCenterStocks();
 
-        if ($accessoryTypes->isEmpty()) {
-            $this->command->error('No accessory types found. Run AccessoryTypeSeeder first.');
-
-            return;
-        }
-
-        if ($centers->isEmpty()) {
-            $this->command->error('No distribution centers found. Run DistributionCenterSeeder first.');
+        if ($distCenterStocks->isEmpty()) {
+            $this->command->error('No distribution centers with accessory stock found.');
 
             return;
         }
 
-        foreach ($centers as $center) {
-            $this->createAccessoriesForCenter($center, $accessoryTypes);
-        }
+        $this->productFactory = new ProductFactory;
+        $totalCreated = $this->createAccessories($distCenterStocks);
 
-        $this->command->info('Development accessories created successfully!');
+        $this->command->info("Development accessories created successfully! Total created: {$totalCreated}");
     }
 
-    /**
-     * Create accessories for a distribution center
-     */
-    private function createAccessoriesForCenter(DistributionCenter $center, $accessoryTypes): void
+    private function getDistributionCenterStocks()
     {
-        $this->command->info("Creating accessories for {$center->name}...");
+        return ProductCategoryDistributionCenter::with([
+            'productCategory',
+            'distributionCenter',
+        ])
+            ->whereHas('productCategory', function ($query) {
+                $query->accessories();
+            })
+            ->where('stock', '>', 0)
+            ->get();
+    }
 
-        foreach ($accessoryTypes as $accessoryType) {
-            $quantity = fake()->numberBetween(10, 50);
+    private function createAccessories($distCenterStocks): int
+    {
+        $totalCreated = 0;
+        $productsToCreate = [];
 
-            $product = Product::factory()
-                ->accessory($accessoryType->id, $center->id, [
-                    'sku' => 'ACC-'.strtoupper(Str::random(6)),
-                    'quantity' => $quantity,
-                ])
-                ->create();
+        foreach ($distCenterStocks as $stock) {
+            $productCategory = $stock->productCategory;
+            $accessoryType = $productCategory->productType;
+            $center = $stock->distributionCenter;
 
-            $this->command->info("{$quantity} {$accessoryType->name} accessories created for {$center->name}");
+            if (! $accessoryType) {
+                $this->command->warn("Skipping stock ID {$stock->id} - no accessory type found");
+                continue;
+            }
+
+            $stockAmount = (int) $stock->stock;
+            $this->command->info("Creating {$stockAmount} {$accessoryType->name} accessories for {$center->name}");
+
+            for ($i = 0; $i < $stockAmount; $i++) {
+                $productsToCreate[] = [
+                    'productCategoryId' => $productCategory->id,
+                    'accessoryTypeId' => $accessoryType->id,
+                    'distributionCenterId' => $center->id,
+                    'accessoryAttributes' => [
+                        'is_sold' => false,
+                    ],
+                ];
+            }
+
+            if (count($productsToCreate) >= 100) {
+                $totalCreated += $this->createProductsBatch($productsToCreate);
+                $productsToCreate = [];
+            }
         }
+
+        if (! empty($productsToCreate)) {
+            $totalCreated += $this->createProductsBatch($productsToCreate);
+        }
+
+        return $totalCreated;
+    }
+
+    private function createProductsBatch(array $products): int
+    {
+        $created = 0;
+
+        DB::transaction(function () use ($products, &$created) {
+            foreach ($products as $productData) {
+                try {
+                    $this->productFactory->accessory(
+                        productCategoryId: $productData['productCategoryId'],
+                        accessoryTypeId: $productData['accessoryTypeId'],
+                        distributionCenterId: $productData['distributionCenterId'],
+                        accessoryAttributes: $productData['accessoryAttributes']
+                    )->create();
+
+                    $created++;
+                } catch (\Exception $e) {
+                    $this->command->warn('Failed to create accessory: '.$e->getMessage());
+                }
+            }
+        });
+
+        return $created;
     }
 }

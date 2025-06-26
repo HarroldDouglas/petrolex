@@ -96,6 +96,8 @@ class DistributionCenterService
 
     /**
      * Get distribution centers for current authenticated user
+     *
+     * @return Collection<DistributionCenter>
      */
     public static function getForCurrentUser(): Collection
     {
@@ -110,6 +112,8 @@ class DistributionCenterService
 
     /**
      * Get distribution centers for specific user
+     *
+     * @return Collection<DistributionCenter>
      */
     public static function getForUser(User $user): Collection
     {

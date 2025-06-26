@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-abstract class BaseModelWithMedia extends Model implements HasMedia
+abstract class BaseModelWithMedia extends Model
 {
     use InteractsWithMedia;
 

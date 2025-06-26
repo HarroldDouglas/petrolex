@@ -7,14 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
  * @property int $product_id
  * @property int $accessory_type_id
  * @property int $distribution_center_id
- * @property string|null $barcode
- * @property int $quantity
+ * @property string|null $sku
+ * @property bool $is_sold
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -34,7 +35,7 @@ class Accessory extends Model
         'accessory_type_id',
         'distribution_center_id',
         'sku',
-        'quantity',
+        'is_sold',
     ];
 
     /**
@@ -43,8 +44,38 @@ class Accessory extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'quantity' => 'integer',
+        'is_sold' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::creating(function ($accessory) {
+            if (empty($accessory->sku)) {
+                $accessory->sku = self::generateSku();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique SKU for an accessory in the format date-time-random
+     * Example: 12062025-060159-kpmzike
+     */
+    public static function generateSku(): string
+    {
+        $date = now()->format('dmY');
+        $time = now()->format('His');
+        $random = Str::lower(Str::random(7));
+
+        return "{$date}-{$time}-{$random}";
+    }
 
     /**
      * Get the product associated with the accessory.

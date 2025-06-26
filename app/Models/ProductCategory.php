@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -24,6 +23,8 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Product> $products
  * @property-read Collection<int, OrderItem> $orderItems
  * @property-read Collection<int, ProductCategoryDistributionCenter> $distributionCenters
+ * @property-read Collection<int, Accessory> $accessories
+ * @property-read Collection<int, Bottle> $bottles
  *
  * // Accessors
  * @property-read string $name
@@ -50,9 +51,13 @@ class ProductCategory extends Model
     /**
      * Polymorphic relation to BottleType or AccessoryType
      */
-    public function productType(): MorphTo
+    public function getProductTypeAttribute()
     {
-        return $this->morphTo('product_type', 'product_type', 'product_type_id');
+        return match ($this->attributes['product_type']) {
+            ProductType::BOTTLE()->value => BottleType::find($this->product_type_id),
+            ProductType::ACCESSORY()->value => AccessoryType::find($this->product_type_id),
+            default => null,
+        };
     }
 
     /**

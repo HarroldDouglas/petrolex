@@ -3,9 +3,11 @@
 namespace App\Livewire\Accessory;
 
 use App\Enums\EntityStatus;
+use App\Enums\ProductType;
 use App\Models\AccessoryType;
 use App\Models\DistributionCenter;
 use App\Models\User;
+use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -143,7 +145,7 @@ class AccessoryDataTable extends BaseDataTable
                             $query->select('accessory_type_id')
                                 ->where('distribution_center_id', $distCenterId)
                                 ->groupBy('accessory_type_id')
-                                ->havingRaw('SUM(quantity) >= ?', [$value]);
+                                ->havingRaw('COUNT(*) >= ?', [$value]);
                         });
                     } else {
                         return $builder->having('accessories_sum_quantity', '>=', $value);
@@ -162,7 +164,7 @@ class AccessoryDataTable extends BaseDataTable
                             $query->select('accessory_type_id')
                                 ->where('distribution_center_id', $distCenterId)
                                 ->groupBy('accessory_type_id')
-                                ->havingRaw('SUM(quantity) <= ?', [$value]);
+                                ->havingRaw('COUNT(*) <= ?', [$value]);
                         });
                     } else {
                         return $builder->having('accessories_sum_quantity', '<=', $value);
@@ -178,15 +180,24 @@ class AccessoryDataTable extends BaseDataTable
         if ($distCenterId) {
             $centerIds = [$distCenterId];
         } else {
-            /** @var User $user */
-            $user = auth()->user();
-            $centerIds = $user->accessibleDistributionCenters()->pluck('distribution_centers.id')->toArray();
+            $distributionCenters = DistributionCenterService::getForCurrentUser();
+            $centerIds = $distributionCenters->pluck('id')->toArray();
         }
 
+        $centerIdsStr = implode(',', $centerIds ?: [0]);
+
         return AccessoryType::query()
-            ->with(['accessories' => function ($query) use ($centerIds) {
-                $query->whereIn('distribution_center_id', $centerIds);
-            }]);
+            ->leftJoin('product_categories', function ($join) {
+                $join->on('accessory_types.id', '=', 'product_categories.product_type_id')
+                    ->where('product_categories.product_type', '=', ProductType::ACCESSORY()->value);
+            })
+            ->leftJoin('product_category_distribution_center as pcdc', 'product_categories.id', '=', 'pcdc.product_category_id')
+            ->when($centerIds, function ($query) use ($centerIds) {
+                $query->whereIn('pcdc.distribution_center_id', $centerIds);
+            })
+            ->select('accessory_types.*')
+            ->selectRaw('COALESCE(SUM(pcdc.stock), 0) as accessories_sum_quantity')
+            ->groupBy('accessory_types.id');
     }
 
     /**

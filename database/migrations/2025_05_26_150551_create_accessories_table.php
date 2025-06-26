@@ -17,9 +17,12 @@ return new class extends Migration
             $table->foreignId('accessory_type_id')->constrained()->onDelete('restrict');
             $table->foreignId('distribution_center_id')->constrained()->onDelete('restrict');
             $table->string('sku', 255)->nullable()->unique();
-            $table->integer('quantity')->default(1);
+            $table->boolean('is_sold')->default(false);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index(['distribution_center_id', 'accessory_type_id']);
+            $table->index('is_sold');
         });
     }
 

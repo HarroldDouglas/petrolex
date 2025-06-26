@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -68,6 +69,15 @@ class AccessoryType extends BaseModelWithMedia
     }
 
     /**
+     * Get the product categories for this accessory type.
+     */
+    public function productCategories(): HasMany
+    {
+        return $this->hasMany(ProductCategory::class, 'product_type_id')
+            ->where('product_type', ProductType::ACCESSORY());
+    }
+
+    /**
      * Get stock quantity for a specific accessory type across specified distribution centers
      *
      * @param  array|null  $distributionCenterIds  Array of distribution center IDs to filter by
@@ -75,11 +85,12 @@ class AccessoryType extends BaseModelWithMedia
      */
     public function getStockForType(?array $distributionCenterIds = null): int
     {
-        return $this->accessories()
+        return $this->productCategories()
+            ->join('product_category_distribution_center as pcdc', 'product_categories.id', '=', 'pcdc.product_category_id')
             ->when($distributionCenterIds, function ($query) use ($distributionCenterIds) {
-                $query->whereIn('distribution_center_id', $distributionCenterIds);
+                $query->whereIn('pcdc.distribution_center_id', $distributionCenterIds);
             })
-            ->sum('quantity');
+            ->sum('pcdc.stock');
     }
 
     public function requiresMainImage(): bool

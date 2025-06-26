@@ -624,9 +624,9 @@ class OrderSeeder extends Seeder
      */
     private function addAccessoriesToOrder(Order $order): void
     {
-        // Get accessories with stock from the distribution center
+        // Get accessories available in the distribution center that aren't sold yet
         $accessories = Accessory::where('distribution_center_id', $order->distribution_center_id)
-            ->where('quantity', '>', 0)
+            ->where('is_sold', false)
             ->with(['accessoryType'])
             ->get();
 
@@ -639,10 +639,16 @@ class OrderSeeder extends Seeder
         $selectedTypes = $accessoriesByType->random(min(rand(1, 2), $accessoriesByType->count()));
 
         foreach ($selectedTypes as $accessoriesOfSameType) {
-            $accessory = $accessoriesOfSameType->first();
-            $quantity = 1;
+            // Determine quantity (1-3) of accessories to sell, but limit by what's available
+            $maxQty = min(3, $accessoriesOfSameType->count());
+            $quantity = rand(1, $maxQty);
 
-            $this->createAccessoryOrderItem($order, $accessory, $quantity);
+            // Get the specific accessories to include
+            $selectedAccessories = $accessoriesOfSameType->take($quantity);
+            $firstAccessory = $selectedAccessories->first();
+
+            // Create order item for these accessories
+            $this->createAccessoryOrderItem($order, $firstAccessory, $selectedAccessories);
         }
     }
 
@@ -745,7 +751,7 @@ class OrderSeeder extends Seeder
     /**
      * Create an accessory order item
      */
-    private function createAccessoryOrderItem(Order $order, Accessory $accessory, int $quantity): void
+    private function createAccessoryOrderItem(Order $order, Accessory $accessory, $selectedAccessories): void
     {
         // Find the product category for this accessory type
         $productCategory = ProductCategory::where('product_type', ProductType::ACCESSORY())
@@ -758,13 +764,15 @@ class OrderSeeder extends Seeder
             return;
         }
 
-        // Check if an order item with this product category already exists
+        $quantity = count($selectedAccessories);
+
+        // Create or update order item
         $existingItem = $order->items()
             ->where('product_category_id', $productCategory->id)
             ->first();
 
         if ($existingItem) {
-            // If the item already exists, increase its quantity
+            // If item already exists, increase quantity and price
             $newQuantity = $existingItem->quantity + $quantity;
             $newPrice = $accessory->accessoryType->price * $newQuantity;
 
@@ -772,9 +780,11 @@ class OrderSeeder extends Seeder
                 'quantity' => $newQuantity,
                 'total_price' => $newPrice,
             ]);
+
+            $orderItem = $existingItem;
         } else {
-            // Otherwise, create a new item
-            OrderItem::create([
+            // Create new order item
+            $orderItem = OrderItem::create([
                 'order_id' => $order->id,
                 'product_category_id' => $productCategory->id,
                 'quantity' => $quantity,
@@ -782,6 +792,23 @@ class OrderSeeder extends Seeder
                 'unit_price' => $accessory->accessoryType->price,
                 'total_price' => $accessory->accessoryType->price * $quantity,
             ]);
+        }
+
+        // Mark each selected accessory as sold (unless order was cancelled)
+        if (! $order->status->equals(OrderStatus::CANCELLED())) {
+            foreach ($selectedAccessories as $accessory) {
+                $accessory->update([
+                    'is_sold' => true,
+                ]);
+
+                // Mise à jour du stock sans passer productCategory
+                $this->updateAccessoryStockCount($accessory);
+            }
+        }
+
+        // Update pivot table stock counts based on order status
+        if ($order->status->equals(OrderStatus::CANCELLED())) {
+            Log::info("Order {$order->order_number} was cancelled - not updating accessory stock");
         }
     }
 
@@ -1125,5 +1152,44 @@ class OrderSeeder extends Seeder
         }
 
         return $result;
+    }
+
+    /**
+     * Update accessory stock count in the pivot table
+     */
+    private function updateAccessoryStockCount(Accessory $accessory): void
+    {
+        $productCategory = ProductCategory::where('product_type', ProductType::ACCESSORY())
+            ->where('product_type_id', $accessory->accessory_type_id)
+            ->first();
+
+        if (! $productCategory) {
+            Log::warning("Product category not found for accessory #{$accessory->id} with type ID {$accessory->accessory_type_id}");
+
+            return;
+        }
+
+        // Get current pivot data
+        $pivotData = DB::table('product_category_distribution_center')
+            ->where('distribution_center_id', $accessory->distribution_center_id)
+            ->where('product_category_id', $productCategory->id)
+            ->first();
+
+        if (! $pivotData) {
+            Log::warning("Pivot data not found for accessory #{$accessory->id} in center {$accessory->distribution_center_id}");
+
+            return;
+        }
+
+        // Decrement stock count by 1
+        $newStock = max(0, $pivotData->stock - 1);
+
+        DB::table('product_category_distribution_center')
+            ->where('distribution_center_id', $accessory->distribution_center_id)
+            ->where('product_category_id', $productCategory->id)
+            ->update([
+                'stock' => $newStock,
+                'updated_at' => now(),
+            ]);
     }
 }
