@@ -199,4 +199,31 @@ class SuppliesDataTable extends BaseDataTable
 
         return $query;
     }
+
+    public function cancelSupply(int $supplyId): void
+    {
+        try {
+            $supply = SupplierDelivery::findOrFail($supplyId);
+            $supply->status = SupplierDeliveryStatus::CANCELLED();
+            $supply->save();
+
+            $this->dispatch('show-notification', [
+                'type' => 'success',
+                'title' => 'Annulée !',
+                'message' => 'Approvisionnement annulé avec succès.',
+                'timer' => 3000,
+            ]);
+
+        }  catch (\Exception $e) {
+            Log::error("Error cancelling supply #{$supplyId}: " . $e->getMessage(), ['exception' => $e]);
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => 'Une erreur est survenue lors de l\'annulation de l\'approvisionement.',
+                'timer' => 3000,
+            ]);
+        }
+    }
+
 }
