@@ -15,17 +15,36 @@
         </li>
         @if ($product->is_active)
             <li>
-                <a class="dropdown-item change-status" href="#"
-                    data-id="{{ $product->id }}"
-                    data-action="deactivate">
+                <a class="dropdown-item change-status" href="#" onclick="confirmActionWithInput({
+                    method: 'toggleAccessoryStatus',
+                    parameters: [{{ $product->id }}],
+                    title: 'Désactiver l\'accessoire',
+                    text: 'Vous êtes sur le point de désactiver cet accessoire. Cette action affectera toutes les fonctionnalités associées.',
+                    confirmWord: 'desactiver',
+                    entityName: 'Centre: {{ str_replace("'", "\\'", $product->name) }}',
+                    icon: 'warning',
+                    confirmText: 'Oui, désactiver',
+                    confirmButtonIcon: 'ti ti-ban',
+                    actionInProgressText: 'Désactivation en cours...'
+                }); return false;">
                     <i class="iconoir-xmark-circle text-warning me-2"></i>
                     Désactiver
                 </a>
             </li>
         @else
             <li>
-                <a class="dropdown-item change-status" href="#"
-                    data-id="{{ $product->id }}" data-action="activate">
+                <a class="dropdown-item change-status" href="#" onclick="confirmActionWithInput({
+                    method: 'toggleAccessoryStatus',
+                    parameters: [{{ $product->id }}],
+                    title: 'Activer l\'accessoire',
+                    text: 'Vous êtes sur le point d\'activer cet accessoire.',
+                    confirmWord: 'activer',
+                    entityName: 'Centre: {{ str_replace("'", "\\'", $product->name) }}',
+                    icon: 'info',
+                    confirmText: 'Oui, activer',
+                    confirmButtonIcon: 'ti ti-check',
+                    actionInProgressText: 'Activation en cours...'
+                }); return false;">
                     <i class="iconoir-check-circle text-success me-2"></i>
                     Activer
                 </a>

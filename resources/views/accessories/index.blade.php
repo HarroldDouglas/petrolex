@@ -80,6 +80,7 @@
             </div>
         </div>
     </div>
+    <x-sweet-alert-notification-listener />
 
 @section('script')
     <!-- slick-file -->
@@ -88,5 +89,6 @@
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
 @endsection
 @endsection
