@@ -33,8 +33,8 @@
 
             <div class="col-6 p-0">
                 <div class="d-flex justify-content-end text-primary-dark">
-                    <a type="button" class="btn btn-success btn-md mb-2" href="{{ route('distribution-centers.list') }}">
-                        <i class="ti ti-arrow-left"></i> Retourner à la liste des centres de distribution
+                    <a type="button" class="btn btn-primary btn-md mb-2" href="{{ route('distribution-centers.list') }}">
+                        <i class="ti ti-arrow-back"></i> Retourner à la liste des centres de distribution
                     </a>
                 </div>
             </div>

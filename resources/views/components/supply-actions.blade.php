@@ -28,6 +28,19 @@
                     <i class="ti ti-trash text-danger me-2"></i> Supprimer
                 </a>
             </li>
+            <li>
+                <a class="dropdown-item mark-cancelled" href="#" onclick="confirmAction({
+                        method: 'cancelSupply',
+                        parameters: [{{ $supply->id }}],
+                        title: 'Confirmer l\'annulation',
+                        text: 'Voulez-vous vraiment annuler cette livraison fournisseur (Référence: {{ $supply->delivery_number }}) ?',
+                        icon: 'warning',
+                        confirmText: 'Oui, Annuler la Livraison',
+                        cancelText: 'Annuler',
+                    }); return false;">
+                    <i class="ti ti-ban text-warning me-2"></i> Annuler
+                </a>
+            </li>
         </ul>
     @else
         <button class="btn btn-light-secondary icon-btn w-30 h-30 me-0" disabled

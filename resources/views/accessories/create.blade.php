@@ -21,7 +21,7 @@
             </div>
             <div class="col-4 p-0">
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('accessories.index') }}" class="btn btn-success">
+                    <a href="{{ route('accessories.index') }}" class="btn btn-primary">
                         <i class="ti ti-arrow-back"></i> Retourner à la liste
                     </a>
                 </div>
