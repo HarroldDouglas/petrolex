@@ -68,7 +68,13 @@ class Bottle extends Model
      */
     public function getBottleTypeAttribute(): ?BottleType
     {
-        return $this->product?->productCategory?->productType;
+        $productType = $this->product?->productCategory?->productType;
+
+        if ($productType instanceof BottleType) {
+            return $productType;
+        }
+
+        return null;
     }
 
     public function getBottleTypeIdAttribute(): ?int

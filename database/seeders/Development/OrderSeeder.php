@@ -627,7 +627,6 @@ class OrderSeeder extends Seeder
         // Get accessories available in the distribution center that aren't sold yet
         $accessories = Accessory::where('distribution_center_id', $order->distribution_center_id)
             ->where('is_sold', false)
-            ->with(['accessoryType'])
             ->get();
 
         if ($accessories->isEmpty()) {
@@ -635,7 +634,10 @@ class OrderSeeder extends Seeder
         }
 
         // Group accessories by type and select random types
-        $accessoriesByType = $accessories->groupBy('accessory_type_id');
+        $accessoriesByType = $accessories->groupBy(function ($accessory) {
+            return $accessory->accessoryTypeId;
+        });
+
         $selectedTypes = $accessoriesByType->random(min(rand(1, 2), $accessoriesByType->count()));
 
         foreach ($selectedTypes as $accessoriesOfSameType) {
@@ -755,16 +757,24 @@ class OrderSeeder extends Seeder
     {
         // Find the product category for this accessory type
         $productCategory = ProductCategory::where('product_type', ProductType::ACCESSORY())
-            ->where('product_type_id', $accessory->accessory_type_id)
+            ->where('product_type_id', $accessory->accessoryTypeId)
             ->first();
 
         if (! $productCategory) {
-            Log::warning("Product category not found for accessory type ID: {$accessory->accessory_type_id}");
+            Log::warning("Product category not found for accessory type ID: {$accessory->accessoryTypeId}");
 
             return;
         }
 
         $quantity = count($selectedAccessories);
+
+        // Get the price from the accessory type
+        $accessoryType = $accessory->accessoryType;
+        if (! $accessoryType) {
+            Log::warning("Accessory type not found for accessory #{$accessory->id}");
+
+            return;
+        }
 
         // Create or update order item
         $existingItem = $order->items()
@@ -774,7 +784,7 @@ class OrderSeeder extends Seeder
         if ($existingItem) {
             // If item already exists, increase quantity and price
             $newQuantity = $existingItem->quantity + $quantity;
-            $newPrice = $accessory->accessoryType->price * $newQuantity;
+            $newPrice = $accessoryType->price * $newQuantity;
 
             $existingItem->update([
                 'quantity' => $newQuantity,
@@ -789,8 +799,8 @@ class OrderSeeder extends Seeder
                 'product_category_id' => $productCategory->id,
                 'quantity' => $quantity,
                 'bottle_type' => null,
-                'unit_price' => $accessory->accessoryType->price,
-                'total_price' => $accessory->accessoryType->price * $quantity,
+                'unit_price' => $accessoryType->price,
+                'total_price' => $accessoryType->price * $quantity,
             ]);
         }
 
@@ -1160,11 +1170,11 @@ class OrderSeeder extends Seeder
     private function updateAccessoryStockCount(Accessory $accessory): void
     {
         $productCategory = ProductCategory::where('product_type', ProductType::ACCESSORY())
-            ->where('product_type_id', $accessory->accessory_type_id)
+            ->where('product_type_id', $accessory->accessoryTypeId)
             ->first();
 
         if (! $productCategory) {
-            Log::warning("Product category not found for accessory #{$accessory->id} with type ID {$accessory->accessory_type_id}");
+            Log::warning("Product category not found for accessory #{$accessory->id} with type ID {$accessory->accessoryTypeId}");
 
             return;
         }

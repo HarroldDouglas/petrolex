@@ -77,7 +77,7 @@ class ProductsList extends Component
     private function formatAccessoryProduct(SupplierDeliveryProductType $product, array $baseProduct): array
     {
         return array_merge($baseProduct, [
-            'accessory_type_id' => $product->accessory_type_id,
+            'product_type_id' => $product->product_type_id,
             'accessory_type_name' => $product->accessoryType?->name ?? 'Unknown type',
         ]);
     }

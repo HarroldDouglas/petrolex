@@ -12,13 +12,14 @@ use Illuminate\Support\Str;
 /**
  * @property int $id
  * @property int $product_id
- * @property int $accessory_type_id
  * @property int $distribution_center_id
  * @property string|null $sku
  * @property bool $is_sold
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property Product $product
+ * @property AccessoryType $accessoryType
  */
 class Accessory extends Model
 {
@@ -32,7 +33,6 @@ class Accessory extends Model
      */
     protected $fillable = [
         'product_id',
-        'accessory_type_id',
         'distribution_center_id',
         'sku',
         'is_sold',
@@ -88,9 +88,23 @@ class Accessory extends Model
     /**
      * Get the accessory type of the accessory.
      */
-    public function accessoryType(): BelongsTo
+    public function getAccessoryTypeAttribute(): ?AccessoryType
     {
-        return $this->belongsTo(AccessoryType::class);
+        $productType = $this->product?->productCategory?->productType;
+
+        if ($productType instanceof AccessoryType) {
+            return $productType;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the accessory type ID of the accessory.
+     */
+    public function getAccessoryTypeIdAttribute(): ?int
+    {
+        return $this->accessoryType?->id;
     }
 
     /**
@@ -99,5 +113,16 @@ class Accessory extends Model
     public function distributionCenter(): BelongsTo
     {
         return $this->belongsTo(DistributionCenter::class);
+    }
+
+    /**
+     * Scope a query to only include accessories of a specific accessory type.
+     */
+    public function scopeOfAccessoryType($query, int $accessoryTypeId)
+    {
+        return $query->whereHas('product.productCategory', function ($query) use ($accessoryTypeId) {
+            $query->where('product_type_id', $accessoryTypeId)
+                ->where('product_type', 'accessory');
+        });
     }
 }

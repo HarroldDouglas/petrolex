@@ -10,7 +10,6 @@ use App\Models\DistributionCenter;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class ProductFactory extends Factory
@@ -64,47 +63,6 @@ class ProductFactory extends Factory
         ];
     }
 
-    /**
-     * Détermine le modèle de type approprié (bouteille ou accessoire)
-     *
-     * @param  Product  $product  Produit créé
-     * @param  ProductType  $productType  Type de produit (BOTTLE ou ACCESSORY)
-     * @param  int|null  $typeId  ID du type spécifique (si fourni)
-     * @param  string  $typeModelClass  Classe du modèle de type
-     * @param  string  $idField  Nom du champ ID dans la catégorie de produit
-     * @return Model Instance du modèle de type
-     */
-    protected function resolveProductTypeModel(
-        Product $product,
-        ProductType $productType,
-        ?int $typeId,
-        string $typeModelClass,
-        string $idField = 'product_type_id'
-    ): Model {
-        // Si l'ID du type est fourni, utilisons-le
-        if ($typeId) {
-            $typeModel = $typeModelClass::find($typeId);
-            if ($typeModel) {
-                return $typeModel;
-            }
-        }
-
-        if ($product->productCategory && $product->productCategory->product_type === $productType) {
-            $typeModel = $typeModelClass::find($product->productCategory->$idField);
-            if ($typeModel) {
-                return $typeModel;
-            }
-        }
-
-        $typeModel = $typeModelClass::inRandomOrder()->first();
-
-        if (! $typeModel) {
-            throw new \RuntimeException("Aucun modèle de type {$typeModelClass} trouvé. Assurez-vous que des types existent.");
-        }
-
-        return $typeModel;
-    }
-
     public function bottle(
         ?int $productCategoryId = null,
         ?int $bottleTypeId = null,
@@ -146,19 +104,12 @@ class ProductFactory extends Factory
                 $accessoryTypeId,
                 AccessoryType::class
             );
-        })->afterCreating(function (Product $product) use ($accessoryTypeId, $distributionCenterId, $accessoryAttributes) {
-            $accessoryType = $this->resolveProductTypeModel(
-                $product,
-                ProductType::ACCESSORY(),
-                $accessoryTypeId,
-                AccessoryType::class
-            );
+        })->afterCreating(function (Product $product) use ($distributionCenterId, $accessoryAttributes) {
 
             $distributionCenter = $distributionCenterId ?: DistributionCenter::inRandomOrder()->first()->id;
 
             $defaultAttributes = [
                 'product_id' => $product->id,
-                'accessory_type_id' => $accessoryType->id,
                 'distribution_center_id' => $distributionCenter,
             ];
 
