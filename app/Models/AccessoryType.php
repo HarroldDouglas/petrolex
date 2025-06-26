@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * @property int $id
@@ -24,9 +23,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class AccessoryType extends Model implements HasMedia
 {
     use HasFactory;
-    use HasMediaCollections;
-    use InteractsWithMedia;
     use SoftDeletes;
+    use HasMediaCollections;
 
     /**
      * The attributes that are mass assignable.
