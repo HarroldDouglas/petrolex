@@ -72,6 +72,7 @@ class UserService extends BaseServiceWithMedia
      */
     public function update(Model $user, array $attributes): Model
     {
+        
         /** @var User $user */
         if (! $user instanceof User) {
             throw new \InvalidArgumentException('Expected User model');
@@ -85,10 +86,16 @@ class UserService extends BaseServiceWithMedia
         DB::beginTransaction();
 
         try {
-            /** @var User */
-            $result = $this->userRepository->update($user, $attributes);
 
-            if ($result) {
+            if ($attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
+                /** @var User $user */
+                $user = parent::updateWithMedia($user, $attributes);
+            } else {
+                /** @var User $user */
+                $user = parent::update($user, $attributes);
+            }
+
+            if ($user) {
                 $user->refresh();
                 $currentValues = $user->only(array_keys($attributes));
                 $changes = array_diff_assoc($currentValues, $originalValues);
@@ -100,7 +107,7 @@ class UserService extends BaseServiceWithMedia
 
             DB::commit();
 
-            return $result;
+            return $user;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

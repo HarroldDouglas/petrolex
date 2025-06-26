@@ -3,6 +3,7 @@
 namespace App\Livewire\User;
 
 use App\Enums\UserRole;
+use App\Models\User;
 use App\Services\DistributionCenter\DistributionCenterService;
 use App\Services\Shared\Media\MediaServiceInterface;
 use App\Services\User\UserService;
@@ -44,7 +45,7 @@ abstract class AbstractUserForm extends Component
         $this->distribution_center_ids = $data['selectedOptions'] ?? [];
     }
 
-    public function mount(): void
+     public function initialize()
     {
         $this->allowedRoles = UserRole::toArray();
 

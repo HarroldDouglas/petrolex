@@ -11,6 +11,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CreateUserForm extends AbstractUserForm
 {
+    public function mount(){
+        parent::initialize();
+    }
     protected function customRequest(): FormRequest
     {
         return new StoreUserRequest;

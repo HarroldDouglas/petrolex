@@ -13,9 +13,9 @@ abstract class BaseUserRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email', 'max:255'],
+            'email' => $this->emailRules(),
             'phone_number' => ['required', 'string', 'max:20'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => $this->passwordRules(),
             'role' => ['required', Rule::in(UserRole::values())],
             'image' => ['nullable', 'image', 'max:2048'],
             'distribution_center_ids' => ['nullable', 'array'],
@@ -34,6 +34,21 @@ abstract class BaseUserRequest extends FormRequest
         ];
     }
 
+    protected function emailRules(): array
+    {
+        return [
+            'required',
+            'email',
+            'max:255',
+            Rule::unique('users', 'email'),
+        ];
+    }
+
+    protected function passwordRules(): array
+    {
+        return ['required', 'string', 'min:8'];
+    }
+
     public function messages(): array
     {
         return [
@@ -50,6 +65,7 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number.required' => 'Le téléphone est obligatoire.',
             'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
             'phone_number.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'password.required' => 'Le mot de passe est obligatoire.',
             'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'role.enum' => 'Le rôle sélectionné n\'est pas valide.',

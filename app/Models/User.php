@@ -177,4 +177,17 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->fullame ?? 'User #'.$this->id;
     }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $collections = $this->getImageCollections();
+
+        if (empty($collections)) {
+            return;
+        }
+
+        $this->registerConversionForCollections('thumb', 150, 150, $collections);
+        $this->registerConversionForCollections('medium', 500, 500, $collections);
+        $this->registerConversionForCollections('large', 1200, 1200, $collections);
+    }
 }
