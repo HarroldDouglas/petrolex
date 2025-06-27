@@ -3,7 +3,6 @@
 namespace App\Livewire\User;
 
 use App\Enums\UserRole;
-use App\Models\User;
 use App\Services\DistributionCenter\DistributionCenterService;
 use App\Services\Shared\Media\MediaServiceInterface;
 use App\Services\User\UserService;
@@ -26,6 +25,8 @@ abstract class AbstractUserForm extends Component
 
     /** @var UploadedFile|null */
     public $image = null;
+
+    public ?string $existingImage = null;
     public $distribution_center_ids = [];
     public bool $showDistributionCenters = false;
     public bool $showPassword = false;
@@ -45,7 +46,7 @@ abstract class AbstractUserForm extends Component
         $this->distribution_center_ids = $data['selectedOptions'] ?? [];
     }
 
-     public function initialize()
+    public function initialize()
     {
         $this->allowedRoles = UserRole::toArray();
 
@@ -75,11 +76,13 @@ abstract class AbstractUserForm extends Component
 
     public function getImagePreviewStyleProperty(): string
     {
-        if ($this->image) {
-            if (is_string($this->image)) {
-                $url = asset('storage/'.$this->image);
-            } elseif ($this->image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                $url = $this->image->temporaryUrl();
+        $image = $this->image ?? $this->existingImage;
+
+        if ($image) {
+            if (is_string(value: $image)) {
+                $url = $image;
+            } elseif ($image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                $url = $image->temporaryUrl();
             } else {
                 return '';
             }

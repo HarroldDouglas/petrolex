@@ -10,8 +10,7 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editUserModal"
-                data-user-id="{{ $user->id }}">
+            <a class="dropdown-item" href="{{ route('users.edit', $user->id) }}">
                 <i class="ti ti-edit text-success me-2"></i> Editer
             </a>
         </li>

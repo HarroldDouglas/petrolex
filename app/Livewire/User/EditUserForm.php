@@ -8,12 +8,12 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 
 class EditUserForm extends AbstractUserForm
 {
     public $user;
     public $id;
-    public $existingImages = [];
 
     protected function customRequest(): FormRequest
     {
@@ -30,21 +30,25 @@ class EditUserForm extends AbstractUserForm
         $this->last_name = $user->last_name;
         $this->email = $user->email;
         $this->phone_number = $user->phone_number;
-        $this->role = $user->roles->first()?->name;;
-        $this->image = $user->getMedia('images')->first()?->getUrl() ?? null;
+        /** @var \Spatie\Permission\Models\Role|null $role */
+        $role = $user->roles->first();
+        $this->role = $role?->name;
+        $this->existingImage = $user->getMedia('images')->first()?->getUrl() ?? null;
         $this->distribution_center_ids = $user->activeDistributionCenters->pluck('id')?->toArray();
 
         $this->is_active = $user->is_active;
-
-        $this->existingImages = $this->mediaService->getAllImagesForModel($user) ?? [];
+        $this->toggleDistributionCenters();
     }
 
     public function save()
     {
-       
+
         $validatedData = $this->validate();
         $this->validateDistributionCenters();
- 
+        //$validatedData['image'] = $validatedData['image'] instanceof UploadedFile
+          //  ? $validatedData['image'] : null;
+        $validatedData['distribution_center_ids'] = $this->showDistributionCenters
+            ? $validatedData['distribution_center_ids'] : [];
         try {
 
             $dto = new UpdateUserDTO(
@@ -57,7 +61,7 @@ class EditUserForm extends AbstractUserForm
                 address: $validatedData['address'] ?? null,
                 is_active: $validatedData['is_active'] ?? true,
                 role: UserRole::from($validatedData['role']),
-                distribution_center_ids: $validatedData['distribution_center_ids'] ?? [],
+                distribution_center_ids: $validatedData['distribution_center_ids'],
                 image: $validatedData['image']
             );
 

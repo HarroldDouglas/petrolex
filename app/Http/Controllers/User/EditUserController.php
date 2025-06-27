@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class EditUserController extends Controller
 {
-     public function __construct(
+    public function __construct(
         private readonly UserService $userService
     ) {}
 
@@ -19,12 +19,12 @@ class EditUserController extends Controller
     {
         $this->authorize('users.edit');
         $user = $this->userService->find($userId);
-        if(!$user) {
+        if (! $user) {
             abort(404, "Cet utilisateur n'existe pas.");
         }
 
         return view('users.edit', [
             'user' => $user,
-        ]   );
+        ]);
     }
 }

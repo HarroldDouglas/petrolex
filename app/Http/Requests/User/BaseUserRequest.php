@@ -17,7 +17,19 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number' => ['required', 'string', 'max:20'],
             'password' => $this->passwordRules(),
             'role' => ['required', Rule::in(UserRole::values())],
-            'image' => ['nullable', 'image', 'max:2048'],
+            'image' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if (is_string($value)) {
+                        return;
+                    }
+
+                    if (! is_a($value, \Illuminate\Http\UploadedFile::class)) {
+                        $fail('L\'image doit être un fichier image valide.');
+                    }
+                },
+                'max:2048',
+            ],
             'distribution_center_ids' => ['nullable', 'array'],
             'distribution_center_ids.*' => [
                 Rule::requiredIf(function () {

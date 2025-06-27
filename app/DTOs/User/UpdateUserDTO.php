@@ -26,7 +26,7 @@ class UpdateUserDTO extends BaseDTO
         public readonly ?UploadedFile $image = null,
     ) {}
 
-     public function toArray(): array
+    public function toArray(): array
     {
         return [
             'id' => $this->id,

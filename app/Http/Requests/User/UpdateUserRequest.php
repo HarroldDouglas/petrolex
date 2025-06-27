@@ -6,7 +6,6 @@ use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends BaseUserRequest
 {
-
     /**
      * Constructor
      */

@@ -72,7 +72,7 @@ class UserService extends BaseServiceWithMedia
      */
     public function update(Model $user, array $attributes): Model
     {
-        
+
         /** @var User $user */
         if (! $user instanceof User) {
             throw new \InvalidArgumentException('Expected User model');
@@ -101,7 +101,12 @@ class UserService extends BaseServiceWithMedia
                 $changes = array_diff_assoc($currentValues, $originalValues);
 
                 if (! empty($changes)) {
-                    UserUpdatedEvent::dispatch($user, $changes);
+                    UserUpdatedEvent::dispatch(
+                        $user,
+                        $attributes['role'],
+                        $attributes['distribution_center_ids'],
+                        $changes
+                    );
                 }
             }
 

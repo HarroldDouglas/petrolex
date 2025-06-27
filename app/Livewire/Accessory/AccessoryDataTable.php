@@ -218,6 +218,7 @@ class AccessoryDataTable extends BaseDataTable
                     'message' => "L'accessoire sélectionné n'existe pas.",
                     'timer' => 3000,
                 ]);
+
                 return;
             }
 

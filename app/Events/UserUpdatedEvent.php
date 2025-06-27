@@ -16,6 +16,9 @@ class UserUpdatedEvent
      */
     public function __construct(
         public User $user,
+        public string $role,
+        /** @var int[] */
+        public array $distribution_center_ids,
         public array $changes
     ) {}
 }

@@ -214,8 +214,8 @@ class SuppliesDataTable extends BaseDataTable
                 'timer' => 3000,
             ]);
 
-        }  catch (\Exception $e) {
-            Log::error("Error cancelling supply #{$supplyId}: " . $e->getMessage(), ['exception' => $e]);
+        } catch (\Exception $e) {
+            Log::error("Error cancelling supply #{$supplyId}: ".$e->getMessage(), ['exception' => $e]);
 
             $this->dispatch('show-notification', [
                 'type' => 'error',
@@ -225,5 +225,4 @@ class SuppliesDataTable extends BaseDataTable
             ]);
         }
     }
-
 }

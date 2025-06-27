@@ -1,15 +1,6 @@
 <div>
     <form wire:submit.prevent="save" class="app-form">
         <div class="row">
-        @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul class="list-disc list-inside text-sm text-red-600">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
             <div class="col-lg-3">
                 <div class="card order-details-card">
                     <div class="card-body">
