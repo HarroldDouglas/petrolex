@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Enums\ProductType;
 use App\Traits\HasMediaCollections;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Spatie\MediaLibrary\HasMedia;
@@ -20,6 +22,15 @@ use Spatie\MediaLibrary\HasMedia;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Accessory> $accessories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $productCategories
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class AccessoryType extends Model implements HasMedia
 {
@@ -51,17 +62,29 @@ class AccessoryType extends Model implements HasMedia
     /**
      * Get the products that use this accessory type.
      */
-    public function products(): HasMany
+    public function products(): HasManyThrough
     {
-        return $this->hasMany(Product::class);
+        return $this->hasManyThrough(
+            Product::class,
+            ProductCategory::class,
+            'product_type_id',
+            'product_category_id'
+        )->where('product_categories.product_type', ProductType::ACCESSORY());
     }
 
     /**
-     * Get the accessories of this type.
+     * Get all accessories for this accessory type.
+     *
+     * @return Collection<int, Accessory>
      */
-    public function accessories(): HasMany
+    public function accessories(): Collection
     {
-        return $this->hasMany(Accessory::class);
+        return $this->products()
+            ->whereHas('accessory')
+            ->with('accessory')
+            ->get()
+            ->map(fn (Product $product) => $product->accessory)
+            ->filter();
     }
 
     /**
@@ -83,7 +106,7 @@ class AccessoryType extends Model implements HasMedia
     {
         return $this->productCategories()
             ->join('product_category_distribution_center as pcdc', 'product_categories.id', '=', 'pcdc.product_category_id')
-            ->when($distributionCenterIds, function ($query) use ($distributionCenterIds) {
+            ->when($distributionCenterIds, function (\Illuminate\Database\Eloquent\Builder $query) use ($distributionCenterIds): void {
                 $query->whereIn('pcdc.distribution_center_id', $distributionCenterIds);
             })
             ->sum('pcdc.stock');

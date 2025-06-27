@@ -21,6 +21,13 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read Order $order
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class Refund extends Model
 {

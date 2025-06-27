@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryBottleMovementType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,12 +23,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * // Relations
  * @property-read \App\Models\ProductCategory $productCategory
  * @property-read \App\Models\SupplierDelivery $supplierDelivery
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $deliveryBottles
- * @property-read int|null $incoming_scanned_count
- * @property-read int|null $outgoing_scanned_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $incomingBottles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $outgoingBottles
+ *
+ * // Accessors
+ * @property-read int $incoming_scanned_count
+ * @property-read int $outgoing_scanned_count
  * @property-read bool $incoming_done
+ * @property-read bool $outgoing_done
+ *
+ * // Query Scopes
+ *
+ * @method static Builder bottles()
+ * @method static Builder accessories()
  */
 class SupplierDeliveryProductType extends Model
 {
@@ -132,9 +145,9 @@ class SupplierDeliveryProductType extends Model
     /**
      * Scope a query to only include bottle product types.
      */
-    public function scopeBottles($query)
+    public function scopeBottles(Builder $query): Builder
     {
-        return $query->whereHas('productCategory', function ($q) {
+        return $query->whereHas('productCategory', function (Builder $q): void {
             $q->where('product_type', ProductType::BOTTLE());
         });
     }
@@ -142,9 +155,9 @@ class SupplierDeliveryProductType extends Model
     /**
      * Scope a query to only include accessory product types.
      */
-    public function scopeAccessories($query)
+    public function scopeAccessories(Builder $query): Builder
     {
-        return $query->whereHas('productCategory', function ($q) {
+        return $query->whereHas('productCategory', function (Builder $q): void {
             $q->where('product_type', ProductType::ACCESSORY());
         });
     }

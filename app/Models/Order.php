@@ -7,9 +7,11 @@ use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\ProductType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,6 +31,23 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read Customer $customer
+ * @property-read CustomerDeliveryAddress $deliveryAddress
+ * @property-read DeliveryPerson $deliveryPerson
+ * @property-read DistributionCenter $distributionCenter
+ * @property-read OrderPayment $payment
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $items
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
+ * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Product, \Illuminate\Database\Eloquent\Relations\Pivot> $products
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Refund> $refunds
+ *
+ * // Accessors
+ * @property-read \App\Enums\PaymentStatus|null $payment_status
+ * @property-read \App\Enums\PaymentMethod|null $payment_method
+ *
+ * // Query Scopes
  */
 class Order extends Model
 {
@@ -142,7 +161,7 @@ class Order extends Model
     /**
      * Get all products associated with this order through order items.
      */
-    public function products()
+    public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'order_items')
             ->withPivot(['quantity', 'unit_price', 'total_price'])
@@ -154,7 +173,7 @@ class Order extends Model
      *
      * @return $this
      */
-    public function assignToDeliveryPerson(int $deliveryPersonId)
+    public function assignToDeliveryPerson(int $deliveryPersonId): self
     {
         $this->update([
             'delivery_person_id' => $deliveryPersonId,
@@ -196,10 +215,8 @@ class Order extends Model
 
     /**
      * Get payment status through the payment relation
-     *
-     * @return mixed
      */
-    public function getPaymentStatusAttribute()
+    public function getPaymentStatusAttribute(): ?\App\Enums\PaymentStatus
     {
         /** @var \App\Models\OrderPayment|null $payment */
         $payment = $this->payment;
@@ -209,10 +226,8 @@ class Order extends Model
 
     /**
      * Get payment method through the payment relation
-     *
-     * @return mixed
      */
-    public function getPaymentMethodAttribute()
+    public function getPaymentMethodAttribute(): ?\App\Enums\PaymentMethod
     {
         /** @var \App\Models\OrderPayment|null $payment */
         $payment = $this->payment;
@@ -252,7 +267,7 @@ class Order extends Model
     public function hasBottleItems(): bool
     {
         return $this->items()
-            ->whereHas('productCategory', function ($query) {
+            ->whereHas('productCategory', function (Builder $query): void {
                 $query->where('product_type', ProductType::BOTTLE());
             })
             ->exists();
@@ -276,7 +291,7 @@ class Order extends Model
         }
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
-        $bottleItems = $this->items()->whereHas('productCategory', function ($query) {
+        $bottleItems = $this->items()->whereHas('productCategory', function (Builder $query): void {
             $query->where('product_type', ProductType::BOTTLE());
         })->get();
 

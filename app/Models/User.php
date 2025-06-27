@@ -29,6 +29,20 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read Customer|null $customer
+ * @property-read DeliveryPerson|null $deliveryPerson
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, UserDistributionCenter> $distributionCenters
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, DistributionCenter> $accessibleDistributionCenters
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, DistributionCenter> $activeDistributionCenters
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, SupplierDelivery> $supplierDeliveries
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
+ *
+ * // Accessors
+ * @property-read string $full_name
+ *
+ * // Query Scopes
  */
 class User extends Authenticatable implements HasMedia
 {
@@ -156,7 +170,7 @@ class User extends Authenticatable implements HasMedia
         return $this->deliveryPerson()->exists();
     }
 
-    public function isGlobal()
+    public function isGlobal(): bool
     {
         $totalDistributionCenters = DistributionCenter::count();
 
@@ -175,6 +189,6 @@ class User extends Authenticatable implements HasMedia
 
     public function getImageIdentifier(): string
     {
-        return $this->fullame ?? 'User #'.$this->id;
+        return $this->full_name ?? 'User #'.$this->id;
     }
 }

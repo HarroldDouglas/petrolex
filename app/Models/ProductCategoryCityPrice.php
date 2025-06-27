@@ -14,7 +14,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property float $content_with_bottle_price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * // Relations
  * @property-read ProductCategory $productCategory
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class ProductCategoryCityPrice extends Model
 {
