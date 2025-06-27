@@ -13,7 +13,8 @@
             <div class="col-8 p-0">
                 <h4 class="main-title">Ajouter un approvisionnement</h4>
                 <ul class="app-line-breadcrumbs mb-3">
-                    <li><a href="{{ route('supplies.list') }}" class="f-s-14 f-w-500"><i class="ph-duotone ph-stack f-s-16"></i> Approvisionnements</a></li>
+                    <li><a href="{{ route('supplies.list') }}" class="f-s-14 f-w-500"><i
+                                class="ph-duotone ph-stack f-s-16"></i> Approvisionnements</a></li>
                     <li class="active"><a href="#" class="f-s-14 f-w-500">Nouveau</a></li>
                 </ul>
             </div>

@@ -7,13 +7,14 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuBottleType{{ $bottleType->id }}">
         <li>
-            <a class="dropdown-item" href="{{route('bottles.types.edit', $bottleType->id)}}">
+            <a class="dropdown-item" href="{{ route('bottles.types.edit', $bottleType->id) }}">
                 <i class="ti ti-edit text-primary me-2"></i> Modifier
             </a>
         </li>
         <li>
             @if ($bottleType->is_active)
-                <a class="dropdown-item" href="#" onclick="confirmActionWithInput({
+                <a class="dropdown-item" href="#"
+                    onclick="confirmActionWithInput({
                     method: 'toggleBottleTypeStatus',
                     parameters: [{{ $bottleType->id }}, false],
                     title: 'Désactiver le type de bouteille',
@@ -29,7 +30,8 @@
                     <i class="ti ti-ban text-warning me-2"></i> Désactiver
                 </a>
             @else
-                <a class="dropdown-item" href="#" onclick="confirmAction({
+                <a class="dropdown-item" href="#"
+                    onclick="confirmAction({
                     method: 'toggleBottleTypeStatus',
                     parameters: [{{ $bottleType->id }}, true],
                     title: 'Activer le type de bouteille',
@@ -42,7 +44,8 @@
             @endif
         </li>
         <li>
-            <a class="dropdown-item" href="#" onclick="confirmActionWithInput({
+            <a class="dropdown-item" href="#"
+                onclick="confirmActionWithInput({
                 method: 'deleteBottleType',
                 parameters: [{{ $bottleType->id }}],
                 title: 'Supprimer le type de bouteille',

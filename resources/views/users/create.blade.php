@@ -46,13 +46,13 @@
         <!-- Add User start -->
         @livewire('user.create-user-form')
         <!-- Add User end -->
-        
-@endsection
 
-@section('script')
-    <!--customizer-->
-    <div id="customizer"></div>
+    @endsection
 
-    <!-- select2 -->
-    <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
-@endsection
+    @section('script')
+        <!--customizer-->
+        <div id="customizer"></div>
+
+        <!-- select2 -->
+        <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
+    @endsection

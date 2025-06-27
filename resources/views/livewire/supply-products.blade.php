@@ -36,7 +36,8 @@
                             <option value="">Sélectionner un type</option>
                             @foreach ($bottleTypes as $type)
                                 @if (!in_array($type['id'], $usedBottleTypes ?? []) || ($isEditing && $selectedBottleType == $type['id']))
-                                    <option value="{{ $type['id'] }}" {{ $selectedBottleType == $type['id'] ? 'selected' : '' }}>
+                                    <option value="{{ $type['id'] }}"
+                                        {{ $selectedBottleType == $type['id'] ? 'selected' : '' }}>
                                         {{ $type['name'] }}
                                     </option>
                                 @endif

@@ -16,11 +16,12 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" onclick="confirmAction({
+            <a class="dropdown-item" href="#"
+                onclick="confirmAction({
                 method: 'toggleUserStatus',
                 parameters: [{{ $user->id }}],
                 title: 'Changer le statut',
-                text: 'Voulez-vous vraiment {{ $user->is_active ? 'désactiver' : 'activer' }} l\'utilisateur {{$user->full_name}} ?',
+                text: 'Voulez-vous vraiment {{ $user->is_active ? 'désactiver' : 'activer' }} l\'utilisateur {{ $user->full_name }} ?',
                 icon: 'question',
                 confirmText: '{{ $user->is_active ? 'Oui, désactiver' : 'Oui, activer' }}'
             }); return false;">
@@ -32,7 +33,8 @@
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" onclick="confirmActionWithInput({
+            <a class="dropdown-item" href="#"
+                onclick="confirmActionWithInput({
                 method: 'deleteUser',
                 parameters: [{{ $user->id }}],
                 title: 'Supprimer l\'utilisateur',
