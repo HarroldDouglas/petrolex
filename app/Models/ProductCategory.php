@@ -19,7 +19,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $deleted_at
  *
  * // Relations
- * @property-read BottleType|AccessoryType $productType
+ * @property-read BottleType|AccessoryType $productTypeInstance
  * @property-read Collection<int, Product> $products
  * @property-read Collection<int, OrderItem> $orderItems
  * @property-read Collection<int, ProductCategoryDistributionCenter> $distributionCenters
@@ -51,7 +51,7 @@ class ProductCategory extends Model
     /**
      * Polymorphic relation to BottleType or AccessoryType
      */
-    public function getProductTypeAttribute()
+    public function getProductTypeInstanceAttribute()
     {
         return match ($this->attributes['product_type']) {
             ProductType::BOTTLE()->value => BottleType::find($this->product_type_id),
@@ -89,7 +89,7 @@ class ProductCategory extends Model
      */
     public function getNameAttribute(): string
     {
-        return $this->productType?->name ?? 'Unknown Product';
+        return $this->productTypeInstance?->name ?? 'Unknown Product';
     }
 
     /**
@@ -97,7 +97,7 @@ class ProductCategory extends Model
      */
     public function getIsActiveAttribute(): bool
     {
-        return $this->productType?->is_active ?? false;
+        return $this->productTypeInstance?->is_active ?? false;
     }
 
     /**
@@ -113,7 +113,7 @@ class ProductCategory extends Model
      */
     public function scopeActive($query)
     {
-        return $query->whereHas('productType', function ($q) {
+        return $query->whereHas('productTypeInstance', function ($q) {
             $q->where('is_active', true);
         });
     }

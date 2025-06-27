@@ -19,7 +19,7 @@ class BottleTypeService
         $bottleType = $this->bottleRepository->create($data->toArray());
 
         if ($data->bottleTypeCityPrices) {
-            $bottleType->cityPrices()->createMany(
+            $bottleType->productCategoryCityPrices()->createMany(
                 array_map(fn ($dto) => $dto->toArray(), $data->bottleTypeCityPrices)
             );
         }
@@ -37,9 +37,9 @@ class BottleTypeService
         $bottleType->cityPrices()?->delete();
 
         if (! empty($data->bottleTypeCityPrices)) {
-            $bottleType->cityPrices()->createMany(
-                array_map(fn ($dto) => $dto->toArray(),
-                    $data->bottleTypeCityPrices)
+            $bottleType->productCategoryCityPrices()->delete();
+            $bottleType->productCategoryCityPrices()->createMany(
+                array_map(fn ($dto) => $dto->toArray(), $data->bottleTypeCityPrices)
             );
         }
 

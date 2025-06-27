@@ -4,10 +4,10 @@ namespace App\Livewire\Supply\ProductForm;
 
 use App\Enums\ProductType;
 use App\Http\Requests\Supply\RegisterAccessoryRequest;
-use App\Models\AccessoryType;
+use App\Models\ProductCategory;
 use App\Models\SupplierDelivery;
 use App\Models\SupplierDeliveryProductType;
-use App\Repositories\Contracts\AccessoryRepositoryInterface;
+use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -29,11 +29,20 @@ class AccessoryForm extends Component
         'products-updated' => 'updateUsedTypes',
     ];
 
-    public function boot(AccessoryRepositoryInterface $accessoryRepository)
+    public function boot(ProductCategoryRepositoryInterface $productCategoryRepository)
     {
-        $this->accessoryTypes = $accessoryRepository->getActiveProducts()
-            ->map(function (AccessoryType $type) {
-                return ['id' => $type->id, 'name' => $type->name];
+        // Utilisation de la méthode dédiée du repository
+        $productCategories = $productCategoryRepository->getAllActiveByType(ProductType::ACCESSORY());
+
+        $this->accessoryTypes = $productCategories
+            ->map(function (ProductCategory $category) {
+                // Utilisation de l'accesseur typeInstance
+                $typeInstance = $category->typeInstance;
+
+                return [
+                    'id' => $category->id,
+                    'name' => $typeInstance ? $typeInstance->name : 'Type inconnu',
+                ];
             })
             ->toArray();
     }
@@ -84,8 +93,8 @@ class AccessoryForm extends Component
         $this->editProductId = $productId;
         $this->accessoryQuantity = $productData['expected_quantity'] ?? '';
 
-        if (isset($productData['accessory_type_id'])) {
-            $this->selectedAccessoryType = (string) $productData['accessory_type_id'];
+        if (isset($productData['product_category_id'])) {
+            $this->selectedAccessoryType = (string) $productData['product_category_id'];
         }
 
         $this->showForm = true;
@@ -113,7 +122,7 @@ class AccessoryForm extends Component
             if ($this->isEditing && $this->editProductId) {
                 $product = SupplierDeliveryProductType::findOrFail($this->editProductId);
                 $product->update([
-                    'accessory_type_id' => $validatedData['selectedAccessoryType'],
+                    'product_category_id' => $validatedData['selectedAccessoryType'],
                     'expected_quantity' => $validatedData['accessoryQuantity'],
                 ]);
 
@@ -121,9 +130,7 @@ class AccessoryForm extends Component
             } else {
                 SupplierDeliveryProductType::create([
                     'supplier_delivery_id' => $this->supplierDelivery->id,
-                    'product_type' => ProductType::ACCESSORY()->value,
-                    'bottle_type_id' => null, // TODO: update this table to have product_type_id instead of bottle_type_id & accessory_type_id
-                    'accessory_type_id' => $validatedData['selectedAccessoryType'],
+                    'product_category_id' => $validatedData['selectedAccessoryType'],
                     'expected_quantity' => $validatedData['accessoryQuantity'],
                     'bottles_out_quantity' => 0,
                 ]);
@@ -144,8 +151,8 @@ class AccessoryForm extends Component
     public function updateUsedTypes($products = null)
     {
         $this->usedAccessoryTypes = $this->supplierDelivery->productTypes()
-            ->where('product_type', ProductType::ACCESSORY()->value)
-            ->pluck('accessory_type_id')
+            ->accessories()
+            ->pluck('product_category_id')
             ->toArray();
     }
 

@@ -76,14 +76,6 @@ class BottleType extends Model
     }
 
     /**
-     * Get the supplier delivery product types for this accessory type.
-     */
-    public function supplierDeliveryProductTypes(): HasMany
-    {
-        return $this->hasMany(SupplierDeliveryProductType::class);
-    }
-
-    /**
      * Get the distribution centers that have this bottle type.
      */
     public function distributionCenters(): BelongsToMany
@@ -95,6 +87,6 @@ class BottleType extends Model
 
     public function cityPrices(): HasMany
     {
-        return $this->hasMany(BottleTypeCityPrice::class);
+        return $this->hasMany(ProductCategoryCityPrice::class);
     }
 }

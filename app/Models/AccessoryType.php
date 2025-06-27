@@ -61,14 +61,6 @@ class AccessoryType extends BaseModelWithMedia
     }
 
     /**
-     * Get the supplier delivery product types for this accessory type.
-     */
-    public function supplierDeliveryProductTypes(): HasMany
-    {
-        return $this->hasMany(SupplierDeliveryProductType::class);
-    }
-
-    /**
      * Get the product categories for this accessory type.
      */
     public function productCategories(): HasMany

@@ -94,7 +94,7 @@ class BottleSeeder extends Seeder
             }
 
             $productCategory = $stock->productCategory;
-            $bottleType = $productCategory->productType;
+            $bottleType = $productCategory->productTypeInstance;
             $center = $stock->distributionCenter;
 
             $emptyCount = (int) $stock->stock_empty;
@@ -125,7 +125,7 @@ class BottleSeeder extends Seeder
             return false;
         }
 
-        if (! $stock->productCategory->productType) {
+        if (! $stock->productCategory->productTypeInstance) {
             $this->command->warn("ProductType not found for ProductCategory #{$stock->productCategory->id}. Skipping.");
 
             return false;

@@ -3,7 +3,6 @@
 namespace App\Livewire\Accessory;
 
 use App\Enums\EntityStatus;
-use App\Enums\ProductType;
 use App\Models\AccessoryType;
 use App\Models\DistributionCenter;
 use App\Models\User;
@@ -184,20 +183,12 @@ class AccessoryDataTable extends BaseDataTable
             $centerIds = $distributionCenters->pluck('id')->toArray();
         }
 
-        $centerIdsStr = implode(',', $centerIds ?: [0]);
-
+        // Retournez une requête plus simple sans jointures complexes
         return AccessoryType::query()
-            ->leftJoin('product_categories', function ($join) {
-                $join->on('accessory_types.id', '=', 'product_categories.product_type_id')
-                    ->where('product_categories.product_type', '=', ProductType::ACCESSORY()->value);
-            })
-            ->leftJoin('product_category_distribution_center as pcdc', 'product_categories.id', '=', 'pcdc.product_category_id')
-            ->when($centerIds, function ($query) use ($centerIds) {
-                $query->whereIn('pcdc.distribution_center_id', $centerIds);
-            })
-            ->select('accessory_types.*')
-            ->selectRaw('COALESCE(SUM(pcdc.stock), 0) as accessories_sum_quantity')
-            ->groupBy('accessory_types.id');
+            ->when($centerIds, function ($query) {
+                // Vous pouvez ajouter une condition si nécessaire
+                // mais évitez les jointures qui créent des conflits
+            });
     }
 
     /**

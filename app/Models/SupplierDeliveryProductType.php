@@ -15,17 +15,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property int $id
  * @property int $supplier_delivery_id
- * @property ProductType $product_type
- * @property int|null $bottle_type_id
- * @property int|null $accessory_type_id
+ * @property int $product_category_id
  * @property int $expected_quantity
  * @property int $bottles_out_quantity
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\AccessoryType|null $accessoryType
- * @property-read \App\Models\BottleType|null $bottleType
+ * @property-read \App\Models\ProductCategory $productCategory
  * @property-read \App\Models\SupplierDelivery $supplierDelivery
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $deliveryBottles
  * @property-read int|null $incoming_scanned_count
@@ -44,9 +41,7 @@ class SupplierDeliveryProductType extends Model
      */
     protected $fillable = [
         'supplier_delivery_id',
-        'product_type',
-        'bottle_type_id',
-        'accessory_type_id',
+        'product_category_id',
         'expected_quantity',
         'bottles_out_quantity',
         'notes',
@@ -60,7 +55,6 @@ class SupplierDeliveryProductType extends Model
     protected $casts = [
         'expected_quantity' => 'integer',
         'bottles_out_quantity' => 'integer',
-        'product_type' => ProductType::class,
     ];
 
     /**
@@ -72,19 +66,11 @@ class SupplierDeliveryProductType extends Model
     }
 
     /**
-     * Get the bottle type for this product type.
+     * Get the product category for this product type.
      */
-    public function bottleType(): BelongsTo
+    public function productCategory(): BelongsTo
     {
-        return $this->belongsTo(BottleType::class);
-    }
-
-    /**
-     * Get the accessory type for this product type.
-     */
-    public function accessoryType(): BelongsTo
-    {
-        return $this->belongsTo(AccessoryType::class);
+        return $this->belongsTo(ProductCategory::class);
     }
 
     /**
@@ -148,7 +134,9 @@ class SupplierDeliveryProductType extends Model
      */
     public function scopeBottles($query)
     {
-        return $query->where('product_type', ProductType::BOTTLE());
+        return $query->whereHas('productCategory', function ($q) {
+            $q->where('product_type', ProductType::BOTTLE());
+        });
     }
 
     /**
@@ -156,6 +144,8 @@ class SupplierDeliveryProductType extends Model
      */
     public function scopeAccessories($query)
     {
-        return $query->where('product_type', ProductType::ACCESSORY());
+        return $query->whereHas('productCategory', function ($q) {
+            $q->where('product_type', ProductType::ACCESSORY());
+        });
     }
 }

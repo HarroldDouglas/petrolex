@@ -4,12 +4,10 @@ namespace App\Livewire\Bottle;
 
 use App\Enums\BottleStatus;
 use App\Models\Bottle;
-use App\Models\User;
 use App\Services\Bottle\BottleService;
 use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\MultiSelectFilter;
@@ -38,17 +36,18 @@ class BottleDataTable extends BaseDataTable
             Column::make('Code-barre', 'barcode')
                 ->sortable()
                 ->searchable(),
-
-            Column::make('Type de bouteille', 'bottle_type_id')
-                ->sortable()
+            Column::make('Type de bouteille')
+                ->sortable(function (Builder $query, string $direction) {
+                    return $query->orderBy('product_categories.id', $direction);
+                })
                 ->searchable(function (Builder $query, string $searchTerm) {
-                    return $query->whereHas('bottleType', function (Builder $q) use ($searchTerm) {
-                        $q->where('name', 'like', '%'.$searchTerm.'%');
+                    return $query->whereHas('product.productCategory', function (Builder $q) use ($searchTerm) {
+                        $q->whereHas('productTypeInstance', function (Builder $q2) use ($searchTerm) {
+                            $q2->where('name', 'like', '%'.$searchTerm.'%');
+                        });
                     });
                 })
-                ->format(function ($value, $row) {
-                    return optional($row->bottleType)->name ?? '-';
-                }),
+                ->label(fn ($row, Column $column) => $row->product?->productCategory?->name ?? '-'),
 
             Column::make('Centre de distr.', 'distribution_center_id')
                 ->sortable()
@@ -123,8 +122,10 @@ class BottleDataTable extends BaseDataTable
             TextFilter::make('Type de bouteille')
                 ->config(['placeholder' => 'Rechercher un type...'])
                 ->filter(function (Builder $builder, string $value) {
-                    $builder->whereHas('bottleType', function (Builder $q) use ($value) {
-                        $q->where('name', 'like', '%'.$value.'%');
+                    $builder->whereHas('product.productCategory', function (Builder $q) use ($value) {
+                        $q->whereHas('productTypeInstance', function (Builder $q2) use ($value) {
+                            $q2->where('name', 'like', '%'.$value.'%');
+                        });
                     });
                 }),
 
@@ -181,16 +182,21 @@ class BottleDataTable extends BaseDataTable
     {
         $query = Bottle::query()
             ->with([
-                'bottleType',
+                'product.productCategory',
                 'distributionCenter',
+            ])
+            ->join('products', 'bottles.product_id', '=', 'products.id')
+            ->join('product_categories', 'products.product_category_id', '=', 'product_categories.id')
+            ->select([
+                'bottles.*',
+                'product_categories.id as product_category_id', // Pour le tri si nécessaire
             ]);
 
-        /** @var User|null $user */
-        $user = Auth::user();
+        $distributionCenters = DistributionCenterService::getForCurrentUser();
 
-        $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
+        $centerIds = $distributionCenters->pluck('id')->toArray();
         if (! empty($centerIds)) {
-            $query->whereIn('distribution_center_id', $centerIds);
+            $query->whereIn('bottles.distribution_center_id', $centerIds);
         }
 
         return $query;
@@ -200,7 +206,7 @@ class BottleDataTable extends BaseDataTable
     {
         return [
             'bottle_type_name' => function ($row) {
-                return optional($row->bottleType)->name ?? '-';
+                return $row->product?->productCategory?->name ?? '-';
             },
             'status_formatted' => function ($row) {
                 $label = $row->status->label ?? '-';

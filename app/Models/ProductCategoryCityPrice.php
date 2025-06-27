@@ -6,19 +6,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class BottleTypeCityPrice extends Model
+/**
+ * @property int $id
+ * @property int $product_category_id
+ * @property string $city
+ * @property float $content_price
+ * @property float $content_with_bottle_price
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * 
+ * @property-read ProductCategory $productCategory
+ */
+class ProductCategoryCityPrice extends Model
 {
     use HasFactory;
 
     /**
      * The table associated with the model.
      */
-    protected $table = 'bottle_type_city_prices';
+    protected $table = 'product_category_city_prices';
 
     /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'product_category_id',
         'city',
         'content_price',
         'content_with_bottle_price',
@@ -33,10 +45,10 @@ class BottleTypeCityPrice extends Model
     ];
 
     /**
-     * Get the bottle type that owns this price record.
+     * Get the product category that owns this price record.
      */
-    public function bottleType(): BelongsTo
+    public function productCategory(): BelongsTo
     {
-        return $this->belongsTo(BottleType::class);
+        return $this->belongsTo(ProductCategory::class);
     }
 }

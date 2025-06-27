@@ -43,12 +43,12 @@ class OrderService
     /**
      * Group order items and return structured DTOs
      *
-     * @param  Collection<OrderItem>  $items
-     * @return Collection<GroupedOrderItemDTO>
+     * @param  Collection<int, OrderItem>  $items
+     * @return Collection<int, GroupedOrderItemDTO>
      */
     public function groupOrderItems(Collection $items): Collection
     {
-        return $items->groupBy(function ($item) {
+        return $items->groupBy(function (OrderItem $item): string {
             $productCategory = $item->productCategory;
 
             return match ($productCategory->product_type) {
@@ -56,7 +56,7 @@ class OrderService
                 ProductType::ACCESSORY() => $this->getAccessoryGroupingKey($item),
                 default => 'unknown-'.$item->id,
             };
-        })->map(function ($group, $groupKey) {
+        })->map(function (Collection $group, string $groupKey): GroupedOrderItemDTO {
             $first = $group->first();
             $groupedQuantity = $group->sum('quantity');
             $groupedTotalPrice = $group->sum('total_price');
@@ -74,7 +74,7 @@ class OrderService
     /**
      * Get display name for the grouped item
      */
-    private function getDisplayName($item): string
+    private function getDisplayName(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
 
@@ -88,7 +88,7 @@ class OrderService
     /**
      * Get display name for bottle items
      */
-    private function getBottleDisplayName($item): string
+    private function getBottleDisplayName(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
         $bottleType = BottleType::find($productCategory->product_type_id); // TODO: use a repository or service to get the bottle type
@@ -105,18 +105,22 @@ class OrderService
     /**
      * Get display name for accessory items
      */
-    private function getAccessoryDisplayName($item): string
+    private function getAccessoryDisplayName(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
         $accessoryType = AccessoryType::find($productCategory->product_type_id); // TODO: use a repository or service to get the accessory type
 
-        return $accessoryType?->name ?? 'Accessoire inconnu';
+        if (! $accessoryType) {
+            return 'Accessoire inconnu';
+        }
+
+        return $accessoryType->name ?? 'Accessoire inconnu';
     }
 
     /**
      * Get grouping key for bottle items
      */
-    private function getBottleGroupingKey($item): string
+    private function getBottleGroupingKey(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
         $bottleTypeId = $productCategory->product_type_id;
@@ -131,7 +135,7 @@ class OrderService
     /**
      * Get grouping key for accessory items
      */
-    private function getAccessoryGroupingKey($item): string
+    private function getAccessoryGroupingKey(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
         $accessoryTypeId = $productCategory->product_type_id;
@@ -146,6 +150,7 @@ class OrderService
     /**
      * Cancel an order
      *
+     * @throws OrderNotFoundException
      * @throws \Exception
      */
     public function cancelOrder(int $orderId): bool

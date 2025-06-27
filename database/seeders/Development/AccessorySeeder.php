@@ -49,7 +49,7 @@ class AccessorySeeder extends Seeder
 
         foreach ($distCenterStocks as $stock) {
             $productCategory = $stock->productCategory;
-            $accessoryType = $productCategory->productType;
+            $accessoryType = $productCategory->productTypeInstance;
             $center = $stock->distributionCenter;
 
             if (! $accessoryType) {

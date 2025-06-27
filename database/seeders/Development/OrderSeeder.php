@@ -14,7 +14,6 @@ use App\Enums\ProductType;
 use App\Models\Accessory;
 use App\Models\Bottle;
 use App\Models\BottleMovement;
-use App\Models\BottleType;
 use App\Models\Customer;
 use App\Models\DeliveryPerson;
 use App\Models\DistributionCenter;
@@ -23,6 +22,7 @@ use App\Models\OrderBottleScans;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
 use App\Models\ProductCategory;
+use App\Models\ProductCategoryDistributionCenter;
 use App\Models\Refund;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -52,30 +52,30 @@ class OrderSeeder extends Seeder
 
         // Get initial statistics
         $centers = DistributionCenter::all();
-        $bottleTypes = BottleType::all();
+        $productCategories = ProductCategory::bottles()->get();
 
         $this->command->info('===== ÉTAT INITIAL DES STOCKS AVANT TOUTE COMMANDE =====');
         foreach ($centers as $center) {
-            $this->initialStockStats[$center->id] = $this->collectCenterStockStats($center, $bottleTypes);
-            $this->displayStockStatistics($center, $bottleTypes);
+            $this->initialStockStats[$center->id] = $this->collectCenterStockStats($center, $productCategories);
+            $this->displayStockStatistics($center, $productCategories);
         }
         $this->command->info('=============================================================');
 
         $this->createConfirmedOrders();
         $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES CONFIRMÉES =====');
-        $this->displayAllCenterStats($centers, $bottleTypes);
+        $this->displayAllCenterStats($centers, $productCategories);
 
         $this->createProcessingOrders();
         $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES EN TRAITEMENT =====');
-        $this->displayAllCenterStats($centers, $bottleTypes);
+        $this->displayAllCenterStats($centers, $productCategories);
 
         $this->createDeliveredOrders();
         $this->command->info('===== STOCK STATE AFTER DELIVERED ORDERS =====');
-        $this->displayAllCenterStats($centers, $bottleTypes);
+        $this->displayAllCenterStats($centers, $productCategories);
 
         $this->createCancelledOrders();
         $this->command->info('===== FINAL STOCK STATE AFTER ALL ORDERS =====');
-        $this->displayAllCenterStats($centers, $bottleTypes);
+        $this->displayAllCenterStats($centers, $productCategories);
 
         // Global summary
         $this->displayOrderSummary();
@@ -106,22 +106,20 @@ class OrderSeeder extends Seeder
     /**
      * Display stock statistics for all centers
      */
-    private function displayAllCenterStats(Collection $centers, Collection $bottleTypes): void
+    private function displayAllCenterStats(Collection $centers, Collection $productCategories): void
     {
         foreach ($centers as $center) {
-            $this->displayStockStatistics($center, $bottleTypes);
+            $this->displayStockStatistics($center, $productCategories);
         }
     }
 
     /**
      * Get stock values from pivot table
      */
-    private function getPivotStockValues(int $centerId, int $bottleTypeId): array
+    private function getPivotStockValues(int $centerId, int $productCategoryId): array
     {
         // Find the product category for this bottle type
-        $productCategory = ProductCategory::where('product_type', ProductType::BOTTLE())
-            ->where('product_type_id', $bottleTypeId)
-            ->first();
+        $productCategory = ProductCategory::find($productCategoryId);
 
         if (! $productCategory) {
             return [
@@ -144,23 +142,31 @@ class OrderSeeder extends Seeder
     /**
      * Get actual stock values by counting bottles
      */
-    private function getActualStockValues(int $centerId, int $bottleTypeId): array
+    private function getActualStockValues(int $centerId, int $productCategoryId): array
     {
-        $emptyCount = Bottle::ofBottleType($bottleTypeId)
-            ->where('is_filled', false)
-            ->where('status', BottleStatus::IN_STOCK())
-            ->where('distribution_center_id', $centerId)
-            ->count();
+        $pivotRecord = ProductCategoryDistributionCenter::where('distribution_center_id', $centerId)
+            ->where('product_category_id', $productCategoryId)
+            ->first();
 
-        $filledCount = Bottle::ofBottleType($bottleTypeId)
-            ->where('is_filled', true)
-            ->where('status', BottleStatus::IN_STOCK())
-            ->where('distribution_center_id', $centerId)
-            ->count();
+        if (! $pivotRecord) {
+            return [
+                'empty' => 0,
+                'filled' => 0,
+            ];
+        }
+
+        $productCategory = ProductCategory::find($productCategoryId);
+
+        if ($productCategory && $productCategory->product_type === \App\Enums\ProductType::BOTTLE()) {
+            return [
+                'empty' => $pivotRecord->stock_empty,
+                'filled' => $pivotRecord->stock_filled,
+            ];
+        }
 
         return [
-            'empty' => $emptyCount,
-            'filled' => $filledCount,
+            'empty' => 0,
+            'filled' => 0,
         ];
     }
 
@@ -181,15 +187,15 @@ class OrderSeeder extends Seeder
     /**
      * Collect stock statistics for a center
      */
-    private function collectCenterStockStats(DistributionCenter $center, Collection $bottleTypes): array
+    private function collectCenterStockStats(DistributionCenter $center, Collection $productCategories): array
     {
         $stats = [];
 
-        foreach ($bottleTypes as $bottleType) {
-            $pivotValues = $this->getPivotStockValues($center->id, $bottleType->id);
-            $actualValues = $this->getActualStockValues($center->id, $bottleType->id);
+        foreach ($productCategories as $productCategory) {
+            $pivotValues = $this->getPivotStockValues($center->id, $productCategory->id);
+            $actualValues = $this->getActualStockValues($center->id, $productCategory->id);
 
-            $stats[$bottleType->id] = [
+            $stats[$productCategory->id] = [
                 'pivot' => $pivotValues,
                 'actual' => $actualValues,
             ];
@@ -201,7 +207,7 @@ class OrderSeeder extends Seeder
     /**
      * Retrieve and display detailed stock statistics for a center
      */
-    private function displayStockStatistics(DistributionCenter $center, Collection $bottleTypes): void
+    private function displayStockStatistics(DistributionCenter $center, Collection $productCategories): void
     {
         $this->command->line('--------------------------------------------------');
         $this->command->line("STOCK STATISTICS FOR: {$center->name}");
@@ -212,14 +218,14 @@ class OrderSeeder extends Seeder
         $totalActualEmpty = 0;
         $totalActualFilled = 0;
 
-        foreach ($bottleTypes as $bottleType) {
+        foreach ($productCategories as $productCategory) {
             // Get pivot values
-            $pivotValues = $this->getPivotStockValues($center->id, $bottleType->id);
+            $pivotValues = $this->getPivotStockValues($center->id, $productCategory->id);
             $pivotEmpty = $pivotValues['empty'];
             $pivotFilled = $pivotValues['filled'];
 
             // Get actual values (calculated from bottles table)
-            $actualValues = $this->getActualStockValues($center->id, $bottleType->id);
+            $actualValues = $this->getActualStockValues($center->id, $productCategory->id);
             $actualEmpty = $actualValues['empty'];
             $actualFilled = $actualValues['filled'];
 
@@ -237,17 +243,17 @@ class OrderSeeder extends Seeder
             $totalActualEmpty += $actualEmpty;
             $totalActualFilled += $actualFilled;
 
-            // Display statistics for this bottle type
-            $this->command->line("{$bottleType->name}:");
+            // Display statistics for this product category
+            $this->command->line("{$productCategory->name}:");
             $this->command->line("  - PIVOT   : {$pivotEmpty} empty, {$pivotFilled} filled");
             $this->command->line("  - BOTTLES : {$actualEmpty} empty {$emptyDiffFormatted}, {$actualFilled} filled {$filledDiffFormatted}");
 
             if ($emptyDiff !== 0 || $filledDiff !== 0) {
-                $this->command->warn("  ⚠️ DIFFERENCE DETECTED for {$bottleType->name} in {$center->name}");
+                $this->command->warn("  ⚠️ DIFFERENCE DETECTED for {$productCategory->name} in {$center->name}");
             }
 
             // If we have initial statistics, calculate the difference from the beginning
-            $this->displayInitialDifference($center, $bottleType, $actualEmpty, $actualFilled);
+            $this->displayInitialDifference($center, $productCategory, $actualEmpty, $actualFilled);
         }
 
         // Display totals
@@ -257,10 +263,10 @@ class OrderSeeder extends Seeder
     /**
      * Display difference from initial state
      */
-    private function displayInitialDifference(DistributionCenter $center, BottleType $bottleType, int $actualEmpty, int $actualFilled): void
+    private function displayInitialDifference(DistributionCenter $center, ProductCategory $productCategory, int $actualEmpty, int $actualFilled): void
     {
-        if (isset($this->initialStockStats[$center->id][$bottleType->id])) {
-            $initialActualValues = $this->initialStockStats[$center->id][$bottleType->id]['actual'];
+        if (isset($this->initialStockStats[$center->id][$productCategory->id])) {
+            $initialActualValues = $this->initialStockStats[$center->id][$productCategory->id]['actual'];
             $initialEmptyCount = $initialActualValues['empty'];
             $initialFilledCount = $initialActualValues['filled'];
 
@@ -588,14 +594,14 @@ class OrderSeeder extends Seeder
      * Update statistics for bottle types
      */
     private function updateBottleTypeStatistics(
-        BottleType $bottleType,
+        ProductCategory $productCategory,
         Order $order,
         int $quantity,
         BottleOrderType $bottleOrderType
     ): void {
-        if (! isset($this->bottleTypeStats[$bottleType->id])) {
-            $this->bottleTypeStats[$bottleType->id] = [
-                'name' => $bottleType->name,
+        if (! isset($this->bottleTypeStats[$productCategory->id])) {
+            $this->bottleTypeStats[$productCategory->id] = [
+                'name' => $productCategory->name,
                 'total_orders' => 0,
                 'total_bottles' => 0,
                 'by_status' => [],
@@ -603,20 +609,20 @@ class OrderSeeder extends Seeder
             ];
         }
 
-        $this->bottleTypeStats[$bottleType->id]['total_orders']++;
-        $this->bottleTypeStats[$bottleType->id]['total_bottles'] += $quantity;
+        $this->bottleTypeStats[$productCategory->id]['total_orders']++;
+        $this->bottleTypeStats[$productCategory->id]['total_bottles'] += $quantity;
 
         // By order status
-        if (! isset($this->bottleTypeStats[$bottleType->id]['by_status'][$order->status->value])) {
-            $this->bottleTypeStats[$bottleType->id]['by_status'][$order->status->value] = 0;
+        if (! isset($this->bottleTypeStats[$productCategory->id]['by_status'][$order->status->value])) {
+            $this->bottleTypeStats[$productCategory->id]['by_status'][$order->status->value] = 0;
         }
-        $this->bottleTypeStats[$bottleType->id]['by_status'][$order->status->value] += $quantity;
+        $this->bottleTypeStats[$productCategory->id]['by_status'][$order->status->value] += $quantity;
 
         // By bottle order type
-        if (! isset($this->bottleTypeStats[$bottleType->id]['by_order_type'][$bottleOrderType->value])) {
-            $this->bottleTypeStats[$bottleType->id]['by_order_type'][$bottleOrderType->value] = 0;
+        if (! isset($this->bottleTypeStats[$productCategory->id]['by_order_type'][$bottleOrderType->value])) {
+            $this->bottleTypeStats[$productCategory->id]['by_order_type'][$bottleOrderType->value] = 0;
         }
-        $this->bottleTypeStats[$bottleType->id]['by_order_type'][$bottleOrderType->value] += $quantity;
+        $this->bottleTypeStats[$productCategory->id]['by_order_type'][$bottleOrderType->value] += $quantity;
     }
 
     /**
@@ -657,11 +663,15 @@ class OrderSeeder extends Seeder
     /**
      * Create a bottle order item
      */
-    private function createBottleOrderItem(Order $order, BottleType $bottleType, int $quantity, BottleOrderType $bottleOrderType): void
+    private function createBottleOrderItem(Order $order, ProductCategory $productCategory, int $quantity, BottleOrderType $bottleOrderType): void
     {
+        $bottleType = $productCategory->typeInstance;
+        $bottleWithContentPrice = $bottleType->bottle_with_content_price ?? 5000;
+        $contentPrice = $bottleType->content_price ?? 3500;
+
         $unitPrice = match ($bottleOrderType) {
-            BottleOrderType::FULL() => $bottleType->bottle_with_content_price,
-            BottleOrderType::RECHARGE() => $bottleType->content_price,
+            BottleOrderType::FULL() => $bottleWithContentPrice,
+            BottleOrderType::RECHARGE() => $contentPrice,
         };
 
         // Determine bottle status based on order status
@@ -673,19 +683,9 @@ class OrderSeeder extends Seeder
             default => BottleStatus::IN_STOCK(),
         };
 
-        // Find the product category for this bottle type
-        $productCategory = ProductCategory::where('product_type', ProductType::BOTTLE())
-            ->where('product_type_id', $bottleType->id)
-            ->first();
-
-        if (! $productCategory) {
-            Log::warning("Product category not found for bottle type {$bottleType->name}, ID: {$bottleType->id}");
-
-            return;
-        }
-
-        // Find available bottles
-        $availableBottles = Bottle::ofBottleType($bottleType->id)
+        $availableBottles = Bottle::whereHas('product', function ($query) use ($productCategory) {
+            $query->where('product_category_id', $productCategory->id);
+        })
             ->where('distribution_center_id', $order->distribution_center_id)
             ->where('is_filled', true)
             ->where('status', BottleStatus::IN_STOCK())
@@ -699,7 +699,7 @@ class OrderSeeder extends Seeder
         }
 
         if ($foundCount < $quantity) {
-            Log::info('Insufficient stock: missing '.($quantity - $foundCount)." bottles of type {$bottleType->name} for order #{$order->order_number}");
+            Log::info('Insufficient stock: missing '.($quantity - $foundCount)." bottles of type {$productCategory->name} for order #{$order->order_number}");
         }
 
         // Create a single OrderItem for all bottles of the same type and option
@@ -756,12 +756,11 @@ class OrderSeeder extends Seeder
     private function createAccessoryOrderItem(Order $order, Accessory $accessory, $selectedAccessories): void
     {
         // Find the product category for this accessory type
-        $productCategory = ProductCategory::where('product_type', ProductType::ACCESSORY())
-            ->where('product_type_id', $accessory->accessoryTypeId)
+        $productCategory = ProductCategory::where('id', $accessory->product_category_id)
             ->first();
 
         if (! $productCategory) {
-            Log::warning("Product category not found for accessory type ID: {$accessory->accessoryTypeId}");
+            Log::warning("Product category not found for accessory #{$accessory->id} with category ID {$accessory->product_category_id}");
 
             return;
         }
@@ -1025,12 +1024,10 @@ class OrderSeeder extends Seeder
         // If the bottle leaves the stock, decrement the counter in the pivot
         if ($bottle->status !== BottleStatus::IN_STOCK()) {
             // Find product category for this bottle type
-            $productCategory = ProductCategory::where('product_type', ProductType::BOTTLE())
-                ->where('product_type_id', $bottle->bottle_type_id)
-                ->first();
+            $productCategory = ProductCategory::where('id', $bottle->product_category_id)->first();
 
             if (! $productCategory) {
-                Log::warning("Product category not found for bottle #{$bottle->id} with type ID {$bottle->bottle_type_id}");
+                Log::warning("Product category not found for bottle #{$bottle->id} with category ID {$bottle->product_category_id}");
 
                 return;
             }
@@ -1140,24 +1137,23 @@ class OrderSeeder extends Seeder
         // Find all product categories that are bottle types with stock
         $stockData = DB::table('product_category_distribution_center as pcdc')
             ->join('product_categories as pc', 'pcdc.product_category_id', '=', 'pc.id')
-            ->join('bottle_types as bt', 'pc.product_type_id', '=', 'bt.id')
             ->where('pcdc.distribution_center_id', $center->id)
-            ->where('pc.product_type', 'bottle')
+            ->where('pc.product_type', ProductType::BOTTLE()->value)
             ->where('pcdc.stock_filled', '>', 0)
-            ->select('bt.*', 'pcdc.stock_filled', 'pcdc.stock_empty')
+            ->select('pc.*', 'pcdc.stock_filled', 'pcdc.stock_empty')
             ->get();
 
         // Format the data to mimic the previous bottleTypeStocks relation
         $result = [];
         foreach ($stockData as $item) {
-            $bottleType = BottleType::find($item->id);
-            if ($bottleType) {
-                // Add pivot data to the bottle type
-                $bottleType->pivot = (object) [
+            $productCategory = ProductCategory::find($item->id);
+            if ($productCategory) {
+                // Add pivot data to the product category
+                $productCategory->pivot = (object) [
                     'stock_filled' => $item->stock_filled,
                     'stock_empty' => $item->stock_empty,
                 ];
-                $result[] = $bottleType;
+                $result[] = $productCategory;
             }
         }
 
@@ -1170,11 +1166,11 @@ class OrderSeeder extends Seeder
     private function updateAccessoryStockCount(Accessory $accessory): void
     {
         $productCategory = ProductCategory::where('product_type', ProductType::ACCESSORY())
-            ->where('product_type_id', $accessory->accessoryTypeId)
+            ->where('id', $accessory->product_category_id)
             ->first();
 
         if (! $productCategory) {
-            Log::warning("Product category not found for accessory #{$accessory->id} with type ID {$accessory->accessoryTypeId}");
+            Log::warning("Product category not found for accessory #{$accessory->id} with category ID {$accessory->product_category_id}");
 
             return;
         }
