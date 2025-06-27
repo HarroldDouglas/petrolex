@@ -20,6 +20,15 @@ use Spatie\MediaLibrary\HasMedia;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Accessory> $accessories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $productCategories
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class AccessoryType extends Model implements HasMedia
 {
@@ -83,7 +92,7 @@ class AccessoryType extends Model implements HasMedia
     {
         return $this->productCategories()
             ->join('product_category_distribution_center as pcdc', 'product_categories.id', '=', 'pcdc.product_category_id')
-            ->when($distributionCenterIds, function ($query) use ($distributionCenterIds) {
+            ->when($distributionCenterIds, function (\Illuminate\Database\Eloquent\Builder $query) use ($distributionCenterIds): void {
                 $query->whereIn('pcdc.distribution_center_id', $distributionCenterIds);
             })
             ->sum('pcdc.stock');

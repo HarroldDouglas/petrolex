@@ -7,6 +7,7 @@ use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -19,13 +20,21 @@ use Illuminate\Support\Carbon;
  * @property float $unit_price
  * @property float $total_price
  * @property BottleOrderType|null $bottle_type
- * @property Order $order
- * @property ProductCategory $productCategory
- * @property-read int $scanned_bottles_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderBottleScans> $orderBottleScans
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read Order $order
+ * @property-read ProductCategory $productCategory
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderBottleScans> $orderBottleScans
+ * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bottle, \Illuminate\Database\Eloquent\Relations\Pivot> $bottles
+ *
+ * // Accessors
+ * @property-read int $scanned_bottles_count
+ * @property-read ProductType $productType
+ *
+ * // Query Scopes
  */
 class OrderItem extends Model
 {
@@ -90,19 +99,31 @@ class OrderItem extends Model
     /**
      * Get the bottles associated with this order item.
      */
-    public function bottles()
+    public function bottles(): BelongsToMany
     {
         return $this->belongsToMany(Bottle::class, 'order_bottle_scans')
             ->withTimestamps();
     }
 
+    // ===== ACCESSORS =====
+
+    /**
+     * Get the product type for this item.
+     */
+    public function getProductTypeAttribute(): ProductType
+    {
+        return $this->productCategory->product_type;
+    }
+
     /**
      * Get the number of bottles scanned for this order item.
      */
-    public function getScannedBottlesCountAttribute()
+    public function getScannedBottlesCountAttribute(): int
     {
         return $this->orderBottleScans()->count();
     }
+
+    // ===== METHODS =====
 
     /**
      * Check if all bottles have been scanned for this order item.

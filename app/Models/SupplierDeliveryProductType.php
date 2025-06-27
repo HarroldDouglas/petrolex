@@ -22,12 +22,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * // Relations
  * @property-read \App\Models\ProductCategory $productCategory
  * @property-read \App\Models\SupplierDelivery $supplierDelivery
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $deliveryBottles
- * @property-read int|null $incoming_scanned_count
- * @property-read int|null $outgoing_scanned_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $incomingBottles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $outgoingBottles
+ *
+ * // Accessors
+ * @property-read int $incoming_scanned_count
+ * @property-read int $outgoing_scanned_count
  * @property-read bool $incoming_done
+ * @property-read bool $outgoing_done
+ *
+ * // Query Scopes
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder bottles()
+ * @method static \Illuminate\Database\Eloquent\Builder accessories()
  */
 class SupplierDeliveryProductType extends Model
 {
@@ -132,9 +144,9 @@ class SupplierDeliveryProductType extends Model
     /**
      * Scope a query to only include bottle product types.
      */
-    public function scopeBottles($query)
+    public function scopeBottles(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
-        return $query->whereHas('productCategory', function ($q) {
+        return $query->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $q): void {
             $q->where('product_type', ProductType::BOTTLE());
         });
     }
@@ -142,9 +154,9 @@ class SupplierDeliveryProductType extends Model
     /**
      * Scope a query to only include accessory product types.
      */
-    public function scopeAccessories($query)
+    public function scopeAccessories(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
-        return $query->whereHas('productCategory', function ($q) {
+        return $query->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $q): void {
             $q->where('product_type', ProductType::ACCESSORY());
         });
     }

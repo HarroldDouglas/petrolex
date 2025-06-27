@@ -14,15 +14,20 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $product_category_id
- * @property ProductCategory $productCategory
- * @property ProductType $product_type
- * @property Bottle|null $bottle
- * @property Accessory|null $accessory
- * @property-read int $order_items_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $orderItems
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read ProductCategory $productCategory
+ * @property-read Bottle|null $bottle
+ * @property-read Accessory|null $accessory
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $orderItems
+ *
+ * // Accessors
+ * @property-read ProductType $product_type
+ *
+ * // Query Scopes
  */
 class Product extends Model
 {

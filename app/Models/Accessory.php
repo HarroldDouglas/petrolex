@@ -52,12 +52,10 @@ class Accessory extends Model
 
     /**
      * The "booted" method of the model.
-     *
-     * @return void
      */
-    protected static function booted()
+    protected static function booted(): void
     {
-        static::creating(function ($accessory) {
+        static::creating(function (self $accessory): void {
             if (empty($accessory->sku)) {
                 $accessory->sku = self::generateSku();
             }

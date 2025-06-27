@@ -23,6 +23,19 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read Bottle $bottle
+ * @property-read SupplierDelivery $supplierDelivery
+ * @property-read DistributionCenter $distributionCenter
+ * @property-read DeliveryPerson $deliveryPerson
+ * @property-read Customer $customer
+ * @property-read Order $order
+ * @property-read User $user
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class BottleMovement extends Model
 {

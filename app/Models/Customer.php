@@ -16,6 +16,16 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, CustomerDeliveryAddress> $deliveryAddresses
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class Customer extends Model
 {
@@ -76,8 +86,14 @@ class Customer extends Model
     /**
      * Get the default delivery address for this customer.
      */
-    public function defaultDeliveryAddress()
+    /**
+     * Get the default delivery address for this customer.
+     */
+    public function defaultDeliveryAddress(): ?CustomerDeliveryAddress
     {
-        return $this->deliveryAddresses()->where('is_default', true)->first();
+        /** @var CustomerDeliveryAddress|null $address */
+        $address = $this->deliveryAddresses()->where('is_default', true)->first();
+
+        return $address;
     }
 }

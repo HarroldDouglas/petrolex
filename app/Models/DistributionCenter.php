@@ -22,6 +22,24 @@ use Illuminate\Support\Facades\DB;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, UserDistributionCenter> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, DeliveryPerson> $deliveryPersons
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Bottle> $bottles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Accessory> $accessories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, SupplierDelivery> $supplierDeliveries
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $productCategories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleType> $bottleTypeStocks
+ *
+ * // Accessors
+ * @property-read int $total_empty_bottles
+ * @property-read int $total_filled_bottles
+ * @property-read int $total_bottles
+ *
+ * // Query Scopes
  */
 class DistributionCenter extends Model
 {

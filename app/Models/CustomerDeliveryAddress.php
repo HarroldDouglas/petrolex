@@ -21,6 +21,14 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read Customer $customer
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class CustomerDeliveryAddress extends Model
 {

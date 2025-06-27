@@ -18,8 +18,14 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
  * @property-read SupplierDeliveryProductType $bottleType
  * @property-read Bottle $bottle
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  *
  * @method static Builder|static incoming()
  * @method static Builder|static outgoing()

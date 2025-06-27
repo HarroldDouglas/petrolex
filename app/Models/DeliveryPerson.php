@@ -19,6 +19,17 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, DistributionCenter> $distributionCenters
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, DistributionCenter> $activeDistributionCenters
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class DeliveryPerson extends Model
 {

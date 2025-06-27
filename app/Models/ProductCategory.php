@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ProductType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,17 +20,22 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $deleted_at
  *
  * // Relations
- * @property-read BottleType|AccessoryType $productTypeInstance
  * @property-read Collection<int, Product> $products
  * @property-read Collection<int, OrderItem> $orderItems
  * @property-read Collection<int, ProductCategoryDistributionCenter> $distributionCenters
- * @property-read Collection<int, Accessory> $accessories
- * @property-read Collection<int, Bottle> $bottles
  *
  * // Accessors
+ * @property-read BottleType|AccessoryType|null $productTypeInstance
  * @property-read string $name
  * @property-read bool $is_active
  * @property-read float|null $price
+ *
+ * // Query Scopes
+ *
+ * @method static Builder ofType(ProductType $type)
+ * @method static Builder active()
+ * @method static Builder bottles()
+ * @method static Builder accessories()
  */
 class ProductCategory extends Model
 {
@@ -48,10 +54,26 @@ class ProductCategory extends Model
         'deleted_at' => 'datetime',
     ];
 
-    /**
-     * Polymorphic relation to BottleType or AccessoryType
-     */
-    public function getProductTypeInstanceAttribute()
+    // ===== RELATIONS =====
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function distributionCenters(): HasMany
+    {
+        return $this->hasMany(ProductCategoryDistributionCenter::class);
+    }
+
+    // ===== ACCESSORS =====
+
+    public function getProductTypeInstanceAttribute(): BottleType|AccessoryType|null
     {
         return match ($this->attributes['product_type']) {
             ProductType::BOTTLE()->value => BottleType::find($this->product_type_id),
@@ -60,76 +82,41 @@ class ProductCategory extends Model
         };
     }
 
-    /**
-     * Relation to individual products
-     */
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class);
-    }
-
-    /**
-     * Relation to order items
-     */
-    public function orderItems(): HasMany
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    /**
-     * Relation to distribution centers (pivot table)
-     */
-    public function distributionCenters(): HasMany
-    {
-        return $this->hasMany(ProductCategoryDistributionCenter::class);
-    }
-
-    /**
-     * Get the product name from the related type
-     */
     public function getNameAttribute(): string
     {
         return $this->productTypeInstance?->name ?? 'Unknown Product';
     }
 
-    /**
-     * Check if the product is active
-     */
     public function getIsActiveAttribute(): bool
     {
         return $this->productTypeInstance?->is_active ?? false;
     }
 
-    /**
-     * Scope to filter by product type
-     */
-    public function scopeOfType($query, ProductType $type)
+    public function getPriceAttribute(): ?float
+    {
+        return $this->productTypeInstance?->price;
+    }
+
+    // ===== QUERY SCOPES =====
+
+    public function scopeOfType(Builder $query, ProductType $type): Builder
     {
         return $query->where('product_type', $type);
     }
 
-    /**
-     * Scope for active products
-     */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->whereHas('productTypeInstance', function ($q) {
             $q->where('is_active', true);
         });
     }
 
-    /**
-     * Scope for bottles
-     */
-    public function scopeBottles($query)
+    public function scopeBottles(Builder $query): Builder
     {
         return $query->where('product_type', ProductType::BOTTLE());
     }
 
-    /**
-     * Scope for accessories
-     */
-    public function scopeAccessories($query)
+    public function scopeAccessories(Builder $query): Builder
     {
         return $query->where('product_type', ProductType::ACCESSORY());
     }

@@ -16,6 +16,14 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read User $user
+ * @property-read DistributionCenter $distributionCenter
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class UserDistributionCenter extends Model
 {

@@ -12,10 +12,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $order_item_id
  * @property int $bottle_id
- * @property OrderItem $orderItem
- * @property Bottle $bottle
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
+ *
+ * // Relations
+ * @property-read OrderItem $orderItem
+ * @property-read Bottle $bottle
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class OrderBottleScans extends Model
 {

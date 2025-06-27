@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * OrderPayment model represents the payment details for an order.
  *
- * * @property int $id
+ * @property int $id
  * @property int $order_id
  * @property string $payment_reference
  * @property PaymentStatus $payment_status
@@ -24,6 +24,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read Order $order
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class OrderPayment extends Model
 {

@@ -22,6 +22,16 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Bottle> $bottles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, DistributionCenter> $distributionCenters
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategoryCityPrice> $cityPrices
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class BottleType extends Model
 {

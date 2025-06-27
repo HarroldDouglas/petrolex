@@ -18,14 +18,24 @@ use Illuminate\Support\Carbon;
  * @property string $barcode
  * @property bool $is_filled
  * @property BottleStatus $status
- * @property Product $product
- * @property BottleType $bottleType
- * @property DistributionCenter $distribution_center
- * @property-read int $movements_count
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
  * @property Carbon|null $marked_lost_at
+ *
+ * // Relations
+ * @property-read Product $product
+ * @property-read DistributionCenter $distributionCenter
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $movements
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, SupplierDeliveryBottle> $supplierDeliveryBottles
+ *
+ * // Accessors
+ * @property-read BottleType|null $bottleType
+ * @property-read int|null $bottleTypeId
+ *
+ * // Query Scopes
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder ofBottleType(int $bottleTypeId)
  */
 class Bottle extends Model
 {
@@ -106,9 +116,9 @@ class Bottle extends Model
         return $this->hasMany(SupplierDeliveryBottle::class);
     }
 
-    public function scopeOfBottleType($query, int $bottleTypeId)
+    public function scopeOfBottleType(\Illuminate\Database\Eloquent\Builder $query, int $bottleTypeId): \Illuminate\Database\Eloquent\Builder
     {
-        return $query->whereHas('product.productCategory', function ($query) use ($bottleTypeId) {
+        return $query->whereHas('product.productCategory', function (\Illuminate\Database\Eloquent\Builder $query) use ($bottleTypeId): void {
             $query->where('product_type_id', $bottleTypeId)
                 ->where('product_type', 'bottle');
         });

@@ -23,6 +23,8 @@ use Illuminate\Support\Carbon;
  *
  * // Accessors
  * @property-read int $total_stock
+ *
+ * // Query Scopes
  */
 class ProductCategoryDistributionCenter extends Pivot
 {
