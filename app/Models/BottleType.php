@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\ProductType;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -72,17 +75,29 @@ class BottleType extends Model
     /**
      * Get the products that use this bottle type.
      */
-    public function products(): HasMany
+    public function products(): HasManyThrough
     {
-        return $this->hasMany(Product::class);
+        return $this->hasManyThrough(
+            Product::class,
+            ProductCategory::class,
+            'product_type_id',
+            'product_category_id'
+        )->where('product_categories.product_type', ProductType::BOTTLE());
     }
 
     /**
      * Get the bottles for the bottle type.
+     *
+     * @return Collection<int, Bottle>
      */
-    public function bottles(): HasMany
+    public function bottles(): Collection
     {
-        return $this->hasMany(Bottle::class);
+        return $this->products()
+            ->whereHas('bottle')
+            ->with('bottle')
+            ->get()
+            ->map(fn (Product $product) => $product->bottle)
+            ->filter();
     }
 
     /**

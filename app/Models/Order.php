@@ -7,6 +7,7 @@ use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\ProductType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -266,7 +267,7 @@ class Order extends Model
     public function hasBottleItems(): bool
     {
         return $this->items()
-            ->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $query): void {
+            ->whereHas('productCategory', function (Builder $query): void {
                 $query->where('product_type', ProductType::BOTTLE());
             })
             ->exists();
@@ -290,7 +291,7 @@ class Order extends Model
         }
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
-        $bottleItems = $this->items()->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $query): void {
+        $bottleItems = $this->items()->whereHas('productCategory', function (Builder $query): void {
             $query->where('product_type', ProductType::BOTTLE());
         })->get();
 

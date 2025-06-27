@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryBottleMovementType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,8 +39,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * // Query Scopes
  *
- * @method static \Illuminate\Database\Eloquent\Builder bottles()
- * @method static \Illuminate\Database\Eloquent\Builder accessories()
+ * @method static Builder bottles()
+ * @method static Builder accessories()
  */
 class SupplierDeliveryProductType extends Model
 {
@@ -144,9 +145,9 @@ class SupplierDeliveryProductType extends Model
     /**
      * Scope a query to only include bottle product types.
      */
-    public function scopeBottles(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeBottles(Builder $query): Builder
     {
-        return $query->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $q): void {
+        return $query->whereHas('productCategory', function (Builder $q): void {
             $q->where('product_type', ProductType::BOTTLE());
         });
     }
@@ -154,9 +155,9 @@ class SupplierDeliveryProductType extends Model
     /**
      * Scope a query to only include accessory product types.
      */
-    public function scopeAccessories(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeAccessories(Builder $query): Builder
     {
-        return $query->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $q): void {
+        return $query->whereHas('productCategory', function (Builder $q): void {
             $q->where('product_type', ProductType::ACCESSORY());
         });
     }

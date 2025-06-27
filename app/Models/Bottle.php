@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BottleStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,7 +36,7 @@ use Illuminate\Support\Carbon;
  *
  * // Query Scopes
  *
- * @method static \Illuminate\Database\Eloquent\Builder ofBottleType(int $bottleTypeId)
+ * @method static Builder ofBottleType(int $bottleTypeId)
  */
 class Bottle extends Model
 {
@@ -116,9 +117,9 @@ class Bottle extends Model
         return $this->hasMany(SupplierDeliveryBottle::class);
     }
 
-    public function scopeOfBottleType(\Illuminate\Database\Eloquent\Builder $query, int $bottleTypeId): \Illuminate\Database\Eloquent\Builder
+    public function scopeOfBottleType(Builder $query, int $bottleTypeId): Builder
     {
-        return $query->whereHas('product.productCategory', function (\Illuminate\Database\Eloquent\Builder $query) use ($bottleTypeId): void {
+        return $query->whereHas('product.productCategory', function (Builder $query) use ($bottleTypeId): void {
             $query->where('product_type_id', $bottleTypeId)
                 ->where('product_type', 'bottle');
         });
