@@ -3,12 +3,10 @@
 namespace App\Livewire\User;
 
 use App\DTOs\User\UpdateUserDTO;
-use App\Enums\UserRole;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\UploadedFile;
 
 class EditUserForm extends AbstractUserForm
 {
@@ -42,32 +40,14 @@ class EditUserForm extends AbstractUserForm
 
     public function save()
     {
-
         $validatedData = $this->validate();
         $this->validateDistributionCenters();
-        //$validatedData['image'] = $validatedData['image'] instanceof UploadedFile
-          //  ? $validatedData['image'] : null;
         $validatedData['distribution_center_ids'] = $this->showDistributionCenters
             ? $validatedData['distribution_center_ids'] : [];
         try {
-
-            $dto = new UpdateUserDTO(
-                id: $this->user->id,
-                first_name: $validatedData['first_name'],
-                last_name: $validatedData['last_name'],
-                email: $validatedData['email'],
-                phone_number: $validatedData['phone_number'],
-                password: $validatedData['password'],
-                address: $validatedData['address'] ?? null,
-                is_active: $validatedData['is_active'] ?? true,
-                role: UserRole::from($validatedData['role']),
-                distribution_center_ids: $validatedData['distribution_center_ids'],
-                image: $validatedData['image']
-            );
+            $dto = UpdateUserDTO::fromArray($validatedData);
 
             $dtoArray = $dto->toArray();
-
-            $dtoArray['image'] = $this->image;
 
             /** @var User */
             $user = $this->userService->update($this->user, $dtoArray);

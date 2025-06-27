@@ -4,42 +4,42 @@ namespace App\DTOs\User;
 
 use App\DTOs\BaseDTO;
 use App\Enums\UserRole;
+use App\Transformers\EnumValueTransformer;
 use Illuminate\Http\UploadedFile;
-use Spatie\Enum\Laravel\Casts\EnumCast;
-use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
 
 class UpdateUserDTO extends BaseDTO
 {
     public function __construct(
-        public int $id,
-        public string $first_name,
-        public string $last_name,
-        public string $email,
-        public string $phone_number,
+        public ?int $id,
+        public ?string $first_name,
+        public ?string $last_name,
+        public ?string $email,
+        public ?string $phone_number,
         public ?string $password,
-        public ?string $address,
-        public bool $is_active,
-        #[WithCast(EnumCast::class)]
-        public UserRole $role,
+        public ?bool $is_active,
+        #[WithTransformer(EnumValueTransformer::class)]
+        public ?UserRole $role,
         /** @var array<int> $distribution_center_ids */
         public ?array $distribution_center_ids = [],
-        public readonly ?UploadedFile $image = null,
+        public ?UploadedFile $image = null,
+        public ?string $address = null,
     ) {}
 
-    public function toArray(): array
+    public static function fromArray(array $data): self
     {
-        return [
-            'id' => $this->id,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-            'phone_number' => $this->phone_number,
-            'password' => $this->password,
-            'address' => $this->address,
-            'is_active' => $this->is_active,
-            'role' => $this->role->value,
-            'distribution_center_ids' => $this->distribution_center_ids,
-            'image' => $this->image ? $this->image->getClientOriginalName() : null,
-        ];
+        return new self(
+            id: $data['id'],
+            first_name: $data['first_name'] ?? null,
+            last_name: $data['last_name'] ?? null,
+            email: $data['email'] ?? null,
+            phone_number: $data['phone_number'] ?? null,
+            password: $data['password'] ?? null,
+            is_active: $data['is_active'] ?? null,
+            role: UserRole::from($data['role']) ?? null,
+            distribution_center_ids: $data['distribution_center_ids'] ?? [],
+            image: $data['image'] ?? null,
+            address: $data['address'] ?? null,
+        );
     }
 }
