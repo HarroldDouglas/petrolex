@@ -31,17 +31,15 @@ class AccessoryForm extends Component
 
     public function boot(ProductCategoryRepositoryInterface $productCategoryRepository)
     {
-        // Utilisation de la méthode dédiée du repository
         $productCategories = $productCategoryRepository->getAllActiveByType(ProductType::ACCESSORY());
 
         $this->accessoryTypes = $productCategories
             ->map(function (ProductCategory $category) {
-                // Utilisation de l'accesseur typeInstance
-                $typeInstance = $category->typeInstance;
+                $typeInstance = $category->productTypeInstance;
 
                 return [
                     'id' => $category->id,
-                    'name' => $typeInstance ? $typeInstance->name : 'Type inconnu',
+                    'name' => $typeInstance?->name,
                 ];
             })
             ->toArray();
@@ -151,7 +149,9 @@ class AccessoryForm extends Component
     public function updateUsedTypes($products = null)
     {
         $this->usedAccessoryTypes = $this->supplierDelivery->productTypes()
-            ->accessories()
+            ->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $query) {
+                $query->where('product_type', ProductType::ACCESSORY());
+            })
             ->pluck('product_category_id')
             ->toArray();
     }

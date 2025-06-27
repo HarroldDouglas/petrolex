@@ -41,7 +41,8 @@ class ProductCategoryRepository extends BaseEloquentRepository implements Produc
                 ->get();
         }
 
-        return collect();
+        // Retourner une collection Eloquent vide au lieu d'une collection Support
+        return $this->model->whereRaw('1 = 0')->get();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Supply;
 
+use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryBottleMovementType;
 use App\Models\Bottle;
 use App\Models\ProductCategory;
@@ -76,7 +77,9 @@ class ScanBottles extends Component
 
         $this->availableProducts = $this->supply->productTypes()
             ->with(['productCategory', 'deliveryBottles'])
-            ->bottles()
+            ->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $query) {
+                $query->where('product_type', ProductType::BOTTLE());
+            })
             ->get()
             ->map(function (SupplierDeliveryProductType $product) {
                 /** @var ProductCategory */

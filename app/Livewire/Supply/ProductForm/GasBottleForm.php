@@ -35,7 +35,7 @@ class GasBottleForm extends Component
 
         $this->bottleTypes = $productCategories
             ->map(function (ProductCategory $category) {
-                $typeInstance = $category->typeInstance;
+                $typeInstance = $category->productTypeInstance;
 
                 return [
                     'id' => $category->id,
@@ -147,7 +147,9 @@ class GasBottleForm extends Component
     public function updateUsedTypes($products = null)
     {
         $this->usedBottleTypes = $this->supplierDelivery->productTypes()
-            ->bottles()
+            ->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $query) {
+                $query->where('product_type', ProductType::BOTTLE());
+            })
             ->pluck('product_category_id')
             ->toArray();
     }

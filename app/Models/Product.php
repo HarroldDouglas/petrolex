@@ -110,7 +110,7 @@ class Product extends Model
     private function getBottlePrice(): string
     {
         /** @var BottleType */
-        $bottleType = $this->productCategory->productType;
+        $bottleType = $this->productCategory->productTypeInstance;
 
         if (! $bottleType) {
             return '0';
@@ -128,21 +128,9 @@ class Product extends Model
     private function getAccessoryPrice(): string
     {
         /** @var AccessoryType */
-        $accessoryType = $this->productCategory->productType;
+        $accessoryType = $this->productCategory->productTypeInstance;
 
-        return $accessoryType?->price ?? '0';
-    }
-
-    /**
-     * Get the stock quantity of the product.
-     */
-    public function stock(): int
-    {
-        return match ($this->product_type) {
-            ProductType::BOTTLE() => $this->bottle ? 1 : 0,
-            ProductType::ACCESSORY() => $this->accessory?->quantity ?? 0,
-            default => 0,
-        };
+        return (string) ($accessoryType?->price ?? '0');
     }
 
     /**

@@ -98,7 +98,7 @@ class ProductsList extends Component
 
         try {
             $this->supplierDelivery = $this->supplierDelivery
-                ->fresh(['productTypes.productCategory.productType']);
+                ->fresh(['productTypes.productCategory']);
             $this->loadProducts();
             $this->dispatch('products-updated', $this->products);
         } finally {

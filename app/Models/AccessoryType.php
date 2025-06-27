@@ -24,8 +24,8 @@ use Spatie\MediaLibrary\HasMedia;
 class AccessoryType extends Model implements HasMedia
 {
     use HasFactory;
-    use SoftDeletes;
     use HasMediaCollections;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

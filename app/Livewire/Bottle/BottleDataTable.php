@@ -38,7 +38,7 @@ class BottleDataTable extends BaseDataTable
                 ->searchable(),
             Column::make('Type de bouteille')
                 ->sortable(function (Builder $query, string $direction) {
-                    return $query->orderBy('product_categories.id', $direction);
+                    return $query->orderBy('product_category_id', $direction);
                 })
                 ->searchable(function (Builder $query, string $searchTerm) {
                     return $query->whereHas('product.productCategory', function (Builder $q) use ($searchTerm) {
@@ -189,7 +189,7 @@ class BottleDataTable extends BaseDataTable
             ->join('product_categories', 'products.product_category_id', '=', 'product_categories.id')
             ->select([
                 'bottles.*',
-                'product_categories.id as product_category_id', // Pour le tri si nécessaire
+                'product_categories.id as product_category_id',
             ]);
 
         $distributionCenters = DistributionCenterService::getForCurrentUser();

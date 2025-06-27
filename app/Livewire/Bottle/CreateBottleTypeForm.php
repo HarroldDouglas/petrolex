@@ -31,6 +31,7 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
                 /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
                 fn (array $cityPrice): ProductCategoryCityPriceDTO => new ProductCategoryCityPriceDTO(
                     bottle_type_id: null,
+                    product_category_id: null,
                     city: $cityPrice['city'],
                     content_price: (float) $cityPrice['content_price'],
                     content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],

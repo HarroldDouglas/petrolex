@@ -90,7 +90,7 @@ class Accessory extends Model
      */
     public function getAccessoryTypeAttribute(): ?AccessoryType
     {
-        $productType = $this->product?->productCategory?->productType;
+        $productType = $this->product?->productCategory?->productTypeInstance;
 
         if ($productType instanceof AccessoryType) {
             return $productType;

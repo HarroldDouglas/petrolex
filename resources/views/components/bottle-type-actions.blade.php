@@ -7,8 +7,7 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuBottleType{{ $bottleType->id }}">
         <li>
-            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editBottleTypeModal"
-                wire:click.prevent="$dispatch('showEditBottleTypeModal', { bottleTypeId: {{ $bottleType->id }} })">
+            <a class="dropdown-item" href="{{route('bottles.types.edit', $bottleType->id)}}">
                 <i class="ti ti-edit text-primary me-2"></i> Modifier
             </a>
         </li>
