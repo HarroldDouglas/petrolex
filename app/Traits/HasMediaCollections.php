@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Traits;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-abstract class BaseModelWithMedia extends Model
+trait HasMediaCollections
 {
     use InteractsWithMedia;
 

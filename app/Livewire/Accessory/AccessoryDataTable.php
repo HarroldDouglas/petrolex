@@ -204,4 +204,55 @@ class AccessoryDataTable extends BaseDataTable
 
         return null;
     }
+
+    /**
+     * Toggle the active status of an accessory type
+     */
+    public function toggleAccessoryStatus($accessoryTypeId)
+    {
+        try {
+            $accessoryType = AccessoryType::find($accessoryTypeId);
+
+            if (! $accessoryType) {
+                $this->dispatch('show-notification', [
+                    'type' => 'error',
+                    'title' => 'Erreur !',
+                    'message' => "L'accessoire sélectionné n'existe pas.",
+                    'timer' => 3000,
+                ]);
+                return;
+            }
+
+            $currentStatus = $accessoryType->is_active;
+            $newStatus = ! $currentStatus;
+
+            $accessoryType->is_active = $newStatus;
+            $result = $accessoryType->save();
+
+            if ($result) {
+                $status = $newStatus ? 'activé' : 'désactivé';
+                $name = $accessoryType->name;
+
+                session()->flash('success', "L'accessoire a été {$status} avec succès.");
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Statut modifié !',
+                    'message' => "L'accessoire {$name} a été {$status} avec succès.",
+                    'timer' => 3000,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error toggling accessory status: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la modification du statut de l'accessoire.",
+                'timer' => 3000,
+            ]);
+        } finally {
+            $this->dispatch('close-loading-swal');
+        }
+    }
 }

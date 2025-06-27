@@ -29,7 +29,9 @@
                 <x-order.detail.actions :order="$order" />
                 <!-- Customer Details end -->
 
-                <a class="btn btn-info ms-2" href="{{ route('orders.list') }}">Retour à la Liste des Commandes</a>
+                <a class="btn btn-primary ms-2" href="{{ route('orders.list') }}">
+                    <i class="ti ti-arrow-back"></i> Retourner à la siste
+                </a>
             </div>
         </div>
         <!-- Breadcrumb end -->

@@ -2,13 +2,12 @@
 
 namespace App\DTOs;
 
-use App\Models\BaseModelWithMedia;
-use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
 
 class ModelWithImagesDTO
 {
     public function __construct(
-        public readonly Model $model,
+        public readonly HasMedia $model,
         public readonly ImageDataDTO $mainImage,
         /**
          * @var ImageDataDTO[]
@@ -16,7 +15,7 @@ class ModelWithImagesDTO
         public readonly array $images,
     ) {}
 
-    public static function fromModel(BaseModelWithMedia $model): self
+    public static function fromModel(HasMedia $model): self
     {
         $mainImage = ImageDataDTO::fromMedia($model->main_image ?? null);
 
