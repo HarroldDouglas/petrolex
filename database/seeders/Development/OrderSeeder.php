@@ -7,23 +7,32 @@ namespace Database\Seeders\Development;
 use App\Enums\BottleMovementType;
 use App\Enums\BottleOrderType;
 use App\Enums\BottleStatus;
+use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Enums\ProductType;
 use App\Models\Accessory;
 use App\Models\Bottle;
-use App\Models\BottleType;
+use App\Models\BottleMovement;
 use App\Models\Customer;
 use App\Models\DeliveryPerson;
 use App\Models\DistributionCenter;
 use App\Models\Order;
+use App\Models\OrderBottleScans;
 use App\Models\OrderItem;
+use App\Models\OrderPayment;
+use App\Models\ProductCategory;
+use App\Models\ProductCategoryDistributionCenter;
+use App\Models\Refund;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrderSeeder extends Seeder
 {
-    // Compteurs pour suivre les modifications de statut des bouteilles
+    // Counters to track bottle status changes
     private array $bottleStatusCounts = [];
     private array $initialStockStats = [];
     private array $orderTypeStats = [
@@ -32,7 +41,6 @@ class OrderSeeder extends Seeder
         'delivered' => 0,
         'cancelled' => 0,
     ];
-
     private array $bottleTypeStats = [];
 
     /**
@@ -42,69 +50,87 @@ class OrderSeeder extends Seeder
     {
         $this->command->info('Creating orders for development...');
 
-        // Récupérer les statistiques initiales
+        // Get initial statistics
         $centers = DistributionCenter::all();
-        $bottleTypes = BottleType::all();
+        $productCategories = ProductCategory::bottles()->get();
 
         $this->command->info('===== ÉTAT INITIAL DES STOCKS AVANT TOUTE COMMANDE =====');
         foreach ($centers as $center) {
-            $this->initialStockStats[$center->id] = $this->collectCenterStockStats($center, $bottleTypes);
-            $this->displayStockStatistics($center, $bottleTypes);
+            $this->initialStockStats[$center->id] = $this->collectCenterStockStats($center, $productCategories);
+            $this->displayStockStatistics($center, $productCategories);
         }
         $this->command->info('=============================================================');
 
         $this->createConfirmedOrders();
         $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES CONFIRMÉES =====');
-        $this->displayAllCenterStats($centers, $bottleTypes);
+        $this->displayAllCenterStats($centers, $productCategories);
 
         $this->createProcessingOrders();
         $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES EN TRAITEMENT =====');
-        $this->displayAllCenterStats($centers, $bottleTypes);
+        $this->displayAllCenterStats($centers, $productCategories);
 
         $this->createDeliveredOrders();
-        $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES LIVRÉES =====');
-        $this->displayAllCenterStats($centers, $bottleTypes);
+        $this->command->info('===== STOCK STATE AFTER DELIVERED ORDERS =====');
+        $this->displayAllCenterStats($centers, $productCategories);
 
         $this->createCancelledOrders();
-        $this->command->info('===== ÉTAT FINAL DES STOCKS APRÈS TOUTES LES COMMANDES =====');
-        $this->displayAllCenterStats($centers, $bottleTypes);
+        $this->command->info('===== FINAL STOCK STATE AFTER ALL ORDERS =====');
+        $this->displayAllCenterStats($centers, $productCategories);
 
-        // Résumé global
-        $this->command->info('==============================================');
-        $this->command->info('RÉSUMÉ DES COMMANDES CRÉÉES:');
-        $this->command->info("Commandes confirmées: {$this->orderTypeStats['confirmed']}");
-        $this->command->info("Commandes en traitement: {$this->orderTypeStats['processing']}");
-        $this->command->info("Commandes livrées: {$this->orderTypeStats['delivered']}");
-        $this->command->info("Commandes annulées: {$this->orderTypeStats['cancelled']}");
-        $this->command->info('==============================================');
-
-        // Récapitulatif des changements de statut de bouteilles
-        $this->command->info('RÉSUMÉ DES CHANGEMENTS DE STATUT DE BOUTEILLES:');
-        foreach ($this->bottleStatusCounts as $status => $count) {
-            $this->command->info("Bouteilles {$status}: {$count}");
-        }
+        // Global summary
+        $this->displayOrderSummary();
 
         $this->command->info('Development orders created successfully!');
     }
 
     /**
-     * Affiche les statistiques de stock pour tous les centres
+     * Display a summary of created orders
      */
-    private function displayAllCenterStats($centers, $bottleTypes): void
+    private function displayOrderSummary(): void
     {
-        foreach ($centers as $center) {
-            $this->displayStockStatistics($center, $bottleTypes);
+        $this->command->info('==============================================');
+        $this->command->info('ORDERS CREATED SUMMARY:');
+        $this->command->info("Confirmed orders: {$this->orderTypeStats['confirmed']}");
+        $this->command->info("Processing orders: {$this->orderTypeStats['processing']}");
+        $this->command->info("Delivered orders: {$this->orderTypeStats['delivered']}");
+        $this->command->info("Cancelled orders: {$this->orderTypeStats['cancelled']}");
+        $this->command->info('==============================================');
+
+        // Bottle status change summary
+        $this->command->info('BOTTLE STATUS CHANGE SUMMARY:');
+        foreach ($this->bottleStatusCounts as $status => $count) {
+            $this->command->info("Bottles {$status}: {$count}");
         }
     }
 
     /**
-     * Récupère les valeurs de stock depuis la table pivot
+     * Display stock statistics for all centers
      */
-    private function getPivotStockValues(int $centerId, int $bottleTypeId): array
+    private function displayAllCenterStats(Collection $centers, Collection $productCategories): void
     {
-        $stockData = DB::table('bottle_type_distribution_center')
+        foreach ($centers as $center) {
+            $this->displayStockStatistics($center, $productCategories);
+        }
+    }
+
+    /**
+     * Get stock values from pivot table
+     */
+    private function getPivotStockValues(int $centerId, int $productCategoryId): array
+    {
+        // Find the product category for this bottle type
+        $productCategory = ProductCategory::find($productCategoryId);
+
+        if (! $productCategory) {
+            return [
+                'empty' => 0,
+                'filled' => 0,
+            ];
+        }
+
+        $stockData = DB::table('product_category_distribution_center')
             ->where('distribution_center_id', $centerId)
-            ->where('bottle_type_id', $bottleTypeId)
+            ->where('product_category_id', $productCategory->id)
             ->first();
 
         return [
@@ -114,35 +140,43 @@ class OrderSeeder extends Seeder
     }
 
     /**
-     * Récupère les valeurs de stock actuelles en comptant les bouteilles
+     * Get actual stock values by counting bottles
      */
-    private function getActualStockValues(int $centerId, int $bottleTypeId): array
+    private function getActualStockValues(int $centerId, int $productCategoryId): array
     {
-        $emptyCount = Bottle::where('bottle_type_id', $bottleTypeId)
-            ->where('is_filled', false)
-            ->where('status', BottleStatus::IN_STOCK())
-            ->where('distribution_center_id', $centerId)
-            ->count();
+        $pivotRecord = ProductCategoryDistributionCenter::where('distribution_center_id', $centerId)
+            ->where('product_category_id', $productCategoryId)
+            ->first();
 
-        $filledCount = Bottle::where('bottle_type_id', $bottleTypeId)
-            ->where('is_filled', true)
-            ->where('status', BottleStatus::IN_STOCK())
-            ->where('distribution_center_id', $centerId)
-            ->count();
+        if (! $pivotRecord) {
+            return [
+                'empty' => 0,
+                'filled' => 0,
+            ];
+        }
+
+        $productCategory = ProductCategory::find($productCategoryId);
+
+        if ($productCategory && $productCategory->product_type === \App\Enums\ProductType::BOTTLE()) {
+            return [
+                'empty' => $pivotRecord->stock_empty,
+                'filled' => $pivotRecord->stock_filled,
+            ];
+        }
 
         return [
-            'empty' => $emptyCount,
-            'filled' => $filledCount,
+            'empty' => 0,
+            'filled' => 0,
         ];
     }
 
     /**
-     * Formate une différence pour l'affichage
+     * Format a difference for display
      */
     private function formatDifference(int $diff): string
     {
         if ($diff === 0) {
-            return '(identique)';
+            return '(identical)';
         }
 
         $sign = $diff > 0 ? '+' : '';
@@ -151,17 +185,17 @@ class OrderSeeder extends Seeder
     }
 
     /**
-     * Collecte les statistiques de stock pour un centre
+     * Collect stock statistics for a center
      */
-    private function collectCenterStockStats(DistributionCenter $center, $bottleTypes): array
+    private function collectCenterStockStats(DistributionCenter $center, Collection $productCategories): array
     {
         $stats = [];
 
-        foreach ($bottleTypes as $bottleType) {
-            $pivotValues = $this->getPivotStockValues($center->id, $bottleType->id);
-            $actualValues = $this->getActualStockValues($center->id, $bottleType->id);
+        foreach ($productCategories as $productCategory) {
+            $pivotValues = $this->getPivotStockValues($center->id, $productCategory->id);
+            $actualValues = $this->getActualStockValues($center->id, $productCategory->id);
 
-            $stats[$bottleType->id] = [
+            $stats[$productCategory->id] = [
                 'pivot' => $pivotValues,
                 'actual' => $actualValues,
             ];
@@ -171,12 +205,12 @@ class OrderSeeder extends Seeder
     }
 
     /**
-     * Récupère et affiche les statistiques détaillées des stocks pour un centre
+     * Retrieve and display detailed stock statistics for a center
      */
-    private function displayStockStatistics(DistributionCenter $center, $bottleTypes): void
+    private function displayStockStatistics(DistributionCenter $center, Collection $productCategories): void
     {
         $this->command->line('--------------------------------------------------');
-        $this->command->line("STATISTIQUES DE STOCK POUR: {$center->name}");
+        $this->command->line("STOCK STATISTICS FOR: {$center->name}");
         $this->command->line('--------------------------------------------------');
 
         $totalPivotEmpty = 0;
@@ -184,70 +218,87 @@ class OrderSeeder extends Seeder
         $totalActualEmpty = 0;
         $totalActualFilled = 0;
 
-        foreach ($bottleTypes as $bottleType) {
-            // Récupérer les valeurs du pivot
-            $pivotValues = $this->getPivotStockValues($center->id, $bottleType->id);
+        foreach ($productCategories as $productCategory) {
+            // Get pivot values
+            $pivotValues = $this->getPivotStockValues($center->id, $productCategory->id);
             $pivotEmpty = $pivotValues['empty'];
             $pivotFilled = $pivotValues['filled'];
 
-            // Récupérer les valeurs réelles (calculées à partir de la table des bouteilles)
-            $actualValues = $this->getActualStockValues($center->id, $bottleType->id);
+            // Get actual values (calculated from bottles table)
+            $actualValues = $this->getActualStockValues($center->id, $productCategory->id);
             $actualEmpty = $actualValues['empty'];
             $actualFilled = $actualValues['filled'];
 
-            // Calculer les différences
+            // Calculate differences
             $emptyDiff = $actualEmpty - $pivotEmpty;
             $filledDiff = $actualFilled - $pivotFilled;
 
-            // Formater les différences
+            // Format differences
             $emptyDiffFormatted = $this->formatDifference($emptyDiff);
             $filledDiffFormatted = $this->formatDifference($filledDiff);
 
-            // Mettre à jour les totaux
+            // Update totals
             $totalPivotEmpty += $pivotEmpty;
             $totalPivotFilled += $pivotFilled;
             $totalActualEmpty += $actualEmpty;
             $totalActualFilled += $actualFilled;
 
-            // Afficher les statistiques pour ce type de bouteille
-            $this->command->line("{$bottleType->name}:");
-            $this->command->line("  - PIVOT   : {$pivotEmpty} vides, {$pivotFilled} pleines");
-            $this->command->line("  - BOTTLES : {$actualEmpty} vides {$emptyDiffFormatted}, {$actualFilled} pleines {$filledDiffFormatted}");
+            // Display statistics for this product category
+            $this->command->line("{$productCategory->name}:");
+            $this->command->line("  - PIVOT   : {$pivotEmpty} empty, {$pivotFilled} filled");
+            $this->command->line("  - BOTTLES : {$actualEmpty} empty {$emptyDiffFormatted}, {$actualFilled} filled {$filledDiffFormatted}");
 
             if ($emptyDiff !== 0 || $filledDiff !== 0) {
-                $this->command->warn("  ⚠️ DIFFÉRENCE DÉTECTÉE pour {$bottleType->name} dans {$center->name}");
+                $this->command->warn("  ⚠️ DIFFERENCE DETECTED for {$productCategory->name} in {$center->name}");
             }
 
-            // Si on a des statistiques initiales, calculer la différence depuis le début
-            if (isset($this->initialStockStats[$center->id][$bottleType->id])) {
-                $initialActualValues = $this->initialStockStats[$center->id][$bottleType->id]['actual'];
-                $initialEmptyCount = $initialActualValues['empty'];
-                $initialFilledCount = $initialActualValues['filled'];
-
-                $totalEmptyDiff = $actualEmpty - $initialEmptyCount;
-                $totalFilledDiff = $actualFilled - $initialFilledCount;
-
-                if ($totalEmptyDiff !== 0 || $totalFilledDiff !== 0) {
-                    $emptyDiffText = $this->formatDifference($totalEmptyDiff);
-                    $filledDiffText = $this->formatDifference($totalFilledDiff);
-                    $this->command->line("  - DIFF TOTAL: {$emptyDiffText} vides, {$filledDiffText} pleines depuis le début");
-                }
-            }
+            // If we have initial statistics, calculate the difference from the beginning
+            $this->displayInitialDifference($center, $productCategory, $actualEmpty, $actualFilled);
         }
 
-        // Afficher les totaux
+        // Display totals
+        $this->displayTotalStatistics($totalPivotEmpty, $totalPivotFilled, $totalActualEmpty, $totalActualFilled, $center);
+    }
+
+    /**
+     * Display difference from initial state
+     */
+    private function displayInitialDifference(DistributionCenter $center, ProductCategory $productCategory, int $actualEmpty, int $actualFilled): void
+    {
+        if (isset($this->initialStockStats[$center->id][$productCategory->id])) {
+            $initialActualValues = $this->initialStockStats[$center->id][$productCategory->id]['actual'];
+            $initialEmptyCount = $initialActualValues['empty'];
+            $initialFilledCount = $initialActualValues['filled'];
+
+            $totalEmptyDiff = $actualEmpty - $initialEmptyCount;
+            $totalFilledDiff = $actualFilled - $initialFilledCount;
+
+            if ($totalEmptyDiff !== 0 || $totalFilledDiff !== 0) {
+                $emptyDiffText = $this->formatDifference($totalEmptyDiff);
+                $filledDiffText = $this->formatDifference($totalFilledDiff);
+                $this->command->line("  - TOTAL DIFF: {$emptyDiffText} empty, {$filledDiffText} filled since beginning");
+            }
+        }
+    }
+
+    /**
+     * Display total statistics for a center
+     */
+    private function displayTotalStatistics(int $totalPivotEmpty, int $totalPivotFilled, int $totalActualEmpty, int $totalActualFilled, DistributionCenter $center): void
+    {
         $totalEmptyDiff = $totalActualEmpty - $totalPivotEmpty;
         $totalFilledDiff = $totalActualFilled - $totalPivotFilled;
         $totalEmptyDiffFormatted = $this->formatDifference($totalEmptyDiff);
         $totalFilledDiffFormatted = $this->formatDifference($totalFilledDiff);
 
         $this->command->line('--------------------------------------------------');
-        $this->command->line('TOTAUX:');
-        $this->command->line("  - PIVOT   : {$totalPivotEmpty} vides, {$totalPivotFilled} pleines, Total: ".($totalPivotEmpty + $totalPivotFilled));
-        $this->command->line("  - BOTTLES : {$totalActualEmpty} vides {$totalEmptyDiffFormatted}, {$totalActualFilled} pleines {$totalFilledDiffFormatted}, Total: ".($totalActualEmpty + $totalActualFilled).' '.$this->formatDifference($totalEmptyDiff + $totalFilledDiff));
+        $this->command->line('TOTALS:');
+        $this->command->line("  - PIVOT   : {$totalPivotEmpty} empty, {$totalPivotFilled} filled, Total: ".($totalPivotEmpty + $totalPivotFilled));
+        $this->command->line("  - BOTTLES : {$totalActualEmpty} empty {$totalEmptyDiffFormatted}, {$totalActualFilled} filled {$totalFilledDiffFormatted}, Total: ".
+            ($totalActualEmpty + $totalActualFilled).' '.$this->formatDifference($totalEmptyDiff + $totalFilledDiff));
 
         if ($totalEmptyDiff !== 0 || $totalFilledDiff !== 0) {
-            $this->command->warn("  ⚠️ DIFFÉRENCE TOTALE DÉTECTÉE pour {$center->name}");
+            $this->command->warn("  ⚠️ TOTAL DIFFERENCE DETECTED for {$center->name}");
         }
 
         $this->command->line('--------------------------------------------------');
@@ -279,21 +330,7 @@ class OrderSeeder extends Seeder
         // Create 8 confirmed orders
         $confirmedOrders = [];
         for ($i = 0; $i < 8; $i++) {
-            $customer = $customers->random();
-            $center = $centers->random();
-
-            // Get a random delivery address for this customer
-            $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
-
-            $confirmedOrders[] = Order::factory()
-                ->confirmed()
-                ->create([
-                    'customer_id' => $customer->id,
-                    'distribution_center_id' => $center->id,
-                    'delivery_address_id' => $deliveryAddress->id,
-                    'order_number' => 'ORD-'.rand(100000, 999999),
-                    'order_date' => now()->subDays(rand(1, 10)),
-                ]);
+            $confirmedOrders[] = $this->createRandomOrder($customers, $centers, OrderStatus::CONFIRMED());
         }
 
         $this->addOrderItems($confirmedOrders);
@@ -333,23 +370,12 @@ class OrderSeeder extends Seeder
         // Create 8 processing orders
         $processingOrders = [];
         for ($i = 0; $i < 8; $i++) {
-            $customer = $customers->random();
-            $center = $centers->random();
-            $deliveryPerson = $deliveryPersons->isNotEmpty() ? $deliveryPersons->random() : null;
-
-            // Get a random delivery address for this customer
-            $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
-
-            $processingOrders[] = Order::factory()
-                ->processing()
-                ->create([
-                    'customer_id' => $customer->id,
-                    'distribution_center_id' => $center->id,
-                    'delivery_address_id' => $deliveryAddress->id,
-                    'delivery_person_id' => $deliveryPerson?->id,
-                    'order_number' => 'ORD-'.rand(100000, 999999),
-                    'order_date' => now()->subDays(rand(1, 7)),
-                ]);
+            $processingOrders[] = $this->createRandomOrder(
+                $customers,
+                $centers,
+                OrderStatus::PROCESSING(),
+                $deliveryPersons->isNotEmpty() ? $deliveryPersons->random() : null
+            );
         }
 
         $this->addOrderItems($processingOrders);
@@ -395,25 +421,13 @@ class OrderSeeder extends Seeder
             $ordersPerDeliveryPerson = rand(1, 4);
 
             for ($i = 0; $i < $ordersPerDeliveryPerson; $i++) {
-                $customer = $customers->random();
-                $center = $centers->random();
-
-                // Get a random delivery address for this customer
-                $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
-
-                $order = Order::factory()
-                    ->delivered()
-                    ->create([
-                        'customer_id' => $customer->id,
-                        'distribution_center_id' => $center->id,
-                        'delivery_address_id' => $deliveryAddress->id,
-                        'delivery_person_id' => $deliveryPerson->id,
-                        'order_number' => 'ORD-'.rand(100000, 999999),
-                        'order_date' => now()->subDays(rand(2, 5)),
-                        'rating' => rand(0, 100) <= 70 ? rand(30, 50) / 10 : null,
-                        'comments' => rand(0, 100) <= 70 ? fake()->realText(150) : null,
-                        'center_comments' => rand(0, 100) <= 40 ? fake()->realText(100) : null,
-                    ]);
+                $order = $this->createRandomOrder(
+                    $customers,
+                    $centers,
+                    OrderStatus::DELIVERED(),
+                    $deliveryPerson,
+                    true
+                );
 
                 $deliveredOrders[] = $order;
             }
@@ -452,25 +466,14 @@ class OrderSeeder extends Seeder
 
         // Create 7 cancelled orders
         for ($i = 0; $i < 7; $i++) {
-            $customer = $customers->random();
-            $center = $centers->random();
-
-            // Get a random delivery address for this customer
-            $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
-
-            $cancelledOrders[] = Order::factory()
-                ->cancelled()
-                ->create([
-                    'customer_id' => $customer->id,
-                    'distribution_center_id' => $center->id,
-                    'delivery_address_id' => $deliveryAddress->id,
-                    'order_number' => 'ORD-'.rand(100000, 999999),
-                    'order_date' => now()->subDays(rand(5, 30)),
-                    // Add rating and comments for cancelled orders (50% chance)
-                    'rating' => rand(0, 100) <= 50 ? rand(10, 40) / 10 : null,
-                    'comments' => rand(0, 100) <= 50 ? fake()->realText(150) : null,
-                    'center_comments' => rand(0, 100) <= 60 ? fake()->realText(100) : null,
-                ]);
+            $order = $this->createRandomOrder(
+                $customers,
+                $centers,
+                OrderStatus::CANCELLED(),
+                null,
+                true
+            );
+            $cancelledOrders[] = $order;
         }
 
         $this->addOrderItems($cancelledOrders);
@@ -479,7 +482,46 @@ class OrderSeeder extends Seeder
         $this->command->info(count($cancelledOrders).' cancelled orders created.');
     }
 
-    private function addOrderItems($orders): void
+    /**
+     * Create a random order with specified parameters
+     */
+    private function createRandomOrder(
+        Collection $customers,
+        Collection $centers,
+        OrderStatus $status,
+        ?DeliveryPerson $deliveryPerson = null,
+        bool $addRatings = false
+    ): Order {
+        $customer = $customers->random();
+        $center = $centers->random();
+        $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
+
+        $orderData = [
+            'customer_id' => $customer->id,
+            'distribution_center_id' => $center->id,
+            'delivery_address_id' => $deliveryAddress->id,
+            'delivery_person_id' => $deliveryPerson?->id,
+            'order_number' => 'ORD-'.rand(100000, 999999),
+            'order_date' => now()->subDays(rand(1, 10)),
+        ];
+
+        if ($addRatings) {
+            $orderData = array_merge($orderData, [
+                'rating' => rand(0, 100) <= 70 ? rand(30, 50) / 10 : null,
+                'comments' => rand(0, 100) <= 70 ? fake()->realText(150) : null,
+                'center_comments' => rand(0, 100) <= 40 ? fake()->realText(100) : null,
+            ]);
+        }
+
+        return Order::factory()
+            ->state(['status' => $status]) // Explicitly set the status
+            ->create($orderData);
+    }
+
+    /**
+     * Add order items to orders
+     */
+    private function addOrderItems(array $orders): void
     {
         foreach ($orders as $order) {
             if (rand(1, 100) <= 70) {
@@ -493,166 +535,295 @@ class OrderSeeder extends Seeder
         }
     }
 
+    /**
+     * Add bottles to an order
+     */
     private function addBottlesToOrder(Order $order): void
     {
-        $bottleStocks = $order->distributionCenter
-            ->bottleTypeStocks()
-            ->wherePivot('stock_filled', '>', 0)
-            ->get();
+        // Get bottle types with available stock
+        $bottleStocks = $this->getBottleTypesWithStock($order->distributionCenter);
 
-        if ($bottleStocks->isEmpty()) {
+        if (empty($bottleStocks)) {
             $this->command->warn("No filled bottles available for order {$order->order_number}");
 
             return;
         }
 
-        $selectedTypes = $bottleStocks->random(min(rand(1, 3), $bottleStocks->count()));
+        // Select a random subset of bottle types
+        $selectedTypes = $this->selectRandomBottleTypes($bottleStocks);
 
         foreach ($selectedTypes as $bottleType) {
+            // Determine bottle order type (full or recharge)
             $bottleOrderType = rand(1, 100) <= 40
                 ? BottleOrderType::FULL()
                 : BottleOrderType::RECHARGE();
 
+            // Calculate available quantity
             $maxQuantity = min($bottleType->pivot->stock_filled, 3);
             $quantity = rand(1, $maxQuantity);
 
+            // Create order item with bottles
             $this->createBottleOrderItem($order, $bottleType, $quantity, $bottleOrderType);
 
-            // Suivi des statistiques par type de bouteille
-            if (! isset($this->bottleTypeStats[$bottleType->id])) {
-                $this->bottleTypeStats[$bottleType->id] = [
-                    'name' => $bottleType->name,
-                    'total_orders' => 0,
-                    'total_bottles' => 0,
-                    'by_status' => [],
-                    'by_order_type' => [],
-                ];
-            }
-
-            $this->bottleTypeStats[$bottleType->id]['total_orders']++;
-            $this->bottleTypeStats[$bottleType->id]['total_bottles'] += $quantity;
-
-            // Par statut de commande
-            if (! isset($this->bottleTypeStats[$bottleType->id]['by_status'][$order->status->value])) {
-                $this->bottleTypeStats[$bottleType->id]['by_status'][$order->status->value] = 0;
-            }
-            $this->bottleTypeStats[$bottleType->id]['by_status'][$order->status->value] += $quantity;
-
-            // Par type de commande de bouteille
-            if (! isset($this->bottleTypeStats[$bottleType->id]['by_order_type'][$bottleOrderType->value])) {
-                $this->bottleTypeStats[$bottleType->id]['by_order_type'][$bottleOrderType->value] = 0;
-            }
-            $this->bottleTypeStats[$bottleType->id]['by_order_type'][$bottleOrderType->value] += $quantity;
+            // Track statistics
+            $this->updateBottleTypeStatistics($bottleType, $order, $quantity, $bottleOrderType);
         }
     }
 
+    /**
+     * Select random bottle types from available stocks
+     */
+    private function selectRandomBottleTypes(array $bottleStocks): array
+    {
+        $count = min(rand(1, 3), count($bottleStocks));
+        $keys = array_rand($bottleStocks, $count);
+
+        if (! is_array($keys)) {
+            $keys = [$keys]; // If only one key is returned, wrap it in an array
+        }
+
+        $selectedTypes = [];
+        foreach ($keys as $key) {
+            $selectedTypes[] = $bottleStocks[$key];
+        }
+
+        return $selectedTypes;
+    }
+
+    /**
+     * Update statistics for bottle types
+     */
+    private function updateBottleTypeStatistics(
+        ProductCategory $productCategory,
+        Order $order,
+        int $quantity,
+        BottleOrderType $bottleOrderType
+    ): void {
+        if (! isset($this->bottleTypeStats[$productCategory->id])) {
+            $this->bottleTypeStats[$productCategory->id] = [
+                'name' => $productCategory->name,
+                'total_orders' => 0,
+                'total_bottles' => 0,
+                'by_status' => [],
+                'by_order_type' => [],
+            ];
+        }
+
+        $this->bottleTypeStats[$productCategory->id]['total_orders']++;
+        $this->bottleTypeStats[$productCategory->id]['total_bottles'] += $quantity;
+
+        // By order status
+        if (! isset($this->bottleTypeStats[$productCategory->id]['by_status'][$order->status->value])) {
+            $this->bottleTypeStats[$productCategory->id]['by_status'][$order->status->value] = 0;
+        }
+        $this->bottleTypeStats[$productCategory->id]['by_status'][$order->status->value] += $quantity;
+
+        // By bottle order type
+        if (! isset($this->bottleTypeStats[$productCategory->id]['by_order_type'][$bottleOrderType->value])) {
+            $this->bottleTypeStats[$productCategory->id]['by_order_type'][$bottleOrderType->value] = 0;
+        }
+        $this->bottleTypeStats[$productCategory->id]['by_order_type'][$bottleOrderType->value] += $quantity;
+    }
+
+    /**
+     * Add accessories to an order
+     */
     private function addAccessoriesToOrder(Order $order): void
     {
-        $accessories = Accessory::whereHas('product')
-            ->where('distribution_center_id', $order->distribution_center)
-            ->where('quantity', '>', 0)
-            ->with(['product', 'accessoryType'])
+        // Get accessories available in the distribution center that aren't sold yet
+        $accessories = Accessory::where('distribution_center_id', $order->distribution_center_id)
+            ->where('is_sold', false)
             ->get();
 
         if ($accessories->isEmpty()) {
             return;
         }
 
-        $accessoriesByType = $accessories->groupBy('accessory_type_id');
+        // Group accessories by type and select random types
+        $accessoriesByType = $accessories->groupBy(function ($accessory) {
+            return $accessory->accessoryTypeId;
+        });
+
         $selectedTypes = $accessoriesByType->random(min(rand(1, 2), $accessoriesByType->count()));
 
         foreach ($selectedTypes as $accessoriesOfSameType) {
-            $accessory = $accessoriesOfSameType->first();
-            $quantity = 1;
+            // Determine quantity (1-3) of accessories to sell, but limit by what's available
+            $maxQty = min(3, $accessoriesOfSameType->count());
+            $quantity = rand(1, $maxQty);
 
-            $this->createAccessoryOrderItem($order, $accessory, $quantity);
+            // Get the specific accessories to include
+            $selectedAccessories = $accessoriesOfSameType->take($quantity);
+            $firstAccessory = $selectedAccessories->first();
+
+            // Create order item for these accessories
+            $this->createAccessoryOrderItem($order, $firstAccessory, $selectedAccessories);
         }
     }
 
-    private function createBottleOrderItem(Order $order, BottleType $bottleType, int $quantity, BottleOrderType $bottleOrderType): void
+    /**
+     * Create a bottle order item
+     */
+    private function createBottleOrderItem(Order $order, ProductCategory $productCategory, int $quantity, BottleOrderType $bottleOrderType): void
     {
+        $bottleType = $productCategory->typeInstance;
+        $bottleWithContentPrice = $bottleType->bottle_with_content_price ?? 5000;
+        $contentPrice = $bottleType->content_price ?? 3500;
+
         $unitPrice = match ($bottleOrderType) {
-            BottleOrderType::FULL() => $bottleType->bottle_with_content_price,
-            BottleOrderType::RECHARGE() => $bottleType->content_price,
+            BottleOrderType::FULL() => $bottleWithContentPrice,
+            BottleOrderType::RECHARGE() => $contentPrice,
         };
 
-        // Déterminer le statut de bouteille en fonction du statut de commande
-        $targetBottleStatus = match ($order->status->value) {
-            'processing' => BottleStatus::WITH_DELIVERY_PERSON(),
-            'confirmed' => BottleStatus::IN_STOCK(), // Reste en stock jusqu'à ce que le livreur l'emporte
-            'delivered' => BottleStatus::WITH_CLIENT(),
-            'cancelled' => BottleStatus::IN_STOCK(),
+        // Determine bottle status based on order status
+        $targetBottleStatus = match (true) {
+            $order->status->equals(OrderStatus::PROCESSING()) => BottleStatus::WITH_DELIVERY_PERSON(),
+            $order->status->equals(OrderStatus::CONFIRMED()) => BottleStatus::IN_STOCK(), // Remains in stock until delivery person takes it
+            $order->status->equals(OrderStatus::DELIVERED()) => BottleStatus::WITH_CLIENT(),
+            $order->status->equals(OrderStatus::CANCELLED()) => BottleStatus::IN_STOCK(),
             default => BottleStatus::IN_STOCK(),
         };
 
-        // Find available bottles (IN_STOCK + not linked to active order)
-        $availableBottles = Bottle::where('bottle_type_id', $bottleType->id)
+        $availableBottles = Bottle::whereHas('product', function ($query) use ($productCategory) {
+            $query->where('product_category_id', $productCategory->id);
+        })
             ->where('distribution_center_id', $order->distribution_center_id)
-            ->where('is_filled', true)  // Toujours des bouteilles pleines pour les commandes
-            ->where('status', BottleStatus::IN_STOCK())  // Toujours à partir du stock
-            ->whereDoesntHave('product.orderItems', function ($query) {
-                $query->whereHas('order', function ($orderQuery) {
-                    $orderQuery->whereNotIn('status', ['cancelled', 'delivered']);
-                });
-            })
-            ->with('product')
+            ->where('is_filled', true)
+            ->where('status', BottleStatus::IN_STOCK())
             ->take($quantity)
             ->get();
 
         $foundCount = $availableBottles->count();
-        $missingCount = $quantity - $foundCount;
 
-        if ($missingCount > 0) {
-            Log::info("Stock insuffisant: manque {$missingCount} bouteilles de type {$bottleType->name} pour la commande #{$order->order_number}");
+        if ($foundCount === 0) {
+            return;
         }
 
-        // Traiter les bouteilles trouvées
+        if ($foundCount < $quantity) {
+            Log::info('Insufficient stock: missing '.($quantity - $foundCount)." bottles of type {$productCategory->name} for order #{$order->order_number}");
+        }
+
+        // Create a single OrderItem for all bottles of the same type and option
+        $orderItem = OrderItem::create([
+            'order_id' => $order->id,
+            'product_category_id' => $productCategory->id,
+            'quantity' => $foundCount,
+            'bottle_type' => $bottleOrderType->value,
+            'unit_price' => $unitPrice,
+            'total_price' => $unitPrice * $foundCount,
+        ]);
+
+        // Update the status of each bottle individually
         foreach ($availableBottles as $bottle) {
-            // Créer l'élément de commande
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $bottle->product_id,
-                'quantity' => 1,
-                'bottle_type' => $bottleOrderType->value,
-                'unit_price' => $unitPrice,
-                'total_price' => $unitPrice,
+            $this->processBottle($bottle, $order, $orderItem, $targetBottleStatus);
+        }
+    }
+
+    /**
+     * Process an individual bottle for an order
+     */
+    private function processBottle(Bottle $bottle, Order $order, OrderItem $orderItem, BottleStatus $targetBottleStatus): void
+    {
+        $oldStatus = $bottle->status;
+
+        // Update the status
+        $bottle->update(['status' => $targetBottleStatus]);
+
+        // Track status changes
+        $statusKey = $oldStatus->value.' -> '.$targetBottleStatus->value;
+        if (! isset($this->bottleStatusCounts[$statusKey])) {
+            $this->bottleStatusCounts[$statusKey] = 0;
+        }
+        $this->bottleStatusCounts[$statusKey]++;
+
+        // Record appropriate movement
+        $this->createBottleMovement($bottle, $order, $targetBottleStatus);
+
+        // Update pivot stock counts
+        $this->updatePivotStockCountsAfterStatusChange($bottle);
+
+        // Associate bottle with OrderItem only for orders beyond confirmed status
+        if (! $order->status->equals(OrderStatus::CONFIRMED())) {
+            OrderBottleScans::create([
+                'order_item_id' => $orderItem->id,
+                'bottle_id' => $bottle->id,
+            ]);
+        }
+    }
+
+    /**
+     * Create an accessory order item
+     */
+    private function createAccessoryOrderItem(Order $order, Accessory $accessory, $selectedAccessories): void
+    {
+        // Find the product category for this accessory type
+        $productCategory = ProductCategory::where('id', $accessory->product_category_id)
+            ->first();
+
+        if (! $productCategory) {
+            Log::warning("Product category not found for accessory #{$accessory->id} with category ID {$accessory->product_category_id}");
+
+            return;
+        }
+
+        $quantity = count($selectedAccessories);
+
+        // Get the price from the accessory type
+        $accessoryType = $accessory->accessoryType;
+        if (! $accessoryType) {
+            Log::warning("Accessory type not found for accessory #{$accessory->id}");
+
+            return;
+        }
+
+        // Create or update order item
+        $existingItem = $order->items()
+            ->where('product_category_id', $productCategory->id)
+            ->first();
+
+        if ($existingItem) {
+            // If item already exists, increase quantity and price
+            $newQuantity = $existingItem->quantity + $quantity;
+            $newPrice = $accessoryType->price * $newQuantity;
+
+            $existingItem->update([
+                'quantity' => $newQuantity,
+                'total_price' => $newPrice,
             ]);
 
-            // Si le statut doit changer, mettre à jour et enregistrer le mouvement
-            if ($targetBottleStatus !== BottleStatus::IN_STOCK()) {
-                $oldStatus = $bottle->status;
+            $orderItem = $existingItem;
+        } else {
+            // Create new order item
+            $orderItem = OrderItem::create([
+                'order_id' => $order->id,
+                'product_category_id' => $productCategory->id,
+                'quantity' => $quantity,
+                'bottle_type' => null,
+                'unit_price' => $accessoryType->price,
+                'total_price' => $accessoryType->price * $quantity,
+            ]);
+        }
 
-                // Mettre à jour le statut
-                $bottle->update(['status' => $targetBottleStatus]);
+        // Mark each selected accessory as sold (unless order was cancelled)
+        if (! $order->status->equals(OrderStatus::CANCELLED())) {
+            foreach ($selectedAccessories as $accessory) {
+                $accessory->update([
+                    'is_sold' => true,
+                ]);
 
-                // Suivi des changements de statut
-                $statusKey = $oldStatus->value.' -> '.$targetBottleStatus->value;
-                if (! isset($this->bottleStatusCounts[$statusKey])) {
-                    $this->bottleStatusCounts[$statusKey] = 0;
-                }
-                $this->bottleStatusCounts[$statusKey]++;
-
-                // Enregistrer le mouvement approprié
-                $this->createBottleMovement($bottle, $order, $targetBottleStatus);
-
-                // IMPORTANT: Mettre à jour la table pivot pour refléter le changement de stock
-                $this->updatePivotStockCountsAfterStatusChange($bottle);
+                // Mise à jour du stock sans passer productCategory
+                $this->updateAccessoryStockCount($accessory);
             }
+        }
+
+        // Update pivot table stock counts based on order status
+        if ($order->status->equals(OrderStatus::CANCELLED())) {
+            Log::info("Order {$order->order_number} was cancelled - not updating accessory stock");
         }
     }
 
-    private function createAccessoryOrderItem(Order $order, Accessory $accessory, int $quantity): void
-    {
-        OrderItem::create([
-            'order_id' => $order->id,
-            'product_id' => $accessory->product_id,
-            'quantity' => $quantity,
-            'bottle_type' => null,
-            'unit_price' => $accessory->accessoryType->price,
-            'total_price' => $accessory->accessoryType->price * $quantity,
-        ]);
-    }
-
+    /**
+     * Update order totals
+     */
     private function updateOrderTotals(Order $order): void
     {
         $order->refresh();
@@ -690,7 +861,7 @@ class OrderSeeder extends Seeder
         };
 
         // Create payment record
-        $payment = \App\Models\OrderPayment::create([
+        OrderPayment::create([
             'order_id' => $order->id,
             'payment_reference' => $paymentReference,
             'payment_status' => $paymentStatus,
@@ -701,8 +872,8 @@ class OrderSeeder extends Seeder
             'payment_notes' => null,
         ]);
 
-        // Si la commande est annulée et qu'elle avait été payée, on crée un remboursement
-        if ($order->status->value === 'cancelled' && $paymentStatus == PaymentStatus::PAID()) {
+        // If the order is cancelled and it was paid, create a refund
+        if ($order->status->equals(OrderStatus::CANCELLED()) && $paymentStatus == PaymentStatus::PAID()) {
             $this->createRefundForCancelledOrder($order, $totalAmount);
         }
     }
@@ -767,11 +938,11 @@ class OrderSeeder extends Seeder
     }
 
     /**
-     * Crée un enregistrement de mouvement de bouteille lors du changement de statut
+     * Create a bottle movement record when status changes
      */
     private function createBottleMovement(Bottle $bottle, Order $order, BottleStatus $targetStatus): void
     {
-        // Déterminer le type de mouvement en fonction du statut cible
+        // Determine movement type based on target status
         $movementType = match ($targetStatus) {
             BottleStatus::WITH_DELIVERY_PERSON() => BottleMovementType::ASSIGNMENT_TO_DELIVERY(),
             BottleStatus::WITH_CLIENT() => BottleMovementType::DELIVERY_TO_CUSTOMER(),
@@ -779,12 +950,12 @@ class OrderSeeder extends Seeder
         };
 
         if (! $movementType) {
-            Log::warning("Type de mouvement non pris en charge pour le statut {$targetStatus->value}");
+            Log::warning("Movement type not supported for status {$targetStatus->value}");
 
             return;
         }
 
-        // Déterminer les paramètres du mouvement
+        // Determine movement parameters
         $params = [
             'bottle_id' => $bottle->id,
             'distribution_center_id' => $order->distribution_center_id,
@@ -792,87 +963,120 @@ class OrderSeeder extends Seeder
             'created_at' => $order->updated_at ?? now()->subHours(rand(1, 24)),
         ];
 
-        if ($targetStatus === BottleStatus::WITH_DELIVERY_PERSON()) {
-            $params['user_id'] = $order->delivery_person_id ?? \App\Models\User::role('center_manager')->inRandomOrder()->first()->id;
-            $params['delivery_person_id'] = $order->delivery_person_id;
-            $params['notes'] = "Bouteille assignée au livreur pour la commande #{$order->order_number}";
-        } elseif ($targetStatus === BottleStatus::WITH_CLIENT()) {
-            $params['user_id'] = $order->delivery_person_id ?? \App\Models\User::role('center_manager')->inRandomOrder()->first()->id;
-            $params['delivery_person_id'] = $order->delivery_person_id;
-            $params['customer_id'] = $order->customer_id;
-            $params['notes'] = "Bouteille livrée au client via la commande #{$order->order_number}";
+        $this->setMovementUserParams($params, $order, $targetStatus);
 
-            // Pour les commandes livrées, nous devons d'abord enregistrer le passage au livreur
-            // si la bouteille était directement en stock avant
-            if ($bottle->getOriginal('status') === BottleStatus::IN_STOCK()->value) {
-                \App\Models\BottleMovement::create([
-                    'bottle_id' => $bottle->id,
-                    'user_id' => $order->delivery_person_id ?? \App\Models\User::role('center_manager')->inRandomOrder()->first()->id,
-                    'delivery_person_id' => $order->delivery_person_id,
-                    'distribution_center_id' => $order->distribution_center_id,
-                    'type' => BottleMovementType::ASSIGNMENT_TO_DELIVERY(),
-                    'notes' => "Bouteille assignée au livreur pour la commande #{$order->order_number}",
-                    'created_at' => now()->subHours(rand(24, 48)),
-                ]);
-
-                // Suivi des mouvements intermédiaires
-                $intermediateKey = 'IN_STOCK -> WITH_DELIVERY_PERSON (intermédiaire)';
-                if (! isset($this->bottleStatusCounts[$intermediateKey])) {
-                    $this->bottleStatusCounts[$intermediateKey] = 0;
-                }
-                $this->bottleStatusCounts[$intermediateKey]++;
-            }
+        // For delivered orders, if bottle was in stock, record transition through delivery person first
+        if ($targetStatus === BottleStatus::WITH_CLIENT() && $bottle->getOriginal('status') === BottleStatus::IN_STOCK()->value) {
+            $this->createIntermediateMovement($bottle, $order);
         }
 
-        // Créer l'enregistrement de mouvement
-        \App\Models\BottleMovement::create($params);
+        // Create movement record
+        BottleMovement::create($params);
     }
 
     /**
-     * Met à jour les compteurs de stock dans la table pivot après un changement de statut
-     * Cette étape est cruciale pour maintenir la cohérence entre le nombre réel de bouteilles
-     * et les valeurs dans la table pivot bottle_type_distribution_center
+     * Set user-related parameters for movement record
+     */
+    private function setMovementUserParams(array &$params, Order $order, BottleStatus $targetStatus): void
+    {
+        if ($targetStatus === BottleStatus::WITH_DELIVERY_PERSON()) {
+            $params['user_id'] = $order->delivery_person_id ?? User::role('center_manager')->inRandomOrder()->first()->id;
+            $params['delivery_person_id'] = $order->delivery_person_id;
+            $params['notes'] = "Bottle assigned to delivery person for order #{$order->order_number}";
+        } elseif ($targetStatus === BottleStatus::WITH_CLIENT()) {
+            $params['user_id'] = $order->delivery_person_id ?? User::role('center_manager')->inRandomOrder()->first()->id;
+            $params['delivery_person_id'] = $order->delivery_person_id;
+            $params['customer_id'] = $order->customer_id;
+            $params['notes'] = "Bottle delivered to customer via order #{$order->order_number}";
+        }
+    }
+
+    /**
+     * Create intermediate movement record for bottles going directly from stock to client
+     */
+    private function createIntermediateMovement(Bottle $bottle, Order $order): void
+    {
+        BottleMovement::create([
+            'bottle_id' => $bottle->id,
+            'user_id' => $order->delivery_person_id ?? User::role('center_manager')->inRandomOrder()->first()->id,
+            'delivery_person_id' => $order->delivery_person_id,
+            'distribution_center_id' => $order->distribution_center_id,
+            'type' => BottleMovementType::ASSIGNMENT_TO_DELIVERY(),
+            'notes' => "Bottle assigned to delivery person for order #{$order->order_number}",
+            'created_at' => now()->subHours(rand(24, 48)),
+        ]);
+
+        // Track intermediate movements
+        $intermediateKey = 'IN_STOCK -> WITH_DELIVERY_PERSON (intermediate)';
+        if (! isset($this->bottleStatusCounts[$intermediateKey])) {
+            $this->bottleStatusCounts[$intermediateKey] = 0;
+        }
+        $this->bottleStatusCounts[$intermediateKey]++;
+    }
+
+    /**
+     * Update stock counters in the pivot table after a status change
+     * This step is crucial to maintain consistency between actual bottle count
+     * and values in product_category_distribution_center pivot table
      */
     private function updatePivotStockCountsAfterStatusChange(Bottle $bottle): void
     {
-        // Si la bouteille quitte le stock, il faut décrémenter le compteur dans le pivot
+        // If the bottle leaves the stock, decrement the counter in the pivot
         if ($bottle->status !== BottleStatus::IN_STOCK()) {
-            // Récupérer les données actuelles du pivot
-            $pivotData = DB::table('bottle_type_distribution_center')
-                ->where('distribution_center_id', $bottle->distribution_center_id)
-                ->where('bottle_type_id', $bottle->bottle_type_id)
-                ->first();
+            // Find product category for this bottle type
+            $productCategory = ProductCategory::where('id', $bottle->product_category_id)->first();
 
-            if (! $pivotData) {
-                Log::warning("Données pivot non trouvées pour la bouteille #{$bottle->id} dans le centre {$bottle->distribution_center_id}");
+            if (! $productCategory) {
+                Log::warning("Product category not found for bottle #{$bottle->id} with category ID {$bottle->product_category_id}");
 
                 return;
             }
 
-            if ($bottle->is_filled) {
-                $newFilledCount = max(0, $pivotData->stock_filled - 1);
+            // Get current pivot data
+            $pivotData = DB::table('product_category_distribution_center')
+                ->where('distribution_center_id', $bottle->distribution_center_id)
+                ->where('product_category_id', $productCategory->id)
+                ->first();
 
-                DB::table('bottle_type_distribution_center')
-                    ->where('distribution_center_id', $bottle->distribution_center_id)
-                    ->where('bottle_type_id', $bottle->bottle_type_id)
-                    ->update([
-                        'stock_filled' => $newFilledCount,
-                        'updated_at' => now(),
-                    ]);
-            } else {
-                $newEmptyCount = max(0, $pivotData->stock_empty - 1);
+            if (! $pivotData) {
+                Log::warning("Pivot data not found for bottle #{$bottle->id} in center {$bottle->distribution_center_id}");
 
-                DB::table('bottle_type_distribution_center')
-                    ->where('distribution_center_id', $bottle->distribution_center_id)
-                    ->where('bottle_type_id', $bottle->bottle_type_id)
-                    ->update([
-                        'stock_empty' => $newEmptyCount,
-                        'updated_at' => now(),
-                    ]);
+                return;
             }
+
+            // Update stock count based on bottle fill status
+            $this->updateStockPivotCount($bottle, $productCategory, $pivotData);
         }
-        // Si la bouteille revient en stock, il faudrait incrémenter le compteur
-        // Ce cas n'est pas géré ici car dans ce seeder nous ne retournons pas les bouteilles en stock
+        // If the bottle returns to stock, we would need to increment the counter
+        // This case is not handled here as we don't return bottles to stock in this seeder
+    }
+
+    /**
+     * Update stock count in pivot table
+     */
+    private function updateStockPivotCount(Bottle $bottle, ProductCategory $productCategory, $pivotData): void
+    {
+        if ($bottle->is_filled) {
+            $newFilledCount = max(0, $pivotData->stock_filled - 1);
+
+            DB::table('product_category_distribution_center')
+                ->where('distribution_center_id', $bottle->distribution_center_id)
+                ->where('product_category_id', $productCategory->id)
+                ->update([
+                    'stock_filled' => $newFilledCount,
+                    'updated_at' => now(),
+                ]);
+        } else {
+            $newEmptyCount = max(0, $pivotData->stock_empty - 1);
+
+            DB::table('product_category_distribution_center')
+                ->where('distribution_center_id', $bottle->distribution_center_id)
+                ->where('product_category_id', $productCategory->id)
+                ->update([
+                    'stock_empty' => $newEmptyCount,
+                    'updated_at' => now(),
+                ]);
+        }
     }
 
     /**
@@ -881,13 +1085,12 @@ class OrderSeeder extends Seeder
     private function createRefundForCancelledOrder(Order $order, float $totalAmount): void
     {
         $refundAmount = $totalAmount;
-        $initiatedBy = \App\Models\User::role('admin')->inRandomOrder()->first()?->id
-            ?? \App\Models\User::role('center_manager')->inRandomOrder()->first()?->id
-            ?? 1;
+        $initiatedBy = $this->getRandomAdminUserId();
 
         $orderDate = $order->order_date;
         $cancelledAt = $orderDate->copy()->addHours(rand(1, 72));
         $cancelledAt = $cancelledAt->min(now()->subHours(1));
+
         $order->update([
             'cancelled_at' => $cancelledAt,
         ]);
@@ -895,23 +1098,104 @@ class OrderSeeder extends Seeder
         $completedAt = $cancelledAt->copy()->addHours(rand(1, 24));
         $completedAt = $completedAt->min(now());
 
-        \App\Models\Refund::create([
+        Refund::create([
             'order_id' => $order->id,
             'initiated_by' => $initiatedBy,
             'refund_method' => PaymentMethod::cases()[array_rand(PaymentMethod::cases())],
             'refund_identifier' => 'REF-'.strtoupper(substr(md5(uniqid()), 0, 8)),
             'status' => PaymentStatus::PAID(),
             'amount' => $refundAmount,
-            'reason' => 'Commande annulée par le client',
-            'notes' => 'Remboursement automatique suite à annulation',
+            'reason' => 'Order cancelled by customer',
+            'notes' => 'Automatic refund after cancellation',
             'initiated_at' => $cancelledAt,
             'completed_at' => $completedAt,
         ]);
 
         $order->cancelled_by = $initiatedBy;
-        $order->cancelled_reason = rand(0, 1) ? 'Demande du client ' : 'Problème technique au centre';
+        $order->cancelled_reason = rand(0, 1) ? 'Customer request' : 'Technical problem at the center';
         $order->save();
 
-        Log::info("Remboursement créé pour commande #{$order->order_number} d'un montant de {$refundAmount} CFA");
+        Log::info("Refund created for order #{$order->order_number} in the amount of {$refundAmount} CFA");
+    }
+
+    /**
+     * Get random admin user ID for refund
+     */
+    private function getRandomAdminUserId(): int
+    {
+        return User::role('admin')->inRandomOrder()->first()?->id
+            ?? User::role('center_manager')->inRandomOrder()->first()?->id
+            ?? 1;
+    }
+
+    /**
+     * Get bottle types with available stock for a distribution center
+     * This replaces the use of DistributionCenter->bottleTypeStocks() relation
+     */
+    private function getBottleTypesWithStock(DistributionCenter $center): array
+    {
+        // Find all product categories that are bottle types with stock
+        $stockData = DB::table('product_category_distribution_center as pcdc')
+            ->join('product_categories as pc', 'pcdc.product_category_id', '=', 'pc.id')
+            ->where('pcdc.distribution_center_id', $center->id)
+            ->where('pc.product_type', ProductType::BOTTLE()->value)
+            ->where('pcdc.stock_filled', '>', 0)
+            ->select('pc.*', 'pcdc.stock_filled', 'pcdc.stock_empty')
+            ->get();
+
+        // Format the data to mimic the previous bottleTypeStocks relation
+        $result = [];
+        foreach ($stockData as $item) {
+            $productCategory = ProductCategory::find($item->id);
+            if ($productCategory) {
+                // Add pivot data to the product category
+                $productCategory->pivot = (object) [
+                    'stock_filled' => $item->stock_filled,
+                    'stock_empty' => $item->stock_empty,
+                ];
+                $result[] = $productCategory;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Update accessory stock count in the pivot table
+     */
+    private function updateAccessoryStockCount(Accessory $accessory): void
+    {
+        $productCategory = ProductCategory::where('product_type', ProductType::ACCESSORY())
+            ->where('id', $accessory->product_category_id)
+            ->first();
+
+        if (! $productCategory) {
+            Log::warning("Product category not found for accessory #{$accessory->id} with category ID {$accessory->product_category_id}");
+
+            return;
+        }
+
+        // Get current pivot data
+        $pivotData = DB::table('product_category_distribution_center')
+            ->where('distribution_center_id', $accessory->distribution_center_id)
+            ->where('product_category_id', $productCategory->id)
+            ->first();
+
+        if (! $pivotData) {
+            Log::warning("Pivot data not found for accessory #{$accessory->id} in center {$accessory->distribution_center_id}");
+
+            return;
+        }
+
+        // Decrement stock count by 1
+        $newStock = max(0, $pivotData->stock - 1);
+
+        DB::table('product_category_distribution_center')
+            ->where('distribution_center_id', $accessory->distribution_center_id)
+            ->where('product_category_id', $productCategory->id)
+            ->update([
+                'stock' => $newStock,
+                'updated_at' => now(),
+            ]);
     }
 }

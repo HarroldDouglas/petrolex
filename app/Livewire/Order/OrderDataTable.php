@@ -272,8 +272,7 @@ class OrderDataTable extends BaseDataTable
                 'customer.user',
                 'distributionCenter',
                 'deliveryPerson.user',
-                'items.product.bottle.bottleType',
-                'items.product.accessory.accessoryType',
+                'items.productCategory',
                 'payment',
             ]);
 

@@ -75,12 +75,11 @@ class OrderBottleScanRepository extends BaseEloquentRepository implements OrderB
     public function getBottleTypesByOrder(Order $order): Collection
     {
         return BottleType::whereIn('id', function ($query) use ($order) {
-            $query->select('bottles.bottle_type_id')
-                ->from('products')
-                ->join('order_items', 'products.id', '=', 'order_items.product_id')
-                ->join('bottles', 'products.id', '=', 'bottles.product_id')
+            $query->select('product_categories.product_type_id')
+                ->from('product_categories')
+                ->join('order_items', 'product_categories.id', '=', 'order_items.product_category_id')
                 ->where('order_items.order_id', $order->id)
-                ->where('products.product_type', ProductType::BOTTLE());
+                ->where('product_categories.product_type', ProductType::BOTTLE());
         })->get();
     }
 
@@ -133,8 +132,9 @@ class OrderBottleScanRepository extends BaseEloquentRepository implements OrderB
 
         /** @var OrderItem|null */
         return $order->items()
-            ->whereHas('product.bottle', function ($query) use ($bottleTypeId) {
-                $query->where('bottle_type_id', $bottleTypeId);
+            ->whereHas('productCategory', function ($query) use ($bottleTypeId) {
+                $query->where('product_type', ProductType::BOTTLE())
+                    ->where('product_type_id', $bottleTypeId);
             })
             ->get()
             ->filter(function (OrderItem $item) {
@@ -151,8 +151,9 @@ class OrderBottleScanRepository extends BaseEloquentRepository implements OrderB
     public function getOrderBottleScansByBottleType(Order $order, int $bottleTypeId): Collection
     {
         $orderItemIds = $order->items()
-            ->whereHas('product.bottle', function ($query) use ($bottleTypeId) {
-                $query->where('bottle_type_id', $bottleTypeId);
+            ->whereHas('productCategory', function ($query) use ($bottleTypeId) {
+                $query->where('product_type', ProductType::BOTTLE())
+                    ->where('product_type_id', $bottleTypeId);
             })
             ->pluck('id')
             ->toArray();

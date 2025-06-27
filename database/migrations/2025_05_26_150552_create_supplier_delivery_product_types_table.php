@@ -16,9 +16,7 @@ return new class extends Migration
         Schema::create('supplier_delivery_product_types', function (Blueprint $table) {
             $table->id();
             $table->foreignId('supplier_delivery_id')->constrained()->onDelete('cascade');
-            $table->enum('product_type', ProductType::values());
-            $table->foreignId('bottle_type_id')->nullable()->constrained()->onDelete('restrict');
-            $table->foreignId('accessory_type_id')->nullable()->constrained()->onDelete('restrict');
+            $table->foreignId('product_category_id')->constrained()->onDelete('cascade');
             $table->integer('expected_quantity');
             $table->integer('bottles_out_quantity')->default(0);
             $table->text('notes')->nullable();

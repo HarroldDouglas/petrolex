@@ -14,13 +14,13 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $order_id
- * @property int $product_id
+ * @property int $product_category_id
  * @property int $quantity
  * @property float $unit_price
  * @property float $total_price
  * @property BottleOrderType|null $bottle_type
  * @property Order $order
- * @property Product $product
+ * @property ProductCategory $productCategory
  * @property-read int $scanned_bottles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderBottleScans> $orderBottleScans
  * @property Carbon $created_at
@@ -39,7 +39,7 @@ class OrderItem extends Model
      */
     protected $fillable = [
         'order_id',
-        'product_id',
+        'product_category_id',
         'quantity',
         'bottle_type',
         'unit_price',
@@ -66,20 +66,17 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function productType(): ProductType
+    /**
+     * Get the product category for this item.
+     */
+    public function productCategory(): BelongsTo
     {
-        /** @var Product $product */
-        $product = $this->product;
-
-        return $product->product_type;
+        return $this->belongsTo(ProductCategory::class);
     }
 
-    /**
-     * Get the product for this item.
-     */
-    public function product(): BelongsTo
+    public function productType(): ProductType
     {
-        return $this->belongsTo(Product::class);
+        return $this->productCategory->product_type;
     }
 
     /**
@@ -121,17 +118,11 @@ class OrderItem extends Model
 
     public function isBottle(): bool
     {
-        /** @var Product $product */
-        $product = $this->product;
-
-        return $product->product_type === ProductType::BOTTLE();
+        return $this->productCategory->product_type === ProductType::BOTTLE();
     }
 
     public function isAccessory(): bool
     {
-        /** @var Product $product */
-        $product = $this->product;
-
-        return $product->product_type === ProductType::ACCESSORY();
+        return $this->productCategory->product_type === ProductType::ACCESSORY();
     }
 }

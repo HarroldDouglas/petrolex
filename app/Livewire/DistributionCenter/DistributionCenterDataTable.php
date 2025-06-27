@@ -24,30 +24,6 @@ class DistributionCenterDataTable extends BaseDataTable
         return 'centres-distribution';
     }
 
-    public bool $rememberColumnSelection = true;
-    public bool $rememberFilters = true;
-    public bool $rememberSort = true;
-    public bool $rememberPerPage = true;
-
-    public function configure(): void
-    {
-        parent::configure();
-
-        $this->setPrimaryKey('id')
-            ->setTableWrapperAttributes([
-                'class' => 'table-responsive',
-            ])
-            ->setTableAttributes([
-                'class' => 'table table-striped table-hover',
-            ])
-            ->setTheadAttributes([
-                'class' => 'table-light',
-            ])
-            ->setDefaultSort(self::DEFAULT_SORT_FIELD, self::DEFAULT_SORT_DIRECTION)
-            ->setPerPageAccepted([10, 25, 50, 100])
-            ->setPerPage(10);
-    }
-
     public function columns(): array
     {
         return [

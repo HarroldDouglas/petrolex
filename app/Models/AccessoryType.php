@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProductType;
 use App\Traits\HasMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,8 +24,8 @@ use Spatie\MediaLibrary\HasMedia;
 class AccessoryType extends Model implements HasMedia
 {
     use HasFactory;
-    use SoftDeletes;
     use HasMediaCollections;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -64,11 +65,12 @@ class AccessoryType extends Model implements HasMedia
     }
 
     /**
-     * Get the supplier delivery product types for this accessory type.
+     * Get the product categories for this accessory type.
      */
-    public function supplierDeliveryProductTypes(): HasMany
+    public function productCategories(): HasMany
     {
-        return $this->hasMany(SupplierDeliveryProductType::class);
+        return $this->hasMany(ProductCategory::class, 'product_type_id')
+            ->where('product_type', ProductType::ACCESSORY());
     }
 
     /**
@@ -79,11 +81,12 @@ class AccessoryType extends Model implements HasMedia
      */
     public function getStockForType(?array $distributionCenterIds = null): int
     {
-        return $this->accessories()
+        return $this->productCategories()
+            ->join('product_category_distribution_center as pcdc', 'product_categories.id', '=', 'pcdc.product_category_id')
             ->when($distributionCenterIds, function ($query) use ($distributionCenterIds) {
-                $query->whereIn('distribution_center_id', $distributionCenterIds);
+                $query->whereIn('pcdc.distribution_center_id', $distributionCenterIds);
             })
-            ->sum('quantity');
+            ->sum('pcdc.stock');
     }
 
     public function requiresMainImage(): bool

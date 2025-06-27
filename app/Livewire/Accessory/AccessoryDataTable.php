@@ -6,8 +6,10 @@ use App\Enums\EntityStatus;
 use App\Models\AccessoryType;
 use App\Models\DistributionCenter;
 use App\Models\User;
+use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\NumberFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
@@ -139,14 +141,25 @@ class AccessoryDataTable extends BaseDataTable
                     $distCenterId = $this->getAppliedFilterValue('centre_de_distribution');
 
                     if ($distCenterId) {
-                        return $builder->whereHas('accessories', function ($query) use ($value, $distCenterId) {
-                            $query->select('accessory_type_id')
-                                ->where('distribution_center_id', $distCenterId)
-                                ->groupBy('accessory_type_id')
-                                ->havingRaw('SUM(quantity) >= ?', [$value]);
+                        return $builder->whereHas('productCategories.distributionCenters', function ($query) use ($value, $distCenterId) {
+                            $query->where('distribution_center_id', $distCenterId)
+                                ->where('stock', '>=', $value);
                         });
                     } else {
-                        return $builder->having('accessories_sum_quantity', '>=', $value);
+                        $centerIds = DistributionCenterService::getForCurrentUser()->pluck('id')->toArray();
+
+                        // Récupérer les IDs des AccessoryType qui ont un stock >= value
+                        $accessoryTypeIds = AccessoryType::query()
+                            ->join('product_categories as pc', 'accessory_types.id', '=', 'pc.product_type_id')
+                            ->join('product_category_distribution_center as pcdc', 'pc.id', '=', 'pcdc.product_category_id')
+                            ->where('pc.product_type', 'accessory')
+                            ->whereIn('pcdc.distribution_center_id', $centerIds)
+                            ->whereNull('pc.deleted_at')
+                            ->groupBy('accessory_types.id')
+                            ->havingRaw('SUM(pcdc.stock) >= ?', [$value])
+                            ->pluck('accessory_types.id');
+
+                        return $builder->whereIn('id', $accessoryTypeIds);
                     }
                 }),
 
@@ -158,16 +171,27 @@ class AccessoryDataTable extends BaseDataTable
                     $distCenterId = $this->getAppliedFilterValue('centre_de_distribution');
 
                     if ($distCenterId) {
-                        return $builder->whereHas('accessories', function ($query) use ($value, $distCenterId) {
-                            $query->select('accessory_type_id')
-                                ->where('distribution_center_id', $distCenterId)
-                                ->groupBy('accessory_type_id')
-                                ->havingRaw('SUM(quantity) <= ?', [$value]);
+                        return $builder->whereHas('productCategories.distributionCenters', function ($query) use ($value, $distCenterId) {
+                            $query->where('distribution_center_id', $distCenterId)
+                                ->where('stock', '<=', $value);
                         });
                     } else {
-                        return $builder->having('accessories_sum_quantity', '<=', $value);
+                        $centerIds = DistributionCenterService::getForCurrentUser()->pluck('id')->toArray();
+
+                        $accessoryTypeIds = AccessoryType::query()
+                            ->join('product_categories as pc', 'accessory_types.id', '=', 'pc.product_type_id')
+                            ->join('product_category_distribution_center as pcdc', 'pc.id', '=', 'pcdc.product_category_id')
+                            ->where('pc.product_type', 'accessory')
+                            ->whereIn('pcdc.distribution_center_id', $centerIds)
+                            ->whereNull('pc.deleted_at')
+                            ->groupBy('accessory_types.id')
+                            ->havingRaw('SUM(pcdc.stock) <= ?', [$value])
+                            ->pluck('accessory_types.id');
+
+                        return $builder->whereIn('id', $accessoryTypeIds);
                     }
                 }),
+
         ];
     }
 
@@ -178,13 +202,12 @@ class AccessoryDataTable extends BaseDataTable
         if ($distCenterId) {
             $centerIds = [$distCenterId];
         } else {
-            /** @var User $user */
-            $user = auth()->user();
-            $centerIds = $user->accessibleDistributionCenters()->pluck('distribution_centers.id')->toArray();
+            $distributionCenters = DistributionCenterService::getForCurrentUser();
+            $centerIds = $distributionCenters->pluck('id')->toArray();
         }
 
         return AccessoryType::query()
-            ->with(['accessories' => function ($query) use ($centerIds) {
+            ->with(['productCategories.distributionCenters' => function ($query) use ($centerIds) {
                 $query->whereIn('distribution_center_id', $centerIds);
             }]);
     }
@@ -218,6 +241,7 @@ class AccessoryDataTable extends BaseDataTable
                     'message' => "L'accessoire sélectionné n'existe pas.",
                     'timer' => 3000,
                 ]);
+
                 return;
             }
 

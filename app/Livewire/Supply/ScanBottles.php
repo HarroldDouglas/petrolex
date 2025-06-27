@@ -5,8 +5,7 @@ namespace App\Livewire\Supply;
 use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryBottleMovementType;
 use App\Models\Bottle;
-use App\Models\BottleType;
-use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\SupplierDelivery;
 use App\Models\SupplierDeliveryBottle;
 use App\Models\SupplierDeliveryProductType;
@@ -77,17 +76,19 @@ class ScanBottles extends Component
         }
 
         $this->availableProducts = $this->supply->productTypes()
-            ->with(['bottleType', 'deliveryBottles'])
-            ->where('product_type', ProductType::BOTTLE())
+            ->with(['productCategory', 'deliveryBottles'])
+            ->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $query) {
+                $query->where('product_type', ProductType::BOTTLE());
+            })
             ->get()
             ->map(function (SupplierDeliveryProductType $product) {
-                /** @var BottleType */
-                $bottleType = $product->bottleType;
+                /** @var ProductCategory */
+                $productCategory = $product->productCategory;
 
                 return [
                     'id' => $product->id,
-                    'bottle_type_id' => $product->bottle_type_id,
-                    'bottle_type_name' => $bottleType->name,
+                    'product_category_id' => $productCategory->id,
+                    'bottle_type_name' => $productCategory->name,
                     'quantity' => $product->expected_quantity,
                     'incoming_scanned' => $product->incoming_scanned_count,
                     'outgoing_quantity' => $product->bottles_out_quantity,
@@ -174,16 +175,11 @@ class ScanBottles extends Component
         }
 
         try {
-            $product = Product::create([
-                'product_type' => ProductType::BOTTLE(),
-            ]);
-
             $bottle = new Bottle([
-                'bottle_type_id' => $this->selectedProductType->bottleType->id,
+                'product_category_id' => $this->selectedProductType->product_category_id,
                 'barcode' => $barcode,
             ]);
 
-            $product->bottle()->save($bottle);
             /** @var Bottle $bottle */
             $this->bottles[] = [
                 'id' => $bottle->id,
@@ -261,13 +257,9 @@ class ScanBottles extends Component
             $bottle = Bottle::where('barcode', $barcode)->first();
 
             if (! $bottle && $this->isIncomingMode) {
-                $product = Product::create([
-                    'product_type' => ProductType::BOTTLE(),
-                ]);
                 $bottle = Bottle::create([
                     'barcode' => $barcode,
-                    'product_id' => $product->id,
-                    'bottle_type_id' => $this->selectedProductType->bottle_type_id,
+                    'product_category_id' => $this->selectedProductType->product_category_id,
                     'distribution_center_id' => $this->supply->distribution_center_id,
                 ]);
             } elseif (! $bottle) {
@@ -303,7 +295,7 @@ class ScanBottles extends Component
 
         } catch (\Exception $e) {
             DB::rollback();
-            session()->flash('error', "Erreur lors de l'ajout de la bouteille: ".$e->getMessage());
+            session()->flash('error', 'Erreur lors de l\'ajout de la bouteille: '.$e->getMessage());
         }
     }
 

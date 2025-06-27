@@ -13,7 +13,6 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $product_id
- * @property int $bottle_type_id
  * @property int $distribution_center_id
  * @property int|null $marked_lost_by_user_id
  * @property string $barcode
@@ -40,7 +39,6 @@ class Bottle extends Model
      */
     protected $fillable = [
         'product_id',
-        'bottle_type_id',
         'distribution_center_id',
         'barcode',
         'is_filled',
@@ -68,9 +66,20 @@ class Bottle extends Model
     /**
      * Get the bottle type of the bottle.
      */
-    public function bottleType(): BelongsTo
+    public function getBottleTypeAttribute(): ?BottleType
     {
-        return $this->belongsTo(BottleType::class);
+        $productType = $this->product?->productCategory?->productTypeInstance;
+
+        if ($productType instanceof BottleType) {
+            return $productType;
+        }
+
+        return null;
+    }
+
+    public function getBottleTypeIdAttribute(): ?int
+    {
+        return $this->bottleType?->id;
     }
 
     /**
@@ -95,5 +104,13 @@ class Bottle extends Model
     public function supplierDeliveryBottles(): HasMany
     {
         return $this->hasMany(SupplierDeliveryBottle::class);
+    }
+
+    public function scopeOfBottleType($query, int $bottleTypeId)
+    {
+        return $query->whereHas('product.productCategory', function ($query) use ($bottleTypeId) {
+            $query->where('product_type_id', $bottleTypeId)
+                ->where('product_type', 'bottle');
+        });
     }
 }

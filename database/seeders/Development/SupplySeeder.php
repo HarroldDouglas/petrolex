@@ -11,6 +11,7 @@ use App\Models\SupplyItem;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+// TODO: review the whole logic of this class
 class SupplySeeder extends Seeder
 {
     /**
@@ -184,6 +185,7 @@ class SupplySeeder extends Seeder
                 // Pour PENDING et CANCELLED, deliveredQuantity reste à 0
 
                 // Créer l'élément d'approvisionnement
+                // TODO: remove this , SupplyItem does not exist anymore
                 SupplyItem::create([
                     'supply_id' => $supply->id,
                     'bottle_type_id' => $bottleType->id,

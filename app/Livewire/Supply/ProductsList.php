@@ -39,6 +39,8 @@ class ProductsList extends Component
         $this->products = $this->supplierDelivery->productTypes
             ->map(fn ($product) => $this->formatProduct($product))
             ->all();
+
+        Log::info('Loaded products:', $this->products);
     }
 
     /**
@@ -48,11 +50,11 @@ class ProductsList extends Component
     {
         $baseProduct = [
             'id' => $product->id,
-            'product_type' => $product->product_type->value,
+            'product_type' => $product->productCategory->product_type->value,
             'expected_quantity' => $product->expected_quantity,
         ];
 
-        return match ($product->product_type->value) {
+        return match ($product->productCategory->product_type->value) {
             ProductType::BOTTLE()->value => $this->formatBottleProduct($product, $baseProduct),
             ProductType::ACCESSORY()->value => $this->formatAccessoryProduct($product, $baseProduct),
             default => $baseProduct
@@ -65,9 +67,9 @@ class ProductsList extends Component
     private function formatBottleProduct(SupplierDeliveryProductType $product, array $baseProduct): array
     {
         return array_merge($baseProduct, [
-            'bottle_type_id' => $product->bottle_type_id,
-            'bottle_type_name' => $product->bottleType?->name ?? 'Unknown type',
+            'product_category_id' => $product->product_category_id,
             'bottles_out_quantity' => $product->bottles_out_quantity,
+            'name' => $product->productCategory->name ?? 'Unknown bottle type',
         ]);
     }
 
@@ -77,8 +79,8 @@ class ProductsList extends Component
     private function formatAccessoryProduct(SupplierDeliveryProductType $product, array $baseProduct): array
     {
         return array_merge($baseProduct, [
-            'accessory_type_id' => $product->accessory_type_id,
-            'accessory_type_name' => $product->accessoryType?->name ?? 'Unknown type',
+            'product_category_id' => $product->product_category_id,
+            'name' => $product->productCategory->name,
         ]);
     }
 
@@ -96,7 +98,7 @@ class ProductsList extends Component
 
         try {
             $this->supplierDelivery = $this->supplierDelivery
-                ->fresh(['productTypes.bottleType', 'productTypes.accessoryType']);
+                ->fresh(['productTypes.productCategory']);
             $this->loadProducts();
             $this->dispatch('products-updated', $this->products);
         } finally {
@@ -197,7 +199,7 @@ class ProductsList extends Component
 
         return redirect()->route('supplies.scan-bottles', [
             'supply_id' => $this->supplierDelivery->id,
-            'type_id' => $product['bottle_type_id'],
+            'type_id' => $product['product_category_id'],
         ]);
     }
 
@@ -214,11 +216,7 @@ class ProductsList extends Component
      */
     public function getProductDisplayName(array $product): string
     {
-        return match ($product['product_type'] ?? null) {
-            ProductType::BOTTLE()->value => $product['bottle_type_name'] ?? 'Unknown bottle type',
-            ProductType::ACCESSORY()->value => $product['accessory_type_name'] ?? 'Unknown accessory type',
-            default => 'Unknown product'
-        };
+        return $product['name'];
     }
 
     /**
