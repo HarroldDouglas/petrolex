@@ -198,7 +198,9 @@ class UserDataTable extends BaseDataTable
                     }
 
                     if ($value === 'global') {
-                        return $builder->whereDoesntHave('accessibleDistributionCenters');
+                        $totalCenters = DistributionCenter::count();
+
+                        return $builder->whereHas('accessibleDistributionCenters', function ($query) {}, '=', $totalCenters);
                     }
 
                     return $builder->whereHas('accessibleDistributionCenters', function ($query) use ($value) {
