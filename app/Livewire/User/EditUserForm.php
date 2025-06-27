@@ -10,8 +10,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class EditUserForm extends AbstractUserForm
 {
+    /** @var User */
     public $user;
-    public $id;
+    public int $id;
 
     protected function customRequest(): FormRequest
     {

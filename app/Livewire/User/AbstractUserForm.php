@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 abstract class AbstractUserForm extends Component
 {
@@ -81,15 +82,13 @@ abstract class AbstractUserForm extends Component
         if ($image) {
             if (is_string(value: $image)) {
                 $url = $image;
-            } elseif ($image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+            } elseif ($image instanceof TemporaryUploadedFile) {
                 $url = $image->temporaryUrl();
             } else {
                 return '';
             }
-
             return "background-image: url('{$url}');";
         }
-
         return '';
     }
 

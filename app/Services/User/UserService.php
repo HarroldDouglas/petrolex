@@ -11,6 +11,7 @@ use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use \Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseServiceWithMedia
@@ -87,7 +88,7 @@ class UserService extends BaseServiceWithMedia
 
         try {
 
-            if ($attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
+            if ($attributes['image'] instanceof UploadedFile) {
                 /** @var User $user */
                 $user = parent::updateWithMedia($user, $attributes);
             } else {

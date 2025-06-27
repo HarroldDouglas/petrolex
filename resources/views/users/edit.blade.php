@@ -44,9 +44,6 @@
 @endsection
 
 @section('script')
-    <!--customizer-->
-    <div id="customizer"></div>
-
     <!-- select2 -->
     <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
 @endsection

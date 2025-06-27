@@ -19,9 +19,6 @@ class EditUserController extends Controller
     {
         $this->authorize('users.edit');
         $user = $this->userService->find($userId);
-        if (! $user) {
-            abort(404, "Cet utilisateur n'existe pas.");
-        }
 
         return view('users.edit', [
             'user' => $user,
