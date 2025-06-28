@@ -28,7 +28,7 @@ use Illuminate\Support\Carbon;
  * @property-read Order $order
  * @property-read ProductCategory $productCategory
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderBottleScans> $orderBottleScans
- * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bottle, \Illuminate\Database\Eloquent\Relations\Pivot> $bottles
+ *  * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bottle, \App\Models\OrderBottleScans> $bottles
  *
  * // Accessors
  * @property-read int $scanned_bottles_count

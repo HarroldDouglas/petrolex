@@ -17,7 +17,7 @@
                         </a>
                     </li>
 
-                    <x-header.notification />
+                    @livewire('components.notification-header')
 
                     <x-header.profile />
                 </ul>

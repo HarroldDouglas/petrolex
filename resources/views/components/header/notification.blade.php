@@ -17,124 +17,137 @@
         </div>
         <div class="offcanvas-body notification-offcanvas-body app-scroll p-0">
             <div class="head-container notification-head-container">
+                <!-- Nouvelle commande créée -->
                 <div class="notification-message head-box">
                     <div class="message-images">
                         <span
-                            class="bg-secondary h-35 w-35 d-flex-center b-r-10 position-relative">
-                            <img alt="avtar" class="img-fluid b-r-10"
-                                src="../assets/images/ai_avtar/6.jpg">
-                            <span
-                                class="position-absolute bottom-30 end-0 p-1 bg-secondary border border-light rounded-circle notification-avtar"></span>
+                            class="bg-light-primary h-35 w-35 d-flex-center b-r-10 position-relative">
+                            <i class="ph-duotone ph-shopping-cart-simple f-s-18"></i>
                         </span>
                     </div>
                     <div class="message-content-box flex-grow-1 ps-2">
-
-                        <a class="f-s-15 text-secondary mb-0" href="{{ route('orders.list') }}"
-                            target="_blank"><span class="f-w-500 text-secondary">Gene Hart</span>
-                            wants to
-                            edit <span class="f-w-500 text-secondary">Report.doc</span></a>
-                        <div>
-                            <a class="d-inline-block f-w-500 text-success me-1"
-                                href="#">Approve</a>
-                            <a class="d-inline-block f-w-500 text-danger" href="#">Deny</a>
-                        </div>
-                        <span class="badge text-light-primary mt-2"> sep 23 </span>
-
-                    </div>
-                    <div class="align-self-start text-end">
-                        <i class="iconoir-xmark close-btn"></i>
-                    </div>
-                </div>
-                <div class="notification-message head-box">
-                    <div class="message-images">
-                        <span
-                            class="bg-light-dark h-35 w-35 d-flex-center b-r-10 position-relative">
-                            <i class="ph-duotone  ph-truck f-s-18"></i>
-                        </span>
-                    </div>
-                    <div class="message-content-box flex-grow-1 ps-2">
-                        <a class="f-s-15 text-secondary mb-0" href="{{ route('orders.list') }}"
-                            target="_blank">Hey
-                            <span class="f-w-500 text-secondary">Emery McKenzie</span>,
-                            get ready: Your order from <span
-                                class="f-w-500 text-secondary">@Shopper.com</span>
-                            is out for delivery today!</a>
-                        <span class="badge text-light-info mt-2"> sep 23 </span>
-
-                    </div>
-                    <div class="align-self-start text-end">
-                        <i class="iconoir-xmark close-btn"></i>
-                    </div>
-                </div>
-                <div class="notification-message head-box">
-                    <div class="message-images">
-                        <span
-                            class="bg-secondary h-35 w-35 d-flex-center b-r-10 position-relative">
-                            <img alt="" class="img-fluid b-r-10"
-                                src="../assets/images/ai_avtar/2.jpg">
-                            <span
-                                class="position-absolute  end-0 p-1 bg-secondary border border-light rounded-circle notification-avtar"></span>
-                        </span>
-                    </div>
-                    <div class="message-content-box flex-grow-1 ps-2">
-                        <a class="f-s-15 text-secondary mb-0" href="{{ route('orders.list') }}"
-                            target="_blank"><span class="f-w-500 text-secondary">Simon
-                                Young</span> shared
-                            a file called <span
-                                class="f-w-500 text-secondary">Dropdown.pdf</span></a>
-                        <span class="badge text-light-success mt-2"> 30 min</span>
-
-                    </div>
-                    <div class="align-self-start text-end">
-                        <i class="iconoir-xmark close-btn"></i>
-                    </div>
-                </div>
-                <div class="notification-message head-box">
-                    <div class="message-images">
-                        <span
-                            class="bg-secondary h-35 w-35 d-flex-center b-r-10 position-relative">
-                            <img alt="" class="img-fluid b-r-10"
-                                src="../assets/images/ai_avtar/5.jpg">
-                            <span
-                                class="position-absolute end-0 p-1 bg-secondary border border-light rounded-circle notification-avtar"></span>
-                        </span>
-                    </div>
-                    <div class="message-content-box flex-grow-1 ps-2">
-                        <a class="f-s-15 text-secondary mb-0" href="{{ route('orders.list') }}"
-                            target="_blank"><span class="f-w-500 text-secondary">Becky G.
-                                Hayes</span> has
-                            added a comment to <span
-                                class="f-w-500 text-secondary">Final_Report.pdf</span></a>
-                        <span class="badge text-light-warning mt-2"> 45 min</span>
-                    </div>
-                    <div class="align-self-start text-end">
-                        <i class="iconoir-xmark close-btn"></i>
-                    </div>
-                </div>
-                <div class="notification-message head-box">
-                    <div class="message-images">
-                        <span
-                            class="bg-secondary h-35 w-35 d-flex-center b-r-10 position-relative">
-                            <img alt="" class="img-fluid b-r-10"
-                                src="../assets/images/ai_avtar/1.jpg">
-                            <span
-                                class="position-absolute  end-0 p-1 bg-secondary border border-light rounded-circle notification-avtar"></span>
-                        </span>
-                    </div>
-                    <div class="message-content-box flex-grow-1 ps-2">
-                        <a class="f-s-15 text-secondary mb-0" href="{{ route('orders.list') }}"
-                            target="_blank"><span class="f-w-600 text-secondary">Romaine
-                                Nadeau</span>
-                            invited you to join a meeting
+                        <a class="f-s-15  mb-0" href="{{ route('orders.list') }}"
+                            target="_blank">
+                            <span class="f-w-500 ">Nouvelle commande</span> 
+                            créée avec succès - Réf. <span class="f-w-500 ">CMD-12345</span>
                         </a>
                         <div>
-                            <a class="d-inline-block f-w-500 text-success me-1"
-                                href="#">Join</a>
-                            <a class="d-inline-block f-w-500 text-danger"
-                                href="#">Decline</a>
+                            <span class="d-inline-block f-w-500 me-1">
+                                Client: <span class="text-primary">Entreprise ABC</span>
+                            </span> |
+                            <span class="d-inline-block f-w-500 ms-1">
+                                Total: <span class="text-primary">125.000 FCFA</span>
+                            </span>
                         </div>
-
-                        <span class="badge text-light-secondary mt-2"> 1 hour ago </span>
+                        <span class="badge text-light-primary mt-2">Il y a 10 min</span>
+                    </div>
+                    <div class="align-self-start text-end">
+                        <i class="iconoir-xmark close-btn"></i>
+                    </div>
+                </div>
+                
+                <!-- Commande en cours de livraison -->
+                <div class="notification-message head-box">
+                    <div class="message-images">
+                        <span
+                            class="bg-light-info h-35 w-35 d-flex-center b-r-10 position-relative">
+                            <i class="ph-duotone ph-truck f-s-18"></i>
+                        </span>
+                    </div>
+                    <div class="message-content-box flex-grow-1 ps-2">
+                        <a class="f-s-15  mb-0" href="{{ route('orders.list') }}"
+                            target="_blank">
+                            La commande <span class="f-w-500 ">CMD-10982</span>
+                            est en cours de livraison
+                        </a>
+                        <div>
+                            <span class="d-inline-block f-w-500">
+                                Client: <span class="text-info">Station Mobil</span> |
+                                ETA: <span class="text-info">Aujourd'hui, 14:30</span>
+                            </span>
+                        </div>
+                        <span class="badge text-light-info mt-2">Il y a 45 min</span>
+                    </div>
+                    <div class="align-self-start text-end">
+                        <i class="iconoir-xmark close-btn"></i>
+                    </div>
+                </div>
+                
+                <!-- Commande livrée -->
+                <div class="notification-message head-box">
+                    <div class="message-images">
+                        <span
+                            class="bg-light-success h-35 w-35 d-flex-center b-r-10 position-relative">
+                            <i class="ph-duotone ph-check-circle f-s-18"></i>
+                        </span>
+                    </div>
+                    <div class="message-content-box flex-grow-1 ps-2">
+                        <a class="f-s-15  mb-0" href="{{ route('orders.list') }}"
+                            target="_blank">
+                            La commande <span class="f-w-500 ">CMD-10876</span>
+                            a été livrée avec succès
+                        </a>
+                        <div>
+                            <span class="d-inline-block f-w-500">
+                                Client: <span class="text-success">Total Energies</span> |
+                                Quantité: <span class="text-success">250 bouteilles</span>
+                            </span>
+                        </div>
+                        <span class="badge text-light-success mt-2">Il y a 2h</span>
+                    </div>
+                    <div class="align-self-start text-end">
+                        <i class="iconoir-xmark close-btn"></i>
+                    </div>
+                </div>
+                
+                <!-- Commande annulée -->
+                <div class="notification-message head-box">
+                    <div class="message-images">
+                        <span
+                            class="bg-light-danger h-35 w-35 d-flex-center b-r-10 position-relative">
+                            <i class="ph-duotone ph-x-circle f-s-18"></i>
+                        </span>
+                    </div>
+                    <div class="message-content-box flex-grow-1 ps-2">
+                        <a class="f-s-15  mb-0" href="{{ route('orders.list') }}"
+                            target="_blank">
+                            La commande <span class="f-w-500 ">CMD-11023</span>
+                            a été annulée
+                        </a>
+                        <div>
+                            <span class="d-inline-block f-w-500">
+                                Client: <span class="text-danger">Station Shell</span> |
+                                Raison: <span class="text-danger">Erreur de commande</span>
+                            </span>
+                        </div>
+                        <span class="badge text-light-danger mt-2">Il y a 3h</span>
+                    </div>
+                    <div class="align-self-start text-end">
+                        <i class="iconoir-xmark close-btn"></i>
+                    </div>
+                </div>
+                
+                <!-- Modification de commande -->
+                <div class="notification-message head-box">
+                    <div class="message-images">
+                        <span
+                            class="bg-light-warning h-35 w-35 d-flex-center b-r-10 position-relative">
+                            <i class="ph-duotone ph-note-pencil f-s-18"></i>
+                        </span>
+                    </div>
+                    <div class="message-content-box flex-grow-1 ps-2">
+                        <a class="f-s-15  mb-0" href="{{ route('orders.list') }}"
+                            target="_blank">
+                            La commande <span class="f-w-500 ">CMD-11042</span>
+                            a été modifiée
+                        </a>
+                        <div>
+                            <span class="d-inline-block f-w-500">
+                                Client: <span class="text-warning">Petrolex SA</span> |
+                                Modification: <span class="text-warning">Quantité +50</span>
+                            </span>
+                        </div>
+                        <span class="badge text-light-warning mt-2">Il y a 5h</span>
                     </div>
                     <div class="align-self-start text-end">
                         <i class="iconoir-xmark close-btn"></i>
@@ -143,13 +156,10 @@
 
                 <div class="hidden-massage py-4 px-3">
                     <img alt="" class="w-50 h-50 mb-3 mt-2"
-                        src="../assets/images/icons/bell.png">
+                        src="{{ asset('assets/images/icons/bell.png') }}">
                     <div>
-                        <h6 class="mb-0">Notification Not Found</h6>
-                        <p class="text-secondary">When you have any notifications added
-                            here,will
-                            appear here.
-                        </p>
+                        <h6 class="mb-0">Aucune notification</h6>
+                        <p class="">Vous n'avez pas de nouvelles notifications concernant les commandes.</p>
                     </div>
                 </div>
             </div>

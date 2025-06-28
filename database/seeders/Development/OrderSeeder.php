@@ -25,10 +25,12 @@ use App\Models\ProductCategory;
 use App\Models\ProductCategoryDistributionCenter;
 use App\Models\Refund;
 use App\Models\User;
+use App\Notifications\NewOrderNotification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification as FacadesNotification;
 
 class OrderSeeder extends Seeder
 {
@@ -79,6 +81,7 @@ class OrderSeeder extends Seeder
 
         // Global summary
         $this->displayOrderSummary();
+        $this->createNotificationsForOrders();
 
         $this->command->info('Development orders created successfully!');
     }
@@ -1197,5 +1200,35 @@ class OrderSeeder extends Seeder
                 'stock' => $newStock,
                 'updated_at' => now(),
             ]);
+    }
+
+    /**
+     * Create notifications for a subset of recent orders.
+     */
+    private function createNotificationsForOrders(): void
+    {
+        $this->command->info('Creating notifications for recent orders...');
+
+        $userToNotify = User::find(1);
+        if (! $userToNotify) {
+            $this->command->error('User with ID 1 not found. Cannot create notifications.');
+
+            return;
+        }
+
+        // Get the last 5 created orders
+        $recentOrders = Order::latest()->take(5)->get();
+
+        if ($recentOrders->isEmpty()) {
+            $this->command->info('No recent orders found to create notifications for.');
+
+            return;
+        }
+
+        foreach ($recentOrders as $order) {
+            FacadesNotification::send($userToNotify, new NewOrderNotification($order));
+        }
+
+        $this->command->info($recentOrders->count().' notifications created for user '.$userToNotify->name);
     }
 }
