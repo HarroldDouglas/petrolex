@@ -31,18 +31,24 @@
         <div class="offcanvas-body notification-offcanvas-body app-scroll p-0">
             <div class="head-container notification-head-container">
                 @forelse($notifications as $notification)
+                    @php
+                        $notificationType = \App\Enums\NotificationType::tryFrom($notification->data['type'] ?? '');
+                    @endphp
                     <div class="notification-message head-box {{ $notification->unRead() ? 'unread' : '' }}"
+                         wire:click="handleNotificationClick('{{ $notification->id }}')"
+                         style="cursor: pointer"
                          wire:key="notification-{{ $notification->id }}">
                         <div class="message-images">
-                            <span class="{{ $notification->type->getBadgeClass() }} h-35 w-35 d-flex-center b-r-10 position-relative">
-                                <i class="ph-duotone {{ $notification->type->getIcon() }} f-s-18"></i>
+                            
+                            <span class="{{ $notificationType?->getBadgeClass() }} h-35 w-35 d-flex-center b-r-10 position-relative">
+                                <i class="ph-duotone {{ $notificationType?->getIcon() }} f-s-18"></i>
                             </span>
                         </div>
                         
                         <div class="message-content-box flex-grow-1 ps-2">
-                            <div class="f-s-15 mb-0 cursor-pointer" 
-                                 wire:click="openNotification({{ $notification->id }})">
-                                <span class="f-w-500">{{ $notification->type->label }}</span>
+                            <div class="f-s-15 mb-0">
+                                >
+                                <span class="f-w-500">{{ $notificationType?->label }}</span>
                             </div>
                             
                             <div class="notification-details">
@@ -67,7 +73,7 @@
                                 {{ $notification->data['message'] ?? '' }}
                             </div>
                             
-                            <span class="{{ $notification->type->getBadgeClass() }} badge mt-2">
+                            <span class="{{ $notificationType?->getBadgeClass() }} badge mt-2">
                                 {{ $notification->time_ago }}
                             </span>
                         </div>

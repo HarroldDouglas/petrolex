@@ -7,6 +7,7 @@ namespace Database\Seeders\Development;
 use App\Enums\BottleMovementType;
 use App\Enums\BottleOrderType;
 use App\Enums\BottleStatus;
+use App\Enums\NotificationType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
@@ -25,7 +26,7 @@ use App\Models\ProductCategory;
 use App\Models\ProductCategoryDistributionCenter;
 use App\Models\Refund;
 use App\Models\User;
-use App\Notifications\NewOrderNotification;
+use App\Notifications\OrderNotification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -1226,7 +1227,7 @@ class OrderSeeder extends Seeder
         }
 
         foreach ($recentOrders as $order) {
-            FacadesNotification::send($userToNotify, new NewOrderNotification($order));
+            FacadesNotification::send($userToNotify, new OrderNotification($order, NotificationType::ORDER_CREATED()));
         }
 
         $this->command->info($recentOrders->count().' notifications created for user '.$userToNotify->name);

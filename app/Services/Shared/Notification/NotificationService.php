@@ -3,80 +3,67 @@
 namespace App\Services\Shared\Notification;
 
 use App\Enums\NotificationType;
-use App\Models\Notification;
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
+use App\Notifications\OrderNotification;
+use Illuminate\Support\Collection as SupportCollection;
 
 class NotificationService
 {
-    public function createOrderNotification(Order $order, NotificationType $type): ?Notification
+    public function createOrderNotification(Order $order, NotificationType $type, User $user): void
+    {
+        $user->notify(new OrderNotification($order, $type));
+    }
+
+    public function createOrderNotificationForUsers(Order $order, NotificationType $type, array $users): void
+    {
+        foreach ($users as $user) {
+            $this->createOrderNotification($order, $type, $user);
+        }
+    }
+
+    public function createOrderNotificationForManager(Order $order, NotificationType $type): void
     {
         $manager = $order->distributionCenter->manager;
 
-        if (! $manager) {
-            // Log a warning or handle the case where no manager is found
-            // For now, we'll just return null, meaning no notification is created for the manager.
-            return null;
+        if ($manager) {
+            $this->createOrderNotification($order, $type, $manager);
         }
-
-        $data = $this->prepareOrderNotificationData($order, $type);
-
-        return $this->createNotification(
-            user: $manager,
-            type: $type,
-            data: $data
-        );
     }
 
-    private function createNotification(User $user, NotificationType $type, array $data): Notification
+    public function getUnreadNotifications(User $user, int $limit = 10): SupportCollection
     {
-        return Notification::create([
-            'notifiable_type' => get_class($user),
-            'notifiable_id' => $user->id,
-            'type' => $type,
-            'data' => $data,
-        ]);
+        return $user->unreadNotifications()
+            ->orderBy('created_at', 'desc')
+            ->take($limit)
+            ->get();
     }
 
-    private function prepareOrderNotificationData(Order $order, NotificationType $type): array
+    public function getUnreadCount(User $user): int
     {
-        return [
-            'order_id' => $order->id,
-            'order_number' => $order->order_number,
-            'customer_name' => $order->customer->name,
-            'total_amount' => $order->total_amount,
-            'message' => $this->generateMessage($order, $type),
-            'url' => route('orders.details', $order->id),
-        ];
+        return $user->unreadNotifications()->count();
     }
 
-    private function generateMessage(Order $order, NotificationType $type): string
+    public function markAsRead(User $user, string $notificationId): void
     {
-        return match ($type) {
-            NotificationType::ORDER_CREATED() => "Nouvelle commande {$order->order_number} créée par {$order->customer->name}",
-            NotificationType::ORDER_DELIVERED() => "Commande {$order->order_number} livrée avec succès",
-            NotificationType::ORDER_CANCELLED() => "Commande {$order->order_number} annulée",
-            NotificationType::ORDER_MODIFIED() => "Commande {$order->order_number} modifiée",
-            default => "Mise à jour pour la commande {$order->order_number}",
-        };
+        $user->unreadNotifications()
+            ->where('id', $notificationId)
+            ->first()?->markAsRead();
     }
 
-    public function markAsRead(int $notificationId, User $user): bool
+    public function markAllAsRead(User $user): void
     {
-        $notification = $user->notifications()->find($notificationId);
+        $user->unreadNotifications()->update(['read_at' => now()]);
+    }
+
+    public function deleteNotification(User $user, string $notificationId): bool
+    {
+        $notification = $user->notifications()->where('id', $notificationId)->first();
 
         if ($notification) {
-            $notification->markAsRead();
-
-            return true;
+            return $notification->delete();
         }
 
         return false;
-    }
-
-    public function deleteNotification(int $notificationId, User $user): bool
-    {
-        return $user->notifications()->where('id', $notificationId)->delete() > 0;
     }
 }

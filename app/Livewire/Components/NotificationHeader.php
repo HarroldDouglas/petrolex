@@ -3,6 +3,7 @@
 namespace App\Livewire\Components;
 
 use App\Enums\NotificationType;
+use App\Services\Shared\Notification\NotificationService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -13,6 +14,13 @@ class NotificationHeader extends Component
     public Collection $notifications;
     public int $unreadCount = 0;
 
+    protected NotificationService $notificationService;
+
+    public function boot(NotificationService $notificationService): void
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function mount(): void
     {
         $this->loadNotifications();
@@ -22,49 +30,85 @@ class NotificationHeader extends Component
     {
         $user = auth()->user();
 
-        // On ne charge que les notifications non lues
-        $this->notifications = $user->unreadNotifications()
-            ->latest()
-            ->limit(10)
-            ->get()
-            ->map(function ($notification) {
-                if (isset($notification->data['type'])) {
-                    $notification->type = NotificationType::from($notification->data['type']);
-                }
-
-                return $notification;
-            });
-
-        $this->unreadCount = $this->notifications->count();
+        $this->notifications = $this->notificationService->getUnreadNotifications($user);
+        $this->unreadCount = $this->notificationService->getUnreadCount($user);
     }
 
-    public function markAsRead(string $notificationId): void
+    public function handleNotificationClick(string $notificationId)
     {
-        Log::info('Tentative de marquer la notification comme lue', ['id' => $notificationId]);
-
         $notification = auth()->user()->notifications()->find($notificationId);
-
-        if ($notification) {
-            $notification->markAsRead();
-            Log::info('Notification marquée comme lue avec succès', ['id' => $notificationId]);
-            $this->loadNotifications(); // Recharger la liste pour la mettre à jour
-            $this->dispatch('notification-updated');
-        } else {
-            Log::warning('Notification non trouvée', ['id' => $notificationId]);
-        }
-    }
-
-    public function openNotification(string $notificationId): void
-    {
-        $notification = $this->notifications->firstWhere('id', $notificationId);
 
         if ($notification) {
             $this->markAsRead($notificationId);
 
-            if (isset($notification->data['url'])) {
-                $this->redirect($notification->data['url'], navigate: true);
+            $url = $notification->data['url'] ?? null;
+            if ($url) {
+                return redirect($url);
             }
         }
+    }
+
+    public function markAsRead(string $notificationId): void
+    {
+        $user = auth()->user();
+
+        try {
+            $this->notificationService->markAsRead($user, $notificationId);
+            $this->loadNotifications();
+            $this->dispatch('notification-updated');
+        } catch (\Exception $e) {
+            Log::warning('Erreur lors du marquage de la notification comme lue', [
+                'notification_id' => $notificationId,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function markAllAsRead(): void
+    {
+        $user = auth()->user();
+
+        try {
+            $this->notificationService->markAllAsRead($user);
+            $this->loadNotifications();
+            $this->dispatch('notification-updated');
+        } catch (\Exception $e) {
+            Log::warning('Erreur lors du marquage de toutes les notifications comme lues', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function deleteNotification(string $notificationId): void
+    {
+        $user = auth()->user();
+
+        try {
+            $this->notificationService->deleteNotification($user, $notificationId);
+            $this->loadNotifications();
+            $this->dispatch('notification-updated');
+        } catch (\Exception $e) {
+            Log::warning('Erreur lors de la suppression de la notification', [
+                'notification_id' => $notificationId,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function getNotificationType($notification): NotificationType
+    {
+        $typeClass = $notification->type;
+
+        if (str_contains($typeClass, 'OrderNotification')) {
+            $typeValue = $notification->data['type'] ?? 'order_created';
+
+            return NotificationType::from($typeValue);
+        }
+
+        return NotificationType::ORDER_CREATED();
     }
 
     #[On('refresh-notifications')]
