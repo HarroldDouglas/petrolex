@@ -1,3 +1,15 @@
+/* Theme name prepend to localstorage key*/
+const themeName = "La-Theme";
+
+/* Set item in local store */
+function getLocalStorageItem(key,defaultValue=null){
+  return localStorage.getItem(`${themeName}-${key}`)??defaultValue;
+}
+/* Get item in local store */
+function setLocalStorageItem(key,value){
+  localStorage.setItem(`${themeName}-${key}`, value);
+}
+
 //  -----------------------------------------------------------------------------------
 
 //     Template Name: axel Admin
