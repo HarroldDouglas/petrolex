@@ -12,6 +12,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Enums\ProductType;
+use App\Enums\UserRole;
 use App\Models\Accessory;
 use App\Models\Bottle;
 use App\Models\BottleMovement;
@@ -1210,15 +1211,14 @@ class OrderSeeder extends Seeder
     {
         $this->command->info('Creating notifications for recent orders...');
 
-        $userToNotify = User::find(1);
-        if (! $userToNotify) {
-            $this->command->error('User with ID 1 not found. Cannot create notifications.');
+        $usersToNotify = User::role(UserRole::SUPER_ADMIN())->get();
+        $recentOrders = Order::latest()->take(5)->get();
+
+        if ($usersToNotify->isEmpty()) {
+            $this->command->error('No users found for notifications.');
 
             return;
         }
-
-        // Get the last 5 created orders
-        $recentOrders = Order::latest()->take(5)->get();
 
         if ($recentOrders->isEmpty()) {
             $this->command->info('No recent orders found to create notifications for.');
@@ -1227,9 +1227,16 @@ class OrderSeeder extends Seeder
         }
 
         foreach ($recentOrders as $order) {
-            FacadesNotification::send($userToNotify, new OrderNotification($order, NotificationType::ORDER_CREATED()));
+            $recipientsArray = $usersToNotify->all();
+
+            // Vérifier si le manager existe avant de l'ajouter
+            if ($order->distributionCenter && $order->distributionCenter->manager) {
+                $recipientsArray[] = $order->distributionCenter->manager;
+            }
+
+            FacadesNotification::send($recipientsArray, new OrderNotification($order, NotificationType::ORDER_CREATED()));
         }
 
-        $this->command->info($recentOrders->count().' notifications created for user '.$userToNotify->name);
+        $this->command->info($recentOrders->count().' notifications created successfully');
     }
 }
