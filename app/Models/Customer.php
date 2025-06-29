@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
  *
  * // Accessors
+ * @property-read string $name
  *
  * // Query Scopes
  */
@@ -51,6 +52,8 @@ class Customer extends Model
         'current_balance' => 'decimal:2',
     ];
 
+    // ===== RELATIONS =====
+
     /**
      * Get the user that owns the customer.
      */
@@ -61,6 +64,8 @@ class Customer extends Model
 
     /**
      * Get the delivery addresses for the customer.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CustomerDeliveryAddress, $this>
      */
     public function deliveryAddresses(): HasMany
     {
@@ -83,17 +88,21 @@ class Customer extends Model
         return $this->hasMany(BottleMovement::class);
     }
 
+    // ===== ACCESSORS =====
+
     /**
-     * Get the default delivery address for this customer.
+     * Get the customer's name from the associated user.
      */
+    public function getNameAttribute(): string
+    {
+        return $this->user->full_name ?? 'N/A';
+    }
+
     /**
      * Get the default delivery address for this customer.
      */
     public function defaultDeliveryAddress(): ?CustomerDeliveryAddress
     {
-        /** @var CustomerDeliveryAddress|null $address */
-        $address = $this->deliveryAddresses()->where('is_default', true)->first();
-
-        return $address;
+        return $this->deliveryAddresses()->where('is_default', true)->first();
     }
 }

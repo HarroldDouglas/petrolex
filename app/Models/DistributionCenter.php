@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -38,6 +39,7 @@ use Illuminate\Support\Facades\DB;
  * @property-read int $total_empty_bottles
  * @property-read int $total_filled_bottles
  * @property-read int $total_bottles
+ * @property-read \App\Models\User|null $manager
  *
  * // Query Scopes
  */
@@ -76,6 +78,8 @@ class DistributionCenter extends Model
         'longitude' => 'decimal:8',
         'is_active' => 'boolean',
     ];
+
+    // ===== RELATIONS =====
 
     /**
      * Get the user permissions for this center.
@@ -160,6 +164,8 @@ class DistributionCenter extends Model
             ->withTimestamps();
     }
 
+    // ===== ACCESSORS =====
+
     /**
      * Get the total number of empty bottles in stock.
      */
@@ -182,5 +188,17 @@ class DistributionCenter extends Model
     public function getTotalBottlesAttribute(): int
     {
         return $this->total_empty_bottles + $this->total_filled_bottles;
+    }
+
+    /**
+     * Get the manager user for this distribution center.
+     */
+    public function getManagerAttribute(): ?User
+    {
+        return User::whereHas('distributionCenters', function ($query) {
+            $query->where('distribution_center_id', $this->id);
+        })
+            ->role(UserRole::CENTER_MANAGER())
+            ->first();
     }
 }

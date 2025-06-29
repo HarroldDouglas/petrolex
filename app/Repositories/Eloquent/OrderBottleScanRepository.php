@@ -51,7 +51,10 @@ class OrderBottleScanRepository extends BaseEloquentRepository implements OrderB
      */
     public function getBottlesByOrderItem(OrderItem $orderItem): Collection
     {
-        return $orderItem->bottles()->get();
+        /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bottle, \App\Models\OrderItem> $relation */
+        $relation = $orderItem->bottles();
+
+        return $relation->get();
     }
 
     /**

@@ -7,10 +7,12 @@ namespace Database\Seeders\Development;
 use App\Enums\BottleMovementType;
 use App\Enums\BottleOrderType;
 use App\Enums\BottleStatus;
+use App\Enums\NotificationType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Enums\ProductType;
+use App\Enums\UserRole;
 use App\Models\Accessory;
 use App\Models\Bottle;
 use App\Models\BottleMovement;
@@ -25,10 +27,12 @@ use App\Models\ProductCategory;
 use App\Models\ProductCategoryDistributionCenter;
 use App\Models\Refund;
 use App\Models\User;
+use App\Notifications\OrderNotification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification as FacadesNotification;
 
 class OrderSeeder extends Seeder
 {
@@ -79,6 +83,7 @@ class OrderSeeder extends Seeder
 
         // Global summary
         $this->displayOrderSummary();
+        $this->createNotificationsForOrders();
 
         $this->command->info('Development orders created successfully!');
     }
@@ -1197,5 +1202,41 @@ class OrderSeeder extends Seeder
                 'stock' => $newStock,
                 'updated_at' => now(),
             ]);
+    }
+
+    /**
+     * Create notifications for a subset of recent orders.
+     */
+    private function createNotificationsForOrders(): void
+    {
+        $this->command->info('Creating notifications for recent orders...');
+
+        $usersToNotify = User::role(UserRole::SUPER_ADMIN())->get();
+        $recentOrders = Order::latest()->take(5)->get();
+
+        if ($usersToNotify->isEmpty()) {
+            $this->command->error('No users found for notifications.');
+
+            return;
+        }
+
+        if ($recentOrders->isEmpty()) {
+            $this->command->info('No recent orders found to create notifications for.');
+
+            return;
+        }
+
+        foreach ($recentOrders as $order) {
+            $recipientsArray = $usersToNotify->all();
+
+            // Vérifier si le manager existe avant de l'ajouter
+            if ($order->distributionCenter && $order->distributionCenter->manager) {
+                $recipientsArray[] = $order->distributionCenter->manager;
+            }
+
+            FacadesNotification::send($recipientsArray, new OrderNotification($order, NotificationType::ORDER_CREATED()));
+        }
+
+        $this->command->info($recentOrders->count().' notifications created successfully');
     }
 }
