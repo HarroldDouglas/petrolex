@@ -27,9 +27,7 @@
             </div>
         </div>
     </div>
-
-    <!-- chart js -->
-    <script src="{{ asset('assets/js/chart.js') }}"></script>
+    
     <!-- chartjs js -->
     <script src="{{asset('assets/vendor/chartjs/chart.js')}}"></script>
 
