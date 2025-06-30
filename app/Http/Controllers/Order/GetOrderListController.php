@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class GetOrderListController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Display a listing of the orders.
+     *
+     * Route: GET /orders
+     * Name: orders.list
      */
     public function __invoke(Request $request)
     {

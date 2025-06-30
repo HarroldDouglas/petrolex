@@ -15,7 +15,10 @@ class GetOrderDetailsController extends Controller
     ) {}
 
     /**
-     * Handle the incoming request.
+     * Display the specified order details.
+     *
+     * Route: GET /orders/{order}/details
+     * Name: orders.details
      */
     public function __invoke(Request $request, int $orderId): View
     {

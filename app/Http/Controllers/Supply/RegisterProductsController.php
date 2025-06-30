@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Supply;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\SupplierDeliveryRepositoryInterface;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 class RegisterProductsController extends Controller
@@ -15,7 +16,13 @@ class RegisterProductsController extends Controller
         $this->supplierDeliveryRepository = $supplierDeliveryRepository;
     }
 
-    public function __invoke(Request $request, $supply_id)
+    /**
+     * Register products for a specific supply.
+     *
+     * Route: GET /supplies/{supply_id}/register-products
+     * Name: supplies.register-products
+     */
+    public function __invoke(Request $request, $supply_id): View
     {
         $supply = $this->supplierDeliveryRepository->getWithProducts($supply_id);
 

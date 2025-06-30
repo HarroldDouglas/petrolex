@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class GetSupplyListController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Display a listing of the supplies.
+     *
+     * Route: GET /supplies
+     * Name: supplies.list
      */
     public function __invoke(Request $request)
     {

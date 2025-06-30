@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class GetUserDataTableController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Get user data for datatable.
+     *
+     * Route: GET /users/json
+     * Name: users.json
      */
     public function __invoke(Request $request)
     {

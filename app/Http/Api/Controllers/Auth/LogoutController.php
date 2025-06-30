@@ -12,7 +12,10 @@ class LogoutController extends Controller
     public function __construct(protected AuthenticationServiceInterface $authService) {}
 
     /**
-     * Logout user and revoke API token
+     * Logout user and revoke API token.
+     *
+     * Route: POST /logout
+     * Name: api.logout
      */
     public function __invoke(Request $request): LogoutResponse
     {

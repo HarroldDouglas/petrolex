@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class DeleteUserController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Remove the specified user from storage.
+     *
+     * Route: DELETE /users/{user_id}/delete
+     * Name: users.delete
      */
     public function __invoke(Request $request)
     {

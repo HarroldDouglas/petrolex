@@ -14,7 +14,10 @@ class GetAccessoriesController extends Controller
     ) {}
 
     /**
-     * Handle the incoming request.
+     * Display a listing of accessories.
+     *
+     * Route: GET /accessories
+     * Name: accessories.index
      */
     public function __invoke(Request $request): View
     {

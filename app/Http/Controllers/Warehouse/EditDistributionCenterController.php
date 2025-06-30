@@ -11,7 +11,10 @@ class EditDistributionCenterController extends Controller
     public function __construct(private DistributionCenterService $service) {}
 
     /**
-     * Handle the incoming request.
+     * Show the form for editing the specified distribution center.
+     *
+     * Route: GET /distribution-centers/{center_id}/edit
+     * Name: distribution-centers.edit
      */
     public function __invoke(Request $request, int $centerId)
     {

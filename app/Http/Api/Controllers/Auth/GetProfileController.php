@@ -11,7 +11,10 @@ class GetProfileController extends Controller
     public function __construct(protected AuthenticationServiceInterface $authService) {}
 
     /**
-     * Get current user profile
+     * Get current user profile.
+     *
+     * Route: GET /user
+     * Name: api.user
      */
     public function __invoke(): ProfileResponse
     {

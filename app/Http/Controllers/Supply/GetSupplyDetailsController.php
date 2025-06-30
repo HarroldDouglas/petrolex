@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class GetSupplyDetailsController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Display the specified supply details.
+     *
+     * Route: GET /supplies/{supply_id}/details
+     * Name: supplies.details
      */
     public function __invoke(Request $request)
     {

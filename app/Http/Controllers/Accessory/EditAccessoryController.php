@@ -14,7 +14,10 @@ class EditAccessoryController extends Controller
     ) {}
 
     /**
-     * Handle the incoming request.
+     * Show the form for editing the specified accessory.
+     *
+     * Route: GET /accessories/edit/{id}
+     * Name: accessories.edit
      */
     public function __invoke(Request $request, int $accessoryTypeId): View
     {

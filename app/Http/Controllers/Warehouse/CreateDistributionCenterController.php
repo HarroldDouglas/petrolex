@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class CreateDistributionCenterController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Show the form for creating a new distribution center.
+     *
+     * Route: GET /distribution-centers/create
+     * Name: distribution-centers.create
      */
     public function __invoke(Request $request)
     {

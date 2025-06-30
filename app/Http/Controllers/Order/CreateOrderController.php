@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class CreateOrderController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Show the form for creating a new order.
+     *
+     * Route: GET /orders/create
+     * Name: orders.create
      */
     public function __invoke(Request $request)
     {

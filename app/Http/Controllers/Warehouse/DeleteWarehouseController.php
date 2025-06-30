@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class DeleteWarehouseController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Remove the specified warehouse from storage.
+     *
+     * Route: DELETE /distribution-centers/{center_id}/delete
+     * Name: distribution-centers.delete
      */
     public function __invoke(Request $request)
     {

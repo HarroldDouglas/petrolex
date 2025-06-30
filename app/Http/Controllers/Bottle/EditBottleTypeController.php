@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Bottle;
 
 use App\Http\Controllers\Controller;
 use App\Models\BottleType;
-use Illuminate\Http\Request;
 
 class EditBottleTypeController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Show the form for editing the specified bottle type.
+     *
+     * Route: GET /bottles/types/edit/{bottleType}
+     * Name: bottles.types.edit
      */
     public function __invoke(BottleType $bottleType)
     {
