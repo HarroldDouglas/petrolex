@@ -8,6 +8,7 @@ use App\Models\AccessoryType;
 use App\Models\BottleType;
 use App\Models\DistributionCenter;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -18,26 +19,68 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_type' => fake()->randomElement(ProductType::values()),
+            'product_category_id' => ProductCategory::inRandomOrder()->first()->id,
         ];
     }
 
     /**
-     * Create a bottle product with optional bottle attributes
+     * Méthode générique pour créer un produit avec un type spécifique
+     *
+     * @param  ProductType  $productType  Type de produit (BOTTLE ou ACCESSORY)
+     * @param  int|null  $productCategoryId  ID de catégorie de produit (optionnel)
+     * @param  int|null  $typeId  ID du type spécifique (bouteille ou accessoire)
+     * @param  string  $typeModelClass  Classe du modèle de type (BottleType ou AccessoryType)
+     * @return array État à appliquer au produit
      */
-    public function bottle(?int $bottleTypeId = null, ?int $distributionCenterId = null, array $bottleAttributes = []): static
-    {
-        return $this->state(function (array $attributes) {
+    protected function createProductState(
+        ProductType $productType,
+        ?int $productCategoryId,
+        ?int $typeId,
+        string $typeModelClass
+    ): array {
+        if ($productCategoryId) {
             return [
-                'product_type' => ProductType::BOTTLE(),
+                'product_category_id' => $productCategoryId,
             ];
-        })->afterCreating(function (Product $product) use ($bottleTypeId, $distributionCenterId, $bottleAttributes) {
-            $bottleType = $bottleTypeId ? BottleType::find($bottleTypeId) : BottleType::inRandomOrder()->first();
+        }
+
+        $productTypeModel = $typeId ? $typeModelClass::find($typeId) : $typeModelClass::inRandomOrder()->first();
+
+        if (! $productTypeModel) {
+            throw new \RuntimeException("Aucun modèle de type {$typeModelClass} trouvé.");
+        }
+
+        $productCategory = ProductCategory::where('product_type', $productType)
+            ->where('product_type_id', $productTypeModel->id)
+            ->first();
+
+        if (! $productCategory) {
+            throw new \RuntimeException("Aucune catégorie de produit trouvée pour {$productType->name} avec ID: {$productTypeModel->id}");
+        }
+
+        return [
+            'product_category_id' => $productCategory->id,
+        ];
+    }
+
+    public function bottle(
+        ?int $productCategoryId = null,
+        ?int $bottleTypeId = null,
+        ?int $distributionCenterId = null,
+        array $bottleAttributes = []
+    ): static {
+        return $this->state(function (array $attributes) use ($productCategoryId, $bottleTypeId) {
+            return $this->createProductState(
+                ProductType::BOTTLE(),
+                $productCategoryId,
+                $bottleTypeId,
+                BottleType::class
+            );
+        })->afterCreating(function (Product $product) use ($distributionCenterId, $bottleAttributes) {
             $distributionCenter = $distributionCenterId ?: DistributionCenter::inRandomOrder()->first()->id;
 
             $defaultAttributes = [
                 'product_id' => $product->id,
-                'bottle_type_id' => $bottleType->id,
                 'distribution_center_id' => $distributionCenter,
                 'barcode' => 'BT'.strtoupper(Str::random(8)),
                 'is_filled' => fake()->boolean(65),
@@ -48,22 +91,26 @@ class ProductFactory extends Factory
         });
     }
 
-    public function accessory(?int $accessoryTypeId = null, ?int $distributionCenterId = null, array $accessoryAttributes = []): static
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'product_type' => ProductType::ACCESSORY(),
-            ];
-        })->afterCreating(function (Product $product) use ($accessoryTypeId, $distributionCenterId, $accessoryAttributes) {
-            $accessoryType = $accessoryTypeId ? AccessoryType::find($accessoryTypeId) : AccessoryType::inRandomOrder()->first();
+    public function accessory(
+        ?int $productCategoryId = null,
+        ?int $accessoryTypeId = null,
+        ?int $distributionCenterId = null,
+        array $accessoryAttributes = []
+    ): static {
+        return $this->state(function (array $attributes) use ($productCategoryId, $accessoryTypeId) {
+            return $this->createProductState(
+                ProductType::ACCESSORY(),
+                $productCategoryId,
+                $accessoryTypeId,
+                AccessoryType::class
+            );
+        })->afterCreating(function (Product $product) use ($distributionCenterId, $accessoryAttributes) {
+
             $distributionCenter = $distributionCenterId ?: DistributionCenter::inRandomOrder()->first()->id;
 
             $defaultAttributes = [
                 'product_id' => $product->id,
-                'accessory_type_id' => $accessoryType->id,
                 'distribution_center_id' => $distributionCenter,
-                'sku' => fake()->unique()->bothify('ACC-####-***'),
-                'quantity' => fake()->numberBetween(1, 100),
             ];
 
             $product->accessory()->create(array_merge($defaultAttributes, $accessoryAttributes));

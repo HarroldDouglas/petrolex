@@ -9,6 +9,7 @@ use App\Models\User;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateRangeFilter;
@@ -56,12 +57,7 @@ class SuppliesDataTable extends BaseDataTable
 
                     $html = '';
                     foreach ($productTypes as $productType) {
-                        $name = '';
-                        if ($productType->product_type->isBottle() && $productType->bottleType) {
-                            $name = $productType->bottleType->name;
-                        } elseif ($productType->product_type->isAccessory() && $productType->accessoryType) {
-                            $name = $productType->accessoryType->name;
-                        }
+                        $name = $productType->productCategory->name;
 
                         if ($name) {
                             $html .= '<span class="badge rounded-pill bg-light-secondary mb-1">'
@@ -184,8 +180,7 @@ class SuppliesDataTable extends BaseDataTable
         $query = SupplierDelivery::query()
             ->with([
                 'distributionCenter',
-                'productTypes.bottleType',
-                'productTypes.accessoryType',
+                'productTypes.productCategory',
                 'user',
             ]);
 
@@ -261,8 +256,8 @@ class SuppliesDataTable extends BaseDataTable
                 'timer' => 3000,
             ]);
 
-        }  catch (\Exception $e) {
-            Log::error("Error cancelling supply #{$supplyId}: " . $e->getMessage(), ['exception' => $e]);
+        } catch (\Exception $e) {
+            Log::error("Error cancelling supply #{$supplyId}: ".$e->getMessage(), ['exception' => $e]);
 
             $this->dispatch('show-notification', [
                 'type' => 'error',
@@ -272,5 +267,4 @@ class SuppliesDataTable extends BaseDataTable
             ]);
         }
     }
-
 }

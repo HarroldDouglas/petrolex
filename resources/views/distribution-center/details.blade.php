@@ -71,14 +71,14 @@
                         <div class="row mb-3">
                             <div class="col-md-4 fw-medium">Statut :</div>
                             <div class="col-md-8">
-                                @if($distributionCenter->is_active)
+                                @if ($distributionCenter->is_active)
                                     <span class="badge bg-success">Actif</span>
                                 @else
                                     <span class="badge bg-danger">Inactif</span>
                                 @endif
                             </div>
                         </div>
-                        @if($distributionCenter->description)
+                        @if ($distributionCenter->description)
                             <div class="row mb-3">
                                 <div class="col-md-4 fw-medium">Description :</div>
                                 <div class="col-md-8">{{ $distributionCenter->description }}</div>
@@ -87,7 +87,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-body">
@@ -108,8 +108,8 @@
                         </div>
                     </div>
                 </div>
-                
-                @if($distributionCenter->latitude && $distributionCenter->longitude)
+
+                @if ($distributionCenter->latitude && $distributionCenter->longitude)
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title mb-3">Localisation</h5>
@@ -125,7 +125,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Stock détaillé par type de bouteille</h5>
-                        
+
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
@@ -138,16 +138,18 @@
                                 </thead>
                                 <tbody>
                                     @forelse($distributionCenter->bottleTypeStocks as $bottleType)
-                                    <tr>
-                                        <td>{{ $bottleType->name }}</td>
-                                        <td>{{ $bottleType->pivot->stock_empty }}</td>
-                                        <td>{{ $bottleType->pivot->stock_filled }}</td>
-                                        <td>{{ $bottleType->pivot->stock_empty + $bottleType->pivot->stock_filled }}</td>
-                                    </tr>
+                                        <tr>
+                                            <td>{{ $bottleType->name }}</td>
+                                            <td>{{ $bottleType->pivot->stock_empty }}</td>
+                                            <td>{{ $bottleType->pivot->stock_filled }}</td>
+                                            <td>{{ $bottleType->pivot->stock_empty + $bottleType->pivot->stock_filled }}
+                                            </td>
+                                        </tr>
                                     @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center">Aucun type de bouteille associé à ce centre de distribution</td>
-                                    </tr>
+                                        <tr>
+                                            <td colspan="4" class="text-center">Aucun type de bouteille associé à ce
+                                                centre de distribution</td>
+                                        </tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -160,28 +162,50 @@
 @endsection
 
 @section('script')
-    @if($distributionCenter->latitude && $distributionCenter->longitude)
-<script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&callback=initMap" async defer></script>
-<script>
-    function initMap() {
-        const center = {
-            lat: {{ $distributionCenter->latitude }},
-            lng: {{ $distributionCenter->longitude }}
-        };
+    @if ($distributionCenter->latitude && $distributionCenter->longitude)
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Vérifier que l'API Google Maps est chargée correctement
+                if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+                    console.error('Google Maps API n\'a pas été chargée correctement');
+                    document.getElementById('map').innerHTML = '<div class="alert alert-warning">Impossible de charger la carte. Veuillez vérifier votre connexion internet.</div>';
+                    return;
+                }
+                
+                initMap();
+            });
+
+            function initMap() {
+                const center = {
+                    lat: {{ $distributionCenter->latitude }},
+                    lng: {{ $distributionCenter->longitude }}
+                };
+
+                try {
+                    const map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 15,
+                        center: center,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    });
+
+                    new google.maps.Marker({
+                        position: center,
+                        map: map,
+                        title: '{{ $distributionCenter->name }}',
+                        animation: google.maps.Animation.DROP
+                    });
+                } catch (error) {
+                    console.error('Erreur lors de l\'initialisation de la carte:', error);
+                    document.getElementById('map').innerHTML = '<div class="alert alert-danger">Erreur lors du chargement de la carte: ' + error.message + '</div>';
+                }
+            }
+        </script>
         
-        const map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 15,
-            center: center,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        });
-        
-        new google.maps.Marker({
-            position: center,
-            map: map,
-            title: '{{ $distributionCenter->name }}',
-            animation: google.maps.Animation.DROP
-        });
-    }
-</script>
-@endif
+        <!-- Charger l'API Google Maps avec une gestion d'erreur -->
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&callback=initMap&v=weekly" 
+            async 
+            defer
+            onerror="document.getElementById('map').innerHTML = '<div class\'alert alert-danger\'>Impossible de charger l\'API Google Maps. Veuillez vérifier votre clé API.</div>'">
+        </script>
+    @endif
 @endsection

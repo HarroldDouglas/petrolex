@@ -23,6 +23,17 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read DistributionCenter $distributionCenter
+ * @property-read User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, SupplierDeliveryProductType> $productTypes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, SupplierDeliveryBottle> $bottles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
 class SupplierDelivery extends Model
 {
@@ -99,11 +110,11 @@ class SupplierDelivery extends Model
         return $this->hasMany(BottleMovement::class);
     }
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
-        static::creating(function ($supplierDelivery) {
+        static::creating(function (self $supplierDelivery): void {
             $supplierDelivery->setDefaultValues();
         });
     }

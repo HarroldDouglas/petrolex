@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('accessories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->foreignId('accessory_type_id')->constrained()->onDelete('restrict');
             $table->foreignId('distribution_center_id')->constrained()->onDelete('restrict');
             $table->string('sku', 255)->nullable()->unique();
-            $table->integer('quantity')->default(1);
+            $table->boolean('is_sold')->default(false);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index(['distribution_center_id']);
+            $table->index('is_sold');
         });
     }
 

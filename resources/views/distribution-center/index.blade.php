@@ -49,13 +49,13 @@
             </div>
         </div>
     </div>
-    @endsection
+@endsection
 
-    <x-sweet-alert-notification-listener />
-    @section('script')
-        <!-- slick-file -->
-        <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
-        <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
-        <script src="{{ asset('assets/js/ticket.js') }}"></script>
-        <script src="{{ asset('assets/vendor/apexcharts/timelinechart/moment.min.js') }}"></script>
-    @endsection
+<x-sweet-alert-notification-listener />
+@section('script')
+    <!-- slick-file -->
+    <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
+    <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
+    <script src="{{ asset('assets/js/ticket.js') }}"></script>
+    <script src="{{ asset('assets/vendor/apexcharts/timelinechart/moment.min.js') }}"></script>
+@endsection

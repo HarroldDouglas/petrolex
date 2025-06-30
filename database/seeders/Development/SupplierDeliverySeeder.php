@@ -4,10 +4,9 @@ namespace Database\Seeders\Development;
 
 use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryStatus;
-use App\Models\AccessoryType;
 use App\Models\Bottle;
-use App\Models\BottleType;
 use App\Models\DistributionCenter;
+use App\Models\ProductCategory;
 use App\Models\SupplierDelivery;
 use App\Models\SupplierDeliveryBottle;
 use App\Models\SupplierDeliveryProductType;
@@ -41,13 +40,12 @@ class SupplierDeliverySeeder extends Seeder
             return;
         }
 
-        [$distributionCenters, $users, $bottleTypes, $accessoryTypes] = $resources;
+        [$distributionCenters, $users, $productCategories] = $resources;
 
         $this->generateDeliveriesForAllCenters(
             $distributionCenters,
             $users,
-            $bottleTypes,
-            $accessoryTypes
+            $productCategories
         );
 
         $this->command->info('Supplier deliveries created successfully!');
@@ -76,17 +74,16 @@ class SupplierDeliverySeeder extends Seeder
             return null;
         }
 
-        // Get product types
-        $bottleTypes = BottleType::all();
-        $accessoryTypes = AccessoryType::all();
+        // Get product categories
+        $productCategories = ProductCategory::all();
 
-        if ($bottleTypes->isEmpty() || $accessoryTypes->isEmpty()) {
-            $this->command->error('No bottle types or accessory types found! Please run the required seeders first.');
+        if ($productCategories->isEmpty()) {
+            $this->command->error('No product categories found! Please run the required seeders first.');
 
             return null;
         }
 
-        return [$distributionCenters, $users, $bottleTypes, $accessoryTypes];
+        return [$distributionCenters, $users, $productCategories];
     }
 
     /**
@@ -95,11 +92,10 @@ class SupplierDeliverySeeder extends Seeder
     protected function generateDeliveriesForAllCenters(
         Collection $distributionCenters,
         Collection $users,
-        Collection $bottleTypes,
-        Collection $accessoryTypes
+        Collection $productCategories
     ): void {
         foreach ($distributionCenters as $center) {
-            $this->generateDeliveriesForCenter($center, $users, $bottleTypes, $accessoryTypes);
+            $this->generateDeliveriesForCenter($center, $users, $productCategories);
         }
     }
 
@@ -109,8 +105,7 @@ class SupplierDeliverySeeder extends Seeder
     protected function generateDeliveriesForCenter(
         DistributionCenter $center,
         Collection $users,
-        Collection $bottleTypes,
-        Collection $accessoryTypes
+        Collection $productCategories
     ): void {
         $statuses = [
             SupplierDeliveryStatus::IN_PROGRESS(),
@@ -123,8 +118,7 @@ class SupplierDeliverySeeder extends Seeder
                 $center,
                 $users->random(),
                 $status,
-                $bottleTypes,
-                $accessoryTypes
+                $productCategories
             );
         }
     }
@@ -136,12 +130,10 @@ class SupplierDeliverySeeder extends Seeder
         DistributionCenter $center,
         User $user,
         SupplierDeliveryStatus $status,
-        Collection $bottleTypes,
-        Collection $accessoryTypes
+        Collection $productCategories
     ): SupplierDelivery {
         $delivery = $this->createDeliveryRecord($center, $user, $status);
-        $this->addBottleProductTypes($delivery, $bottleTypes, $center, $status);
-        $this->addAccessoryProductTypes($delivery, $accessoryTypes);
+        $this->addProductCategories($delivery, $productCategories, $center, $status);
 
         return $delivery;
     }
@@ -195,41 +187,39 @@ class SupplierDeliverySeeder extends Seeder
     }
 
     /**
-     * Add bottle product types to the delivery
+     * Add product categories to the delivery
      */
-    protected function addBottleProductTypes(
+    protected function addProductCategories(
         SupplierDelivery $delivery,
-        Collection $bottleTypes,
+        Collection $productCategories,
         DistributionCenter $center,
         SupplierDeliveryStatus $status
     ): void {
-        $selectedBottleTypes = $bottleTypes->random(rand(1, 3));
+        $selectedProductCategories = $productCategories->random(rand(1, 3));
 
-        foreach ($selectedBottleTypes as $bottleType) {
+        foreach ($selectedProductCategories as $productCategory) {
             $expectedQuantity = rand(10, 50);
 
-            $productType = $this->createBottleProductType($delivery, $bottleType, $expectedQuantity, $status);
+            $productType = $this->createSupplierDeliveryProductType($delivery, $productCategory, $expectedQuantity, $status);
 
-            if ($status === SupplierDeliveryStatus::COMPLETED()) {
-                $this->addBottlesToCompletedDelivery($delivery, $productType, $bottleType, $center, $expectedQuantity);
+            if ($status === SupplierDeliveryStatus::COMPLETED() && $productCategory->product_type === ProductType::BOTTLE()) {
+                $this->addBottlesToCompletedDelivery($delivery, $productType, $productCategory, $center, $expectedQuantity);
             }
         }
     }
 
     /**
-     * Create a bottle product type entry
+     * Create a supplier delivery product type entry
      */
-    protected function createBottleProductType(
+    protected function createSupplierDeliveryProductType(
         SupplierDelivery $delivery,
-        BottleType $bottleType,
+        ProductCategory $productCategory,
         int $expectedQuantity,
         SupplierDeliveryStatus $status
     ): SupplierDeliveryProductType {
         return SupplierDeliveryProductType::create([
             'supplier_delivery_id' => $delivery->id,
-            'product_type' => ProductType::BOTTLE()->value,
-            'bottle_type_id' => $bottleType->id,
-            'accessory_type_id' => null,
+            'product_category_id' => $productCategory->id,
             'expected_quantity' => $expectedQuantity,
             'bottles_out_quantity' => $status === SupplierDeliveryStatus::COMPLETED() ? rand(0, 5) : 0,
         ]);
@@ -241,11 +231,11 @@ class SupplierDeliverySeeder extends Seeder
     protected function addBottlesToCompletedDelivery(
         SupplierDelivery $delivery,
         SupplierDeliveryProductType $productType,
-        BottleType $bottleType,
+        ProductCategory $productCategory,
         DistributionCenter $center,
         int $expectedQuantity
     ): void {
-        $availableBottles = $this->getAvailableBottles($bottleType, $center, $expectedQuantity);
+        $availableBottles = $this->getAvailableBottles($productCategory, $center, $expectedQuantity);
 
         foreach ($availableBottles as $bottle) {
             $this->linkBottleToDelivery($delivery, $productType, $bottle);
@@ -256,11 +246,13 @@ class SupplierDeliverySeeder extends Seeder
      * Get available bottles for a specific type and center
      */
     protected function getAvailableBottles(
-        BottleType $bottleType,
+        ProductCategory $productCategory,
         DistributionCenter $center,
         int $limit
     ): Collection {
-        return Bottle::where('bottle_type_id', $bottleType->id)
+        return Bottle::whereHas('product', function ($query) use ($productCategory) {
+            $query->where('product_category_id', $productCategory->id);
+        })
             ->where('distribution_center_id', $center->id)
             ->take($limit)
             ->get();
@@ -277,42 +269,6 @@ class SupplierDeliverySeeder extends Seeder
         SupplierDeliveryBottle::create([
             'supplier_delivery_product_type_id' => $productType->id,
             'bottle_id' => $bottle->id,
-        ]);
-    }
-
-    /**
-     * Add accessory product types to the delivery
-     */
-    protected function addAccessoryProductTypes(
-        SupplierDelivery $delivery,
-        Collection $accessoryTypes
-    ): void {
-        // 50% chance to have accessories
-        if (rand(0, 1) === 0) {
-            return;
-        }
-
-        $selectedAccessoryTypes = $accessoryTypes->random(rand(1, 2));
-
-        foreach ($selectedAccessoryTypes as $accessoryType) {
-            $this->createAccessoryProductType($delivery, $accessoryType);
-        }
-    }
-
-    /**
-     * Create an accessory product type entry
-     */
-    protected function createAccessoryProductType(
-        SupplierDelivery $delivery,
-        AccessoryType $accessoryType
-    ): SupplierDeliveryProductType {
-        return SupplierDeliveryProductType::create([
-            'supplier_delivery_id' => $delivery->id,
-            'product_type' => ProductType::ACCESSORY()->value,
-            'bottle_type_id' => null,
-            'accessory_type_id' => $accessoryType->id,
-            'expected_quantity' => rand(5, 20),
-            'bottles_out_quantity' => 0, // Not applicable for accessories
         ]);
     }
 }

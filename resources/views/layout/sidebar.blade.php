@@ -22,12 +22,14 @@
             @canany([$permissionEnum::ORDERS_VIEW()->value])
                 <li class="no-sub">
                     <a class="" href="{{ route('orders.list') }}">
-                        <i class="iconoir-cart-alt"></i> {{ auth()->user()->role == \App\Enums\UserRole::CENTER_MANAGER() ? 'Mes Commandes' : 'Commandes' }}
+                        <i class="iconoir-cart-alt"></i>
+                        {{ auth()->user()->role == \App\Enums\UserRole::CENTER_MANAGER() ? 'Mes Commandes' : 'Commandes' }}
                     </a>
                 </li>
             @endcanany
 
-            @canany([$permissionEnum::SUPPLIER_DELIVERIES_VIEW()->value, $permissionEnum::SUPPLIER_DELIVERIES_CREATE()->value])
+            @canany([$permissionEnum::SUPPLIER_DELIVERIES_VIEW()->value,
+                $permissionEnum::SUPPLIER_DELIVERIES_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#supply">
                         <i class="iconoir-database-restore"></i> Approvisionnements
@@ -89,7 +91,8 @@
                 </li>
             @endcanany
 
-            @canany([$permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value, $permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value])
+            @canany([$permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value,
+                $permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#point-of-sales">
                         <i class="iconoir-network"></i> Centres de distribution

@@ -9,7 +9,7 @@ class UpdateBottleTypeDTO extends BaseDTO
     public function __construct(
         public readonly ?int $id = null,
         public readonly ?string $name = null,
-        /** @var BottleTypeCityPriceDTO[]|null */
+        /** @var ProductCategoryCityPriceDTO[]|null */
         public readonly ?array $bottleTypeCityPrices = null,
         public readonly ?string $capacity = null,
         public readonly ?float $content_price = null,

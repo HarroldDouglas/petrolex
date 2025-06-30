@@ -2,10 +2,16 @@
 
 namespace App\Models;
 
+use App\Enums\ProductType;
+use App\Traits\HasMediaCollections;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Spatie\MediaLibrary\HasMedia;
 
 /**
  * @property int $id
@@ -16,10 +22,20 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Accessory> $accessories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $productCategories
+ *
+ * // Accessors
+ *
+ * // Query Scopes
  */
-class AccessoryType extends BaseModelWithMedia
+class AccessoryType extends Model implements HasMedia
 {
     use HasFactory;
+    use HasMediaCollections;
     use SoftDeletes;
 
     /**
@@ -46,25 +62,38 @@ class AccessoryType extends BaseModelWithMedia
     /**
      * Get the products that use this accessory type.
      */
-    public function products(): HasMany
+    public function products(): HasManyThrough
     {
-        return $this->hasMany(Product::class);
+        return $this->hasManyThrough(
+            Product::class,
+            ProductCategory::class,
+            'product_type_id',
+            'product_category_id'
+        )->where('product_categories.product_type', ProductType::ACCESSORY());
     }
 
     /**
-     * Get the accessories of this type.
+     * Get all accessories for this accessory type.
+     *
+     * @return Collection<int, Accessory>
      */
-    public function accessories(): HasMany
+    public function accessories(): Collection
     {
-        return $this->hasMany(Accessory::class);
+        return $this->products()
+            ->whereHas('accessory')
+            ->with('accessory')
+            ->get()
+            ->map(fn (Product $product) => $product->accessory)
+            ->filter();
     }
 
     /**
-     * Get the supplier delivery product types for this accessory type.
+     * Get the product categories for this accessory type.
      */
-    public function supplierDeliveryProductTypes(): HasMany
+    public function productCategories(): HasMany
     {
-        return $this->hasMany(SupplierDeliveryProductType::class);
+        return $this->hasMany(ProductCategory::class, 'product_type_id')
+            ->where('product_type', ProductType::ACCESSORY());
     }
 
     /**
@@ -75,11 +104,12 @@ class AccessoryType extends BaseModelWithMedia
      */
     public function getStockForType(?array $distributionCenterIds = null): int
     {
-        return $this->accessories()
-            ->when($distributionCenterIds, function ($query) use ($distributionCenterIds) {
-                $query->whereIn('distribution_center_id', $distributionCenterIds);
+        return $this->productCategories()
+            ->join('product_category_distribution_center as pcdc', 'product_categories.id', '=', 'pcdc.product_category_id')
+            ->when($distributionCenterIds, function (\Illuminate\Database\Eloquent\Builder $query) use ($distributionCenterIds): void {
+                $query->whereIn('pcdc.distribution_center_id', $distributionCenterIds);
             })
-            ->sum('quantity');
+            ->sum('pcdc.stock');
     }
 
     public function requiresMainImage(): bool

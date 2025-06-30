@@ -1,21 +1,18 @@
 <div class="btn-group dropdown-icon-none">
-    <button
-        class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle"
-        type="button" id="dropdownMenuButton{{ $product->id }}"
-        data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle" type="button"
+        id="dropdownMenuButton{{ $product->id }}" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="ti ti-dots-vertical"></i>
     </button>
-    <ul class="dropdown-menu"
-        aria-labelledby="dropdownMenuButton{{ $product->id }}">
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $product->id }}">
         <li>
-            <a class="dropdown-item"
-                href="{{ route('accessories.edit', $product->id) }}">
+            <a class="dropdown-item" href="{{ route('accessories.edit', $product->id) }}">
                 <i class="iconoir-edit text-info me-2"></i> Modifier
             </a>
         </li>
         @if ($product->is_active)
             <li>
-                <a class="dropdown-item change-status" href="#" onclick="confirmActionWithInput({
+                <a class="dropdown-item change-status" href="#"
+                    onclick="confirmActionWithInput({
                     method: 'toggleAccessoryStatus',
                     parameters: [{{ $product->id }}],
                     title: 'Désactiver l\'accessoire',
@@ -33,7 +30,8 @@
             </li>
         @else
             <li>
-                <a class="dropdown-item change-status" href="#" onclick="confirmActionWithInput({
+                <a class="dropdown-item change-status" href="#"
+                    onclick="confirmActionWithInput({
                     method: 'toggleAccessoryStatus',
                     parameters: [{{ $product->id }}],
                     title: 'Activer l\'accessoire',
@@ -51,8 +49,7 @@
             </li>
         @endif
         <li>
-            <a class="dropdown-item delete-product" href="#"
-                data-id="{{ $product->id }}">
+            <a class="dropdown-item delete-product" href="#" data-id="{{ $product->id }}">
                 <i class="iconoir-trash text-danger me-2"></i> Supprimer
             </a>
         </li>

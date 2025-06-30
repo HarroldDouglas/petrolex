@@ -5,6 +5,7 @@ namespace App\Services\BottleType;
 use App\DTOs\BottleType\CreateBottleTypeDTO;
 use App\DTOs\BottleType\UpdateBottleTypeDTO;
 use App\Models\BottleType;
+use App\Models\ProductCategoryCityPrice;
 use App\Repositories\Contracts\BottleTypeRepositoryInterface;
 
 class BottleTypeService
@@ -19,7 +20,7 @@ class BottleTypeService
         $bottleType = $this->bottleRepository->create($data->toArray());
 
         if ($data->bottleTypeCityPrices) {
-            $bottleType->cityPrices()->createMany(
+            ProductCategoryCityPrice::insert(
                 array_map(fn ($dto) => $dto->toArray(), $data->bottleTypeCityPrices)
             );
         }
@@ -34,13 +35,19 @@ class BottleTypeService
         $this->bottleRepository->update($bottleType,
             $data->toArray());
 
-        $bottleType->cityPrices()?->delete();
+        // Récupérer la catégorie de produit associée au type de bouteille
+        $productCategory = \App\Models\ProductCategory::where('product_type', \App\Enums\ProductType::BOTTLE())
+            ->where('product_type_id', $bottleType->id)
+            ->first();
 
-        if (! empty($data->bottleTypeCityPrices)) {
-            $bottleType->cityPrices()->createMany(
-                array_map(fn ($dto) => $dto->toArray(),
-                    $data->bottleTypeCityPrices)
-            );
+        if ($productCategory) {
+            ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->delete();
+
+            if (! empty($data->bottleTypeCityPrices)) {
+                ProductCategoryCityPrice::insert(
+                    array_map(fn ($dto) => $dto->toArray(), $data->bottleTypeCityPrices)
+                );
+            }
         }
 
         return $bottleType;

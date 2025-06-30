@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property int $id
@@ -21,6 +23,25 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * // Relations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, UserDistributionCenter> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, DeliveryPerson> $deliveryPersons
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Bottle> $bottles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Accessory> $accessories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, SupplierDelivery> $supplierDeliveries
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $productCategories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleType> $bottleTypeStocks
+ *
+ * // Accessors
+ * @property-read int $total_empty_bottles
+ * @property-read int $total_filled_bottles
+ * @property-read int $total_bottles
+ * @property-read \App\Models\User|null $manager
+ *
+ * // Query Scopes
  */
 class DistributionCenter extends Model
 {
@@ -57,6 +78,8 @@ class DistributionCenter extends Model
         'longitude' => 'decimal:8',
         'is_active' => 'boolean',
     ];
+
+    // ===== RELATIONS =====
 
     /**
      * Get the user permissions for this center.
@@ -115,12 +138,33 @@ class DistributionCenter extends Model
         return $this->hasMany(BottleMovement::class);
     }
 
-    public function bottleTypeStocks(): BelongsToMany
+    /**
+     * Get the product categories for this distribution center.
+     */
+    public function productCategories(): BelongsToMany
     {
-        return $this->belongsToMany(BottleType::class, 'bottle_type_distribution_center')
-            ->withPivot('stock_empty', 'stock_filled')
+        return $this->belongsToMany(ProductCategory::class, 'product_category_distribution_center')
+            ->using(ProductCategoryDistributionCenter::class)
+            ->withPivot(['stock_empty', 'stock_filled'])
             ->withTimestamps();
     }
+
+    /**
+     * Get the bottle types with stock information for this distribution center.
+     * This maintains backward compatibility while working with the new product_category structure.
+     */
+    public function bottleTypeStocks(): BelongsToMany
+    {
+        // We need to join through ProductCategory since the direct relationship no longer exists
+        return $this->belongsToMany(BottleType::class, 'product_category_distribution_center', 'distribution_center_id', 'product_category_id')
+            ->join('product_categories', 'product_category_distribution_center.product_category_id', '=', 'product_categories.id')
+            ->where('product_categories.product_type', 'bottle')
+            ->where('product_categories.product_type_id', '=', DB::raw('bottle_types.id'))
+            ->withPivot(['stock_empty', 'stock_filled'])
+            ->withTimestamps();
+    }
+
+    // ===== ACCESSORS =====
 
     /**
      * Get the total number of empty bottles in stock.
@@ -144,5 +188,17 @@ class DistributionCenter extends Model
     public function getTotalBottlesAttribute(): int
     {
         return $this->total_empty_bottles + $this->total_filled_bottles;
+    }
+
+    /**
+     * Get the manager user for this distribution center.
+     */
+    public function getManagerAttribute(): ?User
+    {
+        return User::whereHas('distributionCenters', function ($query) {
+            $query->where('distribution_center_id', $this->id);
+        })
+            ->role(UserRole::CENTER_MANAGER())
+            ->first();
     }
 }

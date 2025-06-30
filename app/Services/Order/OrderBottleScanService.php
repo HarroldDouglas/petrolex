@@ -2,6 +2,7 @@
 
 namespace App\Services\Order;
 
+use App\Enums\ProductType;
 use App\Exceptions\BottleScanException;
 use App\Models\Bottle;
 use App\Models\Order;
@@ -48,11 +49,13 @@ class OrderBottleScanService
     public function getOrderItemsGroupedByBottleType(Order $order): Collection
     {
         return $order->items()
-            ->whereHas('product.bottle')
-            ->with(['product.bottle.bottleType'])
+            ->whereHas('productCategory', function ($query) {
+                $query->where('product_type', ProductType::BOTTLE());
+            })
+            ->with(['productCategory'])
             ->withCount('orderBottleScans')
             ->get()
-            ->groupBy('product.bottle.bottle_type_id')
+            ->groupBy('productCategory.product_type_id')
             ->map(function (Collection $items) {
                 // Return the first item from each group since they all share the same bottle type
                 return $items->first();

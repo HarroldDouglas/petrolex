@@ -6,6 +6,6 @@
 
 @section('tab-content')
     @livewire('supply.scan-bottles', [
-        'supply' => $supply
+        'supply' => $supply,
     ])
 @endsection

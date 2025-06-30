@@ -96,6 +96,8 @@ class DistributionCenterService
 
     /**
      * Get distribution centers for current authenticated user
+     *
+     * @return Collection<DistributionCenter>
      */
     public static function getForCurrentUser(): Collection
     {
@@ -110,9 +112,14 @@ class DistributionCenterService
 
     /**
      * Get distribution centers for specific user
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, DistributionCenter>
      */
-    public static function getForUser(User $user): Collection
+    public static function getForUser(User $user): \Illuminate\Database\Eloquent\Collection
     {
-        return $user->activeDistributionCenters()->get();
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\DistributionCenter> $distributionCenters */
+        $distributionCenters = $user->activeDistributionCenters()->get();
+
+        return $distributionCenters;
     }
 }

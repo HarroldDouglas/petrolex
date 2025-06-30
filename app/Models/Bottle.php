@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BottleStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,20 +14,29 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $product_id
- * @property int $bottle_type_id
  * @property int $distribution_center_id
  * @property int|null $marked_lost_by_user_id
  * @property string $barcode
  * @property bool $is_filled
  * @property BottleStatus $status
- * @property Product $product
- * @property BottleType $bottleType
- * @property DistributionCenter $distribution_center
- * @property-read int $movements_count
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
  * @property Carbon|null $marked_lost_at
+ *
+ * // Relations
+ * @property-read Product $product
+ * @property-read DistributionCenter $distributionCenter
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $movements
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, SupplierDeliveryBottle> $supplierDeliveryBottles
+ *
+ * // Accessors
+ * @property-read BottleType|null $bottleType
+ * @property-read int|null $bottleTypeId
+ *
+ * // Query Scopes
+ *
+ * @method static Builder ofBottleType(int $bottleTypeId)
  */
 class Bottle extends Model
 {
@@ -40,7 +50,6 @@ class Bottle extends Model
      */
     protected $fillable = [
         'product_id',
-        'bottle_type_id',
         'distribution_center_id',
         'barcode',
         'is_filled',
@@ -68,9 +77,20 @@ class Bottle extends Model
     /**
      * Get the bottle type of the bottle.
      */
-    public function bottleType(): BelongsTo
+    public function getBottleTypeAttribute(): ?BottleType
     {
-        return $this->belongsTo(BottleType::class);
+        $productType = $this->product?->productCategory?->productTypeInstance;
+
+        if ($productType instanceof BottleType) {
+            return $productType;
+        }
+
+        return null;
+    }
+
+    public function getBottleTypeIdAttribute(): ?int
+    {
+        return $this->bottleType?->id;
     }
 
     /**
@@ -95,5 +115,13 @@ class Bottle extends Model
     public function supplierDeliveryBottles(): HasMany
     {
         return $this->hasMany(SupplierDeliveryBottle::class);
+    }
+
+    public function scopeOfBottleType(Builder $query, int $bottleTypeId): Builder
+    {
+        return $query->whereHas('product.productCategory', function (Builder $query) use ($bottleTypeId): void {
+            $query->where('product_type_id', $bottleTypeId)
+                ->where('product_type', 'bottle');
+        });
     }
 }

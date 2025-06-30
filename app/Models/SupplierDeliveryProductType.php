@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryBottleMovementType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,22 +16,31 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @property int $id
  * @property int $supplier_delivery_id
- * @property ProductType $product_type
- * @property int|null $bottle_type_id
- * @property int|null $accessory_type_id
+ * @property int $product_category_id
  * @property int $expected_quantity
  * @property int $bottles_out_quantity
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\AccessoryType|null $accessoryType
- * @property-read \App\Models\BottleType|null $bottleType
+ *
+ * // Relations
+ * @property-read \App\Models\ProductCategory $productCategory
  * @property-read \App\Models\SupplierDelivery $supplierDelivery
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $deliveryBottles
- * @property-read int|null $incoming_scanned_count
- * @property-read int|null $outgoing_scanned_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $incomingBottles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierDeliveryBottle> $outgoingBottles
+ *
+ * // Accessors
+ * @property-read int $incoming_scanned_count
+ * @property-read int $outgoing_scanned_count
  * @property-read bool $incoming_done
+ * @property-read bool $outgoing_done
+ *
+ * // Query Scopes
+ *
+ * @method static Builder bottles()
+ * @method static Builder accessories()
  */
 class SupplierDeliveryProductType extends Model
 {
@@ -44,9 +54,7 @@ class SupplierDeliveryProductType extends Model
      */
     protected $fillable = [
         'supplier_delivery_id',
-        'product_type',
-        'bottle_type_id',
-        'accessory_type_id',
+        'product_category_id',
         'expected_quantity',
         'bottles_out_quantity',
         'notes',
@@ -60,7 +68,6 @@ class SupplierDeliveryProductType extends Model
     protected $casts = [
         'expected_quantity' => 'integer',
         'bottles_out_quantity' => 'integer',
-        'product_type' => ProductType::class,
     ];
 
     /**
@@ -72,19 +79,11 @@ class SupplierDeliveryProductType extends Model
     }
 
     /**
-     * Get the bottle type for this product type.
+     * Get the product category for this product type.
      */
-    public function bottleType(): BelongsTo
+    public function productCategory(): BelongsTo
     {
-        return $this->belongsTo(BottleType::class);
-    }
-
-    /**
-     * Get the accessory type for this product type.
-     */
-    public function accessoryType(): BelongsTo
-    {
-        return $this->belongsTo(AccessoryType::class);
+        return $this->belongsTo(ProductCategory::class);
     }
 
     /**
@@ -146,16 +145,20 @@ class SupplierDeliveryProductType extends Model
     /**
      * Scope a query to only include bottle product types.
      */
-    public function scopeBottles($query)
+    public function scopeBottles(Builder $query): Builder
     {
-        return $query->where('product_type', ProductType::BOTTLE());
+        return $query->whereHas('productCategory', function (Builder $q): void {
+            $q->where('product_type', ProductType::BOTTLE());
+        });
     }
 
     /**
      * Scope a query to only include accessory product types.
      */
-    public function scopeAccessories($query)
+    public function scopeAccessories(Builder $query): Builder
     {
-        return $query->where('product_type', ProductType::ACCESSORY());
+        return $query->whereHas('productCategory', function (Builder $q): void {
+            $q->where('product_type', ProductType::ACCESSORY());
+        });
     }
 }

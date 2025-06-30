@@ -4,10 +4,10 @@ namespace App\Livewire\Supply\ProductForm;
 
 use App\Enums\ProductType;
 use App\Http\Requests\Supply\RegisterGasBottleRequest;
-use App\Models\BottleType;
+use App\Models\ProductCategory;
 use App\Models\SupplierDelivery;
 use App\Models\SupplierDeliveryProductType;
-use App\Repositories\Contracts\BottleTypeRepositoryInterface;
+use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -29,10 +29,19 @@ class GasBottleForm extends Component
 
     protected $listeners = ['products-updated' => 'updateUsedTypes'];
 
-    public function boot(BottleTypeRepositoryInterface $bottleTypeRepository)
+    public function boot(ProductCategoryRepositoryInterface $productCategoryRepository)
     {
-        $this->bottleTypes = $bottleTypeRepository->all()
-            ->map(fn (BottleType $type) => ['id' => $type->id, 'name' => $type->name])
+        $productCategories = $productCategoryRepository->getAllActiveByType(ProductType::BOTTLE());
+
+        $this->bottleTypes = $productCategories
+            ->map(function (ProductCategory $category) {
+                $typeInstance = $category->productTypeInstance;
+
+                return [
+                    'id' => $category->id,
+                    'name' => $typeInstance ? $typeInstance->name : 'Type inconnu',
+                ];
+            })
             ->toArray();
     }
 
@@ -79,8 +88,8 @@ class GasBottleForm extends Component
         $this->incomingQuantity = $productData['expected_quantity'] ?? '';
         $this->outgoingQuantity = $productData['bottles_out_quantity'] ?? 0;
 
-        if (isset($productData['bottle_type_id'])) {
-            $this->selectedBottleType = (string) $productData['bottle_type_id'];
+        if (isset($productData['product_category_id'])) {
+            $this->selectedBottleType = (string) $productData['product_category_id'];
         }
 
         $this->showForm = true;
@@ -108,7 +117,7 @@ class GasBottleForm extends Component
             if ($this->isEditing && $this->editProductId) {
                 $product = SupplierDeliveryProductType::findOrFail($this->editProductId);
                 $product->update([
-                    'bottle_type_id' => $validatedData['selectedBottleType'],
+                    'product_category_id' => $validatedData['selectedBottleType'],
                     'expected_quantity' => $validatedData['incomingQuantity'],
                     'bottles_out_quantity' => $validatedData['outgoingQuantity'] ?? 0,
                 ]);
@@ -117,9 +126,7 @@ class GasBottleForm extends Component
             } else {
                 SupplierDeliveryProductType::create([
                     'supplier_delivery_id' => $this->supplierDelivery->id,
-                    'product_type' => ProductType::BOTTLE()->value,
-                    'bottle_type_id' => $validatedData['selectedBottleType'],
-                    'accessory_type_id' => null,
+                    'product_category_id' => $validatedData['selectedBottleType'],
                     'expected_quantity' => $validatedData['incomingQuantity'],
                     'bottles_out_quantity' => $validatedData['outgoingQuantity'] ?? 0,
                 ]);
@@ -140,8 +147,10 @@ class GasBottleForm extends Component
     public function updateUsedTypes($products = null)
     {
         $this->usedBottleTypes = $this->supplierDelivery->productTypes()
-            ->where('product_type', ProductType::BOTTLE()->value)
-            ->pluck('bottle_type_id')
+            ->whereHas('productCategory', function (\Illuminate\Database\Eloquent\Builder $query) {
+                $query->where('product_type', ProductType::BOTTLE());
+            })
+            ->pluck('product_category_id')
             ->toArray();
     }
 

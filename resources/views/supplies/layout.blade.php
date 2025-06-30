@@ -8,8 +8,9 @@
             text-decoration: none !important;
             color: inherit;
         }
+
         #supply-tabs {
-            border:none!important;
+            border: none !important;
         }
     </style>
     @stack('css')
@@ -23,7 +24,7 @@
                 <h4 class="main-title">@yield('page-title')</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li><a href="{{ route('supplies.list') }}" class="f-s-14 f-w-500">
-                        <i class="ph-duotone ph-stack f-s-16"></i> Approvisionnements</a></li>
+                            <i class="ph-duotone ph-stack f-s-16"></i> Approvisionnements</a></li>
                     <li class="active"><a href="#" class="f-s-14 f-w-500">@yield('breadcrumb-title')</a></li>
                 </ul>
             </div>
@@ -40,7 +41,7 @@
             <div class="card-body">
                 <!-- Navigation "onglets" -->
                 @include('supplies.partials.tabs-navigation')
-                
+
                 <!-- Contenu de la page -->
                 <div class="mt-3">
                     @yield('tab-content')

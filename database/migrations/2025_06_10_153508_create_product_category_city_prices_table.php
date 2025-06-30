@@ -11,20 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bottle_type_city_prices', function (Blueprint $table) {
+        Schema::create('product_category_city_prices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bottle_type_id')->constrained('bottle_types')->onDelete('cascade');
+            $table->foreignId('product_category_id')->constrained('product_categories')->onDelete('cascade');
             $table->string('city');
             $table->decimal('content_price', 10, 2);
             $table->decimal('content_with_bottle_price', 10, 2);
             $table->timestamps();
 
             $table->index('city');
-            $table->index(['bottle_type_id', 'city']);
+            $table->index(['product_category_id', 'city']);
 
             $table->unique(
-                ['bottle_type_id', 'city'],
-                'bottle_type_city_unique'
+                ['product_category_id', 'city'],
+                'product_category_city_unique'
             );
 
         });
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bottle_type_city_prices');
+        Schema::dropIfExists('product_category_city_prices');
     }
 };
