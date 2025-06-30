@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 
 abstract class BaseUserRequest extends FormRequest
 {
+    //TODO refaire une revue par Douglas
     public function rules(): array
     {
         return [
