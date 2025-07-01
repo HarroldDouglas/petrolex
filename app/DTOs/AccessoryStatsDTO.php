@@ -2,7 +2,7 @@
 
 namespace App\DTOs;
 
-class AccessoryStatsDTO
+class AccessoryStatsDTO extends BaseDTO
 {
     public function __construct(
         public readonly int $activeCount,
