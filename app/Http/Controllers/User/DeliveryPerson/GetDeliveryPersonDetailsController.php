@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\User\DeliveryPerson;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\DeliveryPerson; 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class GetDeliveryPersonDetailsController extends Controller
@@ -18,14 +17,14 @@ class GetDeliveryPersonDetailsController extends Controller
                     $query->with([
                         'orders' => function ($orderQuery) {
                             $orderQuery->latest()->take(10)->with('customer.user');
-                        }
+                        },
                     ]);
-                }
+                },
             ]);
 
             $deliveryPerson = $user->deliveryPerson;
 
-            if (!$deliveryPerson) {
+            if (! $deliveryPerson) {
                 return redirect()->route('users.list')->with('error', "The selected user ({$user->full_name}) does not have an associated delivery person profile.");
             }
 
@@ -38,8 +37,8 @@ class GetDeliveryPersonDetailsController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            $userIdForLog = isset($user) ? $user->id : 'N/A';
-            Log::error("Error in GetDeliveryPersonDetailsController for user ID " . $userIdForLog . ": " . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error in GetDeliveryPersonDetailsController for user ID '.$user->id.': '.$e->getMessage(), ['exception' => $e]);
+
             return back()->with('error', 'An unexpected error occurred while fetching delivery person details. Please try again.');
         }
     }

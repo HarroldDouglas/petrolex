@@ -210,13 +210,14 @@ class SuppliesDataTable extends BaseDataTable
                     'message' => "L'approvisionnement sélectionné n'existe pas.",
                     'timer' => 3000,
                 ]);
+
                 return;
             }
 
             $deliveryNumber = $supply->delivery_number;
             if ($supply->delete()) {
 
-                $this->dispatch('show-notification', [ 
+                $this->dispatch('show-notification', [
                     'type' => 'success',
                     'title' => 'Supprimé !',
                     'message' => "L'approvisionnement {$deliveryNumber} a été supprimé avec succès.",
@@ -242,6 +243,7 @@ class SuppliesDataTable extends BaseDataTable
             $this->dispatch('close-loading-swal');
         }
     }
+
     public function cancelSupply(int $supplyId): void
     {
         try {

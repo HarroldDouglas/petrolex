@@ -4,9 +4,9 @@ namespace App\Livewire\Order;
 
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
+use App\Models\DeliveryPerson;
 use App\Models\Order;
 use App\Models\User;
-use App\Models\DeliveryPerson;
 use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -194,16 +194,14 @@ class OrderDataTable extends BaseDataTable
      */
     protected function getDeliveryPersonOptions(): array
     {
-        // Fetch all DeliveryPersons and eager load their associated User models
         $deliveryPersons = DeliveryPerson::with('user')->get();
 
-        $options = ['' => 'Tous les livreurs']; // Default option to show all delivery persons
+        $options = ['' => 'Tous les livreurs'];
 
         foreach ($deliveryPersons as $deliveryPerson) {
             if ($deliveryPerson->user) {
-                $fullName = trim(($deliveryPerson->user->first_name ?? '') . ' ' . ($deliveryPerson->user->last_name ?? ''));
-                // Use deliveryPerson->id as the filter value, which corresponds to delivery_person_id on the Order
-                $options[$deliveryPerson->id] = $fullName ?: 'Livreur Inconnu (ID: ' . $deliveryPerson->id . ')';
+                $fullName = trim(($deliveryPerson->user->first_name ?? '').' '.($deliveryPerson->user->last_name ?? ''));
+                $options[$deliveryPerson->id] = $fullName ?: 'Livreur Inconnu (ID: '.$deliveryPerson->id.')';
             }
         }
 
@@ -233,12 +231,13 @@ class OrderDataTable extends BaseDataTable
                     return $builder->where('distribution_center_id', $value);
                 }),
 
-            SelectFilter::make('Livreur') // <--- ADD THIS NEW FILTER
+            SelectFilter::make('Livreur')
                 ->options($this->getDeliveryPersonOptions())
                 ->filter(function (Builder $builder, string $value) {
                     if ($value === '') {
-                        return $builder; // No filter applied if 'Tous les livreurs' is selected
+                        return $builder;
                     }
+
                     return $builder->where('delivery_person_id', $value);
                 }),
 

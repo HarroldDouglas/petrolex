@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Log;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
-use Illuminate\Support\HtmlString;
 
 class UserDataTable extends BaseDataTable
 {
@@ -248,7 +247,7 @@ class UserDataTable extends BaseDataTable
             $newStatus = ! $currentStatus;
 
             $updateDto = new UpdateUserDTO(
-                is_active: $newStatus
+                is_active: $newStatus,
             );
 
             $result = $userService->update($user, $updateDto->toArrayFiltered());

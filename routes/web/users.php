@@ -9,10 +9,10 @@
 
 use App\Http\Controllers\User\CreateUserController;
 use App\Http\Controllers\User\DeleteUserController;
+use App\Http\Controllers\User\DeliveryPerson\GetDeliveryPersonDetailsController;
 use App\Http\Controllers\User\EditUserController;
 use App\Http\Controllers\User\GetUserDataTableController;
 use App\Http\Controllers\User\GetUserDetailsController;
-use App\Http\Controllers\User\DeliveryPerson\GetDeliveryPersonDetailsController;
 use App\Http\Controllers\User\GetUsersController;
 use Illuminate\Support\Facades\Route;
 
