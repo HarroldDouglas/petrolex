@@ -10,8 +10,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 
 abstract class AbstractUserForm extends Component
 {
@@ -23,11 +23,7 @@ abstract class AbstractUserForm extends Component
     public string $role = '';
     public string $password = '';
     public bool $is_active = true;
-
-    /** @var UploadedFile|null */
-    public $image = null;
-
-    public ?string $existingImage = null;
+    public string|UploadedFile|null $image = null;
     public $distribution_center_ids = [];
     public bool $showDistributionCenters = false;
     public bool $showPassword = false;
@@ -49,7 +45,7 @@ abstract class AbstractUserForm extends Component
 
     public function initialize()
     {
-        $this->allowedRoles = UserRole::toArray();
+        $this->allowedRoles = array_diff(UserRole::toArray(), [UserRole::CUSTOMER()->value]);
 
         $this->availableDistributionCenters = $this->distributionCenterService->getAll()
             ->pluck('name', 'id')
@@ -77,7 +73,7 @@ abstract class AbstractUserForm extends Component
 
     public function getImagePreviewStyleProperty(): string
     {
-        $image = $this->image ?? $this->existingImage;
+        $image = $this->image;
 
         if ($image) {
             if (is_string(value: $image)) {
@@ -87,8 +83,10 @@ abstract class AbstractUserForm extends Component
             } else {
                 return '';
             }
+
             return "background-image: url('{$url}');";
         }
+
         return '';
     }
 

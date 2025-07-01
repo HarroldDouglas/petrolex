@@ -3,6 +3,7 @@
 namespace App\Livewire\User;
 
 use App\DTOs\User\UpdateUserDTO;
+use App\Enums\UserRole;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use Dotenv\Exception\ValidationException;
@@ -10,8 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class EditUserForm extends AbstractUserForm
 {
-    /** @var User */
-    public $user;
+    public User $user;
     public int $id;
 
     protected function customRequest(): FormRequest
@@ -32,7 +32,7 @@ class EditUserForm extends AbstractUserForm
         /** @var \Spatie\Permission\Models\Role|null $role */
         $role = $user->roles->first();
         $this->role = $role?->name;
-        $this->existingImage = $user->getMedia('images')->first()?->getUrl() ?? null;
+        $this->image = $user->getMedia('images')->first()?->getUrl() ?? null;
         $this->distribution_center_ids = $user->activeDistributionCenters->pluck('id')?->toArray();
 
         $this->is_active = $user->is_active;
@@ -46,8 +46,10 @@ class EditUserForm extends AbstractUserForm
         $validatedData['distribution_center_ids'] = $this->showDistributionCenters
             ? $validatedData['distribution_center_ids'] : [];
         try {
-            $dto = UpdateUserDTO::fromArray($validatedData);
+            $validatedData['role'] = UserRole::from($validatedData['role']);
+            $validatedData['image'] = is_string($validatedData['image']) ? null : $validatedData['image'];
 
+            $dto = UpdateUserDTO::from($validatedData);
             $dtoArray = $dto->toArray();
 
             /** @var User */

@@ -20,9 +20,8 @@ class UpdateUserRelatedEntitiesListener
         $user->syncRoles($role);
         $user->accessibleDistributionCenters()->sync($distribution_center_ids);
         if ($role === UserRole::DELIVERY_PERSON()->value) {
+            $user->deliveryPerson()?->delete();
             $user->deliveryPerson()->create();
-        } elseif ($role === UserRole::CUSTOMER()->value) {
-            $user->customer()->create(['current_balance' => 0]);
         }
 
         $user->save();

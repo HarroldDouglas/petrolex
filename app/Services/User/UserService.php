@@ -10,8 +10,8 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use \Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseServiceWithMedia
@@ -73,6 +73,7 @@ class UserService extends BaseServiceWithMedia
      */
     public function update(Model $user, array $attributes): Model
     {
+        Log::info('Editing attributes', $attributes);
 
         /** @var User $user */
         if (! $user instanceof User) {
@@ -83,6 +84,10 @@ class UserService extends BaseServiceWithMedia
         }
 
         $originalValues = $user->only(array_keys($attributes));
+
+        if (empty($attributes['password'])) {
+            unset($attributes['password']);
+        }
 
         DB::beginTransaction();
 
@@ -101,14 +106,12 @@ class UserService extends BaseServiceWithMedia
                 $currentValues = $user->only(array_keys($attributes));
                 $changes = array_diff_assoc($currentValues, $originalValues);
 
-                if (! empty($changes)) {
-                    UserUpdatedEvent::dispatch(
-                        $user,
-                        $attributes['role'],
-                        $attributes['distribution_center_ids'],
-                        $changes
-                    );
-                }
+                UserUpdatedEvent::dispatch(
+                    $user,
+                    $attributes['role'],
+                    $attributes['distribution_center_ids'],
+                    $changes
+                );
             }
 
             DB::commit();

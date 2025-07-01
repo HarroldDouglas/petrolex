@@ -17,7 +17,6 @@ class EditUserController extends Controller
      */
     public function __invoke(Request $request, int $userId)
     {
-        $this->authorize('users.edit');
         $user = $this->userService->find($userId);
 
         return view('users.edit', [

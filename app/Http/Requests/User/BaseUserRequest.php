@@ -3,24 +3,30 @@
 namespace App\Http\Requests\User;
 
 use App\Enums\UserRole;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 abstract class BaseUserRequest extends FormRequest
 {
-    //TODO refaire une revue par Douglas
+    // TODO refaire une revue par Douglas
     public function rules(): array
     {
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => $this->emailRules(),
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email'),
+            ],
             'phone_number' => ['required', 'string', 'max:20'],
-            'password' => $this->passwordRules(),
+            'password' => ['required', 'string', 'min:8'],
             'role' => ['required', Rule::in(UserRole::values())],
             'image' => [
                 'nullable',
-                function ($attribute, $value, $fail) {
+                function (string $attribute, mixed $value, Closure $fail): void {
                     if (is_string($value)) {
                         return;
                     }
@@ -45,21 +51,6 @@ abstract class BaseUserRequest extends FormRequest
             ],
             'is_active' => ['required', 'boolean'],
         ];
-    }
-
-    protected function emailRules(): array
-    {
-        return [
-            'required',
-            'email',
-            'max:255',
-            Rule::unique('users', 'email'),
-        ];
-    }
-
-    protected function passwordRules(): array
-    {
-        return ['required', 'string', 'min:8'];
     }
 
     public function messages(): array

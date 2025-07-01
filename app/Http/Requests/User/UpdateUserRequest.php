@@ -19,28 +19,20 @@ class UpdateUserRequest extends BaseUserRequest
         return true;
     }
 
-    protected function passwordRules(): array
-    {
-        return ['nullable', 'string', 'min:8'];
-    }
-
-    protected function emailRules(): array
-    {
-        return [
-            'required',
-            'email',
-            'max:255',
-            Rule::unique('users', 'email')->ignore($this->id),
-        ];
-    }
-
     public function rules(): array
     {
         return array_merge(
+            parent::rules(),
             [
                 'id' => ['required', 'integer', 'exists:users,id'],
-            ],
-            parent::rules()
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')->ignore($this->id),
+                ],
+                'password' => ['nullable', 'string', 'min:8'],
+            ]
         );
     }
 
