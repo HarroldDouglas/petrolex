@@ -16,7 +16,10 @@ class ScanBottlesController extends Controller
     }
 
     /**
-     * Handle the incoming request.
+     * Scan bottles for a specific supply.
+     *
+     * Route: GET /supplies/{supply_id}/scan-bottles
+     * Name: supplies.scan-bottles
      */
     public function __invoke(Request $request, $supply_id)
     {

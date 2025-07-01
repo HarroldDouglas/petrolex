@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class CreateAccessoryController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Show the form for creating a new accessory.
+     *
+     * Route: GET /accessories/create
+     * Name: accessories.create
      */
     public function __invoke(Request $request)
     {

@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class GetDistributionCentersController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Display a listing of the distribution centers.
+     *
+     * Route: GET /distribution-centers
+     * Name: distribution-centers.list
      */
     public function __invoke(Request $request)
     {

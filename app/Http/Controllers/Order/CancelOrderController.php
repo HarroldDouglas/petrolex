@@ -15,7 +15,10 @@ class CancelOrderController extends Controller
     ) {}
 
     /**
-     * Handle the incoming request.
+     * Cancel the specified order.
+     *
+     * Route: PATCH /orders/{order}/cancel
+     * Name: orders.cancel
      */
     public function __invoke(Request $request, Order $order): RedirectResponse
     {

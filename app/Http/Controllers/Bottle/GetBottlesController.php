@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class GetBottlesController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Display a listing of the bottles.
+     *
+     * Route: GET /bottles
+     * Name: bottles.index
      */
     public function __invoke(Request $request)
     {

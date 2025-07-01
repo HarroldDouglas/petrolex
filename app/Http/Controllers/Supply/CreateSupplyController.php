@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class CreateSupplyController extends Controller
 {
     /**
-     * Handle the incoming request to display the create form.
+     * Show the form for creating a new supply.
+     *
+     * Route: GET /supplies/create
+     * Name: supplies.create
      */
     public function __invoke(Request $request)
     {

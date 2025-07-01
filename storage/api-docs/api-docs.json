@@ -1,0 +1,218 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Documentation",
+        "description": "Documentation de l'API",
+        "contact": {
+            "email": "contact@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://my-default-host.com",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Authentification utilisateur",
+                "description": "Authentifie un utilisateur et génère un token d'accès API",
+                "operationId": "api.login",
+                "requestBody": {
+                    "description": "Informations d'authentification",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authentification réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "LoginRequest": {
+                "required": [
+                    "login",
+                    "password"
+                ],
+                "properties": {
+                    "login": {
+                        "description": "Email ou téléphone de l'utilisateur (+237690000000)",
+                        "type": "string",
+                        "example": "admin@petrolex.com"
+                    },
+                    "password": {
+                        "description": "Mot de passe",
+                        "type": "string",
+                        "format": "password",
+                        "example": "password"
+                    }
+                },
+                "type": "object"
+            },
+            "TokenData": {
+                "properties": {
+                    "access_token": {
+                        "description": "Token d'accès Bearer",
+                        "type": "string",
+                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+                    },
+                    "token_type": {
+                        "description": "Type de token",
+                        "type": "string",
+                        "example": "bearer"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/TokenData"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Authentification réussie"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ApiResponse": {
+                "description": "Réponse standard de l'API",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Opération réussie"
+                    },
+                    "data": {
+                        "description": "Données retournées par l'API",
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": false
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Une erreur est survenue."
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ValidationErrorDetail": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "example": "Le champ email est requis."
+                }
+            },
+            "ValidationErrorResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": false
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Erreur de validation."
+                            },
+                            "data": {
+                                "description": "Détail des erreurs de validation",
+                                "properties": {
+                                    "field_name": {
+                                        "$ref": "#/components/schemas/ValidationErrorDetail"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        }
+    ]
+}

@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class TransactionReportController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Display the transaction report.
+     *
+     * Route: GET /rapport-transaction
+     * Name: transaction_report
      */
     public function __invoke(Request $request)
     {

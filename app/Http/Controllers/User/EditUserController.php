@@ -13,7 +13,10 @@ class EditUserController extends Controller
     ) {}
 
     /**
-     * Handle the incoming request.
+     * Show the form for editing the specified user.
+     *
+     * Route: GET /users/{user_id}/edit
+     * Name: users.edit
      */
     public function __invoke(Request $request, int $userId)
     {

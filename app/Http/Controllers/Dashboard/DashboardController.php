@@ -9,7 +9,8 @@ class DashboardController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Route: GET /dashboard
+     * Name: dashboard
      */
     public function __invoke()
     {

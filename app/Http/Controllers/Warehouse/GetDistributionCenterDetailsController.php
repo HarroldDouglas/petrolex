@@ -11,7 +11,10 @@ class GetDistributionCenterDetailsController extends Controller
     public function __construct(private DistributionCenterService $service) {}
 
     /**
-     * Handle the incoming request.
+     * Display the specified distribution center details.
+     *
+     * Route: GET /distribution-centers/{center_id}/details
+     * Name: distribution-centers.details
      */
     public function __invoke(Request $request, int $centerId)
     {

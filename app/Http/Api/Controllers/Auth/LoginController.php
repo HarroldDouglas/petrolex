@@ -15,7 +15,10 @@ class LoginController extends Controller
     public function __construct(protected AuthenticationServiceInterface $authService) {}
 
     /**
-     * Authenticate user and generate API token
+     * Authenticate user and generate API token.
+     *
+     * Route: POST /login
+     * Name: api.login
      */
     public function __invoke(LoginRequest $request): ApiResponse
     {

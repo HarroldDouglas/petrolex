@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthCheckController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Handle the incoming request to check authentication and redirect.
      *
-     * @return RedirectResponse
+     * Route: GET /
      */
     public function __invoke(Request $request)
     {

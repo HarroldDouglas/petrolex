@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "darkaonline/l5-swagger": "^9.0",
         "harrold-wafo/laravel-custom-datatable": "^1.0",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
@@ -41,7 +42,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "classmap": [
+            "documentation/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

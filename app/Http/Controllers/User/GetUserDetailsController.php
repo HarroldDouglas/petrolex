@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class GetUserDetailsController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Display the specified user details.
+     *
+     * Route: GET /users/{user_id}/details
+     * Name: users.details
      */
     public function __invoke(Request $request)
     {

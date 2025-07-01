@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class CreateUserController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Show the form for creating a new user.
+     *
+     * Route: GET /users/create
+     * Name: users.create
      */
     public function __invoke(Request $request)
     {

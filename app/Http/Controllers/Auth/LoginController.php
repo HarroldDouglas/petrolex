@@ -14,11 +14,22 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    /**
+     * Display the login form.
+     *
+     * Route: GET /login
+     * Name: login
+     */
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
+    /**
+     * Handle an incoming authentication request.
+     *
+     * Route: POST /login
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -49,6 +60,12 @@ class LoginController extends Controller
         ]);
     }
 
+    /**
+     * Log the user out of the application.
+     *
+     * Route: POST /logout
+     * Name: logout
+     */
     public function logout(Request $request)
     {
         Auth::logout();

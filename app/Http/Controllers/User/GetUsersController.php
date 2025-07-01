@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class GetUsersController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Display a listing of the users.
+     *
+     * Route: GET /users
+     * Name: users.list
      */
     public function __invoke(Request $request)
     {

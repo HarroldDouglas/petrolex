@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 class DeleteSupplyController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Remove the specified supply from storage.
+     *
+     * Route: DELETE /supplies/{supply_id}/delete
+     * Name: supplies.delete
      */
     public function __invoke(Request $request)
     {
