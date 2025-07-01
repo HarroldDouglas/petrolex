@@ -17,15 +17,15 @@ class RouteMap extends Component
      * In the final project, these should be replaced with dynamic data.
      */
     const POINT_A = [
-        'lat' => 3.8743539,
-        'lng' => 11.5412081,
-        'name' => 'OLA energy Essos',
+        'lat'  => 3.8922476106410713,
+        'lng'  => 11.547542478352296,
+        'name' => 'Petrolex Ngousso'
     ];
 
     const POINT_B = [
-        'lat' => 3.8626487,
-        'lng' => 11.5039655,
-        'name' => 'TotalEnergies MELEN 2',
+        'lat'  => 3.848035597643558,
+        'lng'  => 11.482854013491417,
+        'name' => 'Petrolex Carrefour Etoug-ebe, Station'
     ];
 
     /**
