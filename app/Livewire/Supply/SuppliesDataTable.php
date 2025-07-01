@@ -82,7 +82,7 @@ class SuppliesDataTable extends BaseDataTable
 
             Column::make('Actions', 'id')
                 ->format(function ($value, $row) {
-                    return new HtmlString(view('components.supply-actions', ['supply' => $row])->render());
+                    return new HtmlString(view('partials.supplies.actions', ['supply' => $row])->render());
                 }),
         ];
     }

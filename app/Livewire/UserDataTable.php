@@ -140,9 +140,9 @@ class UserDataTable extends BaseDataTable
             Column::make('Actions')
                 ->label(function (User $row) {
                     return match (true) {
-                        $row->isDeliveryPerson() => view('components.user-actions-for-delivery-person', ['user' => $row]),
-                        $row->isCustomer() => view('components.user-actions-for-customer', ['user' => $row]),
-                        default => view('components.user-actions-for-global', ['user' => $row]),
+                        $row->isDeliveryPerson() => view('partials.users.actions-delivery', ['user' => $row]),
+                        $row->isCustomer() => view('partials.users.actions-customer', ['user' => $row]),
+                        default => view('partials.users.actions-admin', ['user' => $row]),
                     };
                 })
                 ->html(),

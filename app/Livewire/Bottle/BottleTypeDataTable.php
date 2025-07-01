@@ -70,7 +70,7 @@ class BottleTypeDataTable extends BaseDataTable
             Column::make('Action', 'id')
                 ->format(function ($value, $row) {
                     return new HtmlString(
-                        view('components.bottle-type-actions', ['bottleType' => $row])->render()
+                        view('partials.bottle-types.actions', ['bottleType' => $row])->render()
                     );
                 }),
         ];

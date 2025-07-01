@@ -73,7 +73,7 @@ class DistributionCenterDataTable extends BaseDataTable
             Column::make('Actions')
                 ->label(
                     function ($row) {
-                        return view('components.distribution-center-actions', ['distributionCenter' => $row]);
+                        return view('partials.distribution-centers.actions', ['distributionCenter' => $row]);
                     }
                 ),
         ];
