@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\DeliveryPerson;
 use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -187,6 +188,28 @@ class OrderDataTable extends BaseDataTable
         return $options;
     }
 
+    /**
+     * Get delivery person options for the filter.
+     * Assumes a DeliveryPerson model exists and has a 'user' relationship.
+     */
+    protected function getDeliveryPersonOptions(): array
+    {
+        // Fetch all DeliveryPersons and eager load their associated User models
+        $deliveryPersons = DeliveryPerson::with('user')->get();
+
+        $options = ['' => 'Tous les livreurs']; // Default option to show all delivery persons
+
+        foreach ($deliveryPersons as $deliveryPerson) {
+            if ($deliveryPerson->user) {
+                $fullName = trim(($deliveryPerson->user->first_name ?? '') . ' ' . ($deliveryPerson->user->last_name ?? ''));
+                // Use deliveryPerson->id as the filter value, which corresponds to delivery_person_id on the Order
+                $options[$deliveryPerson->id] = $fullName ?: 'Livreur Inconnu (ID: ' . $deliveryPerson->id . ')';
+            }
+        }
+
+        return $options;
+    }
+
     public function filters(): array
     {
         $statusOptions = [];
@@ -208,6 +231,15 @@ class OrderDataTable extends BaseDataTable
                     }
 
                     return $builder->where('distribution_center_id', $value);
+                }),
+
+            SelectFilter::make('Livreur') // <--- ADD THIS NEW FILTER
+                ->options($this->getDeliveryPersonOptions())
+                ->filter(function (Builder $builder, string $value) {
+                    if ($value === '') {
+                        return $builder; // No filter applied if 'Tous les livreurs' is selected
+                    }
+                    return $builder->where('delivery_person_id', $value);
                 }),
 
             SelectFilter::make('Type de bouteille')
