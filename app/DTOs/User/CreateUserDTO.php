@@ -21,4 +21,14 @@ class CreateUserDTO extends BaseDTO
         public ?array $distribution_center_ids = [],
         public readonly ?UploadedFile $image = null,
     ) {}
+
+    public function toArray(): array
+    {
+        return array_merge(
+            parent::toArray(),
+            [
+                'image' => $this->image ? $this->image->getClientOriginalName() : null,
+            ]
+        );
+    }
 }
