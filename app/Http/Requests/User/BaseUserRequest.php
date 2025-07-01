@@ -3,21 +3,40 @@
 namespace App\Http\Requests\User;
 
 use App\Enums\UserRole;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 abstract class BaseUserRequest extends FormRequest
 {
+    // TODO refaire une revue par Douglas
     public function rules(): array
     {
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email'),
+            ],
             'phone_number' => ['required', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', Rule::in(UserRole::values())],
-            'image' => ['nullable', 'image', 'max:2048'],
+            'image' => [
+                'nullable',
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    if (is_string($value)) {
+                        return;
+                    }
+
+                    if (! is_a($value, \Illuminate\Http\UploadedFile::class)) {
+                        $fail('L\'image doit être un fichier image valide.');
+                    }
+                },
+                'max:2048',
+            ],
             'distribution_center_ids' => ['nullable', 'array'],
             'distribution_center_ids.*' => [
                 Rule::requiredIf(function () {
@@ -50,6 +69,7 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number.required' => 'Le téléphone est obligatoire.',
             'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
             'phone_number.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'password.required' => 'Le mot de passe est obligatoire.',
             'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
             'role.enum' => 'Le rôle sélectionné n\'est pas valide.',

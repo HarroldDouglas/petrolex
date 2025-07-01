@@ -1,7 +1,6 @@
 <div>
     <form wire:submit.prevent="save" class="app-form">
         <div class="row">
-        
             <div class="col-lg-3">
                 <div class="card order-details-card">
                     <div class="card-body">
