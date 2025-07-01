@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\DTOs\User\UpdateUserDTO;
 use App\Enums\EntityStatus;
 use App\Enums\PermissionEnum;
-use App\Enums\UserRole;
 use App\Models\DistributionCenter;
 use App\Models\User;
 use App\Services\DistributionCenter\DistributionCenterService;
@@ -247,19 +246,8 @@ class UserDataTable extends BaseDataTable
             $currentStatus = $user->is_active;
             $newStatus = ! $currentStatus;
 
-            /** @var \Spatie\Permission\Models\Role|null $firstRole */
-            $firstRole = $user->roles->first();
-
             $updateDto = new UpdateUserDTO(
-                id: $user->id,
-                first_name: $user->first_name,
-                last_name: $user->last_name,
-                email: $user->email,
-                phone_number: $user->phone_number,
-                password: null, // Le mot de passe n'est pas modifié ici
                 is_active: $newStatus,
-                role: $firstRole ? UserRole::from($firstRole->name) : null,
-                distribution_center_ids: $user->accessibleDistributionCenters->pluck('id')->toArray()
             );
 
             $result = $userService->update($user, $updateDto->toArrayFiltered());
