@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
+use Illuminate\Support\HtmlString;
 
 class UserDataTable extends BaseDataTable
 {
@@ -33,7 +34,7 @@ class UserDataTable extends BaseDataTable
     public function builder(): Builder
     {
         $query = User::query()
-            ->with(['roles', 'accessibleDistributionCenters']);
+            ->with(['roles', 'accessibleDistributionCenters', 'deliveryPerson']);
 
         $centers = DistributionCenterService::getForCurrentUser();
         $centerIds = $centers->pluck('id')->toArray();
@@ -142,10 +143,15 @@ class UserDataTable extends BaseDataTable
             Column::make('Actions')
                 ->label(
                     function ($row) {
-                        if (Auth::user()->can(PermissionEnum::USERS_EDIT()->value)) {
-                            return view('components.user-actions', ['user' => $row]);
+                        if ($row->isDeliveryPerson()) {
+                            return view('components.user-actions-for-delivery-person', ['user' => $row]);
                         } else {
                             return '<i class="bi bi-lock-fill text-secondary"></i>';
+                            if (Auth::user()->can(PermissionEnum::USERS_EDIT()->value)) {
+                                return view('components.user-actions-for-global', ['user' => $row, 'livewireInstance' => $this]);
+                            } else {
+                                return '<i class="bi bi-lock-fill text-secondary"></i>';
+                            }
                         }
                     }
                 )
