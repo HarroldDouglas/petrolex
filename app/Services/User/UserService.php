@@ -73,7 +73,6 @@ class UserService extends BaseServiceWithMedia
      */
     public function update(Model $user, array $attributes): Model
     {
-        Log::info('Editing attributes', $attributes);
 
         /** @var User $user */
         if (! $user instanceof User) {
