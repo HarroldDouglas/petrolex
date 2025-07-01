@@ -6,11 +6,11 @@
                     <div class="d-flex align-items-center flex-wrap">
                         <div class="me-3 mb-2">
                             <i class="ti ti-car text-primary me-1"></i> 
-                            <strong>Mode:</strong> Car
+                            <strong>Mode:</strong> Voiture
                         </div>
                         <div class="me-3 mb-2">
                             <i class="ti ti-map-pin text-primary me-1"></i>
-                            <strong>Departure:</strong> 
+                            <strong>Départ:</strong> 
                             <a href="https://www.google.com/maps/search/?api=1&query={{ $pointA['lat'] }},{{ $pointA['lng'] }}" 
                                target="_blank" title="Open in Google Maps" class="text-primary">
                                 {{ $pointA['name'] }} <i class="ti ti-external-link text-primary"></i>
@@ -34,10 +34,10 @@
             <div class="route-info mb-3" id="route-info-panel">
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong><i class="ti ti-ruler"></i> Distance:</strong> <span id="distance-text">Loading...</span></p>
+                        <p><strong><i class="ti ti-ruler"></i> Distance:</strong> <span id="distance-text">En cours de chargement...</span></p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong><i class="ti ti-clock"></i> Estimated time:</strong> <span id="duration-text">Loading...</span></p>
+                        <p><strong><i class="ti ti-clock"></i> Temps estimé:</strong> <span id="duration-text">En cours de chargement...</span></p>
                     </div>
                 </div>
             </div>

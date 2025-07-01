@@ -19,13 +19,13 @@ class RouteMap extends Component
     const POINT_A = [
         'lat' => 3.8743539,
         'lng' => 11.5412081,
-        'name' => 'OLA energy Essos',
+        'name' => 'Petrolex Essos',
     ];
 
     const POINT_B = [
         'lat' => 3.8626487,
         'lng' => 11.5039655,
-        'name' => 'TotalEnergies MELEN 2',
+        'name' => 'Petrolex Melen 2',
     ];
 
     /**

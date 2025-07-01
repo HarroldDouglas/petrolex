@@ -249,17 +249,17 @@ class RouteMap {
      * @param {Error} error - Error object
      */
     _handleError(context, error) {
-        console.error(`❌ Error during ${context}:`, error);
+        console.error(`❌ Erreur pendant ${context}:`, error);
 
         const errorMessages = {
-            ZERO_RESULTS: "No route found",
-            OVER_QUERY_LIMIT: "API quota exceeded",
-            REQUEST_DENIED: "Request denied",
-            INVALID_REQUEST: "Invalid request",
-            UNKNOWN_ERROR: "Server error",
+            ZERO_RESULTS: "Aucune route trouvée",
+            OVER_QUERY_LIMIT: "Quota d'API dépassé",
+            REQUEST_DENIED: "Requête refusée",
+            INVALID_REQUEST: "Requête invalide",
+            UNKNOWN_ERROR: "Erreur du Serveur",
         };
 
-        let errorMsg = "An error occurred";
+        let errorMsg = "Une erreur s'est produite";
         if (error.message) {
             const status = error.message.split(":").pop().trim();
             errorMsg = errorMessages[status] || error.message;
@@ -283,9 +283,9 @@ class RouteMap {
         switch (state) {
             case "loading":
                 distanceElement.innerHTML =
-                    '<span class="loading-status">Calculating...</span>';
+                    '<span class="loading-status">Calcul en cours...</span>';
                 durationElement.innerHTML =
-                    '<span class="loading-status">Calculating...</span>';
+                    '<span class="loading-status">Calcul en cours....</span>';
                 break;
 
             case "success":
@@ -303,5 +303,5 @@ class RouteMap {
 
 // Global error handling
 window.addEventListener("error", (e) => {
-    console.error("❌ JavaScript error:", e.error);
+    console.error("❌ Erreur JavaScript:", e.error);
 });
