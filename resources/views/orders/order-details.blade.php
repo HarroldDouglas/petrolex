@@ -59,38 +59,7 @@
 
                 <div class="col-xxl-8 mt-3">
                     <div class="row">
-                        <!-- Order Details start -->
-                        <div class="col-lg-6">
-                            <div class="card order-details-card">
-                                <div class="card-header">
-                                    <h5 class="text-nowrap">Détails de la Commande ({{ $order->id }})</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="f-w-600 text-dark"><i
-                                                class="ti ti-calendar f-s-18 me-2 text-secondary"></i>Date</h6>
-                                        <div class="text-end">
-                                            <p>{{ $order->order_date->format('d/m/Y') }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-between mt-3">
-                                        <h6 class="f-w-600 text-dark"><i class="ti ti-credit-card f-s-18 me-2"></i>Paiement
-                                        </h6>
-                                        <div class="text-end">
-                                            <p>{{ $order->payment_method->label }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-between mt-3">
-                                        <h6 class="f-w-600 text-dark"><i
-                                                class="ti ti-truck-delivery f-s-18 me-2"></i>Livraison</h6>
-                                        <div class="text-end">
-                                            <p>{{ $order->delivery_type->label }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Order Details end -->
+                        <x-order.detail.order-details :order="$order" />
 
                         <!-- Customer Details start -->
                         <x-order.detail.customer-details :order="$order" />

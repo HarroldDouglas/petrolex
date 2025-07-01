@@ -4,14 +4,12 @@ namespace App\Livewire;
 
 use App\DTOs\User\UpdateUserDTO;
 use App\Enums\EntityStatus;
-use App\Enums\PermissionEnum;
 use App\Models\DistributionCenter;
 use App\Models\User;
 use App\Services\DistributionCenter\DistributionCenterService;
 use App\Services\User\UserService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -140,20 +138,13 @@ class UserDataTable extends BaseDataTable
                 ->deselected(),
 
             Column::make('Actions')
-                ->label(
-                    function ($row) {
-                        if ($row->isDeliveryPerson()) {
-                            return view('components.user-actions-for-delivery-person', ['user' => $row]);
-                        } else {
-                            return '<i class="bi bi-lock-fill text-secondary"></i>';
-                            if (Auth::user()->can(PermissionEnum::USERS_EDIT()->value)) {
-                                return view('components.user-actions-for-global', ['user' => $row, 'livewireInstance' => $this]);
-                            } else {
-                                return '<i class="bi bi-lock-fill text-secondary"></i>';
-                            }
-                        }
-                    }
-                )
+                ->label(function (User $row) {
+                    return match (true) {
+                        $row->isDeliveryPerson() => view('components.user-actions-for-delivery-person', ['user' => $row]),
+                        $row->isCustomer() => view('components.user-actions-for-customer', ['user' => $row]),
+                        default => view('components.user-actions-for-global', ['user' => $row]),
+                    };
+                })
                 ->html(),
         ];
     }

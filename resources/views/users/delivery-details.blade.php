@@ -1,8 +1,6 @@
 @extends('layout.master')
 @section('title', 'Détail du livreur') {{-- Changed to Livreur for consistency --}}
 @section('css')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/jquery.dataTables.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/datatable/datatable2/buttons.dataTables.min.css') }}">
 @endsection
 @section('main-content')
     <div class="container-fluid">
@@ -136,54 +134,7 @@
                                     <h5>Commandes du livreur</h5>
                                 </div>
                                 <div class="card-body">
-                                    @if ($deliveryPersonOrders && $deliveryPersonOrders->count() > 0) 
-                                        <div class="table-responsive">
-                                            <table id="deliveryOrdersTable" class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Numéro</th>
-                                                        <th>Status</th>
-                                                        <th>Date</th>
-                                                        <th>Client</th> 
-                                                        <th>Montant</th> 
-                                                        <th>Actions</th> 
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($deliveryPersonOrders as $order)
-                                                        <tr>
-                                                            <td>
-                                                                <a href="{{ route('orders.details', $order->id) }}">{{ $order->id }}</a>
-                                                            </td>
-                                                            <td>
-                                                                @php
-                                                                    $badgeClass = 'text-outline-success'; 
-                                                                    if ($order->status === 'En cours') {
-                                                                        $badgeClass = 'text-outline-warning';
-                                                                    } elseif ($order->status === 'Annulée') {
-                                                                        $badgeClass = 'text-outline-danger';
-                                                                    } elseif ($order->status === 'Livrée') { 
-                                                                        $badgeClass = 'text-outline-success';
-                                                                    }
-                                                                @endphp
-                                                                <span class="badge {{ $badgeClass }}">{{ $order->status }}</span>
-                                                            </td>
-                                                            <td>{{ $order->order_date ? \Carbon\Carbon::parse($order->order_date)->format('d/m/Y H:i') : '-' }}</td>
-                                                            <td>{{ $order->customer->user->full_name ?? ($order->customer->user->first_name . ' ' . $order->customer->user->last_name ?? '-') }}</td>
-                                                            <td>{{ number_format($order->total_amount ?? 0, 2) }} XAF</td>
-                                                            <td>
-                                                                <a href="{{ route('orders.details', $order->id) }}" class="btn btn-sm btn-outline-primary">
-                                                                    <i class="bi bi-eye"></i> Voir
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    @else
-                                        <p>Ce livreur n'a pas encore de commandes attribuées.</p>
-                                    @endif
+                                    @livewire('user.delivery-person-order-data-table', ['user' => $user])
                                 </div>
                             </div>
                         </div>
@@ -200,32 +151,8 @@
 @section('script')
     <div id="customizer"></div>
 
-    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/datatable2/dataTables.buttons.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/datatable2/buttons.print.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/datatable2/jszip.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/datatable2/pdfmake.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/datatable2/vfs_fonts.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/datatable2/buttons.html5.min.js') }}"></script>
-
     <script>
         $(document).ready(function() {
-            // Initialize DataTable for orders
-            $('#deliveryOrdersTable').DataTable({
-                dom: 'Bfrtip', // Show buttons
-                buttons: [
-                    'copyHtml5',
-                    'excelHtml5',
-                    'csvHtml5',
-                    'pdfHtml5',
-                    'print'
-                ],
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/French.json" // French localization
-                },
-                "order": [[2, "desc"]] // Sort by Date column (index 2) descending by default
-            });
-
             // Optional: Handle profile image upload preview (requires more JS/backend)
             // This is just a placeholder for the preview, actual upload needs server-side logic.
             $("#imageUpload").change(function() {

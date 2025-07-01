@@ -80,4 +80,26 @@ class CustomerDeliveryAddress extends Model
     {
         return $this->hasMany(Order::class, 'delivery_address_id');
     }
+
+    /**
+     * Get the full formatted address.
+     */
+    public function fullAddress(): string
+    {
+        $parts = [];
+        if ($this->address) {
+            $parts[] = $this->address;
+        }
+        if ($this->neighborhood) {
+            $parts[] = $this->neighborhood;
+        }
+        if ($this->city) {
+            $parts[] = $this->city;
+        }
+        if ($this->country) {
+            $parts[] = $this->country;
+        }
+
+        return implode(', ', $parts);
+    }
 }
