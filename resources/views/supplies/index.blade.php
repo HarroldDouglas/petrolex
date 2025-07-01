@@ -50,7 +50,6 @@
             </div>
         </div>
     </div>
-
     <x-sweet-alert-notification-listener />
 @endsection
 

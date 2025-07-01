@@ -195,6 +195,53 @@ class SuppliesDataTable extends BaseDataTable
         return $query;
     }
 
+    /**
+     * Delete a supply directly.
+     */
+    public function deleteSupply($supplyId)
+    {
+        try {
+            $supply = SupplierDelivery::find($supplyId);
+
+            if (! $supply) {
+                $this->dispatch('show-notification', [
+                    'type' => 'error',
+                    'title' => 'Erreur !',
+                    'message' => "L'approvisionnement sélectionné n'existe pas.",
+                    'timer' => 3000,
+                ]);
+                return;
+            }
+
+            $deliveryNumber = $supply->delivery_number;
+            if ($supply->delete()) {
+
+                $this->dispatch('show-notification', [ 
+                    'type' => 'success',
+                    'title' => 'Supprimé !',
+                    'message' => "L'approvisionnement {$deliveryNumber} a été supprimé avec succès.",
+                    'timer' => 3000,
+                ]);
+            } else {
+                $this->dispatch('show-notification', [
+                    'type' => 'error',
+                    'title' => 'Erreur !',
+                    'message' => "Échec de la suppression de l'approvisionnement.",
+                    'timer' => 3000,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error deleting supply: '.$e->getMessage());
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la suppression de l'approvisionnement.",
+                'timer' => 3000,
+            ]);
+        } finally {
+            $this->dispatch('close-loading-swal');
+        }
+    }
     public function cancelSupply(int $supplyId): void
     {
         try {

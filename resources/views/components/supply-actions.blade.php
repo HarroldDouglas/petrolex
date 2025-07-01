@@ -8,6 +8,8 @@
     ]);
 @endphp
 
+@props(['supply'])
+
 <div class="btn-group dropdown-icon-none">
     @if ($isEditable)
         <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle" type="button"
@@ -21,8 +23,18 @@
                 </a>
             </li>
             <li>
-                <a class="dropdown-item delete-btn" href="#" data-id="{{ $supply->id }}"
-                    data-reference="{{ $supply->delivery_number }}">
+                <a class="dropdown-item" href="#" onclick="confirmActionWithInput({
+                    method: 'deleteSupply',
+                    parameters: [{{ $supply->id }}],
+                    title: 'Supprimer l\'approvisionnement',
+                    text: 'Vous êtes sur le point de supprimer l\'approvisionnement &quot;{{ str_replace("'", "\\'", $supply->delivery_number) }}&quot;. Cette action est irréversible et affectera les stocks.',
+                    confirmWord: 'supprimer',
+                    entityName: 'Approvisionnement: {{ str_replace("'", "\\'", $supply->delivery_number) }}',
+                    icon: 'error',
+                    confirmText: 'Oui, supprimer',
+                    confirmButtonIcon: 'ti ti-trash',
+                    actionInProgressText: 'Suppression en cours...',
+                }); return false;"> 
                     <i class="ti ti-trash text-danger me-2"></i> Supprimer
                 </a>
             </li>
