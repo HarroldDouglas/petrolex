@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Enums\UserRole;
 use App\Events\ProfileUpdatedEvent;
 use App\Events\UserCreatedEvent;
 use App\Events\UserDeletedEvent;
@@ -78,14 +79,27 @@ class UserService extends BaseServiceWithMedia
         if (! $user instanceof User) {
             throw new \InvalidArgumentException('Expected User model');
         }
+
         if (empty($attributes)) {
             return $user;
         }
 
         $originalValues = $user->only(array_keys($attributes));
+        
+        $originalRole = $user->getRoleNames()->first();
+        $originalDistributionCenterIds = $user->distributionCenters()->pluck('id')->toArray();
 
         if (empty($attributes['password'])) {
             unset($attributes['password']);
+        }
+
+        if(!isset($attributes['role']) || UserRole::from($originalRole)->equals($attributes['role'])){
+            $attributes['role'] = null;
+        }
+
+        if (isset($attributes['distribution_center_id']) 
+            && empty(array_diff($attributes['distribution_center_id'], $originalDistributionCenterIds))) {
+            $attributes['distribution_center_ids'] = [];
         }
 
         DB::beginTransaction();
@@ -122,54 +136,6 @@ class UserService extends BaseServiceWithMedia
                 'attributes' => $attributes,
                 'trace' => $e->getTraceAsString(),
             ]);
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
-    public function updateProfile(Model $user, array $attributes): Model
-    {
-        /** @var User $user */
-        if (! $user instanceof User) {
-            throw new \InvalidArgumentException('Expected User model');
-        }
-        if (empty($attributes)) {
-            return $user;
-        }
-
-        $originalValues = $user->only(array_keys($attributes));
-
-        if (empty($attributes['password'])) {
-            unset($attributes['password']);
-        }
-
-        DB::beginTransaction();
-
-        try {
-
-            if ($attributes['image'] instanceof UploadedFile) {
-                /** @var User $user */
-                $user = parent::updateWithMedia($user, $attributes);
-            } else {
-                /** @var User $user */
-                $user = parent::update($user, $attributes);
-            }
-
-            if ($user) {
-                $user->refresh();
-                $currentValues = $user->only(array_keys($attributes));
-                $changes = array_diff_assoc($currentValues, $originalValues);
-
-                ProfileUpdatedEvent::dispatch(
-                    $user,
-                    $changes
-                );
-            }
-
-            DB::commit();
-
-            return $user;
-        } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }

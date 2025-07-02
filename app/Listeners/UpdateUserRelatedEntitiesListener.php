@@ -17,15 +17,17 @@ class UpdateUserRelatedEntitiesListener
         $distribution_center_ids = $event->distribution_center_ids;
         $role = $event->role;
 
-        $user->syncRoles($role);
-        $user->accessibleDistributionCenters()->sync($distribution_center_ids);
-        if ($role === UserRole::DELIVERY_PERSON()->value) {
-            $user->deliveryPerson()?->delete();
-            $user->deliveryPerson()->create();
+        if($role){
+            $user->syncRoles($role);
         }
-
-        $user->save();
-
+        
+        if(count($distribution_center_ids)){
+            $user->accessibleDistributionCenters()->sync($distribution_center_ids);
+            if ($role === UserRole::DELIVERY_PERSON()->value) {
+                $user->deliveryPerson()->create();
+            }
+        }
+        
         Log::channel('user-dynamic')
             ->info("Role and distribution center added to User: {$user->full_name} (ID: {$user->id})", [
                 'user_id' => $user->id,

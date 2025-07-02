@@ -113,7 +113,7 @@ class EditProfileForm extends Component
             $dtoArray = $dto->toArray();
 
             /** @var User */
-            $user = $this->userService->updateProfile($this->user, $dtoArray);
+            $user = $this->userService->update($this->user, $dtoArray);
 
             session()->flash('success', 'Votre profil a été mis à jour avec succès!');
 
