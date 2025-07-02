@@ -234,6 +234,19 @@ class UserDataTable extends BaseDataTable
         try {
             $userService = app(UserService::class);
             $user = $userService->find($userId);
+
+            if (! $user) {
+                Log::error('User not found when toggling status', ['userId' => $userId]);
+                $this->dispatch('show-notification', [
+                    'type' => 'error',
+                    'title' => 'Erreur !',
+                    'message' => "L'utilisateur n'a pas été trouvé.",
+                    'timer' => 3000,
+                ]);
+
+                return;
+            }
+
             $currentStatus = $user->is_active;
             $newStatus = ! $currentStatus;
 
@@ -257,7 +270,11 @@ class UserDataTable extends BaseDataTable
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Error toggling user status: '.$e->getMessage());
+            Log::error('Error toggling user status', [
+                'userId' => $userId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
             $this->dispatch('show-notification', [
                 'type' => 'error',

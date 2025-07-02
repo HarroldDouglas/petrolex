@@ -36,6 +36,7 @@ class BottleService
     {
         $this->bottleRepository->updateStatus($bottleId, $status);
         $bottle = $this->bottleRepository->find($bottleId);
+
         if ($bottle) {
             event(new BottleStatusUpdatedEvent(
                 bottle: $bottle,

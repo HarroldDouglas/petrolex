@@ -17,15 +17,15 @@
                     onclick="confirmActionWithInput({
                     method: 'toggleBottleTypeStatus',
                     parameters: [{{ $bottleType->id }}, false],
+                    componentId: '{{ $this->getId() }}',
                     title: 'Désactiver le type de bouteille',
                     text: 'Vous êtes sur le point de désactiver ce type de bouteille. Cette action rendra le type de bouteille indisponible.',
                     confirmWord: 'desactiver',
                     entityName: 'Type de bouteille: {{ str_replace("'", "\\'", $bottleType->name) }}',
                     icon: 'warning',
-                    confirmText: 'Désactiver',
+                    confirmText: 'Oui, désactiver',
                     confirmButtonIcon: 'ti ti-ban',
-                    actionInProgressText: 'Désactivation en cours...',
-                    id: {{ $bottleType->id }}
+                    actionInProgressText: 'Désactivation en cours...'
                 }); return false;">
                     <i class="ti ti-ban text-warning me-2"></i> Désactiver
                 </a>
@@ -34,10 +34,12 @@
                     onclick="confirmAction({
                     method: 'toggleBottleTypeStatus',
                     parameters: [{{ $bottleType->id }}, true],
+                    componentId: '{{ $this->getId() }}',
                     title: 'Activer le type de bouteille',
                     text: 'Voulez-vous vraiment activer ce type de bouteille {{ $bottleType->name }} ?',
                     icon: 'question',
-                    confirmText: 'Oui, activer'
+                    confirmText: 'Oui, activer',
+                    cancelText: 'Annuler'
                 }); return false;">
                     <i class="ti ti-check text-success me-2"></i> Activer
                 </a>
@@ -48,6 +50,7 @@
                 onclick="confirmActionWithInput({
                 method: 'deleteBottleType',
                 parameters: [{{ $bottleType->id }}],
+                componentId: '{{ $this->getId() }}',
                 title: 'Supprimer le type de bouteille',
                 text: 'Vous êtes sur le point de supprimer définitivement ce type de bouteille.',
                 confirmWord: 'supprimer',
@@ -55,9 +58,8 @@
                 icon: 'warning',
                 confirmText: 'Supprimer définitivement',
                 confirmButtonIcon: 'ti ti-trash',
-                actionInProgressText: 'Suppression en cours...',
-                id: {{ $bottleType->id }}
-            }); return false;">
+                actionInProgressText: 'Suppression en cours...'
+                }); return false;">
                 <i class="ti ti-trash text-danger me-2"></i> Supprimer
             </a>
         </li>

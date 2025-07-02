@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithSession;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
-    use RefreshDatabase;
     use InteractsWithSession;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -30,7 +30,7 @@ class LoginTest extends TestCase
         $response = $this->post('/login', [
             'login' => $email,
             'password' => $password,
-            'remember' => false
+            'remember' => false,
         ]);
 
         $response->assertRedirect('/dashboard'); // Or your actual dashboard route
@@ -45,7 +45,7 @@ class LoginTest extends TestCase
         $this->withoutCsrfProtection();
         $response = $this->post('/login', [
             'login' => $phone,
-            'password' => $password
+            'password' => $password,
         ]);
 
         $response->assertRedirect('/dashboard'); // Or your actual dashboard route
@@ -62,7 +62,7 @@ class LoginTest extends TestCase
             ->assertSee('Mot de passe')
             ->assertSee('Souvenez-vous de moi')
             ->assertSee('Mot de passe oublié ?');
-            // ->assertSee('logo'); // Uncomment if 'logo' is a visible text or alt attribute
+        // ->assertSee('logo'); // Uncomment if 'logo' is a visible text or alt attribute
     }
 
     public function test_login_fails_with_wrong_credentials()
@@ -72,7 +72,7 @@ class LoginTest extends TestCase
         $this->withoutCsrfProtection();
         $response = $this->post('/login', [
             'login' => $email,
-            'password' => 'wrong-password'
+            'password' => 'wrong-password',
         ]);
 
         $response->assertRedirect('/login')
@@ -87,7 +87,7 @@ class LoginTest extends TestCase
         $this->withoutCsrfProtection();
         $response = $this->post('/login', [
             'login' => 'inexistant@example.com',
-            'password' => 'password123'
+            'password' => 'password123',
         ]);
 
         $response->assertRedirect('/login')
@@ -104,9 +104,9 @@ class LoginTest extends TestCase
 
         // You can test exact messages
         $this->followingRedirects()
-             ->post('/login', [])
-             ->assertSee('Le champ email est obligatoire')
-             ->assertSee('Le champ mot de passe est obligatoire');
+            ->post('/login', [])
+            ->assertSee('Le champ email est obligatoire')
+            ->assertSee('Le champ mot de passe est obligatoire');
     }
 
     public function test_remember_me_functionality_works()
@@ -118,7 +118,7 @@ class LoginTest extends TestCase
         $response = $this->post('/login', [
             'login' => $email,
             'password' => $password,
-            'remember' => true
+            'remember' => true,
         ]);
 
         $this->assertAuthenticated();

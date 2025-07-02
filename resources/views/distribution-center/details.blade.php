@@ -168,10 +168,11 @@
                 // Vérifier que l'API Google Maps est chargée correctement
                 if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
                     console.error('Google Maps API n\'a pas été chargée correctement');
-                    document.getElementById('map').innerHTML = '<div class="alert alert-warning">Impossible de charger la carte. Veuillez vérifier votre connexion internet.</div>';
+                    document.getElementById('map').innerHTML =
+                        '<div class="alert alert-warning">Impossible de charger la carte. Veuillez vérifier votre connexion internet.</div>';
                     return;
                 }
-                
+
                 initMap();
             });
 
@@ -196,15 +197,16 @@
                     });
                 } catch (error) {
                     console.error('Erreur lors de l\'initialisation de la carte:', error);
-                    document.getElementById('map').innerHTML = '<div class="alert alert-danger">Erreur lors du chargement de la carte: ' + error.message + '</div>';
+                    document.getElementById('map').innerHTML =
+                        '<div class="alert alert-danger">Erreur lors du chargement de la carte: ' + error.message + '</div>';
                 }
             }
         </script>
-        
+
         <!-- Charger l'API Google Maps avec une gestion d'erreur -->
-        <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&callback=initMap&v=weekly" 
-            async 
-            defer
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&callback=initMap&v=weekly"
+            async defer
             onerror="document.getElementById('map').innerHTML = '<div class\'alert alert-danger\'>Impossible de charger l\'API Google Maps. Veuillez vérifier votre clé API.</div>'">
         </script>
     @endif

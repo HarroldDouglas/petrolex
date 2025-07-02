@@ -18,8 +18,19 @@
         @if ($bottle->status->value !== \App\Enums\BottleStatus::LOST_STOLEN()->value)
             <li>
                 <a class="dropdown-item mark-lost" href="#"
-                    wire:click.prevent="changeBottleStatus({{ $bottle->id }}, 
-                        '{{ \App\Enums\BottleStatus::LOST_STOLEN()->value }}')"
+                    onclick="confirmActionWithInput({
+                        method: 'changeBottleStatus',
+                        parameters: [{{ $bottle->id }}, '{{ \App\Enums\BottleStatus::LOST_STOLEN()->value }}'],
+                        componentId: '{{ $this->getId() }}',
+                        title: 'Déclarer la bouteille perdue',
+                        text: 'Vous êtes sur le point de déclarer cette bouteille comme perdue ou volée. Cette action est irréversible.',
+                        confirmWord: 'perdue',
+                        entityName: 'Bouteille: {{ str_replace("'", "\\'", $bottle->barcode) }}',
+                        icon: 'warning',
+                        confirmText: 'Oui, déclarer perdue',
+                        confirmButtonIcon: 'ti ti-alert-triangle',
+                        actionInProgressText: 'Déclaration en cours...'
+                    }); return false;"
                     data-id="{{ $bottle->id }}">
                     <i class="iconoir-chat-bubble-question text-danger me-2"></i>
                     Déclarer perdu
@@ -27,7 +38,21 @@
             </li>
         @else
             <li>
-                <a class="dropdown-item mark-found" href="#" data-id="{{ $bottle->id }}">
+                <a class="dropdown-item mark-found" href="#"
+                    onclick="confirmActionWithInput({
+                        method: 'changeBottleStatus',
+                        parameters: [{{ $bottle->id }}, '{{ \App\Enums\BottleStatus::IN_STOCK()->value }}'],
+                        componentId: '{{ $this->getId() }}',
+                        title: 'Marquer la bouteille comme retrouvée',
+                        text: 'Vous êtes sur le point de marquer cette bouteille comme retrouvée. Elle sera remise en stock.',
+                        confirmWord: 'retrouvee',
+                        entityName: 'Bouteille: {{ str_replace("'", "\\'", $bottle->barcode) }}',
+                        icon: 'info',
+                        confirmText: 'Oui, marquer retrouvée',
+                        confirmButtonIcon: 'ti ti-check',
+                        actionInProgressText: 'Mise à jour en cours...'
+                    }); return false;"
+                    data-id="{{ $bottle->id }}">
                     <i class="iconoir-circle-spark text-success me-2"></i>
                     Marquer retrouvée
                 </a>
