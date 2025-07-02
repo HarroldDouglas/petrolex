@@ -2,7 +2,7 @@
     <form wire:submit.prevent="save" class="app-form">
         <div class="row">
             <div class="col-lg-3">
-                <div class="card order-details-card h-380">
+                <div class="card order-details-card @if($this->isEditable) h-380 @endif">
                     <div class="card-body">
                         <div class="profile-container">
                             <div class="image-details h-200">
