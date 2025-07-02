@@ -53,7 +53,6 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
             $cityPriceDTOs = $cityPrices->map(
                 function (ProductCategoryCityPrice $cityPrice) use ($productCategory): ProductCategoryCityPriceDTO {
                     return new ProductCategoryCityPriceDTO(
-                        bottle_type_id: $this->bottleType->id, // On conserve cette association pour le DTO
                         product_category_id: $productCategory->id,
                         city: $cityPrice->city,
                         content_price: (float) $cityPrice->content_price,
@@ -87,7 +86,6 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
             $bottleTypeCityPrices = array_map(
                 /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
                 fn (array $cityPrice): ProductCategoryCityPriceDTO => new ProductCategoryCityPriceDTO(
-                    bottle_type_id: $this->bottleType->id,
                     product_category_id: $productCategory->id,
                     city: $cityPrice['city'],
                     content_price: (float) $cityPrice['content_price'],

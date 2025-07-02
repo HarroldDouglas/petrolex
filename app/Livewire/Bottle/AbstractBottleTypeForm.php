@@ -23,6 +23,8 @@ abstract class AbstractBottleTypeForm extends Component
     public $cityPrices = [];
     public $availableCities = [];
     public $selectedCity = '';
+    public $tempCityContentPrice = '';
+    public $tempCityContentWithBottlePrice = '';
 
     public bool $is_active = true;
 
@@ -38,20 +40,34 @@ abstract class AbstractBottleTypeForm extends Component
 
     public function addCityPrice()
     {
-        if (! $this->selectedCity
-            || in_array($this->selectedCity,
-                array_column($this->cityPrices, 'city'))) {
+        if (! $this->selectedCity || $this->tempCityContentPrice === '' || $this->tempCityContentWithBottlePrice === '') {
+            session()->flash('error', 'Veuillez sélectionner une ville et renseigner les prix avant d\'ajouter.');
+
             return;
         }
 
+        // Vérifier si cette ville existe déjà
+        if (in_array($this->selectedCity, array_column($this->cityPrices, 'city'))) {
+            session()->flash('error', 'Cette ville a déjà un prix spécifique défini.');
+
+            return;
+        }
+
+        // Ajout d'un nouveau prix
         $this->cityPrices[] = [
             'city' => $this->selectedCity,
-            'bottle_type_id' => null,
-            'content_price' => '',
-            'content_with_bottle_price' => '',
+            'content_price' => $this->tempCityContentPrice,
+            'content_with_bottle_price' => $this->tempCityContentWithBottlePrice,
         ];
 
         $this->selectedCity = '';
+        $this->tempCityContentPrice = '';
+        $this->tempCityContentWithBottlePrice = '';
+    }
+
+    public function updateCityPrice($index, $field, $value)
+    {
+        $this->cityPrices[$index][$field] = $value;
     }
 
     public function removeCityPrice($index)
@@ -90,7 +106,6 @@ abstract class AbstractBottleTypeForm extends Component
         $this->validateOnly($propertyName);
     }
 
-    // A helper method to generate the name string
     protected function generateName()
     {
         $this->name = 'Bouteille  de '.$this->weight.' Kg';
