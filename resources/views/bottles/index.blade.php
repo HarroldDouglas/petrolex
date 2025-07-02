@@ -63,12 +63,14 @@
 
     <!-- History Modal -->
     @livewire('bottle.history-modal')
+    <x-sweet-alert-notification-listener />
 @endsection
+
 
 @section('script')
     <!-- slick-file -->
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/datatable/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
 @endsection

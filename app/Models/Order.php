@@ -303,4 +303,33 @@ class Order extends Model
 
         return true;
     }
+
+    /**
+     * Get the percentage of bottles scanned for this order.
+     */
+    public function getBottleScanProgressAttribute(): int
+    {
+        if (! $this->hasBottleItems()) {
+            return 100;
+        }
+
+        $totalExpectedBottles = 0;
+        $totalScannedBottles = 0;
+
+        /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
+        $bottleItems = $this->items()->whereHas('productCategory', function (Builder $query): void {
+            $query->where('product_type', ProductType::BOTTLE());
+        })->get();
+
+        foreach ($bottleItems as $item) {
+            $totalExpectedBottles += $item->quantity;
+            $totalScannedBottles += $item->scanned_bottles_count;
+        }
+
+        if ($totalExpectedBottles === 0) {
+            return 100; // No bottles expected, so 100% scanned
+        }
+
+        return (int) round(($totalScannedBottles / $totalExpectedBottles) * 100);
+    }
 }

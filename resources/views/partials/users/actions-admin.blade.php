@@ -19,6 +19,7 @@
                 onclick="confirmAction({
                 method: 'toggleUserStatus',
                 parameters: [{{ $user->id }}],
+                componentId: '{{ $this->getId() }}',
                 title: 'Changer le statut',
                 text: 'Voulez-vous vraiment {{ $user->is_active ? 'désactiver' : 'activer' }} l\'utilisateur {{ $user->full_name }} ?',
                 icon: 'question',
@@ -36,6 +37,7 @@
                 onclick="confirmActionWithInput({
                 method: 'deleteUser',
                 parameters: [{{ $user->id }}],
+                componentId: '{{ $this->getId() }}',
                 title: 'Supprimer l\'utilisateur',
                 text: 'Vous êtes sur le point de supprimer définitivement cet utilisateur.',
                 confirmWord: 'supprimer',

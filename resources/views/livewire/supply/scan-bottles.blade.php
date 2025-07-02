@@ -88,14 +88,16 @@
                             ({{ $scanned }} scannés / {{ $isIncomingMode ? $quantity : $outgoingQuantity }})
                         </h6>
                     </div>
-                    <div class="col-sm-4 text-end">
-                        <button type="button" class="btn btn-primary me-2" id="scanButton">
-                            <i class="ti ti-scan me-1"></i>Scanner
-                        </button>
-                        <button type="button" class="btn btn-dark d-none" wire:click="toggleManualForm">
-                            <i class="ti ti-keyboard me-1"></i>Ajouter manuellement
-                        </button>
-                    </div>
+                    @if ($supply->canBeEdited())
+                        <div class="col-sm-4 text-end">
+                            <button type="button" class="btn btn-primary me-2" id="scanButton">
+                                <i class="ti ti-scan me-1"></i>Scanner
+                            </button>
+                            <button type="button" class="btn btn-dark d-none" wire:click="toggleManualForm">
+                                <i class="ti ti-keyboard me-1"></i>Ajouter manuellement
+                            </button>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Progress Bar -->
@@ -169,13 +171,15 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="mt-3">
-                    <button type="button" class="btn btn-danger" {{ count($selectedBottles) ? '' : 'disabled' }}
-                        wire:click="removeSelected"
-                        wire:confirm="Êtes-vous sûr de vouloir supprimer les bouteilles sélectionnées?">
-                        <i class="ti ti-trash me-1"></i> Supprimer la sélection
-                    </button>
-                </div>
+                @if ($supply->canBeEdited())
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-danger" {{ count($selectedBottles) ? '' : 'disabled' }}
+                            wire:click="removeSelected"
+                            wire:confirm="Êtes-vous sûr de vouloir supprimer les bouteilles sélectionnées?">
+                            <i class="ti ti-trash me-1"></i> Supprimer la sélection
+                        </button>
+                    </div>
+                @endif
             @elseif(count($availableProducts) > 0)
                 <div class="alert alert-info">
                     <i class="ti ti-info-circle me-2"></i>
@@ -185,10 +189,12 @@
                 <div class="alert alert-danger">
                     <i class="ti ti-alert-triangle me-2"></i>
                     Vous devez d'abord enregistrer des types de bouteilles pour cette livraison.
-                    <a href="{{ route('supplies.register-products', request()->route('supply_id')) }}"
-                        class="btn btn-sm btn-danger mt-2">
-                        <i class="ti ti-plus me-1"></i> Ajouter des produits
-                    </a>
+                    @if ($supply->canBeEdited())
+                        <a href="{{ route('supplies.register-products', request()->route('supply_id')) }}"
+                            class="btn btn-sm btn-danger mt-2">
+                            <i class="ti ti-plus me-1"></i> Ajouter des produits
+                        </a>
+                    @endif
                 </div>
             @endif
         </div>

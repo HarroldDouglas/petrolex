@@ -42,14 +42,14 @@
 
                 <div class="col-md-2">
                     <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-success w-100" wire:loading.attr="disabled">
-                        <span wire:loading.remove>
-                            <i class="ti ti-device-floppy"></i> Enregistrer
-                        </span>
-                        <span wire:loading>
-                            <i class="ti ti-loader-2 me-1"></i>Enregistrement ...
-                        </span>
-                    </button>
+                        <button type="submit" class="btn btn-success w-100" wire:loading.attr="disabled">
+                            <span wire:loading.remove>
+                                <i class="ti ti-device-floppy"></i> Enregistrer
+                            </span>
+                            <span wire:loading>
+                                <i class="ti ti-loader-2 me-1"></i>Enregistrement ...
+                            </span>
+                        </button>
                 </div>
             </div>
         </form>

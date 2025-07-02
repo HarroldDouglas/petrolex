@@ -20,6 +20,7 @@
                     onclick="confirmActionWithInput({
                     method: 'toggleDistributionCenterStatus',
                     parameters: [{{ $distributionCenter->id }}],
+                    componentId: '{{ $this->getId() }}',
                     title: 'Désactiver le centre de distribution',
                     text: 'Vous êtes sur le point de désactiver ce centre de distribution. Cette action affectera toutes les fonctionnalités associées.',
                     confirmWord: 'desactiver',
@@ -38,6 +39,7 @@
                     onclick="confirmActionWithInput({
                     method: 'toggleDistributionCenterStatus',
                     parameters: [{{ $distributionCenter->id }}],
+                    componentId: '{{ $this->getId() }}',
                     title: 'Activer le centre de distribution',
                     text: 'Vous êtes sur le point d\'activer ce centre de distribution.',
                     confirmWord: 'activer',

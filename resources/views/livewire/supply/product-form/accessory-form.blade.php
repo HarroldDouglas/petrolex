@@ -1,4 +1,4 @@
-<div>
+'''<div>
     <div class="card p-3">
         <form wire:submit="save">
             <div class="row">
@@ -35,16 +35,16 @@
 
                 <div class="col-md-4">
                     <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-success w-100" wire:loading.attr="disabled">
-                        <span wire:loading.remove>
-                            <i class="ti ti-device-floppy me-1"></i>Enregistrer
-                        </span>
-                        <span wire:loading>
-                            <i class="ti ti-loader-2 me-1"></i>Enregistrement...
-                        </span>
-                    </button>
+                        <button type="submit" class="btn btn-success w-100" wire:loading.attr="disabled">
+                            <span wire:loading.remove>
+                                <i class="ti ti-device-floppy me-1"></i>Enregistrer
+                            </span>
+                            <span wire:loading>
+                                <i class="ti ti-loader-2 me-1"></i>Enregistrement...
+                            </span>
+                        </button>
                 </div>
             </div>
         </form>
     </div>
-</div>
+</div>''
