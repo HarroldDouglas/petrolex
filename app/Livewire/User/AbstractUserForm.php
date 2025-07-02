@@ -11,7 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use Livewire\WithFileUploads;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 abstract class AbstractUserForm extends Component
 {

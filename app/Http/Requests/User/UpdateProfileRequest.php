@@ -2,13 +2,15 @@
 
 namespace App\Http\Requests\User;
 
-use App\Enums\UserRole;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 
-abstract class BaseUserRequest extends FormRequest
+class UpdateProfileRequest extends FormRequest
 {
+    public function __construct(protected $id) {}
+
     public function rules(): array
     {
         return [
@@ -18,11 +20,10 @@ abstract class BaseUserRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email'),
+                Rule::unique('users', 'email')->ignore($this->id),
             ],
             'phone_number' => ['required', 'string', 'max:20'],
-            'password' => ['required', 'string', 'min:8'],
-            'role' => ['required', Rule::in(UserRole::values())],
+            'password' => ['nullable', 'string', 'min:8'],
             'image' => [
                 'nullable',
                 function (string $attribute, mixed $value, Closure $fail): void {
@@ -30,25 +31,12 @@ abstract class BaseUserRequest extends FormRequest
                         return;
                     }
 
-                    if (! is_a($value, \Illuminate\Http\UploadedFile::class)) {
+                    if (! is_a($value, UploadedFile::class)) {
                         $fail('L\'image doit être un fichier image valide.');
                     }
                 },
                 'max:2048',
             ],
-            'distribution_center_ids' => ['nullable', 'array'],
-            'distribution_center_ids.*' => [
-                Rule::requiredIf(function () {
-                    $role = $this->input('role');
-
-                    return in_array($role, [
-                        UserRole::CENTER_MANAGER()->value,
-                        UserRole::DELIVERY_PERSON()->value,
-                    ]);
-                }),
-                'exists:distribution_centers,id',
-            ],
-            'is_active' => ['required', 'boolean'],
         ];
     }
 
@@ -68,16 +56,8 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number.required' => 'Le téléphone est obligatoire.',
             'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
             'phone_number.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
-            'password.required' => 'Le mot de passe est obligatoire.',
-            'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
-            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
-            'role.enum' => 'Le rôle sélectionné n\'est pas valide.',
-            'role.required' => 'Le rôle est obligatoire.',
             'image.image' => 'L\'image doit être un fichier image valide.',
             'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
-            'distribution_center_ids.array' => 'Les centres de distribution doivent être un tableau.',
-            'distribution_center_ids.*.exists' => 'Un ou plusieurs centres de distribution sélectionnés n\'existent pas.',
-            'is_active.required' => 'Le statut est obligatoire.',
         ];
     }
 }

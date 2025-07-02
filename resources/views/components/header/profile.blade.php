@@ -3,7 +3,7 @@
         data-bs-target="#profilecanvasRight" data-bs-toggle="offcanvas" href="#"
         role="button">
         <img alt="avtar" class="b-r-50 h-35 w-35 bg-dark"
-            src="{{ asset('assets/images/avtar/woman.jpg') }}">
+            src="{{ asset(auth()->user()->getMedia('images')->first()?->getUrl() ?: 'assets/images/avtar/woman.jpg') }}" >
     </a>
 
     <div aria-labelledby="profilecanvasRight" class="offcanvas offcanvas-end header-profile-canvas"
@@ -12,9 +12,9 @@
             <ul class="m-0 p-0">
                 <li class="d-flex align-items-center gap-3 mb-3">
                     <div class="d-flex-center">
-                        <span class="h-45 w-45 d-flex-center b-r-10">
+                        <span class="h-45 w-45 d-flex-center b-r-10"> 
                             <img alt="" class="img-fluid b-r-10"
-                                src="{{ asset('assets/images/avtar/woman.jpg') }}">
+                                src="{{ asset(auth()->user()->getMedia('images')->first()?->getUrl() ?: 'assets/images/avtar/woman.jpg') }}">
                         </span>
                     </div>
                     <div>
@@ -24,7 +24,7 @@
                 </li>
 
                 <li class="mb-2">
-                    <a class="f-w-500 d-block rounded hover-bg-light" href="{{ route('profile') }}">
+                    <a class="f-w-500 d-block rounded hover-bg-light" href="{{ route('users.profile') }}">
                         <i class="iconoir-user-love pe-2 f-s-18"></i>Mon Profile
                     </a>
                 </li>

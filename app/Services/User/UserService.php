@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Events\ProfileUpdatedEvent;
 use App\Events\UserCreatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
@@ -73,7 +74,6 @@ class UserService extends BaseServiceWithMedia
      */
     public function update(Model $user, array $attributes): Model
     {
-
         /** @var User $user */
         if (! $user instanceof User) {
             throw new \InvalidArgumentException('Expected User model');
@@ -109,6 +109,54 @@ class UserService extends BaseServiceWithMedia
                     $user,
                     $attributes['role'],
                     $attributes['distribution_center_ids'],
+                    $changes
+                );
+            }
+
+            DB::commit();
+
+            return $user;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function updateProfile(Model $user, array $attributes): Model
+    {
+        /** @var User $user */
+        if (! $user instanceof User) {
+            throw new \InvalidArgumentException('Expected User model');
+        }
+        if (empty($attributes)) {
+            return $user;
+        }
+
+        $originalValues = $user->only(array_keys($attributes));
+
+        if (empty($attributes['password'])) {
+            unset($attributes['password']);
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            if ($attributes['image'] instanceof UploadedFile) {
+                /** @var User $user */
+                $user = parent::updateWithMedia($user, $attributes);
+            } else {
+                /** @var User $user */
+                $user = parent::update($user, $attributes);
+            }
+
+            if ($user) {
+                $user->refresh();
+                $currentValues = $user->only(array_keys($attributes));
+                $changes = array_diff_assoc($currentValues, $originalValues);
+
+                ProfileUpdatedEvent::dispatch(
+                    $user,
                     $changes
                 );
             }
