@@ -98,6 +98,10 @@ class EditProfileForm extends Component
 
         return '';
     }
+    public function updated($propertyName)
+    {
+        $this->validateOnly($propertyName);
+    }
 
     public function save()
     {
