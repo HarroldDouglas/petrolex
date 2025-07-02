@@ -161,6 +161,6 @@ class SupplierDelivery extends Model
      */
     public function canBeEdited(): bool
     {
-        return $this->status->value === 'in_progress';
+        return $this->status->value === SupplierDeliveryStatus::IN_PROGRESS();
     }
 }
