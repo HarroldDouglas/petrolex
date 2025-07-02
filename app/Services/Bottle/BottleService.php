@@ -3,20 +3,27 @@
 namespace App\Services\Bottle;
 
 use App\DTOs\Bottle\BottleStatsDTO;
-use App\Enums\BottleStatus;
 use App\Events\BottleStatusUpdatedEvent;
 use App\Models\Bottle;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
 use App\Repositories\Contracts\BottleRepositoryInterface;
+use App\Services\BaseServiceWithMedia;
+use App\Services\Shared\Media\MediaServiceInterface;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-class BottleService
+class BottleService extends BaseServiceWithMedia
 {
     public function __construct(
         private BottleRepositoryInterface $bottleRepository,
         private BottleMovementRepositoryInterface $bottleMovementRepository,
-    ) {}
+        protected MediaServiceInterface $mediaService,
+    ) {
+        parent::__construct($bottleRepository, $mediaService);
+    }
 
     /**
      * Find a bottle by its ID
@@ -32,17 +39,59 @@ class BottleService
         return $this->bottleRepository->getBottleHistory($bottleId);
     }
 
-    public function updateStatus($bottleId, BottleStatus $status): void
+    /**
+     * Update a bottle with the provided attributes
+     *
+     * @param  Bottle  $bottle  The bottle to update
+     * @param  array  $attributes  The attributes to update
+     * @return Bottle The updated bottle
+     */
+    public function update(Model $bottle, array $attributes): Model
     {
-        $this->bottleRepository->updateStatus($bottleId, $status);
-        $bottle = $this->bottleRepository->find($bottleId);
+        if (! $bottle instanceof Bottle) {
+            throw new \InvalidArgumentException('Expected Bottle model');
+        }
 
-        if ($bottle) {
-            event(new BottleStatusUpdatedEvent(
-                bottle: $bottle,
-                status: $status,
-                userId: auth()->id()
-            ));
+        if (empty($attributes)) {
+            return $bottle;
+        }
+
+        $originalStatus = $bottle->status;
+        $hasStatusChange = isset($attributes['status']) && $originalStatus != $attributes['status'];
+
+        DB::beginTransaction();
+
+        try {
+            if (isset($attributes['image']) && $attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
+                /** @var Bottle $updatedBottle */
+                $updatedBottle = parent::updateWithMedia($bottle, $attributes);
+            } else {
+                /** @var Bottle $updatedBottle */
+                $updatedBottle = parent::update($bottle, $attributes);
+            }
+
+            if ($hasStatusChange && $updatedBottle) {
+                event(new BottleStatusUpdatedEvent(
+                    bottle: $updatedBottle,
+                    status: $updatedBottle->status,
+                    userId: auth()->id()
+                ));
+            }
+
+            DB::commit();
+
+            return $updatedBottle;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Bottle update failed', [
+                'message' => $e->getMessage(),
+                'bottle_id' => $bottle->id,
+                'attributes' => $attributes,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
         }
     }
 
@@ -69,5 +118,15 @@ class BottleService
             withClient: $withClient,
             lostStolen: $lostStolen
         );
+    }
+
+    protected function getMediaFields(): array
+    {
+        return ['image'];
+    }
+
+    protected function getModel(): string
+    {
+        return Bottle::class;
     }
 }
