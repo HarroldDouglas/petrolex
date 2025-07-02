@@ -233,13 +233,66 @@ class BottleDataTable extends BaseDataTable
 
     public function changeBottleStatus($bottleId, $status)
     {
-        $bottleService = app(BottleService::class);
+        try {
+            $bottleService = app(BottleService::class);
+            $bottle = $bottleService->find($bottleId);
 
-        $bottle = $bottleService->find($bottleId);
-        if ($bottle) {
-            $bottleService->updateStatus($bottleId, BottleStatus::from($status));
-            $this->dispatch('refreshDatatable');
-            session()->flash('success', 'Le status de la bouteille a été modifié avec succès!');
+            if (! $bottle) {
+                $this->dispatch('show-notification', [
+                    'type' => 'error',
+                    'title' => 'Erreur !',
+                    'message' => "La bouteille sélectionnée n'existe pas.",
+                    'timer' => 3000,
+                ]);
+
+                return;
+            }
+
+            $oldStatus = $bottle->status->label;
+            $newStatus = BottleStatus::from($status);
+
+            // TODO update this when we will remove updateStatus
+            $bottleService->updateStatus($bottleId, $newStatus);
+
+            // On vérifie que le statut a été mis à jour en récupérant à nouveau la bouteille
+            $updatedBottle = $bottleService->find($bottleId);
+            if ($updatedBottle && $updatedBottle->status === $newStatus) {
+                $statusLabel = $newStatus->label;
+                $barcode = $bottle->barcode;
+
+                if ($newStatus === BottleStatus::LOST_STOLEN()) {
+                    $message = "La bouteille {$barcode} a été déclarée perdue avec succès.";
+                } elseif ($newStatus === BottleStatus::IN_STOCK()) {
+                    $message = "La bouteille {$barcode} a été marquée comme retrouvée avec succès.";
+                } else {
+                    $message = "Le statut de la bouteille {$barcode} a été changé à '{$statusLabel}' avec succès.";
+                }
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Succès !',
+                    'message' => $message,
+                    'timer' => 3000,
+                ]);
+
+                $this->dispatch('refreshDatatable');
+            } else {
+                $this->dispatch('show-notification', [
+                    'type' => 'error',
+                    'title' => 'Erreur !',
+                    'message' => "Une erreur s'est produite lors de la modification du statut de la bouteille.",
+                    'timer' => 3000,
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error changing bottle status: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => "Une erreur s'est produite lors de la modification du statut de la bouteille : ".$e->getMessage(),
+                'timer' => 3000,
+            ]);
         }
     }
 }

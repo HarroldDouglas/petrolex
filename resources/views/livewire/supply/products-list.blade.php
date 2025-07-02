@@ -16,7 +16,9 @@
                                 <th>Produit</th>
                                 <th style="width: 120px;">Qté entrante</th>
                                 <th style="width: 120px;">Qté sortante</th>
-                                <th style="width: 150px;">Actions</th>
+                                @if($supplierDelivery->canBeEdited())
+                                <th style="width: 100px;">Actions</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -48,27 +50,35 @@
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
+                                    @if($supplierDelivery->canBeEdited())
                                     <td>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <button wire:click="editProduct({{ $product['id'] }})" 
-                                                    class="btn btn-outline-primary"
-                                                    title="Modifier">
-                                                <i class="ti ti-edit"></i>
+                                        <div class="btn-group dropdown-icon-none">
+                                            <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle" type="button"
+                                                id="dropdownMenuButton{{ $product['id'] }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="ti ti-dots-vertical"></i>
                                             </button>
-                                            <button wire:click="confirmDeleteProduct({{ $product['id'] }})" 
-                                                    class="btn btn-outline-danger"
-                                                    title="Supprimer">
-                                                <i class="ti ti-trash"></i>
-                                            </button>
-                                            @if($productType === 'bottle')
-                                                <button wire:click="scanBottles({{ $product['id'] }})" 
-                                                        class="btn btn-outline-info"
-                                                        title="Scanner les bouteilles">
-                                                    <i class="ti ti-scan"></i>
-                                                </button>
-                                            @endif
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $product['id'] }}">
+                                                <li>
+                                                    <a class="dropdown-item" href="#" wire:click.prevent="editProduct({{ $product['id'] }})">
+                                                        <i class="iconoir-edit text-info me-2"></i> Modifier
+                                                    </a>
+                                                </li>
+                                                @if($productType === 'bottle')
+                                                <li>
+                                                    <a class="dropdown-item" href="#" wire:click.prevent="scanBottles({{ $product['id'] }})">
+                                                        <i class="ti ti-scan text-primary me-2"></i> Scanner les bouteilles
+                                                    </a>
+                                                </li>
+                                                @endif
+                                                <li>
+                                                    <a class="dropdown-item" href="#" wire:click.prevent="confirmDeleteProduct({{ $product['id'] }})">
+                                                        <i class="iconoir-trash text-danger me-2"></i> Supprimer
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>

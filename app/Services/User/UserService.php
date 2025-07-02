@@ -91,8 +91,7 @@ class UserService extends BaseServiceWithMedia
         DB::beginTransaction();
 
         try {
-
-            if ($attributes['image'] instanceof UploadedFile) {
+            if (isset($attributes['image']) && $attributes['image'] instanceof UploadedFile) {
                 /** @var User $user */
                 $user = parent::updateWithMedia($user, $attributes);
             } else {
@@ -107,8 +106,8 @@ class UserService extends BaseServiceWithMedia
 
                 UserUpdatedEvent::dispatch(
                     $user,
-                    $attributes['role'],
-                    $attributes['distribution_center_ids'],
+                    $attributes['role'] ?? null,
+                    $attributes['distribution_center_ids'] ?? [],
                     $changes
                 );
             }
@@ -117,6 +116,12 @@ class UserService extends BaseServiceWithMedia
 
             return $user;
         } catch (\Exception $e) {
+            Log::error('User update failed', [
+                'message' => $e->getMessage(),
+                'user_id' => $user->id,
+                'attributes' => $attributes,
+                'trace' => $e->getTraceAsString(),
+            ]);
             DB::rollBack();
             throw $e;
         }

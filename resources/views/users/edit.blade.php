@@ -22,8 +22,7 @@
                         </a>
                     </li>
                     <li class="active">
-                        <a href="#" 
-                            class="f-s-14 f-w-500">Modifier</a>
+                        <a href="#" class="f-s-14 f-w-500">Modifier</a>
                     </li>
                 </ul>
             </div>
@@ -40,10 +39,10 @@
         <!-- Add User start -->
         @livewire('user.edit-user-form', ['user' => $user])
         <!-- Add User end -->
-        
-@endsection
 
-@section('script')
-    <!-- select2 -->
-    <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
-@endsection
+    @endsection
+
+    @section('script')
+        <!-- select2 -->
+        <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
+    @endsection

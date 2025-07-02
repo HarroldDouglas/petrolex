@@ -41,16 +41,17 @@
                                     <div class="profile-container">
                                         <div class="image-details">
                                             <div class="profile-image"
-                                                style="background-image: url('{{ $user->profile_picture_url ?? asset('assets/images/default-avatar.jpg') }}');"></div>
+                                                style="background-image: url('{{ $user->profile_picture_url ?? asset('assets/images/default-avatar.jpg') }}');">
+                                            </div>
                                             <div class="profile-pic">
                                                 <div class="avatar-upload">
                                                     <div class="avatar-edit">
-                                                        <input type="file" id="imageUpload"
-                                                            accept=".png, .jpg, .jpeg">
+                                                        <input type="file" id="imageUpload" accept=".png, .jpg, .jpeg">
                                                         <label for="imageUpload"><i class="ti ti-photo-heart"></i></label>
                                                     </div>
                                                     <div class="avatar-preview">
-                                                        <div id="imgPreview" style="background-image: url('{{ $user->profile_picture_url ?? asset('assets/images/default-avatar.jpg') }}');">
+                                                        <div id="imgPreview"
+                                                            style="background-image: url('{{ $user->profile_picture_url ?? asset('assets/images/default-avatar.jpg') }}');">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -88,7 +89,8 @@
                                         <div class="text-end">
                                             <p>{{ $user->last_name ?? '-' }}</p>
                                         </div>
-                                    </div><div class="d-flex justify-content-between mt-3">
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-3">
                                         <h6 class="f-w-600 text-dark"><i
                                                 class="ti ti-user text-secondary f-s-18 me-2"></i>Prénom</h6>
                                         <div class="text-end">
@@ -96,7 +98,8 @@
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-between mt-3">
-                                        <h6 class="f-w-600 text-dark"><i class="ti ti-mail f-s-18 text-secondary me-2"></i>Email
+                                        <h6 class="f-w-600 text-dark"><i
+                                                class="ti ti-mail f-s-18 text-secondary me-2"></i>Email
                                         </h6>
                                         <div class="text-end">
                                             <p>{{ $user->email ?? '-' }}</p>
@@ -118,7 +121,8 @@
                                     </div>
                                     <div class="d-flex justify-content-between mt-3">
                                         <h6 class="f-w-600 text-dark"><i
-                                                class="ti ti-calendar-stats text-secondary f-s-18 me-2"></i>Date de création</h6>
+                                                class="ti ti-calendar-stats text-secondary f-s-18 me-2"></i>Date de création
+                                        </h6>
                                         <div class="text-end">
                                             <p>{{ $user->created_at ? $user->created_at->format('d/m/Y') : '-' }}</p>
                                         </div>

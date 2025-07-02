@@ -155,4 +155,12 @@ class SupplierDelivery extends Model
 
         return sprintf('%s-%s%s-%04d', $prefix, $year, $month, $nextNumber);
     }
+
+    /**
+     * Check if the supply can be edited.
+     */
+    public function canBeEdited(): bool
+    {
+        return $this->status->value === SupplierDeliveryStatus::IN_PROGRESS();
+    }
 }

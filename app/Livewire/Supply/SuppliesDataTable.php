@@ -239,8 +239,6 @@ class SuppliesDataTable extends BaseDataTable
                 'message' => "Une erreur s'est produite lors de la suppression de l'approvisionnement.",
                 'timer' => 3000,
             ]);
-        } finally {
-            $this->dispatch('close-loading-swal');
         }
     }
 

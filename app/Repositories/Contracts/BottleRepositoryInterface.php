@@ -11,6 +11,7 @@ interface BottleRepositoryInterface extends BaseRepositoryInterface
 {
     public function getBottleHistory($bottleId): Collection;
 
+    // TODO: remove this and only use update!
     public function updateStatus($bottleId, BottleStatus $status): void;
 
     /**
