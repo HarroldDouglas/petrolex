@@ -157,7 +157,7 @@
     <div class="ticket">
         <!-- En-tête -->
         <div class="header">
-            <div class="company-name">DELIVERY EXPRESS</div>
+            <img src="{{ asset('assets/images/logo/isogaz-no-bg.png') }}" alt="Petrolex Logo" style="width: 100px; margin-bottom: 5px;">
             <div class="company-info">Service de livraison rapide</div>
             <div class="company-info">Tél: +33 1 23 45 67 89</div>
             <div class="company-info">www.delivery-express.fr</div>

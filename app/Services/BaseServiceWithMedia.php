@@ -7,6 +7,7 @@ use App\Repositories\Contracts\BaseRepositoryInterface;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Spatie\MediaLibrary\HasMedia;
 
 abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasMediaServiceInterface
 {
@@ -21,6 +22,7 @@ abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasM
     {
         return $this->executeInTransaction(function () use ($data) {
             $modelData = $this->filterDataForModel($data);
+            /** @var Model&HasMedia $model */
             $model = $this->repository->create($modelData);
 
             $this->processMediaWithStrategy($model, $data);
@@ -29,11 +31,26 @@ abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasM
         });
     }
 
-    public function updateWithMedia(Model $model, array $data): Model
+    /**
+     * Update a model with media handling
+     *
+     * @param  HasMedia|Model  $model  The model to update
+     * @param  array  $data  The data to update the model with
+     * @param  array<int>|null  $imagesIdsToDelete  Optional array of media IDs to delete
+     * @return Model The updated model
+     */
+    public function updateWithMedia(HasMedia|Model $model, array $data, ?array $imagesIdsToDelete = null): Model
     {
-        return $this->executeInTransaction(function () use ($model, $data) {
+        return $this->executeInTransaction(function () use ($model, $data, $imagesIdsToDelete) {
             $modelData = $this->filterDataForModel($data);
+            /** @var Model&HasMedia $updatedModel */
             $updatedModel = $this->repository->update($model, $modelData);
+
+            if (! empty($imagesIdsToDelete)) {
+                foreach ($imagesIdsToDelete as $mediaId) {
+                    $this->mediaService->detachMedia($updatedModel, (int) $mediaId);
+                }
+            }
 
             $this->processMediaWithStrategy($updatedModel, $data);
 
@@ -44,13 +61,14 @@ abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasM
     /**
      * Remove a media item from a model
      */
-    public function removeMedia(Model $model, int $mediaId): bool
+    public function removeMedia(HasMedia $model, int $mediaId): bool
     {
         return $this->mediaService->detachMedia($model, $mediaId);
     }
 
     public function getWithMediaData(int $id): ?ModelWithImagesDTO
     {
+        /** @var (Model&HasMedia)|null $model */
         $model = $this->find($id);
 
         if (! $model) {
@@ -60,7 +78,7 @@ abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasM
         return $this->mediaService->getModelMediaData($model);
     }
 
-    protected function processMediaWithStrategy(Model $model, array $data): void
+    protected function processMediaWithStrategy(HasMedia $model, array $data): void
     {
         $strategy = $this->getMediaStrategy();
         match ($strategy) {

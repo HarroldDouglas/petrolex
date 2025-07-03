@@ -4,7 +4,7 @@ namespace App\Livewire\Bottle;
 
 use App\DTOs\BottleType\UpdateBottleTypeDTO;
 use App\Models\BottleType;
-use App\Services\Bottle\BottleTypeService;
+use App\Services\BottleType\BottleTypeService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
