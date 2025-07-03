@@ -3,7 +3,8 @@
 namespace App\Services\BottleType;
 
 use App\DTOs\BottleType\CreateBottleTypeDTO;
-use App\DTOs\BottleType\ProductCategoryCityPriceDTO;
+use App\DTOs\BottleType\UpdateBottleTypeDTO;
+use App\DTOs\ProductCategory\ProductCategoryCityPriceDTO;
 use App\DTOs\ProductCategory\ProductCategoryDTO;
 use App\Enums\ProductType;
 use App\Models\BottleType;
@@ -35,11 +36,12 @@ class BottleTypeService extends BaseServiceWithMedia
                 product_type_id: $bottleType->id,
             );
 
+            /** @var \App\Models\ProductCategory $productCategory */
             $productCategory = $this->productCategoryRepository->create($productCategoryDto->toArray());
 
             if (! empty($createBottleTypeDTO->bottleTypeCityPrices)) {
                 $bottleTypeCityPricesData = array_map(
-                    fn (ProductCategoryCityPriceDTO $cityPriceDTO) => $cityPriceDTO->toArray(),
+                    fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => $cityPriceDTO->toArray(),
                     $createBottleTypeDTO->bottleTypeCityPrices
                 );
                 $productCategory->cityPrices()->createMany($bottleTypeCityPricesData);
@@ -51,26 +53,37 @@ class BottleTypeService extends BaseServiceWithMedia
 
     public function update(Model|BottleType $model, array $data, ?array $imagesIdsToDelete = null): BottleType
     {
-        /** @var BottleType $bottleType */
-        $bottleType = parent::updateWithMedia($model, $data, $imagesIdsToDelete);
+        return $this->executeInTransaction(function () use ($model, $data, $imagesIdsToDelete) {
+            $updateBottleTypeDTO = UpdateBottleTypeDTO::from($data);
 
-        $productCategory = $bottleType->productCategory;
+            /** @var BottleType $bottleType */
+            $bottleType = parent::updateWithMedia($model, $updateBottleTypeDTO->toArray(), $imagesIdsToDelete);
 
-        if ($productCategory) {
-            $productCategory->cityPrices()->delete();
+            $productCategory = $bottleType->productCategory;
 
-            if (! empty($data['bottleTypeCityPrices'])) {
-                $productCategory->cityPrices()->createMany($data['bottleTypeCityPrices']);
+            if ($productCategory) {
+                $productCategory->cityPrices()->delete();
+
+                if (! empty($updateBottleTypeDTO->bottleTypeCityPrices)) {
+                    $bottleTypeCityPricesData = array_map(
+                        fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => $cityPriceDTO->toArray(),
+                        $updateBottleTypeDTO->bottleTypeCityPrices
+                    );
+                    $productCategory->cityPrices()->createMany($bottleTypeCityPricesData);
+                }
             }
-        }
 
-        return $bottleType;
+            return $bottleType;
+        });
     }
 
-    public function getWithMedia(int $bottleTypeId): BottleType
+    public function getWithMedia(int $bottleTypeId): ?BottleType
     {
+        /** @var \App\Models\BottleType|null $bottleType */
         $bottleType = $this->bottleTypeRepository->find($bottleTypeId);
-        $bottleType->load('media');
+        if ($bottleType) {
+            $bottleType->load('media');
+        }
 
         return $bottleType;
     }

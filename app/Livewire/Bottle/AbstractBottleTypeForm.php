@@ -4,7 +4,6 @@ namespace App\Livewire\Bottle;
 
 use App\Services\BottleType\BottleTypeService;
 use App\Services\Geography\StaticGeographyService;
-use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
@@ -33,16 +32,26 @@ abstract class AbstractBottleTypeForm extends Component
 
     protected $bottleTypeService;
     protected $geographyService;
-    protected $mediaService;
 
     public function boot(
         BottleTypeService $bottleTypeService,
         StaticGeographyService $geographyService,
-        MediaServiceInterface $mediaService
     ) {
         $this->bottleTypeService = $bottleTypeService;
         $this->geographyService = $geographyService;
-        $this->mediaService = $mediaService;
+    }
+
+    public function isCityPriceAddButtonDisabled(): bool
+    {
+        if (empty($this->selectedCity) || empty($this->tempCityContentPrice) || empty($this->tempCityContentWithBottlePrice)) {
+            return true;
+        }
+
+        if ((float) $this->tempCityContentWithBottlePrice <= (float) $this->tempCityContentPrice) {
+            return true;
+        }
+
+        return false;
     }
 
     public function addCityPrice()
@@ -53,18 +62,10 @@ abstract class AbstractBottleTypeForm extends Component
             return;
         }
 
-        // Vérifier si cette ville existe déjà
-        if (in_array($this->selectedCity, array_column($this->cityPrices, 'city'))) {
-            session()->flash('error', 'Cette ville a déjà un prix spécifique défini.');
-
-            return;
-        }
-
-        // Ajout d'un nouveau prix
         $this->cityPrices[] = [
             'city' => $this->selectedCity,
-            'content_price' => $this->tempCityContentPrice,
-            'content_with_bottle_price' => $this->tempCityContentWithBottlePrice,
+            'content_price' => (float) $this->tempCityContentPrice,
+            'content_with_bottle_price' => (float) $this->tempCityContentWithBottlePrice,
         ];
 
         $this->selectedCity = '';
@@ -74,7 +75,7 @@ abstract class AbstractBottleTypeForm extends Component
 
     public function updateCityPrice($index, $field, $value)
     {
-        $this->cityPrices[$index][$field] = $value;
+        $this->cityPrices[$index][$field] = (float) $value;
     }
 
     public function removeCityPrice($index)
@@ -120,7 +121,6 @@ abstract class AbstractBottleTypeForm extends Component
         $this->validateOnly($propertyName);
     }
 
-    // A helper method to generate the name string
     protected function generateName()
     {
         $this->name = 'Bouteille  de '.$this->weight.' Kg';

@@ -13,11 +13,6 @@ class ProductCategoryCityPriceRepository extends BaseEloquentRepository implemen
         parent::__construct($model);
     }
 
-    public function insertMany(array $cityPrices): bool
-    {
-        return ProductCategoryCityPrice::insert($cityPrices);
-    }
-
     public function deleteByProductCategoryId(int $productCategoryId): bool
     {
         return ProductCategoryCityPrice::where('product_category_id', $productCategoryId)->delete() > 0;

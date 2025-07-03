@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Bottle;
 
-use App\DTOs\BottleType\ProductCategoryCityPriceDTO;
 use App\DTOs\BottleType\UpdateBottleTypeDTO;
+use App\DTOs\ProductCategory\ProductCategoryCityPriceDTO;
 use App\Http\Requests\Bottletype\UpdateBottleTypeRequest;
 use App\Models\BottleType;
 use App\Models\ProductCategory;
@@ -60,7 +60,7 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
             /** @var Collection<int, ProductCategoryCityPrice> $cityPrices */
             $cityPrices = ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->get(); // TODO: move this into the repository
 
-            /** @var array<int, ProductCategoryCityPriceDTO> $cityPriceDTOs */
+            /** @var ProductCategoryCityPriceDTO[] $cityPriceDTOs */
             $cityPriceDTOs = $cityPrices->map(
                 function (ProductCategoryCityPrice $cityPrice) use ($productCategory): ProductCategoryCityPriceDTO {
                     return new ProductCategoryCityPriceDTO(
@@ -93,7 +93,7 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
                 ->where('product_type_id', $this->bottleType->id)
                 ->first();
 
-            /** @var array<int, ProductCategoryCityPriceDTO> */
+            /** @var ProductCategoryCityPriceDTO[] */
             $bottleTypeCityPrices = array_map(
                 /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
                 fn (array $cityPrice): ProductCategoryCityPriceDTO => new ProductCategoryCityPriceDTO(
@@ -119,8 +119,8 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
             );
 
             $this->bottleTypeService->update(
-                $this->bottleType, 
-                $bottleTypeDTO->toArray(), 
+                $this->bottleType,
+                $bottleTypeDTO->toArray(),
                 ! empty($this->imagesIdsToDelete) ? $this->imagesIdsToDelete : null
             );
 

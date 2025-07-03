@@ -260,6 +260,7 @@ class BottleDataTable extends BaseDataTable
 
             if ($updatedBottle) {
                 $statusLabel = $newStatus->label;
+                /** @var \App\Models\Bottle $bottle */
                 $barcode = $bottle->barcode;
 
                 if ($newStatus === BottleStatus::LOST_STOLEN()) {

@@ -22,7 +22,7 @@ abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasM
     {
         return $this->executeInTransaction(function () use ($data) {
             $modelData = $this->filterDataForModel($data);
-            /** @var HasMedia|Model $model */
+            /** @var Model&HasMedia $model */
             $model = $this->repository->create($modelData);
 
             $this->processMediaWithStrategy($model, $data);
@@ -34,19 +34,19 @@ abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasM
     /**
      * Update a model with media handling
      *
-     * @param HasMedia|Model $model The model to update
-     * @param array $data The data to update the model with
-     * @param array<int>|null $imagesIdsToDelete Optional array of media IDs to delete
+     * @param  HasMedia|Model  $model  The model to update
+     * @param  array  $data  The data to update the model with
+     * @param  array<int>|null  $imagesIdsToDelete  Optional array of media IDs to delete
      * @return Model The updated model
      */
     public function updateWithMedia(HasMedia|Model $model, array $data, ?array $imagesIdsToDelete = null): Model
     {
         return $this->executeInTransaction(function () use ($model, $data, $imagesIdsToDelete) {
             $modelData = $this->filterDataForModel($data);
-            /** @var HasMedia|Model $updatedModel */
+            /** @var Model&HasMedia $updatedModel */
             $updatedModel = $this->repository->update($model, $modelData);
 
-            if (!empty($imagesIdsToDelete)) {
+            if (! empty($imagesIdsToDelete)) {
                 foreach ($imagesIdsToDelete as $mediaId) {
                     $this->mediaService->detachMedia($updatedModel, (int) $mediaId);
                 }
@@ -68,7 +68,7 @@ abstract class BaseServiceWithMedia extends BaseServiceForEntity implements HasM
 
     public function getWithMediaData(int $id): ?ModelWithImagesDTO
     {
-        /** @var HasMedia $model */
+        /** @var (Model&HasMedia)|null $model */
         $model = $this->find($id);
 
         if (! $model) {

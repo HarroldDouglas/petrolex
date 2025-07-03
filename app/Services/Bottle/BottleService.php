@@ -25,15 +25,6 @@ class BottleService extends BaseServiceWithMedia
         parent::__construct($bottleRepository, $mediaService);
     }
 
-    /**
-     * Find a bottle by its ID
-     */
-    public function find(int $bottleId): ?Bottle
-    {
-        /** @var Bottle|null */
-        return $this->bottleRepository->find($bottleId);
-    }
-
     public function getBottleHistory($bottleId): Collection
     {
         return $this->bottleRepository->getBottleHistory($bottleId);

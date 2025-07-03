@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Product> $products
  * @property-read Collection<int, OrderItem> $orderItems
  * @property-read Collection<int, ProductCategoryDistributionCenter> $distributionCenters
+ * @property-read Collection<int, ProductCategoryCityPrice> $cityPrices
  *
  * // Accessors
  * @property-read BottleType|AccessoryType|null $productTypeInstance

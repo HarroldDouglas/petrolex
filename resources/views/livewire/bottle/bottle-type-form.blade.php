@@ -112,7 +112,7 @@
             <div class="row mb-3 align-items-end">
                 <div class="col-md-4">
                     <label for="selectedCity" class="form-label">Ville</label>
-                    <select class="form-select" id="selectedCity" wire:model="selectedCity">
+                    <select class="form-select" id="selectedCity" wire:model.live="selectedCity">
                         <option value="">Sélectionner une ville</option>
                         @foreach($availableCities as $city)
                             @if(!in_array($city, array_column($cityPrices, 'city')))
@@ -124,15 +124,17 @@
                 <div class="col-md-3">
                     <label for="tempCityContentPrice" class="form-label">Prix de la recharge</label>
                     <input type="number" class="form-control" id="tempCityContentPrice" 
-                           placeholder="Ex: 8500" wire:model="tempCityContentPrice">
+                           placeholder="Ex: 8500" wire:model.live="tempCityContentPrice">
                 </div>
                 <div class="col-md-3">
                     <label for="tempCityContentWithBottlePrice" class="form-label">Prix consigne + recharge</label>
                     <input type="number" class="form-control" id="tempCityContentWithBottlePrice" 
-                           placeholder="Ex: 25000" wire:model="tempCityContentWithBottlePrice">
+                           placeholder="Ex: 25000" wire:model.live="tempCityContentWithBottlePrice">
                 </div>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-primary w-100" wire:click="addCityPrice">
+                    <button type="button" class="btn btn-primary w-100" 
+                           wire:click="addCityPrice"
+                           @if($this->isCityPriceAddButtonDisabled()) disabled @endif>
                         <i class="ti ti-plus"></i> Ajouter
                     </button>
                 </div>

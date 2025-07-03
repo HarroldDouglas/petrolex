@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,11 +18,12 @@ use Spatie\MediaLibrary\HasMedia;
  * @property int $id
  * @property string $name
  * @property string $description
+ * @property float $capacity
+ * @property float $height
+ * @property float $weight
+ * @property float $radius
  * @property float $content_price
  * @property float $bottle_with_content_price
- * @property float $bottle_only_price
- * @property float $deposit_price
- * @property int $weight
  * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -115,9 +115,9 @@ class BottleType extends Model implements HasMedia
             ->withTimestamps();
     }
 
-    public function cityPrices(): HasMany
+    public function cityPrices(): Collection
     {
-        return $this->hasMany(ProductCategoryCityPrice::class);
+        return $this->productCategory?->cityPrices;
     }
 
     /**

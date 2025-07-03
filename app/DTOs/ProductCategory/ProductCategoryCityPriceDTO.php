@@ -1,17 +1,11 @@
 <?php
 
-namespace App\DTOs\BottleType;
+namespace App\DTOs\ProductCategory;
 
 use App\DTOs\BaseDTO;
 
 class ProductCategoryCityPriceDTO extends BaseDTO
 {
-    /**
-     * @param  int|null  $product_category_id  ID de la catégorie de produit
-     * @param  string  $city  Ville
-     * @param  float  $content_price  Prix du contenu
-     * @param  float  $content_with_bottle_price  Prix du contenu avec bouteille
-     */
     public function __construct(
         public readonly ?int $product_category_id,
         public readonly string $city,
