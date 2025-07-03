@@ -27,6 +27,7 @@ class EventServiceProvider extends ServiceProvider
         DistributionCenterUpdatedEvent::class => [
             LogDistributionCenterUpdated::class,
         ],
+
     ];
 
     /**

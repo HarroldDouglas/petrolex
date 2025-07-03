@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Bottle;
 
-use App\DTOs\BottleType\ProductCategoryCityPriceDTO;
 use App\DTOs\BottleType\UpdateBottleTypeDTO;
+use App\DTOs\ProductCategory\ProductCategoryCityPriceDTO;
 use App\Http\Requests\Bottletype\UpdateBottleTypeRequest;
 use App\Models\BottleType;
 use App\Models\ProductCategory;
@@ -12,7 +12,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
-// TODO: move db request to a repository and call a service!
 class EditBottleTypeForm extends AbstractBottleTypeForm
 {
     public BottleType $bottleType;
@@ -41,19 +40,30 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
         $this->description = $this->bottleType->description;
         $this->weight = $this->bottleType->weight;
 
+        $this->bottleType->load('media');
+        $this->existingImages = $this->bottleType->getMedia('images')->map(function ($media) {
+            return [
+                'id' => $media->id,
+                'name' => $media->name,
+                'file_name' => $media->file_name,
+                'mime_type' => $media->mime_type,
+                'original_url' => $media->getUrl(),
+                'preview_url' => $media->getUrl('thumb'),
+            ];
+        })->toArray();
+
         $productCategory = ProductCategory::bottles()
             ->where('product_type_id', $this->bottleType->id)
             ->first();
 
         if ($productCategory) {
             /** @var Collection<int, ProductCategoryCityPrice> $cityPrices */
-            $cityPrices = ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->get();
+            $cityPrices = ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->get(); // TODO: move this into the repository
 
-            /** @var array<int, ProductCategoryCityPriceDTO> $cityPriceDTOs */
+            /** @var ProductCategoryCityPriceDTO[] $cityPriceDTOs */
             $cityPriceDTOs = $cityPrices->map(
                 function (ProductCategoryCityPrice $cityPrice) use ($productCategory): ProductCategoryCityPriceDTO {
                     return new ProductCategoryCityPriceDTO(
-                        bottle_type_id: $this->bottleType->id, // On conserve cette association pour le DTO
                         product_category_id: $productCategory->id,
                         city: $cityPrice->city,
                         content_price: (float) $cityPrice->content_price,
@@ -83,11 +93,10 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
                 ->where('product_type_id', $this->bottleType->id)
                 ->first();
 
-            /** @var array<int, ProductCategoryCityPriceDTO> */
+            /** @var ProductCategoryCityPriceDTO[] */
             $bottleTypeCityPrices = array_map(
                 /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
                 fn (array $cityPrice): ProductCategoryCityPriceDTO => new ProductCategoryCityPriceDTO(
-                    bottle_type_id: $this->bottleType->id,
                     product_category_id: $productCategory->id,
                     city: $cityPrice['city'],
                     content_price: (float) $cityPrice['content_price'],
@@ -106,13 +115,18 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
                 is_active: $validatedData['is_active'],
                 description: $validatedData['description'],
                 weight: $validatedData['weight'] ? (float) $validatedData['weight'] : null,
+                images: $this->product_images ?: null,
             );
 
-            $this->bottleTypeService->update($this->bottleType->id, $bottleTypeDTO);
+            $this->bottleTypeService->update(
+                $this->bottleType,
+                $bottleTypeDTO->toArray(),
+                ! empty($this->imagesIdsToDelete) ? $this->imagesIdsToDelete : null
+            );
 
             session()->flash('success', 'Type de bouteille modifié avec succès!');
 
-            return redirect()->route('bottles.types.index');
+            return redirect()->route('bottles.types.edit', $this->bottleType->id);
         } catch (\Throwable $th) {
             session()->flash('error', $th->getMessage());
             throw $th;

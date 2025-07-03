@@ -11,7 +11,7 @@ class ProductCategoryRepository extends BaseEloquentRepository implements Produc
 {
     public function __construct(ProductCategory $productCategory)
     {
-        $this->model = $productCategory;
+        parent::__construct($productCategory);
     }
 
     /**

@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Bottle;
 
+use App\DTOs\Bottle\UpdateBottleDTO;
 use App\Enums\BottleStatus;
 use App\Models\Bottle;
 use App\Services\Bottle\BottleService;
 use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\MultiSelectFilter;
@@ -248,16 +250,17 @@ class BottleDataTable extends BaseDataTable
                 return;
             }
 
-            $oldStatus = $bottle->status->label;
             $newStatus = BottleStatus::from($status);
 
-            // TODO update this when we will remove updateStatus
-            $bottleService->updateStatus($bottleId, $newStatus);
+            $updateDto = new UpdateBottleDTO(
+                status: $newStatus
+            );
 
-            // On vérifie que le statut a été mis à jour en récupérant à nouveau la bouteille
-            $updatedBottle = $bottleService->find($bottleId);
-            if ($updatedBottle && $updatedBottle->status === $newStatus) {
+            $updatedBottle = $bottleService->update($bottle, $updateDto->toArrayFiltered());
+
+            if ($updatedBottle) {
                 $statusLabel = $newStatus->label;
+                /** @var \App\Models\Bottle $bottle */
                 $barcode = $bottle->barcode;
 
                 if ($newStatus === BottleStatus::LOST_STOLEN()) {
@@ -285,7 +288,7 @@ class BottleDataTable extends BaseDataTable
                 ]);
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error changing bottle status: '.$e->getMessage());
+            Log::error('Error changing bottle status: '.$e->getMessage());
 
             $this->dispatch('show-notification', [
                 'type' => 'error',

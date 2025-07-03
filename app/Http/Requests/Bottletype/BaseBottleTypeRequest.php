@@ -18,6 +18,9 @@ abstract class BaseBottleTypeRequest extends FormRequest
             'bottle_with_content_price' => ['required', 'numeric', 'min:0', 'gt:content_price'],
             'is_active' => ['required', 'boolean'],
 
+            'product_images.*' => ['nullable', 'image', 'max:5120'], // 5MB max par image
+            'product_images' => ['nullable', 'array', 'max:10'], // Maximum 10 images
+
             'cityPrices' => ['nullable', 'array'],
             'cityPrices.*.city' => ['required_with:cityPrices', 'string', 'max:255'],
             'cityPrices.*.content_price' => ['required_with:cityPrices', 'numeric', 'min:0'],
@@ -64,6 +67,11 @@ abstract class BaseBottleTypeRequest extends FormRequest
             'bottle_with_content_price.gt' => 'Le prix de la consigne avec recharge doit être supérieur au prix du contenu.',
 
             'is_active.boolean' => 'Le statut doit être vrai ou faux.',
+
+            'product_images.*.image' => 'Chaque fichier doit être une image.',
+            'product_images.*.max' => 'Chaque image ne doit pas dépasser 5 Mo.',
+            'product_images.array' => 'Les images doivent être un tableau.',
+            'product_images.max' => 'Vous ne pouvez télécharger que 10 images maximum.',
 
             'cityPrices.*.city.required_with' => 'Le nom de la ville est requis.',
             'cityPrices.*.city.string' => 'Le nom de la ville doit être une chaîne de caractères.',

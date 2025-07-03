@@ -17,47 +17,76 @@ abstract class AbstractBottleTypeForm extends Component
     public $capacity;
     public $content_price;
     public $bottle_with_content_price;
-    public $product_images;
+    public array $product_images = [];
     public $description;
+    public $existingImages = [];
+    public $imagesIdsToDelete = [];
 
     public $cityPrices = [];
     public $availableCities = [];
     public $selectedCity = '';
+    public $tempCityContentPrice = '';
+    public $tempCityContentWithBottlePrice = '';
 
     public bool $is_active = true;
 
     protected $bottleTypeService;
     protected $geographyService;
 
-    public function boot(BottleTypeService $bottleTypeService,
-        StaticGeographyService $geographyService)
-    {
+    public function boot(
+        BottleTypeService $bottleTypeService,
+        StaticGeographyService $geographyService,
+    ) {
         $this->bottleTypeService = $bottleTypeService;
         $this->geographyService = $geographyService;
     }
 
+    public function isCityPriceAddButtonDisabled(): bool
+    {
+        if (empty($this->selectedCity) || empty($this->tempCityContentPrice) || empty($this->tempCityContentWithBottlePrice)) {
+            return true;
+        }
+
+        if ((float) $this->tempCityContentWithBottlePrice <= (float) $this->tempCityContentPrice) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function addCityPrice()
     {
-        if (! $this->selectedCity
-            || in_array($this->selectedCity,
-                array_column($this->cityPrices, 'city'))) {
+        if (! $this->selectedCity || $this->tempCityContentPrice === '' || $this->tempCityContentWithBottlePrice === '') {
+            session()->flash('error', 'Veuillez sélectionner une ville et renseigner les prix avant d\'ajouter.');
+
             return;
         }
 
         $this->cityPrices[] = [
             'city' => $this->selectedCity,
-            'bottle_type_id' => null,
-            'content_price' => '',
-            'content_with_bottle_price' => '',
+            'content_price' => (float) $this->tempCityContentPrice,
+            'content_with_bottle_price' => (float) $this->tempCityContentWithBottlePrice,
         ];
 
         $this->selectedCity = '';
+        $this->tempCityContentPrice = '';
+        $this->tempCityContentWithBottlePrice = '';
+    }
+
+    public function updateCityPrice($index, $field, $value)
+    {
+        $this->cityPrices[$index][$field] = (float) $value;
     }
 
     public function removeCityPrice($index)
     {
         unset($this->cityPrices[$index]);
         $this->cityPrices = array_values($this->cityPrices);
+    }
+
+    public function deleteImage($imageId)
+    {
+        $this->imagesIdsToDelete[] = $imageId;
     }
 
     public function rules()
@@ -78,7 +107,9 @@ abstract class AbstractBottleTypeForm extends Component
 
     public function render()
     {
-        return view('livewire.bottle.bottle-type-form');
+        return view('livewire.bottle.bottle-type-form', [
+            'existingImages' => $this->existingImages,
+        ]);
     }
 
     public function updated($propertyName)
@@ -90,7 +121,6 @@ abstract class AbstractBottleTypeForm extends Component
         $this->validateOnly($propertyName);
     }
 
-    // A helper method to generate the name string
     protected function generateName()
     {
         $this->name = 'Bouteille  de '.$this->weight.' Kg';
