@@ -3,14 +3,17 @@
 namespace App\Models;
 
 use App\Enums\ProductType;
+use App\Traits\HasMediaCollections;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Spatie\MediaLibrary\HasMedia;
 
 /**
  * @property int $id
@@ -31,14 +34,16 @@ use Illuminate\Support\Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Bottle> $bottles
  * @property-read \Illuminate\Database\Eloquent\Collection<int, DistributionCenter> $distributionCenters
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategoryCityPrice> $cityPrices
+ * @property-read \App\Models\ProductCategory|null $productCategory
  *
  * // Accessors
  *
  * // Query Scopes
  */
-class BottleType extends Model
+class BottleType extends Model implements HasMedia
 {
     use HasFactory;
+    use HasMediaCollections;
     use SoftDeletes;
 
     /**
@@ -113,5 +118,46 @@ class BottleType extends Model
     public function cityPrices(): HasMany
     {
         return $this->hasMany(ProductCategoryCityPrice::class);
+    }
+
+    /**
+     * Get the product category associated with the bottle type.
+     */
+    public function productCategory(): HasOne
+    {
+        return $this->hasOne(ProductCategory::class, 'product_type_id')
+            ->where('product_type', ProductType::BOTTLE());
+    }
+
+    /**
+     * Get the image collections that this model uses
+     */
+    protected function getImageCollections(): array
+    {
+        return ['images'];
+    }
+
+    /**
+     * Determine if this model requires a main image
+     */
+    public function requiresMainImage(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine if this model supports multiple images
+     */
+    public function supportsMultipleImages(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the identifier for the image
+     */
+    public function getImageIdentifier(): string
+    {
+        return "bottle-type-{$this->id}";
     }
 }

@@ -71,6 +71,11 @@ class ProductCategory extends Model
         return $this->hasMany(ProductCategoryDistributionCenter::class);
     }
 
+    public function cityPrices(): HasMany
+    {
+        return $this->hasMany(ProductCategoryCityPrice::class);
+    }
+
     // ===== ACCESSORS =====
 
     public function getProductTypeInstanceAttribute(): BottleType|AccessoryType|null

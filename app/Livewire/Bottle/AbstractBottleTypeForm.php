@@ -4,6 +4,7 @@ namespace App\Livewire\Bottle;
 
 use App\Services\BottleType\BottleTypeService;
 use App\Services\Geography\StaticGeographyService;
+use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
@@ -17,8 +18,10 @@ abstract class AbstractBottleTypeForm extends Component
     public $capacity;
     public $content_price;
     public $bottle_with_content_price;
-    public $product_images;
+    public array $product_images = [];
     public $description;
+    public $existingImages = [];
+    public $imagesIdsToDelete = [];
 
     public $cityPrices = [];
     public $availableCities = [];
@@ -30,12 +33,16 @@ abstract class AbstractBottleTypeForm extends Component
 
     protected $bottleTypeService;
     protected $geographyService;
+    protected $mediaService;
 
-    public function boot(BottleTypeService $bottleTypeService,
-        StaticGeographyService $geographyService)
-    {
+    public function boot(
+        BottleTypeService $bottleTypeService,
+        StaticGeographyService $geographyService,
+        MediaServiceInterface $mediaService
+    ) {
         $this->bottleTypeService = $bottleTypeService;
         $this->geographyService = $geographyService;
+        $this->mediaService = $mediaService;
     }
 
     public function addCityPrice()
@@ -76,6 +83,11 @@ abstract class AbstractBottleTypeForm extends Component
         $this->cityPrices = array_values($this->cityPrices);
     }
 
+    public function deleteImage($imageId)
+    {
+        $this->imagesIdsToDelete[] = $imageId;
+    }
+
     public function rules()
     {
         // @phpstan-ignore-next-line
@@ -94,7 +106,9 @@ abstract class AbstractBottleTypeForm extends Component
 
     public function render()
     {
-        return view('livewire.bottle.bottle-type-form');
+        return view('livewire.bottle.bottle-type-form', [
+            'existingImages' => $this->existingImages,
+        ]);
     }
 
     public function updated($propertyName)
@@ -106,6 +120,7 @@ abstract class AbstractBottleTypeForm extends Component
         $this->validateOnly($propertyName);
     }
 
+    // A helper method to generate the name string
     protected function generateName()
     {
         $this->name = 'Bouteille  de '.$this->weight.' Kg';

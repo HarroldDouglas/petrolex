@@ -14,7 +14,6 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
     {
         $this->availableCities = $this->geographyService
             ->getCities(Config::get('geography.authorized-countries.CM.name'));
-
     }
 
     protected function customRequest(): FormRequest
@@ -47,9 +46,10 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
                 is_active: $validatedData['is_active'],
                 description: $validatedData['description'],
                 weight: $validatedData['weight'] ? (float) $validatedData['weight'] : null,
+                images: $this->product_images ?: null,
             );
 
-            $this->bottleTypeService->create($bottleTypeDTO);
+            $this->bottleTypeService->create($bottleTypeDTO->toArray());
 
             session()->flash('success', 'Type de bouteille créé avec succès!');
 

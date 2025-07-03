@@ -29,12 +29,5 @@
     "Remove All Filters": "Supprimer tous les filtres",
     "Clear Search": "Effacer la recherche",
     "From Date": "Du",
-    "To Date": "Au",
-    "Select All On Page": "Sélectionner tout sur la page",
-    "Deselect All": "Tout désélectionner",
-    "Clear Selection": "Effacer la sélection",
-    "You have selected :count items, would you like to select all :total items?": "Vous avez sélectionné :count éléments, voulez-vous sélectionner tous les :total éléments ?",
-    "Selected :count items": ":count éléments sélectionnés",
-    "Loading": "Chargement",
-    "No results": "Aucun résultat"
+    "To Date": "Au"
 }

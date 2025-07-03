@@ -52,10 +52,44 @@
         <div class="col-md-12">
             <label for="product_images" class="form-label">Images du produit</label>
             <input type="file" class="form-control @error('product_images') is-invalid @enderror" id="product_images"
-                wire:model="product_images">
+                wire:model="product_images" multiple accept="image/*">
             @error('product_images')
                 <div class="invalid-feedback">{{ __($message) }}</div>
             @enderror
+            
+            <!-- Affichage des aperçus des fichiers sélectionnés -->
+            @if ($product_images)
+                <div class="mt-2">
+                    <p class="text-sm text-gray-500 mb-2">Aperçu des nouvelles images:</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach($product_images as $image)
+                            <div class="position-relative">
+                                <img src="{{ $image->temporaryUrl() }}" alt="Aperçu" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+            
+            <!-- Affichage des images existantes (en mode édition) -->
+            @if (!empty($existingImages))
+                <div class="mt-3">
+                    <h6 class="mb-2">Images actuelles:</h6>
+                    <div class="d-flex flex-wrap gap-3">
+                        @foreach($existingImages as $image)
+                            @if (!in_array($image['id'], $imagesIdsToDelete))
+                                <div class="position-relative">
+                                    <img src="{{ $image['original_url'] }}" alt="{{ $image['name'] }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" 
+                                        wire:click="deleteImage({{ $image['id'] }})" title="Supprimer cette image">
+                                        <i class="ti ti-x"></i>
+                                    </button>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div class="col-md-12">

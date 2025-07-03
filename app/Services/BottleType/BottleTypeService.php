@@ -3,78 +3,85 @@
 namespace App\Services\BottleType;
 
 use App\DTOs\BottleType\CreateBottleTypeDTO;
-use App\DTOs\BottleType\UpdateBottleTypeDTO;
+use App\DTOs\BottleType\ProductCategoryCityPriceDTO;
+use App\DTOs\ProductCategory\ProductCategoryDTO;
 use App\Enums\ProductType;
 use App\Models\BottleType;
-use App\Models\ProductCategory;
-use App\Models\ProductCategoryCityPrice;
 use App\Repositories\Contracts\BottleTypeRepositoryInterface;
+use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
+use App\Services\BaseServiceWithMedia;
+use App\Services\Shared\Media\MediaServiceInterface;
+use Illuminate\Database\Eloquent\Model;
 
-class BottleTypeService
+class BottleTypeService extends BaseServiceWithMedia
 {
     public function __construct(
-        private BottleTypeRepositoryInterface $bottleRepository
-    ) {}
+        protected BottleTypeRepositoryInterface $bottleTypeRepository,
+        protected MediaServiceInterface $mediaService,
+        private ProductCategoryRepositoryInterface $productCategoryRepository
+    ) {
+        parent::__construct($bottleTypeRepository, $mediaService);
+    }
 
-    public function create(CreateBottleTypeDTO $data): BottleType
+    public function create(array $data): BottleType
     {
-        /** @var BottleType $bottleType */
-        $bottleType = $this->bottleRepository->create($data->toArray());
+        return $this->executeInTransaction(function () use ($data) {
+            $createBottleTypeDTO = CreateBottleTypeDTO::from($data);
 
-        // Créer une catégorie de produit associée au type de bouteille
-        $productCategory = ProductCategory::create([
-            'name' => $data->name,
-            'product_type' => ProductType::BOTTLE(),
-            'product_type_id' => $bottleType->id,
-            'description' => $data->description,
-            'is_active' => $data->is_active,
-        ]);
+            /** @var BottleType $bottleType */
+            $bottleType = parent::createWithMedia($createBottleTypeDTO->toArray());
+            $productCategoryDto = new ProductCategoryDTO(
+                product_type: ProductType::BOTTLE(),
+                product_type_id: $bottleType->id,
+            );
 
-        if ($data->bottleTypeCityPrices && $productCategory) {
-            // Mettre à jour les DTOs avec le product_category_id
-            $cityPrices = [];
-            foreach ($data->bottleTypeCityPrices as $cityPriceDTO) {
-                $cityPriceData = $cityPriceDTO->toArray();
-                $cityPriceData['product_category_id'] = $productCategory->id;
-                $cityPrices[] = $cityPriceData;
+            $productCategory = $this->productCategoryRepository->create($productCategoryDto->toArray());
+
+            if (! empty($createBottleTypeDTO->bottleTypeCityPrices)) {
+                $bottleTypeCityPricesData = array_map(
+                    fn (ProductCategoryCityPriceDTO $cityPriceDTO) => $cityPriceDTO->toArray(),
+                    $createBottleTypeDTO->bottleTypeCityPrices
+                );
+                $productCategory->cityPrices()->createMany($bottleTypeCityPricesData);
             }
 
-            // Insérer les prix par ville avec le product_category_id
-            ProductCategoryCityPrice::insert($cityPrices);
+            return $bottleType;
+        });
+    }
+
+    public function update(Model|BottleType $model, array $data, ?array $imagesIdsToDelete = null): BottleType
+    {
+        /** @var BottleType $bottleType */
+        $bottleType = parent::updateWithMedia($model, $data, $imagesIdsToDelete);
+
+        $productCategory = $bottleType->productCategory;
+
+        if ($productCategory) {
+            $productCategory->cityPrices()->delete();
+
+            if (! empty($data['bottleTypeCityPrices'])) {
+                $productCategory->cityPrices()->createMany($data['bottleTypeCityPrices']);
+            }
         }
 
         return $bottleType;
     }
 
-    public function update(int $bottleTypeId, UpdateBottleTypeDTO $data): BottleType
+    public function getWithMedia(int $bottleTypeId): BottleType
     {
-        /** @var BottleType $bottleType */
-        $bottleType = $this->bottleRepository->find($bottleTypeId);
-        $this->bottleRepository->update($bottleType,
-            $data->toArray());
-
-        // Récupérer la catégorie de produit associée au type de bouteille
-        $productCategory = ProductCategory::where('product_type', ProductType::BOTTLE())
-            ->where('product_type_id', $bottleType->id)
-            ->first();
-
-        if ($productCategory) {
-            ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->delete();
-
-            if (! empty($data->bottleTypeCityPrices)) {
-                // Mettre à jour les DTOs avec le product_category_id
-                $cityPrices = [];
-                foreach ($data->bottleTypeCityPrices as $cityPriceDTO) {
-                    $cityPriceData = $cityPriceDTO->toArray();
-                    $cityPriceData['product_category_id'] = $productCategory->id;
-                    $cityPrices[] = $cityPriceData;
-                }
-
-                // Insérer les prix par ville avec le product_category_id
-                ProductCategoryCityPrice::insert($cityPrices);
-            }
-        }
+        $bottleType = $this->bottleTypeRepository->find($bottleTypeId);
+        $bottleType->load('media');
 
         return $bottleType;
+    }
+
+    protected function getMediaFields(): array
+    {
+        return ['images'];
+    }
+
+    protected function getModel(): string
+    {
+        return BottleType::class;
     }
 }
