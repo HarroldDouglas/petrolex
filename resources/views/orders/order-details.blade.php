@@ -26,11 +26,11 @@
             </div>
             <div class="col mt-3 mb-3 text-end">
                 <!-- Customer Details start -->
-                <x-order.detail.actions :order="$order" />
+                @livewire('order-details-actions', ['order' => $order])
                 <!-- Customer Details end -->
 
                 <a class="btn btn-primary ms-2" href="{{ route('orders.list') }}">
-                    <i class="ti ti-arrow-back"></i> Retourner à la siste
+                    <i class="ti ti-arrow-back"></i> Retourner à la liste
                 </a>
             </div>
         </div>
@@ -59,7 +59,38 @@
 
                 <div class="col-xxl-8 mt-3">
                     <div class="row">
-                        <x-order.detail.order-details :order="$order" />
+                        <!-- Order Details start -->
+                        <div class="col-lg-6">
+                            <div class="card order-details-card">
+                                <div class="card-header">
+                                    <h5 class="text-nowrap">Détails de la Commande ({{ $order->id }})</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="f-w-600 text-dark"><i
+                                                class="ti ti-calendar f-s-18 me-2 text-secondary"></i>Date</h6>
+                                        <div class="text-end">
+                                            <p>{{ $order->order_date->format('d/m/Y') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <h6 class="f-w-600 text-dark"><i class="ti ti-credit-card f-s-18 me-2"></i>Paiement
+                                        </h6>
+                                        <div class="text-end">
+                                            <p>{{ $order->payment_method->label }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <h6 class="f-w-600 text-dark"><i
+                                                class="ti ti-truck-delivery f-s-18 me-2"></i>Livraison</h6>
+                                        <div class="text-end">
+                                            <p>{{ $order->delivery_type->label }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Order Details end -->
 
                         <!-- Customer Details start -->
                         <x-order.detail.customer-details :order="$order" />
@@ -78,6 +109,7 @@
             <p>Commande non trouvée.</p>
         @endif
     </div>
+    <x-sweet-alert-notification-listener />
 
 @endsection
 
@@ -85,4 +117,5 @@
 
     <!-- leaflet js -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
 @endsection

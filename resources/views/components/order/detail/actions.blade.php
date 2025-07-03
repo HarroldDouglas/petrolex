@@ -1,3 +1,4 @@
+<div>
 <div class="d-inline-block">
     <div class="dropdown">
         <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -28,8 +29,12 @@
 
             @if ($order->canBeCancelled())
                 <li>
-                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
-                        data-bs-target="#cancelOrderModal">
+                    <a class="dropdown-item text-danger" href="#" 
+                        onclick="promptForCancellationReason({ 
+                            method: 'cancelOrder', 
+                            parameters: [{{ $order->id }}], 
+                            componentId: '{{ $this->getId() }}' 
+                        })">
                         <i class="ti ti-receipt-refund me-2"></i>Annuler
                     </a>
                 </li>
@@ -44,31 +49,7 @@
     </div>
 </div>
 
-@if ($order->canBeCancelled())
-    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header justify-content-center">
-                    <h5 class="modal-title" id="cancelOrderModalLabel">Confirmation d'annulation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <p class="mb-0">Êtes-vous sûr de vouloir annuler cette commande ? Cette action est irréversible.
-                    </p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <form action="{{ route('orders.cancel', $order) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="btn btn-danger">Confirmer l'annulation</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-@endif
+
 
 
 <!-- Modal pour changer de livreur -->
@@ -135,3 +116,4 @@
         }
     </script>
 @endpush
+</div>

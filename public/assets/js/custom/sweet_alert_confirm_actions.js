@@ -270,3 +270,51 @@ function confirmActionWithInput(params) {
         }
     });
 }
+/**
+ * Affiche une première boîte de dialogue pour demander la raison de l'annulation,
+ * puis enchaîne avec la confirmation de saisie.
+ *
+ * @param {Object} params - Les paramètres de configuration
+ * @param {string} params.method - Nom de la méthode Livewire à appeler
+ * @param {Array} params.parameters - Paramètres initiaux à passer (l'ID de la commande, etc.)
+ * @param {string} params.componentId - ID du composant Livewire
+ * @param {string} params.confirmWord - Mot à taper pour la confirmation finale (ex: "Annuler")
+ */
+function promptForCancellationReason(params) {
+    Swal.fire({
+        title: 'Motif de l\'annulation',
+        input: 'textarea',
+        inputLabel: 'Veuillez spécifier la raison de l\'annulation de cette commande.',
+        inputPlaceholder: 'Entrez la raison ici...',
+        inputAttributes: {
+            'aria-label': 'Entrez la raison ici'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Continuer',
+        cancelButtonText: 'Fermer',
+        confirmButtonColor: "#198754",
+        cancelButtonColor: "#6c757d",
+        reverseButtons: true,
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Vous devez fournir une raison !'
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            const reason = result.value;
+            const finalParams = {
+                ...params,
+                parameters: [...params.parameters, reason], // Ajoute la raison aux paramètres
+                title: 'Êtes-vous absolument sûr ?',
+                text: 'Cette action est irréversible et annulera la commande.',
+                entityName: `Raison : ${reason}`,
+                icon: 'warning',
+                confirmWord: 'Annuler',
+                confirmButtonIcon: 'ti ti-receipt-refund',
+                confirmText: 'Oui, annuler la commande'
+            };
+            confirmActionWithInput(finalParams);
+        }
+    });
+}
