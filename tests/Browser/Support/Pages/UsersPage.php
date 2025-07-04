@@ -50,7 +50,7 @@ class UsersPage extends Page
     public function navigateToCreateUser(Browser $browser): void
     {
         $browser->click('@create-user-button')
-                ->assertPathIs('/users/create');
+            ->assertPathIs('/users/create');
     }
 
     /**
@@ -95,7 +95,7 @@ class UsersPage extends Page
     public function clickEditUser(Browser $browser, string $email): void
     {
         $browser->waitForText($email)
-                ->click('//td[contains(text(), "'.$email.'")]/ancestor::tr//a[contains(@class, "edit-user-button")]');
+            ->click('//td[contains(text(), "'.$email.'")]/ancestor::tr//a[contains(@class, "edit-user-button")]');
     }
 
     /**
@@ -104,8 +104,8 @@ class UsersPage extends Page
     public function deleteUser(Browser $browser, string $email): void
     {
         $browser->waitForText($email)
-                ->click('//td[contains(text(), "'.$email.'")]/ancestor::tr//button[contains(@class, "delete-user-button")]')
-                ->waitFor('@confirm-delete-button')
-                ->click('@confirm-delete-button');
+            ->click('//td[contains(text(), "'.$email.'")]/ancestor::tr//button[contains(@class, "delete-user-button")]')
+            ->waitFor('@confirm-delete-button')
+            ->click('@confirm-delete-button');
     }
 }

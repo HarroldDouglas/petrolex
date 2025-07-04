@@ -174,79 +174,170 @@ chmod +x tests/Curl/*.sh
 ./tests/Curl/test_products.sh
 ```
 
-### Tests E2E (Laravel Dusk)
+Tests E2E (Laravel Dusk)
+Ce projet utilise Laravel Dusk pour les tests d'interface utilisateur automatisés avec Chrome for Testing.
 
-Ce projet utilise Laravel Dusk pour les tests d'interface utilisateur automatisés.
+1. Installation et Configuration de Dusk
+Bash
 
-## Installation et Configuration
-
-### 1. Installation de Dusk
-```bash
 composer require --dev laravel/dusk
 php artisan dusk:install
-```
+2. Téléchargement et "Installation" de Chrome for Testing et ChromeDriver
+Laravel Dusk utilise un navigateur réel et son pilote (driver) pour simuler les interactions utilisateur. Nous utilisons Chrome for Testing, une version de Chrome dédiée aux tests, et son pilote ChromeDriver.
 
-### 2. Installation du driver Firefox (Geckodriver)
-```bash
-# Ubuntu/Debian :
-# Méthode 1 : Via le gestionnaire de paquets
-sudo apt update
-sudo apt install firefox-geckodriver
+Créez un dossier bin à la racine de votre projet :
+C'est là que nous stockerons les exécutables de Chrome for Testing et ChromeDriver.
 
-# Méthode 2 : Installation manuelle
-wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
-tar -xzf geckodriver-v0.33.0-linux64.tar.gz
-sudo mv geckodriver /usr/local/bin/
-sudo chmod +x /usr/local/bin/geckodriver
-```
-```bash
-# Windows :
-# Avec Chocolatey
-choco install geckodriver
+Bash
 
-# Ou télécharger depuis : https://github.com/mozilla/geckodriver/releases
-# Puis ajouter au PATH
-```
-```bash
-# macOS :
-# Avec Homebrew
-brew install geckodriver
-```
+mkdir -p bin/chrome-for-testing
+Téléchargez les binaires :
+Rendez-vous sur le tableau de bord officiel de Chrome for Testing pour télécharger la version Stable de Chrome et ChromeDriver pour votre plateforme linux64 :
 
-### 3. Configuration des variables d'environnement
-Ajoutez ces variables dans votre fichier `.env` :
+Chrome for Testing (linux64): Recherchez la version linux64/chrome-linux64.zip sous la section "Stable".
 
-```env
+ChromeDriver (linux64): Recherchez la version linux64/chromedriver-linux64.zip sous la section "Stable" (doit correspondre à la même version que Chrome).
+
+Vous pouvez généralement trouver les liens directs ici (vérifiez toujours les versions les plus récentes sur le site) :
+
+https://googlechromelabs.github.io/chrome-for-testing/
+
+Exemple de commandes pour télécharger la version Stable (ajustez les numéros de version si elles ont évolué) :
+
+Bash
+
+# Téléchargez Chrome for Testing (linux64)
+wget https://storage.googleapis.com/chrome-for-testing-public/138.0.7204.92/linux64/chrome-linux64.zip -P ~/Downloads/
+
+# Téléchargez ChromeDriver (linux64)
+wget https://storage.googleapis.com/chrome-for-testing-public/138.0.7204.92/linux64/chromedriver-linux64.zip -P ~/Downloads/
+(Note : Remplacez 138.0.7204.92 par la version stable la plus récente si elle a changé.)
+
+Déplacez et décompressez les binaires dans le dossier bin du projet :
+
+Bash
+
+# Déplacez et décompressez Chrome for Testing
+mv ~/Downloads/chrome-linux64.zip bin/chrome-for-testing/
+cd bin/chrome-for-testing/
+unzip chrome-linux64.zip
+rm chrome-linux64.zip # Supprime l'archive après l'extraction
+
+# Retournez au dossier 'bin'
+cd ../
+
+# Déplacez et décompressez ChromeDriver
+mv ~/Downloads/chromedriver-linux64.zip bin/
+unzip chromedriver-linux64.zip
+rm chromedriver-linux64.zip # Supprime l'archive après l'extraction
+Après ces étapes, vous devriez avoir la structure suivante :
+
+votre-projet/
+├── bin/
+│   └── chrome-for-testing/
+│       ├── chrome-linux64/
+│       │   └── chrome  <-- L'exécutable Chrome for Testing
+│       └── chromedriver-linux64/
+│           └── chromedriver <-- L'exécutable ChromeDriver
+└── ...
+Rendez ChromeDriver exécutable :
+
+Bash
+
+chmod +x bin/chrome-for-testing/chromedriver-linux64/chromedriver
+3. Configuration de Dusk pour Chrome for Testing
+Ouvrez le fichier tests/DuskTestCase.php et assurez-vous que la méthode driver() est configurée pour utiliser Chrome for Testing et ChromeDriver comme suit :
+
+PHP
+
+<?php
+
+namespace Tests;
+
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Laravel\Dusk\TestCase as BaseTestCase;
+
+abstract class DuskTestCase extends BaseTestCase
+{
+    use CreatesApplication;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    /**
+     * Configuration pour Chrome Driver avec Chrome for Testing
+     */
+    protected function driver(): RemoteWebDriver
+    {
+        // ASSUREZ-VOUS QUE CES CHEMINS SONT CORRECTS !
+        // Ils doivent pointer vers les exécutables que vous avez décompressés dans votre dossier 'bin'.
+        $chromeBinaryPath = base_path('bin/chrome-for-testing/chrome-linux64/chrome');
+        $chromeDriverPath = base_path('bin/chrome-for-testing/chromedriver-linux64/chromedriver');
+
+        $options = (new ChromeOptions)
+            ->addArguments(collect([
+                '--disable-gpu',
+                '--headless=new', // Utilisez '--headless=new' pour la nouvelle version du mode headless (Chrome 112+).
+                '--window-size=1920,1080',
+                '--no-sandbox', // Essentiel sur Linux, surtout dans les environnements CI.
+            ])->filter()->all());
+
+        // Définir le chemin de l'exécutable Chrome for Testing
+        $options->setBinary($chromeBinaryPath);
+
+        return RemoteWebDriver::create(
+            'http://localhost:9515', // Port par défaut de ChromeDriver
+            DesiredCapabilities::chrome()->setCapability(ChromeOptions::CAPABILITY, $options),
+            60000, // Timeout de connexion en millisecondes (60 secondes)
+            60000  // Timeout de requête en millisecondes (60 secondes)
+        );
+    }
+
+    // ... (Le reste de votre fichier DuskTestCase.php)
+
+}
+4. Configuration des variables d'environnement
+Assurez-vous que votre fichier .env est configuré avec l'URL de votre application Laravel :
+
+Extrait de code
+
 # Configuration Dusk
-APP_URL=http://127.0.0.1:8000
+APP_URL=http://127.0.0.1:8000 # Ou l'URL de votre application si différente
 
-# Données de test (utilisez vos vraies données admin)
+# Données de test (utilisez vos vraies données admin ou des données de test)
 ADMIN_EMAIL=admin@petrolex.com
 ADMIN_PASSWORD=votre_mot_de_passe_admin
 ADMIN_PHONE=+237655332183
-```
+5. Lancement des Tests E2E
+Pour exécuter les tests Dusk, vous devez d'abord lancer votre serveur Laravel et ChromeDriver.
 
-### 4. Configuration Firefox dans Dusk
-Le fichier `tests/DuskTestCase.php` est configuré pour utiliser Firefox :
+Lancez votre serveur Laravel (dans un terminal) :
 
-```php
-// Firefox configuré avec les bonnes options
-// Pas besoin de modifier sauf cas spécifique
-```
+Bash
 
-## Lancement des Tests
-
-### Prérequis
-Laravel doit tourner :
-```bash
 php artisan serve
-```
-Firefox doit être installé sur votre système.
+Laissez ce terminal ouvert.
 
-### Commandes de test
-```bash
-# Lancer tous les tests Dusk
+Lancez ChromeDriver (dans un nouveau terminal) :
+
+Bash
+
+cd bin/chrome-for-testing/chromedriver-linux64/
+./chromedriver --port=9515
+Laissez ce terminal ouvert.
+
+Exécutez vos tests Dusk (dans un troisième terminal) :
+
+Bash
+
 php artisan dusk
+Autres commandes utiles pour les tests Dusk :
+
+Bash
 
 # Lancer un test spécifique
 php artisan dusk tests/Browser/LoginTest.php
@@ -256,7 +347,16 @@ php artisan dusk tests/Browser/LoginTest.php --filter=test_user_can_login_with_e
 
 # Tests avec sortie détaillée
 php artisan dusk --verbose
-```
+Bonnes Pratiques de Test
+Créer un test pour chaque nouvelle fonctionnalité
+
+Maintenir une couverture de code > 80%
+
+Utiliser des données de test cohérentes
+
+Nettoyer l'environnement après chaque test
+
+Documenter les cas de test complexes
 
 ### Bonnes Pratiques de Test
 

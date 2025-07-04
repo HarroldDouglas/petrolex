@@ -43,14 +43,11 @@ class OrderPage extends Page
 
     /**
      * Méthode utilitaire pour les pauses
-     * 
-     * @param Browser $browser
-     * @param int $milliseconds
-     * @return self
      */
     public function pause(Browser $browser, int $milliseconds): self
     {
         $browser->pause($milliseconds);
+
         return $this;
     }
 
@@ -61,16 +58,16 @@ class OrderPage extends Page
     {
         try {
             $browser->assertPresent('@filter-button')
-                    ->click('@filter-button')
-                    ->pause(2000)
-                    ->screenshot('orders_filter_opened')
-                    ->assertVisible('@filter-panel');
-            
+                ->click('@filter-button')
+                ->pause(2000)
+                ->screenshot('orders_filter_opened')
+                ->assertVisible('@filter-panel');
+
             echo "✅ Panneau de filtre ouvert\n";
         } catch (\Exception $e) {
-            echo "⚠️ Impossible d'ouvrir le filtre: " . $e->getMessage() . "\n";
+            echo "⚠️ Impossible d'ouvrir le filtre: ".$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -82,7 +79,7 @@ class OrderPage extends Page
         try {
             $browser->assertPresent('@orders-table');
             echo "✅ Tableau des commandes présent\n";
-            
+
             // Vérifier s'il y a des lignes dans le tableau
             try {
                 $browser->assertPresent('@table-rows');
@@ -91,9 +88,9 @@ class OrderPage extends Page
                 echo "⚠️ Aucune commande listée dans le tableau\n";
             }
         } catch (\Exception $e) {
-            echo "⚠️ Tableau des commandes non trouvé: " . $e->getMessage() . "\n";
+            echo '⚠️ Tableau des commandes non trouvé: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -104,15 +101,15 @@ class OrderPage extends Page
     {
         try {
             $browser->assertPresent('@search-input')
-                    ->type('@search-input', $keyword)
-                    ->pause(3000) // Attendre que Livewire réagisse
-                    ->screenshot('order_search_results');
-            
+                ->type('@search-input', $keyword)
+                ->pause(3000) // Attendre que Livewire réagisse
+                ->screenshot('order_search_results');
+
             echo "✅ Recherche effectuée pour: $keyword\n";
         } catch (\Exception $e) {
-            echo "⚠️ Impossible d'effectuer la recherche: " . $e->getMessage() . "\n";
+            echo "⚠️ Impossible d'effectuer la recherche: ".$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -123,15 +120,15 @@ class OrderPage extends Page
     {
         try {
             $browser->assertPresent('@create-button')
-                    ->click('@create-button')
-                    ->pause(2000)
-                    ->screenshot('create_order_clicked');
-            
+                ->click('@create-button')
+                ->pause(2000)
+                ->screenshot('create_order_clicked');
+
             echo "✅ Redirection vers la page de création de commande\n";
         } catch (\Exception $e) {
-            echo "⚠️ Bouton de création non trouvé: " . $e->getMessage() . "\n";
+            echo '⚠️ Bouton de création non trouvé: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -142,15 +139,15 @@ class OrderPage extends Page
     {
         try {
             $browser->assertPresent('@table-rows')
-                    ->click('@table-rows a[href*="/orders/"], @table-rows button[wire\\:click*="details"], @table-rows .btn-info')
-                    ->pause(3000)
-                    ->screenshot('order_details_opened');
-            
+                ->click('@table-rows a[href*="/orders/"], @table-rows button[wire\\:click*="details"], @table-rows .btn-info')
+                ->pause(3000)
+                ->screenshot('order_details_opened');
+
             echo "✅ Détails d'une commande ouverts\n";
         } catch (\Exception $e) {
-            echo "⚠️ Impossible d'ouvrir les détails d'une commande: " . $e->getMessage() . "\n";
+            echo "⚠️ Impossible d'ouvrir les détails d'une commande: ".$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -162,17 +159,17 @@ class OrderPage extends Page
         try {
             if ($browser->element('@pagination')) {
                 $browser->click('@pagination li:not(.active) a')
-                        ->pause(2000)
-                        ->screenshot('pagination_clicked');
-                
+                    ->pause(2000)
+                    ->screenshot('pagination_clicked');
+
                 echo "✅ Pagination fonctionnelle\n";
             } else {
                 echo "⚠️ Pas de pagination trouvée (peut-être une seule page)\n";
             }
         } catch (\Exception $e) {
-            echo "⚠️ Impossible de tester la pagination: " . $e->getMessage() . "\n";
+            echo '⚠️ Impossible de tester la pagination: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -183,17 +180,17 @@ class OrderPage extends Page
     {
         try {
             $this->openFilter($browser);
-            
+
             $browser->assertPresent('@reset-filter')
-                    ->click('@reset-filter')
-                    ->pause(3000)
-                    ->screenshot('orders_filters_reset');
-            
+                ->click('@reset-filter')
+                ->pause(3000)
+                ->screenshot('orders_filters_reset');
+
             echo "✅ Filtres réinitialisés\n";
         } catch (\Exception $e) {
-            echo "⚠️ Bouton de réinitialisation non trouvé: " . $e->getMessage() . "\n";
+            echo '⚠️ Bouton de réinitialisation non trouvé: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 }

@@ -44,14 +44,11 @@ class OrderCreatePage extends Page
 
     /**
      * Méthode utilitaire pour les pauses
-     * 
-     * @param Browser $browser
-     * @param int $milliseconds
-     * @return self
      */
     public function pause(Browser $browser, int $milliseconds): self
     {
         $browser->pause($milliseconds);
+
         return $this;
     }
 
@@ -64,9 +61,9 @@ class OrderCreatePage extends Page
             $browser->assertPresent('@order-form');
             echo "✅ Formulaire de création de commande présent\n";
         } catch (\Exception $e) {
-            echo "⚠️ Formulaire non trouvé: " . $e->getMessage() . "\n";
+            echo '⚠️ Formulaire non trouvé: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -77,15 +74,15 @@ class OrderCreatePage extends Page
     {
         try {
             $browser->assertPresent('@client-select')
-                    ->select('@client-select', $clientId)
-                    ->pause(2000)
-                    ->screenshot('client_selected');
-            
+                ->select('@client-select', $clientId)
+                ->pause(2000)
+                ->screenshot('client_selected');
+
             echo "✅ Client sélectionné (ID: $clientId)\n";
         } catch (\Exception $e) {
-            echo "⚠️ Impossible de sélectionner un client: " . $e->getMessage() . "\n";
+            echo '⚠️ Impossible de sélectionner un client: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -96,21 +93,21 @@ class OrderCreatePage extends Page
     {
         try {
             $browser->assertPresent('@product-select')
-                    ->select('@product-select', $productId)
-                    ->pause(1000);
-                    
+                ->select('@product-select', $productId)
+                ->pause(1000);
+
             $browser->assertPresent('@quantity-input')
-                    ->clear('@quantity-input')
-                    ->type('@quantity-input', $quantity)
-                    ->pause(1000);
-                    
+                ->clear('@quantity-input')
+                ->type('@quantity-input', $quantity)
+                ->pause(1000);
+
             $browser->assertPresent('@add-item-button')
-                    ->click('@add-item-button')
-                    ->pause(2000)
-                    ->screenshot('item_added');
-                    
+                ->click('@add-item-button')
+                ->pause(2000)
+                ->screenshot('item_added');
+
             echo "✅ Article ajouté à la commande (Produit ID: $productId, Quantité: $quantity)\n";
-            
+
             // Vérifier que l'article a bien été ajouté
             try {
                 $browser->assertPresent('@order-items');
@@ -119,9 +116,9 @@ class OrderCreatePage extends Page
                 echo "⚠️ Article non visible dans le récapitulatif\n";
             }
         } catch (\Exception $e) {
-            echo "⚠️ Impossible d'ajouter un article: " . $e->getMessage() . "\n";
+            echo "⚠️ Impossible d'ajouter un article: ".$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -133,7 +130,7 @@ class OrderCreatePage extends Page
         try {
             $browser->assertPresent('@order-preview');
             echo "✅ Récapitulatif de commande présent\n";
-            
+
             try {
                 $browser->assertPresent('@order-total');
                 echo "✅ Total de la commande affiché\n";
@@ -141,9 +138,9 @@ class OrderCreatePage extends Page
                 echo "⚠️ Total de la commande non affiché\n";
             }
         } catch (\Exception $e) {
-            echo "⚠️ Récapitulatif non trouvé: " . $e->getMessage() . "\n";
+            echo '⚠️ Récapitulatif non trouvé: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -154,15 +151,15 @@ class OrderCreatePage extends Page
     {
         try {
             $browser->assertPresent('@submit-button')
-                    ->click('@submit-button')
-                    ->pause(5000) // Attendre la soumission et la redirection
-                    ->screenshot('order_submitted');
-            
+                ->click('@submit-button')
+                ->pause(5000) // Attendre la soumission et la redirection
+                ->screenshot('order_submitted');
+
             echo "✅ Commande soumise\n";
         } catch (\Exception $e) {
-            echo "⚠️ Impossible de soumettre la commande: " . $e->getMessage() . "\n";
+            echo '⚠️ Impossible de soumettre la commande: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -173,15 +170,15 @@ class OrderCreatePage extends Page
     {
         try {
             $browser->assertPresent('@cancel-button')
-                    ->click('@cancel-button')
-                    ->pause(2000)
-                    ->screenshot('order_creation_cancelled');
-            
+                ->click('@cancel-button')
+                ->pause(2000)
+                ->screenshot('order_creation_cancelled');
+
             echo "✅ Création de commande annulée\n";
         } catch (\Exception $e) {
-            echo "⚠️ Impossible d'annuler la création: " . $e->getMessage() . "\n";
+            echo "⚠️ Impossible d'annuler la création: ".$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 }

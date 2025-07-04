@@ -23,29 +23,29 @@ class BottlesTest extends DuskTestCase
             echo "🔒 Test accès aux pages Bouteilles sans authentification...\n";
 
             $pages = [
-                new BottlesIndexPage(),
-                new BottleTypesIndexPage(),
-                new CreateBottleTypePage(),
+                new BottlesIndexPage,
+                new BottleTypesIndexPage,
+                new CreateBottleTypePage,
                 new EditBottleTypePage(1), // Utilise un ID factice pour le test d'URL
             ];
 
             foreach ($pages as $page) {
-                echo "  -> Test de la page: " . $page->url() . "\n";
+                echo '  -> Test de la page: '.$page->url()."\n";
                 $browser->visit($page->url())
                     ->pause(1000) // Petite pause pour s'assurer de la redirection
-                    ->screenshot('bottle_auth_redirect_' . str_replace(['/', '.'], '_', trim($page->url(), '/')));
+                    ->screenshot('bottle_auth_redirect_'.str_replace(['/', '.'], '_', trim($page->url(), '/')));
 
                 // Vérifier la redirection vers login
                 $currentUrl = $browser->driver->getCurrentURL();
-                echo "    URL actuelle: " . $currentUrl . "\n";
+                echo '    URL actuelle: '.$currentUrl."\n";
                 // Dump the page source for debugging
                 // echo "    Contenu de la page:\n" . $browser->driver->getPageSource() . "\n";
 
-                if (!str_contains($currentUrl, '/login')) {
-                    $this->fail("❌ La page " . $page->url() . " n'a pas redirigé vers la page de login. URL actuelle: " . $currentUrl);
+                if (! str_contains($currentUrl, '/login')) {
+                    $this->fail('❌ La page '.$page->url()." n'a pas redirigé vers la page de login. URL actuelle: ".$currentUrl);
                 }
                 $browser->assertSee('Se connecter');
-                echo "  ✅ Redirection vers login confirmée pour " . $page->url() . "\n";
+                echo '  ✅ Redirection vers login confirmée pour '.$page->url()."\n";
             }
         });
     }
@@ -62,18 +62,18 @@ class BottlesTest extends DuskTestCase
             $this->loginAsAdmin($browser);
 
             $pages = [
-                new BottlesIndexPage(),
-                new BottleTypesIndexPage(),
-                new CreateBottleTypePage(),
+                new BottlesIndexPage,
+                new BottleTypesIndexPage,
+                new CreateBottleTypePage,
             ];
 
             foreach ($pages as $page) {
-                echo "  -> Test de la page: " . $page->url() . "\n";
+                echo '  -> Test de la page: '.$page->url()."\n";
                 $browser->visit($page)
                     ->pause(2000) // Pause pour le chargement de la page
-                    ->screenshot('bottle_authenticated_' . str_replace(['/', '.'], '_', trim($page->url(), '/')));
+                    ->screenshot('bottle_authenticated_'.str_replace(['/', '.'], '_', trim($page->url(), '/')));
                 $page->assert($browser); // Utilise la méthode assert de la Page Object
-                echo "  ✅ Accès confirmé à " . $page->url() . "\n";
+                echo '  ✅ Accès confirmé à '.$page->url()."\n";
             }
 
             // Pour la page d'édition, nous avons besoin d'un ID réel.
@@ -81,8 +81,8 @@ class BottlesTest extends DuskTestCase
             // Dans un scénario réel, il faudrait créer un type de bouteille en base de données pour obtenir un ID valide.
             echo "  -> Test de la page d'édition de type de bouteille (avec ID factice)...\n";
             $browser->visit(new EditBottleTypePage(1))
-                    ->pause(2000)
-                    ->screenshot('bottle_authenticated_edit_type');
+                ->pause(2000)
+                ->screenshot('bottle_authenticated_edit_type');
             // Note: L'assertion de la page d'édition pourrait échouer si l'ID n'existe pas réellement.
             // $page->assert($browser); // Cette assertion pourrait échouer si la page renvoie une 404 ou une erreur.
             echo "  ✅ Accès tenté à la page d'édition de type de bouteille.\n";
@@ -100,21 +100,21 @@ class BottlesTest extends DuskTestCase
             $this->loginAsAdmin($browser);
 
             // Naviguer de la liste des bouteilles vers la liste des types de bouteilles
-            $bottlesIndexPage = new BottlesIndexPage();
-            $bottleTypesIndexPage = new BottleTypesIndexPage();
-            $createBottleTypePage = new CreateBottleTypePage();
+            $bottlesIndexPage = new BottlesIndexPage;
+            $bottleTypesIndexPage = new BottleTypesIndexPage;
+            $createBottleTypePage = new CreateBottleTypePage;
 
             $browser->visit($bottlesIndexPage)
-                    ->pause(1000)
-                    ->screenshot('nav_bottles_index');
+                ->pause(1000)
+                ->screenshot('nav_bottles_index');
 
             // Assurez-vous qu'il y a un lien vers les types de bouteilles sur la page d'index des bouteilles
             // Remplacez 'a[href="/bottles/types"]', 'Lien vers Types de Bouteilles' par le sélecteur et le texte réels du lien
             // Si le lien n'est pas direct, il faudra simuler la navigation via le menu ou un bouton.
             try {
                 $browser->clickLink('Types de Bouteilles') // Exemple: si un lien existe avec ce texte
-                        ->pause(2000)
-                        ->screenshot('nav_to_bottle_types_index');
+                    ->pause(2000)
+                    ->screenshot('nav_to_bottle_types_index');
                 $bottleTypesIndexPage->assert($browser);
                 echo "  ✅ Navigation de la liste des bouteilles vers la liste des types réussie.\n";
             } catch (\Exception $e) {
@@ -127,8 +127,8 @@ class BottlesTest extends DuskTestCase
             // Naviguer de la liste des types de bouteilles vers la page de création
             try {
                 $browser->clickLink('Créer un Type de Bouteille') // Exemple: si un lien existe avec ce texte
-                        ->pause(2000)
-                        ->screenshot('nav_to_create_bottle_type');
+                    ->pause(2000)
+                    ->screenshot('nav_to_create_bottle_type');
                 $createBottleTypePage->assert($browser);
                 echo "  ✅ Navigation de la liste des types vers la création réussie.\n";
             } catch (\Exception $e) {
@@ -142,8 +142,8 @@ class BottlesTest extends DuskTestCase
             // Assurez-vous qu'il y a un bouton retour ou un lien approprié
             try {
                 $browser->back()
-                        ->pause(2000)
-                        ->screenshot('nav_back_to_bottle_types_index');
+                    ->pause(2000)
+                    ->screenshot('nav_back_to_bottle_types_index');
                 $bottleTypesIndexPage->assert($browser);
                 echo "  ✅ Retour à la liste des types de bouteilles réussi.\n";
             } catch (\Exception $e) {
@@ -165,30 +165,30 @@ class BottlesTest extends DuskTestCase
 
             $this->loginAsAdmin($browser);
 
-            $createPage = new CreateBottleTypePage();
+            $createPage = new CreateBottleTypePage;
             $browser->visit($createPage)
-                    ->pause(2000)
-                    ->screenshot('before_create_bottle_type_form');
+                ->pause(2000)
+                ->screenshot('before_create_bottle_type_form');
 
             // Remplir le formulaire (remplacez les sélecteurs et les valeurs par les vôtres)
             // Assurez-vous que les champs existent et sont visibles
             try {
-                $browser->type('input[name="name"]', 'Type de Bouteille Test' . time()) // Exemple de champ 'name'
-                        ->type('textarea[name="description"]', 'Description du type de bouteille de test.') // Exemple de champ 'description'
-                        ->press('Enregistrer') // Texte du bouton de soumission
-                        ->pause(3000) // Attendre la soumission et la redirection
-                        ->screenshot('after_create_bottle_type_form_submission');
+                $browser->type('input[name="name"]', 'Type de Bouteille Test'.time()) // Exemple de champ 'name'
+                    ->type('textarea[name="description"]', 'Description du type de bouteille de test.') // Exemple de champ 'description'
+                    ->press('Enregistrer') // Texte du bouton de soumission
+                    ->pause(3000) // Attendre la soumission et la redirection
+                    ->screenshot('after_create_bottle_type_form_submission');
 
                 // Vérifier la redirection ou un message de succès
                 // Par exemple, si cela redirige vers la liste des types de bouteilles
-                $bottleTypesIndexPage = new BottleTypesIndexPage();
+                $bottleTypesIndexPage = new BottleTypesIndexPage;
                 $bottleTypesIndexPage->assert($browser);
                 $browser->assertSee('Type de bouteille créé avec succès'); // Message de succès attendu
                 echo "  ✅ Soumission du formulaire de création réussie.\n";
             } catch (\Exception $e) {
-                echo "  ❌ Erreur lors de la soumission du formulaire de création: " . $e->getMessage() . "\n";
+                echo '  ❌ Erreur lors de la soumission du formulaire de création: '.$e->getMessage()."\n";
                 $browser->screenshot('error_create_bottle_type_form');
-                $this->fail("Erreur lors de la soumission du formulaire de création: " . $e->getMessage());
+                $this->fail('Erreur lors de la soumission du formulaire de création: '.$e->getMessage());
             }
         });
     }
@@ -210,25 +210,25 @@ class BottlesTest extends DuskTestCase
 
             $editPage = new EditBottleTypePage($bottleTypeId);
             $browser->visit($editPage)
-                    ->pause(2000)
-                    ->screenshot('before_edit_bottle_type_form');
+                ->pause(2000)
+                ->screenshot('before_edit_bottle_type_form');
 
             // Remplir le formulaire (remplacez les sélecteurs et les valeurs par les vôtres)
             try {
-                $browser->type('input[name="name"]', 'Type de Bouteille Modifié' . time()) // Exemple de champ 'name'
-                        ->press('Mettre à jour') // Texte du bouton de soumission
-                        ->pause(3000) // Attendre la soumission et la redirection
-                        ->screenshot('after_edit_bottle_type_form_submission');
+                $browser->type('input[name="name"]', 'Type de Bouteille Modifié'.time()) // Exemple de champ 'name'
+                    ->press('Mettre à jour') // Texte du bouton de soumission
+                    ->pause(3000) // Attendre la soumission et la redirection
+                    ->screenshot('after_edit_bottle_type_form_submission');
 
                 // Vérifier la redirection ou un message de succès
-                $bottleTypesIndexPage = new BottleTypesIndexPage();
+                $bottleTypesIndexPage = new BottleTypesIndexPage;
                 $bottleTypesIndexPage->assert($browser);
                 $browser->assertSee('Type de bouteille mis à jour avec succès'); // Message de succès attendu
                 echo "  ✅ Soumission du formulaire d'édition réussie.\n";
             } catch (\Exception $e) {
-                echo "  ❌ Erreur lors de la soumission du formulaire d'édition: " . $e->getMessage() . "\n";
+                echo "  ❌ Erreur lors de la soumission du formulaire d'édition: ".$e->getMessage()."\n";
                 $browser->screenshot('error_edit_bottle_type_form');
-                $this->fail("Erreur lors de la soumission du formulaire d'édition: " . $e->getMessage());
+                $this->fail("Erreur lors de la soumission du formulaire d'édition: ".$e->getMessage());
             }
         });
     }

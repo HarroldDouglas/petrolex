@@ -3,9 +3,9 @@
 namespace Tests\Browser\Pages;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
-use Illuminate\Support\Facades\Hash;
 
 class LoginTest extends DuskTestCase
 {
@@ -16,12 +16,12 @@ class LoginTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                    ->waitFor('input[name="email"]', 5) // Attendre 5 secondes
-                    ->type('email', env('ADMIN_EMAIL'))
-                    ->type('password', env('ADMIN_PASSWORD'))
-                    ->press('button[type="submit"]') // Ou le texte du bouton
-                    ->waitForLocation('/dashboard', 10) // Attendre redirection
-                    ->assertSee('Tableau de bord'); // Texte confirmant la connexion
+                ->waitFor('input[name="email"]', 5) // Attendre 5 secondes
+                ->type('email', env('ADMIN_EMAIL'))
+                ->type('password', env('ADMIN_PASSWORD'))
+                ->press('button[type="submit"]') // Ou le texte du bouton
+                ->waitForLocation('/dashboard', 10) // Attendre redirection
+                ->assertSee('Tableau de bord'); // Texte confirmant la connexion
         });
     }
 
@@ -41,12 +41,12 @@ class LoginTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                    ->waitFor('input[name="phone"]', 5)
-                    ->type('phone', env('TEST_USER_PHONE'))
-                    ->type('password', env('TEST_USER_PASSWORD'))
-                    ->press('button[type="submit"]')
-                    ->waitForLocation('/dashboard', 10)
-                    ->assertSee('Tableau de bord');
+                ->waitFor('input[name="phone"]', 5)
+                ->type('phone', env('TEST_USER_PHONE'))
+                ->type('password', env('TEST_USER_PASSWORD'))
+                ->press('button[type="submit"]')
+                ->waitForLocation('/dashboard', 10)
+                ->assertSee('Tableau de bord');
         });
     }
 
@@ -57,12 +57,12 @@ class LoginTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                    ->waitFor('input[name="email"]', 5)
-                    ->type('email', 'wrong@email.com')
-                    ->type('password', 'wrongpassword')
-                    ->press('button[type="submit"]')
-                    ->waitFor('.alert-danger', 5) // Attendre message d'erreur
-                    ->assertSee('Ces identifiants ne correspondent pas'); // Message d'erreur
+                ->waitFor('input[name="email"]', 5)
+                ->type('email', 'wrong@email.com')
+                ->type('password', 'wrongpassword')
+                ->press('button[type="submit"]')
+                ->waitFor('.alert-danger', 5) // Attendre message d'erreur
+                ->assertSee('Ces identifiants ne correspondent pas'); // Message d'erreur
         });
     }
 
@@ -80,13 +80,13 @@ class LoginTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                    ->waitFor('input[name="email"]', 5)
-                    ->type('email', env('TEST_USER_EMAIL'))
-                    ->type('password', env('TEST_USER_PASSWORD'))
-                    ->press('button[type="submit"]')
-                    ->waitForLocation('/dashboard', 10)
-                    ->assertPathIs('/dashboard')
-                    ->assertDontSee('Se connecter'); // Plus de lien login
+                ->waitFor('input[name="email"]', 5)
+                ->type('email', env('TEST_USER_EMAIL'))
+                ->type('password', env('TEST_USER_PASSWORD'))
+                ->press('button[type="submit"]')
+                ->waitForLocation('/dashboard', 10)
+                ->assertPathIs('/dashboard')
+                ->assertDontSee('Se connecter'); // Plus de lien login
         });
     }
 }

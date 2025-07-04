@@ -107,7 +107,7 @@ class AccessoryTest extends DuskTestCase
 
             $this->loginAsAdmin($browser);
 
-            $accessoryPage = new AccessoryPage();
+            $accessoryPage = new AccessoryPage;
 
             $browser->visit('/accessories/create')
                 ->assertSeeCreateForm($browser)
@@ -120,7 +120,7 @@ class AccessoryTest extends DuskTestCase
 
             // Vérifier la redirection vers la liste et la présence du nouvel accessoire
             $browser->assertPathIs('/accessories')
-                    ->assertSee('Test Accessory Name');
+                ->assertSee('Test Accessory Name');
 
             echo "✅ Nouvel accessoire créé avec succès\n";
         });
@@ -137,7 +137,7 @@ class AccessoryTest extends DuskTestCase
             // Créer un accessoire pour avoir un ID valide pour le test
             $accessory = \App\Models\Accessory::factory()->create();
 
-            $browser->visit('/accessories/edit/' . $accessory->id)
+            $browser->visit('/accessories/edit/'.$accessory->id)
                 ->pause(2000)
                 ->screenshot('edit_accessory_auth_redirect');
 
@@ -167,7 +167,7 @@ class AccessoryTest extends DuskTestCase
             // Créer un accessoire pour avoir un ID valide pour le test
             $accessory = \App\Models\Accessory::factory()->create();
 
-            $browser->visit('/accessories/edit/' . $accessory->id)
+            $browser->visit('/accessories/edit/'.$accessory->id)
                 ->screenshot('edit_accessory_form_after_login')
                 ->assertSeeEditForm($browser, $accessory->name);
 
@@ -195,9 +195,9 @@ class AccessoryTest extends DuskTestCase
                 'price' => 100.00,
             ]);
 
-            $accessoryPage = new AccessoryPage();
+            $accessoryPage = new AccessoryPage;
 
-            $browser->visit('/accessories/edit/' . $accessory->id)
+            $browser->visit('/accessories/edit/'.$accessory->id)
                 ->assertSeeEditForm($browser, $accessory->name)
                 ->type('@accessory-name-field', 'Updated Accessory Name')
                 ->type('@accessory-description-field', 'Updated Description.')
@@ -208,7 +208,7 @@ class AccessoryTest extends DuskTestCase
 
             // Vérifier la redirection vers la liste et la présence du nom mis à jour
             $browser->assertPathIs('/accessories')
-                    ->assertSee('Updated Accessory Name');
+                ->assertSee('Updated Accessory Name');
 
             echo "✅ Accessoire modifié avec succès\n";
 
@@ -238,11 +238,11 @@ class AccessoryTest extends DuskTestCase
 
             // Cliquer sur le bouton de suppression (supposons un bouton avec une classe 'delete-button' ou un lien)
             // Il faudra peut-être ajuster ce sélecteur en fonction de l'implémentation réelle
-            $browser->click('button[data-id="' . $accessory->id . '"]') // Exemple: bouton avec data-id
-                    ->pause(1000) // Attendre la confirmation si nécessaire
-                    ->acceptDialog() // Accepter la boîte de dialogue de confirmation
-                    ->pause(3000) // Attendre la suppression et le rechargement de la page
-                    ->screenshot('accessory_deleted');
+            $browser->click('button[data-id="'.$accessory->id.'"]') // Exemple: bouton avec data-id
+                ->pause(1000) // Attendre la confirmation si nécessaire
+                ->acceptDialog() // Accepter la boîte de dialogue de confirmation
+                ->pause(3000) // Attendre la suppression et le rechargement de la page
+                ->screenshot('accessory_deleted');
 
             // Vérifier que l'accessoire n'est plus visible
             $browser->assertDontSee('Accessory to Delete');

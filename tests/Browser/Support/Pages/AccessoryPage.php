@@ -33,26 +33,29 @@ class AccessoryPage extends Page
     public function assertSeeAccessoryList(Browser $browser): self
     {
         $browser->assertSee('Liste des accessoires')
-                ->assertPresent('@accessory-table');
+            ->assertPresent('@accessory-table');
+
         return $this;
     }
 
     public function assertSeeCreateForm(Browser $browser): self
     {
         $browser->assertSee('Créer un accessoire')
-                ->assertPresent('@accessory-name-field')
-                ->assertPresent('@submit-button');
+            ->assertPresent('@accessory-name-field')
+            ->assertPresent('@submit-button');
+
         return $this;
     }
 
-    public function assertSeeEditForm(Browser $browser, string $accessoryName = null): self
+    public function assertSeeEditForm(Browser $browser, ?string $accessoryName = null): self
     {
         $browser->assertSee('Modifier l\'accessoire')
-                ->assertPresent('@accessory-name-field')
-                ->assertPresent('@submit-button');
+            ->assertPresent('@accessory-name-field')
+            ->assertPresent('@submit-button');
         if ($accessoryName) {
             $browser->assertInputValue('@accessory-name-field', $accessoryName);
         }
+
         return $this;
     }
 }

@@ -15,7 +15,7 @@ class BottleTypesIndexPage extends Page
     public function assert(Browser $browser): void
     {
         $browser->assertPathIs($this->url())
-                ->assertSee('Types de Bouteilles'); // Assurez-vous que c'est le titre de la page
+            ->assertSee('Types de Bouteilles'); // Assurez-vous que c'est le titre de la page
     }
 
     public function elements(): array

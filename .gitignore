@@ -21,3 +21,4 @@ npm-debug.log
 /.fleet
 /.idea
 /.vscode
+bin/

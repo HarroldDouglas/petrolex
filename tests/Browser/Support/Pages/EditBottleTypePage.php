@@ -9,20 +9,20 @@ class EditBottleTypePage extends Page
 {
     private $bottleTypeId;
 
-    public function __construct(int $bottleTypeId = null)
+    public function __construct(?int $bottleTypeId = null)
     {
         $this->bottleTypeId = $bottleTypeId;
     }
 
     public function url(): string
     {
-        return '/bottles/types/edit/' . $this->bottleTypeId;
+        return '/bottles/types/edit/'.$this->bottleTypeId;
     }
 
     public function assert(Browser $browser): void
     {
         $browser->assertPathIs($this->url())
-                ->assertSee('Modifier le Type de Bouteille'); // Assurez-vous que c'est le titre de la page
+            ->assertSee('Modifier le Type de Bouteille'); // Assurez-vous que c'est le titre de la page
     }
 
     public function elements(): array

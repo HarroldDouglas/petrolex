@@ -51,14 +51,11 @@ class DashboardPage extends Page
 
     /**
      * Méthode utilitaire pour les pauses
-     * 
-     * @param Browser $browser
-     * @param int $milliseconds
-     * @return self
      */
     public function pause(Browser $browser, int $milliseconds): self
     {
         $browser->pause($milliseconds);
+
         return $this;
     }
 
@@ -69,9 +66,9 @@ class DashboardPage extends Page
     {
         try {
             $browser->click('@filter-button')
-                   ->pause(2000)
-                   ->screenshot('filter_opened');
-                   
+                ->pause(2000)
+                ->screenshot('filter_opened');
+
             // Vérifier que le panneau est visible de façon plus flexible
             try {
                 $browser->assertVisible('@filter-panel');
@@ -158,23 +155,23 @@ class DashboardPage extends Page
     {
         try {
             $browser->assertPresent('@center-selector')
-                   ->select('@center-selector', $centerId)
-                   ->pause(2000)
-                   ->screenshot('distribution_center_selected');
+                ->select('@center-selector', $centerId)
+                ->pause(2000)
+                ->screenshot('distribution_center_selected');
 
             echo "✅ Centre de distribution $centerId sélectionné\n";
         } catch (\Exception $e) {
             echo "⚠️ Problème lors de la sélection du centre, tentative alternative...\n";
-            
+
             try {
                 // Essayer de trouver n'importe quel select dans le filtre
                 $filterSelects = 'select';
                 $browser->select($filterSelects, $centerId)
-                       ->pause(2000)
-                       ->screenshot('distribution_center_selected_alternative');
+                    ->pause(2000)
+                    ->screenshot('distribution_center_selected_alternative');
                 echo "✅ Centre sélectionné via sélecteur générique\n";
             } catch (\Exception $e2) {
-                echo "⚠️ Impossible de sélectionner un centre: ".$e2->getMessage()."\n";
+                echo '⚠️ Impossible de sélectionner un centre: '.$e2->getMessage()."\n";
             }
         }
 
@@ -188,22 +185,22 @@ class DashboardPage extends Page
     {
         try {
             $browser->assertPresent('@period-selector')
-                   ->select('@period-selector', $periodId)
-                   ->pause(2000)
-                   ->screenshot('period_selected');
+                ->select('@period-selector', $periodId)
+                ->pause(2000)
+                ->screenshot('period_selected');
 
             echo "✅ Période $periodId sélectionnée\n";
         } catch (\Exception $e) {
             echo "⚠️ Problème lors de la sélection de la période, tentative alternative...\n";
-            
+
             try {
                 // Essayer de trouver un select qui pourrait être celui de la période
                 $browser->select('select:not([wire\\:model\\.live="distributionCenterId"]):not([id*="distribution"])', $periodId)
-                       ->pause(2000)
-                       ->screenshot('period_selected_alternative');
+                    ->pause(2000)
+                    ->screenshot('period_selected_alternative');
                 echo "✅ Période sélectionnée via sélecteur générique\n";
             } catch (\Exception $e2) {
-                echo "⚠️ Impossible de sélectionner une période: ".$e2->getMessage()."\n";
+                echo '⚠️ Impossible de sélectionner une période: '.$e2->getMessage()."\n";
             }
         }
 
@@ -226,28 +223,28 @@ class DashboardPage extends Page
             // Rechercher les champs de date
             $browser->assertPresent('@start-date');
             $browser->assertPresent('@end-date');
-            
+
             // Remplir les dates
             $browser->type('@start-date', $startDate)
-                   ->pause(1000)
-                   ->type('@end-date', $endDate)
-                   ->pause(1000)
-                   ->screenshot('custom_dates_selected');
+                ->pause(1000)
+                ->type('@end-date', $endDate)
+                ->pause(1000)
+                ->screenshot('custom_dates_selected');
 
             echo "✅ Plage de dates personnalisée sélectionnée: $startDate à $endDate\n";
         } catch (\Exception $e) {
             echo "⚠️ Problème lors de la sélection des dates, tentative alternative...\n";
-            
+
             try {
                 // Essayer de trouver n'importe quels champs de type date
                 $browser->type('input[type="date"]:first-of-type', $startDate)
-                       ->pause(1000)
-                       ->type('input[type="date"]:last-of-type', $endDate)
-                       ->pause(1000)
-                       ->screenshot('custom_dates_selected_alternative');
+                    ->pause(1000)
+                    ->type('input[type="date"]:last-of-type', $endDate)
+                    ->pause(1000)
+                    ->screenshot('custom_dates_selected_alternative');
                 echo "✅ Dates sélectionnées via sélecteur générique\n";
             } catch (\Exception $e2) {
-                echo "⚠️ Impossible de sélectionner les dates: ".$e2->getMessage()."\n";
+                echo '⚠️ Impossible de sélectionner les dates: '.$e2->getMessage()."\n";
             }
         }
 
@@ -261,27 +258,27 @@ class DashboardPage extends Page
     {
         try {
             // S'assurer que le filtre est ouvert
-            if (!$browser->resolver->findOrFail('@filter-panel')->isDisplayed()) {
+            if (! $browser->resolver->findOrFail('@filter-panel')->isDisplayed()) {
                 $this->openFilter($browser);
             }
-            
+
             $browser->assertPresent('@reset-filter')
-                   ->click('@reset-filter')
-                   ->pause(3000)
-                   ->screenshot('filters_reset');
+                ->click('@reset-filter')
+                ->pause(3000)
+                ->screenshot('filters_reset');
 
             echo "✅ Filtres réinitialisés\n";
         } catch (\Exception $e) {
             echo "⚠️ Problème lors de la réinitialisation, tentative alternative...\n";
-            
+
             try {
                 // Essayer de trouver un bouton qui pourrait être celui de réinitialisation
                 $browser->click('.btn-secondary, button:contains("Réinitialiser"), a:contains("Réinitialiser")')
-                       ->pause(3000)
-                       ->screenshot('filters_reset_alternative');
+                    ->pause(3000)
+                    ->screenshot('filters_reset_alternative');
                 echo "✅ Filtres réinitialisés via sélecteur générique\n";
             } catch (\Exception $e2) {
-                echo "⚠️ Impossible de réinitialiser les filtres: ".$e2->getMessage()."\n";
+                echo '⚠️ Impossible de réinitialiser les filtres: '.$e2->getMessage()."\n";
             }
         }
 
@@ -294,7 +291,7 @@ class DashboardPage extends Page
     public function assertComponentsUpdatedAfterFilter(Browser $browser): self
     {
         $browser->pause(3000)
-               ->screenshot('after_filter_applied');
+            ->screenshot('after_filter_applied');
 
         // Utiliser les méthodes avec gestion d'erreur
         $this->assertStatsComponents($browser);
@@ -314,43 +311,43 @@ class DashboardPage extends Page
             // Vérifier la présence des cartes statistiques
             $browser->assertPresent('@stat-cards');
             echo "✅ Cartes statistiques détectées\n";
-            
+
             // Compter les cartes
             $cards = $browser->elements('@stat-cards');
             $cardCount = count($cards);
             echo "📊 {$cardCount} cartes statistiques trouvées\n";
-            
+
             // Cliquer sur la première carte et vérifier la navigation
             if ($cardCount > 0) {
                 $initialUrl = $browser->driver->getCurrentURL();
-                
+
                 try {
                     // Prendre un screenshot avant de cliquer
                     $browser->screenshot('before_click_stat_card');
-                    
+
                     // Cliquer sur la première carte
                     $browser->click('@stat-card-first')
-                           ->pause(3000)
-                           ->screenshot('after_click_stat_card');
-                    
+                        ->pause(3000)
+                        ->screenshot('after_click_stat_card');
+
                     // Vérifier si l'URL a changé (navigation vers une page dédiée)
                     $newUrl = $browser->driver->getCurrentURL();
                     if ($newUrl !== $initialUrl) {
                         echo "✅ Navigation réussie vers la page dédiée: {$newUrl}\n";
-                        
+
                         // Retourner au dashboard
                         $browser->visit('/dashboard')->pause(2000);
                     } else {
                         echo "⚠️ Pas de navigation après clic sur la carte statistique\n";
                     }
                 } catch (\Exception $e) {
-                    echo "⚠️ Erreur lors du clic sur la carte: " . $e->getMessage() . "\n";
+                    echo '⚠️ Erreur lors du clic sur la carte: '.$e->getMessage()."\n";
                 }
             }
         } catch (\Exception $e) {
-            echo "⚠️ Erreur lors du test des cartes cliquables: " . $e->getMessage() . "\n";
+            echo '⚠️ Erreur lors du test des cartes cliquables: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 }

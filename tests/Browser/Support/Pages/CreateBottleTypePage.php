@@ -15,7 +15,7 @@ class CreateBottleTypePage extends Page
     public function assert(Browser $browser): void
     {
         $browser->assertPathIs($this->url())
-                ->assertSee('Créer un Type de Bouteille'); // Assurez-vous que c'est le titre de la page
+            ->assertSee('Créer un Type de Bouteille'); // Assurez-vous que c'est le titre de la page
     }
 
     public function elements(): array

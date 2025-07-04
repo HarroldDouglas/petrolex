@@ -11,7 +11,7 @@ use Tests\DuskTestCase;
 
 class UsersTest extends DuskTestCase
 {
-    use DatabaseMigrations, AuthenticatesUsers;
+    use AuthenticatesUsers, DatabaseMigrations;
 
     protected function setUp(): void
     {
@@ -72,7 +72,7 @@ class UsersTest extends DuskTestCase
             echo "➕ Test création nouvel utilisateur...\n";
 
             $this->loginAsAdmin($browser);
-            $usersPage = new UsersPage();
+            $usersPage = new UsersPage;
             $browser->visit($usersPage);
 
             $userData = [
@@ -86,9 +86,9 @@ class UsersTest extends DuskTestCase
             $usersPage->fillAndSubmitUserForm($browser, $userData);
 
             $browser->pause(2000)
-                    ->screenshot('user_created')
-                    ->assertPathIs($usersPage->url())
-                    ->assertSee('Utilisateur créé avec succès'); // Assuming a success message
+                ->screenshot('user_created')
+                ->assertPathIs($usersPage->url())
+                ->assertSee('Utilisateur créé avec succès'); // Assuming a success message
 
             $usersPage->assertUserInTable($browser, $userData['email']);
 
@@ -105,7 +105,7 @@ class UsersTest extends DuskTestCase
             echo "✏️ Test modification utilisateur existant...\n";
 
             $this->loginAsAdmin($browser);
-            $usersPage = new UsersPage();
+            $usersPage = new UsersPage;
             $browser->visit($usersPage);
 
             // Create a user to edit
@@ -125,9 +125,9 @@ class UsersTest extends DuskTestCase
             $usersPage->fillAndSubmitUserForm($browser, $updatedData);
 
             $browser->pause(2000)
-                    ->screenshot('user_edited')
-                    ->assertPathIs($usersPage->url())
-                    ->assertSee('Utilisateur mis à jour avec succès'); // Assuming a success message
+                ->screenshot('user_edited')
+                ->assertPathIs($usersPage->url())
+                ->assertSee('Utilisateur mis à jour avec succès'); // Assuming a success message
 
             $usersPage->assertUserInTable($browser, $updatedData['email']);
             $usersPage->assertUserNotInTable($browser, $user->email); // Old email should not be there
@@ -145,7 +145,7 @@ class UsersTest extends DuskTestCase
             echo "🗑️ Test suppression utilisateur...\n";
 
             $this->loginAsAdmin($browser);
-            $usersPage = new UsersPage();
+            $usersPage = new UsersPage;
             $browser->visit($usersPage);
 
             // Create a user to delete
@@ -158,9 +158,9 @@ class UsersTest extends DuskTestCase
             $usersPage->deleteUser($browser, $user->email);
 
             $browser->pause(2000)
-                    ->screenshot('user_deleted')
-                    ->assertPathIs($usersPage->url())
-                    ->assertSee('Utilisateur supprimé avec succès'); // Assuming a success message
+                ->screenshot('user_deleted')
+                ->assertPathIs($usersPage->url())
+                ->assertSee('Utilisateur supprimé avec succès'); // Assuming a success message
 
             $usersPage->assertUserNotInTable($browser, $user->email);
 
@@ -177,7 +177,7 @@ class UsersTest extends DuskTestCase
             echo "👁️ Test affichage détails utilisateur...\n";
 
             $this->loginAsAdmin($browser);
-            $usersPage = new UsersPage();
+            $usersPage = new UsersPage;
             $browser->visit($usersPage);
 
             // Create a user to view details
@@ -191,10 +191,10 @@ class UsersTest extends DuskTestCase
             // For now, let's assume we can navigate directly to the details page
             // This might need adjustment based on actual UI
             $browser->visit('/users/'.$user->id.'/details')
-                    ->pause(2000)
-                    ->screenshot('user_details')
-                    ->assertSee($user->name)
-                    ->assertSee($user->email);
+                ->pause(2000)
+                ->screenshot('user_details')
+                ->assertSee($user->name)
+                ->assertSee($user->email);
 
             echo "✅ Détails utilisateur affichés avec succès\n";
         });
@@ -209,7 +209,7 @@ class UsersTest extends DuskTestCase
             echo "❌ Test validation création utilisateur (champs requis)...\n";
 
             $this->loginAsAdmin($browser);
-            $usersPage = new UsersPage();
+            $usersPage = new UsersPage;
             $browser->visit($usersPage);
 
             $usersPage->navigateToCreateUser($browser);
@@ -218,10 +218,10 @@ class UsersTest extends DuskTestCase
             $usersPage->fillAndSubmitUserForm($browser, []);
 
             $browser->pause(1000)
-                    ->screenshot('create_user_validation_required')
-                    ->assertSee('Le champ nom est obligatoire.') // Assuming validation messages
-                    ->assertSee('Le champ email est obligatoire.')
-                    ->assertSee('Le champ mot de passe est obligatoire.');
+                ->screenshot('create_user_validation_required')
+                ->assertSee('Le champ nom est obligatoire.') // Assuming validation messages
+                ->assertSee('Le champ email est obligatoire.')
+                ->assertSee('Le champ mot de passe est obligatoire.');
 
             echo "✅ Validation des champs requis réussie\n";
         });
@@ -236,7 +236,7 @@ class UsersTest extends DuskTestCase
             echo "❌ Test validation création utilisateur (email unique)...\n";
 
             $this->loginAsAdmin($browser);
-            $usersPage = new UsersPage();
+            $usersPage = new UsersPage;
             $browser->visit($usersPage);
 
             // Create a user first
@@ -256,8 +256,8 @@ class UsersTest extends DuskTestCase
             $usersPage->fillAndSubmitUserForm($browser, $userData);
 
             $browser->pause(1000)
-                    ->screenshot('create_user_validation_unique_email')
-                    ->assertSee('L\'adresse email a déjà été prise.'); // Assuming validation message
+                ->screenshot('create_user_validation_unique_email')
+                ->assertSee('L\'adresse email a déjà été prise.'); // Assuming validation message
 
             echo "✅ Validation de l'email unique réussie\n";
         });

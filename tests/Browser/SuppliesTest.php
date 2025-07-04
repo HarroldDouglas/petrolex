@@ -3,8 +3,8 @@
 namespace Tests\Browser;
 
 use Laravel\Dusk\Browser;
-use Tests\DuskTestCase;
 use Tests\Browser\Traits\AuthenticatesUsers;
+use Tests\DuskTestCase;
 
 class SuppliesTest extends DuskTestCase
 {
@@ -18,8 +18,8 @@ class SuppliesTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $this->loginAsAdmin($browser);
             $browser->visit('/supplies')
-                    ->waitForText('Liste des approvisionnements', 10)
-                    ->assertSee('Liste des approvisionnements');
+                ->waitForText('Liste des approvisionnements', 10)
+                ->assertSee('Liste des approvisionnements');
         });
     }
 
@@ -31,8 +31,8 @@ class SuppliesTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $this->loginAsAdmin($browser);
             $browser->visit('/supplies/create')
-                    ->waitForText('Ajouter un approvisionnement', 10)
-                    ->assertSee('Ajouter un approvisionnement');
+                ->waitForText('Ajouter un approvisionnement', 10)
+                ->assertSee('Ajouter un approvisionnement');
 
             // TODO: Fill out the form and submit
             // Example: ->type('field_name', 'value')

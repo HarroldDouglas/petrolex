@@ -14,8 +14,8 @@ class OrderDetailsPage extends Page
 
     /**
      * Constructeur
-     * 
-     * @param string|int $orderId L'ID de la commande
+     *
+     * @param  string|int  $orderId  L'ID de la commande
      */
     public function __construct($orderId = '1')
     {
@@ -58,14 +58,11 @@ class OrderDetailsPage extends Page
 
     /**
      * Méthode utilitaire pour les pauses
-     * 
-     * @param Browser $browser
-     * @param int $milliseconds
-     * @return self
      */
     public function pause(Browser $browser, int $milliseconds): self
     {
         $browser->pause($milliseconds);
+
         return $this;
     }
 
@@ -76,10 +73,10 @@ class OrderDetailsPage extends Page
     {
         try {
             $browser->assertPresent('@order-info')
-                    ->assertPresent('@order-id');
-            
+                ->assertPresent('@order-id');
+
             echo "✅ Informations générales de la commande présentes\n";
-            
+
             // Vérifier le statut
             try {
                 $browser->assertPresent('@order-status');
@@ -88,9 +85,9 @@ class OrderDetailsPage extends Page
                 echo "⚠️ Statut de la commande non trouvé\n";
             }
         } catch (\Exception $e) {
-            echo "⚠️ Informations de la commande non trouvées: " . $e->getMessage() . "\n";
+            echo '⚠️ Informations de la commande non trouvées: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -103,9 +100,9 @@ class OrderDetailsPage extends Page
             $browser->assertPresent('@order-items');
             echo "✅ Articles de la commande affichés\n";
         } catch (\Exception $e) {
-            echo "⚠️ Articles de la commande non trouvés: " . $e->getMessage() . "\n";
+            echo '⚠️ Articles de la commande non trouvés: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -118,9 +115,9 @@ class OrderDetailsPage extends Page
             $browser->assertPresent('@order-totals');
             echo "✅ Totaux de la commande affichés\n";
         } catch (\Exception $e) {
-            echo "⚠️ Totaux de la commande non trouvés: " . $e->getMessage() . "\n";
+            echo '⚠️ Totaux de la commande non trouvés: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -131,10 +128,10 @@ class OrderDetailsPage extends Page
     {
         try {
             $browser->assertPresent('@print-button')
-                    ->click('@print-button')
-                    ->pause(3000)
-                    ->screenshot('order_print_clicked');
-            
+                ->click('@print-button')
+                ->pause(3000)
+                ->screenshot('order_print_clicked');
+
             echo "✅ Bouton d'impression cliqué\n";
 
             // Retourner à la page de détails si nécessaire
@@ -143,9 +140,9 @@ class OrderDetailsPage extends Page
                 echo "⚠️ Retour à la page de détails après impression\n";
             }
         } catch (\Exception $e) {
-            echo "⚠️ Bouton d'impression non fonctionnel: " . $e->getMessage() . "\n";
+            echo "⚠️ Bouton d'impression non fonctionnel: ".$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -156,21 +153,21 @@ class OrderDetailsPage extends Page
     {
         try {
             $browser->assertPresent('@download-button')
-                    ->click('@download-button')
-                    ->pause(3000)
-                    ->screenshot('order_download_clicked');
-            
+                ->click('@download-button')
+                ->pause(3000)
+                ->screenshot('order_download_clicked');
+
             echo "✅ Bouton de téléchargement cliqué\n";
-            
+
             // Retourner à la page de détails si nécessaire
             if ($browser->driver->getCurrentURL() !== $this->url()) {
                 $browser->back()->pause(2000);
                 echo "⚠️ Retour à la page de détails après téléchargement\n";
             }
         } catch (\Exception $e) {
-            echo "⚠️ Bouton de téléchargement non fonctionnel: " . $e->getMessage() . "\n";
+            echo '⚠️ Bouton de téléchargement non fonctionnel: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -183,13 +180,13 @@ class OrderDetailsPage extends Page
         try {
             $browser->assertPresent('@cancel-button');
             echo "✅ Bouton d'annulation présent\n";
-            
+
             // On ne clique pas réellement pour éviter d'annuler une vraie commande
             $browser->screenshot('cancel_button_present');
         } catch (\Exception $e) {
-            echo "⚠️ Bouton d'annulation non trouvé: " . $e->getMessage() . "\n";
+            echo "⚠️ Bouton d'annulation non trouvé: ".$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 
@@ -200,15 +197,15 @@ class OrderDetailsPage extends Page
     {
         try {
             $browser->assertPresent('@back-button')
-                    ->click('@back-button')
-                    ->pause(2000)
-                    ->screenshot('back_button_clicked');
-            
+                ->click('@back-button')
+                ->pause(2000)
+                ->screenshot('back_button_clicked');
+
             echo "✅ Bouton de retour cliqué\n";
         } catch (\Exception $e) {
-            echo "⚠️ Bouton de retour non fonctionnel: " . $e->getMessage() . "\n";
+            echo '⚠️ Bouton de retour non fonctionnel: '.$e->getMessage()."\n";
         }
-        
+
         return $this;
     }
 }

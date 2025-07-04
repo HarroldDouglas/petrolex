@@ -218,27 +218,27 @@ class DashboardTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             echo "🔄 Test réinitialisation des filtres...\n";
-            
-            $dashboardPage = new DashboardPage();
-            
+
+            $dashboardPage = new DashboardPage;
+
             // Connexion et accès au dashboard
             $this->loginAsAdmin($browser);
-            
+
             // Vérifier que nous sommes bien sur le dashboard
             $browser->visit('/dashboard')
-                    ->assertPathIs('/dashboard')
-                    ->pause(2000)
-                    ->screenshot('dashboard_loaded');
-            
+                ->assertPathIs('/dashboard')
+                ->pause(2000)
+                ->screenshot('dashboard_loaded');
+
             try {
                 // Appliquer un filtre d'abord
                 $dashboardPage->openFilter($browser)
-                              ->selectDistributionCenter($browser, '1');
-                              
+                    ->selectDistributionCenter($browser, '1');
+
                 // C'est le browser qui doit faire pause, pas le dashboardPage
                 $browser->pause(3000)
-                        ->screenshot('before_reset');
-                
+                    ->screenshot('before_reset');
+
                 // S'assurer que nous sommes toujours authentifiés
                 if (str_contains($browser->driver->getCurrentURL(), '/login')) {
                     echo "⚠️ Session expirée, reconnexion...\n";
@@ -246,18 +246,18 @@ class DashboardTest extends DuskTestCase
                     $browser->visit('/dashboard')->pause(2000);
                     $dashboardPage->openFilter($browser);
                 }
-                
+
                 // Réinitialiser les filtres
                 $dashboardPage->resetFilters($browser);
-                
+
                 echo "✅ Réinitialisation des filtres réussie\n";
             } catch (\Exception $e) {
-                echo "❌ Erreur lors de la réinitialisation: " . $e->getMessage() . "\n";
-                
+                echo '❌ Erreur lors de la réinitialisation: '.$e->getMessage()."\n";
+
                 // Capturer l'état pour diagnostic
                 $browser->screenshot('reset_filter_error');
-                echo "URL actuelle: " . $browser->driver->getCurrentURL() . "\n";
-                
+                echo 'URL actuelle: '.$browser->driver->getCurrentURL()."\n";
+
                 // Essayer de reconnecter si nécessaire
                 if (str_contains($browser->driver->getCurrentURL(), '/login')) {
                     echo "🔑 Tentative de reconnexion...\n";
@@ -274,24 +274,24 @@ class DashboardTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             echo "🔍 Test des blocs statistiques cliquables...\n";
-            
+
             // Connexion et accès au dashboard
             $this->loginAsAdmin($browser);
-            $dashboardPage = new DashboardPage();
+            $dashboardPage = new DashboardPage;
             $browser->visit($dashboardPage)
-                    ->pause(3000)
-                    ->screenshot('dashboard_before_card_click');
-            
+                ->pause(3000)
+                ->screenshot('dashboard_before_card_click');
+
             try {
                 // Analyser les éléments cliquables pour aider au diagnostic
                 $this->findClickableElements($browser, '.row .card, .row [class*="card"]');
-                
+
                 // Tester si les cartes statistiques sont cliquables
                 $dashboardPage->testClickableStatCards($browser);
-                
+
                 echo "✅ Test des cartes statistiques terminé\n";
             } catch (\Exception $e) {
-                echo "❌ Erreur lors du test des cartes statistiques: " . $e->getMessage() . "\n";
+                echo '❌ Erreur lors du test des cartes statistiques: '.$e->getMessage()."\n";
                 $this->captureErrorState($browser, 'stat_cards_error', '.row .card');
             }
         });
@@ -304,16 +304,16 @@ class DashboardTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             echo "🔍 Test du bouton filtre spécifique...\n";
-            
+
             // Connexion et accès au dashboard
             $this->loginAsAdmin($browser);
             $browser->visit('/dashboard')
-                   ->pause(2000);
-            
+                ->pause(2000);
+
             try {
                 // Capturer l'état avant clic
                 $browser->screenshot('before_filter_click');
-                
+
                 // Identifier explicitement le bouton filtre dans la colonne de droite
                 $filterButtons = $browser->elements('.col-4 a[data-bs-toggle="collapse"]');
                 if (count($filterButtons) > 0) {
@@ -323,27 +323,27 @@ class DashboardTest extends DuskTestCase
                     echo "⚠️ Bouton filtre standard non trouvé, recherche d'alternatives...\n";
                     // Afficher tous les boutons avec data-bs-toggle pour aider au diagnostic
                     $toggleButtons = $browser->elements('[data-bs-toggle="collapse"]');
-                    echo count($toggleButtons) . " boutons avec data-bs-toggle trouvés\n";
-                    
+                    echo count($toggleButtons)." boutons avec data-bs-toggle trouvés\n";
+
                     foreach ($toggleButtons as $index => $button) {
                         $text = $button->getText() ?: '[Pas de texte]';
                         $class = $button->getAttribute('class') ?: '[Pas de classe]';
                         echo "Bouton #{$index}: '{$text}' (class: {$class})\n";
                     }
-                    
+
                     // Essayer de cliquer sur un bouton explicite de filtre
                     $browser->click('a:contains("Filtrer"), button:contains("Filtrer")');
                 }
-                
+
                 $browser->pause(2000)
-                       ->screenshot('after_filter_click');
-                
+                    ->screenshot('after_filter_click');
+
                 // Vérifier que c'est bien le panneau de filtre qui s'ouvre
                 if ($browser->resolver->findOrFail('#collapseFilter')->isDisplayed()) {
                     echo "✅ Le panneau de filtre #collapseFilter s'est bien ouvert\n";
-                } else if ($browser->resolver->findOrFail('.collapse.show')->isDisplayed()) {
+                } elseif ($browser->resolver->findOrFail('.collapse.show')->isDisplayed()) {
                     echo "✅ Un panneau s'est ouvert (.collapse.show)\n";
-                    
+
                     // Vérifier que ce n'est pas le menu de navigation
                     if ($browser->resolver->findOrFail('.collapse.show:contains("Approvisionnement")')->isDisplayed()) {
                         echo "❌ ERREUR: Le menu de navigation s'est ouvert au lieu du filtre!\n";
@@ -354,7 +354,7 @@ class DashboardTest extends DuskTestCase
                     echo "❌ ERREUR: Aucun panneau ne s'est ouvert après clic sur le bouton filtre\n";
                 }
             } catch (\Exception $e) {
-                echo "❌ Erreur lors du test du bouton filtre: " . $e->getMessage() . "\n";
+                echo '❌ Erreur lors du test du bouton filtre: '.$e->getMessage()."\n";
                 $this->captureErrorState($browser, 'filter_button_error', '[data-bs-toggle="collapse"]');
             }
         });
