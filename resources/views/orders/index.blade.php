@@ -30,7 +30,7 @@
             <!-- Breadcrumb end -->
 
             <!-- Ticket start -->
-            <div class="row ticket-app">
+            <div class="row ticket-app p-0">
 
                 <!-- ticket table-->
                 <div class="col-12">

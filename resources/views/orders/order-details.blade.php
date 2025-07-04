@@ -30,7 +30,7 @@
                 <!-- Customer Details end -->
 
                 <a class="btn btn-primary ms-2" href="{{ route('orders.list') }}">
-                    <i class="ti ti-arrow-back"></i> Retourner à la siste
+                    <i class="ti ti-arrow-back"></i> Retourner à la liste
                 </a>
             </div>
         </div>
