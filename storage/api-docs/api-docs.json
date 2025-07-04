@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://localhost:8000",
             "description": "API Server"
         }
     ],
@@ -67,6 +67,53 @@
                     }
                 }
             }
+        },
+        "/api/distribution-centers": {
+            "get": {
+                "tags": [
+                    "Centres de Distribution"
+                ],
+                "summary": "Récupérer tous les centres de distribution",
+                "description": "Récupérer la liste de tous les centres de distribution.",
+                "operationId": "api.distribution-centers.index",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DistributionCentersResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -119,6 +166,96 @@
                             "message": {
                                 "type": "string",
                                 "example": "Authentification réussie"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "DistributionCenterData": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Centre Principal"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Cameroun"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Douala"
+                    },
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Bonanjo"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 Rue Principale, Douala"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Centre de distribution principal avec toutes les commodités"
+                    },
+                    "latitude": {
+                        "type": "string",
+                        "example": "4.05110000"
+                    },
+                    "longitude": {
+                        "type": "string",
+                        "example": "9.76790000"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+237612345678"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "centre.principal@petrolex.cm"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "storage_capacity": {
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T14:47:11.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T14:47:11.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "DistributionCentersResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/DistributionCenterData"
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Liste des centres de distribution récupérée avec succès"
                             }
                         },
                         "type": "object"
@@ -213,6 +350,10 @@
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Centres de Distribution",
+            "description": "Centres de Distribution"
         }
     ]
 }
