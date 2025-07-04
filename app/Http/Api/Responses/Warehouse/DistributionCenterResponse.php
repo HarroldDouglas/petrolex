@@ -4,7 +4,6 @@ namespace App\Http\Api\Responses\Warehouse;
 
 use App\Http\Api\Resources\DistributionCenterResource;
 use App\Http\Api\Responses\ApiResponse;
-use App\Models\DistributionCenter;
 use Illuminate\Support\Collection;
 
 class DistributionCenterResponse extends ApiResponse
@@ -12,13 +11,13 @@ class DistributionCenterResponse extends ApiResponse
     /**
      * Return response with multiple distribution centers.
      *
-     * @param  Collection|array  $distributionCenters
-     * @return static
+     * @param  Collection  $distributionCenters
+     * @return self
      */
-    public static function withDistributionCenters($distributionCenters): self
+    public static function withDistributionCenters(Collection $distributionCenters): self
     {
         return new self(
-            DistributionCenterResource::collection($distributionCenters),
+            new DistributionCenterResource($distributionCenters),
             'Centre de distribution récupéré avec succès'
         );
     }
