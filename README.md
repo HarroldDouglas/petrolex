@@ -176,21 +176,86 @@ chmod +x tests/Curl/*.sh
 
 ### Tests E2E (Laravel Dusk)
 
-> ⚠️ En cours d'intégration
+Ce projet utilise Laravel Dusk pour les tests d'interface utilisateur automatisés.
 
-Laravel Dusk est utilisé pour les tests de navigation web.
+## Installation et Configuration
 
-Installation et configuration :
+### 1. Installation de Dusk
 ```bash
-# Installation
 composer require --dev laravel/dusk
 php artisan dusk:install
+```
 
-# Création d'un test Dusk
-php artisan dusk:make NomDuTest
+### 2. Installation du driver Firefox (Geckodriver)
+```bash
+# Ubuntu/Debian :
+# Méthode 1 : Via le gestionnaire de paquets
+sudo apt update
+sudo apt install firefox-geckodriver
 
-# Exécution des tests Dusk
+# Méthode 2 : Installation manuelle
+wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
+tar -xzf geckodriver-v0.33.0-linux64.tar.gz
+sudo mv geckodriver /usr/local/bin/
+sudo chmod +x /usr/local/bin/geckodriver
+```
+```bash
+# Windows :
+# Avec Chocolatey
+choco install geckodriver
+
+# Ou télécharger depuis : https://github.com/mozilla/geckodriver/releases
+# Puis ajouter au PATH
+```
+```bash
+# macOS :
+# Avec Homebrew
+brew install geckodriver
+```
+
+### 3. Configuration des variables d'environnement
+Ajoutez ces variables dans votre fichier `.env` :
+
+```env
+# Configuration Dusk
+APP_URL=http://127.0.0.1:8000
+
+# Données de test (utilisez vos vraies données admin)
+ADMIN_EMAIL=admin@petrolex.com
+ADMIN_PASSWORD=votre_mot_de_passe_admin
+ADMIN_PHONE=+237655332183
+```
+
+### 4. Configuration Firefox dans Dusk
+Le fichier `tests/DuskTestCase.php` est configuré pour utiliser Firefox :
+
+```php
+// Firefox configuré avec les bonnes options
+// Pas besoin de modifier sauf cas spécifique
+```
+
+## Lancement des Tests
+
+### Prérequis
+Laravel doit tourner :
+```bash
+php artisan serve
+```
+Firefox doit être installé sur votre système.
+
+### Commandes de test
+```bash
+# Lancer tous les tests Dusk
 php artisan dusk
+
+# Lancer un test spécifique
+php artisan dusk tests/Browser/LoginTest.php
+
+# Lancer une méthode spécifique
+php artisan dusk tests/Browser/LoginTest.php --filter=test_user_can_login_with_email
+
+# Tests avec sortie détaillée
+php artisan dusk --verbose
 ```
 
 ### Bonnes Pratiques de Test
