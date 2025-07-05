@@ -144,6 +144,11 @@ class BottleTypeDataTable extends BaseDataTable
             $bottleType = $bottleTypeService->find($bottleTypeId);
 
             $updateDto = new UpdateBottleTypeDTO(
+                name: $bottleType->name,
+                capacity: $bottleType->capacity,
+                content_price: $bottleType->content_price,
+                bottle_with_content_price: $bottleType->bottle_with_content_price,
+                weight: $bottleType->weight,
                 is_active: $isActive
             );
 
