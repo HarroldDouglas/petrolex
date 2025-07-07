@@ -16,7 +16,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="city", type="string", example="Douala"),
  *     @OA\Property(property="country", type="string", example="Cameroun"),
  *     @OA\Property(property="is_active", type="boolean", example=true),
- *     @OA\Property(property="balance", type="number", format="float", example=15000.50),
+ *     @OA\Property(property="current_balance", type="number", format="float", example=15000.50),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T14:47:11.000000Z"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T14:47:11.000000Z"),
  * )
