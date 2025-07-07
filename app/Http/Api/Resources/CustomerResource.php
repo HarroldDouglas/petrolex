@@ -23,7 +23,7 @@ class CustomerResource extends UserResource
         return array_merge(
             parent::toArray($request),
             [
-                'balance' => $user->customer()->balance ?? null,
+                'current_balance' => $user->customer?->current_balance ?? null,
             ]
         );
 
