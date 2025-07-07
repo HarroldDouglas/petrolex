@@ -13,9 +13,6 @@ class DistributionCenterResponse extends ApiResponse
      * Return response with multiple distribution centers.
      *
      * @param  Collection<int, DistributionCenter>|array<int, DistributionCenter>  $distributionCenters
-     * @param  string|null  $message
-     * @param  int  $statusCode
-     * @return self
      */
     public static function withCollection(
         Collection|array $distributionCenters,

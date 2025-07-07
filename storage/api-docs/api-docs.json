@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://localhost:8000",
             "description": "API Server"
         }
     ],
@@ -66,6 +66,53 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/customers": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Récupérer tous les clients",
+                "description": "Récupérer la liste de tous les clients.",
+                "operationId": "api.customers.index",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomersResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/distribution-centers": {
@@ -166,6 +213,88 @@
                             "message": {
                                 "type": "string",
                                 "example": "Authentification réussie"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "CustomerData": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Jean"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Dupont"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "jean.dupont@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+237612345678"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 Rue Principale, Douala"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Douala"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Cameroun"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "balance": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 15000.5
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T14:47:11.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T14:47:11.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "CustomersResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/CustomerData"
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Liste des clients récupérée avec succès"
                             }
                         },
                         "type": "object"
@@ -350,6 +479,10 @@
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Clients",
+            "description": "Clients"
         },
         {
             "name": "Centres de Distribution",

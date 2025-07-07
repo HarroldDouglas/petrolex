@@ -30,7 +30,7 @@ abstract class DuskTestCase extends BaseTestCase
         $options = (new ChromeOptions)
             ->addArguments(collect([
                 '--disable-gpu',
-                //'--headless=new', // Utilisez '--headless=new' pour la nouvelle version du mode headless (Chrome 112+). Pour les anciennes versions, utilisez '--headless'.
+                // '--headless=new', // Utilisez '--headless=new' pour la nouvelle version du mode headless (Chrome 112+). Pour les anciennes versions, utilisez '--headless'.
                 '--window-size=1920,1080', // Taille de la fenêtre du navigateur pour les tests
                 '--no-sandbox', // Essentiel sur Linux, surtout dans les environnements CI, pour éviter des problèmes de permissions.
                 // Tu peux ajouter d'autres arguments ici si besoin, par exemple '--proxy-server=http://yourproxy:port'
