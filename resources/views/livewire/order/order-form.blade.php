@@ -90,7 +90,7 @@
                            placeholder="Ex: 10" wire:model.live="productOptionQuantity">
                 </div>
                 <div class="col-md-3">
-                    <button type="button" class="btn btn-primary w-100" 
+                    <button type="button" class="btn btn-success w-100" 
                            wire:click="addProduct"
                            @disabled($this->isProductAddButtonDisabled())>
                         <i class="ti ti-plus"></i> Ajouter
@@ -114,7 +114,7 @@
                             @foreach($productOptionPrices as $index => $productOptionPrice)
                                 <tr>
                                     <td>{{ $productOptionPrice['name'] }}</td>
-                                    <td>{{ $productOptionPrice['option'] }}</td>
+                                    <td>{{\App\Enums\BottleOrderType::from( $productOptionPrice['option'])->label}}</td>
                                     <td>{{ $productOptionPrice['price'] }}</td>
                                     <td>
                                         <input type="number" class="form-control @error('productOptionPrices.'.$index.'.quantity') is-invalid @enderror" 
@@ -143,10 +143,14 @@
         
             <div class="col-12">
                 <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
-                    <a href="{{ route('distribution-centers.list') }}" class="btn btn-light-danger">
-                        Annuler
+                    <a href="{{ route('orders.list') }}" class="btn btn-light-danger">
+                        <i class="ti ti-x"></i> Annuler
                     </a>
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                    <button type="submit" class="btn btn-success" wire:loading.attr="disabled">
+                        <i class="ti ti-device-floppy"></i> 
+                        Enregistrer
+                        <span wire:loading wire:target="submit">...</span>
+                    </button>
                 </div>
             </div>
         </div>
