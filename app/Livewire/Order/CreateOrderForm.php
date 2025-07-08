@@ -4,7 +4,6 @@ namespace App\Livewire\Order;
 
 use App\Http\Requests\Order\StoreOrderRequest;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
 
 class CreateOrderForm extends AbstractOrderForm
 {
@@ -15,7 +14,6 @@ class CreateOrderForm extends AbstractOrderForm
 
     public function mount()
     {
-        Log::info('create component mounted', ['before initialize']);
         parent::initialize();
     }
 
@@ -25,7 +23,7 @@ class CreateOrderForm extends AbstractOrderForm
 
         try {
 
-            // Add creation call logic here
+            // Add creation API call logic here
 
             session()->flash('success', 'Commande créée avec succès!');
 
