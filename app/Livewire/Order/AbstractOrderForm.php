@@ -44,12 +44,10 @@ abstract class AbstractOrderForm extends Component
     public $selectedOption = '';
     public int $productOptionQuantity = 1;
 
-    public $customer = '';
-    public $distribution_center = '';
-    public $customer_address = '';
+    public $customer;
+    public $distribution_center;
+    public $customer_address;
     public string $payment_method = '';
-
-    public $productOptions = [];
 
     public function initialize()
     {
@@ -121,7 +119,6 @@ abstract class AbstractOrderForm extends Component
             'quantity' => $this->productOptionQuantity,
         ];
 
-        // Reset temp fields
         $this->selectedProduct = '';
         $this->selectedOption = '';
         $this->productOptionQuantity = 1;
