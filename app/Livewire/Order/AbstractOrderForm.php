@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Order;
 
+use App\Enums\PaymentMethod;
 use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
 
@@ -9,20 +10,9 @@ abstract class AbstractOrderForm extends Component
 {
     public $customer_id;
     public $delivery_address_id;
-    public $delivery_person_id;
     public $distribution_center_id;
-    public $order_number;
     public $delivery_type;
-    public $status;
-    public $subtotal;
-    public $delivery_fee;
-    public $total_amount;
-    public $order_date;
-    public $delivery_date;
-    public $comments;
-    public $center_comments;
-    public $rating;
-    public $items = [];
+    public array $items = [];
     public array $customers = [
         ['id' => 1, 'full_name' => 'Jean Dupont'],
         ['id' => 2, 'full_name' => 'Marie Claire'],
@@ -38,11 +28,9 @@ abstract class AbstractOrderForm extends Component
         ['id' => 2, 'full_address' => '456 Avenue Centrale, Yaoundé'],
     ];
 
-    public array $paymentMethods = [
-        'cash' => 'Espèces',
-        'card' => 'Carte bancaire',
-        'mobile' => 'Mobile Money',
-    ];
+    public array $paymentMethods = [];
+
+    public array $availableOptions = [];
 
     public array $availableProducts = [
         'Bouteille 6kg',
@@ -54,24 +42,21 @@ abstract class AbstractOrderForm extends Component
 
     public string $selectedProduct = '';
     public $selectedOption = '';
-    public $productOptionQuantity = '';
-
-    public array $cityPrices = [
-        // Example:
-        // [
-        //     'city' => 'Douala',
-        //     'content_price' => 8500,
-        //     'content_with_bottle_price' => 25000,
-        // ]
-    ];
+    public int $productOptionQuantity = 1;
 
     public $customer = '';
     public $distribution_center = '';
     public $customer_address = '';
-    public $payment_method = 'cash';
+    public string $payment_method = '';
 
     public $productOptions = [];
 
+    public function initialize()
+    {
+        $this->paymentMethods = collect(PaymentMethod::cases())
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label])
+            ->toArray();
+    }
 
     public function rules()
     {

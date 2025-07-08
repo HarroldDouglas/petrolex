@@ -79,8 +79,9 @@
                     <label for="selectedOption" class="form-label">Option</label>
                     <select class="form-select" id="selectedOption" wire:model.live="selectedOption">
                         <option value="">Sélectionner une option</option>
-                        <option value="Recharge">Recharge</option>
-                        <option value="Recharge + consigne">Recharge + consigne</option>
+                        @foreach(\App\Enums\BottleOrderType::cases() as $type)
+                        <option value="{{ $type->value }}">{{ $type->label }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -104,7 +105,7 @@
                             <tr>
                                 <th>Nom</th>
                                 <th>Option</th>
-                                <th>Prix</th>
+                                <th>Prix Unitaire</th>
                                 <th>Quantité</th>
                                 <th>Actions</th>
                             </tr>

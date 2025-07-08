@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Order;
 
-use App\DTOs\Order\CreateOrderDTO;
 use App\Http\Requests\Order\StoreOrderRequest;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class CreateOrderForm extends AbstractOrderForm
 {
@@ -13,18 +13,19 @@ class CreateOrderForm extends AbstractOrderForm
         return new StoreOrderRequest;
     }
 
-    public function mount() {}
+    public function mount()
+    {
+        Log::info('create component mounted', ['before initialize']);
+        parent::initialize();
+    }
 
     public function save()
     {
         $validatedData = $this->validate();
 
         try {
-            $dto = CreateOrderDTO::from($validatedData);
-            $dtoArray = $dto->toArray();
 
-            /** @var Order */
-            $order = $this->orderService->create($this->order, $dtoArray);
+            // Add creation call logic here
 
             session()->flash('success', 'Commande créée avec succès!');
 
