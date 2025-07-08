@@ -2,16 +2,8 @@
 
 namespace App\Livewire\Order;
 
-use App\Http\Requests\Order\StoreOrderRequest;
-use Illuminate\Foundation\Http\FormRequest;
-
 class CreateOrderForm extends AbstractOrderForm
 {
-    protected function customRequest(): FormRequest
-    {
-        return new StoreOrderRequest;
-    }
-
     public function mount()
     {
         parent::initialize();
@@ -19,7 +11,6 @@ class CreateOrderForm extends AbstractOrderForm
 
     public function save()
     {
-        $validatedData = $this->validate();
 
         try {
 

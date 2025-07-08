@@ -3,7 +3,6 @@
 namespace App\Livewire\Order;
 
 use App\Enums\PaymentMethod;
-use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
 
 abstract class AbstractOrderForm extends Component
@@ -56,33 +55,9 @@ abstract class AbstractOrderForm extends Component
             ->toArray();
     }
 
-    public function rules()
-    {
-        // @phpstan-ignore-next-line
-        return $this->customRequest()->rules();
-    }
-
-    public function messages()
-    {
-        return $this->customRequest()->messages();
-    }
-
-    /**
-     * Get the request class for validation
-     */
-    abstract protected function customRequest(): FormRequest;
-
     public function render()
     {
         return view('livewire.order.order-form');
-    }
-
-    /**
-     * Real-time validation for each field
-     */
-    public function updated($propertyName)
-    {
-        $this->validateOnly($propertyName);
     }
 
     public function isProductAddButtonDisabled(): bool
