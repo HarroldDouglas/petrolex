@@ -501,14 +501,28 @@ class OrderSeeder extends Seeder
         $center = $centers->random();
         $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
 
+        $orderDate = now()->subDays(rand(1, 10));
+        $confirmedAt = $orderDate->copy()->addMinutes(rand(5, 60));
+
         $orderData = [
             'customer_id' => $customer->id,
             'distribution_center_id' => $center->id,
             'delivery_address_id' => $deliveryAddress->id,
             'delivery_person_id' => $deliveryPerson?->id,
             'order_number' => 'ORD-'.rand(100000, 999999),
-            'order_date' => now()->subDays(rand(1, 10)),
+            'order_date' => $orderDate,
+            'confirmed_at' => $confirmedAt,
         ];
+
+        // For orders that are processing or delivered, set the processing_at timestamp
+        if ($status->equals(OrderStatus::PROCESSING()) || $status->equals(OrderStatus::DELIVERED())) {
+            $orderData['processing_at'] = $confirmedAt->copy()->addHours(rand(1, 5));
+        }
+
+        // For delivered orders, set the delivered_at timestamp
+        if ($status->equals(OrderStatus::DELIVERED())) {
+            $orderData['delivered_at'] = $orderData['processing_at']->copy()->addHours(rand(1, 8));
+        }
 
         if ($addRatings) {
             $orderData = array_merge($orderData, [
