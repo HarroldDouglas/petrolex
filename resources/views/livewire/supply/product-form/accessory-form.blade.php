@@ -1,4 +1,4 @@
-'''<div>
+<div>
     <div class="card p-3">
         <form wire:submit="save">
             <div class="row">
@@ -47,4 +47,4 @@
             </div>
         </form>
     </div>
-</div>''
+</div>
