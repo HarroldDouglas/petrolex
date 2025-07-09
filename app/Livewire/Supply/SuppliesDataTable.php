@@ -37,16 +37,9 @@ class SuppliesDataTable extends BaseDataTable
                     return new HtmlString('<a href="'.route('supplies.edit', $row->id).'">'.$value.'</a>');
                 }),
 
-            Column::make('Centre de distr.', 'distribution_center_id')
+            Column::make('Centre de distr.', 'distributionCenter.name')
                 ->sortable()
-                ->searchable(function (Builder $query, string $searchTerm) {
-                    return $query->whereHas('distributionCenter', function (Builder $q) use ($searchTerm) {
-                        $q->where('name', 'like', '%'.$searchTerm.'%');
-                    });
-                })
-                ->format(function ($value, $row) {
-                    return $row->distributionCenter->name ?? '-';
-                }),
+                ->searchable(),
 
             Column::make('Produits', 'id')
                 ->format(function ($value, $row) {
@@ -137,16 +130,16 @@ class SuppliesDataTable extends BaseDataTable
 
                     if ($value === 'has_bottles') {
                         // supplies with at least one bottle
-                        return $builder->whereHas('productTypes.productCategory', function (Builder $query) {
+                        return $builder->whereHas('productTypes', function (Builder $query) {
                             $query->where('product_type', 'bottle');
                         });
                     }
 
                     if ($value === 'only_bottles') {
                         // supplies with only bottles and no other product types
-                        return $builder->whereDoesntHave('productTypes.productCategory', function (Builder $query) {
+                        return $builder->whereDoesntHave('productTypes', function (Builder $query) {
                             $query->where('product_type', '!=', 'bottle');
-                        })->whereHas('productTypes.productCategory', function (Builder $query) {
+                        })->whereHas('productTypes', function (Builder $query) {
                             $query->where('product_type', 'bottle');
                         });
                     }
