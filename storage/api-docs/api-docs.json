@@ -237,6 +237,10 @@
                         "type": "string",
                         "example": "Bonapriso"
                     },
+                    "city": {
+                        "type": "string",
+                        "example": "Douala"
+                    },
                     "country": {
                         "type": "string",
                         "example": "Cameroun"
@@ -259,13 +263,9 @@
                         "type": "string",
                         "example": "Jean Dupont"
                     },
-                    "city": {
-                        "type": "string",
-                        "example": "Douala"
-                    },
-                    "postal_code": {
-                        "type": "string",
-                        "example": "BP1234"
+                    "is_default": {
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"
