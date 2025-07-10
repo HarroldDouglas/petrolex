@@ -3,6 +3,7 @@
 namespace App\Livewire\Dashboard;
 
 use App\Enums\PeriodFilterStats;
+use App\Models\User;
 use App\Services\Dashboard\DashboardGraphService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -82,19 +83,18 @@ class DashboardGraphs extends Component
         $ordersStats = (object) ['labels' => [], 'data' => []];
 
         if ($distributionCenterId === null || $distributionCenterId === '') {
+            /** @var User */
             $user = Auth::user();
+
             if ($user && method_exists($user, 'isGlobal') && $user->isGlobal()) {
                 $revenueStats = $this->graphService->getRevenueByDay($finalStartDate, $finalEndDate, null);
                 $ordersStats = $this->graphService->getOrdersByDay($finalStartDate, $finalEndDate, null);
             } elseif ($user) {
-                /**$centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
-                if (!empty($centerIds)) {
+                $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
+                if (! empty($centerIds)) {
                     $revenueStats = $this->graphService->getRevenueByDay($finalStartDate, $finalEndDate, $centerIds);
                     $ordersStats = $this->graphService->getOrdersByDay($finalStartDate, $finalEndDate, $centerIds);
-                } else {
-                    $revenueStats = (object)['labels' => [], 'data' => []];
-                    $ordersStats = (object)['labels' => [], 'data' => []];
-                }**/
+                }
             } else {
                 $revenueStats = (object) ['labels' => [], 'data' => []];
                 $ordersStats = (object) ['labels' => [], 'data' => []];
