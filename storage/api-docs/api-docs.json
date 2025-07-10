@@ -196,6 +196,9 @@
                         "description": "Type de token",
                         "type": "string",
                         "example": "bearer"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/CustomerData"
                     }
                 },
                 "type": "object"
@@ -261,7 +264,7 @@
                         "type": "boolean",
                         "example": true
                     },
-                    "balance": {
+                    "current_balance": {
                         "type": "number",
                         "format": "float",
                         "example": 15000.5

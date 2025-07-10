@@ -36,8 +36,13 @@ use OpenApi\Annotations as OA;
  *         type="string",
  *         description="Type de token",
  *         example="bearer"
+ *     ),
+ *     @OA\Property(
+ *         property="user",
+ *         ref="#/components/schemas/CustomerData",
+ *         description="Informations de l'utilisateur authentifié",
  *     )
- * )
+ *  )
  *
  * @OA\Schema(
  *     schema="LoginResponse",
