@@ -74,7 +74,7 @@
                     "Clients"
                 ],
                 "summary": "Récupérer tous les clients",
-                "description": "Récupérer la liste de tous les clients.",
+                "description": "Récupérer la liste de tous les clients avec leurs informations utilisateur et adresses de livraison.",
                 "operationId": "api.customers.index",
                 "responses": {
                     "200": {
@@ -219,13 +219,60 @@
                     }
                 ]
             },
-            "CustomerData": {
+            "DeliveryAddress": {
                 "properties": {
                     "id": {
                         "type": "integer",
                         "example": 1
                     },
-                    "user_id": {
+                    "label": {
+                        "type": "string",
+                        "example": "Maison principale"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 Rue Principale"
+                    },
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Bonapriso"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Cameroun"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.0511
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 9.7679
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+237612345678"
+                    },
+                    "contact_name": {
+                        "type": "string",
+                        "example": "Jean Dupont"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Douala"
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "example": "BP1234"
+                    }
+                },
+                "type": "object"
+            },
+            "UserData": {
+                "properties": {
+                    "id": {
                         "type": "integer",
                         "example": 5
                     },
@@ -237,11 +284,15 @@
                         "type": "string",
                         "example": "Dupont"
                     },
+                    "full_name": {
+                        "type": "string",
+                        "example": "Jean Dupont"
+                    },
                     "email": {
                         "type": "string",
                         "example": "jean.dupont@example.com"
                     },
-                    "phone": {
+                    "phone_number": {
                         "type": "string",
                         "example": "+237612345678"
                     },
@@ -249,22 +300,34 @@
                         "type": "string",
                         "example": "123 Rue Principale, Douala"
                     },
-                    "city": {
-                        "type": "string",
-                        "example": "Douala"
-                    },
-                    "country": {
-                        "type": "string",
-                        "example": "Cameroun"
-                    },
                     "is_active": {
                         "type": "boolean",
                         "example": true
                     },
-                    "balance": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 15000.5
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "customer"
+                        }
+                    },
+                    "email_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T14:47:11.000000Z",
+                        "nullable": true
+                    },
+                    "phone_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T14:47:11.000000Z",
+                        "nullable": true
+                    },
+                    "last_login_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T14:47:11.000000Z",
+                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",
@@ -278,6 +341,30 @@
                     }
                 },
                 "type": "object"
+            },
+            "CustomerData": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/UserData"
+                    },
+                    {
+                        "properties": {
+                            "deliveryAddresses": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/DeliveryAddress"
+                                }
+                            },
+                            "current_balance": {
+                                "type": "number",
+                                "format": "float",
+                                "example": 15000.5,
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
             },
             "CustomersResponse": {
                 "allOf": [
