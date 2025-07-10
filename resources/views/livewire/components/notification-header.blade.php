@@ -25,6 +25,9 @@
                     <span class="badge bg-primary rounded-pill">{{ $unreadCount }}</span>
                 @endif
             </h5>
+            @if($unreadCount > 0)
+                <button wire:click="markAllAsRead" class="btn btn-sm btn-primary ms-auto me-2">Marquer tout comme lu</button>
+            @endif
             <button aria-label="Close" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
         </div>
         
@@ -79,10 +82,10 @@
                         </div>
                         
                         <div class="align-self-start text-end">
-                            <button wire:click="markAsRead('{{ $notification->id }}')" 
+                            <button wire:click.stop="markAsRead('{{ $notification->id }}')" 
                                     class="btn btn-sm btn-link p-0 text-danger" 
                                     title="Marquer comme lu">
-                                <i class="iconoir-xmark"></i>
+                                <i class="iconoir-xmark f-s-24"></i>
                             </button>
                         </div>
                     </div>
