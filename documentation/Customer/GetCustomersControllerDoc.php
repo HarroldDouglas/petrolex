@@ -5,21 +5,24 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(
  *     schema="DeliveryAddress",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="label", type="string", example="Maison principale"),
  *     @OA\Property(property="address", type="string", example="123 Rue Principale"),
  *     @OA\Property(property="neighborhood", type="string", example="Bonapriso"),
+ *     @OA\Property(property="city", type="string", example="Douala"),
  *     @OA\Property(property="country", type="string", example="Cameroun"),
  *     @OA\Property(property="latitude", type="number", format="float", example=4.0511),
  *     @OA\Property(property="longitude", type="number", format="float", example=9.7679),
  *     @OA\Property(property="phone", type="string", example="+237612345678"),
  *     @OA\Property(property="contact_name", type="string", example="Jean Dupont"),
- *     @OA\Property(property="city", type="string", example="Douala"),
- *     @OA\Property(property="postal_code", type="string", example="BP1234"),
+ *     @OA\Property(property="is_default", type="boolean", example=true),
+ *
  * )
  *
  * @OA\Schema(
  *     schema="UserData",
+ *
  *     @OA\Property(property="id", type="integer", example=5),
  *     @OA\Property(property="first_name", type="string", example="Jean"),
  *     @OA\Property(property="last_name", type="string", example="Dupont"),
@@ -41,11 +44,14 @@ use OpenApi\Annotations as OA;
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/UserData"),
  *         @OA\Schema(
+ *
  *             @OA\Property(
  *                 property="deliveryAddresses",
  *                 type="array",
+ *
  *                 @OA\Items(ref="#/components/schemas/DeliveryAddress")
  *             ),
+ *
  *             @OA\Property(
  *                 property="current_balance",
  *                 type="number",
@@ -62,11 +68,14 @@ use OpenApi\Annotations as OA;
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
+ *
  *             @OA\Property(
  *                 property="data",
  *                 type="array",
+ *
  *                 @OA\Items(ref="#/components/schemas/CustomerData")
  *             ),
+ *
  *             @OA\Property(
  *                 property="message",
  *                 type="string",
@@ -83,19 +92,25 @@ use OpenApi\Annotations as OA;
  *     operationId="api.customers.index",
  *     tags={"Clients"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Liste récupérée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/CustomersResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non autorisé",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur interne du serveur",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )
