@@ -115,6 +115,75 @@
                 ]
             }
         },
+        "/api/distribution-centers/{id}/products": {
+            "get": {
+                "tags": [
+                    "Produits d'un centre de distribution"
+                ],
+                "summary": "Récupérer les produits d'un centre de distribution",
+                "description": "Récupère la liste de tous les produits disponibles dans un centre de distribution spécifique, avec leurs détails et quantités en stock.",
+                "operationId": "api.distribution-centers.products",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du centre de distribution",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des produits récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DistributionCenterProductsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Centre de distribution non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/distribution-centers": {
             "get": {
                 "tags": [
@@ -400,6 +469,28 @@
                     }
                 ]
             },
+            "DistributionCenterProductsResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Product"
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Produits récupérés avec succès"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "DistributionCenterData": {
                 "properties": {
                     "id": {
@@ -564,6 +655,110 @@
                         "type": "object"
                     }
                 ]
+            },
+            "CommonProductProperties": {
+                "properties": {
+                    "id": {
+                        "description": "ID de la catégorie de produit",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "type": {
+                        "description": "Type de produit",
+                        "type": "string",
+                        "enum": [
+                            "bottle",
+                            "accessory"
+                        ],
+                        "example": "bottle"
+                    },
+                    "name": {
+                        "description": "Nom du produit",
+                        "type": "string",
+                        "example": "Bouteille de 6Kg"
+                    },
+                    "description": {
+                        "description": "Description du produit",
+                        "type": "string",
+                        "example": "Une bouteille de gaz de 6 kilogrammes."
+                    },
+                    "quantity": {
+                        "description": "Quantité en stock",
+                        "type": "integer",
+                        "example": 40
+                    }
+                },
+                "type": "object"
+            },
+            "Product": {
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/CommonProductProperties"
+                    },
+                    {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/BottleProduct"
+                            },
+                            {
+                                "$ref": "#/components/schemas/AccessoryProduct"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "BottleProduct": {
+                "properties": {
+                    "capacity": {
+                        "description": "Capacité de la bouteille en litres",
+                        "type": "number",
+                        "format": "float",
+                        "example": 6
+                    },
+                    "height": {
+                        "description": "Hauteur de la bouteille en cm",
+                        "type": "number",
+                        "format": "float",
+                        "example": 45.5
+                    },
+                    "weight": {
+                        "description": "Poids de la bouteille vide en kg",
+                        "type": "number",
+                        "format": "float",
+                        "example": 5.2
+                    },
+                    "radius": {
+                        "description": "Rayon de la bouteille en cm",
+                        "type": "number",
+                        "format": "float",
+                        "example": 15.2
+                    },
+                    "content_price": {
+                        "description": "Prix du gaz seul",
+                        "type": "number",
+                        "format": "float",
+                        "example": 6500
+                    },
+                    "bottle_with_content_price": {
+                        "description": "Prix de la consigne (bouteille + gaz)",
+                        "type": "number",
+                        "format": "float",
+                        "example": 18500
+                    }
+                },
+                "type": "object"
+            },
+            "AccessoryProduct": {
+                "properties": {
+                    "price": {
+                        "description": "Prix de l'accessoire",
+                        "type": "number",
+                        "format": "float",
+                        "example": 2500
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -582,6 +777,10 @@
         {
             "name": "Clients",
             "description": "Clients"
+        },
+        {
+            "name": "Produits d'un centre de distribution",
+            "description": "Produits d'un centre de distribution"
         },
         {
             "name": "Centres de Distribution",

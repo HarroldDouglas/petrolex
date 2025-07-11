@@ -145,7 +145,7 @@ class DistributionCenter extends Model
     {
         return $this->belongsToMany(ProductCategory::class, 'product_category_distribution_center')
             ->using(ProductCategoryDistributionCenter::class)
-            ->withPivot(['stock_empty', 'stock_filled'])
+            ->withPivot(['stock', 'stock_empty', 'stock_filled'])
             ->withTimestamps();
     }
 

@@ -122,4 +122,11 @@ class DistributionCenterService
 
         return $distributionCenters;
     }
+
+    public function getProducts(int $distributionCenterId): Collection
+    {
+        $distributionCenter = $this->find($distributionCenterId);
+
+        return $distributionCenter->productCategories;
+    }
 }
