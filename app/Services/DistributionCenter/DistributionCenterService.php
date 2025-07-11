@@ -123,9 +123,9 @@ class DistributionCenterService
         return $distributionCenters;
     }
 
-    public function getProducts(int $id): Collection
+    public function getProducts(int $distributionCenterId): Collection
     {
-        $distributionCenter = $this->find($id);
+        $distributionCenter = $this->find($distributionCenterId);
 
         return $distributionCenter->productCategories;
     }

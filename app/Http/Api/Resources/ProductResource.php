@@ -20,28 +20,42 @@ class ProductResource extends JsonResource
         $productCategory = $this->resource;
         $productTypeInstance = $productCategory->productTypeInstance;
 
-        $data = [
+        $commonData = [
             'id' => $productCategory->id,
             'type' => $productCategory->product_type->value,
-            'nom' => $productTypeInstance->name,
+            'name' => $productTypeInstance->name,
             'description' => $productTypeInstance->description,
-            'quantite' => $this->getQuantity(),
+            'quantity' => $this->getQuantity(),
         ];
 
-        if ($productCategory->product_type === ProductType::ACCESSORY()) {
-            $data['prix'] = $productTypeInstance->price;
-        }
+        $specificData = match ($productCategory->product_type) {
+            ProductType::ACCESSORY() => $this->getAccessoryDetails(),
+            ProductType::BOTTLE() => $this->getBottleDetails(),
+            default => [],
+        };
 
-        if ($productCategory->product_type === ProductType::BOTTLE()) {
-            $data['capacite'] = $productTypeInstance->capacity;
-            $data['hauteur'] = $productTypeInstance->height;
-            $data['poids'] = $productTypeInstance->weight;
-            $data['rayon'] = $productTypeInstance->radius;
-            $data['prix_contenu'] = $productTypeInstance->content_price;
-            $data['prix_bouteille_avec_contenu'] = $productTypeInstance->bottle_with_content_price;
-        }
+        return array_merge($commonData, $specificData);
+    }
 
-        return $data;
+    private function getAccessoryDetails(): array
+    {
+        return [
+            'price' => $this->resource->productTypeInstance->price,
+        ];
+    }
+
+    private function getBottleDetails(): array
+    {
+        $productTypeInstance = $this->resource->productTypeInstance;
+
+        return [
+            'capacity' => $productTypeInstance->capacity,
+            'height' => $productTypeInstance->height,
+            'weight' => $productTypeInstance->weight,
+            'radius' => $productTypeInstance->radius,
+            'content_price' => $productTypeInstance->content_price,
+            'bottle_with_content_price' => $productTypeInstance->bottle_with_content_price,
+        ];
     }
 
     private function getQuantity(): int

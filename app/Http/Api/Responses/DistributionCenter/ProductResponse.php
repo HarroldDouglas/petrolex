@@ -10,8 +10,6 @@ class ProductResponse extends ApiResponse
 {
     /**
      * Return response with multiple products.
-     *
-     * @param  Collection|array  $products
      */
     public static function withCollection(
         Collection|array $products,
