@@ -51,7 +51,7 @@
                     @enderror
                 </div>
                 <div class="col-md-2 d-flex align-items-end mb-3">
-                    @if ($supply->canBeEdited())
+                    @if (!isset($supply) || $supply->canBeEdited())
                         <button type="submit" class="btn btn-success w-100"><i class="ti ti-device-floppy"></i> Enregistrer</button>
                     @endif
                 </div>

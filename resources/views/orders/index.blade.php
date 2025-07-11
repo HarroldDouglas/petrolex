@@ -27,6 +27,15 @@
                     </li>
                 </ul>
             </div>
+            <div class="col-4 p-0">
+                <div class="d-flex justify-content-end text-success-dark">
+                    <a type="button" href="{{ route('orders.create') }}"
+                        class="waves-effect btn btn-success btn-md mb-2">
+                        <i class="ti ti-plus"></i> Nouveau
+                    </a>
+                </div>
+            </div>
+        </div>
             <!-- Breadcrumb end -->
 
             <!-- Ticket start -->
@@ -50,7 +59,7 @@
                 <!-- ticket table end -->
             </div>
             <!-- Ticket end -->
-        </div>
+    </div>
     @endsection
 
     @section('script')

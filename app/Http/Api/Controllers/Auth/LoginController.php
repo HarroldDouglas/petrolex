@@ -30,7 +30,7 @@ class LoginController extends Controller
         try {
             $tokenDTO = $this->authService->authenticate($credentials);
 
-            return LoginResponse::withToken($tokenDTO);
+            return LoginResponse::withUserAndToken($tokenDTO);
         } catch (\Illuminate\Auth\AuthenticationException $e) {
             return ApiResponse::error(
                 message: $e->getMessage(),

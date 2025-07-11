@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Enums\UserRole;
 use App\Events\UserCreatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
@@ -170,6 +171,16 @@ class UserService extends BaseServiceWithMedia
     {
         /** @var User|null */
         return $this->userRepository->find($id);
+    }
+
+    /**
+     * Get all users with the "customer" role.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|User[]
+     */
+    public function getAllCustomers()
+    {
+        return $this->userRepository->findByRole(UserRole::CUSTOMER());
     }
 
     protected function getModel(): string
