@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="customer" class="form-label">Client</label>
-                <select class="form-select select2 searchable" id="customer" wire:model.live="customer" data-placeholder="Rechercher un client">
+                <select class="form-select" id="customer" wire:model.live="customer" data-placeholder="Rechercher un client">
                     <option value="">Sélectionnez un client</option>
                    @foreach ($customers as $key => $customer)
                        <option value="{{ $customer['id'] }}">{{ $customer['full_name'] }}</option>
@@ -13,7 +13,7 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label for="distribution_center" class="form-label">Centre de distribution</label>
-                <select class="form-select select2 searchable" id="distribution_center" wire:model.live="distribution_center" data-placeholder="Rechercher un centre de distribution">
+                <select class="form-select earchable" id="distribution_center" wire:model.live="distribution_center" data-placeholder="Rechercher un centre de distribution">
                     <option value="">Sélectionnez un centre de distribution</option>
                    @foreach ($distributionCenters as $key => $center)
                        <option value="{{ $center['id'] }}">{{ $center['name'] }}</option>
@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label for="customer_address" class="form-label">Adresse du client</label>
-                <select class="form-select select2 searchable" id="customer_address" wire:model.live="delivery_address_id" data-placeholder="Rechercher une adresse">
+                <select class="form-select" id="customer_address" wire:model.live="delivery_address_id" data-placeholder="Rechercher une adresse">
                     <option value="">Sélectionnez une adresse</option>
                    @foreach ($customerAddresses as $key => $address)
                        <option value="{{ $address['id'] }}">{{ $address['full_address'] }}</option>
@@ -66,23 +66,46 @@
             <div class="row mb-3 align-items-end">
                 <div class="col-md-3">
                     <label for="selectedProduct" class="form-label">Nom du produit</label>
-                    <select class="form-select" id="selectedProduct" wire:model.live="selectedProduct">
+                    <select class="form-select" id="selectedProduct" wire:model.live="selectedProduct" @disabled(empty($distribution_center))>
                         <option value="">Sélectionner un produit</option>
-                        @foreach($availableProducts as $product)
-                            @if(!in_array($product, array_column($productOptionPrices, 'product')))
-                                <option value="{{ $product }}">{{ $product }}</option>
-                            @endif
+                        @foreach($allAvailableProducts as $productCategory)
+                            @php
+                                $isDisabled = false;
+                                foreach ($productOptionPrices as $item) {
+                                    if ($item['product_id'] === $productCategory['id']) {
+                                        if ($productCategory['product_type'] === \App\Enums\ProductType::ACCESSORY()->value) {
+                                            $isDisabled = true;
+                                            break;
+                                        } elseif ($productCategory['product_type'] === \App\Enums\ProductType::BOTTLE()->value && $item['option'] === 'bottle_with_content_price') {
+                                            $isDisabled = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            @endphp
+                            <option value="{{ $productCategory['id'] }}" {{ $isDisabled ? 'disabled' : '' }}>{{ $productCategory['name'] }}</option>
                         @endforeach
                     </select>
+                    @error('selectedProduct') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" x-data="{ show: @entangle('showOptionField') }" x-show="show">
                     <label for="selectedOption" class="form-label">Option</label>
                     <select class="form-select" id="selectedOption" wire:model.live="selectedOption">
                         <option value="">Sélectionner une option</option>
-                        @foreach(\App\Enums\BottleOrderType::cases() as $type)
-                        <option value="{{ $type->value }}">{{ $type->label }}</option>
+                        @foreach($productOptions as $value => $label)
+                            @php
+                                $isDisabled = false;
+                                foreach ($productOptionPrices as $item) {
+                                    if ($item['product_id'] === (int) $selectedProduct && $item['option'] === $value) {
+                                        $isDisabled = true;
+                                        break;
+                                    }
+                                }
+                            @endphp
+                            <option value="{{ $value }}" {{ $isDisabled ? 'disabled' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
+                    @error('selectedOption') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
                 <div class="col-md-3">
                     <label for="productOptionQuantity" class="form-label">Quantité</label>
@@ -114,7 +137,13 @@
                             @foreach($productOptionPrices as $index => $productOptionPrice)
                                 <tr>
                                     <td>{{ $productOptionPrice['name'] }}</td>
-                                    <td>{{\App\Enums\BottleOrderType::from( $productOptionPrice['option'])->label}}</td>
+                                    <td>
+                                        @if($productOptionPrice['product_type'] === \App\Enums\ProductType::BOTTLE()->value)
+                                            {{\App\Enums\BottleOrderType::from( $productOptionPrice['option'])->label}}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td>{{ $productOptionPrice['price'] }}</td>
                                     <td>
                                         <input type="number" class="form-control @error('productOptionPrices.'.$index.'.quantity') is-invalid @enderror" 
@@ -157,32 +186,4 @@
     </form>
 </div>
 
-@push('scripts')
-<script>
 
-    document.addEventListener('livewire:initialized', () => {
-        initializeSelect2();
-        
-        Livewire.hook('morph.updated', ({ el }) => {
-            initializeSelect2();
-        });
-    });
-    
-    function initializeSelect2() {
-        $('.searchable').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                placeholder: $(this).data('placeholder'),
-                allowClear: true
-            });
-            
-            $(this).on('change', function (e) {
-                const elementId = e.target.id;
-                const value = $(this).val();
-                @this.set(elementId, value);
-            });
-        });
-    }
-</script>
-@endpush
