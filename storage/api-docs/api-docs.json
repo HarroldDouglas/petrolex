@@ -196,6 +196,15 @@
                         "description": "Type de token",
                         "type": "string",
                         "example": "bearer"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthData": {
+                "description": "Objet de transfert de données contenant le token et les informations de l'utilisateur authentifié",
+                "properties": {
+                    "token": {
+                        "$ref": "#/components/schemas/TokenData"
                     },
                     "user": {
                         "$ref": "#/components/schemas/CustomerData"
@@ -211,7 +220,7 @@
                     {
                         "properties": {
                             "data": {
-                                "$ref": "#/components/schemas/TokenData"
+                                "$ref": "#/components/schemas/AuthData"
                             },
                             "message": {
                                 "type": "string",

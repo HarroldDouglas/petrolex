@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Constants\AuthConstants;
+use App\DTOs\Auth\AuthDTO;
 use App\DTOs\Auth\LoginCredentialsDTO;
 use App\DTOs\Auth\TokenDTO;
 use App\Models\User;
@@ -25,7 +26,7 @@ class AuthenticationService implements AuthenticationServiceInterface
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function authenticate(LoginCredentialsDTO $credentials): TokenDTO
+    public function authenticate(LoginCredentialsDTO $credentials): AuthDTO
     {
         $user = $this->findUser($credentials->login);
 
@@ -36,9 +37,14 @@ class AuthenticationService implements AuthenticationServiceInterface
 
         $plainTextToken = $this->tokenRepository->createToken($user, AuthConstants::API_TOKEN_NAME);
 
-        return new TokenDTO(
+        $token = new TokenDTO(
             accessToken: $plainTextToken,
             tokenType: AuthConstants::TOKEN_TYPE,
+            user: $user
+        );
+
+        return new AuthDTO(
+            token: $token,
             user: $user
         );
     }

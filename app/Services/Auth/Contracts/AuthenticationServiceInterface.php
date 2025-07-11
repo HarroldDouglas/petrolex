@@ -2,8 +2,8 @@
 
 namespace App\Services\Auth\Contracts;
 
+use App\DTOs\Auth\AuthDTO;
 use App\DTOs\Auth\LoginCredentialsDTO;
-use App\DTOs\Auth\TokenDTO;
 use App\Models\User;
 
 interface AuthenticationServiceInterface
@@ -13,7 +13,7 @@ interface AuthenticationServiceInterface
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function authenticate(LoginCredentialsDTO $credentials): TokenDTO;
+    public function authenticate(LoginCredentialsDTO $credentials): AuthDTO;
 
     /**
      * Revoke the user's current access token

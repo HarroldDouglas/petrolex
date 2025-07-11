@@ -2,29 +2,32 @@
 
 namespace App\Http\Api\Responses\Auth;
 
-use App\DTOs\Auth\TokenDTO;
+use App\DTOs\Auth\AuthDTO;
 use App\Enums\UserRole;
 use App\Http\Api\Resources\CustomerResource;
+use App\Http\Api\Resources\UserResource;
 use App\Http\Api\Responses\ApiResponse;
 use App\Models\User;
 
 class LoginResponse extends ApiResponse
 {
-    public static function withToken(TokenDTO $token): self
+    public static function withToken(AuthDTO $authDTO): self
     {
         /** @var User $user */
-        $user = $token->user;
+        $user = $authDTO->user;
+
+        $userResource = match (true) {
+            $user->hasRole(UserRole::CUSTOMER()->value) => new CustomerResource($user),
+            default => new UserResource($user),
+        };
 
         $data = [
-            'access_token' => $token->accessToken,
-            'token_type' => $token->tokenType,
+            'access_token' => $authDTO->token->accessToken,
+            'token_type' => $authDTO->token->tokenType,
+            'user' => $userResource,
         ];
 
-        if ($user->hasRole(UserRole::CUSTOMER()->value)) {
-            $data['user'] = new CustomerResource($user);
-        }
-
-        // TODO: move this hard code text to translate file
+        // TODO: move this hard coded text to translation files
         return new self($data, __('Authentification réussie'));
     }
 }
