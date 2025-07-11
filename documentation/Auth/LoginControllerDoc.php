@@ -36,6 +36,22 @@ use OpenApi\Annotations as OA;
  *         type="string",
  *         description="Type de token",
  *         example="bearer"
+ *     ),
+ *  )
+ *
+ * @OA\Schema(
+ *     schema="AuthData",
+ *     description="Objet de transfert de données contenant le token et les informations de l'utilisateur authentifié",
+ *
+ *     @OA\Property(
+ *         property="token",
+ *         ref="#/components/schemas/TokenData",
+ *         description="Informations du token"
+ *     ),
+ *     @OA\Property(
+ *         property="user",
+ *         ref="#/components/schemas/CustomerData",
+ *         description="Informations de l'utilisateur authentifié"
  *     )
  * )
  *
@@ -47,7 +63,7 @@ use OpenApi\Annotations as OA;
  *
  *             @OA\Property(
  *                 property="data",
- *                 ref="#/components/schemas/TokenData"
+ *                 ref="#/components/schemas/AuthData"
  *             ),
  *             @OA\Property(
  *                 property="message",

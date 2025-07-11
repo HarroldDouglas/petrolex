@@ -19,7 +19,7 @@
                     </li>
                 </ul>
             </div>
-             <div class="col-4 p-0">
+            <div class="col-4 p-0">
                 <div class="d-flex justify-content-end">
                     <a href="{{ route('bottles.types.index') }}" class="btn btn-primary">
                         <i class="ti ti-arrow-back"></i> Retourner à la liste
