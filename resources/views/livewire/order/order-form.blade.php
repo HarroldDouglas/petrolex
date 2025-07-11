@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="customer" class="form-label">Client</label>
-                <select class="form-select select2 searchable" id="customer" wire:model.live="customer" data-placeholder="Rechercher un client">
+                <select class="form-select" id="customer" wire:model.live="customer" data-placeholder="Rechercher un client">
                     <option value="">Sélectionnez un client</option>
                    @foreach ($customers as $key => $customer)
                        <option value="{{ $customer['id'] }}">{{ $customer['full_name'] }}</option>
@@ -13,7 +13,7 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label for="distribution_center" class="form-label">Centre de distribution</label>
-                <select class="form-select select2 searchable" id="distribution_center" wire:model.live="distribution_center" data-placeholder="Rechercher un centre de distribution">
+                <select class="form-select earchable" id="distribution_center" wire:model.live="distribution_center" data-placeholder="Rechercher un centre de distribution">
                     <option value="">Sélectionnez un centre de distribution</option>
                    @foreach ($distributionCenters as $key => $center)
                        <option value="{{ $center['id'] }}">{{ $center['name'] }}</option>
@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label for="customer_address" class="form-label">Adresse du client</label>
-                <select class="form-select select2 searchable" id="customer_address" wire:model.live="delivery_address_id" data-placeholder="Rechercher une adresse">
+                <select class="form-select" id="customer_address" wire:model.live="delivery_address_id" data-placeholder="Rechercher une adresse">
                     <option value="">Sélectionnez une adresse</option>
                    @foreach ($customerAddresses as $key => $address)
                        <option value="{{ $address['id'] }}">{{ $address['full_address'] }}</option>
@@ -66,7 +66,7 @@
             <div class="row mb-3 align-items-end">
                 <div class="col-md-3">
                     <label for="selectedProduct" class="form-label">Nom du produit</label>
-                    <select class="form-select" id="selectedProduct" wire:model.live="selectedProduct">
+                    <select class="form-select" id="selectedProduct" wire:model.live="selectedProduct" @disabled(empty($distribution_center))>
                         <option value="">Sélectionner un produit</option>
                         @foreach($allAvailableProducts as $productCategory)
                             @php
@@ -186,32 +186,4 @@
     </form>
 </div>
 
-@push('scripts')
-<script>
 
-    document.addEventListener('livewire:initialized', () => {
-        initializeSelect2();
-        
-        Livewire.hook('morph.updated', ({ el }) => {
-            initializeSelect2();
-        });
-    });
-    
-    function initializeSelect2() {
-        $('.searchable').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                placeholder: $(this).data('placeholder'),
-                allowClear: true
-            });
-            
-            $(this).on('change', function (e) {
-                const elementId = e.target.id;
-                const value = $(this).val();
-                @this.set(elementId, value);
-            });
-        });
-    }
-</script>
-@endpush

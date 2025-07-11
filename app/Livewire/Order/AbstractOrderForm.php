@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Order;
 
+use App\Enums\BottleOrderType;
 use App\Enums\PaymentMethod;
 use App\Enums\ProductType;
 use Livewire\Component;
@@ -116,7 +117,28 @@ abstract class AbstractOrderForm extends Component
             ->mapWithKeys(fn ($case) => [$case->value => $case->label])
             ->toArray();
 
-        $this->allAvailableProducts = $this->getFakeProducts();
+        // Only load products if a distribution center is already selected (e.g., on form reload)
+        if ($this->distribution_center) {
+            $this->allAvailableProducts = $this->getFakeProducts();
+        }
+    }
+
+    public function updatedDistributionCenter($value)
+    {
+        // Reset product selection and options if distribution center changes or is cleared
+        $this->selectedProduct = '';
+        $this->selectedOption = '';
+        $this->showOptionField = false;
+        $this->productOptions = [];
+        $this->selectedProductDetails = null;
+        $this->productOptionPrices = []; // Clear cart items if DC changes
+
+        if ($value) {
+            // In a real app, you'd fetch products for this DC via an API call
+            $this->allAvailableProducts = $this->getFakeProducts();
+        } else {
+            $this->allAvailableProducts = [];
+        }
     }
 
     public function updatedSelectedProduct($value)
@@ -137,8 +159,8 @@ abstract class AbstractOrderForm extends Component
                     $this->showOptionField = true;
                     $bottleType = $productCategory['productTypeInstance'];
                     $this->productOptions = [
-                        \App\Enums\BottleOrderType::FULL()->value => \App\Enums\BottleOrderType::FULL()->label.' ('.$bottleType['bottle_with_content_price'].' XAF)',
-                        \App\Enums\BottleOrderType::RECHARGE()->value => \App\Enums\BottleOrderType::RECHARGE()->label.' ('.$bottleType['content_price'].' XAF)',
+                        BottleOrderType::FULL()->value => BottleOrderType::FULL()->label.' ('.$bottleType['bottle_with_content_price'].' XAF)',
+                        BottleOrderType::RECHARGE()->value => BottleOrderType::RECHARGE()->label.' ('.$bottleType['content_price'].' XAF)',
                     ];
                 }
             }
@@ -187,12 +209,12 @@ abstract class AbstractOrderForm extends Component
                 return;
             }
             $bottleType = $this->selectedProductDetails['productTypeInstance'];
-            if ($this->selectedOption === \App\Enums\BottleOrderType::FULL()->value) {
+            if ($this->selectedOption === BottleOrderType::FULL()->value) {
                 $price = $bottleType['bottle_with_content_price'];
-                $optionName = \App\Enums\BottleOrderType::FULL()->label;
-            } elseif ($this->selectedOption === \App\Enums\BottleOrderType::RECHARGE()->value) {
+                $optionName = BottleOrderType::FULL()->label;
+            } elseif ($this->selectedOption === BottleOrderType::RECHARGE()->value) {
                 $price = $bottleType['content_price'];
-                $optionName = \App\Enums\BottleOrderType::RECHARGE()->label;
+                $optionName = BottleOrderType::RECHARGE()->label;
             }
         } else {
             $price = $this->selectedProductDetails['productTypeInstance']['price'];
