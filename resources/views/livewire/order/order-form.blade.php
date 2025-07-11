@@ -68,21 +68,44 @@
                     <label for="selectedProduct" class="form-label">Nom du produit</label>
                     <select class="form-select" id="selectedProduct" wire:model.live="selectedProduct">
                         <option value="">Sélectionner un produit</option>
-                        @foreach($availableProducts as $product)
-                            @if(!in_array($product, array_column($productOptionPrices, 'product')))
-                                <option value="{{ $product }}">{{ $product }}</option>
-                            @endif
+                        @foreach($allAvailableProducts as $productCategory)
+                            @php
+                                $isDisabled = false;
+                                foreach ($productOptionPrices as $item) {
+                                    if ($item['product_id'] === $productCategory['id']) {
+                                        if ($productCategory['product_type'] === \App\Enums\ProductType::ACCESSORY()->value) {
+                                            $isDisabled = true;
+                                            break;
+                                        } elseif ($productCategory['product_type'] === \App\Enums\ProductType::BOTTLE()->value && $item['option'] === 'bottle_with_content_price') {
+                                            $isDisabled = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            @endphp
+                            <option value="{{ $productCategory['id'] }}" {{ $isDisabled ? 'disabled' : '' }}>{{ $productCategory['name'] }}</option>
                         @endforeach
                     </select>
+                    @error('selectedProduct') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" x-data="{ show: @entangle('showOptionField') }" x-show="show">
                     <label for="selectedOption" class="form-label">Option</label>
                     <select class="form-select" id="selectedOption" wire:model.live="selectedOption">
                         <option value="">Sélectionner une option</option>
-                        @foreach(\App\Enums\BottleOrderType::cases() as $type)
-                        <option value="{{ $type->value }}">{{ $type->label }}</option>
+                        @foreach($productOptions as $value => $label)
+                            @php
+                                $isDisabled = false;
+                                foreach ($productOptionPrices as $item) {
+                                    if ($item['product_id'] === (int) $selectedProduct && $item['option'] === $value) {
+                                        $isDisabled = true;
+                                        break;
+                                    }
+                                }
+                            @endphp
+                            <option value="{{ $value }}" {{ $isDisabled ? 'disabled' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
+                    @error('selectedOption') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
                 <div class="col-md-3">
                     <label for="productOptionQuantity" class="form-label">Quantité</label>
@@ -114,7 +137,13 @@
                             @foreach($productOptionPrices as $index => $productOptionPrice)
                                 <tr>
                                     <td>{{ $productOptionPrice['name'] }}</td>
-                                    <td>{{\App\Enums\BottleOrderType::from( $productOptionPrice['option'])->label}}</td>
+                                    <td>
+                                        @if($productOptionPrice['product_type'] === \App\Enums\ProductType::BOTTLE()->value)
+                                            {{\App\Enums\BottleOrderType::from( $productOptionPrice['option'])->label}}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td>{{ $productOptionPrice['price'] }}</td>
                                     <td>
                                         <input type="number" class="form-control @error('productOptionPrices.'.$index.'.quantity') is-invalid @enderror" 
