@@ -11,7 +11,7 @@ use App\Models\User;
 
 class LoginResponse extends ApiResponse
 {
-    public static function withToken(AuthDTO $authDTO): self
+    public static function withUserAndToken(AuthDTO $authDTO): self
     {
         /** @var User $user */
         $user = $authDTO->user;

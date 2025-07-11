@@ -39,8 +39,7 @@ class AuthenticationService implements AuthenticationServiceInterface
 
         $token = new TokenDTO(
             accessToken: $plainTextToken,
-            tokenType: AuthConstants::TOKEN_TYPE,
-            user: $user
+            tokenType: AuthConstants::TOKEN_TYPE
         );
 
         return new AuthDTO(
