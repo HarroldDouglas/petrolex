@@ -2,9 +2,9 @@
 
 namespace App\Livewire;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Livewire\Component;
-use App\Enums\OrderStatus;
 
 class OrderDetailsActions extends Component
 {

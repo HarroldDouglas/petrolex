@@ -5,6 +5,8 @@ namespace App\Livewire\Order;
 use App\Enums\BottleOrderType;
 use App\Enums\PaymentMethod;
 use App\Enums\ProductType;
+use App\Services\User\UserService;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
 abstract class AbstractOrderForm extends Component
@@ -14,19 +16,33 @@ abstract class AbstractOrderForm extends Component
     public $distribution_center_id;
     public $delivery_type;
     public array $items = [];
-    public array $customers = [
-        ['id' => 1, 'full_name' => 'Jean Dupont'],
-        ['id' => 2, 'full_name' => 'Marie Claire'],
-    ];
+    public Collection $customers;
+    protected UserService $userService;
+
+    public function boot(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
 
     public array $distributionCenters = [
         ['id' => 1, 'name' => 'Centre Douala'],
         ['id' => 2, 'name' => 'Centre Yaoundé'],
     ];
-    public array $customerAddresses = [
-        ['id' => 1, 'full_address' => '123 Rue Principale, Douala'],
-        ['id' => 2, 'full_address' => '456 Avenue Centrale, Yaoundé'],
-    ];
+    public Collection $customerAddresses;
+
+    public function updatedCustomer($value)
+    {
+        $this->customerAddresses = new Collection;
+        $this->delivery_address_id = null;
+
+        if ($value) {
+            /** @var \App\Models\User|null $user */
+            $user = $this->customers->firstWhere('id', $value);
+            if ($user && $user->customer) {
+                $this->customerAddresses = $user->customer->deliveryAddresses;
+            }
+        }
+    }
 
     public array $paymentMethods = [];
 
@@ -43,7 +59,6 @@ abstract class AbstractOrderForm extends Component
                     'capacity' => 6,
                     'height' => 45.5,
                     'weight' => 5.2,
-                    'radius' => 15.2,
                     'content_price' => 6500,
                     'bottle_with_content_price' => 18500,
                 ],
@@ -102,7 +117,7 @@ abstract class AbstractOrderForm extends Component
 
     public array $productOptionPrices = [];
 
-    public string $selectedProduct = ''; // This will now hold the productCategory ID
+    public string $selectedProduct = '';
     public string $selectedOption = '';
     public int $productOptionQuantity = 1;
 
@@ -113,6 +128,8 @@ abstract class AbstractOrderForm extends Component
 
     public function initialize()
     {
+        $this->customers = new Collection;
+        $this->customerAddresses = new Collection;
         $this->paymentMethods = collect(PaymentMethod::cases())
             ->mapWithKeys(fn ($case) => [$case->value => $case->label])
             ->toArray();
@@ -120,6 +137,17 @@ abstract class AbstractOrderForm extends Component
         // Only load products if a distribution center is already selected (e.g., on form reload)
         if ($this->distribution_center) {
             $this->allAvailableProducts = $this->getFakeProducts();
+        }
+        $this->fetchCustomers();
+    }
+
+    private function fetchCustomers()
+    {
+        try {
+            $this->customers = $this->userService->getAllCustomers();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Exception lors du chargement des clients: '.$e->getMessage());
+            $this->customers = new Collection;
         }
     }
 
@@ -131,10 +159,9 @@ abstract class AbstractOrderForm extends Component
         $this->showOptionField = false;
         $this->productOptions = [];
         $this->selectedProductDetails = null;
-        $this->productOptionPrices = []; // Clear cart items if DC changes
+        $this->productOptionPrices = [];
 
         if ($value) {
-            // In a real app, you'd fetch products for this DC via an API call
             $this->allAvailableProducts = $this->getFakeProducts();
         } else {
             $this->allAvailableProducts = [];
@@ -232,8 +259,8 @@ abstract class AbstractOrderForm extends Component
         $this->productOptionPrices[] = [
             'product_id' => (int) $this->selectedProduct,
             'name' => $productName,
-            'product_type' => $productType, // Add product_type here
-            'option' => $this->selectedOption, // Store the enum value
+            'product_type' => $productType,
+            'option' => $this->selectedOption,
             'price' => $price,
             'quantity' => $this->productOptionQuantity,
         ];
