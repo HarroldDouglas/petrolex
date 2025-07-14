@@ -5,8 +5,10 @@ namespace App\Livewire\Order;
 use App\Enums\BottleOrderType;
 use App\Enums\PaymentMethod;
 use App\Enums\ProductType;
+use App\Services\DistributionCenter\DistributionCenterService;
 use App\Services\User\UserService;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 abstract class AbstractOrderForm extends Component
@@ -16,23 +18,22 @@ abstract class AbstractOrderForm extends Component
     public $distribution_center_id;
     public $delivery_type;
     public array $items = [];
-    public Collection $customers;
+    public EloquentCollection $customers;
     protected UserService $userService;
+    protected DistributionCenterService $distributionCenterService;
 
-    public function boot(UserService $userService)
+    public function boot(UserService $userService, DistributionCenterService $distributionCenterService)
     {
         $this->userService = $userService;
+        $this->distributionCenterService = $distributionCenterService;
     }
 
-    public array $distributionCenters = [
-        ['id' => 1, 'name' => 'Centre Douala'],
-        ['id' => 2, 'name' => 'Centre Yaoundé'],
-    ];
-    public Collection $customerAddresses;
+    public EloquentCollection $distributionCenters;
+    public EloquentCollection $customerAddresses;
 
     public function updatedCustomer($value)
     {
-        $this->customerAddresses = new Collection;
+        $this->customerAddresses = new EloquentCollection;
         $this->delivery_address_id = null;
 
         if ($value) {
@@ -46,70 +47,7 @@ abstract class AbstractOrderForm extends Component
 
     public array $paymentMethods = [];
 
-    public array $allAvailableProducts = [];
-
-    private function getFakeProducts(): array
-    {
-        return [
-            [
-                'id' => 1,
-                'name' => 'Bouteille de 6Kg',
-                'product_type' => ProductType::BOTTLE()->value,
-                'productTypeInstance' => [
-                    'capacity' => 6,
-                    'height' => 45.5,
-                    'weight' => 5.2,
-                    'content_price' => 6500,
-                    'bottle_with_content_price' => 18500,
-                ],
-                'pivot' => [
-                    'stock_filled' => 40,
-                    'stock' => 0,
-                ],
-            ],
-            [
-                'id' => 2,
-                'name' => 'Bouteille de 9Kg',
-                'product_type' => ProductType::BOTTLE()->value,
-                'productTypeInstance' => [
-                    'capacity' => 9,
-                    'height' => 50.0,
-                    'weight' => 6.5,
-                    'radius' => 17.0,
-                    'content_price' => 8000,
-                    'bottle_with_content_price' => 22000,
-                ],
-                'pivot' => [
-                    'stock_filled' => 32,
-                    'stock' => 0,
-                ],
-            ],
-            [
-                'id' => 3,
-                'name' => 'Tuyau de gaz standard 5m',
-                'product_type' => ProductType::ACCESSORY()->value,
-                'productTypeInstance' => [
-                    'price' => 2500,
-                ],
-                'pivot' => [
-                    'stock_filled' => 0,
-                    'stock' => 61,
-                ],
-            ],
-            [
-                'id' => 4,
-                'name' => 'Détendeur universel',
-                'product_type' => ProductType::ACCESSORY()->value,
-                'productTypeInstance' => [
-                    'price' => 3500,
-                ],
-                'pivot' => [
-                    'stock_filled' => 0,
-                    'stock' => 60,
-                ],
-            ],
-        ];
-    }
+    public Collection $allAvailableProducts;
 
     public bool $showOptionField = false;
     public array $productOptions = [];
@@ -128,17 +66,16 @@ abstract class AbstractOrderForm extends Component
 
     public function initialize()
     {
-        $this->customers = new Collection;
-        $this->customerAddresses = new Collection;
+        $this->customers = new EloquentCollection();
+        $this->customerAddresses = new EloquentCollection();
+        $this->distributionCenters = new EloquentCollection();
+        $this->allAvailableProducts = new Collection();
         $this->paymentMethods = collect(PaymentMethod::cases())
             ->mapWithKeys(fn ($case) => [$case->value => $case->label])
             ->toArray();
 
-        // Only load products if a distribution center is already selected (e.g., on form reload)
-        if ($this->distribution_center) {
-            $this->allAvailableProducts = $this->getFakeProducts();
-        }
         $this->fetchCustomers();
+        $this->fetchDistributionCenters();
     }
 
     private function fetchCustomers()
@@ -147,7 +84,17 @@ abstract class AbstractOrderForm extends Component
             $this->customers = $this->userService->getAllCustomers();
         } catch (\Exception $e) {
             session()->flash('error', 'Exception lors du chargement des clients: '.$e->getMessage());
-            $this->customers = new Collection;
+            $this->customers = new EloquentCollection;
+        }
+    }
+
+    private function fetchDistributionCenters()
+    {
+        try {
+            $this->distributionCenters = $this->distributionCenterService->getAll();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Exception lors du chargement des centres de distribution: '.$e->getMessage());
+            $this->distributionCenters = new EloquentCollection;
         }
     }
 
@@ -162,9 +109,9 @@ abstract class AbstractOrderForm extends Component
         $this->productOptionPrices = [];
 
         if ($value) {
-            $this->allAvailableProducts = $this->getFakeProducts();
+            $this->allAvailableProducts = $this->distributionCenterService->getProducts($value);
         } else {
-            $this->allAvailableProducts = [];
+            $this->allAvailableProducts = new Collection();
         }
     }
 
@@ -175,20 +122,37 @@ abstract class AbstractOrderForm extends Component
         $this->showOptionField = false;
         $this->productOptions = [];
         $this->selectedProductDetails = null;
-
+ 
         if (! empty($value)) {
-            $productCategory = collect($this->allAvailableProducts)->firstWhere('id', (int) $value);
-
+            /** @var \App\Models\ProductCategory|null $productCategory */
+            $productCategory = $this->allAvailableProducts->firstWhere('id', (int) $value);
+            
             if ($productCategory) {
-                $this->selectedProductDetails = $productCategory;
+                $this->selectedProductDetails = [
+                    'id' => $productCategory->id,
+                    'name' => $productCategory->name,
+                    'product_type' => $productCategory->product_type->value,
+                    'productTypeInstance' => null,
+                ];
 
-                if ($productCategory['product_type'] === ProductType::BOTTLE()->value) {
-                    $this->showOptionField = true;
-                    $bottleType = $productCategory['productTypeInstance'];
-                    $this->productOptions = [
-                        BottleOrderType::FULL()->value => BottleOrderType::FULL()->label.' ('.$bottleType['bottle_with_content_price'].' XAF)',
-                        BottleOrderType::RECHARGE()->value => BottleOrderType::RECHARGE()->label.' ('.$bottleType['content_price'].' XAF)',
-                    ];
+                $productTypeInstance = $productCategory->productTypeInstance;
+
+                if ($productTypeInstance) {
+                    if ($productCategory->product_type === ProductType::BOTTLE()) {
+                        $this->showOptionField = true;
+                        $this->selectedProductDetails['productTypeInstance'] = [
+                            'content_price' => $productTypeInstance->content_price,
+                            'bottle_with_content_price' => $productTypeInstance->bottle_with_content_price,
+                        ];
+                        $this->productOptions = [
+                            BottleOrderType::FULL()->value => BottleOrderType::FULL()->label.' ('.$productTypeInstance->bottle_with_content_price.' XAF)',
+                            BottleOrderType::RECHARGE()->value => BottleOrderType::RECHARGE()->label.' ('.$productTypeInstance->content_price.' XAF)',
+                        ];
+                    } elseif ($productCategory->product_type === ProductType::ACCESSORY()) {
+                        $this->selectedProductDetails['productTypeInstance'] = [
+                            'price' => $productTypeInstance->price,
+                        ];
+                    }
                 }
             }
         }
@@ -218,14 +182,17 @@ abstract class AbstractOrderForm extends Component
 
     public function addProduct()
     {
-        if (! $this->selectedProductDetails) {
+        /** @var array|null $selectedProductDetails */
+        $selectedProductDetails = $this->selectedProductDetails;
+
+        if (! $selectedProductDetails) {
             $this->addError('selectedProduct', 'Veuillez sélectionner un produit valide.');
 
             return;
         }
 
-        $productName = $this->selectedProductDetails['name'];
-        $productType = $this->selectedProductDetails['product_type'];
+        $productName = $selectedProductDetails['name'];
+        $productType = $selectedProductDetails['product_type'];
         $price = 0;
         $optionName = '';
 
@@ -235,7 +202,8 @@ abstract class AbstractOrderForm extends Component
 
                 return;
             }
-            $bottleType = $this->selectedProductDetails['productTypeInstance'];
+            
+            $bottleType = $selectedProductDetails['productTypeInstance'];
             if ($this->selectedOption === BottleOrderType::FULL()->value) {
                 $price = $bottleType['bottle_with_content_price'];
                 $optionName = BottleOrderType::FULL()->label;
@@ -243,8 +211,9 @@ abstract class AbstractOrderForm extends Component
                 $price = $bottleType['content_price'];
                 $optionName = BottleOrderType::RECHARGE()->label;
             }
+           
         } else {
-            $price = $this->selectedProductDetails['productTypeInstance']['price'];
+            $price = $selectedProductDetails['productTypeInstance']['price'];
         }
 
         // Check for duplicate product-option combination
