@@ -2,24 +2,97 @@
 
 namespace App\Services\Order;
 
+use App\DTOs\Order\CreateOrderDTO;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Exceptions\OrderNotFoundException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\AccessoryType;
 use App\Models\BottleType;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\ProductCategory;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Services\BaseServiceForEntity;
+use App\Services\ProductCategoryService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 
-class OrderService
+class OrderService extends BaseServiceForEntity
 {
     public function __construct(
-        private OrderRepositoryInterface $orderRepository
-    ) {}
+        protected OrderRepositoryInterface $orderRepository,
+        private ProductCategoryService $productCategoryService
+    ) {
+        parent::__construct($orderRepository);
+    }
+
+    protected function getModel(): string
+    {
+        return Order::class;
+    }
+
+    public function createOrder(CreateOrderDTO $orderDTO): Order
+    {
+        return $this->executeInTransaction(function () use ($orderDTO) {
+            $totalAmount = 0;
+            $orderItemsData = [];
+
+            foreach ($orderDTO->items as $itemDTO) {
+                $productCategory = $this->productCategoryService->getProductCategory($itemDTO->product_category_id);
+                $productInstance = $this->productCategoryService->getProductInstance($productCategory);
+
+                $unitPrice = $this->productCategoryService->getProductPrice(
+                    $productCategory,
+                    $productInstance,
+                    $itemDTO->option
+                );
+
+                $availableQuantity = $this->productCategoryService->getProductQuantity(
+                    $productCategory,
+                    $orderDTO->distribution_center_id
+                );
+
+                if ($availableQuantity < $itemDTO->quantity) {
+                    throw new \Exception('Insufficient stock for product: ' . $productCategory->name);
+                }
+
+                // TODO: Deduct stock after order creation (e.g., in a listener)
+
+                $itemTotalPrice = $unitPrice * $itemDTO->quantity;
+                $totalAmount += $itemTotalPrice;
+
+                $orderItemsData[] = [
+                    'product_category_id' => $itemDTO->product_category_id,
+                    'quantity' => $itemDTO->quantity,
+                    'unit_price' => $unitPrice,
+                    'total_price' => $itemTotalPrice,
+                    'option' => $itemDTO->option, // Nullable for non-bottles
+                ];
+            }
+
+            $orderData = [
+                'customer_id' => $orderDTO->customer_id,
+                'delivery_address_id' => $orderDTO->delivery_address_id,
+                'distribution_center_id' => $orderDTO->distribution_center_id,
+                'delivery_type' => $orderDTO->delivery_type->value,
+                'payment_method' => $orderDTO->payment_method->value,
+                'total_amount' => $totalAmount,
+                'status' => OrderStatus::CONFIRMED()->value, // Default status
+            ];
+
+            /** @var Order $order */
+            $order = $this->repository->create($orderData);
+
+            // Dispatch event to add order items and log
+            Event::dispatch(new \App\Events\OrderCreatedEvent($order, $orderItemsData));
+
+            return $order;
+        });
+    }
 
     /**
      * Get order with grouped items for display
@@ -52,8 +125,8 @@ class OrderService
             $productCategory = $item->productCategory;
 
             return match ($productCategory->product_type) {
-                ProductType::BOTTLE() => $this->getBottleGroupingKey($item),
-                ProductType::ACCESSORY() => $this->getAccessoryGroupingKey($item),
+                ProductType::BOTTLE()->value => $this->getBottleGroupingKey($item),
+                ProductType::ACCESSORY()->value => $this->getAccessoryGroupingKey($item),
                 default => 'unknown-'.$item->id,
             };
         })->map(function (Collection $group, string $groupKey): GroupedOrderItemDTO {
@@ -79,8 +152,8 @@ class OrderService
         $productCategory = $item->productCategory;
 
         return match ($productCategory->product_type) {
-            ProductType::BOTTLE() => $this->getBottleDisplayName($item),
-            ProductType::ACCESSORY() => $this->getAccessoryDisplayName($item),
+            ProductType::BOTTLE()->value => $this->getBottleDisplayName($item),
+            ProductType::ACCESSORY()->value => $this->getAccessoryDisplayName($item),
             default => 'Produit inconnu',
         };
     }
@@ -165,7 +238,7 @@ class OrderService
             DB::beginTransaction();
 
             try {
-                $result = $this->orderRepository->updateStatus($order, OrderStatus::CANCELLED());
+                $result = $this->orderRepository->updateStatus($order, OrderStatus::CANCELLED()->value);
 
                 if ($result) {
                     DB::commit();

@@ -24,7 +24,7 @@ class AbstractOrderRequest extends FormRequest
             'items' => ['required', 'array'],
             'items.*.product_category_id' => ['required', 'exists:product_categories,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'items.*.option' => ['required', Rule::in(BottleOrderType::values())],
+            'items.*.option' => ['nullable', Rule::in(BottleOrderType::values())],
         ];
     }
 
@@ -45,7 +45,6 @@ class AbstractOrderRequest extends FormRequest
             'items.*.quantity.required' => 'La quantité est requise pour chaque article.',
             'items.*.quantity.integer' => 'La quantité doit être un entier pour chaque article.',
             'items.*.quantity.min' => 'La quantité doit être au moins 1 pour chaque article.',
-            'items.*.option.required' => "L'option est requise pour chaque article.",
             'items.*.option.in' => "L'option sélectionnée pour un article est invalide.",
         ];
     }
