@@ -9,6 +9,7 @@ use OpenApi\Annotations as OA;
  *         "label",
  *         "address"
  *     },
+ *
  *     @OA\Property(property="label", type="string", example="Maison secondaire", description="Label for the delivery address"),
  *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté", description="Full street address"),
  *     @OA\Property(property="neighborhood", type="string", example="Bali", nullable=true, description="Neighborhood or district"),
@@ -29,6 +30,7 @@ use OpenApi\Annotations as OA;
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
+ *
  *             @OA\Property(
  *                 property="data",
  *                 ref="#/components/schemas/DeliveryAddress"
@@ -49,41 +51,55 @@ use OpenApi\Annotations as OA;
  *     operationId="api.customers.delivery-addresses.store",
  *     tags={"Clients"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Parameter(
  *         name="customer",
  *         in="path",
  *         required=true,
  *         description="ID du client",
+ *
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ *
  *     @OA\RequestBody(
  *         required=true,
  *         description="Données de l'adresse de livraison à créer",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/StoreCustomerDeliveryAddressRequest")
  *     ),
+ *
  *     @OA\Response(
  *         response=201,
  *         description="Adresse de livraison créée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/StoreCustomerDeliveryAddressResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non autorisé",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=404,
  *         description="Client non trouvé",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=422,
  *         description="Erreur de validation",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur interne du serveur",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )
