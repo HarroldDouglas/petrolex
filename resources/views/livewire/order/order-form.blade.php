@@ -120,7 +120,7 @@
                     </button>
                 </div>
             </div>
-            
+           
             @if(count($productOptionPrices) > 0)
                 <div class="table-responsive">
                     <table class="table table-bordered">

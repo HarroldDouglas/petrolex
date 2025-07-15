@@ -50,7 +50,10 @@ class CustomerDeliveryAddress extends Model
         'latitude',
         'longitude',
         'phone',
-        'contact_name',
+        'contact_firstname',
+        'contact_lastname',
+        'email',
+        'address_precision',
         'is_default',
     ];
 

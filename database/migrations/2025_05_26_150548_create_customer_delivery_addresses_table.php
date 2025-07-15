@@ -22,7 +22,10 @@ return new class extends Migration
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 10, 8)->nullable();
             $table->string('phone')->nullable();
-            $table->string('contact_name')->nullable();
+            $table->string('contact_firstname')->nullable();
+            $table->string('contact_lastname')->nullable();
+            $table->string('email')->nullable();
+            $table->text('address_precision')->nullable();
             $table->boolean('is_default')->default(false);
             $table->timestamps();
             $table->softDeletes();
