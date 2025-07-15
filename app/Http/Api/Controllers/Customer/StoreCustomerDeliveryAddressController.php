@@ -11,7 +11,10 @@ use App\Models\Customer;
 class StoreCustomerDeliveryAddressController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Store new customer delivery address.
+     *
+     * Route: POST /customers/{customer}/delivery-addresses
+     * Name: api.customers.delivery-addresses.store
      */
     public function __invoke(StoreCustomerDeliveryAddressRequest $request, Customer $customer): StoreCustomerDeliveryAddressResponse
     {
