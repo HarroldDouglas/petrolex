@@ -5,15 +5,15 @@
                 <label for="customer" class="form-label">Client</label>
                 <select class="form-select" id="customer" wire:model.live="customer" data-placeholder="Rechercher un client">
                     <option value="">Sélectionnez un client</option>
-                   @foreach ($customers as $key => $customer)
-                       <option value="{{ $customer['id'] }}">{{ $customer['full_name'] }}</option>
+                   @foreach ($customers as $customer)
+                       <option value="{{ $customer->id }}">{{ $customer->full_name }}</option>
                    @endforeach
                 </select>
                 @error('customer') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
                 <label for="distribution_center" class="form-label">Centre de distribution</label>
-                <select class="form-select earchable" id="distribution_center" wire:model.live="distribution_center" data-placeholder="Rechercher un centre de distribution">
+                <select class="form-select" id="distribution_center" wire:model.live="distribution_center">
                     <option value="">Sélectionnez un centre de distribution</option>
                    @foreach ($distributionCenters as $key => $center)
                        <option value="{{ $center['id'] }}">{{ $center['name'] }}</option>
@@ -25,8 +25,8 @@
                 <label for="customer_address" class="form-label">Adresse du client</label>
                 <select class="form-select" id="customer_address" wire:model.live="delivery_address_id" data-placeholder="Rechercher une adresse">
                     <option value="">Sélectionnez une adresse</option>
-                   @foreach ($customerAddresses as $key => $address)
-                       <option value="{{ $address['id'] }}">{{ $address['full_address'] }}</option>
+                   @foreach ($customerAddresses as $address)
+                       <option value="{{ $address->id }}">{{ $address->address }}</option>
                    @endforeach
                 </select>
                 @error('customer_address') <span class="text-danger">{{ $message }}</span> @enderror
