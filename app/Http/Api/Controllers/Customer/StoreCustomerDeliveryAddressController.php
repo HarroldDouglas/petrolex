@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Controllers\Customer;
 
+use App\DTOs\Customer\CustomerDeliveryAddressDTO;
 use App\Http\Api\Responses\Customer\StoreCustomerDeliveryAddressResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\StoreCustomerDeliveryAddressRequest;
@@ -14,7 +15,8 @@ class StoreCustomerDeliveryAddressController extends Controller
      */
     public function __invoke(StoreCustomerDeliveryAddressRequest $request, Customer $customer): StoreCustomerDeliveryAddressResponse
     {
-        $deliveryAddress = $customer->deliveryAddresses()->create($request->validated());
+        $dto = CustomerDeliveryAddressDTO::from($request->validated());
+        $deliveryAddress = $customer->deliveryAddresses()->create($dto->toArray());
 
         return StoreCustomerDeliveryAddressResponse::withAddress($deliveryAddress);
     }

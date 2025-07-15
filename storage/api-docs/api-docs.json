@@ -115,6 +115,96 @@
                 ]
             }
         },
+        "/api/customers/{customer}/delivery-addresses": {
+            "post": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Créer une nouvelle adresse de livraison pour un client",
+                "description": "Permet de créer une nouvelle adresse de livraison associée à un client spécifique.",
+                "operationId": "api.customers.delivery-addresses.store",
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "description": "ID du client",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Données de l'adresse de livraison à créer",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreCustomerDeliveryAddressRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Adresse de livraison créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StoreCustomerDeliveryAddressResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Client non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/distribution-centers/{id}/products": {
             "get": {
                 "tags": [
@@ -463,6 +553,113 @@
                             "message": {
                                 "type": "string",
                                 "example": "Liste des clients récupérée avec succès"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "StoreCustomerDeliveryAddressRequest": {
+                "required": [
+                    "label",
+                    "address"
+                ],
+                "properties": {
+                    "label": {
+                        "description": "Label for the delivery address",
+                        "type": "string",
+                        "example": "Maison secondaire"
+                    },
+                    "address": {
+                        "description": "Full street address",
+                        "type": "string",
+                        "example": "456 Avenue de la Liberté"
+                    },
+                    "neighborhood": {
+                        "description": "Neighborhood or district",
+                        "type": "string",
+                        "example": "Bali",
+                        "nullable": true
+                    },
+                    "city": {
+                        "description": "City",
+                        "type": "string",
+                        "example": "Yaoundé",
+                        "nullable": true
+                    },
+                    "country": {
+                        "description": "Country",
+                        "type": "string",
+                        "example": "Cameroun",
+                        "nullable": true
+                    },
+                    "latitude": {
+                        "description": "Latitude coordinate",
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.848,
+                        "nullable": true
+                    },
+                    "longitude": {
+                        "description": "Longitude coordinate",
+                        "type": "number",
+                        "format": "float",
+                        "example": 11.502,
+                        "nullable": true
+                    },
+                    "phone": {
+                        "description": "Contact phone number",
+                        "type": "string",
+                        "example": "+237699887766",
+                        "nullable": true
+                    },
+                    "contact_firstname": {
+                        "description": "Contact person's first name",
+                        "type": "string",
+                        "example": "Marie",
+                        "nullable": true
+                    },
+                    "contact_lastname": {
+                        "description": "Contact person's last name",
+                        "type": "string",
+                        "example": "Curie",
+                        "nullable": true
+                    },
+                    "email": {
+                        "description": "Contact person's email address",
+                        "type": "string",
+                        "format": "email",
+                        "example": "marie.curie@example.com",
+                        "nullable": true
+                    },
+                    "address_precision": {
+                        "description": "Additional details for address precision",
+                        "type": "string",
+                        "example": "Bâtiment C, 3ème étage",
+                        "nullable": true
+                    },
+                    "is_default": {
+                        "description": "Whether this is the default delivery address for the customer",
+                        "type": "boolean",
+                        "example": false,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StoreCustomerDeliveryAddressResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/DeliveryAddress"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Adresse de livraison créée avec succès"
                             }
                         },
                         "type": "object"
