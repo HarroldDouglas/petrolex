@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Resources;
 
+use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -23,20 +24,7 @@ class CustomerResource extends UserResource
         return array_merge(
             parent::toArray($request),
             [
-                'deliveryAddresses' => $user->customer?->deliveryAddresses
-                    ->map(fn ($address) => [
-                        'id' => $address->id,
-                        'label' => $address->label,
-                        'address' => $address->address,
-                        'neighborhood' => $address->neighborhood,
-                        'city' => $address->city,
-                        'country' => $address->country,
-                        'latitude' => $address->latitude,
-                        'longitude' => $address->longitude,
-                        'phone' => $address->phone,
-                        'contact_name' => $address->contact_name,
-                        'is_default' => $address->is_default,
-                    ]) ?? [],
+                'deliveryAddresses' => CustomerDeliveryAddressResource::collection($user->customer?->deliveryAddresses) ?? [],
                 'current_balance' => $user->customer?->current_balance ?? null,
             ]
         );

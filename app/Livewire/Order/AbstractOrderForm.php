@@ -66,10 +66,10 @@ abstract class AbstractOrderForm extends Component
 
     public function initialize()
     {
-        $this->customers = new EloquentCollection();
-        $this->customerAddresses = new EloquentCollection();
-        $this->distributionCenters = new EloquentCollection();
-        $this->allAvailableProducts = new Collection();
+        $this->customers = new EloquentCollection;
+        $this->customerAddresses = new EloquentCollection;
+        $this->distributionCenters = new EloquentCollection;
+        $this->allAvailableProducts = new Collection;
         $this->paymentMethods = collect(PaymentMethod::cases())
             ->mapWithKeys(fn ($case) => [$case->value => $case->label])
             ->toArray();
@@ -111,7 +111,7 @@ abstract class AbstractOrderForm extends Component
         if ($value) {
             $this->allAvailableProducts = $this->distributionCenterService->getProducts($value);
         } else {
-            $this->allAvailableProducts = new Collection();
+            $this->allAvailableProducts = new Collection;
         }
     }
 
@@ -122,11 +122,11 @@ abstract class AbstractOrderForm extends Component
         $this->showOptionField = false;
         $this->productOptions = [];
         $this->selectedProductDetails = null;
- 
+
         if (! empty($value)) {
             /** @var \App\Models\ProductCategory|null $productCategory */
             $productCategory = $this->allAvailableProducts->firstWhere('id', (int) $value);
-            
+
             if ($productCategory) {
                 $this->selectedProductDetails = [
                     'id' => $productCategory->id,
@@ -202,7 +202,7 @@ abstract class AbstractOrderForm extends Component
 
                 return;
             }
-            
+
             $bottleType = $selectedProductDetails['productTypeInstance'];
             if ($this->selectedOption === BottleOrderType::FULL()->value) {
                 $price = $bottleType['bottle_with_content_price'];
@@ -211,7 +211,7 @@ abstract class AbstractOrderForm extends Component
                 $price = $bottleType['content_price'];
                 $optionName = BottleOrderType::RECHARGE()->label;
             }
-           
+
         } else {
             $price = $selectedProductDetails['productTypeInstance']['price'];
         }
