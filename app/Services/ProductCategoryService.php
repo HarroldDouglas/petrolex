@@ -6,19 +6,19 @@ use App\Enums\BottleOrderType;
 use App\Enums\ProductType;
 use App\Models\ProductCategory;
 use App\Models\ProductCategoryDistributionCenter;
+use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class ProductCategoryService
+class ProductCategoryService extends BaseServiceForEntity
 {
-    public function getProductCategory(int $productCategoryId): ProductCategory
+    public function __construct(ProductCategoryRepositoryInterface $repository)
     {
-        $productCategory = ProductCategory::find($productCategoryId);
+        parent::__construct($repository);
+    }
 
-        if (! $productCategory) {
-            throw new ModelNotFoundException('Product category not found.');
-        }
-
-        return $productCategory;
+    protected function getModel(): string
+    {
+        return ProductCategory::class;
     }
 
     public function getProductInstance(ProductCategory $productCategory)

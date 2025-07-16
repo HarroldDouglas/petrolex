@@ -2,10 +2,10 @@
 
 namespace App\Casts;
 
-use Spatie\LaravelData\Casts\Cast;
-use Spatie\LaravelData\Support\DataProperty;
 use Spatie\Enum\Laravel\Enum;
+use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\DataProperty;
 
 class SpatieEnumCast implements Cast
 {

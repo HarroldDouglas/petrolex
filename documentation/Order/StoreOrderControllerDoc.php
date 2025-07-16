@@ -30,7 +30,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="delivery_address_id", type="integer", example=1, description="ID de l'adresse de livraison"),
  *     @OA\Property(property="distribution_center_id", type="integer", example=1, description="ID du centre de distribution"),
  *     @OA\Property(property="delivery_type", type="string", example="delivery", description="Type de livraison", enum={"delivery", "pickup"}),
- *     @OA\Property(property="payment_method", type="string", example="cash", description="Méthode de paiement", enum={"cash", "mobile_money", "card"}),
+ *     @OA\Property(property="payment_method", type="string", example="mobile_money", description="Méthode de paiement", enum={"mobile_money", "credit_card"}),
  *     @OA\Property(
  *         property="items",
  *         type="array",

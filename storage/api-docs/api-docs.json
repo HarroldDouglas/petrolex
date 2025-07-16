@@ -811,11 +811,10 @@
                         "description": "Méthode de paiement",
                         "type": "string",
                         "enum": [
-                            "cash",
                             "mobile_money",
-                            "card"
+                            "credit_card"
                         ],
-                        "example": "cash"
+                        "example": "mobile_money"
                     },
                     "items": {
                         "description": "Liste des articles de la commande",

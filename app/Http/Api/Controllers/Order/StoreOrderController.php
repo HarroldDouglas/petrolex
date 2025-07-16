@@ -20,7 +20,7 @@ class StoreOrderController extends Controller
     public function __invoke(StoreOrderRequest $request): StoreOrderResponse
     {
         $orderDTO = CreateOrderDTO::from($request->validated());
-        $order = $this->orderService->createOrder($orderDTO);
+        $order = $this->orderService->create($orderDTO->toArray());
 
         return StoreOrderResponse::withOrder($order);
     }
