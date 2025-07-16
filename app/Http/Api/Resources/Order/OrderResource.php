@@ -2,9 +2,9 @@
 
 namespace App\Http\Api\Resources\Order;
 
-use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Http\Api\Resources\CustomerResource;
 use App\Http\Api\Resources\DistributionCenterResource;
+use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,6 +21,7 @@ class OrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'order_number' => $this->order_number,
             'customer_id' => $this->customer_id,
             'customer' => CustomerResource::make($this->whenLoaded('customer')),
             'delivery_address_id' => $this->delivery_address_id,

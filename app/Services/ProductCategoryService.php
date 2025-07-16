@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Enums\BottleOrderType;
 use App\Enums\ProductType;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\ProductCategory;
 use App\Models\ProductCategoryDistributionCenter;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductCategoryService
 {
@@ -37,13 +37,13 @@ class ProductCategoryService
         $productInstance,
         ?string $option = null
     ): float {
-        if ($productCategory->product_type === ProductType::BOTTLE()->value) {
+        if ($productCategory->product_type->value === ProductType::BOTTLE()->value) {
             if ($option === BottleOrderType::FULL()->value) {
                 return $productInstance->bottle_with_content_price;
             } elseif ($option === BottleOrderType::RECHARGE()->value) {
                 return $productInstance->content_price;
             }
-        } elseif ($productCategory->product_type === ProductType::ACCESSORY()->value) {
+        } elseif ($productCategory->product_type->value === ProductType::ACCESSORY()->value) {
             return $productInstance->price;
         }
 

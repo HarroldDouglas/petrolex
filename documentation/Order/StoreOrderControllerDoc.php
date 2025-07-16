@@ -41,6 +41,65 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Schema(
+ *     schema="OrderItemResource",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="order_id", type="integer", example=1),
+ *     @OA\Property(property="product_category_id", type="integer", example=1),
+ *     @OA\Property(property="quantity", type="integer", example=2),
+ *     @OA\Property(property="unit_price", type="number", format="float", example=5000.00),
+ *     @OA\Property(property="total_price", type="number", format="float", example=10000.00),
+ *     @OA\Property(property="option", type="string", example="bottle_with_content", nullable=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time"),
+ * )
+ *
+ * @OA\Schema(
+ *     schema="DistributionCenterResource",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Centre Principal"),
+ *     @OA\Property(property="country", type="string", example="Cameroun"),
+ *     @OA\Property(property="city", type="string", example="Douala"),
+ *     @OA\Property(property="neighborhood", type="string", example="Bonanjo"),
+ *     @OA\Property(property="address", type="string", example="123 Rue Principale, Douala"),
+ *     @OA\Property(property="description", type="string", example="Centre de distribution principal avec toutes les commodités"),
+ *     @OA\Property(property="latitude", type="number", format="float", example=4.0511),
+ *     @OA\Property(property="longitude", type="number", format="float", example=9.7679),
+ *     @OA\Property(property="phone", type="string", example="+237612345678"),
+ *     @OA\Property(property="email", type="string", format="email", example="centre.principal@petrolex.cm"),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="storage_capacity", type="integer", nullable=true, example=1000),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time"),
+ * )
+ *
+ * @OA\Schema(
+ *     schema="OrderResource",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="order_number", type="string", example="ORDER-123456789"),
+ *     @OA\Property(property="customer_id", type="integer", example=1),
+ *     @OA\Property(property="customer", ref="#/components/schemas/CustomerData"),
+ *     @OA\Property(property="delivery_address_id", type="integer", example=1),
+ *     @OA\Property(property="delivery_address", ref="#/components/schemas/DeliveryAddress"),
+ *     @OA\Property(property="distribution_center_id", type="integer", example=1),
+ *     @OA\Property(property="distribution_center", ref="#/components/schemas/DistributionCenterResource"),
+ *     @OA\Property(property="delivery_type", type="string", example="normal"),
+ *     @OA\Property(property="payment_method", type="string", example="cash"),
+ *     @OA\Property(property="total_amount", type="number", format="float", example=23500.00),
+ *     @OA\Property(property="status", type="string", example="confirmed"),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time"),
+ *     @OA\Property(
+ *         property="items",
+ *         type="array",
+ *
+ *         @OA\Items(ref="#/components/schemas/OrderItemResource")
+ *     ),
+ * )
+ *
+ * @OA\Schema(
  *     schema="StoreOrderResponse",
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),

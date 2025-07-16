@@ -7,13 +7,12 @@ use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
+use App\Events\OrderCreatedEvent;
 use App\Exceptions\OrderNotFoundException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\AccessoryType;
 use App\Models\BottleType;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\ProductCategory;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
@@ -39,7 +38,7 @@ class OrderService extends BaseServiceForEntity
     {
         return $this->executeInTransaction(function () use ($orderDTO) {
             $totalAmount = 0;
-            $orderItemsData = [];
+            $processedOrderItemsData = [];
 
             foreach ($orderDTO->items as $itemDTO) {
                 $productCategory = $this->productCategoryService->getProductCategory($itemDTO->product_category_id);
@@ -57,7 +56,7 @@ class OrderService extends BaseServiceForEntity
                 );
 
                 if ($availableQuantity < $itemDTO->quantity) {
-                    throw new \Exception('Insufficient stock for product: ' . $productCategory->name);
+                    throw new \Exception('Insufficient stock for product: '.$productCategory->name);
                 }
 
                 // TODO: Deduct stock after order creation (e.g., in a listener)
@@ -65,30 +64,30 @@ class OrderService extends BaseServiceForEntity
                 $itemTotalPrice = $unitPrice * $itemDTO->quantity;
                 $totalAmount += $itemTotalPrice;
 
-                $orderItemsData[] = [
-                    'product_category_id' => $itemDTO->product_category_id,
-                    'quantity' => $itemDTO->quantity,
-                    'unit_price' => $unitPrice,
-                    'total_price' => $itemTotalPrice,
-                    'option' => $itemDTO->option, // Nullable for non-bottles
-                ];
+                // Convert item DTO to array and augment with calculated prices
+                $itemArray = $itemDTO->toArray();
+                $itemArray['unit_price'] = $unitPrice;
+                $itemArray['total_price'] = $itemTotalPrice;
+
+                $processedOrderItemsData[] = $itemArray;
             }
 
-            $orderData = [
-                'customer_id' => $orderDTO->customer_id,
-                'delivery_address_id' => $orderDTO->delivery_address_id,
-                'distribution_center_id' => $orderDTO->distribution_center_id,
-                'delivery_type' => $orderDTO->delivery_type->value,
-                'payment_method' => $orderDTO->payment_method->value,
-                'total_amount' => $totalAmount,
-                'status' => OrderStatus::CONFIRMED()->value, // Default status
-            ];
+            // Get base order data from DTO and augment with calculated/generated fields
+            $orderData = $orderDTO->toArray();
+            unset($orderData['items']);
+
+            $orderData['total_amount'] = $totalAmount;
+            $orderData['subtotal'] = $totalAmount; // Assuming subtotal is initially the same as total_amount
+            $orderData['status'] = OrderStatus::CONFIRMED()->value; // Default status
+            $orderData['order_number'] = uniqid('ORDER-'); // Generate unique order number
 
             /** @var Order $order */
             $order = $this->repository->create($orderData);
 
-            // Dispatch event to add order items and log
-            Event::dispatch(new \App\Events\OrderCreatedEvent($order, $orderItemsData));
+            Event::dispatch(new OrderCreatedEvent($order, $processedOrderItemsData));
+
+            // Eager load items relationship before returning
+            $order->load('items');
 
             return $order;
         });

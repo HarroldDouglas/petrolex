@@ -205,6 +205,84 @@
                 ]
             }
         },
+        "/api/orders": {
+            "post": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Créer une nouvelle commande",
+                "description": "Permet de créer une nouvelle commande avec ses articles.",
+                "operationId": "api.orders.store",
+                "requestBody": {
+                    "description": "Données de la commande à créer",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Commande créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StoreOrderResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Ressource non trouvée (client, adresse de livraison, centre de distribution, produit)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation ou stock insuffisant",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/distribution-centers/{id}/products": {
             "get": {
                 "tags": [
@@ -666,6 +744,286 @@
                     }
                 ]
             },
+            "OrderItemRequest": {
+                "required": [
+                    "product_category_id",
+                    "quantity"
+                ],
+                "properties": {
+                    "product_category_id": {
+                        "description": "ID de la catégorie de produit",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "quantity": {
+                        "description": "Quantité de l'article",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "option": {
+                        "description": "Option pour les bouteilles (e.g., content_only, bottle_with_content)",
+                        "type": "string",
+                        "enum": [
+                            "content_only",
+                            "bottle_with_content"
+                        ],
+                        "example": "bottle_with_content",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StoreOrderRequest": {
+                "required": [
+                    "customer_id",
+                    "delivery_address_id",
+                    "distribution_center_id",
+                    "delivery_type",
+                    "payment_method",
+                    "items"
+                ],
+                "properties": {
+                    "customer_id": {
+                        "description": "ID du client",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "delivery_address_id": {
+                        "description": "ID de l'adresse de livraison",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "distribution_center_id": {
+                        "description": "ID du centre de distribution",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "delivery_type": {
+                        "description": "Type de livraison",
+                        "type": "string",
+                        "enum": [
+                            "delivery",
+                            "pickup"
+                        ],
+                        "example": "delivery"
+                    },
+                    "payment_method": {
+                        "description": "Méthode de paiement",
+                        "type": "string",
+                        "enum": [
+                            "cash",
+                            "mobile_money",
+                            "card"
+                        ],
+                        "example": "cash"
+                    },
+                    "items": {
+                        "description": "Liste des articles de la commande",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderItemRequest"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "OrderItemResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "product_category_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "unit_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 5000
+                    },
+                    "total_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 10000
+                    },
+                    "option": {
+                        "type": "string",
+                        "example": "bottle_with_content",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "DistributionCenterResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Centre Principal"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Cameroun"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Douala"
+                    },
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Bonanjo"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 Rue Principale, Douala"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Centre de distribution principal avec toutes les commodités"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.0511
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 9.7679
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+237612345678"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "centre.principal@petrolex.cm"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "storage_capacity": {
+                        "type": "integer",
+                        "example": 1000,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "OrderResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order_number": {
+                        "type": "string",
+                        "example": "ORDER-123456789"
+                    },
+                    "customer_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "customer": {
+                        "$ref": "#/components/schemas/CustomerData"
+                    },
+                    "delivery_address_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "delivery_address": {
+                        "$ref": "#/components/schemas/DeliveryAddress"
+                    },
+                    "distribution_center_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "distribution_center": {
+                        "$ref": "#/components/schemas/DistributionCenterResource"
+                    },
+                    "delivery_type": {
+                        "type": "string",
+                        "example": "normal"
+                    },
+                    "payment_method": {
+                        "type": "string",
+                        "example": "cash"
+                    },
+                    "total_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 23500
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "confirmed"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderItemResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "StoreOrderResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/OrderResource"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Commande créée avec succès"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "DistributionCenterProductsResponse": {
                 "allOf": [
                     {
@@ -974,6 +1332,10 @@
         {
             "name": "Clients",
             "description": "Clients"
+        },
+        {
+            "name": "Commandes",
+            "description": "Commandes"
         },
         {
             "name": "Produits d'un centre de distribution",
