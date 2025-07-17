@@ -371,9 +371,19 @@ Documenter les cas de test complexes
 - [Documentation Laravel](https://laravel.com/docs)
 - [Guide de Contribution](CONTRIBUTING.md)
 - [Documentation API](API.md)
-- **API Documentation Generation**: For every new API endpoint or modification, ensure to add Swagger documentation in the `documentation/` directory and run `php artisan l5-swagger:generate` to update the API documentation.
+- **API Documentation Generation**: For every new API endpoint or modification, ensure to add Swagger documentation in the `documentation/` directory and run `php artisan l5-swagger:generate` to update the API documentation. if unknown error found, run composer dump-autoload first please
 - [Guide du Projet](guide.md) - Document essentiel détaillant les spécifications techniques, 
   les phases du projet et la stack technique complète du projet ISOGAZ
+
+### Interface de Test du Flux de Commande API
+
+Une interface de test interactive est disponible pour simuler le flux de création de commande via les endpoints API. Cette interface permet de :
+- Se connecter et gérer le token d'authentification.
+- Sélectionner un client et visualiser/ajouter ses adresses de livraison.
+- Choisir un centre de distribution et les produits associés (avec gestion des options et quantités en stock).
+- Sélectionner le mode de paiement et le type de livraison.
+
+Pour accéder à l'interface, ouvrez votre navigateur et naviguez vers : `http://127.0.0.1:8000/test-products/order.html` (assurez-vous que votre serveur Laravel est en cours d'exécution).
 
 ## 🧰 Maintenance
 

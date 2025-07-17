@@ -70,11 +70,35 @@ window.ApiService = (function() {
         });
     }
 
+    function fetchPaymentMethods() {
+        const headers = getHeaders();
+        if (!headers) return $.Deferred().reject("Token manquant").promise();
+
+        return $.ajax({
+            url: "/api/payment-methods",
+            type: "GET",
+            headers: headers
+        });
+    }
+
+    function fetchDeliveryTypes() {
+        const headers = getHeaders();
+        if (!headers) return $.Deferred().reject("Token manquant").promise();
+
+        return $.ajax({
+            url: "/api/delivery-types",
+            type: "GET",
+            headers: headers
+        });
+    }
+
     return {
         fetchCustomers,
         fetchDistributionCenters,
         fetchProductsByDistributionCenter,
         createCustomerDeliveryAddress,
-        fetchCustomer
+        fetchCustomer,
+        fetchPaymentMethods,
+        fetchDeliveryTypes
     };
 })();
