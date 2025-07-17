@@ -59,10 +59,22 @@ window.ApiService = (function() {
         });
     }
 
+    function fetchCustomer(customerId) {
+        const headers = getHeaders();
+        if (!headers) return $.Deferred().reject("Token manquant").promise();
+
+        return $.ajax({
+            url: `/api/customers/${customerId}`,
+            type: "GET",
+            headers: headers
+        });
+    }
+
     return {
         fetchCustomers,
         fetchDistributionCenters,
         fetchProductsByDistributionCenter,
-        createCustomerDeliveryAddress
+        createCustomerDeliveryAddress,
+        fetchCustomer
     };
 })();

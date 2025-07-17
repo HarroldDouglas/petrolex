@@ -4,42 +4,73 @@ $(document).ready(function() {
 
     let allCustomers = []; // To store all customers with their addresses
     let allProducts = []; // To store all products for the selected distribution center
+    let selectedCustomerData = null; // To store the currently selected customer's full data
 
     // Function to populate customer addresses
-    function populateCustomerAddresses(customerId) {
+    function populateCustomerAddresses(customerData) {
         const customerAddressSelect = $("#customer_address");
         customerAddressSelect.empty().append('<option value="">Sélectionnez une adresse</option>');
+        console.log("populateCustomerAddresses called with:", customerData);
 
-        if (customerId) {
-            const selectedCustomer = allCustomers.find(cust => cust.id == customerId);
-            if (selectedCustomer && selectedCustomer.deliveryAddresses) {
-                selectedCustomer.deliveryAddresses.forEach(function(address) {
-                    customerAddressSelect.append(`<option value="${address.id}">${address.address}</option>`);
-                });
-            }
+        if (customerData && customerData.deliveryAddresses) {
+            console.log("Found delivery addresses:", customerData.deliveryAddresses);
+            customerData.deliveryAddresses.forEach(function(address) {
+                customerAddressSelect.append(`<option value="${address.id}">${address.address}</option>`);
+            });
+            console.log("Number of addresses appended:", customerData.deliveryAddresses.length);
+        } else {
+            console.log("No delivery addresses found for this customer.");
         }
     }
 
     // Function to re-fetch customers and update UI
-    function refreshCustomersAndAddresses(selectedCustomerId = null) {
-        ApiService.fetchCustomers()
-            .done(function(response) {
-                if (response && response.data) {
-                    allCustomers = response.data; // Update stored customers
-                    const customerSelect = $("#customer");
-                    customerSelect.empty().append('<option value="">Sélectionnez un client</option>');
-                    response.data.forEach(function(customer) {
-                        customerSelect.append(`<option value="${customer.id}">${customer.full_name}</option>`);
-                    });
-                    // Re-select the customer if one was previously selected
-                    if (selectedCustomerId) {
-                        customerSelect.val(selectedCustomerId).trigger('change');
+    function refreshCustomersAndAddresses(customerIdToRefresh = null) {
+        console.log("refreshCustomersAndAddresses called with customerIdToRefresh:", customerIdToRefresh);
+        if (customerIdToRefresh) {
+            // Fetch only the specific customer to update their addresses
+            ApiService.fetchCustomer(customerIdToRefresh)
+                .done(function(response) {
+                    console.log("Response from fetchCustomer:", response);
+                    if (response && response.data) {
+                        const updatedCustomer = response.data; // Now expects a single object
+                        // Find and replace the updated customer in allCustomers array
+                        const index = allCustomers.findIndex(cust => cust.id == updatedCustomer.id);
+                        if (index !== -1) {
+                            allCustomers[index] = updatedCustomer;
+                            selectedCustomerData = updatedCustomer; // Update selectedCustomerData if it's the one being refreshed
+                            console.log("allCustomers updated. selectedCustomerData:", selectedCustomerData);
+                        } else {
+                            console.warn("Updated customer not found in allCustomers array. This might indicate a data mismatch.");
+                        }
+                        populateCustomerAddresses(updatedCustomer);
+                    } else {
+                        console.warn("fetchCustomer response.data is empty or null.");
                     }
-                }
-            })
-            .fail(function(jqXHR) {
-                console.error("Error fetching customers:", jqXHR.responseText);
-            });
+                })
+                .fail(function(jqXHR) {
+                    console.error("Error fetching single customer:", jqXHR.responseText);
+                });
+        } else {
+            // Initial fetch of all customers for the dropdown
+            ApiService.fetchCustomers()
+                .done(function(response) {
+                    console.log("Response from fetchCustomers (initial load):", response);
+                    if (response && response.data) {
+                        allCustomers = response.data; // Store all customers
+                        const customerSelect = $("#customer");
+                        customerSelect.empty().append('<option value="">Sélectionnez un client</option>');
+                        response.data.forEach(function(customer) {
+                            customerSelect.append(`<option value="${customer.id}">${customer.full_name}</option>`);
+                        });
+                        console.log("Initial customer dropdown populated.");
+                    } else {
+                        console.warn("fetchCustomers response.data is empty or null.");
+                    }
+                })
+                .fail(function(jqXHR) {
+                    console.error("Error fetching customers (initial load):", jqXHR.responseText);
+                });
+        }
     }
 
     // Initial fetch of customers
@@ -61,8 +92,26 @@ $(document).ready(function() {
 
     // Event listener for Customer selection change
     $("#customer").on("change", function() {
-        const selectedCustomerId = $(this).val();
-        populateCustomerAddresses(selectedCustomerId);
+        const selectedId = $(this).val();
+        console.log("Customer selected:", selectedId);
+        if (selectedId) {
+            ApiService.fetchCustomer(selectedId)
+                .done(function(response) {
+                    if (response && response.data) {
+                        selectedCustomerData = response.data; // Update selectedCustomerData with fresh data
+                        populateCustomerAddresses(selectedCustomerData);
+                        console.log("Customer data and addresses refreshed for ID:", selectedId);
+                    }
+                })
+                .fail(function(jqXHR) {
+                    console.error("Error fetching customer details on selection:", jqXHR.responseText);
+                    selectedCustomerData = null; // Clear selected customer data on error
+                    populateCustomerAddresses(null); // Clear addresses dropdown
+                });
+        } else {
+            selectedCustomerData = null; // Clear selected customer data if no customer is selected
+            populateCustomerAddresses(null); // Clear addresses dropdown
+        }
     });
 
     // Event listener for Distribution Center selection change
@@ -106,8 +155,7 @@ $(document).ready(function() {
 
     // Before showing the modal, check if a customer is selected
     $('#addAddressModal').on('show.bs.modal', function (event) {
-        const selectedCustomerId = $("#customer").val();
-        if (!selectedCustomerId) {
+        if (!selectedCustomerData || !selectedCustomerData.id) { // Use selectedCustomerData.id (which is customer_id)
             alert("Veuillez d'abord sélectionner un client.");
             event.preventDefault(); // Prevent modal from opening
         }
@@ -117,11 +165,12 @@ $(document).ready(function() {
     $("#add-address-form").on("submit", function(e) {
         e.preventDefault();
 
-        const selectedCustomerId = $("#customer").val();
-        if (!selectedCustomerId) {
+        if (!selectedCustomerData || !selectedCustomerData.id) { // Use selectedCustomerData.id (which is customer_id)
             alert("Veuillez sélectionner un client avant d'ajouter une adresse.");
             return;
         }
+
+        const customerIdForAddress = selectedCustomerData.id; // Use the correct customer_id
 
         const formData = {};
         $(this).find("input, select, textarea").each(function() {
@@ -141,20 +190,22 @@ $(document).ready(function() {
         saveAddressBtn.prop("disabled", true);
         addressLoader.removeClass("d-none");
 
-        ApiService.createCustomerDeliveryAddress(selectedCustomerId, formData)
+        console.log("Sending address data:", formData);
+        ApiService.createCustomerDeliveryAddress(customerIdForAddress, formData)
             .done(function(response) {
+                console.log("Add Address Success Response:", response);
                 alert("Adresse ajoutée avec succès!");
                 $('#addAddressModal').modal('hide'); // Close the modal
                 $("#add-address-form")[0].reset(); // Clear the form
-                refreshCustomersAndAddresses(selectedCustomerId); // Re-fetch customers and refresh addresses
+                refreshCustomersAndAddresses(selectedCustomerData.id); // Re-fetch *only* the selected customer and refresh addresses
             })
             .fail(function(jqXHR) {
+                console.error("Add Address Error Response:", jqXHR);
                 let errorMsg = "Erreur lors de l'ajout de l'adresse.";
                 if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
                     errorMsg += ` ${jqXHR.responseJSON.message}`;
                 }
                 alert(errorMsg);
-                console.error("Add Address Error:", jqXHR.responseText);
             })
             .always(function() {
                 saveAddressBtn.prop("disabled", false);

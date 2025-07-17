@@ -371,6 +371,7 @@ Documenter les cas de test complexes
 - [Documentation Laravel](https://laravel.com/docs)
 - [Guide de Contribution](CONTRIBUTING.md)
 - [Documentation API](API.md)
+- **API Documentation Generation**: For every new API endpoint or modification, ensure to add Swagger documentation in the `documentation/` directory and run `php artisan l5-swagger:generate` to update the API documentation.
 - [Guide du Projet](guide.md) - Document essentiel détaillant les spécifications techniques, 
   les phases du projet et la stack technique complète du projet ISOGAZ
 
