@@ -1,8 +1,5 @@
 #!/bin/bash
 
-BASE_URL="${APP_URL}/api"
-TOKEN_FILE="$(dirname "${BASH_SOURCE[0]}")/token.txt"
-
 # Chemin vers la racine du projet
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
@@ -13,6 +10,9 @@ else
     echo "❌ Fichier .env non trouvé dans $PROJECT_ROOT!"
     exit 1
 fi
+
+BASE_URL="${APP_URL}/api"
+TOKEN_FILE="$(dirname "${BASH_SOURCE[0]}")/token.txt"
 
 # Vérifier si le fichier token.txt existe
 if [ ! -f "$TOKEN_FILE" ]; then
@@ -35,7 +35,10 @@ DC_RESPONSE=$(curl -s -X GET "$BASE_URL/distribution-centers" \
 echo "Liste des centres de distribution:"
 echo "$DC_RESPONSE" | jq .
 
-if [ $(echo "$DC_RESPONSE" | jq -r '._metadata.success') == "true" ]; then
+# Check if the response is valid JSON and contains the success field
+SUCCESS_STATUS=$(echo "$DC_RESPONSE" | jq -r '._metadata.success // "false"')
+
+if [ "$SUCCESS_STATUS" == "true" ]; then
     echo "✅ Récupération des centres de distribution réussie."
 else
     echo "❌ Échec de la récupération des centres de distribution. Réponse: $DC_RESPONSE"

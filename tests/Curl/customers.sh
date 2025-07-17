@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Chemin vers la racine du projet
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
@@ -13,7 +12,6 @@ else
 fi
 
 BASE_URL="${APP_URL}/api"
-
 TOKEN_FILE="$(dirname "${BASH_SOURCE[0]}")/token.txt"
 
 # Vérifier si le fichier token.txt existe
@@ -37,7 +35,7 @@ CUSTOMERS_RESPONSE=$(curl -s -X GET "$BASE_URL/customers" \
 echo "Liste des clients:"
 echo "$CUSTOMERS_RESPONSE" | jq .
 
-if [ $(echo "$CUSTOMERS_RESPONSE" | jq -r '._metadata.success') == "true" ]; then
+if [ $(echo "$CUSTOMERS_RESPONSE" | jq -r '._metadata.success // "false"') == "true" ]; then
     echo "✅ Récupération des clients réussie."
 else
     echo "❌ Échec de la récupération des clients. Réponse: $CUSTOMERS_RESPONSE"

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Chemin vers la racine du projet
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
@@ -13,19 +12,7 @@ else
 fi
 
 BASE_URL="${APP_URL}/api"
-
 TOKEN_FILE="$(dirname "${BASH_SOURCE[0]}")/token.txt"
-
-# Chemin vers la racine du projet
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-
-# Charger les variables depuis .env
-if [ -f "$PROJECT_ROOT/.env" ]; then
-    export $(cat "$PROJECT_ROOT/.env" | grep -v '#' | awk '/^[A-Z]/ {print}')
-else
-    echo "❌ Fichier .env non trouvé dans $PROJECT_ROOT!"
-    exit 1
-fi
 
 # Vérifier que les variables requises sont définies
 if [ -z "$ADMIN_EMAIL" ] || [ -z "$ADMIN_PASSWORD" ]; then

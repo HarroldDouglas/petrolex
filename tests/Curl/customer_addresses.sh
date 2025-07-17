@@ -1,10 +1,7 @@
 #!/bin/bash
 
-BASE_URL="${APP_URL}/api"
-TOKEN_FILE="$(dirname "${BASH_SOURCE[0]}")/token.txt"
-
 # Chemin vers la racine du projet
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
 
 # Charger les variables depuis .env
 if [ -f "$PROJECT_ROOT/.env" ]; then
@@ -13,6 +10,9 @@ else
     echo "❌ Fichier .env non trouvé dans $PROJECT_ROOT!"
     exit 1
 fi
+
+BASE_URL="${APP_URL}/api"
+TOKEN_FILE="$(dirname "${BASH_SOURCE[0]}")/token.txt"
 
 # Vérifier si le fichier token.txt existe
 if [ ! -f "$TOKEN_FILE" ]; then
@@ -30,7 +30,7 @@ fi
 if [ -z "$1" ]; then
     echo "Usage: $0 <CUSTOMER_ID>"
     exit 1
-}
+fi
 
 CUSTOMER_ID=$1
 
@@ -42,7 +42,7 @@ ADDRESSES_RESPONSE=$(curl -s -X GET "$BASE_URL/customers/$CUSTOMER_ID" \
 echo "Adresses du client $CUSTOMER_ID:"
 echo "$ADDRESSES_RESPONSE" | jq .
 
-if [ $(echo "$ADDRESSES_RESPONSE" | jq -r '._metadata.success') == "true" ]; then
+if [ $(echo "$ADDRESSES_RESPONSE" | jq -r '._metadata.success // "false"') == "true" ]; then
     echo "✅ Récupération des adresses réussie."
 else
     echo "❌ Échec de la récupération des adresses. Réponse: $ADDRESSES_RESPONSE"

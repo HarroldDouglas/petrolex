@@ -1,10 +1,7 @@
 #!/bin/bash
-
-BASE_URL="${APP_URL}/api"
-TOKEN_FILE="$(dirname "${BASH_SOURCE[0]}")/token.txt"
-
+#./tests/Curl/create_address.sh 1 "Maison principale" "123 Rue des Palmiers" "Bonanjo" "Douala" "Cameroun" "+237612345678" "Jean" "Dupont" "jean.dupont@email.com" "Près de la pharmacie centrale" true
 # Chemin vers la racine du projet
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
 
 # Charger les variables depuis .env
 if [ -f "$PROJECT_ROOT/.env" ]; then
@@ -13,6 +10,9 @@ else
     echo "❌ Fichier .env non trouvé dans $PROJECT_ROOT!"
     exit 1
 fi
+
+BASE_URL="${APP_URL}/api"
+TOKEN_FILE="$(dirname "${BASH_SOURCE[0]}")/token.txt"
 
 # Vérifier si le fichier token.txt existe
 if [ ! -f "$TOKEN_FILE" ]; then
@@ -35,45 +35,75 @@ fi
 CUSTOMER_ID=$1
 LABEL=$2
 ADDRESS=$3
-NEIGHBORHOOD=${4:-null}
-CITY=${5:-null}
-COUNTRY=${6:-null}
-PHONE=${7:-null}
-CONTACT_FIRSTNAME=${8:-null}
-CONTACT_LASTNAME=${9:-null}
-EMAIL=${10:-null}
-ADDRESS_PRECISION=${11:-null}
+NEIGHBORHOOD=${4:-""}
+CITY=${5:-""}
+COUNTRY=${6:-""}
+PHONE=${7:-""}
+CONTACT_FIRSTNAME=${8:-""}
+CONTACT_LASTNAME=${9:-""}
+EMAIL=${10:-""}
+ADDRESS_PRECISION=${11:-""}
 IS_DEFAULT=${12:-false}
 
-# Construire le corps de la requête JSON
-JSON_PAYLOAD=$(jq -n \
-  --arg label "$LABEL" \
-  --arg address "$ADDRESS" \
-  --arg neighborhood "$NEIGHBORHOOD" \
-  --arg city "$CITY" \
-  --arg country "$COUNTRY" \
-  --arg phone "$PHONE" \
-  --arg contact_firstname "$CONTACT_FIRSTNAME" \
-  --arg contact_lastname "$CONTACT_LASTNAME" \
-  --arg email "$EMAIL" \
-  --arg address_precision "$ADDRESS_PRECISION" \
-  --argjson is_default "$IS_DEFAULT" \
-  '{label: $label, address: $address, neighborhood: $neighborhood, city: $city, country: $country, phone: $phone, contact_firstname: $contact_firstname, contact_lastname: $contact_lastname, email: $email, address_precision: $address_precision, is_default: $is_default}')
+# Construire le JSON manuellement
+JSON_DATA="{"
+JSON_DATA="$JSON_DATA\"label\": \"$LABEL\","
+JSON_DATA="$JSON_DATA\"address\": \"$ADDRESS\""
 
-echo "🚀 Création d'une adresse pour le client ID: $CUSTOMER_ID avec les données:"
-echo "$JSON_PAYLOAD" | jq .
+if [ -n "$NEIGHBORHOOD" ]; then
+    JSON_DATA="$JSON_DATA,\"neighborhood\": \"$NEIGHBORHOOD\""
+fi
+
+if [ -n "$CITY" ]; then
+    JSON_DATA="$JSON_DATA,\"city\": \"$CITY\""
+fi
+
+if [ -n "$COUNTRY" ]; then
+    JSON_DATA="$JSON_DATA,\"country\": \"$COUNTRY\""
+fi
+
+if [ -n "$PHONE" ]; then
+    JSON_DATA="$JSON_DATA,\"phone\": \"$PHONE\""
+fi
+
+if [ -n "$CONTACT_FIRSTNAME" ]; then
+    JSON_DATA="$JSON_DATA,\"contact_firstname\": \"$CONTACT_FIRSTNAME\""
+fi
+
+if [ -n "$CONTACT_LASTNAME" ]; then
+    JSON_DATA="$JSON_DATA,\"contact_lastname\": \"$CONTACT_LASTNAME\""
+fi
+
+if [ -n "$EMAIL" ]; then
+    JSON_DATA="$JSON_DATA,\"email\": \"$EMAIL\""
+fi
+
+if [ -n "$ADDRESS_PRECISION" ]; then
+    JSON_DATA="$JSON_DATA,\"address_precision\": \"$ADDRESS_PRECISION\""
+fi
+
+if [ "$IS_DEFAULT" = "true" ]; then
+    JSON_DATA="$JSON_DATA,\"is_default\": true"
+else
+    JSON_DATA="$JSON_DATA,\"is_default\": false"
+fi
+
+JSON_DATA="$JSON_DATA}"
+
+echo "📤 Données envoyées :"
+echo "$JSON_DATA" | jq .
 
 CREATE_ADDRESS_RESPONSE=$(curl -s -X POST "$BASE_URL/customers/$CUSTOMER_ID/delivery-addresses" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d "$JSON_PAYLOAD")
+    -H "Accept: application/json" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TOKEN" \
+    -d "$JSON_DATA")
 
-echo "Réponse de création d'adresse:"
+echo "📥 Réponse de création d'adresse:"
 echo "$CREATE_ADDRESS_RESPONSE" | jq .
 
-if [ $(echo "$CREATE_ADDRESS_RESPONSE" | jq -r '._metadata.success') == "true" ]; then
+if [ $(echo "$CREATE_ADDRESS_RESPONSE" | jq -r '._metadata.success // "false"') == "true" ]; then
     echo "✅ Création d'adresse réussie."
 else
-    echo "❌ Échec de la création d'adresse. Réponse: $CREATE_ADDRESS_RESPONSE"
+    echo "❌ Échec de la création d'adresse."
 fi
