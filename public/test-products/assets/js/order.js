@@ -1,61 +1,43 @@
 $(document).ready(function() {
-    const apiToken = localStorage.getItem('api_token');
-    if (!apiToken) {
-        window.location.href = '/test-products/index.html';
-        return;
-    }
+    // Initialize CartService
+    CartService.init();
 
-    const cart = [];
+    // Fetch Customers
+    ApiService.fetchCustomers()
+        .done(function(response) {
+            if (response && response.data) {
+                const customerSelect = $("#customer");
+                response.data.forEach(function(customer) {
+                    customerSelect.append(`<option value="${customer.id}">${customer.full_name}</option>`);
+                });
+            }
+        })
+        .fail(function(jqXHR) {
+            console.error("Error fetching customers:", jqXHR.responseText);
+        });
 
-    function updateCartView() {
-        const cartItemsContainer = $("#cart-items");
-        const emptyCartMsg = $("#cart-empty-msg");
-        cartItemsContainer.empty();
-
-        if (cart.length === 0) {
-            emptyCartMsg.show();
-        } else {
-            emptyCartMsg.hide();
-            cart.forEach((item, index) => {
-                const totalPrice = item.price * item.quantity;
-                const row = `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.option_name || 'N/A'}</td>
-                        <td>${item.price} XAF</td>
-                        <td>${item.quantity}</td>
-                        <td>${totalPrice} XAF</td>
-                        <td>
-                            <button class="btn btn-sm btn-danger remove-item" data-index="${index}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                cartItemsContainer.append(row);
-            });
-        }
-    }
+    // Fetch Distribution Centers
+    ApiService.fetchDistributionCenters()
+        .done(function(response) {
+            if (response && response.data) {
+                const dcSelect = $("#distribution_center");
+                response.data.forEach(function(dc) {
+                    dcSelect.append(`<option value="${dc.id}">${dc.name}</option>`);
+                });
+            }
+        })
+        .fail(function(jqXHR) {
+            console.error("Error fetching distribution centers:", jqXHR.responseText);
+        });
 
     $("#addProductBtn").on("click", function() {
-        // This is a placeholder logic. Integration with API will come next.
+        // Placeholder for adding product to cart
         const newProduct = {
-            name: `Produit exemple ${cart.length + 1}`,
+            name: `Produit exemple ${CartService.getCart().length + 1}`,
             option_name: "Recharge",
             price: 6500, // Example price
             quantity: parseInt($("#productQuantity").val())
         };
-
-        cart.push(newProduct);
-        updateCartView();
+        CartService.addToCart(newProduct);
     });
-
-    $("#cart-items").on("click", ".remove-item", function() {
-        const index = $(this).data("index");
-        cart.splice(index, 1);
-        updateCartView();
-    });
-
-    // Initial view
-    updateCartView();
 });
