@@ -22,19 +22,14 @@ class OrderResource extends JsonResource
         return [
             'id' => $this->id,
             'order_number' => $this->order_number,
-            'customer_id' => $this->customer_id,
-            'customer' => CustomerResource::make($this->whenLoaded('customer')),
-            'delivery_address_id' => $this->delivery_address_id,
-            'delivery_address' => CustomerDeliveryAddressResource::make($this->whenLoaded('deliveryAddress')),
-            'distribution_center_id' => $this->distribution_center_id,
-            'distribution_center' => DistributionCenterResource::make($this->whenLoaded('distributionCenter')),
             'delivery_type' => $this->delivery_type,
             'payment_method' => $this->payment_method,
             'total_amount' => $this->total_amount,
             'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
+            'customer' => CustomerResource::make($this->whenLoaded('customer')),
+            'delivery_address' => CustomerDeliveryAddressResource::make($this->whenLoaded('deliveryAddress')),
+            'distribution_center' => DistributionCenterResource::make($this->whenLoaded('distributionCenter')),
         ];
     }
 }

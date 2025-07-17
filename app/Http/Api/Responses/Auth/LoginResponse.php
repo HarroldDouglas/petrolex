@@ -17,7 +17,7 @@ class LoginResponse extends ApiResponse
         $user = $authDTO->user;
 
         $userResource = match (true) {
-            $user->hasRole(UserRole::CUSTOMER()->value) => new CustomerResource($user),
+            $user->hasRole(UserRole::CUSTOMER()->value) => new CustomerResource($user->customer),
             default => new UserResource($user),
         };
 

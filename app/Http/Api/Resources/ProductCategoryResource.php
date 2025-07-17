@@ -17,21 +17,20 @@ class ProductCategoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'product_type' => $this->product_type,
             'product_type_id' => $this->product_type_id,
-            'product_type_instance' => $this->when(
-                $this->product_type->value === ProductType::BOTTLE()->value,
-                BottleTypeResource::make($this->productTypeInstance)
-            ),
-            'accessory_type_instance' => $this->when(
-                $this->product_type->value === ProductType::ACCESSORY()->value,
-                AccessoryTypeResource::make($this->productTypeInstance)
-            ),
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
+
+        if ($this->product_type->value === ProductType::BOTTLE()->value) {
+            $data = array_merge($data, BottleTypeResource::make($this->productTypeInstance)->toArray($request));
+        } elseif ($this->product_type->value === ProductType::ACCESSORY()->value) {
+            $data = array_merge($data, AccessoryTypeResource::make($this->productTypeInstance)->toArray($request));
+        }
+
+        return $data;
     }
 }

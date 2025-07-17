@@ -5,7 +5,9 @@ namespace App\Http\Requests\Order;
 use App\Enums\BottleOrderType;
 use App\Enums\DeliveryType;
 use App\Enums\PaymentMethod;
+use App\Rules\AvailableStock;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
 
 class AbstractOrderRequest extends FormRequest
@@ -25,7 +27,13 @@ class AbstractOrderRequest extends FormRequest
             'payment_method' => ['required', Rule::in(PaymentMethod::values())],
             'items' => ['required', 'array'],
             'items.*.product_category_id' => ['required', 'exists:product_categories,id'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.quantity' => [
+                'required', 'integer', 'min:1',
+                App::make(AvailableStock::class, [
+                    'distributionCenterId' => $this->input('distribution_center_id'),
+                ]),
+            ],
+
             'items.*.option' => ['nullable', Rule::in(BottleOrderType::values())],
         ];
     }

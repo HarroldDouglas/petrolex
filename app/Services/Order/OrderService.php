@@ -21,6 +21,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use \App\Events\OrderCreatedEvent;
+use Spatie\LaravelData\DataCollection;
 
 class OrderService extends BaseServiceForEntity
 {
@@ -28,7 +29,7 @@ class OrderService extends BaseServiceForEntity
         protected OrderRepositoryInterface $orderRepository,
         private ProductCategoryService $productCategoryService
     ) {
-        parent::__construct($orderRepository);
+        parent::__construct($this->orderRepository);
     }
 
     protected function getModel(): string
@@ -49,7 +50,7 @@ class OrderService extends BaseServiceForEntity
         $orderDTO = CreateOrderDTO::from($data);
 
         return $this->executeInTransaction(function () use ($orderDTO) {
-            $totalAmount = 0;
+            $subtotal = 0;
             $processedOrderItemsData = [];
 
             foreach ($orderDTO->items as $itemDTO) {
@@ -59,11 +60,8 @@ class OrderService extends BaseServiceForEntity
                     throw new ModelNotFoundException('Product category not found.');
                 }
 
-                $productInstance = $this->productCategoryService->getProductInstance($productCategory);
-
                 $unitPrice = $this->productCategoryService->getProductPrice(
                     $productCategory,
-                    $productInstance,
                     $itemDTO->option
                 );
 
@@ -72,16 +70,13 @@ class OrderService extends BaseServiceForEntity
                     $orderDTO->distribution_center_id
                 );
 
-                if (! $this->checkItemAvailabilityInStock($productCategory, $orderDTO->distribution_center_id, $itemDTO->quantity)) {
+                if ($availableQuantity < $itemDTO->quantity) {
                     throw new \Exception('Insufficient stock for product: ' . ($productCategory instanceof ProductCategory ? $productCategory->name : 'Unknown'));
                 }
 
-                // TODO: Deduct stock after order creation (e.g., in a listener)
+                $itemTotalPrice = $unitPrice * $itemDTO->quantity;
+                $subtotal += $itemTotalPrice;
 
-                $itemTotalPrice = $this->calculateOrderItemTotalPrice($unitPrice, $itemDTO->quantity);
-                $totalAmount += $itemTotalPrice;
-
-                // Convert item DTO to array and augment with calculated prices
                 $itemArray = $itemDTO->toArray();
                 $itemArray['unit_price'] = $unitPrice;
                 $itemArray['total_price'] = $itemTotalPrice;
@@ -89,86 +84,26 @@ class OrderService extends BaseServiceForEntity
                 $processedOrderItemsData[] = $itemArray;
             }
 
-            // Get base order data from DTO and augment with calculated/generated fields
             $orderData = $orderDTO->toArray();
-            unset($orderData['items']); // Remove items as they are handled separately
+            if (isset($orderData['items'])) {
+                unset($orderData['items']);
+            }
 
-            $orderData['total_amount'] = $totalAmount;
-            $orderData['subtotal'] = $totalAmount; // Assuming subtotal is initially the same as total_amount
-            $orderData['status'] = OrderStatus::CONFIRMED()->value; // Default status
-            $orderData['order_number'] = uniqid('ORDER-'); // Generate unique order number
+            $orderData['total_amount'] = $subtotal;
+            $orderData['subtotal'] = $subtotal;
+            $orderData['status'] = OrderStatus::PENDING()->value;
 
             /** @var Order $order */
             $order = $this->repository->create($orderData);
 
             Event::dispatch(new OrderCreatedEvent($order, $processedOrderItemsData));
 
-            // Eager load items and their productCategory relationship
             $order->load('items.productCategory');
-
-            // Manually eager load productTypeInstance for each productCategory in a single loop
-            $bottleTypeIds = [];
-            $accessoryTypeIds = [];
-
-            // Collect all necessary IDs first
-            foreach ($order->items as $item) {
-                /** @var ProductCategory $productCategory */
-                $productCategory = $item->productCategory;
-
-                if ($productCategory->product_type->value === ProductType::BOTTLE()->value) {
-                    $bottleTypeIds[] = $productCategory->product_type_id;
-                } elseif ($productCategory->product_type->value === ProductType::ACCESSORY()->value) {
-                    $accessoryTypeIds[] = $productCategory->product_type_id;
-                }
-            }
-
-            // Fetch all instances in bulk
-            $bottleTypes = BottleType::findMany(array_unique($bottleTypeIds))->keyBy('id');
-            $accessoryTypes = AccessoryType::findMany(array_unique($accessoryTypeIds))->keyBy('id');
-
-            // Assign pre-fetched instances to productCategory->productTypeInstance
-            foreach ($order->items as $item) {
-                /** @var ProductCategory $productCategory */
-                $productCategory = $item->productCategory;
-
-                if ($productCategory->product_type->value === ProductType::BOTTLE()->value) {
-                    $productCategory->setRelation('productTypeInstance', $bottleTypes->get($productCategory->product_type_id));
-                } elseif ($productCategory->product_type->value === ProductType::ACCESSORY()->value) {
-                    $productCategory->setRelation('productTypeInstance', $accessoryTypes->get($productCategory->product_type_id));
-                }
-            }
 
             return $order;
         });
     }
 
-    /**
-     * Calculate the total price for a single order item.
-     */
-    private function calculateOrderItemTotalPrice(float $unitPrice, int $quantity): float
-    {
-        return $unitPrice * $quantity;
-    }
-
-    /**
-     * Check if an item is available in stock at a given distribution center.
-     */
-    private function checkItemAvailabilityInStock(
-        ProductCategory $productCategory,
-        int $distributionCenterId,
-        int $requestedQuantity
-    ): bool {
-        $availableQuantity = $this->productCategoryService->getProductQuantity(
-            $productCategory,
-            $distributionCenterId
-        );
-
-        return $availableQuantity >= $requestedQuantity;
-    }
-
-    /**
-     * Get order with grouped items for display
-     */
     public function getOrderWithGroupedItems(int $orderId): ?OrderDetailsDTO
     {
         $order = $this->orderRepository->getWithDetails($orderId);
@@ -185,12 +120,6 @@ class OrderService extends BaseServiceForEntity
         );
     }
 
-    /**
-     * Group order items and return structured DTOs
-     *
-     * @param  Collection<int, OrderItem>  $items
-     * @return Collection<int, GroupedOrderItemDTO>
-     */
     public function groupOrderItems(Collection $items): Collection
     {
         return $items->groupBy(function (OrderItem $item): string {
@@ -216,9 +145,6 @@ class OrderService extends BaseServiceForEntity
         })->values();
     }
 
-    /**
-     * Get display name for the grouped item
-     */
     private function getDisplayName(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
@@ -230,13 +156,10 @@ class OrderService extends BaseServiceForEntity
         };
     }
 
-    /**
-     * Get display name for bottle items
-     */
     private function getBottleDisplayName(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
-        $bottleType = BottleType::find($productCategory->product_type_id); // TODO: use a repository or service to get the bottle type
+        $bottleType = BottleType::find($productCategory->product_type_id);
 
         if (! $bottleType) {
             return 'Bouteille inconnue';
@@ -247,13 +170,10 @@ class OrderService extends BaseServiceForEntity
         return "{$bottleType->name} ({$option})";
     }
 
-    /**
-     * Get display name for accessory items
-     */
     private function getAccessoryDisplayName(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
-        $accessoryType = AccessoryType::find($productCategory->product_type_id); // TODO: use a repository or service to get the accessory type
+        $accessoryType = AccessoryType::find($productCategory->product_type_id);
 
         if (! $accessoryType) {
             return 'Accessoire inconnu';
@@ -262,9 +182,6 @@ class OrderService extends BaseServiceForEntity
         return $accessoryType->name ?? 'Accessoire inconnu';
     }
 
-    /**
-     * Get grouping key for bottle items
-     */
     private function getBottleGroupingKey(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
@@ -277,9 +194,6 @@ class OrderService extends BaseServiceForEntity
         return "bottle-{$bottleTypeId}-price-{$item->unit_price}";
     }
 
-    /**
-     * Get grouping key for accessory items
-     */
     private function getAccessoryGroupingKey(OrderItem $item): string
     {
         $productCategory = $item->productCategory;
@@ -292,12 +206,6 @@ class OrderService extends BaseServiceForEntity
         return "accessory-{$accessoryTypeId}";
     }
 
-    /**
-     * Cancel an order
-     *
-     * @throws OrderNotFoundException
-     * @throws \Exception
-     */
     public function cancelOrder(int $orderId): bool
     {
         try {

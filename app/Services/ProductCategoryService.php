@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Enums\BottleOrderType;
 use App\Enums\ProductType;
+use App\Models\AccessoryType;
+use App\Models\BottleType;
 use App\Models\ProductCategory;
 use App\Models\ProductCategoryDistributionCenter;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
@@ -21,22 +23,19 @@ class ProductCategoryService extends BaseServiceForEntity
         return ProductCategory::class;
     }
 
-    public function getProductInstance(ProductCategory $productCategory)
-    {
-        $productInstance = $productCategory->getProductTypeInstanceAttribute();
+    public function getProductPrice(
+        ProductCategory $productCategory,
+        ?string $option = null
+    ): float {
+        /**
+         * @var BottleType|AccessoryType|null $productInstance
+         */
+        $productInstance = $productCategory->productTypeInstance;
 
         if (! $productInstance) {
             throw new ModelNotFoundException('Product instance not found for category.');
         }
 
-        return $productInstance;
-    }
-
-    public function getProductPrice(
-        ProductCategory $productCategory,
-        $productInstance,
-        ?string $option = null
-    ): float {
         if ($productCategory->product_type->value === ProductType::BOTTLE()->value) {
             if ($option === BottleOrderType::FULL()->value) {
                 return $productInstance->bottle_with_content_price;
@@ -54,6 +53,7 @@ class ProductCategoryService extends BaseServiceForEntity
         ProductCategory $productCategory,
         int $distributionCenterId
     ): int {
+        // TODO Optimize this method to avoid unnecessary queries
         $productCategoryDistributionCenter = ProductCategoryDistributionCenter::where('product_category_id', $productCategory->id)
             ->where('distribution_center_id', $distributionCenterId)
             ->first();

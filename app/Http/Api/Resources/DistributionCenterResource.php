@@ -33,10 +33,7 @@ class DistributionCenterResource extends JsonResource
             'longitude' => $distributionCenter->longitude,
             'phone' => $distributionCenter->phone,
             'email' => $distributionCenter->email,
-            'is_active' => $distributionCenter->is_active,
             'storage_capacity' => $distributionCenter->storage_capacity,
-            'created_at' => $distributionCenter->created_at->toISOString(),
-            'updated_at' => $distributionCenter->updated_at->toISOString(),
         ];
     }
 }

@@ -17,8 +17,6 @@ class BottleTypeResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
             'description' => $this->description,
             'capacity' => $this->capacity,
             'height' => $this->height,
@@ -26,9 +24,7 @@ class BottleTypeResource extends JsonResource
             'radius' => $this->radius,
             'content_price' => $this->content_price,
             'bottle_with_content_price' => $this->bottle_with_content_price,
-            'is_active' => $this->is_active,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

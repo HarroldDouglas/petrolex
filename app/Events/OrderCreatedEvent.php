@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\DTOs\Order\OrderItemDTO;
 use App\Models\Order;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -14,7 +15,7 @@ class OrderCreatedEvent
     /**
      * Create a new event instance.
      *
-     * @param  array<int, array{product_category_id: int, quantity: int, unit_price: float, total_price: float, option: ?string}>  $orderItemsData
+     * @param  array<OrderItemDTO>  $orderItemsData
      */
     public function __construct(
         public Order $order,
