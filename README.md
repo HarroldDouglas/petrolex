@@ -157,22 +157,45 @@ php artisan test --parallel
 
 ### Tests API (Curl Scripts)
 
-Le dossier `tests/Curl/` contient des scripts shell pour tester les endpoints API manuellement.
+Le dossier `tests/Curl/` contient des scripts shell pour tester les endpoints API.
 
 1. Rendre les scripts exécutables :
 ```bash
 chmod +x tests/Curl/*.sh
 ```
 
-2. Lancer les tests API :
+2. Lancer les tests API individuellement :
 ```bash
 # Test d'authentification
-./tests/Curl/test_auth.sh
+./tests/Curl/auth.sh
 
-# Autres tests disponibles
-./tests/Curl/test_users.sh
-./tests/Curl/test_products.sh
+# Récupération de la liste des clients
+./tests/Curl/customers.sh
+
+# Récupération de la liste des centres de distribution
+./tests/Curl/distribution_centers.sh
+
+# Récupération des adresses d'un client (exemple avec ID 1)
+./tests/Curl/customer_addresses.sh 1
+
+# Création d'une adresse (exemple avec ID client 1 et données de test)
+./tests/Curl/create_address.sh 1 "Maison principale" "123 Rue des Palmiers" "Bonanjo" "Douala" "Cameroun" "+237612345678" "Jean" "Dupont" "jean.dupont@email.com" "Près de la pharmacie centrale" true
 ```
+
+3. **Exécuter tous les tests API automatiquement**:
+
+Le script `tests/Curl/run_all_tests.sh` permet de lancer l'ensemble des tests API de manière automatisée. Il gère l'authentification, l'exécution séquentielle des tests et fournit un résumé des succès et des échecs. C'est un outil essentiel pour la validation rapide des endpoints après chaque modification.
+
+Pour lancer tous les tests :
+```bash
+./tests/Curl/run_all_tests.sh
+```
+
+**Bonnes Pratiques pour les Tests API :**
+- Pour chaque nouveau endpoint ou modification d'un endpoint existant, un test `curl` correspondant doit être ajouté dans le dossier `tests/Curl/`.
+- Ces tests peuvent être facilement générés avec l'aide de l'IA en lui fournissant les spécifications précises de l'endpoint (méthode HTTP, URL, paramètres, corps de la requête, headers attendus, etc.).
+- Assurez-vous que les tests couvrent les cas de succès et les cas d'erreur (ex: validation, authentification).
+
 
 Tests E2E (Laravel Dusk)
 Ce projet utilise Laravel Dusk pour les tests d'interface utilisateur automatisés avec Chrome for Testing.

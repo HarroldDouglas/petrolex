@@ -36,3 +36,4 @@ require __DIR__.'/api/orders.php';
 require __DIR__.'/api/bottles.php';
 require __DIR__.'/api/payments.php';
 require __DIR__.'/api/tracking.php';
+require __DIR__.'/api/geography.php';

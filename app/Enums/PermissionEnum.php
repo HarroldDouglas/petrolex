@@ -126,6 +126,10 @@ class PermissionEnum extends Enum
             'DELIVERY_TRACK_LOCATION' => 'delivery.track_location',
             'PROFILE_EDIT' => 'profile.edit',
             'HISTORY_VIEW_OWN' => 'history.view_own',
+
+            // MUNICIPALITIES
+            'MUNICIPALITIES_VIEW' => 'municipalities.view',
+            'MUNICIPALITIES_CREATE' => 'municipalities.create',
         ];
     }
 }
