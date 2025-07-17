@@ -258,6 +258,14 @@ class Order extends Model
     }
 
     /**
+     * Check if this order is eligible for bottle scanning
+     */
+    public function canScanBottles(): bool
+    {
+        return $this->status === OrderStatus::CONFIRMED() && $this->hasBottleItems();
+    }
+
+    /**
      * Get payment status through the payment relation
      */
     public function getPaymentStatusAttribute(): ?\App\Enums\PaymentStatus

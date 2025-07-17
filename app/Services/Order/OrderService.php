@@ -7,8 +7,8 @@ use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
+use App\Events\OrderCreatedEvent;
 use App\Exceptions\OrderNotFoundException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\AccessoryType;
 use App\Models\BottleType;
 use App\Models\Order;
@@ -17,11 +17,10 @@ use App\Models\ProductCategory;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use \App\Events\OrderCreatedEvent;
-use Spatie\LaravelData\DataCollection;
 
 class OrderService extends BaseServiceForEntity
 {
@@ -40,8 +39,8 @@ class OrderService extends BaseServiceForEntity
     /**
      * Create a new order.
      *
-     * @param array $data The data for creating the order.
-     * @return Order
+     * @param  array  $data  The data for creating the order.
+     *
      * @throws \Exception
      * @throws ModelNotFoundException
      */
@@ -71,7 +70,7 @@ class OrderService extends BaseServiceForEntity
                 );
 
                 if ($availableQuantity < $itemDTO->quantity) {
-                    throw new \Exception('Insufficient stock for product: ' . ($productCategory instanceof ProductCategory ? $productCategory->name : 'Unknown'));
+                    throw new \Exception('Insufficient stock for product: '.($productCategory instanceof ProductCategory ? $productCategory->name : 'Unknown'));
                 }
 
                 $itemTotalPrice = $unitPrice * $itemDTO->quantity;
