@@ -35,8 +35,34 @@ window.ApiService = (function() {
         });
     }
 
+    function fetchProductsByDistributionCenter(distributionCenterId) {
+        const headers = getHeaders();
+        if (!headers) return $.Deferred().reject("Token manquant").promise();
+
+        return $.ajax({
+            url: `/api/distribution-centers/${distributionCenterId}/products`,
+            type: "GET",
+            headers: headers
+        });
+    }
+
+    function createCustomerDeliveryAddress(customerId, addressData) {
+        const headers = getHeaders();
+        if (!headers) return $.Deferred().reject("Token manquant").promise();
+
+        return $.ajax({
+            url: `/api/customers/${customerId}/delivery-addresses`,
+            type: "POST",
+            headers: headers,
+            contentType: "application/json",
+            data: JSON.stringify(addressData)
+        });
+    }
+
     return {
         fetchCustomers,
-        fetchDistributionCenters
+        fetchDistributionCenters,
+        fetchProductsByDistributionCenter,
+        createCustomerDeliveryAddress
     };
 })();
