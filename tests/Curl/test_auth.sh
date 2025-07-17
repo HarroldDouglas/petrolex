@@ -1,6 +1,19 @@
 #!/bin/bash
 
-BASE_URL="http://localhost:8000/api"
+
+# Chemin vers la racine du projet
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# Charger les variables depuis .env
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    export $(cat "$PROJECT_ROOT/.env" | grep -v '#' | awk '/^[A-Z]/ {print}')
+else
+    echo "❌ Fichier .env non trouvé dans $PROJECT_ROOT!"
+    exit 1
+fi
+
+BASE_URL="${APP_URL}/api"
+
 
 # Chemin vers la racine du projet
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
