@@ -86,9 +86,9 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="distribution_center_id", type="integer", example=1),
  *     @OA\Property(property="distribution_center", ref="#/components/schemas/DistributionCenterResource"),
  *     @OA\Property(property="delivery_type", type="string", example="normal"),
- *     @OA\Property(property="payment_method", type="string", example="cash"),
+ *     @OA\Property(property="payment_method", type="string", example="mobile_money"),
  *     @OA\Property(property="total_amount", type="number", format="float", example=23500.00),
- *     @OA\Property(property="status", type="string", example="confirmed"),
+ *     @OA\Property(property="status", type="string", example="pending"),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
  *     @OA\Property(property="updated_at", type="string", format="date-time"),
  *     @OA\Property(

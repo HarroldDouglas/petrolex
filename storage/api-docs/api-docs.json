@@ -976,7 +976,7 @@
                     },
                     "payment_method": {
                         "type": "string",
-                        "example": "cash"
+                        "example": "mobile_money"
                     },
                     "total_amount": {
                         "type": "number",
@@ -985,7 +985,7 @@
                     },
                     "status": {
                         "type": "string",
-                        "example": "confirmed"
+                        "example": "pending"
                     },
                     "created_at": {
                         "type": "string",
