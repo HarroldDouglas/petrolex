@@ -12,7 +12,7 @@ return [
     */
     'CM' => [
         'name' => 'Cameroun',
-        'value' => 'cameroon',
+        'value' => 'CM',
         'active' => true,
     ],
 ];

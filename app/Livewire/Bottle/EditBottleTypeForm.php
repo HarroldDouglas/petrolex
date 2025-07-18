@@ -10,20 +10,19 @@ use App\Models\ProductCategory;
 use App\Models\ProductCategoryCityPrice;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Config;
 
 class EditBottleTypeForm extends AbstractBottleTypeForm
 {
     public BottleType $bottleType;
     public int $id;
 
-    public function mount(BottleType $bottleType)
+    public function mount(?BottleType $bottleType = null)
     {
-        $this->bottleType = $bottleType;
-        $this->availableCities = $this->geographyService
-            ->getCities(Config::get('geography.authorized-countries.CM.name'));
-
-        $this->loadBottleTypeData();
+        parent::mount();
+        if ($bottleType) {
+            $this->bottleType = $bottleType;
+            $this->loadBottleTypeData();
+        }
     }
 
     /**
@@ -65,7 +64,7 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
                 function (ProductCategoryCityPrice $cityPrice) use ($productCategory): ProductCategoryCityPriceDTO {
                     return new ProductCategoryCityPriceDTO(
                         product_category_id: $productCategory->id,
-                        city: $cityPrice->city,
+                        city_id: $cityPrice->city_id,
                         content_price: (float) $cityPrice->content_price,
                         content_with_bottle_price: (float) $cityPrice->content_with_bottle_price
                     );
@@ -85,9 +84,9 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
 
     public function save()
     {
-        $validatedData = $this->validate();
-
         try {
+            $validatedData = $this->validate();
+
             /** @var ProductCategory $productCategory */
             $productCategory = ProductCategory::bottles()
                 ->where('product_type_id', $this->bottleType->id)
@@ -95,10 +94,10 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
 
             /** @var ProductCategoryCityPriceDTO[] */
             $bottleTypeCityPrices = array_map(
-                /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
+                /** @param array{city_id: int, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
                 fn (array $cityPrice): ProductCategoryCityPriceDTO => new ProductCategoryCityPriceDTO(
                     product_category_id: $productCategory->id,
-                    city: $cityPrice['city'],
+                    city_id: $cityPrice['city_id'],
                     content_price: (float) $cityPrice['content_price'],
                     content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
                 ),

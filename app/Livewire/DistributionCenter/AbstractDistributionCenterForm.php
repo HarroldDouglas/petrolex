@@ -2,16 +2,18 @@
 
 namespace App\Livewire\DistributionCenter;
 
-use App\Services\Geography\GeographyServiceInterface;
+use App\Models\Geography\Country;
+use App\Repositories\Geography\GeographyRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
 
 abstract class AbstractDistributionCenterForm extends Component
 {
     public $name;
-    public $country = 'Cameroun';
-    public $city;
-    public $neighborhood;
+    public $countryId = null;
+    public $cityId = null;
+    public $neighborhoodId = null;
     public $address;
     public $phone;
     public $email;
@@ -21,12 +23,34 @@ abstract class AbstractDistributionCenterForm extends Component
     public $is_active = 1;
     public $description;
 
-    /** @var GeographyServiceInterface */
-    protected $geographyService;
+    public Collection $availableCountries;
+    public Collection $availableCities;
+    public Collection $availableNeighborhoods;
 
-    public function boot(GeographyServiceInterface $geographyService)
+    protected GeographyRepositoryInterface $geographyRepository;
+
+    public function boot(GeographyRepositoryInterface $geographyRepository)
     {
-        $this->geographyService = $geographyService;
+        $this->geographyRepository = $geographyRepository;
+        $this->availableCountries = new Collection;
+        $this->availableCities = new Collection;
+        $this->availableNeighborhoods = new Collection;
+
+        $this->availableCountries = $this->geographyRepository->getAllCountries();
+
+        if (is_null($this->countryId) && $this->availableCountries->isNotEmpty()) {
+            /** @var Country $country */
+            $country = $this->availableCountries->first();
+            $this->countryId = $country->id;
+        }
+
+        // Load initial cities and neighborhoods based on current IDs
+        if ($this->countryId) {
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->countryId);
+        }
+        if ($this->cityId) {
+            $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
+        }
     }
 
     public function rules()
@@ -40,26 +64,30 @@ abstract class AbstractDistributionCenterForm extends Component
         return $this->customRequest()->messages();
     }
 
-    /**
-     * Get the request class for validation
-     */
     abstract protected function customRequest(): FormRequest;
 
     public function render()
     {
         return view('livewire.distribution-center.form', [
-            'cities' => $this->geographyService->getCities($this->country),
-            'neighborhoods' => $this->city ? $this->geographyService->getNeighborhoods($this->city) : [],
-            'countries' => $this->geographyService->getCountries(),
+            'countries' => $this->availableCountries,
+            'cities' => $this->availableCities,
+            'neighborhoods' => $this->availableNeighborhoods,
         ]);
     }
 
-    /**
-     * Real-time validation for each field
-     */
     public function updated($propertyName)
     {
         $this->validateOnly($propertyName);
+
+        if ($propertyName === 'countryId') {
+            $this->cityId = null;
+            $this->neighborhoodId = null;
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->countryId);
+            $this->availableNeighborhoods = new Collection;
+        } elseif ($propertyName === 'cityId') {
+            $this->neighborhoodId = null;
+            $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
+        }
     }
 
     abstract public function submit();

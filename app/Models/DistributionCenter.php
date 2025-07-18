@@ -3,8 +3,12 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Models\Geography\City;
+use App\Models\Geography\Country;
+use App\Models\Geography\Neighborhood;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,9 +18,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * @property int $id
  * @property string $name
+ * @property int $neighborhood_id
  * @property string $address
- * @property string $city
- * @property string $country
  * @property string|null $phone
  * @property string|null $email
  * @property bool $is_active
@@ -34,6 +37,9 @@ use Illuminate\Support\Facades\DB;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $productCategories
  * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleType> $bottleTypeStocks
+ * @property-read Neighborhood $neighborhood
+ * @property-read \App\Models\Geography\City $city
+ * @property-read \App\Models\Geography\Country $country
  *
  * // Accessors
  * @property-read int $total_empty_bottles
@@ -55,9 +61,7 @@ class DistributionCenter extends Model
      */
     protected $fillable = [
         'name',
-        'country',
-        'city',
-        'neighborhood',
+        'neighborhood_id',
         'address',
         'description',
         'latitude',
@@ -80,6 +84,32 @@ class DistributionCenter extends Model
     ];
 
     // ===== RELATIONS =====
+
+    /**
+     * Get the neighborhood that owns the distribution center.
+     */
+    public function neighborhood(): BelongsTo
+    {
+        return $this->belongsTo(Neighborhood::class);
+    }
+
+    // ===== ACCESSORS =====
+
+    /**
+     * Get the city of the distribution center through its neighborhood.
+     */
+    public function getCityAttribute(): ?City
+    {
+        return $this->neighborhood->municipality->city ?? null;
+    }
+
+    /**
+     * Get the country of the distribution center through its city.
+     */
+    public function getCountryAttribute(): ?Country
+    {
+        return $this->neighborhood->municipality->city->country ?? null;
+    }
 
     /**
      * Get the user permissions for this center.
@@ -163,8 +193,6 @@ class DistributionCenter extends Model
             ->withPivot(['stock_empty', 'stock_filled'])
             ->withTimestamps();
     }
-
-    // ===== ACCESSORS =====
 
     /**
      * Get the total number of empty bottles in stock.

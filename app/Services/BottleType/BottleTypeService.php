@@ -41,7 +41,11 @@ class BottleTypeService extends BaseServiceWithMedia
 
             if (! empty($createBottleTypeDTO->bottleTypeCityPrices)) {
                 $bottleTypeCityPricesData = array_map(
-                    fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => $cityPriceDTO->toArray(),
+                    fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => [
+                        'city_id' => $cityPriceDTO->city_id,
+                        'content_price' => $cityPriceDTO->content_price,
+                        'content_with_bottle_price' => $cityPriceDTO->content_with_bottle_price,
+                    ],
                     $createBottleTypeDTO->bottleTypeCityPrices
                 );
                 $productCategory->cityPrices()->createMany($bottleTypeCityPricesData);
@@ -66,7 +70,11 @@ class BottleTypeService extends BaseServiceWithMedia
 
                 if (! empty($updateBottleTypeDTO->bottleTypeCityPrices)) {
                     $bottleTypeCityPricesData = array_map(
-                        fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => $cityPriceDTO->toArray(),
+                        fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => [
+                            'city_id' => $cityPriceDTO->city_id,
+                            'content_price' => $cityPriceDTO->content_price,
+                            'content_with_bottle_price' => $cityPriceDTO->content_with_bottle_price,
+                        ],
                         $updateBottleTypeDTO->bottleTypeCityPrices
                     );
                     $productCategory->cityPrices()->createMany($bottleTypeCityPricesData);

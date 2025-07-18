@@ -9,7 +9,11 @@ return [
     | This value determines the allowed countries in the application
     |
     */
-    'countries' => [
-        'Cameroun' => 'Cameroun',
+    'authorized-countries' => [
+        'CM' => [
+            'name' => 'Cameroun',
+            'active' => true,
+            'value' => 'cameroon',
+        ],
     ],
 ];

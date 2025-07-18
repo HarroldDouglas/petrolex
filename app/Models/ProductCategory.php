@@ -74,7 +74,7 @@ class ProductCategory extends Model
 
     public function cityPrices(): HasMany
     {
-        return $this->hasMany(ProductCategoryCityPrice::class);
+        return $this->hasMany(ProductCategoryCityPrice::class, 'product_category_id', 'id');
     }
 
     // ===== ACCESSORS =====

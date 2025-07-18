@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Geography\City;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property int $product_category_id
- * @property string $city
+ * @property int $city_id // ✅ Changé de 'city' à 'city_id'
  * @property float $content_price
  * @property float $content_with_bottle_price
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -17,10 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * // Relations
  * @property-read ProductCategory $productCategory
- *
- * // Accessors
- *
- * // Query Scopes
+ * @property-read City $city  // ✅ Nouvelle relation
  */
 class ProductCategoryCityPrice extends Model
 {
@@ -36,7 +34,7 @@ class ProductCategoryCityPrice extends Model
      */
     protected $fillable = [
         'product_category_id',
-        'city',
+        'city_id',
         'content_price',
         'content_with_bottle_price',
     ];
@@ -55,5 +53,13 @@ class ProductCategoryCityPrice extends Model
     public function productCategory(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class);
+    }
+
+    /**
+     * ✅ Nouvelle relation avec City
+     */
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 }

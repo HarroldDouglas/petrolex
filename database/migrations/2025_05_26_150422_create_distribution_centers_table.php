@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('distribution_centers', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->string('country', 100);
-            $table->string('city', 100);
-            $table->string('neighborhood', 100);
+            // Seul neighborhood_id est stocké, car on peut remonter via les relations
+            $table->foreignId('neighborhood_id')->constrained()->onDelete('cascade');
             $table->text('address');
             $table->text('description');
             $table->decimal('latitude', 10, 8)->nullable();
