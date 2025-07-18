@@ -35,4 +35,5 @@ require __DIR__.'/api/deliverer.php';
 require __DIR__.'/api/orders.php';
 require __DIR__.'/api/bottles.php';
 require __DIR__.'/api/payments.php';
+require __DIR__.'/api/delivery.php';
 require __DIR__.'/api/tracking.php';

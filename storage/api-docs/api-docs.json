@@ -68,6 +68,75 @@
                 }
             }
         },
+        "/api/customers/{customerId}": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Récupérer un client spécifique",
+                "description": "Récupérer les informations d'un client spécifique par son ID avec ses adresses de livraison.",
+                "operationId": "api.customers.show",
+                "parameters": [
+                    {
+                        "name": "customerId",
+                        "in": "path",
+                        "description": "ID du client à récupérer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Client récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Client non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/customers": {
             "get": {
                 "tags": [
@@ -205,6 +274,53 @@
                 ]
             }
         },
+        "/api/delivery-types": {
+            "get": {
+                "tags": [
+                    "Livraison"
+                ],
+                "summary": "Récupérer tous les types de livraison",
+                "description": "Récupérer la liste de tous les types de livraison disponibles.",
+                "operationId": "api.delivery-types.index",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeliveryTypesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/orders": {
             "post": {
                 "tags": [
@@ -257,6 +373,53 @@
                     },
                     "422": {
                         "description": "Erreur de validation ou stock insuffisant",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payment-methods": {
+            "get": {
+                "tags": [
+                    "Paiement"
+                ],
+                "summary": "Récupérer toutes les méthodes de paiement",
+                "description": "Récupérer la liste de toutes les méthodes de paiement disponibles.",
+                "operationId": "api.payment-methods.index",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentMethodsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -462,6 +625,25 @@
                             "message": {
                                 "type": "string",
                                 "example": "Authentification réussie"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "CustomerResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/CustomerData"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Client récupéré avec succès"
                             }
                         },
                         "type": "object"
@@ -744,6 +926,45 @@
                     }
                 ]
             },
+            "DeliveryType": {
+                "title": "Delivery Type",
+                "description": "Represents a single delivery type",
+                "properties": {
+                    "value": {
+                        "description": "The unique identifier for the delivery type",
+                        "type": "string",
+                        "example": "standard"
+                    },
+                    "label": {
+                        "description": "The human-readable label for the delivery type",
+                        "type": "string",
+                        "example": "Standard"
+                    }
+                },
+                "type": "object"
+            },
+            "DeliveryTypesResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/DeliveryType"
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Delivery types retrieved successfully."
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "OrderItemRequest": {
                 "required": [
                     "product_category_id",
@@ -1017,6 +1238,45 @@
                             "message": {
                                 "type": "string",
                                 "example": "Commande créée avec succès"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "PaymentMethod": {
+                "title": "Payment Method",
+                "description": "Represents a single payment method",
+                "properties": {
+                    "value": {
+                        "description": "The unique identifier for the payment method",
+                        "type": "string",
+                        "example": "credit_card"
+                    },
+                    "label": {
+                        "description": "The human-readable label for the payment method",
+                        "type": "string",
+                        "example": "Carte de Crédit"
+                    }
+                },
+                "type": "object"
+            },
+            "PaymentMethodsResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PaymentMethod"
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Payment methods retrieved successfully."
                             }
                         },
                         "type": "object"
@@ -1333,8 +1593,16 @@
             "description": "Clients"
         },
         {
+            "name": "Livraison",
+            "description": "Livraison"
+        },
+        {
             "name": "Commandes",
             "description": "Commandes"
+        },
+        {
+            "name": "Paiement",
+            "description": "Paiement"
         },
         {
             "name": "Produits d'un centre de distribution",

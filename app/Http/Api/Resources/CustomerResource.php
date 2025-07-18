@@ -18,16 +18,20 @@ class CustomerResource extends UserResource
      */
     public function toArray(Request $request): array
     {
-        /** @var Customer $customer */
+        /** @var Customer&\Illuminate\Database\Eloquent\Model $customer */
         $customer = $this->resource;
 
+        // Get user data from the parent UserResource
+        $userData = (new UserResource($customer->user))->toArray($request);
+
+        // Merge user data with customer-specific data
         return array_merge(
-            UserResource::make($customer->user)->toArray($request),
+            $userData,
             [
+                'id' => $customer->id, // Override user ID with customer ID
                 'deliveryAddresses' => CustomerDeliveryAddressResource::collection($customer->deliveryAddresses) ?? [],
                 'current_balance' => $customer->current_balance ?? null,
             ]
         );
-
     }
 }
