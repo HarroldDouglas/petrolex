@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Enums\ProductType;
 use App\Models\ProductCategory;
+use App\Models\ProductCategoryDistributionCenter;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -73,18 +74,13 @@ class ProductCategoryRepository extends BaseEloquentRepository implements Produc
 
     public function getAvailableStock(int $productCategoryId, int $distributionCenterId): int
     {
-        /** @var ProductCategory|null $productCategory */
-        $productCategory = $this->find($productCategoryId);
-
-        if (! $productCategory) {
-            return 0; // Or throw an exception if a non-existent product category should be an error
-        }
-
-        $productCategoryDistributionCenter = $productCategory->distributionCenters()
+        
+        $pivot = ProductCategoryDistributionCenter::with('productCategory')
+            ->where('product_category_id', $productCategoryId)
             ->where('distribution_center_id', $distributionCenterId)
             ->first();
 
-        return $productCategoryDistributionCenter?->availableStock ?? 0;
+        return $pivot?->available_stock ?? 0;
     }
 
     /**
