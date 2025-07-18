@@ -3,11 +3,11 @@
 namespace App\Http\Api\Resources;
 
 use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
-use App\Models\User;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 
 /**
- * @mixin User
+ * @mixin Customer
  */
 class CustomerResource extends UserResource
 {
@@ -18,16 +18,20 @@ class CustomerResource extends UserResource
      */
     public function toArray(Request $request): array
     {
-        /** @var User&\Illuminate\Database\Eloquent\Model $user */
-        $user = $this->resource;
+        /** @var Customer&\Illuminate\Database\Eloquent\Model $customer */
+        $customer = $this->resource;
 
+        // Get user data from the parent UserResource
+        $userData = (new UserResource($customer->user))->toArray($request);
+
+        // Merge user data with customer-specific data
         return array_merge(
-            parent::toArray($request),
+            $userData,
             [
-                'deliveryAddresses' => CustomerDeliveryAddressResource::collection($user->customer?->deliveryAddresses) ?? [],
-                'current_balance' => $user->customer?->current_balance ?? null,
+                'id' => $customer->id, // Override user ID with customer ID
+                'deliveryAddresses' => CustomerDeliveryAddressResource::collection($customer->deliveryAddresses) ?? [],
+                'current_balance' => $customer->current_balance ?? null,
             ]
         );
-
     }
 }
