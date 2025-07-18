@@ -80,6 +80,8 @@ class OrderService extends BaseServiceForEntity
             /** @var Order $order */
             $order = $this->repository->create($orderData);
 
+            //TODO Decrement stock after order completion may be in a listener
+
             Event::dispatch(new OrderCreatedEvent($order, $orderItemsData));
 
             $order->load('items.productCategory');
