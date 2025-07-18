@@ -4,7 +4,6 @@ namespace App\Http\Api\Resources;
 
 use App\Enums\BottleOrderType;
 use App\Enums\ProductType;
-use App\Models\BottleType;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

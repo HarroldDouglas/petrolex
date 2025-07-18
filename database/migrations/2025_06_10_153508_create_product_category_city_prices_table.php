@@ -14,13 +14,11 @@ return new class extends Migration
         Schema::create('product_category_city_prices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_category_id')->constrained('product_categories')->onDelete('cascade');
-            // Remplacer 'city' par 'city_id' et ajouter la contrainte de clé étrangère
             $table->foreignId('city_id')->constrained('cities')->onDelete('cascade');
             $table->decimal('content_price', 10, 2);
             $table->decimal('content_with_bottle_price', 10, 2);
             $table->timestamps();
 
-            // Mettre à jour les index et les contraintes uniques
             $table->index('city_id');
             $table->index(['product_category_id', 'city_id']);
 

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $municipality_id
- * @property-read \App\Models\Geography\Municipality $municipality
+ * @property-read Municipality $municipality
  */
 class Neighborhood extends Model
 {

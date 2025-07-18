@@ -6,19 +6,20 @@ use App\Models\Geography\City;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $product_category_id
- * @property int $city_id // ✅ Changé de 'city' à 'city_id'
+ * @property int $city_id
  * @property float $content_price
  * @property float $content_with_bottle_price
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * // Relations
  * @property-read ProductCategory $productCategory
- * @property-read City $city  // ✅ Nouvelle relation
+ * @property-read City $city
  */
 class ProductCategoryCityPrice extends Model
 {
@@ -55,9 +56,6 @@ class ProductCategoryCityPrice extends Model
         return $this->belongsTo(ProductCategory::class);
     }
 
-    /**
-     * ✅ Nouvelle relation avec City
-     */
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);

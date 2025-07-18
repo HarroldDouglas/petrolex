@@ -20,7 +20,6 @@ class DistributionCenterSeeder extends Seeder
     {
         $this->command->info('Creating distribution centers...');
 
-        // Retrieve geographic IDs
         $cameroon = Country::where('code', 'CM')->first();
         $douala = $cameroon ? City::where('name', 'Douala')->where('country_id', $cameroon->id)->first() : null;
         $bonanjo = $douala ? Neighborhood::where('name', 'Bonanjo')->whereHas('municipality', function ($query) use ($douala) {
@@ -32,7 +31,6 @@ class DistributionCenterSeeder extends Seeder
             $query->where('city_id', $yaounde->id);
         })->first() : null;
 
-        // Use Maroua instead of Adamaoua
         $maroua = $cameroon ? City::where('name', 'Maroua')->where('country_id', $cameroon->id)->first() : null;
         $marouaNeighborhood = null;
         if ($maroua) {

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $city_id
- * @property-read \App\Models\Geography\City $city
+ * @property-read City $city
  */
 class Municipality extends Model
 {

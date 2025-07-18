@@ -16,13 +16,11 @@ class GeographicSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Country: Cameroun
         $cameroon = Country::firstOrCreate(
             ['code' => 'CM'],
             ['name' => 'Cameroun', 'is_active' => true]
         );
 
-        // Get cities data from config
         $citiesConfig = Config::get('geography.cameroon-cities.cities');
 
         foreach ($citiesConfig as $cityKey => $cityData) {

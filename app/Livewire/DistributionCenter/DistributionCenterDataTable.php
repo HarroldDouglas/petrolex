@@ -38,7 +38,6 @@ class DistributionCenterDataTable extends BaseDataTable
                 ->sortable()
                 ->searchable(),
 
-            // Utiliser les relations pour afficher le pays, la ville et le quartier
             Column::make('Pays', 'neighborhood.municipality.city.country.name')
                 ->sortable(function (Builder $query, string $direction) {
                     return $query->orderBy(Country::select('name')->whereColumn('countries.id', 'cities.country_id'), $direction);
@@ -104,7 +103,7 @@ class DistributionCenterDataTable extends BaseDataTable
     public function builder(): Builder
     {
         return DistributionCenter::query()
-            ->with(['neighborhood.municipality.city.country']); // Charger les relations nécessaires
+            ->with(['neighborhood.municipality.city.country']);
     }
 
     protected function customMapAttributes()

@@ -17,10 +17,8 @@ class CreateDistributionCenter extends AbstractDistributionCenterForm
     {
         $validatedData = $this->validate();
 
-        // The model now expects neighborhood_id directly
-        DistributionCenter::create(array_merge($validatedData, [
-            'neighborhood_id' => $this->neighborhoodId,
-        ]));
+        // TODO : use a service to handle the creation logic
+        DistributionCenter::create($validatedData);
 
         session()->flash('success', 'Centre de distribution créé avec succès.');
 
