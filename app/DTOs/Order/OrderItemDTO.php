@@ -2,6 +2,7 @@
 
 namespace App\DTOs\Order;
 
+use App\Enums\BottleOrderType;
 use Spatie\LaravelData\Data;
 
 class OrderItemDTO extends Data
@@ -12,5 +13,6 @@ class OrderItemDTO extends Data
         public int $quantity,
         public ?float $unit_price,
         public ?float $total_price,
+        public ?BottleOrderType $bottle_type
     ) {}
 }

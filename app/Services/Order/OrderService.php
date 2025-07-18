@@ -5,6 +5,7 @@ namespace App\Services\Order;
 use App\DTOs\Order\CreateOrderDTO;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
+use App\Enums\BottleOrderType;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Events\OrderCreatedEvent;
@@ -48,7 +49,7 @@ class OrderService extends BaseServiceForEntity
         $orderDTO = CreateOrderDTO::from($data);
 
         return $this->executeInTransaction(function () use ($orderDTO) {
-            
+
             $orderItemsData = array_map(function ($itemDTO) {
 
                 $unitPrice = $this->productCategoryService->getProductPrice(
@@ -60,6 +61,7 @@ class OrderService extends BaseServiceForEntity
 
                 $itemDTO->unit_price = $unitPrice;
                 $itemDTO->total_price = $itemTotalPrice;
+                $itemDTO->bottle_type = $itemDTO->option ? BottleOrderType::from($itemDTO->option) : null;
 
                 return $itemDTO;
             }, $orderDTO->items);

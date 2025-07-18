@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\DTOs\Order\OrderItemDTO;
 use App\Events\OrderCreatedEvent;
 
 class AddOrderItemsToOrderListener
@@ -11,10 +12,10 @@ class AddOrderItemsToOrderListener
      */
     public function handle(OrderCreatedEvent $event): void
     {
-        $itemsForCreation = array_map(
-            fn ($dto) => $dto->toArray(),
-            $event->orderItemsData
-        );
+        $itemsForCreation = array_map(function (OrderItemDTO $dto) {
+            $data = $dto->toArray();
+            return $data;
+        }, $event->orderItemsData);
 
         $event->order->items()->createMany($itemsForCreation);
     }
