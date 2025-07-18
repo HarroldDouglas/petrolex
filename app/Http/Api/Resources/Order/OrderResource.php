@@ -2,9 +2,6 @@
 
 namespace App\Http\Api\Resources\Order;
 
-use App\Http\Api\Resources\CustomerResource;
-use App\Http\Api\Resources\DistributionCenterResource;
-use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,9 +24,10 @@ class OrderResource extends JsonResource
             'total_amount' => $this->total_amount,
             'status' => $this->status,
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
-            'customer' => CustomerResource::make($this->whenLoaded('customer')),
-            'delivery_address' => CustomerDeliveryAddressResource::make($this->whenLoaded('deliveryAddress')),
-            'distribution_center' => DistributionCenterResource::make($this->whenLoaded('distributionCenter')),
+            'delivery_address' => [
+                'id' => $this->delivery_address_id,
+                'name' => $this->deliveryAddress->fullAddress(),
+            ],
         ];
     }
 }

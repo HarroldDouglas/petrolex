@@ -13,7 +13,6 @@ use App\Models\AccessoryType;
 use App\Models\BottleType;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\ProductCategory;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
@@ -49,39 +48,23 @@ class OrderService extends BaseServiceForEntity
         $orderDTO = CreateOrderDTO::from($data);
 
         return $this->executeInTransaction(function () use ($orderDTO) {
-            $subtotal = 0;
-            $processedOrderItemsData = [];
-
-            foreach ($orderDTO->items as $itemDTO) {
-                $productCategory = $this->productCategoryService->find($itemDTO->product_category_id);
-
-                if (! $productCategory) {
-                    throw new ModelNotFoundException('Product category not found.');
-                }
+            
+            $orderItemsData = array_map(function ($itemDTO) {
 
                 $unitPrice = $this->productCategoryService->getProductPrice(
-                    $productCategory,
+                    $itemDTO->product_category_id,
                     $itemDTO->option
                 );
 
-                $availableQuantity = $this->productCategoryService->getProductQuantity(
-                    $productCategory,
-                    $orderDTO->distribution_center_id
-                );
-
-                if ($availableQuantity < $itemDTO->quantity) {
-                    throw new \Exception('Insufficient stock for product: '.($productCategory instanceof ProductCategory ? $productCategory->name : 'Unknown'));
-                }
-
                 $itemTotalPrice = $unitPrice * $itemDTO->quantity;
-                $subtotal += $itemTotalPrice;
 
-                $itemArray = $itemDTO->toArray();
-                $itemArray['unit_price'] = $unitPrice;
-                $itemArray['total_price'] = $itemTotalPrice;
+                $itemDTO->unit_price = $unitPrice;
+                $itemDTO->total_price = $itemTotalPrice;
 
-                $processedOrderItemsData[] = $itemArray;
-            }
+                return $itemDTO;
+            }, $orderDTO->items);
+
+            $subtotal = array_sum(array_column($orderItemsData, 'total_price'));
 
             $orderData = $orderDTO->toArray();
             if (isset($orderData['items'])) {
@@ -95,7 +78,7 @@ class OrderService extends BaseServiceForEntity
             /** @var Order $order */
             $order = $this->repository->create($orderData);
 
-            Event::dispatch(new OrderCreatedEvent($order, $processedOrderItemsData));
+            Event::dispatch(new OrderCreatedEvent($order, $orderItemsData));
 
             $order->load('items.productCategory');
 

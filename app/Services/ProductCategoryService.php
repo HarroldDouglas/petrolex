@@ -7,7 +7,6 @@ use App\Enums\ProductType;
 use App\Models\AccessoryType;
 use App\Models\BottleType;
 use App\Models\ProductCategory;
-use App\Models\ProductCategoryDistributionCenter;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -24,9 +23,16 @@ class ProductCategoryService extends BaseServiceForEntity
     }
 
     public function getProductPrice(
-        ProductCategory $productCategory,
+        int $productCategoryId,
         ?string $option = null
     ): float {
+        /** @var ProductCategory $productCategory */
+        $productCategory = $this->repository->find($productCategoryId);
+
+        if (! $productCategory) {
+            throw new ModelNotFoundException('Product category not found.');
+        }
+
         /**
          * @var BottleType|AccessoryType|null $productInstance
          */
@@ -50,14 +56,20 @@ class ProductCategoryService extends BaseServiceForEntity
     }
 
     public function getProductQuantity(
-        ProductCategory $productCategory,
+        int $productCategoryId,
         int $distributionCenterId
     ): int {
-        // TODO Optimize this method to avoid unnecessary queries
-        $productCategoryDistributionCenter = ProductCategoryDistributionCenter::where('product_category_id', $productCategory->id)
+        /** @var ProductCategory $productCategory */
+        $productCategory = $this->repository->find($productCategoryId);
+
+        if (! $productCategory) {
+            throw new ModelNotFoundException('Product category not found.');
+        }
+
+        $productCategoryDistributionCenter = $productCategory->distributionCenters()
             ->where('distribution_center_id', $distributionCenterId)
             ->first();
 
-        return $productCategoryDistributionCenter ? $productCategoryDistributionCenter->total_stock : 0;
+        return $productCategoryDistributionCenter?->stock ?? 0;
     }
 }

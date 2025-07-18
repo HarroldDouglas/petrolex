@@ -2,18 +2,18 @@
 
 namespace App\Rules;
 
-use App\Models\ProductCategory;
 use App\Services\DistributionCenter\DistributionCenterService;
 use App\Services\ProductCategoryService;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AvailableStock implements ValidationRule
 {
     public function __construct(
-        private ProductCategoryService $productCategoryService,
-        private DistributionCenterService $distributionCenterService,
-        private int $distributionCenterId
+        private readonly ProductCategoryService $productCategoryService,
+        private readonly DistributionCenterService $distributionCenterService,
+        private readonly int $distributionCenterId,
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -29,22 +29,16 @@ class AvailableStock implements ValidationRule
         $items = request()->input('items');
         $item = $items[$index];
 
-        /** @var ProductCategory $productCategory */
-        $productCategory = $this->productCategoryService->find($item['product_category_id']);
+        try {
+            $availableQuantity = $this->productCategoryService
+                ->getProductQuantity($item['product_category_id'], $this->distributionCenterId);
 
-        $distributionCenter = $this->distributionCenterService->find($this->distributionCenterId);
+            if ($availableQuantity < $item['quantity']) {
+                $fail("La quantité demandée pour le produit avec l'ID {$item['product_category_id']} n'est pas disponible. Stock actuel : {$availableQuantity}.");
+            }
 
-        if (! $productCategory || ! $distributionCenter) {
-            $fail('Categorie de produits ou centre de distribution invalide.');
-
-            return;
-        }
-
-        $availableQuantity = $this->productCategoryService
-            ->getProductQuantity($productCategory, $distributionCenter->id);
-
-        if ($availableQuantity < $item['quantity']) {
-            $fail("Il n'y a que {$availableQuantity} unités disponibles pour {$productCategory->name}.");
+        } catch (ModelNotFoundException) {
+            $fail("Le produit avec l'ID {$item['product_category_id']} n'existe pas.");
         }
     }
 }
