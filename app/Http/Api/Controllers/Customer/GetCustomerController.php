@@ -12,8 +12,6 @@ class GetCustomerController extends Controller
 
     /**
      * Get a single customer by ID.
-     *
-     * @param int $customerId
      */
     public function __invoke(int $customerId): CustomerResponse
     {

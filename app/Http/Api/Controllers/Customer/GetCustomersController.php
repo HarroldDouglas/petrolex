@@ -5,7 +5,6 @@ namespace App\Http\Api\Controllers\Customer;
 use App\Http\Api\Responses\Customer\CustomerResponse;
 use App\Http\Controllers\Controller;
 use App\Services\Customer\CustomerService;
-use App\Services\User\UserService;
 
 class GetCustomersController extends Controller
 {

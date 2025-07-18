@@ -70,6 +70,6 @@ class ProductCategoryService extends BaseServiceForEntity
             ->where('distribution_center_id', $distributionCenterId)
             ->first();
 
-        return $productCategoryDistributionCenter?->stock ?? 0;
+        return $productCategoryDistributionCenter?->AvailableStock ?? 0;
     }
 }

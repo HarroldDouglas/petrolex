@@ -14,6 +14,7 @@ class AddOrderItemsToOrderListener
     {
         $itemsForCreation = array_map(function (OrderItemDTO $dto) {
             $data = $dto->toArray();
+
             return $data;
         }, $event->orderItemsData);
 
