@@ -15,6 +15,7 @@ class ProductCategoryService extends BaseServiceForEntity
     public function __construct(ProductCategoryRepositoryInterface $repository)
     {
         parent::__construct($repository);
+        $this->repository = $repository;
     }
 
     protected function getModel(): string
@@ -66,10 +67,10 @@ class ProductCategoryService extends BaseServiceForEntity
             throw new ModelNotFoundException('Product category not found.');
         }
 
-        $productCategoryDistributionCenter = $productCategory->distributionCenters()
-            ->where('distribution_center_id', $distributionCenterId)
-            ->first();
+        /** @var \App\Repositories\Contracts\ProductCategoryRepositoryInterface $repository */
+        $repository = $this->repository;
+        $availableStock = $repository->getAvailableStock($productCategoryId, $distributionCenterId);
 
-        return $productCategoryDistributionCenter?->AvailableStock ?? 0;
+        return $availableStock;
     }
 }

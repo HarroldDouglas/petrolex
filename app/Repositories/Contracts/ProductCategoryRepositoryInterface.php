@@ -40,4 +40,12 @@ interface ProductCategoryRepositoryInterface extends BaseRepositoryInterface
      * @return int The number of product categories of the given type
      */
     public function countByType(ProductType $type): int;
+
+    /**
+     * Summary of availableStock, get number of accessories and filled bottles
+     * @param int $productCategoryId
+     * @param int $distributionCenterId
+     * @return int
+     */ 
+    public function getAvailableStock(int $productCategoryId, int $distributionCenterId): int;
 }

@@ -71,6 +71,22 @@ class ProductCategoryRepository extends BaseEloquentRepository implements Produc
             ->get();
     }
 
+    public function getAvailableStock(int $productCategoryId, int $distributionCenterId): int
+    {
+        /** @var ProductCategory|null $productCategory */
+        $productCategory = $this->find($productCategoryId);
+
+        if (! $productCategory) {
+            return 0; // Or throw an exception if a non-existent product category should be an error
+        }
+
+        $productCategoryDistributionCenter = $productCategory->distributionCenters()
+            ->where('distribution_center_id', $distributionCenterId)
+            ->first();
+
+        return $productCategoryDistributionCenter?->availableStock ?? 0;
+    }
+
     /**
      * Count product categories by type
      */
