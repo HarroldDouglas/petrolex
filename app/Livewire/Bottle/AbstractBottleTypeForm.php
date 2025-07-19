@@ -27,7 +27,7 @@ abstract class AbstractBottleTypeForm extends Component
 
     public $cityPrices = [];
     public Collection $availableCountries;
-    public array $availableCities; // Changé de Collection à array
+    public array $availableCities;
     public $selectedCountryId = null;
     public $selectedCityId = null;
     public $tempCityContentPrice = null;
@@ -67,7 +67,7 @@ abstract class AbstractBottleTypeForm extends Component
     public function updatedSelectedCountryId($value)
     {
         $this->selectedCityId = null;
-        $this->availableCities = []; // Initialiser comme un tableau vide
+        $this->availableCities = [];
 
         if ($value) {
             $this->availableCities = $this->geographyRepository->getCitiesByCountryId($value)->pluck('name', 'id')->toArray();

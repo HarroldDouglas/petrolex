@@ -7,47 +7,47 @@
                 @error('name') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
-                <label for="countryId" class="form-label">Pays</label>
-                <select class="form-select" id="countryId" wire:model.live="countryId">
+                <label for="country_id" class="form-label">Pays</label>
+                <select class="form-select" id="country_id" wire:model.live="country_id">
                     @foreach($countries as $country)
                     <option value="{{ $country->id }}">{{ $country->name }}</option>
                     @endforeach
                 </select>
-                @error('countryId') <span class="text-danger">{{ $message }}</span> @enderror
+                @error('country_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
-                <label for="cityId" class="form-label">Ville</label>
-                <div wire:loading.remove wire:target="countryId">
-                    <select class="form-select select2 searchable" id="cityId" wire:model.live="cityId" data-placeholder="Rechercher une ville">
-                        <option value="">Sélectionnez une ville</option>
+                <label for="city_id" class="form-label">Ville</label>
+                <div wire:loading.remove wire:target="country_id">
+                    <select class="form-select select2 searchable" id="city_id" wire:model.live="city_id" data-placeholder="Rechercher une ville">
+                        <option value="">Sélectionner une ville</option>
                         @foreach($cities as $city)
                         <option value="{{ $city->id }}">{{ $city->name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div wire:loading wire:target="countryId">
+                <div wire:loading wire:target="country_id">
                     <div class="spinner-border spinner-border-sm" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div> Chargement des villes...
                 </div>
-                @error('cityId') <span class="text-danger">{{ $message }}</span> @enderror
+                @error('city_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
-                <label for="neighborhoodId" class="form-label">Quartier</label>
-                <div wire:loading.remove wire:target="cityId">
-                    <select class="form-select select2 searchable" id="neighborhoodId" wire:model.live="neighborhoodId" data-placeholder="Rechercher un quartier">
+                <label for="neighborhood_id" class="form-label">Quartier</label>
+                <div wire:loading.remove wire:target="city_id">
+                    <select class="form-select select2 searchable" id="neighborhood_id" wire:model.live="neighborhood_id" data-placeholder="Rechercher un quartier">
                         <option value="">Sélectionnez un quartier</option>
                         @foreach($neighborhoods as $neighborhood)
                         <option value="{{ $neighborhood->id }}">{{ $neighborhood->name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div wire:loading wire:target="cityId">
+                <div wire:loading wire:target="city_id">
                     <div class="spinner-border spinner-border-sm" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div> Chargement des quartiers...
                 </div>
-                @error('neighborhoodId') <span class="text-danger">{{ $message }}</span> @enderror
+                @error('neighborhood_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
                 <label for="address" class="form-label">Adresse</label>

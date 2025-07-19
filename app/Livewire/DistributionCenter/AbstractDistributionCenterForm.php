@@ -11,9 +11,9 @@ use Livewire\Component;
 abstract class AbstractDistributionCenterForm extends Component
 {
     public $name;
-    public $countryId = null;
-    public $cityId = null;
-    public $neighborhoodId = null;
+    public $country_id = null;
+    public $city_id = null;
+    public $neighborhood_id = null;
     public $address;
     public $phone;
     public $email;
@@ -38,18 +38,17 @@ abstract class AbstractDistributionCenterForm extends Component
 
         $this->availableCountries = $this->geographyRepository->getAllCountries();
 
-        if (is_null($this->countryId) && $this->availableCountries->isNotEmpty()) {
+        if (is_null($this->country_id) && $this->availableCountries->isNotEmpty()) {
             /** @var Country $country */
             $country = $this->availableCountries->first();
-            $this->countryId = $country->id;
+            $this->country_id = $country->id;
         }
 
-        if ($this->countryId) {
-            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->countryId);
+        if ($this->country_id) {
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->country_id);
         }
-
-        if ($this->cityId) {
-            $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
+        if ($this->city_id) {
+            $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->city_id);
         }
     }
 
@@ -79,16 +78,16 @@ abstract class AbstractDistributionCenterForm extends Component
     {
         $this->validateOnly($propertyName);
 
-        if ($propertyName === 'countryId') {
-            $this->cityId = null;
-            $this->neighborhoodId = null;
-            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->countryId);
+        if ($propertyName === 'country_id') {
+            $this->city_id = null;
+            $this->neighborhood_id = null;
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->country_id);
             $this->availableNeighborhoods = new Collection;
-        } elseif ($propertyName === 'cityId') {
-            $this->neighborhoodId = null;
+        } elseif ($propertyName === 'city_id') {
+            $this->neighborhood_id = null;
             $this->availableNeighborhoods = new Collection;
-            if ($this->cityId) {
-                $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
+            if ($this->city_id) {
+                $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->city_id);
             }
         }
     }

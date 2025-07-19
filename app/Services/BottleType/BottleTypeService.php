@@ -66,10 +66,8 @@ class BottleTypeService extends BaseServiceWithMedia
             $productCategory = $bottleType->productCategory;
 
             if ($productCategory) {
-                // Get existing city prices for this product category
                 $existingCityPrices = $productCategory->cityPrices->keyBy('city_id');
 
-                // Process new/updated city prices
                 if (! empty($updateBottleTypeDTO->bottleTypeCityPrices)) {
                     foreach ($updateBottleTypeDTO->bottleTypeCityPrices as $cityPriceDTO) {
                         $cityPriceData = [
@@ -78,16 +76,13 @@ class BottleTypeService extends BaseServiceWithMedia
                         ];
 
                         if ($existingCityPrices->has($cityPriceDTO->city_id)) {
-                            // Update existing price
                             $existingCityPrices->get($cityPriceDTO->city_id)->update($cityPriceData);
                         } else {
-                            // Create new price
                             $productCategory->cityPrices()->create(array_merge($cityPriceData, ['city_id' => $cityPriceDTO->city_id]));
                         }
                     }
                 }
 
-                // Delete prices that are no longer in the updated list
                 $updatedCityIds = collect($updateBottleTypeDTO->bottleTypeCityPrices)->pluck('city_id');
                 $existingCityPrices->each(function ($cityPrice) use ($updatedCityIds) {
                     if (! $updatedCityIds->contains($cityPrice->city_id)) {

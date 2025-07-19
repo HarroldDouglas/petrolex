@@ -1,13 +1,10 @@
 <?php
 
-// database/seeders/Development/DistributionCenterSeeder.php
-
 namespace Database\Seeders\Development;
 
 use App\Models\DistributionCenter;
 use App\Models\Geography\City;
 use App\Models\Geography\Country;
-use App\Models\Geography\Municipality;
 use App\Models\Geography\Neighborhood;
 use Illuminate\Database\Seeder;
 
@@ -34,9 +31,9 @@ class DistributionCenterSeeder extends Seeder
         $maroua = $cameroon ? City::where('name', 'Maroua')->where('country_id', $cameroon->id)->first() : null;
         $marouaNeighborhood = null;
         if ($maroua) {
-            $marouaMunicipality = $maroua->municipalities->first(); // Get the first municipality of Maroua
+            $marouaMunicipality = $maroua->municipalities->first();
             if ($marouaMunicipality) {
-                $marouaNeighborhood = $marouaMunicipality->neighborhoods->first(); // Get the first neighborhood of that municipality
+                $marouaNeighborhood = $marouaMunicipality->neighborhoods->first();
             }
         }
 

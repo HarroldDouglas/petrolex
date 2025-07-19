@@ -14,3 +14,10 @@ Lors de la génération ou de la modification de code, les principes suivants do
 *   **KISS (Keep It Simple, Stupid) :** Privilégier la simplicité et éviter la complexité inutile.
 
 L'objectif final est de maintenir une base de code robuste, évolutive et digne d'un développeur senior.
+
+
+* Je t'interdis d'ajouter les commentaires lorsque tu travail, non et non je ne veux pas de commentaires inutiles dans mes codes! 
+
+* Tu as obligation de comprendre le code similaire avant d'écrire le nouveau code, tu dois t'assurer que tu as bien compris le code existant avant de proposer des modifications ou des ajouts.
+
+* je t'interdis d'halluciner

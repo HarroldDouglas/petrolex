@@ -17,29 +17,29 @@ class EditDistributionCenter extends AbstractDistributionCenterForm
     {
         $this->distributionCenter = $distributionCenter;
         $this->name = $distributionCenter->name;
-        $this->neighborhoodId = $distributionCenter->neighborhood_id;
+        $this->neighborhood_id = $distributionCenter->neighborhood_id;
 
-        // Derive cityId, and countryId from the neighborhood relationship
-        if ($this->neighborhoodId) {
+        // Derive city_id, and country_id from the neighborhood relationship
+        if ($this->neighborhood_id) {
             /** @var Neighborhood $neighborhood */
             $neighborhood = $distributionCenter->neighborhood;
             if ($neighborhood) {
                 /** @var City $city */
                 $city = $neighborhood->municipality->city;
                 if ($city) {
-                    $this->cityId = $city->id;
+                    $this->city_id = $city->id;
                     /** @var Country $country */
                     $country = $city->country;
-                    $this->countryId = $country?->id;
+                    $this->country_id = $country?->id;
                 }
             }
         }
 
-        if ($this->countryId) {
-            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->countryId);
+        if ($this->country_id) {
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->country_id);
         }
-        if ($this->cityId) {
-            $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
+        if ($this->city_id) {
+            $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->city_id);
         }
 
         $this->address = $distributionCenter->address;
@@ -60,8 +60,6 @@ class EditDistributionCenter extends AbstractDistributionCenterForm
     public function submit()
     {
         $validatedData = $this->validate();
-
-        $validatedData['neighborhood_id'] = $this->neighborhoodId;
 
         $this->distributionCenter->update($validatedData);
 
