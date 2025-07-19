@@ -5,7 +5,6 @@ namespace App\Http\Api\Responses\Customer;
 use App\Http\Api\Resources\CustomerResource;
 use App\Http\Api\Responses\ApiResponse;
 use App\Models\Customer;
-use App\Models\User;
 use Illuminate\Support\Collection;
 
 class CustomerResponse extends ApiResponse
@@ -30,8 +29,6 @@ class CustomerResponse extends ApiResponse
 
     /**
      * Return response with a single customer.
-     *
-     * @param  Customer  $customer
      */
     public static function single(
         Customer $customer,
