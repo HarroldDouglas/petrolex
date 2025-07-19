@@ -18,7 +18,7 @@ trait AuthenticatesUsers
             ->type('input[wire\\:model="identifier"]', env('ADMIN_EMAIL'))
             ->type('input[wire\\:model="password"]', env('ADMIN_PASSWORD'))
             ->press('Se connecter')
-            ->pause(3000);
+            ->pause(5000);
     }
 
     /**
