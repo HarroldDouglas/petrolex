@@ -25,9 +25,6 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
         }
     }
 
-    /**
-     * Transform ProductCategoryCityPrice models to DTOs for editing
-     */
     protected function loadBottleTypeData()
     {
         $this->id = $this->bottleType->id;
@@ -57,21 +54,21 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
 
         if ($productCategory) {
             /** @var Collection<int, ProductCategoryCityPrice> $cityPrices */
-            $cityPrices = ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->get(); // TODO: move this into the repository
+            $cityPrices = ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->get();
 
-            /** @var ProductCategoryCityPriceDTO[] $cityPriceDTOs */
-            $cityPriceDTOs = $cityPrices->map(
-                function (ProductCategoryCityPrice $cityPrice) use ($productCategory): ProductCategoryCityPriceDTO {
-                    return new ProductCategoryCityPriceDTO(
-                        product_category_id: $productCategory->id,
-                        city_id: $cityPrice->city_id,
-                        content_price: (float) $cityPrice->content_price,
-                        content_with_bottle_price: (float) $cityPrice->content_with_bottle_price
-                    );
-                }
-            )->toArray();
+            $this->cityPrices = $cityPrices->map(function (ProductCategoryCityPrice $cityPrice) {
+                $city = $cityPrice->city;
+                $country = $city->country;
 
-            $this->cityPrices = $cityPriceDTOs;
+                return [
+                    'city_id' => $cityPrice->city_id,
+                    'city_name' => $city->name ?? 'N/A',
+                    'country_id' => $country->id ?? 'N/A',
+                    'country_name' => $country->name ?? 'N/A',
+                    'content_price' => (float) $cityPrice->content_price,
+                    'content_with_bottle_price' => (float) $cityPrice->content_with_bottle_price,
+                ];
+            })->toArray();
         } else {
             $this->cityPrices = [];
         }

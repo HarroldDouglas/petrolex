@@ -66,19 +66,34 @@ class BottleTypeService extends BaseServiceWithMedia
             $productCategory = $bottleType->productCategory;
 
             if ($productCategory) {
-                $productCategory->cityPrices()->delete();
+                // Get existing city prices for this product category
+                $existingCityPrices = $productCategory->cityPrices->keyBy('city_id');
 
+                // Process new/updated city prices
                 if (! empty($updateBottleTypeDTO->bottleTypeCityPrices)) {
-                    $bottleTypeCityPricesData = array_map(
-                        fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => [
-                            'city_id' => $cityPriceDTO->city_id,
+                    foreach ($updateBottleTypeDTO->bottleTypeCityPrices as $cityPriceDTO) {
+                        $cityPriceData = [
                             'content_price' => $cityPriceDTO->content_price,
                             'content_with_bottle_price' => $cityPriceDTO->content_with_bottle_price,
-                        ],
-                        $updateBottleTypeDTO->bottleTypeCityPrices
-                    );
-                    $productCategory->cityPrices()->createMany($bottleTypeCityPricesData);
+                        ];
+
+                        if ($existingCityPrices->has($cityPriceDTO->city_id)) {
+                            // Update existing price
+                            $existingCityPrices->get($cityPriceDTO->city_id)->update($cityPriceData);
+                        } else {
+                            // Create new price
+                            $productCategory->cityPrices()->create(array_merge($cityPriceData, ['city_id' => $cityPriceDTO->city_id]));
+                        }
+                    }
                 }
+
+                // Delete prices that are no longer in the updated list
+                $updatedCityIds = collect($updateBottleTypeDTO->bottleTypeCityPrices)->pluck('city_id');
+                $existingCityPrices->each(function ($cityPrice) use ($updatedCityIds) {
+                    if (! $updatedCityIds->contains($cityPrice->city_id)) {
+                        $cityPrice->delete();
+                    }
+                });
             }
 
             return $bottleType;

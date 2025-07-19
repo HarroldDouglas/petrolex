@@ -27,7 +27,7 @@ abstract class AbstractBottleTypeForm extends Component
 
     public $cityPrices = [];
     public Collection $availableCountries;
-    public Collection $availableCities;
+    public array $availableCities; // Changé de Collection à array
     public $selectedCountryId = null;
     public $selectedCityId = null;
     public $tempCityContentPrice = null;
@@ -57,11 +57,9 @@ abstract class AbstractBottleTypeForm extends Component
         }
 
         if ($this->selectedCountryId) {
-            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->selectedCountryId);
-            if (is_null($this->selectedCityId) && $this->availableCities->isNotEmpty()) {
-                /** @var City $city */
-                $city = $this->availableCities->first();
-                $this->selectedCityId = $city->id;
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->selectedCountryId)->pluck('name', 'id')->toArray();
+            if (is_null($this->selectedCityId) && ! empty($this->availableCities)) {
+                $this->selectedCityId = array_key_first($this->availableCities);
             }
         }
     }
@@ -69,14 +67,12 @@ abstract class AbstractBottleTypeForm extends Component
     public function updatedSelectedCountryId($value)
     {
         $this->selectedCityId = null;
-        $this->availableCities = new Collection;
+        $this->availableCities = []; // Initialiser comme un tableau vide
 
         if ($value) {
-            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($value);
-            if ($this->availableCities->isNotEmpty()) {
-                /** @var City $city */
-                $city = $this->availableCities->first();
-                $this->selectedCityId = $city->id;
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($value)->pluck('name', 'id')->toArray();
+            if (! empty($this->availableCities)) {
+                $this->selectedCityId = array_key_first($this->availableCities);
             }
         }
     }

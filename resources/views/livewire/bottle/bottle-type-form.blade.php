@@ -117,7 +117,7 @@
                 </div>
                 <div class="col-md-3"> {{-- Ajusté de col-md-4 à col-md-3 --}}
                     <label for="selectedCityId" class="form-label">Ville</label>
-                    <select class="form-select" id="selectedCityId" wire:model.live="selectedCityId">
+                    <select class="form-select" id="selectedCityId" wire:model.live="selectedCityId" wire:key="{{ $selectedCountryId }}">
                         <option value="">Sélectionner une ville</option>
                         @foreach($availableCities as $id => $name)
                             <option value="{{ $id }}">{{ $name }}</option>
