@@ -44,10 +44,10 @@ abstract class AbstractDistributionCenterForm extends Component
             $this->countryId = $country->id;
         }
 
-        // Load initial cities and neighborhoods based on current IDs
         if ($this->countryId) {
             $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->countryId);
         }
+
         if ($this->cityId) {
             $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
         }
@@ -86,7 +86,10 @@ abstract class AbstractDistributionCenterForm extends Component
             $this->availableNeighborhoods = new Collection;
         } elseif ($propertyName === 'cityId') {
             $this->neighborhoodId = null;
-            $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
+            $this->availableNeighborhoods = new Collection;
+            if ($this->cityId) {
+                $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
+            }
         }
     }
 

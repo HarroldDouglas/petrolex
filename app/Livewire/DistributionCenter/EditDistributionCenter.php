@@ -19,6 +19,7 @@ class EditDistributionCenter extends AbstractDistributionCenterForm
         $this->name = $distributionCenter->name;
         $this->neighborhoodId = $distributionCenter->neighborhood_id;
 
+        // Derive cityId, and countryId from the neighborhood relationship
         if ($this->neighborhoodId) {
             /** @var Neighborhood $neighborhood */
             $neighborhood = $distributionCenter->neighborhood;
@@ -34,8 +35,12 @@ class EditDistributionCenter extends AbstractDistributionCenterForm
             }
         }
 
-        $this->updated('countryId');
-        $this->updated('cityId');
+        if ($this->countryId) {
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->countryId);
+        }
+        if ($this->cityId) {
+            $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->cityId);
+        }
 
         $this->address = $distributionCenter->address;
         $this->phone = $distributionCenter->phone;
@@ -55,6 +60,8 @@ class EditDistributionCenter extends AbstractDistributionCenterForm
     public function submit()
     {
         $validatedData = $this->validate();
+
+        $validatedData['neighborhood_id'] = $this->neighborhoodId;
 
         $this->distributionCenter->update($validatedData);
 

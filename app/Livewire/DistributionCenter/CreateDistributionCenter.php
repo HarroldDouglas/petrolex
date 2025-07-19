@@ -17,7 +17,8 @@ class CreateDistributionCenter extends AbstractDistributionCenterForm
     {
         $validatedData = $this->validate();
 
-        // TODO : use a service to handle the creation logic
+        $validatedData['neighborhood_id'] = $this->neighborhoodId;
+
         DistributionCenter::create($validatedData);
 
         session()->flash('success', 'Centre de distribution créé avec succès.');
