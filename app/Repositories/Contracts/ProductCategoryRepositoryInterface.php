@@ -43,9 +43,6 @@ interface ProductCategoryRepositoryInterface extends BaseRepositoryInterface
 
     /**
      * Summary of availableStock, get number of accessories and filled bottles
-     * @param int $productCategoryId
-     * @param int $distributionCenterId
-     * @return int
-     */ 
+     */
     public function getAvailableStock(int $productCategoryId, int $distributionCenterId): int;
 }

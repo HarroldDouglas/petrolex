@@ -92,6 +92,19 @@ window.ApiService = (function() {
         });
     }
 
+    function storeOrder(orderData) {
+        const headers = getHeaders();
+        if (!headers) return $.Deferred().reject("Token manquant").promise();
+
+        return $.ajax({
+            url: "/api/orders",
+            type: "POST",
+            headers: headers,
+            contentType: "application/json",
+            data: JSON.stringify(orderData)
+        });
+    }
+
     return {
         fetchCustomers,
         fetchDistributionCenters,
@@ -99,6 +112,7 @@ window.ApiService = (function() {
         createCustomerDeliveryAddress,
         fetchCustomer,
         fetchPaymentMethods,
-        fetchDeliveryTypes
+        fetchDeliveryTypes,
+        storeOrder
     };
 })();
