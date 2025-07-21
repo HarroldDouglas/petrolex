@@ -6,14 +6,12 @@ use App\DTOs\BottleType\CreateBottleTypeDTO;
 use App\DTOs\ProductCategory\ProductCategoryCityPriceDTO;
 use App\Http\Requests\Bottletype\StoreBottleTypeRequest;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Config;
 
 class CreateBottleTypeForm extends AbstractBottleTypeForm
 {
     public function mount()
     {
-        $this->availableCities = $this->geographyService
-            ->getCities(Config::get('geography.authorized-countries.CM.name'));
+        parent::mount();
     }
 
     protected function customRequest(): FormRequest
@@ -23,12 +21,18 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
 
     public function save()
     {
-        $validatedData = $this->validate();
         try {
+            $validatedData = $this->validate();
+
             /** @var ProductCategoryCityPriceDTO[] */
             $bottleTypeCityPrices = array_map(
-                /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
-                fn (array $cityPrice): ProductCategoryCityPriceDTO => ProductCategoryCityPriceDTO::from($cityPrice),
+                /** @param array{city_id: int, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
+                fn (array $cityPrice): ProductCategoryCityPriceDTO => new ProductCategoryCityPriceDTO(
+                    product_category_id: null,
+                    city_id: $cityPrice['city_id'],
+                    content_price: (float) $cityPrice['content_price'],
+                    content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
+                ),
                 $validatedData['cityPrices']
             );
 

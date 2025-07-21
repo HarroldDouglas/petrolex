@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Bottle;
 
+use App\Models\Geography\City;
+use App\Models\Geography\Country;
+use App\Repositories\Geography\GeographyRepositoryInterface;
 use App\Services\BottleType\BottleTypeService;
-use App\Services\Geography\StaticGeographyService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
@@ -23,31 +26,67 @@ abstract class AbstractBottleTypeForm extends Component
     public $imagesIdsToDelete = [];
 
     public $cityPrices = [];
-    public $availableCities = [];
-    public $selectedCity = '';
-    public $tempCityContentPrice = '';
-    public $tempCityContentWithBottlePrice = '';
+    public Collection $availableCountries;
+    public array $availableCities;
+    public $selectedCountryId = null;
+    public $selectedCityId = null;
+    public $tempCityContentPrice = null;
+    public $tempCityContentWithBottlePrice = null;
 
     public bool $is_active = true;
 
     protected $bottleTypeService;
-    protected $geographyService;
+    protected GeographyRepositoryInterface $geographyRepository;
 
     public function boot(
         BottleTypeService $bottleTypeService,
-        StaticGeographyService $geographyService,
+        GeographyRepositoryInterface $geographyRepository,
     ) {
         $this->bottleTypeService = $bottleTypeService;
-        $this->geographyService = $geographyService;
+        $this->geographyRepository = $geographyRepository;
+    }
+
+    public function mount()
+    {
+        $this->availableCountries = $this->geographyRepository->getAllCountries();
+
+        if (is_null($this->selectedCountryId) && $this->availableCountries->isNotEmpty()) {
+            /** @var Country $country */
+            $country = $this->availableCountries->first();
+            $this->selectedCountryId = $country->id;
+        }
+
+        if ($this->selectedCountryId) {
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($this->selectedCountryId)->pluck('name', 'id')->toArray();
+            if (is_null($this->selectedCityId) && ! empty($this->availableCities)) {
+                $this->selectedCityId = array_key_first($this->availableCities);
+            }
+        }
+    }
+
+    public function updatedSelectedCountryId($value)
+    {
+        $this->selectedCityId = null;
+        $this->availableCities = [];
+
+        if ($value) {
+            $this->availableCities = $this->geographyRepository->getCitiesByCountryId($value)->pluck('name', 'id')->toArray();
+            if (! empty($this->availableCities)) {
+                $this->selectedCityId = array_key_first($this->availableCities);
+            }
+        }
     }
 
     public function isCityPriceAddButtonDisabled(): bool
     {
-        if (empty($this->selectedCity) || empty($this->tempCityContentPrice) || empty($this->tempCityContentWithBottlePrice)) {
+        if (is_null($this->selectedCityId) || ! is_numeric($this->tempCityContentPrice) || ! is_numeric($this->tempCityContentWithBottlePrice)) {
             return true;
         }
 
-        if ((float) $this->tempCityContentWithBottlePrice <= (float) $this->tempCityContentPrice) {
+        $contentPrice = (float) $this->tempCityContentPrice;
+        $contentWithBottlePrice = (float) $this->tempCityContentWithBottlePrice;
+
+        if ($contentPrice <= 0 || $contentWithBottlePrice <= 0 || $contentWithBottlePrice <= $contentPrice) {
             return true;
         }
 
@@ -56,21 +95,27 @@ abstract class AbstractBottleTypeForm extends Component
 
     public function addCityPrice()
     {
-        if (! $this->selectedCity || $this->tempCityContentPrice === '' || $this->tempCityContentWithBottlePrice === '') {
-            session()->flash('error', 'Veuillez sélectionner une ville et renseigner les prix avant d\'ajouter.');
-
-            return;
-        }
+        /** @var City $selectedCity */
+        $selectedCity = $this->geographyRepository->getCitiesByCountryId($this->selectedCountryId)
+            ->where('id', $this->selectedCityId)
+            ->first();
+        /** @var Country $selectedCountry */
+        $selectedCountry = $this->geographyRepository->getAllCountries()
+            ->where('id', $this->selectedCountryId)
+            ->first();
 
         $this->cityPrices[] = [
-            'city' => $this->selectedCity,
+            'city_id' => $this->selectedCityId,
+            'city_name' => $selectedCity->name ?? 'N/A',
+            'country_id' => $this->selectedCountryId,
+            'country_name' => $selectedCountry->name ?? 'N/A',
             'content_price' => (float) $this->tempCityContentPrice,
             'content_with_bottle_price' => (float) $this->tempCityContentWithBottlePrice,
         ];
 
-        $this->selectedCity = '';
-        $this->tempCityContentPrice = '';
-        $this->tempCityContentWithBottlePrice = '';
+        $this->selectedCityId = null;
+        $this->tempCityContentPrice = null;
+        $this->tempCityContentWithBottlePrice = null;
     }
 
     public function updateCityPrice($index, $field, $value)
@@ -109,6 +154,8 @@ abstract class AbstractBottleTypeForm extends Component
     {
         return view('livewire.bottle.bottle-type-form', [
             'existingImages' => $this->existingImages,
+            'availableCountries' => $this->availableCountries,
+            'availableCities' => $this->availableCities,
         ]);
     }
 

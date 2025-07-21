@@ -4,6 +4,9 @@ namespace App\Livewire\DistributionCenter;
 
 use App\DTOs\DistributionCenter\UpdateDistributionCenterDTO;
 use App\Models\DistributionCenter;
+use App\Models\Geography\City;
+use App\Models\Geography\Country;
+use App\Models\Geography\Neighborhood;
 use App\Services\DistributionCenter\DistributionCenterService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,17 +38,35 @@ class DistributionCenterDataTable extends BaseDataTable
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Pays', 'country')
-                ->sortable()
-                ->searchable(),
+            Column::make('Pays', 'neighborhood.municipality.city.country.name')
+                ->sortable(function (Builder $query, string $direction) {
+                    return $query->orderBy(Country::select('name')->whereColumn('countries.id', 'cities.country_id'), $direction);
+                })
+                ->searchable(function (Builder $query, string $searchTerm) {
+                    $query->orWhereHas('neighborhood.municipality.city.country', function (Builder $query) use ($searchTerm) {
+                        $query->where('name', 'like', '%'.$searchTerm.'%');
+                    });
+                }),
 
-            Column::make('Ville', 'city')
-                ->sortable()
-                ->searchable(),
+            Column::make('Ville', 'neighborhood.municipality.city.name')
+                ->sortable(function (Builder $query, string $direction) {
+                    return $query->orderBy(City::select('name')->whereColumn('cities.id', 'municipalities.city_id'), $direction);
+                })
+                ->searchable(function (Builder $query, string $searchTerm) {
+                    $query->orWhereHas('neighborhood.municipality.city', function (Builder $query) use ($searchTerm) {
+                        $query->where('name', 'like', '%'.$searchTerm.'%');
+                    });
+                }),
 
-            Column::make('Quartier', 'neighborhood')
-                ->sortable()
-                ->searchable(),
+            Column::make('Quartier', 'neighborhood.name')
+                ->sortable(function (Builder $query, string $direction) {
+                    return $query->orderBy(Neighborhood::select('name')->whereColumn('neighborhoods.id', 'distribution_centers.neighborhood_id'), $direction);
+                })
+                ->searchable(function (Builder $query, string $searchTerm) {
+                    $query->orWhereHas('neighborhood', function (Builder $query) use ($searchTerm) {
+                        $query->where('name', 'like', '%'.$searchTerm.'%');
+                    });
+                }),
 
             Column::make('Adresse', 'address')
                 ->sortable()
@@ -81,7 +102,8 @@ class DistributionCenterDataTable extends BaseDataTable
 
     public function builder(): Builder
     {
-        return DistributionCenter::query();
+        return DistributionCenter::query()
+            ->with(['neighborhood.municipality.city.country']);
     }
 
     protected function customMapAttributes()

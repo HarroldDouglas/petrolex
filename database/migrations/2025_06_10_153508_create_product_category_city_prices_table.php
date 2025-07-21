@@ -14,19 +14,18 @@ return new class extends Migration
         Schema::create('product_category_city_prices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_category_id')->constrained('product_categories')->onDelete('cascade');
-            $table->string('city');
+            $table->foreignId('city_id')->constrained('cities')->onDelete('cascade');
             $table->decimal('content_price', 10, 2);
             $table->decimal('content_with_bottle_price', 10, 2);
             $table->timestamps();
 
-            $table->index('city');
-            $table->index(['product_category_id', 'city']);
+            $table->index('city_id');
+            $table->index(['product_category_id', 'city_id']);
 
             $table->unique(
-                ['product_category_id', 'city'],
+                ['product_category_id', 'city_id'],
                 'product_category_city_unique'
             );
-
         });
     }
 

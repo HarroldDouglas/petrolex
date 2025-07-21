@@ -80,10 +80,6 @@
                             @if (!in_array($image['id'], $imagesIdsToDelete))
                                 <div class="position-relative">
                                     <img src="{{ $image['original_url'] }}" alt="{{ $image['name'] }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
-                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" 
-                                        wire:click="deleteImage({{ $image['id'] }})" title="Supprimer cette image">
-                                        <i class="ti ti-x"></i>
-                                    </button>
                                 </div>
                             @endif
                         @endforeach
@@ -110,28 +106,35 @@
             @endif
             
             <div class="row mb-3 align-items-end">
-                <div class="col-md-4">
-                    <label for="selectedCity" class="form-label">Ville</label>
-                    <select class="form-select" id="selectedCity" wire:model.live="selectedCity">
-                        <option value="">Sélectionner une ville</option>
-                        @foreach($availableCities as $city)
-                            @if(!in_array($city, array_column($cityPrices, 'city')))
-                                <option value="{{ $city }}">{{ $city }}</option>
-                            @endif
+                {{-- Masquer le champ Pays --}}
+                <div class="col-md-2" style="display: none;">
+                    <label for="selectedCountryId" class="form-label">Pays</label>
+                    <select class="form-select" id="selectedCountryId" wire:model.live="selectedCountryId">
+                        @foreach($availableCountries as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3"> {{-- Ajusté de col-md-4 à col-md-3 --}}
+                    <label for="selectedCityId" class="form-label">Ville</label>
+                    <select class="form-select" id="selectedCityId" wire:model.live="selectedCityId" wire:key="{{ $selectedCountryId }}">
+                        <option value="">Sélectionner une ville</option>
+                        @foreach($availableCities as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3"> {{-- Ajusté de col-md-3 à col-md-3 --}}
                     <label for="tempCityContentPrice" class="form-label">Prix de la recharge</label>
                     <input type="number" class="form-control" id="tempCityContentPrice" 
                            placeholder="Ex: 8500" wire:model.live="tempCityContentPrice">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3"> {{-- Ajusté de col-md-3 à col-md-3 --}}
                     <label for="tempCityContentWithBottlePrice" class="form-label">Prix consigne + recharge</label>
                     <input type="number" class="form-control" id="tempCityContentWithBottlePrice" 
                            placeholder="Ex: 25000" wire:model.live="tempCityContentWithBottlePrice">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3"> {{-- Ajusté de col-md-2 à col-md-3 pour compenser --}}
                     <button type="button" class="btn btn-primary w-100" 
                            wire:click="addCityPrice"
                            @if($this->isCityPriceAddButtonDisabled()) disabled @endif>
@@ -145,6 +148,8 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
+                                {{-- Masquer la colonne Pays --}}
+                                <th style="display: none;">Pays</th>
                                 <th>Ville</th>
                                 <th>Prix de la recharge</th>
                                 <th>Prix de la consigne + recharge</th>
@@ -154,7 +159,9 @@
                         <tbody>
                             @foreach($cityPrices as $index => $cityPrice)
                                 <tr>
-                                    <td>{{ $cityPrice['city'] }}</td>
+                                    {{-- Masquer la colonne Pays --}}
+                                    <td style="display: none;">{{ $cityPrice['country_name'] ?? '' }}</td>
+                                    <td>{{ $cityPrice['city_name'] ?? '' }}</td>
                                     <td>
                                         <input type="number" class="form-control @error('cityPrices.'.$index.'.content_price') is-invalid @enderror" 
                                             wire:model.live.debounce.500ms="cityPrices.{{ $index }}.content_price">

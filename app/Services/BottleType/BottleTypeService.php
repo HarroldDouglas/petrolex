@@ -41,7 +41,11 @@ class BottleTypeService extends BaseServiceWithMedia
 
             if (! empty($createBottleTypeDTO->bottleTypeCityPrices)) {
                 $bottleTypeCityPricesData = array_map(
-                    fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => $cityPriceDTO->toArray(),
+                    fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => [
+                        'city_id' => $cityPriceDTO->city_id,
+                        'content_price' => $cityPriceDTO->content_price,
+                        'content_with_bottle_price' => $cityPriceDTO->content_with_bottle_price,
+                    ],
                     $createBottleTypeDTO->bottleTypeCityPrices
                 );
                 $productCategory->cityPrices()->createMany($bottleTypeCityPricesData);
@@ -62,15 +66,29 @@ class BottleTypeService extends BaseServiceWithMedia
             $productCategory = $bottleType->productCategory;
 
             if ($productCategory) {
-                $productCategory->cityPrices()->delete();
+                $existingCityPrices = $productCategory->cityPrices->keyBy('city_id');
 
                 if (! empty($updateBottleTypeDTO->bottleTypeCityPrices)) {
-                    $bottleTypeCityPricesData = array_map(
-                        fn (ProductCategoryCityPriceDTO $cityPriceDTO): array => $cityPriceDTO->toArray(),
-                        $updateBottleTypeDTO->bottleTypeCityPrices
-                    );
-                    $productCategory->cityPrices()->createMany($bottleTypeCityPricesData);
+                    foreach ($updateBottleTypeDTO->bottleTypeCityPrices as $cityPriceDTO) {
+                        $cityPriceData = [
+                            'content_price' => $cityPriceDTO->content_price,
+                            'content_with_bottle_price' => $cityPriceDTO->content_with_bottle_price,
+                        ];
+
+                        if ($existingCityPrices->has($cityPriceDTO->city_id)) {
+                            $existingCityPrices->get($cityPriceDTO->city_id)->update($cityPriceData);
+                        } else {
+                            $productCategory->cityPrices()->create(array_merge($cityPriceData, ['city_id' => $cityPriceDTO->city_id]));
+                        }
+                    }
                 }
+
+                $updatedCityIds = collect($updateBottleTypeDTO->bottleTypeCityPrices)->pluck('city_id');
+                $existingCityPrices->each(function ($cityPrice) use ($updatedCityIds) {
+                    if (! $updatedCityIds->contains($cityPrice->city_id)) {
+                        $cityPrice->delete();
+                    }
+                });
             }
 
             return $bottleType;

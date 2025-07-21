@@ -6,7 +6,13 @@ use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin ProductCategory */
+/**
+ * @mixin ProductCategory
+ *
+ * @property int $id
+ * @property string $name
+ * @property \App\Enums\ProductType $product_type
+ */
 class ProductCategoryResource extends JsonResource
 {
     /**
