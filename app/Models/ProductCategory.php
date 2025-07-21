@@ -81,12 +81,6 @@ class ProductCategory extends Model
 
     public function getProductTypeInstanceAttribute(): BottleType|AccessoryType|null
     {
-        // Check if the instance has already been loaded manually
-        if (array_key_exists('productTypeInstance', $this->relations)) {
-            return $this->relations['productTypeInstance'];
-        }
-
-        // Otherwise, perform the query and store it
         $instance = match ($this->attributes['product_type']) {
             ProductType::BOTTLE()->value => BottleType::find($this->product_type_id),
             ProductType::ACCESSORY()->value => AccessoryType::find($this->product_type_id),

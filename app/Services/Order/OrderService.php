@@ -5,7 +5,7 @@ namespace App\Services\Order;
 use App\DTOs\Order\CreateOrderDTO;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
-use App\Enums\BottleOrderType;
+use App\DTOs\Order\OrderItemDTO;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Events\OrderCreatedEvent;
@@ -50,7 +50,7 @@ class OrderService extends BaseServiceForEntity
 
         return $this->executeInTransaction(function () use ($orderDTO) {
 
-            $orderItemsData = array_map(function ($itemDTO) {
+            $orderItemsData = array_map(function (OrderItemDTO $itemDTO): OrderItemDTO {
 
                 $unitPrice = $this->productCategoryService->getProductPrice(
                     $itemDTO->product_category_id,
@@ -61,7 +61,7 @@ class OrderService extends BaseServiceForEntity
 
                 $itemDTO->unit_price = $unitPrice;
                 $itemDTO->total_price = $itemTotalPrice;
-                $itemDTO->bottle_type = $itemDTO->option ? BottleOrderType::from($itemDTO->option) : null;
+                $itemDTO->option = $itemDTO->option ?? null;
 
                 return $itemDTO;
             }, $orderDTO->items);
@@ -79,8 +79,6 @@ class OrderService extends BaseServiceForEntity
 
             /** @var Order $order */
             $order = $this->repository->create($orderData);
-
-            //TODO Decrement stock after order completion may be in a listener
 
             Event::dispatch(new OrderCreatedEvent($order, $orderItemsData));
 

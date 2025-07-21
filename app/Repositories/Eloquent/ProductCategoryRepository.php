@@ -74,7 +74,7 @@ class ProductCategoryRepository extends BaseEloquentRepository implements Produc
 
     public function getAvailableStock(int $productCategoryId, int $distributionCenterId): int
     {
-        
+
         $pivot = ProductCategoryDistributionCenter::with('productCategory')
             ->where('product_category_id', $productCategoryId)
             ->where('distribution_center_id', $distributionCenterId)

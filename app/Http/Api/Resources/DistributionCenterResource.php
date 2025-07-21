@@ -8,6 +8,19 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @mixin DistributionCenter
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $country
+ * @property string $city
+ * @property string|null $neighborhood
+ * @property string|null $address
+ * @property string|null $description
+ * @property float|null $latitude
+ * @property float|null $longitude
+ * @property string|null $phone
+ * @property string|null $email
+ * @property int|null $storage_capacity
  */
 class DistributionCenterResource extends JsonResource
 {

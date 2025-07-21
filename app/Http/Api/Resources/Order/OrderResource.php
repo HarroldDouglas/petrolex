@@ -6,7 +6,18 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Order */
+/**
+ * @mixin Order
+ *
+ * @property int $id
+ * @property string $order_number
+ * @property \App\Enums\DeliveryType $delivery_type
+ * @property \App\Enums\PaymentMethod $payment_method
+ * @property float $total_amount
+ * @property \App\Enums\OrderStatus $status
+ * @property OrderItemResource[] $items
+ * @property array $delivery_address
+ */
 class OrderResource extends JsonResource
 {
     /**

@@ -2,12 +2,23 @@
 
 namespace App\Http\Api\Resources\Order;
 
+use App\Enums\BottleOrderType;
 use App\Http\Api\Resources\ProductCategoryResource;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin OrderItem */
+/**
+ * @mixin OrderItem
+ *
+ * @property int $id
+ * @property ProductCategoryResource $product_category
+ * @property int $quantity
+ * @property float $unit_price
+ * @property float $total_price
+ * @property BottleOrderType|null $option
+ * @property string $created_at
+ */
 class OrderItemResource extends JsonResource
 {
     /**
