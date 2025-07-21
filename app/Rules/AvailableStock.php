@@ -13,7 +13,7 @@ class AvailableStock implements ValidationRule
     public function __construct(
         private readonly ProductCategoryService $productCategoryService,
         private readonly DistributionCenterService $distributionCenterService,
-        private readonly ?int $distributionCenterId,
+        private readonly int $distributionCenterId,
     ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

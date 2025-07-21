@@ -45,18 +45,16 @@ $(document).ready(function() {
             console.error("Error fetching delivery types:", jqXHR.responseText);
         });
     
-
-    // Handle form submission
     $('#order-form').on('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
+        event.preventDefault();
         console.log('order form submitted');
         const customerId = $('#customer').val();
         const distributionCenterId = $('#distribution_center').val();
         const customerDeliveryAddressId = $('#customer_address').val();
         const paymentMethod = $('#payment_method').val();
         const deliveryType = $('#delivery_type').val();
-        const cartItems = CartService.getCart(); // Corrected: using getCart()
-        console.log('cartItems', cartItems);
+        const cartItems = CartService.getCart();
+
         if (!customerId || !distributionCenterId || !customerDeliveryAddressId || !paymentMethod || !deliveryType) {
             alert('Veuillez remplir tous les champs obligatoires.');
             return;
@@ -69,9 +67,6 @@ $(document).ready(function() {
             unit_price: item.price
         }));
 
-    
-        console.log('orderItems', orderItems);
-
         const orderData = {
             customer_id: customerId,
             distribution_center_id: distributionCenterId,
@@ -81,17 +76,14 @@ $(document).ready(function() {
             items: orderItems
         };
 
-        console.log('orderData', orderData);
-
         ApiService.storeOrder(orderData)
             .done(function(response) {
                 if (response && response.data) {
                     alert('Commande enregistrée avec succès!');
-                    window.location.href = '/test-products/order.html'; // Redirect to order page
+                    window.location.href = '/test-products/order.html';
                 } else {
                     alert('Erreur lors de l\'enregistrement de la commande.');
                     console.log('response', response);
-                    //TODO : Display the errors here
                 }
             })
             .fail(function(jqXHR) {
