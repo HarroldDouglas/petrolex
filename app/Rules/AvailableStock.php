@@ -18,6 +18,12 @@ class AvailableStock implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if (is_null($this->distributionCenterId)) {
+            $fail('Le centre de distribution doit être sélectionné pour vérifier le stock disponible.');
+
+            return;
+        }
+
         // Extract index from attribute, eg., items.0.quantity
         preg_match('/items\.(\d+)\.quantity/', $attribute, $matches);
 

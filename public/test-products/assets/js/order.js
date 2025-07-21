@@ -44,6 +44,53 @@ $(document).ready(function() {
         .fail(function(jqXHR) {
             console.error("Error fetching delivery types:", jqXHR.responseText);
         });
+    
+    $('#order-form').on('submit', function(event) {
+        event.preventDefault();
+        console.log('order form submitted');
+        const customerId = $('#customer').val();
+        const distributionCenterId = $('#distribution_center').val();
+        const customerDeliveryAddressId = $('#customer_address').val();
+        const paymentMethod = $('#payment_method').val();
+        const deliveryType = $('#delivery_type').val();
+        const cartItems = CartService.getCart();
+
+        if (!customerId || !distributionCenterId || !customerDeliveryAddressId || !paymentMethod || !deliveryType) {
+            alert('Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
+        // Transform cart items to match API expected format
+        const orderItems = cartItems.map(item => ({
+            product_category_id: item.id,
+            quantity: item.quantity,
+            option: item.option_value, // This will be null for accessories
+            unit_price: item.price
+        }));
+
+        const orderData = {
+            customer_id: customerId,
+            distribution_center_id: distributionCenterId,
+            delivery_address_id: customerDeliveryAddressId,
+            payment_method: paymentMethod,
+            delivery_type: deliveryType,
+            items: orderItems
+        };
+
+        ApiService.storeOrder(orderData)
+            .done(function(response) {
+                if (response && response.data) {
+                    alert('Commande enregistrée avec succès!');
+                    window.location.href = '/test-products/order.html';
+                } else {
+                    alert('Erreur lors de l\'enregistrement de la commande.');
+                    console.log('response', response);
+                }
+            })
+            .fail(function(jqXHR) {
+                console.error("Error storing order:", jqXHR.responseText);
+                alert('Erreur lors de l\'enregistrement de la commande. Voir la console pour plus de détails.');
+            });
+    });
 
     // Simulate selection of Payment Method and Delivery Type
     // This is a placeholder and would typically be driven by user interaction
