@@ -2,4 +2,9 @@
 
 namespace App\Repositories\Contracts;
 
-interface CustomerRepositoryInterface extends BaseRepositoryInterface {}
+use App\Models\Customer;
+
+interface CustomerRepositoryInterface extends BaseRepositoryInterface
+{
+    
+}
