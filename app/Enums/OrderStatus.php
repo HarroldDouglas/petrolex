@@ -9,6 +9,7 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self PROCESSING()
  * @method static self DELIVERED()
  * @method static self CANCELLED()
+ * @method static self PENDING()
  */
 class OrderStatus extends Enum
 {
@@ -22,6 +23,7 @@ class OrderStatus extends Enum
             'PROCESSING' => 'En cours de livraison',
             'DELIVERED' => 'Livrée',
             'CANCELLED' => 'Annulée',
+            'PENDING' => 'En attente',
         ];
     }
 
@@ -35,6 +37,7 @@ class OrderStatus extends Enum
             'PROCESSING' => 'in_progress',
             'DELIVERED' => 'delivered',
             'CANCELLED' => 'cancelled',
+            'PENDING' => 'pending',
         ];
     }
 
@@ -48,6 +51,7 @@ class OrderStatus extends Enum
             self::PROCESSING() => 'bg-primary',
             self::DELIVERED() => 'bg-success',
             self::CANCELLED() => 'bg-danger',
+            self::PENDING() => 'bg-warning',
             default => 'bg-secondary',
         };
     }

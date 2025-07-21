@@ -81,11 +81,15 @@ class ProductCategory extends Model
 
     public function getProductTypeInstanceAttribute(): BottleType|AccessoryType|null
     {
-        return match ($this->attributes['product_type']) {
+        $instance = match ($this->attributes['product_type']) {
             ProductType::BOTTLE()->value => BottleType::find($this->product_type_id),
             ProductType::ACCESSORY()->value => AccessoryType::find($this->product_type_id),
             default => null,
         };
+
+        $this->setRelation('productTypeInstance', $instance);
+
+        return $instance;
     }
 
     public function getNameAttribute(): string

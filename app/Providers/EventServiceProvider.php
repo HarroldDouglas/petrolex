@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 use App\Events\DistributionCenterUpdatedEvent;
+use App\Events\OrderCreatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
+use App\Listeners\AddOrderItemsToOrderListener;
 use App\Listeners\LogDistributionCenterUpdated;
+use App\Listeners\LogOrderCreatedListener;
 use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -26,6 +29,10 @@ class EventServiceProvider extends ServiceProvider
         ],
         DistributionCenterUpdatedEvent::class => [
             LogDistributionCenterUpdated::class,
+        ],
+        OrderCreatedEvent::class => [
+            AddOrderItemsToOrderListener::class,
+            LogOrderCreatedListener::class,
         ],
 
     ];
