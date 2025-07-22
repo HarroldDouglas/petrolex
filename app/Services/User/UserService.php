@@ -188,6 +188,16 @@ class UserService extends BaseServiceWithMedia
         return $this->userRepository->findByEmailOrPhone($identifier);
     }
 
+    public function markEmailAsVerified(User $user): Model
+    {
+        return $this->userRepository->update($user, ['email_verified_at' => now()]);
+    }
+
+    public function markPhoneAsVerified(User $user): Model
+    {
+        return $this->userRepository->update($user, ['phone_verified_at' => now()]);
+    }
+
     protected function getModel(): string
     {
         return User::class;

@@ -30,9 +30,9 @@ class VerifyOtpController extends Controller
 
         if ($user) {
             if ($this->otpService->determineChannel($identifier) === LoginChannel::EMAIL()) {
-                $user->markEmailAsVerified();
+                $this->userService->markEmailAsVerified($user);
             } else {
-                $user->markPhoneAsVerified();
+                $this->userService->markPhoneAsVerified($user);
             }
         }
 

@@ -187,13 +187,6 @@ class User extends Authenticatable implements HasMedia
         return false;
     }
 
-    public function markPhoneAsVerified(): bool
-    {
-        return $this->forceFill([
-            'phone_verified_at' => $this->freshTimestamp(),
-        ])->save();
-    }
-
     public function getImageIdentifier(): string
     {
         return $this->full_name ?? 'User #'.$this->id;
