@@ -2,30 +2,30 @@
 
 namespace App\Services\Customer;
 
-use App\DTOs\Customer\CreateCustomerDTO;
 use App\Events\CustomerCreatedEvent;
-use App\Http\Api\Resources\CustomerResource;
 use App\Models\Customer;
 use App\Models\User;
+use App\Repositories\Contracts\BaseRepositoryInterface;
 use App\Repositories\Contracts\CustomerRepositoryInterface;
+use App\Services\Auth\OtpService;
 use App\Services\BaseServiceForEntity;
-use App\Services\BaseServiceWithMedia;
 use App\Services\User\UserService;
 use Illuminate\Database\Eloquent\Model;
 
 class CustomerService extends BaseServiceForEntity
 {
-    
     /**
      * @var CustomerRepositoryInterface
      */
+    protected BaseRepositoryInterface $repository;
+
     public function __construct(
         CustomerRepositoryInterface $repository,
         protected UserService $userService,
+        protected OtpService $otpService
     ) {
         parent::__construct($repository);
     }
-
 
     protected function getModel(): string
     {
@@ -47,6 +47,9 @@ class CustomerService extends BaseServiceForEntity
             $user->customer()->save($customer);
 
             CustomerCreatedEvent::dispatch($customer);
+
+            // Send OTP to the user's email or phone
+            $this->otpService->sendOtp($user->email ?? $user->phone_number);
 
             return $customer;
         });

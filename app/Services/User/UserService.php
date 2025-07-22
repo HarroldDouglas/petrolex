@@ -183,6 +183,11 @@ class UserService extends BaseServiceWithMedia
         return $this->userRepository->findByRole(UserRole::CUSTOMER());
     }
 
+    public function findUserByIdentifier(string $identifier): ?User
+    {
+        return $this->userRepository->findByEmailOrPhone($identifier);
+    }
+
     protected function getModel(): string
     {
         return User::class;

@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Customer;
 
-use App\Enums\UserRole;
 use App\Http\Requests\User\BaseUserRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,8 +26,6 @@ class StoreCustomerRequest extends BaseUserRequest
     public function messages(): array
     {
         $messages = parent::messages();
-
-        $messages['role.in'] = 'Le rôle doit être client.';
 
         return $messages;
     }

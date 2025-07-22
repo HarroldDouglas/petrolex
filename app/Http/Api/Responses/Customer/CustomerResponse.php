@@ -42,5 +42,4 @@ class CustomerResponse extends ApiResponse
             $statusCode
         );
     }
-    
 }
