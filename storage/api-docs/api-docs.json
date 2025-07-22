@@ -322,6 +322,72 @@
             }
         },
         "/api/orders": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Lister toutes les commandes",
+                "description": "Récupère une liste de toutes les commandes existantes, incluant leurs articles.",
+                "operationId": "api.orders.index",
+                "responses": {
+                    "200": {
+                        "description": "Liste des commandes récupérée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Liste des commandes récupérée avec succès."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/OrderData"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Commandes"
@@ -1469,6 +1535,124 @@
                         "type": "object"
                     }
                 ]
+            },
+            "OrderItemData": {
+                "title": "Order Item Data",
+                "description": "Data of a single item within an order",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "product_category": {
+                        "$ref": "#/components/schemas/ProductCategoryData"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "unit_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1500
+                    },
+                    "total_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 3000
+                    },
+                    "option": {
+                        "type": "string",
+                        "example": "full",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-18T10:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "OrderData": {
+                "title": "Order Data",
+                "description": "Data of a single order",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order_number": {
+                        "type": "string",
+                        "example": "ORD-123456"
+                    },
+                    "delivery_type": {
+                        "type": "string",
+                        "example": "home_delivery"
+                    },
+                    "payment_method": {
+                        "type": "string",
+                        "example": "cash"
+                    },
+                    "total_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 6000
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "pending"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderItemData"
+                        }
+                    },
+                    "delivery_address": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 7
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "place Guichard\\n13682 Lelievre-la-Forêt, Cameroun"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-18T10:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-18T10:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductCategoryData": {
+                "title": "Product Category Data",
+                "description": "Data of a product category",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Bouteille de 6Kg"
+                    },
+                    "product_type": {
+                        "type": "string",
+                        "example": "bottle"
+                    }
+                },
+                "type": "object"
             },
             "CommonProductProperties": {
                 "properties": {

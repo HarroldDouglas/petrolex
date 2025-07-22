@@ -1,8 +1,19 @@
 <?php
 
+namespace App\Documentation\Schemas;
+
 use OpenApi\Annotations as OA;
 
 /**
+ * @OA\Schema(
+ *     schema="ProductCategoryData",
+ *     title="Product Category Data",
+ *     description="Data of a product category",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Bouteille de 6Kg"),
+ *     @OA\Property(property="product_type", type="string", example="bottle")
+ * )
+ *
  * @OA\Schema(
  *     schema="CommonProductProperties",
  *     type="object",
@@ -46,4 +57,4 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="price", type="number", format="float", description="Prix de l'accessoire", example=2500)
  * )
  */
-class Product {}
+class ProductSchema {}
