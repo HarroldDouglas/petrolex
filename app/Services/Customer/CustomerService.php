@@ -2,6 +2,7 @@
 
 namespace App\Services\Customer;
 
+use App\Enums\UserRole;
 use App\Events\CustomerCreatedEvent;
 use App\Models\Customer;
 use App\Models\User;
@@ -35,6 +36,9 @@ class CustomerService extends BaseServiceForEntity
     public function create(array $attributes): Model
     {
         return $this->executeInTransaction(function () use ($attributes) {
+            $attributes = array_merge($attributes, [
+                'role' => UserRole::CUSTOMER(),
+            ]);
             /** @var User $user */
             $user = $this->userService->createWithMedia($attributes);
 
