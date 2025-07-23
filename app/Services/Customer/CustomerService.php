@@ -9,11 +9,12 @@ use App\Models\User;
 use App\Repositories\Contracts\BaseRepositoryInterface;
 use App\Repositories\Contracts\CustomerRepositoryInterface;
 use App\Services\Auth\OtpService;
-use App\Services\BaseServiceForEntity;
+use App\Services\BaseServiceWithMedia;
+use App\Services\Shared\Media\MediaServiceInterface;
 use App\Services\User\UserService;
 use Illuminate\Database\Eloquent\Model;
 
-class CustomerService extends BaseServiceForEntity
+class CustomerService extends BaseServiceWithMedia
 {
     /**
      * @var CustomerRepositoryInterface
@@ -23,9 +24,15 @@ class CustomerService extends BaseServiceForEntity
     public function __construct(
         CustomerRepositoryInterface $repository,
         protected UserService $userService,
+        protected MediaServiceInterface $mediaService,
         protected OtpService $otpService
     ) {
-        parent::__construct($repository);
+        parent::__construct($repository, $mediaService);
+    }
+
+    protected function getMediaFields(): array
+    {
+        return ['image'];
     }
 
     protected function getModel(): string
@@ -39,7 +46,6 @@ class CustomerService extends BaseServiceForEntity
             $attributes = array_merge($attributes, [
                 'role' => UserRole::CUSTOMER(),
             ]);
-
             /** @var User $user */
             $user = $this->userService->createWithMedia($attributes);
 
