@@ -68,6 +68,106 @@
                 }
             }
         },
+        "/api/verify-otp": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Vérifier le code OTP",
+                "description": "Vérifie le code OTP envoyé à l'utilisateur et marque son compte comme vérifié.",
+                "operationId": "api.verify-otp",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "identifier",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "identifier": {
+                                        "type": "string",
+                                        "example": "jean.dupont@example.com"
+                                    },
+                                    "otp": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP vérifié avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "OTP verified successfully."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "identifier": {
+                                                    "type": "string",
+                                                    "example": "jean.dupont@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "OTP ou identifiant invalide.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreurs de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/customers/{customerId}": {
             "get": {
                 "tags": [
@@ -182,6 +282,122 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Créer un nouveau client",
+                "description": "Enregistre un nouvel utilisateur en tant que client et envoie un code OTP pour vérification.",
+                "operationId": "api.customers.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "phone_number",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Jean"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Dupont"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jean.dupont@example.com"
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "+237677123456"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "123 Rue Principale, Douala",
+                                        "nullable": true
+                                    },
+                                    "current_balance": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Client créé avec succès. Un OTP a été envoyé pour vérification.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Client created successfully. An OTP has been sent to your email/phone for verification."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "identifier": {
+                                                    "type": "string",
+                                                    "example": "jean.dupont@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreurs de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/customers/{customer}/delivery-addresses": {
@@ -1771,6 +1987,10 @@
         {
             "name": "Authentication",
             "description": "Authentication"
+        },
+        {
+            "name": "Authentification",
+            "description": "Authentification"
         },
         {
             "name": "Clients",

@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Events\CustomerCreatedEvent;
 use App\Events\DistributionCenterUpdatedEvent;
 use App\Events\OrderCreatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
 use App\Listeners\AddOrderItemsToOrderListener;
+use App\Listeners\LogCustomerCreatedListener;
 use App\Listeners\LogDistributionCenterUpdated;
 use App\Listeners\LogOrderCreatedListener;
 use App\Listeners\LogUserDeleted;
@@ -33,6 +35,9 @@ class EventServiceProvider extends ServiceProvider
         OrderCreatedEvent::class => [
             AddOrderItemsToOrderListener::class,
             LogOrderCreatedListener::class,
+        ],
+        CustomerCreatedEvent::class => [
+            LogCustomerCreatedListener::class,
         ],
 
     ];

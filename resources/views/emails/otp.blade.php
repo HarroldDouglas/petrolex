@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Your Authentication Code</title>
+    <title>Votre code d'authentification</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,20 +38,20 @@
 </head>
 
 <body>
-    <h2>Authentication Code</h2>
-    <p>Hello,</p>
-    <p>We received a request to verify your identity for {{ $maskedIdentifier }}. Please use the following code to
-        complete the process:</p>
+    <h2>Code d'authentification</h2>
+    <p>Bonjour,</p>
+    <p>Nous avons reçu une demande de vérification de votre identité pour {{ $maskedIdentifier }}. Veuillez utiliser le code suivant pour
+        compléter le processus :</p>
 
     <div class="otp-container">
         <div class="otp-code">{{ $otp }}</div>
     </div>
 
-    <p>This code will expire in 10 minutes for security reasons.</p>
-    <p>If you didn't request this code, please ignore this email or contact our support team if you have concerns.</p>
+    <p>Ce code expirera dans 10 minutes pour des raisons de sécurité.</p>
+    <p>Si vous n'avez pas demandé ce code, veuillez ignorer cet e-mail ou contacter notre équipe de support si vous avez des préoccupations.</p>
 
     <div class="footer">
-        <p>This is an automated message, please do not reply to this email.</p>
+        <p>Ceci est un message automatisé, veuillez ne pas répondre à cet e-mail.</p>
     </div>
 </body>
 

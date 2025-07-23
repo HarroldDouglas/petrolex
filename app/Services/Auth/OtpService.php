@@ -17,7 +17,7 @@ class OtpService implements OtpServiceInterface
     private const OTP_LENGTH = 6;
     private const OTP_TTL_MINUTES = 10;
     private const OTP_CACHE_PREFIX = 'otp_';
-    private const SMS_MESSAGE_TEMPLATE = 'Your verification code is %s. This code will expire in 10 minutes.';
+    private const SMS_MESSAGE_TEMPLATE = 'Votre code de vérification est %s. Ce code expirera dans 10 minutes.';
 
     public function __construct(
         private UserRepositoryInterface $userRepository,
