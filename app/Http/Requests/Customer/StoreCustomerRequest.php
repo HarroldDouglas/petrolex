@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Customer;
 
 use App\Http\Requests\User\BaseUserRequest;
-use Illuminate\Validation\Rule;
 
 class StoreCustomerRequest extends BaseUserRequest
 {
@@ -26,8 +25,9 @@ class StoreCustomerRequest extends BaseUserRequest
     public function messages(): array
     {
         $messages = parent::messages();
-        $messages['current_balance.numeric'] = "Le solde actuel doit être un nombre";
-        $messages['current_balance.min'] = "Le solde actuel doit être supérieur ou égal à 0";
+        $messages['current_balance.numeric'] = 'Le solde actuel doit être un nombre';
+        $messages['current_balance.min'] = 'Le solde actuel doit être supérieur ou égal à 0';
+
         return $messages;
     }
 }

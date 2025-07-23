@@ -39,6 +39,7 @@ class CustomerService extends BaseServiceForEntity
             $attributes = array_merge($attributes, [
                 'role' => UserRole::CUSTOMER(),
             ]);
+
             /** @var User $user */
             $user = $this->userService->createWithMedia($attributes);
 
@@ -52,7 +53,6 @@ class CustomerService extends BaseServiceForEntity
 
             CustomerCreatedEvent::dispatch($customer);
 
-            // Send OTP to the user's email or phone
             $this->otpService->sendOtp($user->email ?? $user->phone_number);
 
             return $customer;

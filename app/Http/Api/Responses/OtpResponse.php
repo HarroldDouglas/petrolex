@@ -2,14 +2,14 @@
 
 namespace App\Http\Api\Responses;
 
-use App\Http\Api\Resources\OtpResource;
-
 class OtpResponse extends ApiResponse
 {
     public static function otpSent(string $identifier): self
     {
         return new self(
-            OtpResource::make($identifier),
+            [
+                'identifier' => $identifier,
+            ],
             'OTP sent successfully for verification.'
         );
     }
@@ -17,7 +17,9 @@ class OtpResponse extends ApiResponse
     public static function otpVerified(string $identifier): self
     {
         return new self(
-            OtpResource::make($identifier),
+            [
+                'identifier' => $identifier,
+            ],
             'OTP verified successfully.'
         );
     }

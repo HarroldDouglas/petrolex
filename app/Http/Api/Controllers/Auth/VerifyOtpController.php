@@ -2,13 +2,15 @@
 
 namespace App\Http\Api\Controllers\Auth;
 
-use App\Enums\LoginChannel;
 use App\Http\Api\Responses\OtpResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\OtpVerificationRequest;
 use App\Services\Auth\OtpService;
 use App\Services\User\UserService;
 
+/**
+ * Controller for verifying OTP codes.
+ */
 class VerifyOtpController extends Controller
 {
     public function __construct(
@@ -16,6 +18,9 @@ class VerifyOtpController extends Controller
         protected UserService $userService
     ) {}
 
+    /**
+     * Handle the incoming request.
+     */
     public function __invoke(OtpVerificationRequest $request): OtpResponse
     {
         $identifier = $request->input('identifier');
@@ -25,15 +30,10 @@ class VerifyOtpController extends Controller
             return OtpResponse::error('Invalid OTP or identifier.', null, 400);
         }
 
-        // Mark user as verified
         $user = $this->userService->findUserByIdentifier($identifier);
 
         if ($user) {
-            if ($this->otpService->determineChannel($identifier) === LoginChannel::EMAIL()) {
-                $this->userService->markEmailAsVerified($user);
-            } else {
-                $this->userService->markPhoneAsVerified($user);
-            }
+            $this->userService->markEmailAsVerified($user);
         }
 
         return OtpResponse::otpVerified($identifier);

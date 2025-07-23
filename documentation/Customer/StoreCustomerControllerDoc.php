@@ -11,8 +11,10 @@ use OpenApi\Annotations as OA;
  *     description="Enregistre un nouvel utilisateur en tant que client et envoie un code OTP pour vérification.",
  *     operationId="api.customers.store",
  *     tags={"Clients"},
+ *
  *     @OA\RequestBody(
  *         required=true,
+ *
  *         @OA\JsonContent(
  *             required={
  *                 "first_name",
@@ -21,6 +23,7 @@ use OpenApi\Annotations as OA;
  *                 "phone_number",
  *                 "password"
  *             },
+ *
  *             @OA\Property(property="first_name", type="string", example="Jean"),
  *             @OA\Property(property="last_name", type="string", example="Dupont"),
  *             @OA\Property(property="email", type="string", format="email", example="jean.dupont@example.com"),
@@ -30,10 +33,13 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(property="current_balance", type="number", format="float", nullable=true, example=0.0)
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=201,
  *         description="Client créé avec succès. Un OTP a été envoyé pour vérification.",
+ *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(property="_metadata", type="object",
  *                 @OA\Property(property="success", type="boolean", example=true),
  *                 @OA\Property(property="message", type="string", example="Client created successfully. An OTP has been sent to your email/phone for verification.")
@@ -43,14 +49,18 @@ use OpenApi\Annotations as OA;
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=422,
  *         description="Erreurs de validation",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur interne du serveur",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

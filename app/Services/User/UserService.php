@@ -36,7 +36,7 @@ class UserService extends BaseServiceWithMedia
     {
         DB::beginTransaction();
         try {
-            if ($attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
+            if (isset($attributes['image']) && $attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
                 /** @var User $user */
                 $user = parent::createWithMedia($attributes);
             } else {
@@ -47,7 +47,7 @@ class UserService extends BaseServiceWithMedia
             UserCreatedEvent::dispatch(
                 $user,
                 $attributes['role'],
-                $attributes['distribution_center_ids']
+                $attributes['distribution_center_ids'] ?? []
             );
 
             DB::commit();
