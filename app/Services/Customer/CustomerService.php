@@ -2,6 +2,7 @@
 
 namespace App\Services\Customer;
 
+use App\DTOs\Order\GetOrdersFilterDTO;
 use App\Enums\UserRole;
 use App\Events\CustomerCreatedEvent;
 use App\Models\Customer;
@@ -12,6 +13,7 @@ use App\Services\Auth\OtpService;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use App\Services\User\UserService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 class CustomerService extends BaseServiceWithMedia
@@ -63,5 +65,10 @@ class CustomerService extends BaseServiceWithMedia
 
             return $customer;
         });
+    }
+
+    public function getOrders(Customer $customer, GetOrdersFilterDTO $filters, int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->repository->getOrdersForCustomer($customer, $filters, $perPage);
     }
 }
