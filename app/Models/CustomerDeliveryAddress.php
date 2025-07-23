@@ -105,4 +105,9 @@ class CustomerDeliveryAddress extends Model
 
         return implode(', ', $parts);
     }
+
+    public function getContactFullNameAttribute(): string
+    {
+        return "{$this->contact_firstname} {$this->contact_lastname}";
+    }
 }

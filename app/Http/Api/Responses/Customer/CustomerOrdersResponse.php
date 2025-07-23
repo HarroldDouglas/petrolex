@@ -22,7 +22,7 @@ class CustomerOrdersResponse extends ApiResponse
 
         return $response->addMeta('pagination', [
             'total' => $paginator->total(),
-            'count' => count($paginator->items()),
+            'current_page_total' => count($paginator->items()),
             'per_page' => $paginator->perPage(),
             'current_page' => $paginator->currentPage(),
             'total_pages' => $paginator->lastPage(),

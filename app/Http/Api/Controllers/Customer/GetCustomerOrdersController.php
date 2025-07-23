@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Controllers\Customer;
 
+use App\DTOs\Order\GetOrdersFilterDTO;
 use App\Http\Api\Responses\Customer\CustomerOrdersResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
@@ -16,7 +17,7 @@ class GetCustomerOrdersController extends Controller
 
     public function __invoke(Request $request, Customer $customer): CustomerOrdersResponse
     {
-        $filters = $request->only(['order_number', 'status', 'delivery_type', 'payment_method']);
+        $filters = GetOrdersFilterDTO::from($request->only(['order_number', 'status', 'delivery_type', 'payment_method']));
         $perPage = $request->input('per_page', 10);
 
         $orders = $this->customerService->getOrders($customer, $filters, $perPage);
