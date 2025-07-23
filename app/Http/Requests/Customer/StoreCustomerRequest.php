@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Http\Requests\Customer;
+
+use App\Http\Requests\User\BaseUserRequest;
+
+class StoreCustomerRequest extends BaseUserRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $rules = parent::rules();
+
+        unset($rules['role']);
+
+        $rules['current_balance'] = ['nullable', 'numeric', 'min:0'];
+
+        return $rules;
+    }
+
+    public function messages(): array
+    {
+        $messages = parent::messages();
+        $messages['current_balance.numeric'] = 'Le solde actuel doit être un nombre';
+        $messages['current_balance.min'] = 'Le solde actuel doit être supérieur ou égal à 0';
+
+        return $messages;
+    }
+}

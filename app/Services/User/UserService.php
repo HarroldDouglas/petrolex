@@ -36,7 +36,7 @@ class UserService extends BaseServiceWithMedia
     {
         DB::beginTransaction();
         try {
-            if ($attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
+            if (isset($attributes['image']) && $attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
                 /** @var User $user */
                 $user = parent::createWithMedia($attributes);
             } else {
@@ -47,7 +47,7 @@ class UserService extends BaseServiceWithMedia
             UserCreatedEvent::dispatch(
                 $user,
                 $attributes['role'],
-                $attributes['distribution_center_ids']
+                $attributes['distribution_center_ids'] ?? []
             );
 
             DB::commit();
@@ -181,6 +181,21 @@ class UserService extends BaseServiceWithMedia
     public function getAllCustomers()
     {
         return $this->userRepository->findByRole(UserRole::CUSTOMER());
+    }
+
+    public function findUserByIdentifier(string $identifier): ?User
+    {
+        return $this->userRepository->findByEmailOrPhone($identifier);
+    }
+
+    public function markEmailAsVerified(User $user): Model
+    {
+        return $this->userRepository->update($user, ['email_verified_at' => now()]);
+    }
+
+    public function markPhoneAsVerified(User $user): Model
+    {
+        return $this->userRepository->update($user, ['phone_verified_at' => now()]);
     }
 
     protected function getModel(): string
