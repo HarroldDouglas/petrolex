@@ -12,27 +12,35 @@ use OpenApi\Annotations as OA;
  *     operationId="api.orders.index",
  *     tags={"Commandes"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Liste des commandes récupérée avec succès.",
+ *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(property="_metadata", type="object",
  *                 @OA\Property(property="success", type="boolean", example=true),
  *                 @OA\Property(property="message", type="string", example="Liste des commandes récupérée avec succès.")
  *             ),
  *             @OA\Property(property="data", type="array",
+ *
  *                 @OA\Items(ref="#/components/schemas/OrderData")
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non autorisé",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur interne du serveur",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

@@ -9,6 +9,7 @@ use OpenApi\Annotations as OA;
  *     schema="OrderItemData",
  *     title="Order Item Data",
  *     description="Data of a single item within an order",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="product_category", ref="#/components/schemas/ProductCategoryData"),
  *     @OA\Property(property="quantity", type="integer", example=2),
@@ -22,6 +23,7 @@ use OpenApi\Annotations as OA;
  *     schema="OrderData",
  *     title="Order Data",
  *     description="Data of a single order",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="order_number", type="string", example="ORD-123456"),
  *     @OA\Property(property="delivery_type", type="string", example="home_delivery"),

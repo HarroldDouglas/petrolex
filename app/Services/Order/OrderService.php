@@ -19,7 +19,6 @@ use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
-use \Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 
@@ -87,11 +86,6 @@ class OrderService extends BaseServiceForEntity
 
             return $order;
         });
-    }
-
-    public function getAll(): EloquentCollection
-    {
-        return $this->repository->all()->load('items.productCategory');
     }
 
     public function getOrderWithGroupedItems(int $orderId): ?OrderDetailsDTO
