@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Order\AddCustomerCommentToOrderDTO;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Exceptions\OrderNotFoundException;
@@ -176,5 +177,14 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
             ->get();
 
         return $results;
+    }
+
+    public function addCustomerFeedback(Order $order, AddCustomerCommentToOrderDTO $data): Order
+    {
+        $order->comments = $data->comment;
+        $order->rating = $data->rating;
+        $order->save();
+
+        return $order;
     }
 }

@@ -62,6 +62,8 @@ class OrderResource extends JsonResource
                 'latitude' => $this->deliveryAddress->latitude,
                 'longitude' => $this->deliveryAddress->longitude,
             ],
+            'comments' => $this->comments,
+            'rating' => $this->rating,
         ];
     }
 }

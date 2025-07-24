@@ -2,6 +2,7 @@
 
 namespace App\Services\Order;
 
+use App\DTOs\Order\AddCustomerCommentToOrderDTO;
 use App\DTOs\Order\CreateOrderDTO;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
@@ -268,5 +269,10 @@ class OrderService extends BaseServiceForEntity
         }
 
         return $selectedDeliveryPerson;
+    }
+
+    public function addCustomerCommentAndRating(Order $order, AddCustomerCommentToOrderDTO $data): Order
+    {
+        return $this->orderRepository->addCustomerFeedback($order, $data);
     }
 }
