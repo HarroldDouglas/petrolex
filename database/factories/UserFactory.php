@@ -34,7 +34,7 @@ class UserFactory extends Factory
             'phone_number' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'email_verified_at' => now(),
-            'password' => 'password', // Default password for test users
+            'password' => Hash::make('password'), // Default password for test users
             'remember_token' => Str::random(10),
             'is_active' => true,
         ];
