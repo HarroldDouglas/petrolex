@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Geography\City;
+use App\Models\Geography\Country;
+use App\Models\Geography\Neighborhood;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,9 +15,8 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $customer_id
+ * @property int|null $neighborhood_id
  * @property string $address
- * @property string $city
- * @property string $country
  * @property string|null $instructions
  * @property bool $is_default
  * @property bool $is_active
@@ -25,6 +27,9 @@ use Illuminate\Support\Carbon;
  * // Relations
  * @property-read Customer $customer
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
+ * @property-read Neighborhood|null $neighborhood
+ * @property-read City|null $city
+ * @property-read Country|null $country
  *
  * // Accessors
  *
@@ -44,9 +49,7 @@ class CustomerDeliveryAddress extends Model
         'customer_id',
         'label',
         'address',
-        'neighborhood',
-        'city',
-        'country',
+        'neighborhood_id',
         'latitude',
         'longitude',
         'phone',
@@ -85,6 +88,30 @@ class CustomerDeliveryAddress extends Model
     }
 
     /**
+     * Get the neighborhood that owns the delivery address.
+     */
+    public function neighborhood(): BelongsTo
+    {
+        return $this->belongsTo(Neighborhood::class);
+    }
+
+    /**
+     * Get the city of the delivery address through its neighborhood.
+     */
+    public function getCityAttribute(): ?City
+    {
+        return $this->neighborhood->municipality->city ?? null;
+    }
+
+    /**
+     * Get the country of the delivery address through its city.
+     */
+    public function getCountryAttribute(): ?Country
+    {
+        return $this->neighborhood->municipality->city->country ?? null;
+    }
+
+    /**
      * Get the full formatted address.
      */
     public function fullAddress(): string
@@ -94,13 +121,13 @@ class CustomerDeliveryAddress extends Model
             $parts[] = $this->address;
         }
         if ($this->neighborhood) {
-            $parts[] = $this->neighborhood;
+            $parts[] = $this->neighborhood->name;
         }
         if ($this->city) {
-            $parts[] = $this->city;
+            $parts[] = $this->city->name;
         }
         if ($this->country) {
-            $parts[] = $this->country;
+            $parts[] = $this->country->name;
         }
 
         return implode(', ', $parts);

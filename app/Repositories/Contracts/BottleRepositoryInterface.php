@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Enums\BottleStatus;
 use App\Models\Bottle;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,9 +9,6 @@ use Illuminate\Database\Eloquent\Collection;
 interface BottleRepositoryInterface extends BaseRepositoryInterface
 {
     public function getBottleHistory($bottleId): Collection;
-
-    // TODO: remove this and only use update!
-    public function updateStatus($bottleId, BottleStatus $status): void;
 
     /**
      * Find a bottle by its barcode

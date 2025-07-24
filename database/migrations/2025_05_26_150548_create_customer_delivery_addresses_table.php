@@ -16,9 +16,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->string('label');
             $table->string('address');
-            $table->string('neighborhood')->nullable();
-            $table->string('city')->nullable();
-            $table->string('country')->default('Cameroun');
+            $table->foreignId('neighborhood_id')->nullable()->constrained()->onDelete('set null');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 10, 8)->nullable();
             $table->string('phone')->nullable();

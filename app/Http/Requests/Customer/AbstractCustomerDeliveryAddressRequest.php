@@ -24,17 +24,7 @@ class AbstractCustomerDeliveryAddressRequest extends FormRequest
         return [
             'label' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
-            'neighborhood' => ['nullable', 'string', 'max:255'],
-            'city' => ['nullable', 'string', 'max:255'],
-            'country' => ['nullable', 'string', 'max:255'],
-            'latitude' => ['nullable', 'numeric'],
-            'longitude' => ['nullable', 'numeric'],
-            'phone' => ['nullable', 'string', 'max:255'],
-            'contact_firstname' => ['nullable', 'string', 'max:255'],
-            'contact_lastname' => ['nullable', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'address_precision' => ['nullable', 'string'],
-            'is_default' => ['nullable', 'boolean'],
+            'neighborhood_id' => ['required', 'integer', 'exists:neighborhoods,id'],
         ];
     }
 }

@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Inclure les routes modulaires
 require __DIR__.'/api/auth.php';
 require __DIR__.'/api/distribution-centers.php';
-require __DIR__.'/api/customer.php';
+require __DIR__.'/api/customers.php';
 require __DIR__.'/api/deliverer.php';
 require __DIR__.'/api/orders.php';
 require __DIR__.'/api/bottles.php';

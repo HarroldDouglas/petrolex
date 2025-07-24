@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Customer;
+use App\Models\Geography\Neighborhood;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,15 +18,9 @@ class CustomerDeliveryAddressFactory extends Factory
     {
         return [
             'customer_id' => Customer::factory(),
+            'neighborhood_id' => Neighborhood::factory(),
             'label' => fake()->randomElement(['Domicile', 'Bureau', 'Entrepôt', 'Magasin']),
             'address' => fake()->address(),
-            'latitude' => fake()->latitude(-4.3, -4.2), // Abidjan coords
-            'longitude' => fake()->longitude(-4.1, -3.9),
-            'phone' => fake()->phoneNumber(),
-            'contact_firstname' => fake()->firstName(),
-            'contact_lastname' => fake()->lastName(),
-            'email' => fake()->safeEmail(),
-            'address_precision' => fake()->sentence(),
             'is_default' => false,
         ];
     }

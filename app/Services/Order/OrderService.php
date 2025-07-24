@@ -6,20 +6,22 @@ use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
-use App\Exceptions\OrderNotFoundException;
 use App\Models\AccessoryType;
 use App\Models\BottleType;
+use App\Models\DeliveryPerson;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Services\BaseServiceForEntity;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
-class OrderService
+class OrderService extends BaseServiceForEntity
 {
     public function __construct(
-        private OrderRepositoryInterface $orderRepository
-    ) {}
+        protected OrderRepositoryInterface $orderRepository
+    ) {
+        parent::__construct($orderRepository);
+    }
 
     /**
      * Get order with grouped items for display
@@ -150,39 +152,90 @@ class OrderService
     /**
      * Cancel an order
      *
-     * @throws OrderNotFoundException
      * @throws \Exception
      */
     public function cancelOrder(int $orderId): bool
     {
-        try {
-            $order = $this->orderRepository->getById($orderId);
+        $order = $this->orderRepository->getById($orderId);
 
-            if (! $order->canBeCancelled()) {
-                throw new \Exception('Cette commande ne peut pas être annulée');
-            }
-
-            DB::beginTransaction();
-
-            try {
-                $result = $this->orderRepository->updateStatus($order, OrderStatus::CANCELLED());
-
-                if ($result) {
-                    DB::commit();
-
-                    return true;
-                }
-
-                DB::rollBack();
-
-                return false;
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                throw $e;
-            }
-        } catch (OrderNotFoundException $e) {
-            throw $e;
+        if (! $order->canBeCancelled()) {
+            throw new \Exception('Cette commande ne peut pas être annulée');
         }
+
+        return $this->executeInTransaction(function () use ($order) {
+            $order->status = OrderStatus::CANCELLED();
+
+            return $order->save();
+        });
+    }
+
+    /**
+     * Assigns the most suitable delivery person to an order based on defined criteria.
+     *
+     * @param  Order  $order  The order to assign a delivery person to.
+     * @return DeliveryPerson|null The assigned delivery person, or null if none found.
+     */
+    public function assignDeliveryPerson(Order $order): ?DeliveryPerson
+    {
+        $distributionCenterId = $order->distribution_center_id;
+
+        if (! $distributionCenterId) {
+            return null; // Or throw an exception if distribution center is mandatory
+        }
+
+        // Get all active delivery persons for the given distribution center
+        $deliveryPersons = DeliveryPerson::whereHas('activeDistributionCenters', function ($query) use ($distributionCenterId) {
+            $query->where('distribution_centers.id', $distributionCenterId);
+        })->get();
+
+        if ($deliveryPersons->isEmpty()) {
+            return null; // No delivery persons found for this distribution center
+        }
+
+        $eligibleDeliveryPersons = collect();
+
+        foreach ($deliveryPersons as $deliveryPerson) {
+            $confirmedOrdersCount = $deliveryPerson->orders()->where('status', OrderStatus::CONFIRMED())->count();
+            $processingOrdersCount = $deliveryPerson->orders()->where('status', OrderStatus::PROCESSING())->count();
+
+            $eligibleDeliveryPersons->push([
+                'deliveryPerson' => $deliveryPerson,
+                'confirmedOrdersCount' => $confirmedOrdersCount,
+                'processingOrdersCount' => $processingOrdersCount,
+                'rating' => $deliveryPerson->calculateRating(),
+            ]);
+        }
+
+        // Sort by confirmed orders count (ascending)
+        $eligibleDeliveryPersons = $eligibleDeliveryPersons->sortBy('confirmedOrdersCount');
+
+        // Filter for those with no processing orders
+        $bestCandidates = $eligibleDeliveryPersons->groupBy('confirmedOrdersCount')->first();
+
+        $noProcessingCandidates = $bestCandidates->filter(function ($candidate) {
+            return $candidate['processingOrdersCount'] === 0;
+        });
+
+        if ($noProcessingCandidates->isNotEmpty()) {
+            // If there are candidates with no processing orders, sort them by rating (descending)
+            $selectedCandidates = $noProcessingCandidates->sortByDesc('rating');
+        } else {
+            // If all best candidates have processing orders, sort them by rating (descending)
+            $selectedCandidates = $bestCandidates->sortByDesc('rating');
+        }
+
+        $selectedDeliveryPerson = $selectedCandidates->first()['deliveryPerson'] ?? null;
+
+        if ($selectedDeliveryPerson) {
+            $order->delivery_person_id = $selectedDeliveryPerson->id;
+            $order->save(); // Save the order with the assigned delivery person
+        }
+
+        return $selectedDeliveryPerson;
+    }
+
+    protected function getModel(): string
+    {
+        return Order::class;
     }
 }

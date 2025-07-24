@@ -76,13 +76,13 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
     /**
      * Calculate total revenue from delivered orders
      */
-    public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): string
+    public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): float
     {
         $revenue = $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
             ->where('status', OrderStatus::DELIVERED()->value)
             ->sum('total_amount');
 
-        return number_format($revenue, 0, ',', ' ');
+        return $revenue;
     }
 
     /**
@@ -90,12 +90,13 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
      */
     public function countPendingOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int
     {
-        return $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
+        $query = $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
             ->whereIn('status', [
                 OrderStatus::CONFIRMED()->value,
                 OrderStatus::PROCESSING()->value,
-            ])
-            ->count();
+                OrderStatus::PENDING()->value,
+            ]);
+        return $query->count();
     }
 
     /**
