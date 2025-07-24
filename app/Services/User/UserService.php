@@ -11,8 +11,6 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseServiceWithMedia
@@ -41,7 +39,7 @@ class UserService extends BaseServiceWithMedia
             UserCreatedEvent::dispatch(
                 $user,
                 $attributes['role'],
-                $attributes['distribution_center_ids']
+                $attributes['distribution_center_ids'] ?? []
             );
 
             return $user;
@@ -168,6 +166,21 @@ class UserService extends BaseServiceWithMedia
     public function getAllCustomers()
     {
         return $this->userRepository->findByRole(UserRole::CUSTOMER());
+    }
+
+    public function findUserByIdentifier(string $identifier): ?User
+    {
+        return $this->userRepository->findByEmailOrPhone($identifier);
+    }
+
+    public function markEmailAsVerified(User $user): Model
+    {
+        return $this->userRepository->update($user, ['email_verified_at' => now()]);
+    }
+
+    public function markPhoneAsVerified(User $user): Model
+    {
+        return $this->userRepository->update($user, ['phone_verified_at' => now()]);
     }
 
     protected function getModel(): string

@@ -3,18 +3,16 @@
 namespace Tests\Feature\Services;
 
 use App\DTOs\Dashboard\StockMovementStatsDTO;
-use App\Models\DistributionCenter;
-use App\Models\Order;
-use App\Models\SupplierDelivery;
-use Database\Factories\SupplierDeliveryFactory;
 use App\Enums\BottleOrderType;
 use App\Enums\SupplierDeliveryStatus;
-use App\Models\StockMovement;
+use App\Models\DistributionCenter;
+use App\Models\Order;
 use App\Models\ProductCategory;
+use App\Models\SupplierDelivery;
 use App\Services\Dashboard\StockMovementStatsService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\Carbon;
 
 class StockMovementStatsServiceTest extends TestCase
 {

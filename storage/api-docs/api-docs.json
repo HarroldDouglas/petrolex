@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://localhost:8000",
             "description": "API Server"
         }
     ],
@@ -61,6 +61,106 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/verify-otp": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Vérifier le code OTP",
+                "description": "Vérifie le code OTP envoyé à l'utilisateur et marque son compte comme vérifié.",
+                "operationId": "api.verify-otp",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "identifier",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "identifier": {
+                                        "type": "string",
+                                        "example": "jean.dupont@example.com"
+                                    },
+                                    "otp": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP vérifié avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "OTP verified successfully."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "identifier": {
+                                                    "type": "string",
+                                                    "example": "jean.dupont@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "OTP ou identifiant invalide.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreurs de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -182,6 +282,122 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Créer un nouveau client",
+                "description": "Enregistre un nouvel utilisateur en tant que client et envoie un code OTP pour vérification.",
+                "operationId": "api.customers.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "phone_number",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Jean"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Dupont"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jean.dupont@example.com"
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "+237677123456"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "123 Rue Principale, Douala",
+                                        "nullable": true
+                                    },
+                                    "current_balance": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Client créé avec succès. Un OTP a été envoyé pour vérification.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Client created successfully. An OTP has been sent to your email/phone for verification."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "identifier": {
+                                                    "type": "string",
+                                                    "example": "jean.dupont@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreurs de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/customers/{customer}/delivery-addresses": {
@@ -295,6 +511,150 @@
                     },
                     "401": {
                         "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/orders": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Lister toutes les commandes",
+                "description": "Récupère une liste de toutes les commandes existantes, incluant leurs articles.",
+                "operationId": "api.orders.index",
+                "responses": {
+                    "200": {
+                        "description": "Liste des commandes récupérée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Liste des commandes récupérée avec succès."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/OrderData"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Créer une nouvelle commande",
+                "description": "Permet de créer une nouvelle commande avec ses articles.",
+                "operationId": "api.orders.store",
+                "requestBody": {
+                    "description": "Données de la commande à créer",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Commande créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StoreOrderResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Ressource non trouvée (client, adresse de livraison, centre de distribution, produit)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation ou stock insuffisant",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -887,6 +1247,285 @@
                     }
                 ]
             },
+            "OrderItemRequest": {
+                "required": [
+                    "product_category_id",
+                    "quantity"
+                ],
+                "properties": {
+                    "product_category_id": {
+                        "description": "ID de la catégorie de produit",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "quantity": {
+                        "description": "Quantité de l'article",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "option": {
+                        "description": "Option pour les bouteilles (e.g., content_only, bottle_with_content)",
+                        "type": "string",
+                        "enum": [
+                            "content_only",
+                            "bottle_with_content"
+                        ],
+                        "example": "bottle_with_content",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "StoreOrderRequest": {
+                "required": [
+                    "customer_id",
+                    "delivery_address_id",
+                    "distribution_center_id",
+                    "delivery_type",
+                    "payment_method",
+                    "items"
+                ],
+                "properties": {
+                    "customer_id": {
+                        "description": "ID du client",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "delivery_address_id": {
+                        "description": "ID de l'adresse de livraison",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "distribution_center_id": {
+                        "description": "ID du centre de distribution",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "delivery_type": {
+                        "description": "Type de livraison",
+                        "type": "string",
+                        "enum": [
+                            "delivery",
+                            "pickup"
+                        ],
+                        "example": "delivery"
+                    },
+                    "payment_method": {
+                        "description": "Méthode de paiement",
+                        "type": "string",
+                        "enum": [
+                            "mobile_money",
+                            "credit_card"
+                        ],
+                        "example": "mobile_money"
+                    },
+                    "items": {
+                        "description": "Liste des articles de la commande",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderItemRequest"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "OrderItemResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "product_category_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "unit_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 5000
+                    },
+                    "total_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 10000
+                    },
+                    "option": {
+                        "type": "string",
+                        "example": "bottle_with_content",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "DistributionCenterResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Centre Principal"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Cameroun"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Douala"
+                    },
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Bonanjo"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 Rue Principale, Douala"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Centre de distribution principal avec toutes les commodités"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.0511
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 9.7679
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+237612345678"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "centre.principal@petrolex.cm"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "storage_capacity": {
+                        "type": "integer",
+                        "example": 1000,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "OrderResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order_number": {
+                        "type": "string",
+                        "example": "ORDER-123456789"
+                    },
+                    "customer_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "customer": {
+                        "$ref": "#/components/schemas/CustomerData"
+                    },
+                    "delivery_address_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "delivery_address": {
+                        "$ref": "#/components/schemas/DeliveryAddress"
+                    },
+                    "distribution_center_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "distribution_center": {
+                        "$ref": "#/components/schemas/DistributionCenterResource"
+                    },
+                    "delivery_type": {
+                        "type": "string",
+                        "example": "normal"
+                    },
+                    "payment_method": {
+                        "type": "string",
+                        "example": "mobile_money"
+                    },
+                    "total_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 23500
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "pending"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderItemResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "StoreOrderResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/OrderResource"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Commande créée avec succès"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "PaymentMethod": {
                 "title": "Payment Method",
                 "description": "Represents a single payment method",
@@ -1113,6 +1752,124 @@
                     }
                 ]
             },
+            "OrderItemData": {
+                "title": "Order Item Data",
+                "description": "Data of a single item within an order",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "product_category": {
+                        "$ref": "#/components/schemas/ProductCategoryData"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "unit_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1500
+                    },
+                    "total_price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 3000
+                    },
+                    "option": {
+                        "type": "string",
+                        "example": "full",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-18T10:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "OrderData": {
+                "title": "Order Data",
+                "description": "Data of a single order",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order_number": {
+                        "type": "string",
+                        "example": "ORD-123456"
+                    },
+                    "delivery_type": {
+                        "type": "string",
+                        "example": "home_delivery"
+                    },
+                    "payment_method": {
+                        "type": "string",
+                        "example": "cash"
+                    },
+                    "total_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 6000
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "pending"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderItemData"
+                        }
+                    },
+                    "delivery_address": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 7
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "place Guichard\\n13682 Lelievre-la-Forêt, Cameroun"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-18T10:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-18T10:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductCategoryData": {
+                "title": "Product Category Data",
+                "description": "Data of a product category",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Bouteille de 6Kg"
+                    },
+                    "product_type": {
+                        "type": "string",
+                        "example": "bottle"
+                    }
+                },
+                "type": "object"
+            },
             "CommonProductProperties": {
                 "properties": {
                     "id": {
@@ -1232,12 +1989,20 @@
             "description": "Authentication"
         },
         {
+            "name": "Authentification",
+            "description": "Authentification"
+        },
+        {
             "name": "Clients",
             "description": "Clients"
         },
         {
             "name": "Livraison",
             "description": "Livraison"
+        },
+        {
+            "name": "Commandes",
+            "description": "Commandes"
         },
         {
             "name": "Paiement",

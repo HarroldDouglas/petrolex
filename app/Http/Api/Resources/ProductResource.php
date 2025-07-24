@@ -8,6 +8,19 @@ use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property int $id
+ * @property string $type
+ * @property string $name
+ * @property string|null $description
+ * @property int $quantity
+ * @property float|null $price
+ * @property float|null $capacity
+ * @property float|null $height
+ * @property float|null $weight
+ * @property float|null $radius
+ * @property array<array{value: string, label: string, price: float}>|null $options
+ */
 class ProductResource extends JsonResource
 {
     /**

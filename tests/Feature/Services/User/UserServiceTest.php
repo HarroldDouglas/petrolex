@@ -25,17 +25,17 @@ class UserServiceTest extends TestCase
     {
         parent::setUp();
         $this->userService = $this->app->make(UserService::class);
-        
+
         // Create geographical dependencies with correct structure
         $country = \App\Models\Geography\Country::factory()->create();
         $city = \App\Models\Geography\City::factory()->create(['country_id' => $country->id]);
         $municipality = \App\Models\Geography\Municipality::factory()->create(['city_id' => $city->id]);
         $neighborhood = \App\Models\Geography\Neighborhood::factory()->create(['municipality_id' => $municipality->id]);
-        
+
         $this->distributionCenter = DistributionCenter::factory()->create([
             'neighborhood_id' => $neighborhood->id,
         ]);
-        
+
         // Create roles
         $this->createRoles();
     }
@@ -195,7 +195,7 @@ class UserServiceTest extends TestCase
         $user = User::factory()->create(['password' => Hash::make('oldpassword')]);
         $updateData = ['password' => 'newpassword123'];
 
-        // Act  
+        // Act
         $updatedUser = $this->userService->update($user, $updateData);
 
         // Assert
@@ -294,7 +294,7 @@ class UserServiceTest extends TestCase
         // Assert & Act
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected User model');
-        
+
         $this->userService->update($customer, ['first_name' => 'Test']);
     }
 

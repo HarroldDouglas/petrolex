@@ -96,6 +96,7 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
                 OrderStatus::PROCESSING()->value,
                 OrderStatus::PENDING()->value,
             ]);
+
         return $query->count();
     }
 

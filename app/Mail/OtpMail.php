@@ -27,7 +27,7 @@ class OtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your One-Time Password',
+            subject: 'Votre mot de passe à usage unique',
         );
     }
 

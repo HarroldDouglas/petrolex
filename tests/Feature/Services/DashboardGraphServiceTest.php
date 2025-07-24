@@ -2,14 +2,12 @@
 
 namespace Tests\Feature\Services;
 
-use App\Models\Order;
 use App\Models\DistributionCenter;
-use App\Models\Customer;
-use App\Models\CustomerDeliveryAddress;
+use App\Models\Order;
 use App\Services\Dashboard\DashboardGraphService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\Carbon;
 
 class DashboardGraphServiceTest extends TestCase
 {

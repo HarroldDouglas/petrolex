@@ -3,15 +3,13 @@
 namespace Tests\Feature\Services;
 
 use App\DTOs\Dashboard\StatsDTO;
-use App\Models\Order;
+use App\Enums\OrderStatus;
 use App\Models\DistributionCenter;
-use App\Models\Customer;
-use App\Models\CustomerDeliveryAddress;
+use App\Models\Order;
 use App\Services\Dashboard\DashboardStatsService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\Carbon;
-use App\Enums\OrderStatus;
 
 class DashboardStatsServiceTest extends TestCase
 {

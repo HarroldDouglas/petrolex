@@ -41,7 +41,7 @@
                                 <div class="profile-container">
                                     <div class="image-details">
                                         <div class="profile-image"
-                                            style="background-image: url({{ $user->getFirstMediaUrl('images') ?: asset('build/assets/28-DUtk996K.jpg') }});"></div>
+                                            style="background-image: url({{ $user->getMedia('images')->first()?->getUrl() ?: asset('build/assets/28-DUtk996K.jpg') }});"></div>
                                         <div class="profile-pic">
                                             <div class="avatar-upload">
                                                 <div class="avatar-edit">

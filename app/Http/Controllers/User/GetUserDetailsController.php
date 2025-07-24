@@ -23,8 +23,8 @@ class GetUserDetailsController extends Controller
     {
         try {
             $user = $this->userService->find($userId);
-            
-            if (!$user) {
+
+            if (! $user) {
                 return redirect()->route('users.list')->with('error', 'Utilisateur non trouvé.');
             }
 

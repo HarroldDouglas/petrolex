@@ -9,6 +9,19 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @mixin User
+ *
+ * @property int $id
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $full_name
+ * @property string $email
+ * @property string $phone_number
+ * @property string|null $address
+ * @property string|null $email_verified_at
+ * @property string|null $phone_verified_at
+ * @property string|null $last_login_at
+ * @property string[] $roles
+ * @property string $created_at
  */
 class UserResource extends JsonResource
 {
@@ -30,13 +43,11 @@ class UserResource extends JsonResource
             'email' => $user->email,
             'phone_number' => $user->phone_number,
             'address' => $user->address,
-            'is_active' => $user->is_active,
             'email_verified_at' => $user->email_verified_at instanceof CarbonInterface ? $user->email_verified_at->toISOString() : null,
             'phone_verified_at' => $user->phone_verified_at instanceof CarbonInterface ? $user->phone_verified_at->toISOString() : null,
             'last_login_at' => $user->last_login_at instanceof CarbonInterface ? $user->last_login_at->toISOString() : null,
             'roles' => $user->getRoleNames(),
             'created_at' => $user->created_at->toISOString(),
-            'updated_at' => $user->updated_at->toISOString(),
         ];
     }
 }

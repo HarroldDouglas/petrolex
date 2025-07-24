@@ -69,4 +69,18 @@ class ProductCategoryDistributionCenter extends Pivot
             default => $this->stock,
         };
     }
+
+    /**
+     * Get available stock
+     * For accessories: just stock
+     * For bottles: stock_filled
+     */
+    public function getAvailableStockAttribute(): int
+    {
+        return match ($this->productCategory->product_type) {
+            ProductType::BOTTLE() => $this->stock_filled,
+            ProductType::ACCESSORY() => $this->stock,
+            default => $this->stock,
+        };
+    }
 }
