@@ -71,6 +71,4 @@ interface OrderRepositoryInterface extends BaseRepositoryInterface
         string $aggregationColumn,
         string $aggregationType
     ): Collection;
-
-    public function addCustomerFeedback(Order $order, AddCustomerCommentToOrderDTO $data): Order;
 }

@@ -271,8 +271,4 @@ class OrderService extends BaseServiceForEntity
         return $selectedDeliveryPerson;
     }
 
-    public function addCustomerCommentAndRating(Order $order, AddCustomerCommentToOrderDTO $data): Order
-    {
-        return $this->orderRepository->addCustomerFeedback($order, $data);
-    }
 }

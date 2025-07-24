@@ -178,13 +178,4 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
 
         return $results;
     }
-
-    public function addCustomerFeedback(Order $order, AddCustomerCommentToOrderDTO $data): Order
-    {
-        $order->comments = $data->comment;
-        $order->rating = $data->rating;
-        $order->save();
-
-        return $order;
-    }
 }
