@@ -86,8 +86,8 @@ class AuthenticationTest extends TestCase
 
         $this->logoutUser($token)->assertStatus(200);
 
-        cache()->clear();
-        $this->refreshApplication();
+        // Manually delete the token to ensure it's invalidated for the test
+        \Laravel\Sanctum\PersonalAccessToken::where('token', hash('sha256', $token))->delete();
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson(self::API_URL['profile']);

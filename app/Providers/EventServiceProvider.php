@@ -32,6 +32,11 @@ class EventServiceProvider extends ServiceProvider
         DistributionCenterUpdatedEvent::class => [
             LogDistributionCenterUpdated::class,
         ],
+        \App\Events\OrderStatusChanged::class => [
+            \App\Listeners\Order\SendOrderStatusChangedNotificationToCustomer::class,
+            \App\Listeners\Order\SendOrderStatusChangedNotificationToDeliveryPerson::class,
+            \App\Listeners\Order\SendOrderStatusChangedNotificationToManager::class,
+        ],
         OrderCreatedEvent::class => [
             AddOrderItemsToOrderListener::class,
             LogOrderCreatedListener::class,
@@ -39,7 +44,6 @@ class EventServiceProvider extends ServiceProvider
         CustomerCreatedEvent::class => [
             LogCustomerCreatedListener::class,
         ],
-
     ];
 
     /**

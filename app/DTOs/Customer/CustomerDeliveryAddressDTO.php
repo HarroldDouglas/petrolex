@@ -20,5 +20,6 @@ class CustomerDeliveryAddressDTO extends BaseDTO
         public ?string $email,
         public ?string $address_precision,
         public ?bool $is_default,
-    ) {}
+    ) {
+    }
 }

@@ -11,8 +11,6 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseServiceWithMedia
@@ -34,23 +32,15 @@ class UserService extends BaseServiceWithMedia
      */
     public function createWithMedia(array $attributes): User
     {
-        DB::beginTransaction();
         try {
-            if (isset($attributes['image']) && $attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
-                /** @var User $user */
-                $user = parent::createWithMedia($attributes);
-            } else {
-                /** @var User $user */
-                $user = parent::create($attributes);
-            }
+            /** @var User $user */
+            $user = parent::createWithMedia($attributes);
 
             UserCreatedEvent::dispatch(
                 $user,
                 $attributes['role'],
                 $attributes['distribution_center_ids'] ?? []
             );
-
-            DB::commit();
 
             return $user;
         } catch (\Exception $e) {
@@ -59,10 +49,8 @@ class UserService extends BaseServiceWithMedia
                 'attributes' => $attributes,
                 'trace' => $e->getTraceAsString(),
             ]);
-            DB::rollBack();
             throw $e;
         }
-
     }
 
     /**
@@ -74,7 +62,6 @@ class UserService extends BaseServiceWithMedia
      */
     public function update(Model $user, array $attributes): Model
     {
-
         /** @var User $user */
         if (! $user instanceof User) {
             throw new \InvalidArgumentException('Expected User model');
@@ -89,16 +76,9 @@ class UserService extends BaseServiceWithMedia
             unset($attributes['password']);
         }
 
-        DB::beginTransaction();
-
         try {
-            if (isset($attributes['image']) && $attributes['image'] instanceof UploadedFile) {
-                /** @var User $user */
-                $user = parent::updateWithMedia($user, $attributes);
-            } else {
-                /** @var User $user */
-                $user = parent::update($user, $attributes);
-            }
+            /** @var User $user */
+            $user = parent::updateWithMedia($user, $attributes);
 
             if ($user) {
                 $user->refresh();
@@ -113,8 +93,6 @@ class UserService extends BaseServiceWithMedia
                 );
             }
 
-            DB::commit();
-
             return $user;
         } catch (\Exception $e) {
             Log::error('User update failed', [
@@ -123,7 +101,6 @@ class UserService extends BaseServiceWithMedia
                 'attributes' => $attributes,
                 'trace' => $e->getTraceAsString(),
             ]);
-            DB::rollBack();
             throw $e;
         }
     }
@@ -136,8 +113,6 @@ class UserService extends BaseServiceWithMedia
      */
     public function delete(Model $user): bool
     {
-        DB::beginTransaction();
-
         try {
             $result = $this->userRepository->delete($user);
 
@@ -145,11 +120,8 @@ class UserService extends BaseServiceWithMedia
                 UserDeletedEvent::dispatch($user);
             }
 
-            DB::commit();
-
             return $result;
         } catch (\Exception $e) {
-            DB::rollBack();
             throw $e;
         }
     }
@@ -157,6 +129,19 @@ class UserService extends BaseServiceWithMedia
     protected function getMediaFields(): array
     {
         return ['image'];
+    }
+
+    protected function getMediaStrategy(): string
+    {
+        return 'conditional_single';
+    }
+
+    protected function processMediaWithStrategy($model, array $data): void
+    {
+        // Only process media if there's actually an image in the data
+        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+            $this->mediaService->handleSingleImageStrategy($model, $data['image']);
+        }
     }
 
     /**
