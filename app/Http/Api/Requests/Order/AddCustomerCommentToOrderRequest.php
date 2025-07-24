@@ -11,7 +11,7 @@ class AddCustomerCommentToOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'comment' => ['required', 'string', 'min:10'],
+            'comments' => ['required', 'string', 'min:10'],
             'rating' => ['required', 'numeric', 'min:1', 'max:5'],
         ];
     }
@@ -19,9 +19,9 @@ class AddCustomerCommentToOrderRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'comment.required' => 'Le commentaire est obligatoire.',
-            'comment.string' => 'Le commentaire doit être une chaîne de caractères.',
-            'comment.min' => 'Le commentaire doit contenir au moins :min caractères.',
+            'comments.required' => 'Le commentaire est obligatoire.',
+            'comments.string' => 'Le commentaire doit être une chaîne de caractères.',
+            'comments.min' => 'Le commentaire doit contenir au moins :min caractères.',
             'rating.required' => 'La note est obligatoire.',
             'rating.numeric' => 'La note doit être un nombre.',
             'rating.min' => 'La note doit être au minimum de :min.',

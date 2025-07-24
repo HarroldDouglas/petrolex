@@ -18,7 +18,7 @@ class AddCustomerCommentToOrderController extends Controller
     public function __invoke(AddCustomerCommentToOrderRequest $request, Order $order): AddCustomerCommentToOrderResponse
     {
         $dto = new AddCustomerCommentToOrderDTO(
-            comment: $request->input('comment'),
+            comments: $request->input('comments'),
             rating: (float) $request->input('rating'),
         );
 

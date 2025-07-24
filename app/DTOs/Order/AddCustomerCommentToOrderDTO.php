@@ -9,7 +9,7 @@ use App\DTOs\BaseDTO;
 final class AddCustomerCommentToOrderDTO extends BaseDTO
 {
     public function __construct(
-        public readonly string $comment,
+        public readonly string $comments,
         public readonly float $rating,
     ) {}
 }

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Customer;
 use App\Models\DistributionCenter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 final class OrderCustomerFeedbackTest extends TestCase
@@ -40,7 +41,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         $this->adminUser->assignRole('admin');
 
         $response = $this->postJson(route('api.login'), [
-            'login' => 'admin@test.com',
+            'login' => $this->adminUser->email,
             'password' => 'password',
         ]);
 
@@ -55,9 +56,8 @@ final class OrderCustomerFeedbackTest extends TestCase
     public function it_can_add_customer_feedback_to_order(): void
     {
         $order = Order::factory()->create();
-
         $payload = [
-            'comment' => 'This is a test comment for the order.',
+            'comments' => 'This is a test comment for the order.',
             'rating' => 4.5,
         ];
 
@@ -74,13 +74,13 @@ final class OrderCustomerFeedbackTest extends TestCase
                 ],
                 'data' => [],
             ])
-            ->assertJsonPath('_metadata.success', true)
-            ->assertJsonPath('_metadata.message', 'Commentaire ajouté à la commande avec succès');
+           ->assertJsonPath('_metadata.success', true)
+           ->assertJsonPath('_metadata.message', 'Commentaire ajouté à la commande avec succès');
 
         // Assert that the order in the database has been updated
         $this->assertDatabaseHas('orders', [
             'id' => $order->id,
-            'comments' => $payload['comment'],
+            'comments' => $payload['comments'],
             'rating' => $payload['rating'],
         ]);
     }
@@ -91,7 +91,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         $order = Order::factory()->create();
 
         $payload = [
-            'comment' => 'Too short',
+            'comments' => 'Too short',
             'rating' => 6.0, // Invalid rating
         ];
 
@@ -101,7 +101,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         ])->postJson(route('api.orders.customer-feedback', ['order' => $order->id]), $payload);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['comment', 'rating']);
+            ->assertJsonValidationErrors(['comments', 'rating']);
     }
 
     /** @test */
@@ -110,7 +110,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         $nonExistentOrderId = 99999;
 
         $payload = [
-            'comment' => 'This is a test comment.',
+            'comments' => 'This is a test comment.',
             'rating' => 4.0,
         ];
 
@@ -128,7 +128,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         $order = Order::factory()->create();
 
         $payload = [
-            'comment' => 'This is a test comment.',
+            'comments' => 'This is a test comment.',
             'rating' => 4.0,
         ];
 
