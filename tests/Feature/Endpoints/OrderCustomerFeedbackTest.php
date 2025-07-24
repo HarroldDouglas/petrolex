@@ -6,6 +6,8 @@ namespace Tests\Feature\Endpoints;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Customer;
+use App\Models\DistributionCenter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,21 +18,36 @@ final class OrderCustomerFeedbackTest extends TestCase
     private User $adminUser;
     private string $authToken;
 
+    
+
     protected function setUp(): void
     {
         parent::setUp();
 
         // Create admin role for testing
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        // Create center_manager role for testing
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
+
+        // Ensure a Customer and DistributionCenter exist for OrderFactory
+        Customer::factory()->create();
+        DistributionCenter::factory()->create();
 
         // Create an admin user and authenticate to get a token
-        $this->adminUser = User::factory()->create();
+        $this->adminUser = User::factory()->create([
+            'email' => 'admin@test.com',
+        ]);
         $this->adminUser->assignRole('admin');
 
         $response = $this->postJson(route('api.login'), [
-            'login' => $this->adminUser->email,
+            'login' => 'admin@test.com',
             'password' => 'password',
         ]);
+
+        // Assert that the login was successful and token is present
+        $response->assertStatus(200);
+        $this->assertNotNull($response->json('data.access_token'));
+
         $this->authToken = $response->json('data.access_token');
     }
 
@@ -45,7 +62,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         ];
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->authToken,
+            'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
         ])->postJson(route('api.orders.customer-feedback', ['order' => $order->id]), $payload);
 
@@ -79,7 +96,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         ];
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->authToken,
+            'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
         ])->postJson(route('api.orders.customer-feedback', ['order' => $order->id]), $payload);
 
@@ -98,7 +115,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         ];
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->authToken,
+            'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
         ])->postJson(route('api.orders.customer-feedback', ['order' => $nonExistentOrderId]), $payload);
 

@@ -32,7 +32,7 @@ class AuthenticationService implements AuthenticationServiceInterface
 
         // TODO : instead of directly writing text, let's start using quickly translation!
         if (! $user || ! Hash::check($credentials->password, $user->password)) {
-            throw new AuthenticationException('Les identifiants fournits sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
+            throw new AuthenticationException('Les identifiants fournis sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
         }
 
         $plainTextToken = $this->tokenRepository->createToken($user, AuthConstants::API_TOKEN_NAME);
