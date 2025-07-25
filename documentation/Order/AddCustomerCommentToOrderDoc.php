@@ -23,9 +23,9 @@ use OpenApi\Annotations as OA;
  *         required=true,
  *
  *         @OA\JsonContent(
- *             required={"comment", "rating"},
+ *             required={"comments", "rating"},
  *
- *             @OA\Property(property="comment", type="string", example="The delivery was very fast and the service was excellent!"),
+ *             @OA\Property(property="comments", type="string", example="The delivery was very fast and the service was excellent!"),
  *             @OA\Property(property="rating", type="number", format="float", example=4.5)
  *         )
  *     ),

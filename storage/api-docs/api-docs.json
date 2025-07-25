@@ -561,11 +561,11 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "comment",
+                                    "comments",
                                     "rating"
                                 ],
                                 "properties": {
-                                    "comment": {
+                                    "comments": {
                                         "type": "string",
                                         "example": "The delivery was very fast and the service was excellent!"
                                     },
