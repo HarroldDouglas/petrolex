@@ -42,6 +42,7 @@ class OrderResource extends JsonResource
             'order_date' => $this->order_date,
             'delivery_date' => $this->delivery_date,
             'status' => $this->status,
+            'ticket_url' => route('orders.download.invoice', ['order' => $this->id]),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'payment' => [
                 'id' => $this->payment->id,

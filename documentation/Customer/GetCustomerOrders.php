@@ -30,6 +30,14 @@
  *
  *         @OA\Schema(ref="#/components/schemas/OrderStatus")
  *     ),
+ * 
+ *     @OA\Parameter(
+ *         name="ticket_url",
+ *         in="query",
+ *         description="Filter by ticket URL",
+ *
+ *         @OA\Schema(type="string")
+ *     ),
  *
  *      @OA\Parameter(
  *         name="delivery_type",
