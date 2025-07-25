@@ -206,12 +206,24 @@ class OrderService extends BaseServiceForEntity
     }
 
     /**
+     * Assigns a delivery person to an order by their ID.
+     *
+     * @param  \App\Models\Order  $order  The order to assign the delivery person to.
+     * @param  int  $deliveryPersonId  The ID of the delivery person to assign.
+     */
+    public function assignDeliveryPerson(Order $order, int $deliveryPersonId): void
+    {
+        $order->delivery_person_id = $deliveryPersonId;
+        $order->save();
+    }
+
+    /**
      * Assigns the most suitable delivery person to an order based on defined criteria.
      *
      * @param  Order  $order  The order to assign a delivery person to.
      * @return DeliveryPerson|null The assigned delivery person, or null if none found.
      */
-    public function assignDeliveryPerson(Order $order): ?DeliveryPerson
+    public function findAndAssignDeliveryPerson(Order $order): ?DeliveryPerson
     {
         $distributionCenterId = $order->distribution_center_id;
 
@@ -264,7 +276,7 @@ class OrderService extends BaseServiceForEntity
 
         if ($selectedDeliveryPerson) {
             $order->delivery_person_id = $selectedDeliveryPerson->id;
-            $order->save(); // Save the order with the assigned delivery person
+            $order->save();
         }
 
         return $selectedDeliveryPerson;
