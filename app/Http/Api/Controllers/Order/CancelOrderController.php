@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Controllers\Order;
 
-use App\DTOs\Order\CancelOrderDTO;
+use App\DTOs\Order\UpdateOrderDTO;
 use App\Enums\OrderStatus;
 use App\Http\Api\Responses\Order\CancelOrderResponse;
 use App\Http\Controllers\Controller;
@@ -18,15 +18,14 @@ class CancelOrderController extends Controller
 
     public function __invoke(CancelOrderRequest $request, Order $order): CancelOrderResponse
     {
-        $dto = new CancelOrderDTO(
+        $dto = new UpdateOrderDTO(
             cancelled_reason: $request->input('cancelled_reason'),
             cancelled_by: (int) $request->input('cancelled_by'),
+            status: OrderStatus::CANCELLED(),
+            cancelled_at: now()
         );
 
-        $dtoArray = $dto->toArray();
-        $dtoArray['status'] = OrderStatus::CANCELLED();
-        $dtoArray['cancelled_at'] = now();
-        $order = $this->orderService->update($order, $dtoArray);
+        $order = $this->orderService->update($order, $dto->toArray());
 
         return CancelOrderResponse::withOrder($order);
     }
