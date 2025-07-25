@@ -16,6 +16,13 @@ class CancelOrderController extends Controller
 {
     public function __construct(private readonly OrderService $orderService) {}
 
+    /**
+     * Handle the incoming request to cancel an order.
+     *
+     * @param  \App\Http\Requests\Order\CancelOrderRequest  $request
+     * @param  \App\Models\Order  $order
+     * @return \App\Http\Api\Responses\Order\CancelOrderResponse
+     */
     public function __invoke(CancelOrderRequest $request, Order $order): CancelOrderResponse
     {
         $dto = new UpdateOrderDTO(
