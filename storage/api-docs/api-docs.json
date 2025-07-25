@@ -1247,6 +1247,25 @@
                     }
                 ]
             },
+            "CancelOrderRequest": {
+                "required": [
+                    "cancelled_reason",
+                    "cancelled_by"
+                ],
+                "properties": {
+                    "cancelled_reason": {
+                        "description": "The reason for cancelling the order.",
+                        "type": "string",
+                        "example": "Customer changed their mind."
+                    },
+                    "cancelled_by": {
+                        "description": "The ID of the user who cancelled the order.",
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
             "OrderItemRequest": {
                 "required": [
                     "product_category_id",
