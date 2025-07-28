@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Repositories\Contracts\DeliveryPersonRepositoryInterface;
 use App\Models\DeliveryPerson;
+use App\Repositories\Contracts\DeliveryPersonRepositoryInterface;
 
 class DeliveryPersonService extends BaseServiceForEntity
 {
+  
     public function __construct(
-            DeliveryPersonRepositoryInterface $deliveryPersonRepository
+        protected DeliveryPersonRepositoryInterface $deliveryPersonRepository
     ) {
         parent::__construct($deliveryPersonRepository);
+        $this->deliveryPersonRepository = $deliveryPersonRepository;
     }
 
     protected function getModel(): string

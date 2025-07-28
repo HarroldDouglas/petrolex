@@ -9,12 +9,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void {
-        $this->app->bind(
-            \App\Repositories\Contracts\DeliveryPersonRepositoryInterface::class,
-            \App\Repositories\Eloquent\DeliveryPersonRepository::class
-        );
-    }
+    public function register(): void {}
 
     /**
      * Bootstrap any application services.
