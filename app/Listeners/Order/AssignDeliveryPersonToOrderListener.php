@@ -5,8 +5,6 @@ namespace App\Listeners\Order;
 use App\Events\OrderCreatedEvent;
 use App\Services\DeliveryPersonService;
 use App\Services\Order\OrderService;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Log;
 
 class AssignDeliveryPersonToOrderListener
 {

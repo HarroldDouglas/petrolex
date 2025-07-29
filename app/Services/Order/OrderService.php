@@ -210,9 +210,8 @@ class OrderService extends BaseServiceForEntity
      * @param  \App\Models\Order  $order  The order to assign the delivery person to.
      * @param  int  $deliveryPersonId  The ID of the delivery person to assign.
      */
-    public function assignDeliveryPerson(Order $order, int $deliveryPersonId): void
+    public function assignDeliveryPerson(Order $order, int $deliveryPersonId, ?string $reason = null): void
     {
-        $order->delivery_person_id = $deliveryPersonId;
-        $order->save();
+        $this->orderRepository->assignDeliveryPerson($order, $deliveryPersonId, $reason);
     }
 }

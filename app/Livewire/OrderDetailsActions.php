@@ -4,15 +4,68 @@ namespace App\Livewire;
 
 use App\Enums\OrderStatus;
 use App\Models\Order;
+use App\Services\DeliveryPersonService;
+use App\Services\Order\OrderService;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class OrderDetailsActions extends Component
 {
     public Order $order;
 
+    public Collection $allDeliveryPersons;
+    public ?int $newDeliveryPersonId = null;
+    public ?string $updateReason = null;
+
+    protected DeliveryPersonService $deliveryPersonService;
+    protected OrderService $orderService;
+
+    public function boot(DeliveryPersonService $deliveryPersonService, OrderService $orderService)
+    {
+        $this->deliveryPersonService = $deliveryPersonService;
+        $this->orderService = $orderService;
+    }
+
     public function mount(Order $order)
     {
         $this->order = $order;
+        $this->allDeliveryPersons = $this->deliveryPersonService->getAll();
+        $this->updateReason = $order->delivery_person_update_reason;
+    }
+
+    public function assignDeliveryPerson()
+    {
+        if ($this->order->canChangeDeliveryPerson()) {
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Action non autorisée',
+                'text' => 'Le livreur ne peut être changé que pour une commande confirmée.',
+                'timer' => 4000,
+            ]);
+
+            return;
+        }
+
+        // TODO move this into a custom request class
+        $this->validate([
+            'newDeliveryPersonId' => 'required|exists:delivery_persons,id',
+            'updateReason' => 'required|string|min:10',
+        ]);
+
+        $this->orderService->assignDeliveryPerson($this->order, $this->newDeliveryPersonId, $this->updateReason);
+
+        $this->dispatch('show-notification', [
+            'type' => 'success',
+            'title' => 'Livreur changé!',
+            'text' => 'Le livreur a été changé avec succès.',
+            'timer' => 3000,
+        ]);
+
+        // Close the modal
+        $this->dispatch('close-modal', ['modalId' => 'changeDeliveryPersonModal']);
+
+        // Refresh the order details
+        return $this->redirect(request()->header('Referer'));
     }
 
     public function cancelOrder($orderId, $reason)
