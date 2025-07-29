@@ -31,4 +31,19 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
     {
         return DistributionCenter::with(['bottleTypeStocks'])->find($id);
     }
+
+    public function findClosest(float $latitude, float $longitude): ?DistributionCenter
+    {
+        return DistributionCenter::with(['neighborhood.municipality.city.country'])
+            ->select('distribution_centers.*'
+            )
+            ->selectRaw(
+                '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
+             cos(radians(longitude) - radians(?)) + 
+             sin(radians(?)) * sin(radians(latitude)))) AS distance',
+                [$latitude, $longitude, $latitude]
+            )
+            ->orderBy('distance')
+            ->first();
+    }
 }
