@@ -9,7 +9,6 @@ use App\Repositories\Contracts\DeliveryPersonRepositoryInterface;
 
 class DeliveryPersonService extends BaseServiceForEntity
 {
-  
     public function __construct(
         protected DeliveryPersonRepositoryInterface $deliveryPersonRepository
     ) {

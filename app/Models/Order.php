@@ -65,6 +65,7 @@ class Order extends Model
         'customer_id',
         'delivery_address_id',
         'delivery_person_id',
+        'delivery_person_update_reason',
         'distribution_center_id',
         'order_number',
         'delivery_type',
