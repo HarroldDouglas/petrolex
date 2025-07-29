@@ -35,7 +35,7 @@ class OrderDetailsActions extends Component
 
     public function assignDeliveryPerson()
     {
-        if ($this->order->canChangeDeliveryPerson()) {
+        if (!$this->order->canChangeDeliveryPerson()) {
             $this->dispatch('show-notification', [
                 'type' => 'error',
                 'title' => 'Action non autorisée',
@@ -61,10 +61,8 @@ class OrderDetailsActions extends Component
             'timer' => 3000,
         ]);
 
-        // Close the modal
         $this->dispatch('close-modal', ['modalId' => 'changeDeliveryPersonModal']);
 
-        // Refresh the order details
         return $this->redirect(request()->header('Referer'));
     }
 
