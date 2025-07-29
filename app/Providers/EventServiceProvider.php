@@ -13,6 +13,7 @@ use App\Listeners\LogDistributionCenterUpdated;
 use App\Listeners\LogOrderCreatedListener;
 use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
+use App\Listeners\Order\AssignDeliveryPersonToOrderListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -40,6 +41,7 @@ class EventServiceProvider extends ServiceProvider
         OrderCreatedEvent::class => [
             AddOrderItemsToOrderListener::class,
             LogOrderCreatedListener::class,
+            AssignDeliveryPersonToOrderListener::class,
         ],
         CustomerCreatedEvent::class => [
             LogCustomerCreatedListener::class,

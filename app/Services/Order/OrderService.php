@@ -11,7 +11,6 @@ use App\Enums\ProductType;
 use App\Events\OrderCreatedEvent;
 use App\Models\AccessoryType;
 use App\Models\BottleType;
-use App\Models\DeliveryPerson;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\Contracts\OrderRepositoryInterface;
@@ -206,67 +205,14 @@ class OrderService extends BaseServiceForEntity
     }
 
     /**
-     * Assigns the most suitable delivery person to an order based on defined criteria.
+     * Assigns a delivery person to an order by their ID.
      *
-     * @param  Order  $order  The order to assign a delivery person to.
-     * @return DeliveryPerson|null The assigned delivery person, or null if none found.
+     * @param  \App\Models\Order  $order  The order to assign the delivery person to.
+     * @param  int  $deliveryPersonId  The ID of the delivery person to assign.
      */
-    public function assignDeliveryPerson(Order $order): ?DeliveryPerson
+    public function assignDeliveryPerson(Order $order, int $deliveryPersonId): void
     {
-        $distributionCenterId = $order->distribution_center_id;
-
-        if (! $distributionCenterId) {
-            return null; // Or throw an exception if distribution center is mandatory
-        }
-
-        // Get all active delivery persons for the given distribution center
-        $deliveryPersons = DeliveryPerson::whereHas('activeDistributionCenters', function ($query) use ($distributionCenterId) {
-            $query->where('distribution_centers.id', $distributionCenterId);
-        })->get();
-
-        if ($deliveryPersons->isEmpty()) {
-            return null; // No delivery persons found for this distribution center
-        }
-
-        $eligibleDeliveryPersons = collect();
-
-        foreach ($deliveryPersons as $deliveryPerson) {
-            $confirmedOrdersCount = $deliveryPerson->orders()->where('status', OrderStatus::CONFIRMED())->count();
-            $processingOrdersCount = $deliveryPerson->orders()->where('status', OrderStatus::PROCESSING())->count();
-
-            $eligibleDeliveryPersons->push([
-                'deliveryPerson' => $deliveryPerson,
-                'confirmedOrdersCount' => $confirmedOrdersCount,
-                'processingOrdersCount' => $processingOrdersCount,
-                'rating' => $deliveryPerson->calculateRating(),
-            ]);
-        }
-
-        // Sort by confirmed orders count (ascending)
-        $eligibleDeliveryPersons = $eligibleDeliveryPersons->sortBy('confirmedOrdersCount');
-
-        // Filter for those with no processing orders
-        $bestCandidates = $eligibleDeliveryPersons->groupBy('confirmedOrdersCount')->first();
-
-        $noProcessingCandidates = $bestCandidates->filter(function ($candidate) {
-            return $candidate['processingOrdersCount'] === 0;
-        });
-
-        if ($noProcessingCandidates->isNotEmpty()) {
-            // If there are candidates with no processing orders, sort them by rating (descending)
-            $selectedCandidates = $noProcessingCandidates->sortByDesc('rating');
-        } else {
-            // If all best candidates have processing orders, sort them by rating (descending)
-            $selectedCandidates = $bestCandidates->sortByDesc('rating');
-        }
-
-        $selectedDeliveryPerson = $selectedCandidates->first()['deliveryPerson'] ?? null;
-
-        if ($selectedDeliveryPerson) {
-            $order->delivery_person_id = $selectedDeliveryPerson->id;
-            $order->save(); // Save the order with the assigned delivery person
-        }
-
-        return $selectedDeliveryPerson;
+        $order->delivery_person_id = $deliveryPersonId;
+        $order->save();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Api\Resources\Order;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @mixin Order
@@ -44,11 +45,11 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'payment' => [
-                'id' => $this->payment->id,
-                'status' => $this->payment->payment_status,
-                'date' => $this->payment->payment_date,
-                'reference' => $this->payment->payment_reference,
-                'method' => $this->payment->payment_method,
+                'id' => $this->payment?->id,
+                'status' => $this->payment?->payment_status,
+                'date' => $this->payment?->payment_date,
+                'reference' => $this->payment?->payment_reference,
+                'method' => $this->payment?->payment_method,
             ],
             'delivery_address' => [
                 'id' => $this->delivery_address_id,
