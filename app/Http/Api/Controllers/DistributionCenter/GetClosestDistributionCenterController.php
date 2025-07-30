@@ -16,9 +16,6 @@ final class GetClosestDistributionCenterController extends Controller
 
     /**
      * Handle the incoming request to find the closest distribution center.
-     *
-     * @param  GetClosestDistributionCenterRequest  $request
-     * @return DistributionCenterResponse
      */
     public function __invoke(GetClosestDistributionCenterRequest $request): DistributionCenterResponse
     {

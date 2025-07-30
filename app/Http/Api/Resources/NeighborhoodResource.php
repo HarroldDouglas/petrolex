@@ -2,10 +2,9 @@
 
 namespace App\Http\Api\Resources;
 
+use App\Models\Geography\Neighborhood;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-
-use App\Models\Geography\Neighborhood;
 
 /**
  * @mixin Neighborhood

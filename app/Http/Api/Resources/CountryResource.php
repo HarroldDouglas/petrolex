@@ -2,10 +2,9 @@
 
 namespace App\Http\Api\Resources;
 
+use App\Models\Geography\Country;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-
-use App\Models\Geography\Country;
 
 /**
  * @mixin Country

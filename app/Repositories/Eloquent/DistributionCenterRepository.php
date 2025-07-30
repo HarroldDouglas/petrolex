@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class DistributionCenterRepository extends BaseEloquentRepository implements DistributionCenterRepositoryInterface
 {
+    private const EARTH_RADIUS_KM = 6371;
+
     public function __construct(DistributionCenter $model)
     {
         parent::__construct($model);
@@ -38,7 +40,7 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
             ->select('distribution_centers.*'
             )
             ->selectRaw(
-                '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
+                '('.self::EARTH_RADIUS_KM.' * acos(cos(radians(?)) * cos(radians(latitude)) * 
              cos(radians(longitude) - radians(?)) + 
              sin(radians(?)) * sin(radians(latitude)))) AS distance',
                 [$latitude, $longitude, $latitude]
