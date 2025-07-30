@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Order\GetOrdersFilterDTO;
 use App\Enums\OrderStatus;
 use App\Models\DeliveryPerson;
 use App\Repositories\Contracts\DeliveryPersonRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DeliveryPersonRepository extends BaseEloquentRepository implements DeliveryPersonRepositoryInterface
 {
@@ -30,5 +32,24 @@ class DeliveryPersonRepository extends BaseEloquentRepository implements Deliver
             ->first();
 
         return $deliveryPerson;
+    }
+
+    public function getOrdersForDeliveryPerson(DeliveryPerson $deliveryPerson, GetOrdersFilterDTO $filters, int $perPage): LengthAwarePaginator
+    {
+        $query = $deliveryPerson->orders()->with(['customer', 'deliveryAddress', 'distributionCenter']);
+
+        if ($filters->status) {
+            $query->where('status', $filters->status);
+        }
+
+        if ($filters->order_number) {
+            $query->where('order_number', 'like', '%'.$filters->order_number.'%');
+        }
+
+        if ($filters->delivery_type) {
+            $query->where('delivery_type', $filters->delivery_type);
+        }
+
+        return $query->paginate($perPage);
     }
 }
