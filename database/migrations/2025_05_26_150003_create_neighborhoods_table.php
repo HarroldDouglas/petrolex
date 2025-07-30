@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('municipality_id')->constrained()->onDelete('cascade');
             $table->string('name');
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

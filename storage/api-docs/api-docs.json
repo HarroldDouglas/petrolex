@@ -728,6 +728,124 @@
                 ]
             }
         },
+        "/api/distribution-centers/closest": {
+            "get": {
+                "tags": [
+                    "Centres de Distribution"
+                ],
+                "summary": "Find the closest distribution center to a given latitude and longitude",
+                "description": "Retrieves the closest distribution center based on provided geographical coordinates.",
+                "operationId": "api.distribution-centers.closest",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "description": "Latitude of the location",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "description": "Longitude of the location",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/DistributionCenterData"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Centre de distribution le plus proche trouvé."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No distribution center found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Aucun centre de distribution trouvé."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/distribution-centers/{id}/products": {
             "get": {
                 "tags": [
@@ -2009,12 +2127,12 @@
             "description": "Paiement"
         },
         {
-            "name": "Produits d'un centre de distribution",
-            "description": "Produits d'un centre de distribution"
-        },
-        {
             "name": "Centres de Distribution",
             "description": "Centres de Distribution"
+        },
+        {
+            "name": "Produits d'un centre de distribution",
+            "description": "Produits d'un centre de distribution"
         }
     ]
 }

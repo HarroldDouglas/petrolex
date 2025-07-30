@@ -31,22 +31,19 @@ class DistributionCenterResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var DistributionCenter&\Illuminate\Database\Eloquent\Model $distributionCenter */
-        $distributionCenter = $this->resource;
-
         return [
-            'id' => $distributionCenter->id,
-            'name' => $distributionCenter->name,
-            'country' => $distributionCenter->country,
-            'city' => $distributionCenter->city,
-            'neighborhood' => $distributionCenter->neighborhood,
-            'address' => $distributionCenter->address,
-            'description' => $distributionCenter->description,
-            'latitude' => $distributionCenter->latitude,
-            'longitude' => $distributionCenter->longitude,
-            'phone' => $distributionCenter->phone,
-            'email' => $distributionCenter->email,
-            'storage_capacity' => $distributionCenter->storage_capacity,
+            'id' => $this->id,
+            'name' => $this->name,
+            'country' => new CountryResource($this->country),
+            'city' => new CityResource($this->city),
+            'neighborhood' => new NeighborhoodResource($this->neighborhood),
+            'address' => $this->address,
+            'description' => $this->description,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'phone' => $this->phone,
+            'email' => $this->email,
+            'storage_capacity' => $this->storage_capacity,
         ];
     }
 }

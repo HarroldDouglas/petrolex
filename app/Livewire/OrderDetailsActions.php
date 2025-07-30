@@ -35,7 +35,7 @@ class OrderDetailsActions extends Component
 
     public function assignDeliveryPerson()
     {
-        if (!$this->order->canChangeDeliveryPerson()) {
+        if (! $this->order->canChangeDeliveryPerson()) {
             $this->dispatch('show-notification', [
                 'type' => 'error',
                 'title' => 'Action non autorisée',
