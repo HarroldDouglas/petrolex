@@ -23,7 +23,7 @@ final class GetDeliveryPersonOrdersController extends Controller
      */
     public function __invoke(GetFilteredOrderRequest $request, DeliveryPerson $deliveryPerson): DeliveryPersonOrdersResponse
     {
-        $filters = GetOrdersFilterDTO::from($request->only(['status', 'order_number', 'delivery_type']));
+        $filters = GetOrdersFilterDTO::from($request->only(['order_number', 'status', 'delivery_type']));
         $perPage = $request->input('per_page', 10);
 
         $orders = $this->deliveryPersonService->getOrders($deliveryPerson, $filters, (int) $perPage);
