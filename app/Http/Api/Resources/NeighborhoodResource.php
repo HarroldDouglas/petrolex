@@ -8,6 +8,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @mixin Neighborhood
+ *
+ * @property int $id
+ * @property string $name
+ * @property float|null $latitude
+ * @property float|null $longitude
  */
 class NeighborhoodResource extends JsonResource
 {
@@ -21,6 +26,8 @@ class NeighborhoodResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
             'city' => new CityResource($this->whenLoaded('city')),
         ];
     }

@@ -15,7 +15,10 @@ final class GetClosestDistributionCenterController extends Controller
     public function __construct(private readonly DistributionCenterService $distributionCenterService) {}
 
     /**
-     * Handle the incoming request to find the closest distribution center.
+     * Find the closest distribution center to a given latitude and longitude.
+     *
+     * Route: GET /distribution-centers/closest
+     * Name: api.distribution-centers.closest
      */
     public function __invoke(GetClosestDistributionCenterRequest $request): DistributionCenterResponse
     {
