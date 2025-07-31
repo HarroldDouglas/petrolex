@@ -40,7 +40,7 @@ class DeliveryPersonRepository extends BaseEloquentRepository implements Deliver
             ->with(['customer', 'deliveryAddress', 'distributionCenter', 'payment'])
             ->when(
                 $filters->order_number !== null && $filters->order_number !== '',
-                fn ($q) => $q->where('order_number', $filters->order_number)
+                fn ($q) => $q->where('order_number', 'like', '%'.$filters->order_number.'%')
             )->when(
                 $filters->status !== null,
                 fn ($q) => $q->where('status', $filters->status)
