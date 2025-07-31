@@ -32,8 +32,6 @@ class DeliveryPersonOrdersResponse extends ApiResponse
 
     /**
      * Return response with a paginated collection of orders.
-     *
-     * @param  LengthAwarePaginator  $paginator
      */
     public static function paginatedCollection(LengthAwarePaginator $paginator, ?string $message = null, int $statusCode = 200): self
     {
