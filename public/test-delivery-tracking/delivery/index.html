@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Livreur</title>
+    
+    <!-- External Libraries -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5><span class="status-indicator status-offline" id="connectionStatus"></span>Simulateur Livreur</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Configuration initiale -->
+                        <div id="setupPanel">
+                            <div class="section-header">
+                                <h6>Configuration du livreur</h6>
+                            </div>
+                            <form id="driverSetup">
+                                <div class="mb-3">
+                                    <label class="form-label">Nom du livreur</label>
+                                    <input type="text" class="form-control" id="driverName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Téléphone</label>
+                                    <input type="tel" class="form-control" id="driverPhone" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Position de départ (Lat, Lng)</label>
+                                    <div class="coordinates-input">
+                                        <input type="number" class="form-control" id="startLat" placeholder="Latitude" step="any" required>
+                                        <input type="number" class="form-control" id="startLng" placeholder="Longitude" step="any" required>
+                                    </div>
+                                    <small class="help-text">Cliquez sur la carte pour définir la position</small>
+                                </div>
+                                <button type="submit" class="btn btn-success">Se connecter</button>
+                            </form>
+                        </div>
+
+                        <!-- Panel de livraison -->
+                        <div id="deliveryPanel" style="display: none;">
+                            <div class="driver-info-section">
+                                <div class="section-header">
+                                    <h6>Informations livreur</h6>
+                                </div>
+                                <p><strong>Nom:</strong> <span id="currentDriverName"></span></p>
+                                <div class="current-position">
+                                    <strong>Position:</strong> <span id="currentPosition"></span>
+                                </div>
+                                <p><strong>Statut:</strong> <span id="currentStatus" class="badge bg-secondary">Libre</span></p>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="section-header">
+                                    <h6>Créer une nouvelle livraison</h6>
+                                </div>
+                                <form id="createDeliveryForm">
+                                    <div class="mb-2">
+                                        <input type="text" class="form-control" id="customerName" placeholder="Nom client" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" class="form-control" id="destinationAddress" placeholder="Adresse destination" required>
+                                    </div>
+                                    <div class="coordinates-input mb-2">
+                                        <input type="number" class="form-control" id="destLat" placeholder="Dest Lat" step="any" required>
+                                        <input type="number" class="form-control" id="destLng" placeholder="Dest Lng" step="any" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" id="createDeliveryBtn">Créer livraison</button>
+                                </form>
+                            </div>
+
+                            <!-- Livraisons disponibles -->
+                            <div class="mb-3">
+                                <div class="section-header">
+                                    <h6>Mes livraisons</h6>
+                                </div>
+                                <div id="deliveriesList"></div>
+                            </div>
+
+                            <!-- Détails de l'ordre sélectionné -->
+                            <div id="selectedOrderDetails" class="mb-3" style="display: none;">
+                                <div class="section-header">
+                                    <h6>📦 Ordre sélectionné</h6>
+                                </div>
+                                <div class="selected-order-card">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h6 id="selectedOrderNumber" class="text-primary mb-2"></h6>
+                                            <p class="mb-1"><strong>Client:</strong> <span id="selectedCustomerName"></span></p>
+                                            <p class="mb-1"><strong>Destination:</strong> <span id="selectedDestination"></span></p>
+                                            <p class="mb-0"><strong>Statut:</strong> <span id="selectedStatus" class="badge"></span></p>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <div class="route-info">
+                                                <div class="info-item">
+                                                    <i class="fas fa-clock text-warning"></i>
+                                                    <span id="estimatedTime">Calcul...</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <i class="fas fa-route text-info"></i>
+                                                    <span id="estimatedDistance">Calcul...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mode de transport -->
+                            <div id="transportModeSection" class="mb-3" style="display: none;">
+                                <div class="section-header">
+                                    <h6>🚲 Mode de transport</h6>
+                                </div>
+                                <div class="transport-mode-card">
+                                    <div class="transport-options">
+                                        <div class="transport-option" data-mode="walking">
+                                            <input type="radio" id="transportWalking" name="transportMode" value="walking" checked>
+                                            <label for="transportWalking">
+                                                <div class="transport-icon">🚶‍♂️</div>
+                                                <div class="transport-info">
+                                                    <strong>À pied</strong>
+                                                    <small>Plus lent mais précis</small>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        <div class="transport-option" data-mode="driving">
+                                            <input type="radio" id="transportDriving" name="transportMode" value="driving">
+                                            <label for="transportDriving">
+                                                <div class="transport-icon">🏍️</div>
+                                                <div class="transport-info">
+                                                    <strong>À moto</strong>
+                                                    <small>Rapide et efficace</small>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="transport-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-label">Vitesse simulation:</span>
+                                            <span id="simulationSpeedInfo" class="stat-value">Normale</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Type de route:</span>
+                                            <span id="routeTypeInfo" class="stat-value">Piétonne</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contrôles de simulation -->
+                            <div id="simulationControls" class="simulation-controls" style="display: none;">
+                                <h6>Contrôles de simulation</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Vitesse de simulation</label>
+                                    <input type="range" class="form-range" id="simulationSpeed" min="1" max="10" value="3">
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">Lent</small>
+                                        <small class="text-muted">Rapide</small>
+                                    </div>
+                                </div>
+                                <div class="btn-group w-100 mb-3" role="group">
+                                    <button class="btn btn-success btn-control" id="startSimulation">Démarrer livraison</button>
+                                    <button class="btn btn-warning btn-control" id="pauseSimulation" disabled>Pause</button>
+                                    <button class="btn btn-danger btn-control" id="stopSimulation" disabled>Arrêter</button>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">Progression: <span id="progressPercent">0%</span></small>
+                                    <div class="progress">
+                                        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6>Carte - Position livreur</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/config.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

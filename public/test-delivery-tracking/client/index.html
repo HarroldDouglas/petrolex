@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Client - Suivi Livraison</title>
+    
+    <!-- External Libraries -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5><span class="status-indicator status-pending" id="connectionStatus"></span>Suivi de ma Livraison</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Panneau de recherche de commande -->
+                        <div id="setupPanel">
+                            <h6>Suivre ma commande</h6>
+                            <form id="trackingForm">
+                                <div class="mb-3">
+                                    <label for="orderNumber" class="form-label">Numéro de commande</label>
+                                    <input type="text" class="form-control" id="orderNumber" 
+                                           placeholder="Ex: ORD-20240101-001" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary" id="trackingSubmitBtn">
+                                    <i class="fas fa-search"></i> Suivre ma commande
+                                </button>
+                            </form>
+
+                            <hr>
+                            <h6>Commandes actives</h6>
+                            <div id="availableOrders" class="mt-2">
+                                <small class="text-muted">Chargement...</small>
+                            </div>
+                        </div>
+
+                        <!-- Panneau de suivi actif -->
+                        <div id="trackingPanel" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6>Commande: <span id="currentOrderNumber"></span></h6>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="clientApp.resetTracking()">
+                                    Retour
+                                </button>
+                            </div>
+
+                            <!-- Informations du livreur -->
+                            <div id="driverInfo" class="driver-info" style="display: none;">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <h6 class="mb-1" id="driverName">-</h6>
+                                        <small id="driverPhone">-</small>
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        <button class="btn btn-sm btn-light" onclick="clientApp.callDriver()">
+                                            📞 Appeler
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Statut de la livraison -->
+                            <div class="alert alert-info">
+                                <strong>Statut:</strong> 
+                                <span class="status-indicator status-pending" id="deliveryStatusIndicator"></span>
+                                <span id="deliveryStatus">En attente</span>
+                            </div>
+
+                            <!-- ETA et Distance -->
+                            <div class="row text-center mb-3">
+                                <div class="col-6">
+                                    <div class="eta-display" id="etaDisplay">--</div>
+                                    <small class="text-muted">Temps estimé</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="distance-display" id="distanceDisplay">--</div>
+                                    <small class="text-muted">Distance</small>
+                                </div>
+                            </div>
+
+                            <!-- Progression de la livraison -->
+                            <div class="progress mb-3" style="height: 6px;">
+                                <div class="progress-bar" role="progressbar" id="progressBar" 
+                                     style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+
+                            <!-- Historique des événements -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Historique</h6>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div id="deliveryHistory" style="max-height: 150px; overflow-y: auto;">
+                                        <!-- Historique sera affiché ici -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6>Localisation en temps réel</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/config.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

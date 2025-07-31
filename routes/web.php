@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthCheckController;
+use App\Livewire\DeliveryDashboard;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', AuthCheckController::class);
@@ -27,3 +28,11 @@ Route::middleware(['web', 'auth'])->group(function () {
     require __DIR__.'/web/supplies.php';
     require __DIR__.'/web/orders.php';
 });
+
+
+
+
+
+Route::get('/test/manager/dashboard', function () {
+    return view('manager.dashboard');
+})->name('manager.dashboard');
