@@ -564,11 +564,11 @@
                         "schema": {
                             "type": "string",
                             "enum": [
-                                "CONFIRMED",
-                                "PROCESSING",
-                                "DELIVERED",
-                                "CANCELLED",
-                                "PENDING"
+                                "confirmed",
+                                "in_progress",
+                                "delivered",
+                                "cancelled",
+                                "pending"
                             ]
                         }
                     },

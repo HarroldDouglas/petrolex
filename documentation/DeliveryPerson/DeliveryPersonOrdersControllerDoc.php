@@ -26,7 +26,7 @@ use OpenApi\Annotations as OA;
  *         required=false,
  *         description="Filter orders by status",
  *
- *         @OA\Schema(type="string", enum={"CONFIRMED", "PROCESSING", "DELIVERED", "CANCELLED", "PENDING"})
+ *         @OA\Schema(type="string", enum={"confirmed", "in_progress", "delivered", "cancelled", "pending"})
  *     ),
  *
  *     @OA\Parameter(
