@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Controllers\DeliveryPerson;
 
+use App\Constants\AppConstants;
 use App\DTOs\Order\GetOrdersFilterDTO;
 use App\Http\Api\Requests\Order\GetFilteredOrderRequest;
 use App\Http\Api\Responses\DeliveryPerson\DeliveryPersonOrdersResponse;
@@ -24,7 +25,7 @@ final class GetDeliveryPersonOrdersController extends Controller
     public function __invoke(GetFilteredOrderRequest $request, DeliveryPerson $deliveryPerson): DeliveryPersonOrdersResponse
     {
         $filters = GetOrdersFilterDTO::from($request->only(['order_number', 'status', 'delivery_type']));
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', AppConstants::DEFAULT_PAGINATION_PER_PAGE);
 
         $orders = $this->deliveryPersonService->getOrders($deliveryPerson, $filters, (int) $perPage);
 
