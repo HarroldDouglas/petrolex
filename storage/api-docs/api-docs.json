@@ -537,6 +537,154 @@
                 ]
             }
         },
+        "/api/delivery-persons/{deliveryPersonId}/orders": {
+            "get": {
+                "tags": [
+                    "Livreurs"
+                ],
+                "summary": "Get all orders for a specific delivery person",
+                "description": "Retrieves a paginated list of orders for a given delivery person, with optional filtering by status, order number, and delivery type.",
+                "operationId": "api.delivery-persons.orders",
+                "parameters": [
+                    {
+                        "name": "deliveryPersonId",
+                        "in": "path",
+                        "description": "ID of the delivery person",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter orders by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "confirmed",
+                                "in_progress",
+                                "delivered",
+                                "cancelled",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order_number",
+                        "in": "query",
+                        "description": "Filter orders by order number (partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "delivery_type",
+                        "in": "query",
+                        "description": "Filter orders by delivery type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "normal",
+                                "fast"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of orders per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 10,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/DeliveryPersonOrderData"
+                                                    }
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Commandes du livreur récupérées avec succès"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Delivery person not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/orders": {
             "get": {
                 "tags": [
@@ -1870,6 +2018,126 @@
                     }
                 ]
             },
+            "DeliveryPersonOrderData": {
+                "title": "Delivery Person Order Data",
+                "description": "Detailed order information for a delivery person",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "order_number": {
+                        "type": "string",
+                        "example": "ORD-802583"
+                    },
+                    "delivery_type": {
+                        "type": "string",
+                        "example": "fast"
+                    },
+                    "subtotal": {
+                        "type": "string",
+                        "example": "29000.00"
+                    },
+                    "delivery_fee": {
+                        "type": "string",
+                        "example": "1000.00"
+                    },
+                    "total_amount": {
+                        "type": "string",
+                        "example": "30000.00"
+                    },
+                    "order_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-24T16:21:54.000000Z"
+                    },
+                    "delivery_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "in_progress"
+                    },
+                    "payment": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 12
+                            },
+                            "status": {
+                                "type": "string",
+                                "example": "paid"
+                            },
+                            "date": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2025-07-24T16:21:54.000000Z"
+                            },
+                            "reference": {
+                                "type": "string",
+                                "example": "VISA-PUR @ 68845213-636474827797144"
+                            },
+                            "method": {
+                                "type": "string",
+                                "example": "credit_card"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "delivery_address": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 16
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "8, place de Pons\\n11583 Francois-sur-Normand"
+                            },
+                            "contact_name": {
+                                "type": "string",
+                                "example": "Élodie Gaillard"
+                            },
+                            "email": {
+                                "type": "string",
+                                "example": "matthieu.masse @example.org"
+                            },
+                            "city": {
+                                "type": "string",
+                                "example": null,
+                                "nullable": true
+                            },
+                            "country": {
+                                "type": "string",
+                                "example": null,
+                                "nullable": true
+                            },
+                            "neighborhood": {
+                                "type": "string",
+                                "example": null,
+                                "nullable": true
+                            },
+                            "address_precision": {
+                                "type": "string",
+                                "example": "Magni minus quasi minima eligendi commodi."
+                            },
+                            "latitude": {
+                                "type": "string",
+                                "example": "-4.21324600"
+                            },
+                            "longitude": {
+                                "type": "string",
+                                "example": "-4.04634900"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "OrderItemData": {
                 "title": "Order Item Data",
                 "description": "Data of a single item within an order",
@@ -2117,6 +2385,10 @@
         {
             "name": "Livraison",
             "description": "Livraison"
+        },
+        {
+            "name": "Livreurs",
+            "description": "Livreurs"
         },
         {
             "name": "Commandes",

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\DTOs\Order\GetOrdersFilterDTO;
 use App\Models\DeliveryPerson;
 use App\Repositories\Contracts\DeliveryPersonRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DeliveryPersonService extends BaseServiceForEntity
 {
@@ -27,5 +29,10 @@ class DeliveryPersonService extends BaseServiceForEntity
     public function findLeastBusyDeliveryPerson(): ?DeliveryPerson
     {
         return $this->deliveryPersonRepository->findLeastBusyDeliveryPerson();
+    }
+
+    public function getOrders(DeliveryPerson $deliveryPerson, GetOrdersFilterDTO $filters, int $perPage): LengthAwarePaginator
+    {
+        return $this->deliveryPersonRepository->getOrdersForDeliveryPerson($deliveryPerson, $filters, $perPage);
     }
 }
