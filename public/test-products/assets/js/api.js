@@ -105,6 +105,18 @@ window.ApiService = (function() {
         });
     }
 
+    function fetchDeliveryPersonOrders(deliveryPersonId, filters = {}) {
+        const headers = getHeaders();
+        if (!headers) return $.Deferred().reject("Token manquant").promise();
+
+        return $.ajax({
+            url: `/api/delivery-persons/${deliveryPersonId}/orders`,
+            type: "GET",
+            headers: headers,
+            data: filters
+        });
+    }
+
     return {
         fetchCustomers,
         fetchDistributionCenters,
@@ -113,6 +125,7 @@ window.ApiService = (function() {
         fetchCustomer,
         fetchPaymentMethods,
         fetchDeliveryTypes,
-        storeOrder
+        storeOrder,
+        fetchDeliveryPersonOrders
     };
 })();

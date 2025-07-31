@@ -47,6 +47,8 @@ class UserResource extends JsonResource
             'phone_verified_at' => $user->phone_verified_at instanceof CarbonInterface ? $user->phone_verified_at->toISOString() : null,
             'last_login_at' => $user->last_login_at instanceof CarbonInterface ? $user->last_login_at->toISOString() : null,
             'roles' => $user->getRoleNames(),
+            'customer_id' => $this->when($user->isCustomer(), $user->customer->id ?? null),
+            'delivery_person_id' => $this->when($user->isDeliveryPerson(), $user->deliveryPerson->id ?? null),
             'created_at' => $user->created_at->toISOString(),
         ];
     }

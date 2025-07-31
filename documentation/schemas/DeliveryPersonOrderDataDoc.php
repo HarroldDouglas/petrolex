@@ -7,6 +7,7 @@ use OpenApi\Annotations as OA;
  *     schema="DeliveryPersonOrderData",
  *     title="Delivery Person Order Data",
  *     description="Detailed order information for a delivery person",
+ *
  *     @OA\Property(property="id", type="integer", example=12),
  *     @OA\Property(property="order_number", type="string", example="ORD-802583"),
  *     @OA\Property(property="delivery_type", type="string", example="fast"),

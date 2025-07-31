@@ -37,7 +37,7 @@ class UserRepository extends BaseEloquentRepository implements UserRepositoryInt
      */
     public function findByEmail(string $email): ?User
     {
-        return User::where('email', $email)->first();
+        return User::where('email', $email)->with(['customer', 'deliveryPerson'])->first();
     }
 
     /**
@@ -45,7 +45,7 @@ class UserRepository extends BaseEloquentRepository implements UserRepositoryInt
      */
     public function findByPhone(string $phone): ?User
     {
-        return User::where('phone_number', $phone)->first();
+        return User::where('phone_number', $phone)->with(['customer', 'deliveryPerson'])->first();
     }
 
     /**
