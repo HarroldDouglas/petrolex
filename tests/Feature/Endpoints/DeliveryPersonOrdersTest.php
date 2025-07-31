@@ -27,20 +27,16 @@ final class DeliveryPersonOrdersTest extends TestCase
     {
         parent::setUp();
 
-        // Create roles for testing
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'delivery_person', 'guard_name' => 'web']);
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
 
-        // Create an admin user and authenticate using Sanctum
         $this->adminUser = User::factory()->create();
         $this->adminUser->assignRole('admin');
         Sanctum::actingAs($this->adminUser, ['*']);
 
-        // Create a delivery person
         $this->deliveryPerson = DeliveryPerson::factory()->create();
 
-        // Create necessary dependencies for OrderFactory
         Customer::factory()->create();
         DistributionCenter::factory()->create();
         CustomerDeliveryAddress::factory()->create();
@@ -49,7 +45,6 @@ final class DeliveryPersonOrdersTest extends TestCase
     /** @test */
     public function it_can_retrieve_a_list_of_orders_for_a_delivery_person(): void
     {
-        // Create orders for the delivery person
         Order::factory()->count(5)->create([
             'delivery_person_id' => $this->deliveryPerson->id,
             'status' => OrderStatus::CONFIRMED(),
