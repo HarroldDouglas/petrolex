@@ -70,7 +70,7 @@ use OpenApi\Annotations as OA;
  *                         property="data",
  *                         type="array",
  *
- *                         @OA\Items(ref="#/components/schemas/OrderResource")
+ *                         @OA\Items(ref="#/components/schemas/DeliveryPersonOrderData")
  *                     ),
  *
  *                     @OA\Property(property="message", type="string", example="Commandes du livreur récupérées avec succès")
