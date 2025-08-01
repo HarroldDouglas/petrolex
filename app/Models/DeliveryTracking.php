@@ -4,27 +4,25 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\DeliveryTrackingStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Represents the tracking of a specific delivery.
  *
- * @property string $order_number
- * @property string $customer_name
- * @property string $driver_name
- * @property string $driver_phone
- * @property string $status
- * @property float $driver_lat
- * @property float $driver_lng
- * @property float $destination_lat
- * @property float $destination_lng
- * @property string $destination_address
- * @property int $estimated_duration
- * @property int $distance_remaining
- * @property array|null $route_geometry
+ * @property int $id
+ * @property int $order_id
+ * @property DeliveryTrackingStatus $status
+ * @property float|null $driver_lat
+ * @property float|null $driver_lng
+ * @property int|null $estimated_duration
+ * @property float|null $distance_remaining
+ * @property array<string, mixed>|null $route_geometry
  * @property \Illuminate\Support\Carbon|null $started_at
  * @property \Illuminate\Support\Carbon|null $delivered_at
+ * @property-read Order $order
  */
 final class DeliveryTracking extends Model
 {
@@ -33,19 +31,13 @@ final class DeliveryTracking extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
-        'order_number',
-        'customer_name',
-        'driver_name',
-        'driver_phone',
+        'order_id',
         'status',
         'driver_lat',
         'driver_lng',
-        'destination_lat',
-        'destination_lng',
-        'destination_address',
         'estimated_duration',
         'distance_remaining',
         'route_geometry',
@@ -59,12 +51,16 @@ final class DeliveryTracking extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'status' => DeliveryTrackingStatus::class,
         'route_geometry' => 'array',
         'started_at' => 'datetime',
         'delivered_at' => 'datetime',
         'driver_lat' => 'decimal:8',
         'driver_lng' => 'decimal:8',
-        'destination_lat' => 'decimal:8',
-        'destination_lng' => 'decimal:8',
     ];
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

@@ -5,8 +5,6 @@ namespace App\Events;
 use App\Models\DeliveryTracking;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -28,7 +26,7 @@ class DeliveryPositionUpdated implements ShouldBroadcast
     {
         return [
             new Channel('delivery-tracking'),
-            new Channel('delivery-' . $this->delivery->order_number),
+            new Channel('delivery-'.$this->delivery->order_number),
         ];
     }
 
@@ -43,18 +41,18 @@ class DeliveryPositionUpdated implements ShouldBroadcast
             'order_number' => $this->delivery->order_number,
             'driver_position' => [
                 'lat' => $this->delivery->driver_lat,
-                'lng' => $this->delivery->driver_lng
+                'lng' => $this->delivery->driver_lng,
             ],
             'destination' => [
                 'lat' => $this->delivery->destination_lat,
-                'lng' => $this->delivery->destination_lng
+                'lng' => $this->delivery->destination_lng,
             ],
             'estimated_duration' => $this->delivery->estimated_duration,
             'distance_remaining' => $this->delivery->distance_remaining,
             'status' => $this->delivery->status,
             'driver_name' => $this->delivery->driver_name,
             'customer_name' => $this->delivery->customer_name,
-            'route_geometry' => $this->delivery->route_geometry
+            'route_geometry' => $this->delivery->route_geometry,
         ];
     }
 }

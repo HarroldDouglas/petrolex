@@ -1,10 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\Test\Delivery\CreateDeliveryTrackingController;
-use App\Http\Controllers\Api\Test\Delivery\GetActiveDeliveriesController;
-use App\Http\Controllers\Api\Test\Delivery\GetDeliveryTrackingDetailsController;
-use App\Http\Controllers\Api\Test\Delivery\StartDeliveryTrackingController;
-use App\Http\Controllers\Api\Test\Delivery\UpdateDeliveryTrackingPositionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,16 +37,3 @@ require __DIR__.'/api/bottles.php';
 require __DIR__.'/api/payments.php';
 require __DIR__.'/api/delivery.php';
 require __DIR__.'/api/tracking.php';
-
-
-
-
-
-
-Route::prefix('test/delivery')->name('test.delivery.')->group(function () {
-    Route::get('/active', GetActiveDeliveriesController::class)->name('active');
-    Route::post('/', CreateDeliveryTrackingController::class)->name('create');
-    Route::post('/{orderNumber}/start', StartDeliveryTrackingController::class)->name('start');
-    Route::patch('/{orderNumber}/position', UpdateDeliveryTrackingPositionController::class)->name('position.update');
-    Route::get('/{orderNumber}', GetDeliveryTrackingDetailsController::class)->name('details');
-});

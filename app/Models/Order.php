@@ -43,10 +43,13 @@ use Illuminate\Support\Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
  *  * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Product, \App\Models\OrderItem> $products
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Refund> $refunds
+ * @property-read DeliveryTracking|null $deliveryTracking
  *
  * // Accessors
  * @property-read \App\Enums\PaymentStatus|null $payment_status
  * @property-read \App\Enums\PaymentMethod|null $payment_method
+ * @property-read float|null $destination_lat
+ * @property-read float|null $destination_lng
  *
  * // Query Scopes
  */
@@ -309,7 +312,7 @@ class Order extends Model
      */
     public function getTotalRefundedAmount(): float
     {
-        return $this->refunds()
+        return (float) $this->refunds()
             ->where('status', PaymentStatus::PAID())
             ->sum('amount');
     }
@@ -324,6 +327,41 @@ class Order extends Model
                 $query->where('product_type', ProductType::BOTTLE()->value);
             })
             ->exists();
+    }
+
+    /**
+     * Get the delivery tracking for the order.
+     */
+    public function deliveryTracking(): HasOne
+    {
+        return $this->hasOne(DeliveryTracking::class);
+    }
+
+    /**
+     * Check if the order can be tracked.
+     */
+    public function canBeTracked(): bool
+    {
+        return in_array($this->status->value, [
+            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PROCESSING()->value,
+        ]) && ! $this->deliveryTracking()->exists();
+    }
+
+    /**
+     * Get the destination latitude from the delivery address.
+     */
+    public function getDestinationLatAttribute(): ?float
+    {
+        return (float) $this->deliveryAddress?->latitude;
+    }
+
+    /**
+     * Get the destination longitude from the delivery address.
+     */
+    public function getDestinationLngAttribute(): ?float
+    {
+        return (float) $this->deliveryAddress?->longitude;
     }
 
     /**

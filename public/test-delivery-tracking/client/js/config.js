@@ -4,9 +4,9 @@ const CONFIG = {
     API: {
         BASE_URL: 'http://127.0.0.1:8000/api',
         ENDPOINTS: {
-            DELIVERY_ACTIVE: '/test/delivery/active',
-            DELIVERY_GET: '/test/delivery',
-            DELIVERY_CREATE: '/test/delivery'
+            DELIVERY_ACTIVE: '/tracking/delivery/active',
+            DELIVERY_GET: '/tracking/delivery',
+            DELIVERY_CREATE: '/tracking/delivery'
         }
     },
 

@@ -11,7 +11,7 @@ class DeliveryDashboard extends Component
     public $selectedDelivery = null;
 
     protected $listeners = [
-        'echo:delivery-tracking,position.updated' => 'handlePositionUpdate'
+        'echo:delivery-tracking,position.updated' => 'handlePositionUpdate',
     ];
 
     public function mount()
@@ -31,30 +31,30 @@ class DeliveryDashboard extends Component
             ->orderBy('updated_at', 'desc')
             ->get()
             ->toArray();
-            
+
         logger('Livraisons avec GPS chargées:', [
-            'count' => count($this->deliveries), 
-            'deliveries' => collect($this->deliveries)->map(function($d) {
+            'count' => count($this->deliveries),
+            'deliveries' => collect($this->deliveries)->map(function ($d) {
                 return [
                     'order_number' => $d['order_number'],
                     'status' => $d['status'],
-                    'has_gps' => !empty($d['driver_lat']) && !empty($d['driver_lng']),
-                    'driver_position' => $d['driver_lat'] . ',' . $d['driver_lng']
+                    'has_gps' => ! empty($d['driver_lat']) && ! empty($d['driver_lng']),
+                    'driver_position' => $d['driver_lat'].','.$d['driver_lng'],
                 ];
-            })
+            }),
         ]);
     }
 
     public function selectDelivery($orderNumber)
     {
         logger('Sélection de livraison:', ['orderNumber' => $orderNumber]);
-        
+
         $delivery = DeliveryTracking::where('order_number', $orderNumber)->first();
-        
+
         if ($delivery) {
             $this->selectedDelivery = $delivery->toArray();
             logger('Livraison sélectionnée:', $this->selectedDelivery);
-            
+
             // Envoyer seulement l'objet, pas un tableau
             $this->dispatch('delivery-selected', $this->selectedDelivery);
         }
@@ -69,7 +69,7 @@ class DeliveryDashboard extends Component
     public function handlePositionUpdate($event)
     {
         logger('Position update reçue:', $event);
-        
+
         $this->loadDeliveries();
 
         // Mettre à jour la livraison sélectionnée si c'est celle qui a été mise à jour
