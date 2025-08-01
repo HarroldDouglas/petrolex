@@ -22,6 +22,10 @@ $(document).ready(function() {
                 if (response && response.data && response.data.access_token) {
                     localStorage.setItem('api_token', response.data.access_token);
                     localStorage.setItem('user_full_name', response.data.user.first_name + ' ' + response.data.user.last_name);
+                    localStorage.setItem('test-products-user-email', response.data.user.email);
+                    if (response.data.user.phone) {
+                        localStorage.setItem('test-products-user-phone', response.data.user.phone);
+                    }
                     
                     const user = response.data.user;
                     if (user && user.roles) {

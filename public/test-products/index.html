@@ -36,5 +36,14 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/test-products/assets/js/auth.js"></script>
+    <script>
+        // Vérifier si une session est active et rediriger
+        const sessionToken = localStorage.getItem('test-products-sessionToken');
+        const sessionExpiry = localStorage.getItem('test-products-sessionExpiry');
+
+        if (sessionToken && sessionExpiry && new Date().getTime() < parseInt(sessionExpiry)) {
+            window.location.href = '/test-products/order.html';
+        }
+    </script>
 </body>
 </html>
