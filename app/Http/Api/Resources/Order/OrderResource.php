@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Resources\Order;
 
+use App\Http\Api\Resources\CustomerResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -62,6 +63,13 @@ class OrderResource extends JsonResource
                 'latitude' => $this->deliveryAddress->latitude,
                 'longitude' => $this->deliveryAddress->longitude,
             ],
+            'customer' => CustomerResource::make($this->customer),
+            'distribution_center' => $this->whenLoaded('distributionCenter', function () {
+                return [
+                    'id' => $this->distributionCenter->id,
+                    'name' => $this->distributionCenter->name,
+                ];
+            }),
         ];
     }
 }
