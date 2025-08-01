@@ -1,5 +1,5 @@
-// Composants UI pour la simulation livreur
-class DeliveryUIComponents {
+// Composants UI pour l'interface livreur avec authentification réelle
+class DeliveryPersonUIComponents {
     constructor() {
         this.elements = {};
         this.initElements();
@@ -7,39 +7,37 @@ class DeliveryUIComponents {
 
     initElements() {
         // Panneaux principaux
-        this.elements.setupPanel = document.getElementById('setupPanel');
-        this.elements.deliveryPanel = document.getElementById('deliveryPanel');
-        this.elements.simulationControls = document.getElementById('simulationControls');
+        this.elements.loginPanel = document.getElementById('loginPanel');
+        this.elements.deliveryPersonPanel = document.getElementById('deliveryPersonPanel');
+        this.elements.deliveryControls = document.getElementById('deliveryControls');
         
-        // Formulaires
-        this.elements.driverSetup = document.getElementById('driverSetup');
-        this.elements.createDeliveryForm = document.getElementById('createDeliveryForm');
+        // Authentification
+        this.elements.loginForm = document.getElementById('loginForm');
+        this.elements.deliveryPersonEmail = document.getElementById('deliveryPersonEmail');
+        this.elements.deliveryPersonPassword = document.getElementById('deliveryPersonPassword');
+        this.elements.loginBtn = document.getElementById('loginBtn');
+        this.elements.logoutBtn = document.getElementById('logoutBtn');
         
-        // Configuration livreur
-        this.elements.driverName = document.getElementById('driverName');
-        this.elements.driverPhone = document.getElementById('driverPhone');
-        this.elements.startLat = document.getElementById('startLat');
-        this.elements.startLng = document.getElementById('startLng');
-        
-        // Création de livraison
-        this.elements.customerName = document.getElementById('customerName');
-        this.elements.destinationAddress = document.getElementById('destinationAddress');
-        this.elements.destLat = document.getElementById('destLat');
-        this.elements.destLng = document.getElementById('destLng');
-        
-        // Affichage d'informations
-        this.elements.connectionStatus = document.getElementById('connectionStatus');
-        this.elements.currentDriverName = document.getElementById('currentDriverName');
-        this.elements.currentPosition = document.getElementById('currentPosition');
+        // Informations livreur
+        this.elements.currentDeliveryPersonName = document.getElementById('currentDeliveryPersonName');
+        this.elements.currentDeliveryPersonEmail = document.getElementById('currentDeliveryPersonEmail');
         this.elements.currentStatus = document.getElementById('currentStatus');
-        this.elements.deliveriesList = document.getElementById('deliveriesList');
+        this.elements.connectionStatus = document.getElementById('connectionStatus');
         
-        // Détails de l'ordre sélectionné
+        // Commandes
+        this.elements.ordersList = document.getElementById('ordersList');
+        this.elements.refreshOrdersBtn = document.getElementById('refreshOrdersBtn');
+        this.elements.statusFilter = document.getElementById('statusFilter');
+        this.elements.orderNumberFilter = document.getElementById('orderNumberFilter');
+        this.elements.pagination = document.getElementById('pagination');
+        
+        // Détails commande sélectionnée
         this.elements.selectedOrderDetails = document.getElementById('selectedOrderDetails');
         this.elements.selectedOrderNumber = document.getElementById('selectedOrderNumber');
         this.elements.selectedCustomerName = document.getElementById('selectedCustomerName');
-        this.elements.selectedDestination = document.getElementById('selectedDestination');
-        this.elements.selectedStatus = document.getElementById('selectedStatus');
+        this.elements.selectedCustomerPhone = document.getElementById('selectedCustomerPhone');
+        this.elements.selectedDeliveryAddress = document.getElementById('selectedDeliveryAddress');
+        this.elements.selectedOrderStatus = document.getElementById('selectedOrderStatus');
         this.elements.estimatedTime = document.getElementById('estimatedTime');
         this.elements.estimatedDistance = document.getElementById('estimatedDistance');
         
@@ -50,153 +48,240 @@ class DeliveryUIComponents {
         this.elements.simulationSpeedInfo = document.getElementById('simulationSpeedInfo');
         this.elements.routeTypeInfo = document.getElementById('routeTypeInfo');
         
-        // Contrôles de simulation
+        // Contrôles de livraison
         this.elements.simulationSpeed = document.getElementById('simulationSpeed');
-        this.elements.startSimulation = document.getElementById('startSimulation');
-        this.elements.pauseSimulation = document.getElementById('pauseSimulation');
-        this.elements.stopSimulation = document.getElementById('stopSimulation');
+        this.elements.startDeliveryBtn = document.getElementById('startDeliveryBtn');
+        this.elements.pauseDeliveryBtn = document.getElementById('pauseDeliveryBtn');
+        this.elements.stopDeliveryBtn = document.getElementById('stopDeliveryBtn');
         this.elements.progressPercent = document.getElementById('progressPercent');
         this.elements.progressBar = document.getElementById('progressBar');
+        
+        // Position actuelle
+        this.elements.currentLocationSection = document.getElementById('currentLocationSection');
+        this.elements.currentPosition = document.getElementById('currentPosition');
+        this.elements.lastUpdate = document.getElementById('lastUpdate');
     }
 
-    showDeliveryPanel() {
-        this.elements.setupPanel.style.display = 'none';
-        this.elements.deliveryPanel.style.display = 'block';
+    // Gestion des panneaux
+    showLoginPanel() {
+        this.elements.loginPanel.style.display = 'block';
+        this.elements.deliveryPersonPanel.style.display = 'none';
+        this.updateConnectionStatus(false);
     }
 
-    showSetupPanel() {
-        this.elements.setupPanel.style.display = 'block';
-        this.elements.deliveryPanel.style.display = 'none';
+    showDeliveryPersonPanel() {
+        this.elements.loginPanel.style.display = 'none';
+        this.elements.deliveryPersonPanel.style.display = 'block';
+        this.updateConnectionStatus(true);
     }
 
-    showSimulationControls() {
-        this.elements.simulationControls.style.display = 'block';
+    showSelectedOrderDetails() {
+        this.elements.selectedOrderDetails.style.display = 'block';
+        this.elements.transportModeSection.style.display = 'block';
     }
 
-    hideSimulationControls() {
-        this.elements.simulationControls.style.display = 'none';
+    hideSelectedOrderDetails() {
+        this.elements.selectedOrderDetails.style.display = 'none';
+        this.elements.transportModeSection.style.display = 'none';
+        this.elements.deliveryControls.style.display = 'none';
     }
 
+    showDeliveryControls() {
+        this.elements.deliveryControls.style.display = 'block';
+    }
+
+    hideDeliveryControls() {
+        this.elements.deliveryControls.style.display = 'none';
+    }
+
+    // Authentification
     updateConnectionStatus(connected) {
         const statusClass = connected ? 'status-online' : 'status-offline';
         this.elements.connectionStatus.className = `status-indicator ${statusClass}`;
     }
 
-    updateDriverInfo(name, position) {
-        this.elements.currentDriverName.textContent = name;
-        this.elements.currentPosition.textContent = `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`;
+    updateDeliveryPersonInfo(deliveryPerson) {
+        this.elements.currentDeliveryPersonName.textContent = deliveryPerson.name || 'N/A';
+        this.elements.currentDeliveryPersonEmail.textContent = deliveryPerson.email || 'N/A';
     }
 
-    updateDriverStatus(status, statusClass = 'secondary') {
-        this.elements.currentStatus.textContent = status;
-        this.elements.currentStatus.className = `badge bg-${statusClass}`;
+    // Gestion des commandes
+    renderOrders(orders, currentPage = 1, totalPages = 1) {
+        const list = this.elements.ordersList;
+        list.innerHTML = '';
+
+        if (!orders || orders.length === 0) {
+            list.innerHTML = '<div class="text-center text-muted py-3">Aucune commande trouvée</div>';
+            return;
+        }
+
+        orders.forEach(order => {
+            const orderCard = this.createOrderCard(order);
+            list.appendChild(orderCard);
+        });
+
+        this.updatePagination(currentPage, totalPages);
     }
 
+    createOrderCard(order) {
+        const div = document.createElement('div');
+        div.className = 'order-card mb-2 p-3 border rounded';
+        div.dataset.orderNumber = order.order_number;
+
+        const statusColor = CONFIG.STATUS.COLORS[order.status] || 'secondary';
+        const statusLabel = CONFIG.STATUS.TRANSLATIONS[order.status] || order.status;
+
+        div.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <h6 class="mb-1 text-primary">${order.order_number}</h6>
+                    <p class="mb-1 text-sm"><strong>Client:</strong> ${order.customer?.name || 'N/A'}</p>
+                    <p class="mb-1 text-sm"><strong>Téléphone:</strong> ${order.customer?.phone || 'N/A'}</p>
+                    <p class="mb-1 text-sm"><strong>Adresse:</strong> ${order.delivery_address || 'N/A'}</p>
+                    <p class="mb-0 text-sm"><strong>Montant:</strong> ${order.total_amount || 0}€</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-${statusColor} mb-2">${statusLabel}</span>
+                    ${this.getOrderActions(order)}
+                </div>
+            </div>
+        `;
+
+        return div;
+    }
+
+    getOrderActions(order) {
+        switch (order.status) {
+            case CONFIG.ORDER_STATUS.CONFIRMED:
+                return `<button class="btn btn-sm btn-success w-100" onclick="window.deliveryPersonApp.selectOrder('${order.order_number}')">
+                    <i class="fas fa-play"></i> Sélectionner
+                </button>`;
+            case CONFIG.ORDER_STATUS.PROCESSING:
+                return `<button class="btn btn-sm btn-warning w-100" onclick="window.deliveryPersonApp.selectOrder('${order.order_number}')">
+                    <i class="fas fa-eye"></i> Voir détails
+                </button>`;
+            default:
+                return `<button class="btn btn-sm btn-outline-secondary w-100" disabled>
+                    <i class="fas fa-check"></i> Terminée
+                </button>`;
+        }
+    }
+
+    updatePagination(currentPage, totalPages) {
+        const pagination = this.elements.pagination;
+        pagination.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        const nav = document.createElement('nav');
+        nav.innerHTML = `
+            <ul class="pagination pagination-sm">
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="window.deliveryPersonApp.loadOrders(${currentPage - 1})">Précédent</a>
+                </li>
+                ${this.generatePageNumbers(currentPage, totalPages)}
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="window.deliveryPersonApp.loadOrders(${currentPage + 1})">Suivant</a>
+                </li>
+            </ul>
+        `;
+        pagination.appendChild(nav);
+    }
+
+    generatePageNumbers(currentPage, totalPages) {
+        let pages = '';
+        const start = Math.max(1, currentPage - 2);
+        const end = Math.min(totalPages, currentPage + 2);
+
+        for (let i = start; i <= end; i++) {
+            pages += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="window.deliveryPersonApp.loadOrders(${i})">${i}</a>
+                </li>
+            `;
+        }
+        return pages;
+    }
+
+    // Détails de la commande sélectionnée
+    updateSelectedOrderDetails(order) {
+        this.elements.selectedOrderNumber.textContent = order.order_number;
+        this.elements.selectedCustomerName.textContent = order.customer?.name || 'N/A';
+        this.elements.selectedCustomerPhone.textContent = order.customer?.phone || 'N/A';
+        this.elements.selectedDeliveryAddress.textContent = order.delivery_address || 'N/A';
+        
+        const statusColor = CONFIG.STATUS.COLORS[order.status] || 'secondary';
+        const statusLabel = CONFIG.STATUS.TRANSLATIONS[order.status] || order.status;
+        this.elements.selectedOrderStatus.textContent = statusLabel;
+        this.elements.selectedOrderStatus.className = `badge bg-${statusColor}`;
+        
+        this.showSelectedOrderDetails();
+    }
+
+    // Estimations de route
+    updateRouteEstimates(time, distance, isRealTime = false) {
+        if (time !== null && distance !== null) {
+            const timeText = isRealTime ? `${time} min restant` : `${time} min`;
+            const distanceText = isRealTime ? `${distance} km restant` : `${distance} km`;
+            
+            this.elements.estimatedTime.textContent = timeText;
+            this.elements.estimatedDistance.textContent = distanceText;
+        } else {
+            this.elements.estimatedTime.textContent = 'Non disponible';
+            this.elements.estimatedDistance.textContent = 'Non disponible';
+        }
+    }
+
+    // Mode de transport
+    getSelectedTransportMode() {
+        return this.elements.transportWalking.checked ? 'walking' : 'driving';
+    }
+
+    updateTransportInfo() {
+        const selectedMode = this.getSelectedTransportMode();
+        
+        if (selectedMode === 'driving') {
+            this.elements.simulationSpeedInfo.textContent = 'Très rapide';
+            this.elements.routeTypeInfo.textContent = 'Moto/Route';
+        } else {
+            this.elements.simulationSpeedInfo.textContent = 'Normale';
+            this.elements.routeTypeInfo.textContent = 'Piétonne';
+        }
+    }
+
+    // Contrôles de livraison
     updateProgress(percent) {
         const roundedPercent = Math.round(percent);
         this.elements.progressPercent.textContent = `${roundedPercent}%`;
         this.elements.progressBar.style.width = `${percent}%`;
     }
 
-    setSimulationControlsState(isRunning, isPaused) {
-        this.elements.startSimulation.disabled = isRunning && !isPaused;
-        this.elements.pauseSimulation.disabled = !isRunning || isPaused;
-        this.elements.stopSimulation.disabled = !isRunning;
+    setDeliveryControlsState(isTracking, isPaused) {
+        this.elements.startDeliveryBtn.disabled = isTracking && !isPaused;
+        this.elements.pauseDeliveryBtn.disabled = !isTracking || isPaused;
+        this.elements.stopDeliveryBtn.disabled = !isTracking;
         
         if (isPaused) {
-            this.elements.startSimulation.textContent = 'Reprendre';
+            this.elements.startDeliveryBtn.innerHTML = '<i class="fas fa-play"></i> Reprendre';
         } else {
-            this.elements.startSimulation.textContent = 'Démarrer livraison';
+            this.elements.startDeliveryBtn.innerHTML = '<i class="fas fa-play"></i> Démarrer Livraison';
         }
-    }
-
-    renderDeliveries(deliveries, driverName) {
-        const list = this.elements.deliveriesList;
-        list.innerHTML = '';
-
-        const myDeliveries = deliveries.filter(d => d.driver_name === driverName);
-
-        if (myDeliveries.length === 0) {
-            list.innerHTML = '<p class="text-muted">Aucune livraison</p>';
-            return;
-        }
-
-        myDeliveries.forEach(delivery => {
-            const div = document.createElement('div');
-            div.className = 'border rounded p-2 mb-2';
-            div.innerHTML = `
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <strong>${delivery.order_number}</strong><br>
-                        <small>Client: ${delivery.customer_name}</small><br>
-                        <small>Destination: ${delivery.destination_address}</small>
-                    </div>
-                    <div>
-                        <span class="badge bg-${this.getStatusColor(delivery.status)}">
-                            ${CONFIG.STATUS.TRANSLATIONS[delivery.status] || delivery.status}
-                        </span>
-                        ${delivery.status === 'pending' ? 
-                            `<button class="btn btn-sm btn-success ms-1" onclick="deliveryApp.selectDelivery('${delivery.order_number}')">
-                                Sélectionner
-                            </button>` 
-                            : ''}
-                    </div>
-                </div>
-            `;
-            list.appendChild(div);
-        });
-    }
-
-    getStatusColor(status) {
-        return CONFIG.STATUS.COLORS[status] || 'secondary';
-    }
-
-    populateFormWithDefaults() {
-        this.elements.driverName.value = CONFIG.DRIVER.DEFAULT_NAME;
-        this.elements.driverPhone.value = CONFIG.DRIVER.DEFAULT_PHONE;
-        this.elements.startLat.value = CONFIG.DRIVER.DEFAULT_POSITION.lat;
-        this.elements.startLng.value = CONFIG.DRIVER.DEFAULT_POSITION.lng;
-        
-        this.elements.customerName.value = CONFIG.DELIVERY.DEFAULT_CUSTOMER;
-        this.elements.destinationAddress.value = CONFIG.DELIVERY.DEFAULT_ADDRESS;
-        this.elements.destLat.value = CONFIG.DELIVERY.DEFAULT_DESTINATION.lat;
-        this.elements.destLng.value = CONFIG.DELIVERY.DEFAULT_DESTINATION.lng;
-        
-        this.elements.simulationSpeed.value = CONFIG.SIMULATION.DEFAULT_SPEED;
-    }
-
-    updateMapPosition(lat, lng) {
-        this.elements.startLat.value = lat.toFixed(6);
-        this.elements.startLng.value = lng.toFixed(6);
-    }
-
-    getDriverFormData() {
-        return {
-            name: this.elements.driverName.value,
-            phone: this.elements.driverPhone.value,
-            lat: parseFloat(this.elements.startLat.value),
-            lng: parseFloat(this.elements.startLng.value)
-        };
-    }
-
-    getDeliveryFormData() {
-        return {
-            customer_name: this.elements.customerName.value,
-            destination_address: this.elements.destinationAddress.value,
-            destination_lat: parseFloat(this.elements.destLat.value),
-            destination_lng: parseFloat(this.elements.destLng.value)
-        };
     }
 
     getSimulationSpeed() {
         return parseInt(this.elements.simulationSpeed.value);
     }
 
-    clearDeliveryForm() {
-        this.elements.createDeliveryForm.reset();
-        this.populateFormWithDefaults();
+    // Position actuelle
+    updateCurrentPosition(position) {
+        if (position) {
+            this.elements.currentPosition.textContent = `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`;
+            this.elements.lastUpdate.textContent = new Date().toLocaleTimeString();
+            this.elements.currentLocationSection.style.display = 'block';
+        }
     }
 
+    // Notifications
     showError(message, title = 'Erreur') {
         console.error(title + ':', message);
         this.showNotification('error', title, message, 5000);
@@ -207,8 +292,12 @@ class DeliveryUIComponents {
         this.showNotification('success', title, message, 4000);
     }
 
+    showInfo(message, title = 'Information') {
+        console.info(title + ':', message);
+        this.showNotification('info', title, message, 3000);
+    }
+
     showNotification(type, title, message, duration = 4000) {
-        // Créer l'élément de notification
         const notification = document.createElement('div');
         notification.className = `notification ${type} fade-in`;
         notification.innerHTML = `
@@ -222,10 +311,8 @@ class DeliveryUIComponents {
             </div>
         `;
 
-        // Ajouter au body
         document.body.appendChild(notification);
 
-        // Auto-suppression après la durée spécifiée
         setTimeout(() => {
             if (notification && notification.parentElement) {
                 notification.style.opacity = '0';
@@ -239,306 +326,62 @@ class DeliveryUIComponents {
         }, duration);
     }
 
-    setLoadingState(isLoading, buttonId = null) {
-        if (buttonId) {
-            const button = document.getElementById(buttonId);
-            if (button) {
-                button.disabled = isLoading;
-                if (isLoading) {
-                    button.classList.add('loading');
-                } else {
-                    button.classList.remove('loading');
-                }
-            }
+    // Utilitaires
+    setLoadingState(element, isLoading) {
+        if (typeof element === 'string') {
+            element = document.getElementById(element);
         }
-    }
-
-    showSelectedOrderDetails(delivery) {
-        this.elements.selectedOrderDetails.style.display = 'block';
-        this.elements.selectedOrderNumber.textContent = delivery.order_number;
-        this.elements.selectedCustomerName.textContent = delivery.customer_name;
-        this.elements.selectedDestination.textContent = delivery.destination_address;
         
-        // Mettre à jour le badge de statut
-        const statusColor = this.getStatusColor(delivery.status);
-        this.elements.selectedStatus.textContent = CONFIG.STATUS.TRANSLATIONS[delivery.status] || delivery.status;
-        this.elements.selectedStatus.className = `badge bg-${statusColor}`;
-        
-        // Réinitialiser les estimations
-        this.elements.estimatedTime.textContent = 'Calcul...';
-        this.elements.estimatedDistance.textContent = 'Calcul...';
-        
-        // Afficher la section du mode de transport
-        this.showTransportModeSection();
-    }
-
-    hideSelectedOrderDetails() {
-        this.elements.selectedOrderDetails.style.display = 'none';
-        this.hideTransportModeSection();
-    }
-
-    showTransportModeSection() {
-        this.elements.transportModeSection.style.display = 'block';
-        this.setupTransportModeListeners();
-        this.updateTransportInfo(); // Mettre à jour les infos initiales
-    }
-
-    hideTransportModeSection() {
-        this.elements.transportModeSection.style.display = 'none';
-    }
-
-    setupTransportModeListeners() {
-        // Éviter les multiples listeners
-        if (this.transportListenersSetup) return;
-        
-        [this.elements.transportWalking, this.elements.transportDriving].forEach(radio => {
-            radio.addEventListener('change', () => {
-                this.updateTransportInfo();
-                // Déclencher un recalcul de route si nécessaire
-                if (window.deliveryApp && window.deliveryApp.selectedDelivery) {
-                    window.deliveryApp.recalculateRouteForTransportMode();
-                }
-            });
-        });
-        
-        this.transportListenersSetup = true;
-    }
-
-    updateTransportInfo() {
-        const selectedMode = this.getSelectedTransportMode();
-        const modeConfig = CONFIG.SIMULATION.TRANSPORT_MODES[selectedMode];
-        
-        if (modeConfig) {
-            // Mettre à jour les textes d'information selon le mode sélectionné
-            if (selectedMode === 'driving') {
-                this.elements.simulationSpeedInfo.textContent = 'Très rapide';
-                this.elements.routeTypeInfo.textContent = 'Moto/Route';
+        if (element) {
+            element.disabled = isLoading;
+            if (isLoading) {
+                element.classList.add('loading');
+                const originalText = element.innerHTML;
+                element.dataset.originalText = originalText;
+                element.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement...';
             } else {
-                this.elements.simulationSpeedInfo.textContent = 'Normale';
-                this.elements.routeTypeInfo.textContent = 'Piétonne';
-            }
-            
-            // Animation de changement - utiliser l'ID de l'input radio au lieu d'un sélecteur CSS inexistant
-            const selectedInput = selectedMode === 'driving' ? this.elements.transportDriving : this.elements.transportWalking;
-            const transportOption = selectedInput.closest('.transport-option');
-            
-            if (transportOption) {
-                transportOption.classList.add('switching');
-                setTimeout(() => {
-                    transportOption.classList.remove('switching');
-                }, 300);
+                element.classList.remove('loading');
+                if (element.dataset.originalText) {
+                    element.innerHTML = element.dataset.originalText;
+                    delete element.dataset.originalText;
+                }
             }
         }
     }
 
-    getSelectedTransportMode() {
-        return this.elements.transportWalking.checked ? 'walking' : 'driving';
+    clearFilters() {
+        this.elements.statusFilter.value = '';
+        this.elements.orderNumberFilter.value = '';
     }
 
-    updateRouteEstimates(time, distance, isRealTime = false) {
-        if (time !== null && distance !== null) {
-            const timeText = isRealTime ? `${time} min restant` : `${time} min`;
-            const distanceText = isRealTime ? `${distance} km restant` : `${distance} km`;
-            
-            this.elements.estimatedTime.textContent = timeText;
-            this.elements.estimatedDistance.textContent = distanceText;
-            
-            // Animation pour les mises à jour en temps réel
-            if (isRealTime) {
-                [this.elements.estimatedTime, this.elements.estimatedDistance].forEach(el => {
-                    el.style.animation = 'none';
-                    setTimeout(() => {
-                        el.style.animation = 'gentle-pulse 0.5s ease-in-out';
-                    }, 10);
-                });
-            }
-        } else {
-            this.elements.estimatedTime.textContent = 'Non disponible';
-            this.elements.estimatedDistance.textContent = 'Non disponible';
+    getFilters() {
+        const filters = {};
+        
+        if (this.elements.statusFilter.value) {
+            filters.status = this.elements.statusFilter.value;
         }
+        
+        if (this.elements.orderNumberFilter.value.trim()) {
+            filters.order_number = this.elements.orderNumberFilter.value.trim();
+        }
+        
+        return filters;
     }
 
-    highlightSelectedDelivery(orderNumber) {
+    highlightSelectedOrder(orderNumber) {
         // Supprimer la surbrillance de tous les éléments
-        document.querySelectorAll('#deliveriesList .delivery-item').forEach(item => {
-            item.classList.remove('selected');
+        document.querySelectorAll('.order-card').forEach(card => {
+            card.classList.remove('selected');
         });
         
-        // Ajouter la classe delivery-item et selected à l'élément sélectionné
-        document.querySelectorAll('#deliveriesList .border').forEach(item => {
-            item.classList.add('delivery-item');
-            if (item.innerHTML.includes(orderNumber)) {
-                item.classList.add('selected');
-                
-                // Scroll vers l'élément sélectionné
-                item.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'nearest' 
-                });
-            }
-        });
-    }
-}
-
-// Gestionnaire de formulaires pour le livreur
-class DeliveryFormHandler {
-    constructor(ui, callbacks = {}) {
-        this.ui = ui;
-        this.callbacks = callbacks;
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        // Configuration du livreur
-        this.ui.elements.driverSetup.addEventListener('submit', (e) => {
-            this.handleDriverSetup(e);
-        });
-
-        // Création de livraison
-        this.ui.elements.createDeliveryForm.addEventListener('submit', (e) => {
-            this.handleCreateDelivery(e);
-        });
-
-        // Contrôles de simulation
-        this.ui.elements.startSimulation.addEventListener('click', () => {
-            this.handleStartSimulation();
-        });
-
-        this.ui.elements.pauseSimulation.addEventListener('click', () => {
-            this.handlePauseSimulation();
-        });
-
-        this.ui.elements.stopSimulation.addEventListener('click', () => {
-            this.handleStopSimulation();
-        });
-    }
-
-    async handleDriverSetup(e) {
-        e.preventDefault();
-        
-        const driverData = this.ui.getDriverFormData();
-        
-        if (!this.validateDriverData(driverData)) {
-            return;
-        }
-
-        try {
-            if (this.callbacks.onDriverSetup) {
-                await this.callbacks.onDriverSetup(driverData);
-            }
-        } catch (error) {
-            this.ui.showError('Erreur lors de la configuration du livreur: ' + error.message);
-        }
-    }
-
-    async handleCreateDelivery(e) {
-        e.preventDefault();
-        
-        const deliveryData = this.ui.getDeliveryFormData();
-        const driverData = this.ui.getDriverFormData();
-        
-        const completeData = {
-            ...deliveryData,
-            driver_name: driverData.name,
-            driver_phone: driverData.phone
-        };
-
-        if (!this.validateDeliveryData(completeData)) {
-            return;
-        }
-
-        this.ui.setLoadingState(true, 'createDeliveryBtn');
-
-        try {
-            if (this.callbacks.onCreateDelivery) {
-                await this.callbacks.onCreateDelivery(completeData);
-            }
-        } catch (error) {
-            this.ui.showError('Erreur lors de la création de la livraison: ' + error.message);
-        } finally {
-            this.ui.setLoadingState(false, 'createDeliveryBtn');
-        }
-    }
-
-    handleStartSimulation() {
-        if (this.callbacks.onStartSimulation) {
-            const speed = this.ui.getSimulationSpeed();
-            this.callbacks.onStartSimulation(speed);
-        }
-    }
-
-    handlePauseSimulation() {
-        if (this.callbacks.onPauseSimulation) {
-            this.callbacks.onPauseSimulation();
-        }
-    }
-
-    handleStopSimulation() {
-        if (this.callbacks.onStopSimulation) {
-            this.callbacks.onStopSimulation();
-        }
-    }
-
-    validateDriverData(data) {
-        if (!data.name || data.name.trim() === '') {
-            this.ui.showError('Le nom du livreur est requis');
-            return false;
-        }
-        
-        if (!data.phone || data.phone.trim() === '') {
-            this.ui.showError('Le téléphone du livreur est requis');
-            return false;
-        }
-        
-        if (isNaN(data.lat) || isNaN(data.lng)) {
-            this.ui.showError('Position GPS invalide');
-            return false;
-        }
-        
-        return true;
-    }
-
-    validateDeliveryData(data) {
-        if (!data.customer_name || data.customer_name.trim() === '') {
-            this.ui.showError('Le nom du client est requis');
-            return false;
-        }
-        
-        if (!data.destination_address || data.destination_address.trim() === '') {
-            this.ui.showError('L\'adresse de destination est requise');
-            return false;
-        }
-        
-        if (isNaN(data.destination_lat) || isNaN(data.destination_lng)) {
-            this.ui.showError('Coordonnées de destination invalides');
-            return false;
-        }
-        
-        return true;
-    }
-}
-
-// Gestionnaire d'événements pour les actions spécifiques au livreur
-class DeliveryEventHandler {
-    constructor(callbacks = {}) {
-        this.callbacks = callbacks;
-    }
-
-    selectDelivery(orderNumber) {
-        if (this.callbacks.onSelectDelivery) {
-            this.callbacks.onSelectDelivery(orderNumber);
-        }
-    }
-
-    refreshDeliveries() {
-        if (this.callbacks.onRefreshDeliveries) {
-            this.callbacks.onRefreshDeliveries();
-        }
-    }
-
-    handleMapClick(lat, lng) {
-        if (this.callbacks.onMapClick) {
-            this.callbacks.onMapClick(lat, lng);
+        // Ajouter la surbrillance à l'élément sélectionné
+        const selectedCard = document.querySelector(`[data-order-number="${orderNumber}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+            selectedCard.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest' 
+            });
         }
     }
 }

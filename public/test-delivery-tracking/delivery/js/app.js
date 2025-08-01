@@ -1,18 +1,17 @@
-// Application principale pour la simulation livreur
-class DeliveryDriverApp {
+// Application principale pour l'interface livreur avec authentification réelle
+class DeliveryPersonApp {
     constructor() {
         this.services = {
-            api: new DeliveryApiService(),
-            map: new DeliveryMapService(),
-            simulation: null
+            api: new DeliveryPersonApiService(),
+            map: new DeliveryPersonMapService(),
+            tracking: null
         };
         
-        this.ui = new DeliveryUIComponents();
-        this.formHandler = null;
-        this.eventHandler = null;
-        this.currentPosition = null;
-        this.selectedDelivery = null;
-        this.driverInfo = null;
+        this.ui = new DeliveryPersonUIComponents();
+        this.currentDeliveryPerson = null;
+        this.selectedOrder = null;
+        this.currentPage = 1;
+        this.currentFilters = {};
         
         this.init();
     }
@@ -24,184 +23,333 @@ class DeliveryDriverApp {
         // Configurer les gestionnaires d'événements
         this.setupEventHandlers();
         
-        // Peupler les formulaires avec les valeurs par défaut
-        this.ui.populateFormWithDefaults();
+        // Vérifier si un token existe déjà
+        this.checkExistingSession();
         
-        // Initialiser le statut de connexion
-        this.ui.updateConnectionStatus(false);
-        
-        console.log('Delivery Driver App initialized');
+        console.log('Delivery Person App initialized');
     }
 
     initializeServices() {
         // Initialiser la carte
         this.services.map.initialize('map');
         
-        // Initialiser le service de simulation
-        this.services.simulation = new SimulationService(this.services.api, this.services.map);
+        // Initialiser le service de tracking
+        this.services.tracking = new DeliveryTrackingService(this.services.api, this.services.map);
         
-        // Configurer les callbacks de simulation
-        this.services.simulation.on('simulationStarted', (data) => {
-            this.handleSimulationStarted(data);
+        // Configurer les callbacks de tracking
+        this.services.tracking.on('trackingStarted', (data) => {
+            this.handleTrackingStarted(data);
         });
         
-        this.services.simulation.on('progressUpdate', (data) => {
+        this.services.tracking.on('progressUpdate', (data) => {
             this.handleProgressUpdate(data);
         });
         
-        this.services.simulation.on('simulationCompleted', (data) => {
-            this.handleSimulationCompleted(data);
+        this.services.tracking.on('trackingCompleted', (data) => {
+            this.handleTrackingCompleted(data);
         });
         
-        this.services.simulation.on('simulationStopped', () => {
-            this.handleSimulationStopped();
+        this.services.tracking.on('trackingStopped', () => {
+            this.handleTrackingStopped();
         });
         
-        this.services.simulation.on('simulationPaused', () => {
-            this.handleSimulationPaused();
+        this.services.tracking.on('trackingPaused', () => {
+            this.handleTrackingPaused();
         });
         
-        this.services.simulation.on('simulationResumed', () => {
-            this.handleSimulationResumed();
+        this.services.tracking.on('trackingResumed', () => {
+            this.handleTrackingResumed();
         });
     }
 
     setupEventHandlers() {
-        // Gestionnaire de formulaires
-        this.formHandler = new DeliveryFormHandler(this.ui, {
-            onDriverSetup: (driverData) => this.handleDriverSetup(driverData),
-            onCreateDelivery: (deliveryData) => this.createDelivery(deliveryData),
-            onStartSimulation: (speed) => this.startSimulation(speed),
-            onPauseSimulation: () => this.pauseSimulation(),
-            onStopSimulation: () => this.stopSimulation()
+        // Authentification
+        this.ui.elements.loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleLogin();
         });
         
-        // Gestionnaire d'événements
-        this.eventHandler = new DeliveryEventHandler({
-            onSelectDelivery: (orderNumber) => this.selectDelivery(orderNumber),
-            onRefreshDeliveries: () => this.loadDeliveries(),
-            onMapClick: (lat, lng) => this.handleMapClick(lat, lng)
+        this.ui.elements.logoutBtn.addEventListener('click', () => {
+            this.handleLogout();
+        });
+        
+        // Gestion des commandes
+        this.ui.elements.refreshOrdersBtn.addEventListener('click', () => {
+            this.loadOrders();
+        });
+        
+        this.ui.elements.statusFilter.addEventListener('change', () => {
+            this.currentPage = 1;
+            this.loadOrders();
+        });
+        
+        this.ui.elements.orderNumberFilter.addEventListener('input', () => {
+            // Débounce la recherche
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.currentPage = 1;
+                this.loadOrders();
+            }, 500);
+        });
+        
+        // Mode de transport
+        this.ui.elements.transportWalking.addEventListener('change', () => {
+            this.ui.updateTransportInfo();
+            this.calculateRouteForSelectedOrder();
+        });
+        
+        this.ui.elements.transportDriving.addEventListener('change', () => {
+            this.ui.updateTransportInfo();
+            this.calculateRouteForSelectedOrder();
+        });
+        
+        // Contrôles de livraison
+        this.ui.elements.startDeliveryBtn.addEventListener('click', () => {
+            this.startDelivery();
+        });
+        
+        this.ui.elements.pauseDeliveryBtn.addEventListener('click', () => {
+            this.pauseDelivery();
+        });
+        
+        this.ui.elements.stopDeliveryBtn.addEventListener('click', () => {
+            this.stopDelivery();
         });
         
         // Exposer les méthodes globalement
-        window.deliveryApp = this;
+        window.deliveryPersonApp = this;
     }
 
-    async handleDriverSetup(driverData) {
-        this.driverInfo = driverData;
-        this.currentPosition = { lat: driverData.lat, lng: driverData.lng };
+    async checkExistingSession() {
+        const token = localStorage.getItem('delivery_person_token');
+        const deliveryPersonData = JSON.parse(localStorage.getItem('delivery_person_data') || 'null');
+        const sessionExpiry = localStorage.getItem('delivery_person_session_expiry');
         
-        // Mettre à jour la carte
-        this.services.map.updateDriverPosition(driverData.lat, driverData.lng);
-        
-        // Mettre à jour l'interface
-        this.ui.updateDriverInfo(driverData.name, this.currentPosition);
-        this.ui.updateDriverStatus(CONFIG.STATUS.DRIVER_STATES.FREE, 'secondary');
-        this.ui.updateConnectionStatus(true);
-        
-        // Passer au panneau de livraison
-        this.ui.showDeliveryPanel();
-        
-        // Charger les livraisons
-        await this.loadDeliveries();
-        
-        this.ui.showSuccess('Livreur configuré avec succès');
-    }
-
-    async createDelivery(deliveryData) {
-        try {
-            const response = await this.services.api.createDelivery(deliveryData);
-            
-            if (response.success) {
-                this.ui.showSuccess('Livraison créée avec succès!');
-                this.ui.clearDeliveryForm();
-                await this.loadDeliveries();
-            } else {
-                throw new Error(response.message || 'Échec de la création');
-            }
-        } catch (error) {
-            console.error('Error creating delivery:', error);
-            throw error;
-        }
-    }
-
-    async loadDeliveries() {
-        try {
-            const response = await this.services.api.getActiveDeliveries();
-            
-            if (response.success) {
-                this.ui.renderDeliveries(response.deliveries, this.driverInfo.name);
-            } else {
-                this.ui.renderDeliveries([]);
-            }
-        } catch (error) {
-            console.error('Error loading deliveries:', error);
-            this.ui.showError('Erreur lors du chargement des livraisons');
-        }
-    }
-
-    async selectDelivery(orderNumber) {
-        try {
-            // Récupérer les détails de la livraison via l'API
-            const response = await this.services.api.getDelivery(orderNumber);
-            
-            if (response.success) {
-                const delivery = response.delivery;
-                this.selectedDelivery = orderNumber;
-                
-                // Afficher les détails de l'ordre sélectionné
-                this.ui.showSelectedOrderDetails(delivery);
-                
-                // Mettre en surbrillance l'élément sélectionné
-                this.ui.highlightSelectedDelivery(orderNumber);
-                
-                // Calculer et afficher la route estimée
-                await this.calculateRouteEstimate(delivery);
-                
-                // Afficher les contrôles de simulation
-                this.ui.showSimulationControls();
-                
-                // Afficher une notification de sélection
-                this.ui.showNotification(
-                    'success', 
-                    '✅ Commande sélectionnée !', 
-                    `La livraison ${orderNumber} a été sélectionnée. Consultez les détails ci-dessus et cliquez sur "Démarrer livraison" pour lancer la simulation.`,
-                    5000
-                );
-            } else {
-                throw new Error('Impossible de récupérer les détails de la livraison');
-            }
-        } catch (error) {
-            console.error('Error selecting delivery:', error);
-            this.ui.showError('Erreur lors de la sélection de la livraison: ' + error.message);
-        }
-    }
-
-    async calculateRouteEstimate(delivery) {
-        if (!this.currentPosition || !delivery.destination_lat || !delivery.destination_lng) {
-            this.ui.updateRouteEstimates(null, null);
+        // Vérifier si la session a expiré (2 heures = 7200000 ms)
+        if (sessionExpiry && Date.now() > parseInt(sessionExpiry)) {
+            this.clearSession();
+            this.ui.showLoginPanel();
+            this.ui.showInfo('Session expirée. Veuillez vous reconnecter.');
             return;
         }
-
-        const transportMode = this.ui.getSelectedTransportMode();
-        const mapboxProfile = CONFIG.SIMULATION.TRANSPORT_MODES[transportMode].mapboxProfile;
-
-        try {
-            // Utiliser l'API Mapbox Directions avec le bon profil de transport
-            const query = await fetch(
-                `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${this.currentPosition.lng},${this.currentPosition.lat};${delivery.destination_lng},${delivery.destination_lat}?access_token=${CONFIG.MAPBOX.ACCESS_TOKEN}`
-            );
-            const result = await query.json();
-            
-            if (result.routes && result.routes.length > 0) {
-                const route = result.routes[0];
-                const duration = Math.round(route.duration / 60); // en minutes
-                const distance = (route.distance / 1000).toFixed(1); // en km
+        
+        if (token && deliveryPersonData) {
+            try {
+                // Tester si le token est encore valide avec un appel simple
+                const testResponse = await this.services.api.request('/tracking/delivery/active');
                 
-                this.ui.updateRouteEstimates(duration, distance);
-                this.currentRouteData = { route, totalDuration: duration, totalDistance: distance };
+                if (testResponse._metadata?.success !== false) {
+                    // Le token est valide, restaurer la session
+                    this.currentDeliveryPerson = deliveryPersonData;
+                    this.ui.updateDeliveryPersonInfo(deliveryPersonData);
+                    this.ui.showDeliveryPersonPanel();
+                    this.ui.updateConnectionStatus(true);
+                    
+                    // Prolonger la session (2 heures supplémentaires)
+                    this.extendSession();
+                    
+                    await this.loadOrders();
+                    this.ui.showSuccess(`Reconnexion automatique réussie! Bonjour ${deliveryPersonData.first_name} 👋`);
+                    return;
+                }
+            } catch (error) {
+                console.warn('Session expired or invalid:', error);
+            }
+        }
+        
+        // Pas de session valide
+        this.clearSession();
+        this.ui.showLoginPanel();
+    }
+
+    // Nouvelle méthode pour créer une session avec expiration
+    createSession(deliveryPersonData, token) {
+        const expiryTime = Date.now() + (2 * 60 * 60 * 1000); // 2 heures en millisecondes
+        
+        localStorage.setItem('delivery_person_token', token);
+        localStorage.setItem('delivery_person_data', JSON.stringify(deliveryPersonData));
+        localStorage.setItem('delivery_person_session_expiry', expiryTime.toString());
+        localStorage.setItem('delivery_person_login_time', new Date().toISOString());
+        
+        console.log('Session créée, expire le:', new Date(expiryTime).toLocaleString());
+    }
+    
+    // Prolonger la session de 2 heures
+    extendSession() {
+        const newExpiryTime = Date.now() + (2 * 60 * 60 * 1000);
+        localStorage.setItem('delivery_person_session_expiry', newExpiryTime.toString());
+        console.log('Session prolongée jusqu\'au:', new Date(newExpiryTime).toLocaleString());
+    }
+    
+    // Nettoyer complètement la session
+    clearSession() {
+        localStorage.removeItem('delivery_person_token');
+        localStorage.removeItem('delivery_person_data');
+        localStorage.removeItem('delivery_person_session_expiry');
+        localStorage.removeItem('delivery_person_login_time');
+        this.services.api.clearToken();
+    }
+
+    async handleLogin() {
+        const email = this.ui.elements.deliveryPersonEmail.value.trim();
+        const password = this.ui.elements.deliveryPersonPassword.value;
+        
+        if (!email || !password) {
+            this.ui.showError('Veuillez remplir tous les champs');
+            return;
+        }
+        
+        this.ui.setLoadingState('loginBtn', true);
+        
+        try {
+            const response = await this.services.api.login(email, password);
+            
+            console.log('Login response:', response); // Debug
+            
+            // Vérifier que c'est bien un livreur
+            if (response.user && response.user.roles && response.user.roles.includes('delivery_person')) {
+                this.currentDeliveryPerson = response.user;
+                
+                // Créer une session avec expiration de 2 heures
+                this.createSession(response.user, response.access_token);
+                
+                this.ui.updateDeliveryPersonInfo(response.user);
+                this.ui.showDeliveryPersonPanel();
+                this.ui.showSuccess(`Connexion réussie! Session valide pendant 2 heures 🕐`);
+                
+                // Charger les commandes
+                await this.loadOrders();
+                
+                // Effacer le formulaire
+                this.ui.elements.loginForm.reset();
             } else {
-                this.ui.updateRouteEstimates(null, null);
+                throw new Error('Ce compte n\'est pas associé à un livreur');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            this.ui.showError(error.message || 'Erreur de connexion');
+        } finally {
+            this.ui.setLoadingState('loginBtn', false);
+        }
+    }
+
+    handleLogout() {
+        // Nettoyer la session
+        this.clearSession();
+        
+        this.currentDeliveryPerson = null;
+        this.selectedOrder = null;
+        
+        // Arrêter le tracking si en cours
+        if (this.services.tracking.getTrackingState().isTracking) {
+            this.services.tracking.stopTracking();
+        }
+        
+        this.ui.showLoginPanel();
+        this.ui.hideSelectedOrderDetails();
+        this.ui.hideDeliveryControls();
+        this.ui.updateConnectionStatus(false);
+        this.ui.showSuccess('Déconnexion réussie. Session effacée.');
+    }
+
+    async loadOrders(page = 1) {
+        if (!this.currentDeliveryPerson) return;
+        
+        this.currentPage = page;
+        this.currentFilters = this.ui.getFilters();
+        
+        this.ui.setLoadingState('refreshOrdersBtn', true);
+        
+        try {
+            // Utiliser delivery_person_id au lieu de user.id
+            const deliveryPersonId = this.currentDeliveryPerson.delivery_person_id || this.currentDeliveryPerson.id;
+            
+            const response = await this.services.api.getOrders(
+                deliveryPersonId,
+                this.currentFilters,
+                page
+            );
+            
+            // Adapter la vérification pour le format de réponse avec _metadata
+            if (response._metadata?.success && response.data) {
+                const orders = response.data.data || response.data || [];
+                const pagination = response.data;
+                
+                this.ui.renderOrders(
+                    orders,
+                    pagination.current_page || 1,
+                    pagination.last_page || 1
+                );
+                
+                if (orders.length === 0 && page === 1) {
+                    this.ui.showInfo('Aucune commande trouvée avec les filtres appliqués');
+                }
+            } else {
+                throw new Error(response._metadata?.message || 'Impossible de charger les commandes');
+            }
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            this.ui.showError(error.message || 'Erreur lors du chargement des commandes');
+        } finally {
+            this.ui.setLoadingState('refreshOrdersBtn', false);
+        }
+    }
+
+    async selectOrder(orderNumber) {
+        try {
+            // Charger les détails de la commande
+            const response = await this.services.api.getOrders(
+                this.currentDeliveryPerson.id,
+                { order_number: orderNumber }
+            );
+            
+            if (response.success && response.data && response.data.data.length > 0) {
+                const order = response.data.data[0];
+                this.selectedOrder = order;
+                
+                // Afficher les détails
+                this.ui.updateSelectedOrderDetails(order);
+                this.ui.highlightSelectedOrder(orderNumber);
+                
+                // Calculer la route si la commande est confirmée
+                if (order.status === CONFIG.ORDER_STATUS.CONFIRMED) {
+                    await this.calculateRouteForSelectedOrder();
+                    this.ui.showDeliveryControls();
+                    this.ui.showInfo('Commande sélectionnée! Vous pouvez maintenant démarrer la livraison.');
+                } else if (order.status === CONFIG.ORDER_STATUS.PROCESSING) {
+                    this.ui.showInfo('Cette commande est déjà en cours de livraison');
+                } else {
+                    this.ui.showInfo('Cette commande ne peut plus être modifiée');
+                }
+            } else {
+                throw new Error('Commande non trouvée');
+            }
+        } catch (error) {
+            console.error('Error selecting order:', error);
+            this.ui.showError(error.message || 'Erreur lors de la sélection de la commande');
+        }
+    }
+
+    async calculateRouteForSelectedOrder() {
+        if (!this.selectedOrder || !this.selectedOrder.delivery_address_latitude || !this.selectedOrder.delivery_address_longitude) {
+            return;
+        }
+        
+        try {
+            const currentPosition = await this.services.map.getCurrentGPSPosition();
+            const transportMode = this.ui.getSelectedTransportMode();
+            
+            const routeInfo = await this.services.map.drawRoute(
+                currentPosition,
+                {
+                    lat: this.selectedOrder.delivery_address_latitude,
+                    lng: this.selectedOrder.delivery_address_longitude
+                },
+                transportMode
+            );
+            
+            if (routeInfo) {
+                this.ui.updateRouteEstimates(routeInfo.duration, routeInfo.distance);
             }
         } catch (error) {
             console.error('Error calculating route:', error);
@@ -209,174 +357,140 @@ class DeliveryDriverApp {
         }
     }
 
-    async recalculateRouteForTransportMode() {
-        if (this.selectedDelivery) {
-            const response = await this.services.api.getDelivery(this.selectedDelivery);
-            if (response.success) {
-                await this.calculateRouteEstimate(response.delivery);
-            }
-        }
-    }
-
-    calculateRemainingTimeDistance(currentPosition, destinationLat, destinationLng, progressPercent) {
-        if (!this.currentRouteData) return { time: null, distance: null };
-
-        const remaining = (100 - progressPercent) / 100;
-        const remainingTime = Math.round(this.currentRouteData.totalDuration * remaining);
-        const remainingDistance = (this.currentRouteData.totalDistance * remaining).toFixed(1);
-
-        return { time: remainingTime, distance: remainingDistance };
-    }
-
-    async startSimulation(speed) {
-        if (!this.selectedDelivery) {
-            this.ui.showError('Veuillez sélectionner une livraison');
+    async startDelivery() {
+        if (!this.selectedOrder) {
+            this.ui.showError('Veuillez sélectionner une commande');
             return;
         }
-
+        
+        const trackingState = this.services.tracking.getTrackingState();
+        
+        if (trackingState.isPaused) {
+            // Reprendre la livraison
+            this.services.tracking.resumeTracking();
+            return;
+        }
+        
+        if (trackingState.isTracking) {
+            this.ui.showError('Une livraison est déjà en cours');
+            return;
+        }
+        
+        this.ui.setLoadingState('startDeliveryBtn', true);
+        
         try {
-            // Afficher une notification de démarrage
-            this.ui.showNotification(
-                'info', 
-                '🚀 Simulation démarrée !', 
-                `La simulation de livraison pour ${this.selectedDelivery} a démarré. Le livreur va maintenant se déplacer automatiquement vers la destination. Vous pouvez contrôler la vitesse et voir la progression en temps réel.`,
-                6000
-            );
-
-            const response = await this.services.simulation.startSimulation(this.selectedDelivery, speed);
+            const speed = this.ui.getSimulationSpeed();
+            await this.services.tracking.startTracking(this.selectedOrder.order_number, speed);
             
-            if (response.success) {
-                this.ui.updateDriverStatus(CONFIG.STATUS.DRIVER_STATES.DELIVERING, 'warning');
-                
-                // Notification supplémentaire de succès
-                setTimeout(() => {
-                    this.ui.showNotification(
-                        'success',
-                        '📍 Route calculée !',
-                        'La route optimale a été calculée et le livreur se déplace maintenant vers la destination.',
-                        4000
-                    );
-                }, 1500);
-            }
+            this.ui.showSuccess('Livraison démarrée!');
         } catch (error) {
-            console.error('Error starting simulation:', error);
-            this.ui.showError('Erreur lors du démarrage de la simulation: ' + error.message);
+            console.error('Error starting delivery:', error);
+            this.ui.showError(error.message || 'Erreur lors du démarrage de la livraison');
+        } finally {
+            this.ui.setLoadingState('startDeliveryBtn', false);
         }
     }
 
-    pauseSimulation() {
-        this.services.simulation.pauseSimulation();
+    pauseDelivery() {
+        this.services.tracking.pauseTracking();
     }
 
-    resumeSimulation() {
-        this.services.simulation.resumeSimulation();
-    }
-
-    stopSimulation() {
-        this.services.simulation.stopSimulation();
-    }
-
-    handleMapClick(lat, lng) {
-        // Permettre de définir la position du livreur en cliquant sur la carte
-        if (this.ui.elements.setupPanel.style.display !== 'none') {
-            this.ui.updateMapPosition(lat, lng);
-            this.services.map.updateDriverPosition(lat, lng);
+    stopDelivery() {
+        if (confirm('Êtes-vous sûr de vouloir arrêter cette livraison ?')) {
+            this.services.tracking.stopTracking();
         }
     }
 
-    // Callbacks de simulation
-    handleSimulationStarted(data) {
-        const state = this.services.simulation.getSimulationState();
-        this.ui.setSimulationControlsState(state.isRunning, state.isPaused);
+    // Callbacks de tracking
+    handleTrackingStarted(data) {
+        const state = this.services.tracking.getTrackingState();
+        this.ui.setDeliveryControlsState(state.isTracking, state.isPaused);
         this.ui.updateProgress(0);
+        
+        // Mettre à jour le statut de la commande localement
+        if (this.selectedOrder) {
+            this.selectedOrder.status = CONFIG.ORDER_STATUS.PROCESSING;
+            this.ui.updateSelectedOrderDetails(this.selectedOrder);
+        }
+        
+        this.ui.showInfo('Tracking démarré! La position sera mise à jour en temps réel.');
     }
 
     handleProgressUpdate(data) {
         this.ui.updateProgress(data.progress);
-        this.currentPosition = data.position;
-        this.ui.updateDriverInfo(this.driverInfo.name, this.currentPosition);
+        this.ui.updateCurrentPosition(data.position);
         
-        // Mise à jour en temps réel du temps et distance restant
-        if (this.selectedDelivery && this.currentRouteData && 
-            this.currentRouteData.route && 
-            this.currentRouteData.route.geometry && 
-            this.currentRouteData.route.geometry.coordinates &&
-            this.currentRouteData.route.geometry.coordinates.length > 0) {
-            
-            const coordinates = this.currentRouteData.route.geometry.coordinates;
-            const lastCoordinate = coordinates[coordinates.length - 1];
-            
-            const remaining = this.calculateRemainingTimeDistance(
-                this.currentPosition, 
-                lastCoordinate[1], // latitude
-                lastCoordinate[0], // longitude
-                data.progress
-            );
-            
-            if (remaining.time !== null && remaining.distance !== null) {
-                this.ui.updateRouteEstimates(remaining.time, remaining.distance, true);
+        // Calculer le temps et distance restant si possible
+        if (this.selectedOrder && data.progress > 0) {
+            const remainingPercent = 100 - data.progress;
+            // Estimer le temps restant basé sur la progression
+            const estimatedTimeElement = this.ui.elements.estimatedTime.textContent;
+            if (estimatedTimeElement && estimatedTimeElement !== 'Non disponible') {
+                const totalTime = parseInt(estimatedTimeElement);
+                if (!isNaN(totalTime)) {
+                    const remainingTime = Math.round(totalTime * (remainingPercent / 100));
+                    this.ui.updateRouteEstimates(remainingTime, null, true);
+                }
             }
         }
     }
 
-    handleSimulationCompleted(data) {
+    handleTrackingCompleted(data) {
         this.ui.updateProgress(100);
-        this.ui.updateDriverStatus(CONFIG.STATUS.DRIVER_STATES.FREE, 'success');
-        this.ui.showSuccess('Livraison terminée !');
+        this.ui.showSuccess('Livraison terminée avec succès!');
+        
+        // Mettre à jour le statut de la commande
+        if (this.selectedOrder) {
+            this.selectedOrder.status = CONFIG.ORDER_STATUS.DELIVERED;
+            this.ui.updateSelectedOrderDetails(this.selectedOrder);
+        }
         
         setTimeout(() => {
-            this.resetSimulation();
-            this.loadDeliveries();
-        }, 2000);
+            this.resetDelivery();
+            this.loadOrders(); // Recharger pour voir les changements
+        }, 3000);
     }
 
-    handleSimulationStopped() {
-        this.resetSimulation();
+    handleTrackingStopped() {
+        this.resetDelivery();
+        this.ui.showInfo('Livraison arrêtée');
     }
 
-    handleSimulationPaused() {
-        const state = this.services.simulation.getSimulationState();
-        this.ui.setSimulationControlsState(state.isRunning, state.isPaused);
+    handleTrackingPaused() {
+        const state = this.services.tracking.getTrackingState();
+        this.ui.setDeliveryControlsState(state.isTracking, state.isPaused);
+        this.ui.showInfo('Livraison mise en pause');
     }
 
-    handleSimulationResumed() {
-        const state = this.services.simulation.getSimulationState();
-        this.ui.setSimulationControlsState(state.isRunning, state.isPaused);
+    handleTrackingResumed() {
+        const state = this.services.tracking.getTrackingState();
+        this.ui.setDeliveryControlsState(state.isTracking, state.isPaused);
+        this.ui.showInfo('Livraison reprise');
     }
 
-    resetSimulation() {
-        const state = this.services.simulation.getSimulationState();
-        this.ui.setSimulationControlsState(state.isRunning, state.isPaused);
+    resetDelivery() {
+        const state = this.services.tracking.getTrackingState();
+        this.ui.setDeliveryControlsState(state.isTracking, state.isPaused);
         this.ui.updateProgress(0);
-        this.ui.updateDriverStatus(CONFIG.STATUS.DRIVER_STATES.FREE, 'secondary');
-        this.ui.hideSimulationControls();
-        this.selectedDelivery = null;
+        this.ui.hideDeliveryControls();
+        this.selectedOrder = null;
     }
 
-    // Méthodes publiques pour les événements onclick
-    refreshDeliveries() {
-        this.eventHandler.refreshDeliveries();
-    }
-
-    handleMapClick(lat, lng) {
-        this.eventHandler.handleMapClick(lat, lng);
-    }
-
-    // Getters pour les autres services
+    // Méthodes utilitaires
     getCurrentPosition() {
-        return this.currentPosition || CONFIG.DRIVER.DEFAULT_POSITION;
+        return this.services.map.getCurrentPosition();
     }
 
-    getDriverInfo() {
-        return this.driverInfo;
+    getCurrentDeliveryPerson() {
+        return this.currentDeliveryPerson;
     }
 
-    getSelectedDelivery() {
-        return this.selectedDelivery;
+    getSelectedOrder() {
+        return this.selectedOrder;
     }
 }
 
 // Initialiser l'application quand le DOM est prêt
 document.addEventListener('DOMContentLoaded', function() {
-    window.deliveryApp = new DeliveryDriverApp();
+    window.deliveryPersonApp = new DeliveryPersonApp();
 });

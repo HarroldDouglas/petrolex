@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulateur Livreur</title>
+    <title>Interface Livreur - Tracking Réel</title>
     
     <!-- External Libraries -->
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
@@ -20,87 +20,92 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h5><span class="status-indicator status-offline" id="connectionStatus"></span>Simulateur Livreur</h5>
+                        <h5><span class="status-indicator status-offline" id="connectionStatus"></span>Interface Livreur - Système Réel</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Configuration initiale -->
-                        <div id="setupPanel">
+                        <!-- Connexion livreur -->
+                        <div id="loginPanel">
                             <div class="section-header">
-                                <h6>Configuration du livreur</h6>
+                                <h6><i class="fas fa-user-circle"></i> Connexion Livreur</h6>
                             </div>
-                            <form id="driverSetup">
+                            <form id="loginForm">
                                 <div class="mb-3">
-                                    <label class="form-label">Nom du livreur</label>
-                                    <input type="text" class="form-control" id="driverName" required>
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="deliveryPersonEmail" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Téléphone</label>
-                                    <input type="tel" class="form-control" id="driverPhone" required>
+                                    <label class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="deliveryPersonPassword" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Position de départ (Lat, Lng)</label>
-                                    <div class="coordinates-input">
-                                        <input type="number" class="form-control" id="startLat" placeholder="Latitude" step="any" required>
-                                        <input type="number" class="form-control" id="startLng" placeholder="Longitude" step="any" required>
-                                    </div>
-                                    <small class="help-text">Cliquez sur la carte pour définir la position</small>
-                                </div>
-                                <button type="submit" class="btn btn-success">Se connecter</button>
+                                <button type="submit" class="btn btn-success w-100" id="loginBtn">
+                                    <i class="fas fa-sign-in-alt"></i> Se connecter
+                                </button>
                             </form>
                         </div>
 
-                        <!-- Panel de livraison -->
-                        <div id="deliveryPanel" style="display: none;">
-                            <div class="driver-info-section">
+                        <!-- Panel principal livreur -->
+                        <div id="deliveryPersonPanel" style="display: none;">
+                            <div class="delivery-person-info-section">
                                 <div class="section-header">
-                                    <h6>Informations livreur</h6>
+                                    <h6><i class="fas fa-user"></i> Informations Livreur</h6>
                                 </div>
-                                <p><strong>Nom:</strong> <span id="currentDriverName"></span></p>
-                                <div class="current-position">
-                                    <strong>Position:</strong> <span id="currentPosition"></span>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-1"><strong>Nom:</strong> <span id="currentDeliveryPersonName"></span></p>
+                                        <p class="mb-1"><strong>Email:</strong> <span id="currentDeliveryPersonEmail"></span></p>
+                                        <p class="mb-0"><strong>Statut:</strong> <span id="currentStatus" class="badge bg-secondary">Connecté</span></p>
+                                    </div>
+                                    <button class="btn btn-outline-danger btn-sm" id="logoutBtn">
+                                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                    </button>
                                 </div>
-                                <p><strong>Statut:</strong> <span id="currentStatus" class="badge bg-secondary">Libre</span></p>
                             </div>
 
+                            <!-- Mes commandes -->
                             <div class="mb-3">
-                                <div class="section-header">
-                                    <h6>Créer une nouvelle livraison</h6>
+                                <div class="section-header d-flex justify-content-between align-items-center">
+                                    <h6><i class="fas fa-truck"></i> Mes Commandes</h6>
+                                    <button class="btn btn-outline-primary btn-sm" id="refreshOrdersBtn">
+                                        <i class="fas fa-sync-alt"></i> Actualiser
+                                    </button>
                                 </div>
-                                <form id="createDeliveryForm">
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control" id="customerName" placeholder="Nom client" required>
+                                
+                                <!-- Filtres -->
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select class="form-select form-select-sm" id="statusFilter">
+                                                <option value="">Tous les statuts</option>
+                                                <option value="confirmed">Confirmées</option>
+                                                <option value="in_progress">En cours</option>
+                                                <option value="delivered">Livrées</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control form-control-sm" id="orderNumberFilter" placeholder="N° commande">
+                                        </div>
                                     </div>
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control" id="destinationAddress" placeholder="Adresse destination" required>
-                                    </div>
-                                    <div class="coordinates-input mb-2">
-                                        <input type="number" class="form-control" id="destLat" placeholder="Dest Lat" step="any" required>
-                                        <input type="number" class="form-control" id="destLng" placeholder="Dest Lng" step="any" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary" id="createDeliveryBtn">Créer livraison</button>
-                                </form>
+                                </div>
+                                
+                                <div id="ordersList"></div>
+                                
+                                <!-- Pagination -->
+                                <div id="pagination" class="d-flex justify-content-center mt-3"></div>
                             </div>
 
-                            <!-- Livraisons disponibles -->
-                            <div class="mb-3">
-                                <div class="section-header">
-                                    <h6>Mes livraisons</h6>
-                                </div>
-                                <div id="deliveriesList"></div>
-                            </div>
-
-                            <!-- Détails de l'ordre sélectionné -->
+                            <!-- Détails de la commande sélectionnée -->
                             <div id="selectedOrderDetails" class="mb-3" style="display: none;">
                                 <div class="section-header">
-                                    <h6>📦 Ordre sélectionné</h6>
+                                    <h6><i class="fas fa-box"></i> Commande Sélectionnée</h6>
                                 </div>
                                 <div class="selected-order-card">
                                     <div class="row">
                                         <div class="col-md-8">
                                             <h6 id="selectedOrderNumber" class="text-primary mb-2"></h6>
                                             <p class="mb-1"><strong>Client:</strong> <span id="selectedCustomerName"></span></p>
-                                            <p class="mb-1"><strong>Destination:</strong> <span id="selectedDestination"></span></p>
-                                            <p class="mb-0"><strong>Statut:</strong> <span id="selectedStatus" class="badge"></span></p>
+                                            <p class="mb-1"><strong>Téléphone:</strong> <span id="selectedCustomerPhone"></span></p>
+                                            <p class="mb-1"><strong>Adresse:</strong> <span id="selectedDeliveryAddress"></span></p>
+                                            <p class="mb-0"><strong>Statut:</strong> <span id="selectedOrderStatus" class="badge"></span></p>
                                         </div>
                                         <div class="col-md-4 text-end">
                                             <div class="route-info">
@@ -121,7 +126,7 @@
                             <!-- Mode de transport -->
                             <div id="transportModeSection" class="mb-3" style="display: none;">
                                 <div class="section-header">
-                                    <h6>🚲 Mode de transport</h6>
+                                    <h6><i class="fas fa-motorcycle"></i> Mode de transport</h6>
                                 </div>
                                 <div class="transport-mode-card">
                                     <div class="transport-options">
@@ -159,9 +164,9 @@
                                 </div>
                             </div>
 
-                            <!-- Contrôles de simulation -->
-                            <div id="simulationControls" class="simulation-controls" style="display: none;">
-                                <h6>Contrôles de simulation</h6>
+                            <!-- Contrôles de livraison -->
+                            <div id="deliveryControls" class="delivery-controls" style="display: none;">
+                                <h6><i class="fas fa-play-circle"></i> Contrôles de Livraison</h6>
                                 <div class="mb-3">
                                     <label class="form-label">Vitesse de simulation</label>
                                     <input type="range" class="form-range" id="simulationSpeed" min="1" max="10" value="3">
@@ -171,15 +176,32 @@
                                     </div>
                                 </div>
                                 <div class="btn-group w-100 mb-3" role="group">
-                                    <button class="btn btn-success btn-control" id="startSimulation">Démarrer livraison</button>
-                                    <button class="btn btn-warning btn-control" id="pauseSimulation" disabled>Pause</button>
-                                    <button class="btn btn-danger btn-control" id="stopSimulation" disabled>Arrêter</button>
+                                    <button class="btn btn-success btn-control" id="startDeliveryBtn">
+                                        <i class="fas fa-play"></i> Démarrer Livraison
+                                    </button>
+                                    <button class="btn btn-warning btn-control" id="pauseDeliveryBtn" disabled>
+                                        <i class="fas fa-pause"></i> Pause
+                                    </button>
+                                    <button class="btn btn-danger btn-control" id="stopDeliveryBtn" disabled>
+                                        <i class="fas fa-stop"></i> Arrêter
+                                    </button>
                                 </div>
                                 <div class="mt-2">
                                     <small class="text-muted">Progression: <span id="progressPercent">0%</span></small>
                                     <div class="progress">
                                         <div class="progress-bar" id="progressBar" style="width: 0%"></div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Position actuelle -->
+                            <div id="currentLocationSection" class="mb-3" style="display: none;">
+                                <div class="section-header">
+                                    <h6><i class="fas fa-map-marker-alt"></i> Position Actuelle</h6>
+                                </div>
+                                <div class="current-position-card">
+                                    <p class="mb-1"><strong>Coordonnées:</strong> <span id="currentPosition">Non disponible</span></p>
+                                    <p class="mb-0"><strong>Dernière mise à jour:</strong> <span id="lastUpdate">-</span></p>
                                 </div>
                             </div>
                         </div>
@@ -190,7 +212,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h6>Carte - Position livreur</h6>
+                        <h6><i class="fas fa-map"></i> Carte - Suivi de Livraison</h6>
                     </div>
                     <div class="card-body p-0">
                         <div id="map"></div>

@@ -1,79 +1,136 @@
-// Service pour les appels API spécifiques au livreur
-class DeliveryApiService {
+// Service pour les appels API avec authentification
+class DeliveryPersonApiService {
     constructor() {
         this.baseUrl = CONFIG.API.BASE_URL;
+        this.token = localStorage.getItem('delivery_person_token');
+    }
+
+    setToken(token) {
+        this.token = token;
+        localStorage.setItem('delivery_person_token', token);
+    }
+
+    clearToken() {
+        this.token = null;
+        localStorage.removeItem('delivery_person_token');
+    }
+
+    getHeaders() {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        };
+        
+        if (this.token) {
+            headers.Authorization = `Bearer ${this.token}`;
+        }
+        
+        return headers;
     }
 
     async request(endpoint, options = {}) {
         const url = `${this.baseUrl}${endpoint}`;
         const defaultOptions = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
+            headers: this.getHeaders()
         };
 
         try {
             const response = await fetch(url, { ...defaultOptions, ...options });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            
+            if (response.status === 401) {
+                this.clearToken();
+                throw new Error('Session expirée. Veuillez vous reconnecter.');
             }
-            return (await response.json()).data;
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            
+            return await response.json();
         } catch (error) {
             console.error('API Request failed:', error);
             throw error;
         }
     }
 
-    async getActiveDeliveries() {
-        return this.request(CONFIG.API.ENDPOINTS.DELIVERY_ACTIVE);
+    // Authentification
+    async login(email, password) {
+        const endpoint = CONFIG.API.ENDPOINTS.LOGIN;
+        const response = await this.request(endpoint, {
+            method: 'POST',
+            body: JSON.stringify({
+                login: email,
+                password: password
+            })
+        });
+        
+        console.log('Login response:', response); // Debug
+        
+        // Corriger la vérification pour utiliser _metadata.success
+        if (response._metadata?.success && response.data) {
+            this.setToken(response.data.access_token);
+            return response.data;
+        }
+        
+        throw new Error(response._metadata?.message || 'Erreur de connexion');
     }
 
-    async getDelivery(orderNumber) {
-        const endpoint = CONFIG.API.ENDPOINTS.DELIVERY_GET.replace('{id}', orderNumber);
+    // Récupérer les commandes du livreur
+    async getOrders(deliveryPersonId, filters = {}, page = 1) {
+        let endpoint = CONFIG.API.ENDPOINTS.DELIVERY_PERSON_ORDERS.replace('{id}', deliveryPersonId);
+        
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: CONFIG.UI.DEFAULT_PAGINATION.toString(),
+            ...filters
+        });
+        
+        endpoint += `?${params.toString()}`;
         return this.request(endpoint);
     }
 
-    async createDelivery(deliveryData) {
-        return this.request(CONFIG.API.ENDPOINTS.DELIVERY_CREATE, {
-            method: 'POST',
-            body: JSON.stringify(deliveryData)
-        });
-    }
-
-    async startDelivery(orderNumber, driverPosition) {
-        const endpoint = CONFIG.API.ENDPOINTS.DELIVERY_START.replace('{id}', orderNumber);
+    // Démarrer le tracking d'une commande
+    async startTracking(orderNumber, position) {
+        const endpoint = CONFIG.API.ENDPOINTS.TRACKING_START.replace('{orderNumber}', orderNumber);
         return this.request(endpoint, {
             method: 'POST',
-            body: JSON.stringify(driverPosition)
+            body: JSON.stringify({
+                driver_lat: position.lat,
+                driver_lng: position.lng,
+                timestamp: new Date().toISOString()
+            })
         });
     }
 
+    // Mettre à jour la position
     async updatePosition(orderNumber, position) {
-        const endpoint = CONFIG.API.ENDPOINTS.DELIVERY_POSITION.replace('{id}', orderNumber);
+        const endpoint = CONFIG.API.ENDPOINTS.TRACKING_POSITION.replace('{orderNumber}', orderNumber);
         return this.request(endpoint, {
             method: 'PATCH',
-            body: JSON.stringify(position)
+            body: JSON.stringify({
+                driver_lat: position.lat,
+                driver_lng: position.lng,
+                timestamp: new Date().toISOString()
+            })
         });
     }
 
-    async updateStatus(orderNumber, status) {
-        const endpoint = CONFIG.API.ENDPOINTS.DELIVERY_STATUS.replace('{id}', orderNumber);
-        return this.request(endpoint, {
-            method: 'PATCH',
-            body: JSON.stringify({ status })
-        });
+    // Récupérer les détails du tracking
+    async getTrackingDetails(orderNumber) {
+        const endpoint = CONFIG.API.ENDPOINTS.TRACKING_DETAILS.replace('{orderNumber}', orderNumber);
+        return this.request(endpoint);
     }
 }
 
 // Service pour la gestion de la carte Mapbox du livreur
-class DeliveryMapService {
+class DeliveryPersonMapService {
     constructor() {
         this.map = null;
         this.driverMarker = null;
         this.destinationMarker = null;
         this.routeLayer = null;
         this.initialized = false;
+        this.currentPosition = null;
     }
 
     initialize(containerId) {
@@ -93,37 +150,34 @@ class DeliveryMapService {
 
         this.map.on('load', () => {
             this.initialized = true;
-            console.log('Delivery map initialized successfully');
+            console.log('Delivery person map initialized successfully');
         });
 
-        this.map.on('click', (e) => {
-            this.handleMapClick(e);
+        this.map.on('error', (e) => {
+            console.error('Map error:', e);
         });
 
         return this.map;
     }
 
-    handleMapClick(e) {
-        // Permettre de définir la position du livreur en cliquant sur la carte
-        if (window.deliveryApp && typeof window.deliveryApp.handleMapClick === 'function') {
-            window.deliveryApp.handleMapClick(e.lngLat.lat, e.lngLat.lng);
-        }
-    }
-
-    updateDriverPosition(lat, lng) {
+    updateDriverPosition(lat, lng, popupContent = null) {
         if (this.driverMarker) {
             this.driverMarker.remove();
         }
         
+        const popup = popupContent ? new mapboxgl.Popup().setHTML(popupContent) : null;
+        
         this.driverMarker = new mapboxgl.Marker({ color: '#1E88E5' })
-            .setLngLat([lng, lat])
-            .setPopup(new mapboxgl.Popup().setHTML(`
-                <strong>Livreur</strong><br>
-                Position actuelle<br>
-                ${lat.toFixed(4)}, ${lng.toFixed(4)}
-            `))
-            .addTo(this.map);
-
+            .setLngLat([lng, lat]);
+            
+        if (popup) {
+            this.driverMarker.setPopup(popup);
+        }
+        
+        this.driverMarker.addTo(this.map);
+        this.currentPosition = { lat, lng };
+        
+        // Center map on driver position
         this.map.setCenter([lng, lat]);
     }
 
@@ -137,60 +191,116 @@ class DeliveryMapService {
             .setPopup(new mapboxgl.Popup().setHTML(`
                 <strong>Destination</strong><br>
                 ${info.customer || 'Client'}<br>
-                ${info.address || 'Adresse de livraison'}
+                ${info.address || 'Adresse de livraison'}<br>
+                ${info.phone ? `📞 ${info.phone}` : ''}
             `))
             .addTo(this.map);
     }
 
-    async drawRoute(coordinates) {
-        const sourceId = 'driver-route';
-        const layerId = 'driver-route-layer';
+    async drawRoute(startCoords, endCoords, transportMode = 'driving') {
+        const sourceId = 'delivery-route';
+        const layerId = 'delivery-route-layer';
 
-        // Supprimer l'ancienne route
-        if (this.map.getLayer(layerId)) {
-            this.map.removeLayer(layerId);
-        }
-        if (this.map.getSource(sourceId)) {
-            this.map.removeSource(sourceId);
-        }
-
-        // Ajouter la nouvelle route
-        this.map.addSource(sourceId, {
-            type: 'geojson',
-            data: {
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                    type: 'LineString',
-                    coordinates: coordinates
-                }
+        try {
+            // Supprimer l'ancienne route
+            if (this.map.getLayer(layerId)) {
+                this.map.removeLayer(layerId);
             }
-        });
-
-        this.map.addLayer({
-            id: layerId,
-            type: 'line',
-            source: sourceId,
-            layout: {
-                'line-join': 'round',
-                'line-cap': 'round'
-            },
-            paint: {
-                'line-color': '#1E88E5',
-                'line-width': 4,
-                'line-opacity': 0.8
+            if (this.map.getSource(sourceId)) {
+                this.map.removeSource(sourceId);
             }
-        });
 
-        this.routeLayer = layerId;
+            // Calculer la route avec Mapbox Directions
+            const profile = CONFIG.SIMULATION.TRANSPORT_MODES[transportMode]?.mapboxProfile || 'driving';
+            const query = await fetch(
+                `https://api.mapbox.com/directions/v5/mapbox/${profile}/${startCoords.lng},${startCoords.lat};${endCoords.lng},${endCoords.lat}?geometries=geojson&access_token=${CONFIG.MAPBOX.ACCESS_TOKEN}`
+            );
+            const result = await query.json();
+            
+            if (result.routes && result.routes.length > 0) {
+                const route = result.routes[0];
+                
+                // Ajouter la nouvelle route
+                this.map.addSource(sourceId, {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: route.geometry
+                    }
+                });
+
+                this.map.addLayer({
+                    id: layerId,
+                    type: 'line',
+                    source: sourceId,
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#1E88E5',
+                        'line-width': 4,
+                        'line-opacity': 0.8
+                    }
+                });
+
+                this.routeLayer = layerId;
+                
+                // Ajuster la vue pour afficher toute la route
+                this.fitBounds(route.geometry.coordinates);
+                
+                return {
+                    duration: Math.round(route.duration / 60), // en minutes
+                    distance: (route.distance / 1000).toFixed(1), // en km
+                    geometry: route.geometry
+                };
+            }
+        } catch (error) {
+            console.error('Error drawing route:', error);
+            return null;
+        }
     }
 
-    centerOnBounds(coordinates) {
+    fitBounds(coordinates) {
         if (coordinates && coordinates.length > 0) {
             const bounds = new mapboxgl.LngLatBounds();
             coordinates.forEach(coord => bounds.extend(coord));
             this.map.fitBounds(bounds, { padding: 50 });
         }
+    }
+
+    getCurrentPosition() {
+        return this.currentPosition;
+    }
+
+    // Simuler le mouvement GPS
+    async getCurrentGPSPosition() {
+        return new Promise((resolve, reject) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        });
+                    },
+                    (error) => {
+                        console.warn('GPS error:', error);
+                        // Utiliser position par défaut de Paris
+                        resolve({
+                            lat: CONFIG.MAPBOX.DEFAULT_CENTER[1],
+                            lng: CONFIG.MAPBOX.DEFAULT_CENTER[0]
+                        });
+                    }
+                );
+            } else {
+                resolve({
+                    lat: CONFIG.MAPBOX.DEFAULT_CENTER[1],
+                    lng: CONFIG.MAPBOX.DEFAULT_CENTER[0]
+                });
+            }
+        });
     }
 
     destroy() {
@@ -201,17 +311,18 @@ class DeliveryMapService {
     }
 }
 
-// Service pour la simulation de livraison
-class SimulationService {
+// Service pour la simulation de livraison réelle
+class DeliveryTrackingService {
     constructor(apiService, mapService) {
         this.apiService = apiService;
         this.mapService = mapService;
-        this.isRunning = false;
+        this.isTracking = false;
         this.isPaused = false;
         this.routeCoordinates = [];
         this.currentIndex = 0;
         this.intervalId = null;
-        this.currentDelivery = null;
+        this.positionUpdateIntervalId = null;
+        this.currentOrder = null;
         this.callbacks = {};
     }
 
@@ -228,69 +339,72 @@ class SimulationService {
         }
     }
 
-    async startSimulation(orderNumber, speed = CONFIG.SIMULATION.DEFAULT_SPEED) {
-        if (this.isRunning) {
-            throw new Error('Simulation already running');
+    async startTracking(orderNumber, speed = CONFIG.SIMULATION.DEFAULT_SPEED) {
+        if (this.isTracking) {
+            throw new Error('Tracking already in progress');
         }
 
         try {
-            // Récupérer le mode de transport sélectionné
-            const transportMode = window.deliveryApp?.ui?.getSelectedTransportMode() || 'walking';
-            const modeConfig = CONFIG.SIMULATION.TRANSPORT_MODES[transportMode];
+            // Récupérer la position GPS actuelle
+            const currentPosition = await this.mapService.getCurrentGPSPosition();
             
-            // Ajuster la vitesse selon le mode de transport
-            const adjustedSpeed = speed * modeConfig.speedMultiplier;
+            // Démarrer le tracking via l'API
+            const response = await this.apiService.startTracking(orderNumber, currentPosition);
             
-            // Démarrer la livraison via l'API
-            const driverPosition = this.getCurrentDriverPosition();
-            const response = await this.apiService.startDelivery(orderNumber, driverPosition);
-            
-            if (response.success && response.route) {
-                this.routeCoordinates = response.route.geometry.coordinates;
+            if (response.success && response.data) {
+                this.currentOrder = response.data.order;
+                this.routeCoordinates = response.data.route?.geometry?.coordinates || [];
                 this.currentIndex = 0;
-                this.currentDelivery = response.delivery;
-                this.isRunning = true;
+                this.isTracking = true;
                 this.isPaused = false;
-                this.transportMode = transportMode;
-                this.adjustedSpeed = adjustedSpeed;
 
-                // Dessiner la route sur la carte
-                await this.mapService.drawRoute(this.routeCoordinates);
-                
-                // Ajouter le marqueur de destination
-                this.mapService.setDestination(
-                    this.currentDelivery.destination_lat,
-                    this.currentDelivery.destination_lng,
-                    {
-                        customer: this.currentDelivery.customer_name,
-                        address: this.currentDelivery.destination_address
-                    }
+                // Mettre à jour la carte
+                this.mapService.updateDriverPosition(
+                    currentPosition.lat, 
+                    currentPosition.lng,
+                    `<strong>Position de départ</strong><br>Livraison ${orderNumber}`
                 );
 
-                // Démarrer l'animation avec la vitesse ajustée
-                this.runAnimation(adjustedSpeed);
+                if (this.currentOrder.delivery_address_latitude && this.currentOrder.delivery_address_longitude) {
+                    this.mapService.setDestination(
+                        this.currentOrder.delivery_address_latitude,
+                        this.currentOrder.delivery_address_longitude,
+                        {
+                            customer: this.currentOrder.customer?.name,
+                            address: this.currentOrder.delivery_address,
+                            phone: this.currentOrder.customer?.phone
+                        }
+                    );
+                }
+
+                // Démarrer la simulation de mouvement
+                if (this.routeCoordinates.length > 0) {
+                    this.runSimulation(speed);
+                }
                 
-                this.triggerCallback('simulationStarted', {
-                    delivery: this.currentDelivery,
-                    route: this.routeCoordinates,
-                    transportMode: this.transportMode
+                // Démarrer les mises à jour de position régulières
+                this.startPositionUpdates();
+                
+                this.triggerCallback('trackingStarted', {
+                    order: this.currentOrder,
+                    route: this.routeCoordinates
                 });
 
                 return response;
             } else {
-                throw new Error('Failed to start delivery');
+                throw new Error('Impossible de démarrer le tracking');
             }
         } catch (error) {
-            console.error('Error starting simulation:', error);
+            console.error('Error starting tracking:', error);
             throw error;
         }
     }
 
-    runAnimation(speed) {
+    runSimulation(speed) {
         const interval = CONFIG.SIMULATION.BASE_INTERVAL / speed;
         
         this.intervalId = setInterval(() => {
-            if (this.isPaused || !this.isRunning) {
+            if (this.isPaused || !this.isTracking) {
                 return;
             }
 
@@ -300,10 +414,11 @@ class SimulationService {
                 const lat = coord[1];
                 
                 // Mettre à jour la position sur la carte
-                this.mapService.updateDriverPosition(lat, lng);
-                
-                // Mettre à jour via l'API
-                this.updatePositionAPI(lat, lng);
+                this.mapService.updateDriverPosition(
+                    lat, 
+                    lng,
+                    `<strong>En livraison</strong><br>${this.currentOrder?.order_number}<br>Position: ${lat.toFixed(4)}, ${lng.toFixed(4)}`
+                );
                 
                 // Calculer et déclencher les callbacks de progression
                 const progress = (this.currentIndex / this.routeCoordinates.length) * 100;
@@ -319,105 +434,91 @@ class SimulationService {
                 
                 // Vérifier si la simulation est terminée
                 if (this.currentIndex >= this.routeCoordinates.length) {
-                    this.completeSimulation();
+                    this.completeTracking();
                 }
             }
         }, interval);
     }
 
-    async updatePositionAPI(lat, lng) {
-        if (!this.currentDelivery) return;
+    startPositionUpdates() {
+        // Envoyer la position au serveur toutes les 10 secondes
+        this.positionUpdateIntervalId = setInterval(async () => {
+            if (!this.isTracking || !this.currentOrder) return;
 
-        try {
-            await this.apiService.updatePosition(this.currentDelivery.order_number, {
-                driver_lat: lat,
-                driver_lng: lng
-            });
-        } catch (error) {
-            console.error('Error updating position:', error);
-        }
+            const position = this.mapService.getCurrentPosition();
+            if (position) {
+                try {
+                    await this.apiService.updatePosition(this.currentOrder.order_number, position);
+                } catch (error) {
+                    console.error('Error updating position:', error);
+                }
+            }
+        }, CONFIG.SIMULATION.POSITION_UPDATE_INTERVAL);
     }
 
-    pauseSimulation() {
+    pauseTracking() {
         this.isPaused = true;
-        this.triggerCallback('simulationPaused');
+        this.triggerCallback('trackingPaused');
     }
 
-    resumeSimulation() {
+    resumeTracking() {
         this.isPaused = false;
-        this.triggerCallback('simulationResumed');
+        this.triggerCallback('trackingResumed');
     }
 
-    stopSimulation() {
-        this.isRunning = false;
+    stopTracking() {
+        this.isTracking = false;
         this.isPaused = false;
         
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
+        }
+        
+        if (this.positionUpdateIntervalId) {
+            clearInterval(this.positionUpdateIntervalId);
+            this.positionUpdateIntervalId = null;
         }
         
         this.currentIndex = 0;
         this.routeCoordinates = [];
-        this.currentDelivery = null;
+        this.currentOrder = null;
         
-        this.triggerCallback('simulationStopped');
+        this.triggerCallback('trackingStopped');
     }
 
-    async completeSimulation() {
-        this.isRunning = false;
+    async completeTracking() {
+        this.isTracking = false;
         
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
         }
-
-        // Marquer la livraison comme terminée
-        if (this.currentDelivery) {
-            try {
-                await this.apiService.updateStatus(this.currentDelivery.order_number, 'delivered');
-            } catch (error) {
-                console.error('Error updating delivery status:', error);
-            }
+        
+        if (this.positionUpdateIntervalId) {
+            clearInterval(this.positionUpdateIntervalId);
+            this.positionUpdateIntervalId = null;
         }
         
-        this.triggerCallback('simulationCompleted', {
-            delivery: this.currentDelivery
+        this.triggerCallback('trackingCompleted', {
+            order: this.currentOrder
         });
         
         // Nettoyer après un délai
         setTimeout(() => {
-            this.currentDelivery = null;
+            this.currentOrder = null;
             this.routeCoordinates = [];
             this.currentIndex = 0;
         }, 2000);
     }
 
-    getCurrentDriverPosition() {
-        // Retourner la position actuelle du livreur avec tous les champs requis
-        if (window.deliveryApp && window.deliveryApp.currentPosition) {
-            return {
-                driver_lat: window.deliveryApp.currentPosition.lat,
-                driver_lng: window.deliveryApp.currentPosition.lng,
-                driver_name: window.deliveryApp.driverInfo?.name || CONFIG.DRIVER.DEFAULT_NAME,
-                driver_phone: window.deliveryApp.driverInfo?.phone || CONFIG.DRIVER.DEFAULT_PHONE
-            };
-        }
+    getTrackingState() {
         return {
-            driver_lat: CONFIG.DRIVER.DEFAULT_POSITION.lat,
-            driver_lng: CONFIG.DRIVER.DEFAULT_POSITION.lng,
-            driver_name: CONFIG.DRIVER.DEFAULT_NAME,
-            driver_phone: CONFIG.DRIVER.DEFAULT_PHONE
-        };
-    }
-
-    getSimulationState() {
-        return {
-            isRunning: this.isRunning,
+            isTracking: this.isTracking,
             isPaused: this.isPaused,
             progress: this.routeCoordinates.length > 0 ? 
                 (this.currentIndex / this.routeCoordinates.length) * 100 : 0,
-            currentDelivery: this.currentDelivery
+            currentOrder: this.currentOrder
         };
     }
 }

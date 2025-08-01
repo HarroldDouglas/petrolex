@@ -1,15 +1,24 @@
-// Configuration globale pour la simulation livreur
+// Configuration globale pour le système de tracking réel
 const CONFIG = {
     // API Configuration
     API: {
         BASE_URL: 'http://127.0.0.1:8000/api',
         ENDPOINTS: {
-            DELIVERY_ACTIVE: '/tracking/delivery/active',
-            DELIVERY_CREATE: '/tracking/delivery',
-            DELIVERY_GET: '/tracking/delivery/{id}',
-            DELIVERY_START: '/tracking/delivery/{id}/start',
-            DELIVERY_POSITION: '/tracking/delivery/{id}/position',
-            DELIVERY_STATUS: '/tracking/delivery/{id}/status'
+            // Auth
+            LOGIN: '/login',
+            
+            // Customer endpoints
+            CUSTOMERS: '/customers',
+            CUSTOMER_ORDERS: '/customers/{id}/orders',
+            
+            // Delivery person endpoints  
+            DELIVERY_PERSON_ORDERS: '/delivery-persons/{id}/orders',
+            
+            // Tracking endpoints (updated)
+            TRACKING_ACTIVE: '/tracking/delivery/active',
+            TRACKING_START: '/tracking/delivery/{orderNumber}/start',
+            TRACKING_POSITION: '/tracking/delivery/{orderNumber}/position',
+            TRACKING_DETAILS: '/tracking/delivery/{orderNumber}'
         }
     },
 
@@ -21,13 +30,41 @@ const CONFIG = {
         DEFAULT_ZOOM: 12
     },
 
+    // Order Status Configuration (matching backend)
+    ORDER_STATUS: {
+        CONFIRMED: 'confirmed',
+        PROCESSING: 'in_progress', 
+        DELIVERED: 'delivered',
+        CANCELLED: 'cancelled',
+        PENDING: 'pending'
+    },
+
+    // Status Labels and Colors
+    STATUS: {
+        TRANSLATIONS: {
+            'confirmed': 'Confirmée',
+            'in_progress': 'En cours de livraison',
+            'delivered': 'Livrée',
+            'cancelled': 'Annulée',
+            'pending': 'En attente'
+        },
+        COLORS: {
+            'confirmed': 'dark',
+            'in_progress': 'primary',
+            'delivered': 'success',
+            'cancelled': 'danger', 
+            'pending': 'warning'
+        }
+    },
+
     // Simulation Configuration
     SIMULATION: {
         MIN_SPEED: 1,
         MAX_SPEED: 10,
         DEFAULT_SPEED: 3,
-        BASE_INTERVAL: 1000, // milliseconds
+        BASE_INTERVAL: 1000,
         ROUTE_STEP_MULTIPLIER: 2,
+        POSITION_UPDATE_INTERVAL: 10000, // 10 seconds
         TRANSPORT_MODES: {
             walking: {
                 name: 'À pied',
@@ -48,57 +85,21 @@ const CONFIG = {
         }
     },
 
-    // Driver Configuration
-    DRIVER: {
-        DEFAULT_NAME: 'Michel Dupont',
-        DEFAULT_PHONE: '+33612345678',
-        DEFAULT_POSITION: {
-            lat: 48.8566,
-            lng: 2.3522
-        }
-    },
-
-    // Delivery Configuration
-    DELIVERY: {
-        DEFAULT_CUSTOMER: 'Jean Martin',
-        DEFAULT_ADDRESS: 'Tour Eiffel, Paris',
-        DEFAULT_DESTINATION: {
-            lat: 48.8584,
-            lng: 2.2945
-        }
-    },
-
-    // Status Configuration
-    STATUS: {
-        TRANSLATIONS: {
-            'pending': 'En attente',
-            'assigned': 'Assignée',
-            'started': 'Démarrée',
-            'in_progress': 'En cours',
-            'delivered': 'Livrée',
-            'cancelled': 'Annulée'
-        },
-        COLORS: {
-            'pending': 'secondary',
-            'assigned': 'primary',
-            'started': 'warning',
-            'in_progress': 'info',
-            'delivered': 'success',
-            'cancelled': 'danger'
-        },
-        DRIVER_STATES: {
-            'FREE': 'Libre',
-            'ASSIGNED': 'Assigné',
-            'DELIVERING': 'En livraison',
-            'OFFLINE': 'Hors ligne'
-        }
-    },
-
     // UI Configuration
     UI: {
         ANIMATION_DURATION: 1000,
         PROGRESS_UPDATE_INTERVAL: 500,
-        MAP_UPDATE_INTERVAL: 1000
+        MAP_UPDATE_INTERVAL: 1000,
+        DEFAULT_PAGINATION: 10
+    },
+
+    // WebSocket Configuration
+    WEBSOCKET: {
+        APP_KEY: 'local',
+        HOST: '127.0.0.1',
+        PORT: 8080,
+        FORCE_TLS: false,
+        ENABLED_TRANSPORTS: ['ws', 'wss']
     }
 };
 
