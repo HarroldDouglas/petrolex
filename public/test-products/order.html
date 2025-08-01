@@ -33,7 +33,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="distribution_center" class="form-label">Centre de distribution</label>
+                            <label for="distribution_center" class="form-label">Centre de distribution <span id="distributionCenterLoader" class="spinner-border spinner-border-sm text-primary d-none" role="status" aria-hidden="true"></span></label>
                             <select class="form-select" id="distribution_center">
                                 <option value="">Sélectionnez un centre de distribution</option>
                             </select>
@@ -177,6 +177,57 @@
         } else {
             document.getElementById('loggedInUserPhone').textContent = 'N/A';
         }
+
+        // Gérer la sélection de l'adresse de livraison pour trouver le centre de distribution le plus proche
+        $('#customer_address').on('change', function() {
+            const selectedAddressId = $(this).val();
+            if (selectedAddressId) {
+                const selectedCustomer = CustomerHandler.getSelectedCustomerData();
+                const customerAddresses = selectedCustomer ? selectedCustomer.deliveryAddresses : [];
+                const selectedAddress = customerAddresses.find(addr => addr.id == selectedAddressId);
+
+                if (selectedAddress && selectedAddress.latitude && selectedAddress.longitude) {
+                    const latitude = selectedAddress.latitude;
+                    const longitude = selectedAddress.longitude;
+
+                    const loader = $('#distributionCenterLoader');
+                    loader.removeClass('d-none'); // Afficher le loader
+
+                    $.ajax({
+                        url: '/api/distribution-centers/closest',
+                        type: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('api_token')
+                        },
+                        data: {
+                            latitude: latitude,
+                            longitude: longitude
+                        },
+                        success: function(response) {
+                            loader.addClass('d-none'); // Cacher le loader
+                            if (response.data) {
+                                $('#distribution_center').val(response.data.id).trigger('change');
+                            } else {
+                                alert('Aucun centre de distribution trouvé pour cette adresse.');
+                            }
+                        },
+                        error: function(jqXHR) {
+                            loader.addClass('d-none'); // Cacher le loader
+                            let errorMsg = 'Erreur lors de la recherche du centre de distribution.';
+                            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                                errorMsg += ` ${jqXHR.responseJSON.message}`;
+                            }
+                            alert(errorMsg);
+                            console.error('Error fetching closest distribution center:', jqXHR.responseText);
+                        }
+                    });
+                } else {
+                    alert("Les coordonnées de l'adresse sélectionnée ne sont pas disponibles.");
+                }
+            } else {
+                $('#distribution_center').val(''); // Réinitialiser si aucune adresse n'est sélectionnée
+            }
+        });
     </script>
 
     <!-- Add Address Modal -->

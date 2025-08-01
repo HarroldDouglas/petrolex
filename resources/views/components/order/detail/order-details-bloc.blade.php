@@ -39,6 +39,22 @@
                     </div>
                 </div>
             @endif
+
+            @unless(auth()->user()->hasRole(\App\Enums\UserRole::CENTER_MANAGER()->value))
+                @if ($order->distributionCenter)
+                    <div class="d-flex justify-content-between mt-3">
+                        <h6 class="f-w-600 text-dark"><i
+                                class="ti ti-building-warehouse f-s-18 me-2"></i>Centre de distribution</h6>
+                        <div class="text-end">
+                            <p>
+                                <a href="{{ route('distribution-centers.details', $order->distributionCenter->id) }}" class="btn-link fw-bold">
+                                    {{ $order->distributionCenter->name }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                @endif
+            @endunless
         </div>
     </div>
 </div>

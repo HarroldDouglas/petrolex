@@ -21,6 +21,13 @@ class StoreCustomerDeliveryAddressController extends Controller
         $dto = CustomerDeliveryAddressDTO::from($request->validated());
         $deliveryAddress = $customer->deliveryAddresses()->create($dto->toArray());
 
+        // TODO: move this into a repository or service
+        if ($deliveryAddress->is_default) {
+            $customer->deliveryAddresses()
+                ->where('id', '!=', $deliveryAddress->id)
+                ->update(['is_default' => false]);
+        }
+
         return StoreCustomerDeliveryAddressResponse::withAddress($deliveryAddress);
     }
 }

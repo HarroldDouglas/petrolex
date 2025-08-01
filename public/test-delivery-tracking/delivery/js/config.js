@@ -24,7 +24,7 @@ const CONFIG = {
 
     // Mapbox Configuration
     MAPBOX: {
-        ACCESS_TOKEN: 'pk.eyJ1IjoiaGFycm9zZHdhZm8iLCJhIjoiY21kcjkwenJxMGVtYzJsczY0aXgzbGN6OCJ9.WGRlvNUJFaEFbmvoeTTGlQ',
+        ACCESS_TOKEN: 'pk.eyJ1IjoiaGFycm9sZHdhZm8iLCJhIjoiY21kcjkwenJxMGVtYzJsczY0aXgzbGN6OCJ9.WGRlvNUJFaEFbmvoeTTGlQ',
         STYLE: 'mapbox://styles/mapbox/streets-v11',
         DEFAULT_CENTER: [11.502, 3.848], // Yaoundé, Cameroun (lng, lat)
         DEFAULT_ZOOM: 12

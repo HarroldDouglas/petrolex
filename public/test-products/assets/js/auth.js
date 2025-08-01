@@ -23,9 +23,10 @@ $(document).ready(function() {
                     localStorage.setItem('api_token', response.data.access_token);
                     localStorage.setItem('user_full_name', response.data.user.first_name + ' ' + response.data.user.last_name);
                     localStorage.setItem('test-products-user-email', response.data.user.email);
-                    if (response.data.user.phone) {
-                        localStorage.setItem('test-products-user-phone', response.data.user.phone);
+                    if (response.data.user.phone_number) {
+                        localStorage.setItem('test-products-user-phone', response.data.user.phone_number);
                     }
+                    console.log("User data from API:", response.data.user);
                     
                     const user = response.data.user;
                     if (user && user.roles) {

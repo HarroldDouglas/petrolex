@@ -66,7 +66,7 @@ class OrderService extends BaseServiceForEntity
 
             $subtotal = array_sum(array_column($orderItemsData, 'total_price'));
 
-            $deliveryFee = $orderDTO->delivery_type->getFee();
+            $deliveryFee = $orderDTO->delivery_type->fee();
             $totalAmount = $subtotal + $deliveryFee;
 
             $orderData = $orderDTO->toArray();

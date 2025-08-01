@@ -86,9 +86,9 @@ class Product extends Model
     public function name(): string
     {
         return match ($this->product_type) {
-            ProductType::BOTTLE() => $this->productCategory?->name ?? 'Bouteille sans type',
-            ProductType::ACCESSORY() => $this->productCategory?->name ?? 'Accessoire sans type',
-            default => 'Produit inconnu',
+            ProductType::BOTTLE() => $this->productCategory?->name ?? 'Bottle without type',
+            ProductType::ACCESSORY() => $this->productCategory?->name ?? 'Accessory without type',
+            default => 'Unknown Product',
         };
     }
 

@@ -41,7 +41,7 @@ use Illuminate\Support\Carbon;
  * @property-read OrderPayment $payment
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $items
  * @property-read \Illuminate\Database\Eloquent\Collection<int, BottleMovement> $bottleMovements
- *  * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Product, \App\Models\OrderItem> $products
+ * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Product, \App\Models\OrderItem> $products
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Refund> $refunds
  * @property-read DeliveryTracking|null $deliveryTracking
  *
@@ -57,7 +57,6 @@ class Order extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    // TODO take into account tax
 
     /**
      * The attributes that are mass assignable.

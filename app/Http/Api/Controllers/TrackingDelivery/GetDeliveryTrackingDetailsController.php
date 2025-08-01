@@ -9,6 +9,7 @@ use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
 
 final class GetDeliveryTrackingDetailsController extends Controller
 {
@@ -17,17 +18,20 @@ final class GetDeliveryTrackingDetailsController extends Controller
     /**
      * Get a delivery's details.
      *
-     * Route: GET /api/tracking/delivery/{orderNumber}
+     * Route: GET /api/tracking/delivery/{orderId}
      * Name: tracking.delivery.details
      */
-    public function __invoke(string $orderNumber): ApiResponse
+    public function __invoke(int $orderId): ApiResponse
     {
-        $deliveryTracking = $this->deliveryTrackingRepository->findByOrderNumber($orderNumber);
+        Log::info('Attempting to get delivery tracking details for order ID: ' . $orderId);
+        $deliveryTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
         if (! $deliveryTracking) {
+            Log::warning('Delivery tracking not found for order ID: ' . $orderId);
             return DeliveryTrackingResponse::error('Delivery tracking not found.', Response::HTTP_NOT_FOUND);
         }
 
+        Log::info('Delivery tracking details retrieved successfully for order ID: ' . $orderId);
         return DeliveryTrackingResponse::make(
             $deliveryTracking,
             'Delivery tracking details retrieved successfully.'

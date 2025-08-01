@@ -39,6 +39,9 @@ use Illuminate\Support\Carbon;
  *
  * // Accessors
  * @property-read string $contact_full_name
+ *
+ * @method string fullAddress()
+ * @method string shortAddress()
  */
 class CustomerDeliveryAddress extends Model
 {
@@ -121,30 +124,20 @@ class CustomerDeliveryAddress extends Model
      */
     public function fullAddress(): string
     {
-        $parts = [];
-        
-        if ($this->label) $parts[] = $this->label;
-        if ($this->address) $parts[] = $this->address;
-        if ($this->address_precision) $parts[] = $this->address_precision;
-        
-        if ($this->neighborhood) {
-            $parts[] = $this->neighborhood->name;
-        }
-        
-        if ($this->neighborhood && $this->neighborhood->municipality && $this->neighborhood->municipality->city) {
-            $parts[] = $this->neighborhood->municipality->city->name;
-        }
-        
-        if ($this->neighborhood && $this->neighborhood->municipality && 
-            $this->neighborhood->municipality->city && $this->neighborhood->municipality->city->country) {
-            $parts[] = $this->neighborhood->municipality->city->country->name;
-        }
-        
+        $parts = [
+            $this->label,
+            $this->address,
+            $this->address_precision,
+            $this->neighborhood->name ?? null,
+            $this->city->name ?? null,
+            $this->country->name ?? null,
+        ];
+
         if ($this->latitude && $this->longitude) {
             $parts[] = "GPS: {$this->latitude}, {$this->longitude}";
         }
 
-        return implode(', ', array_filter($parts)) ?: 'Adresse non spécifiée';
+        return implode(', ', array_filter($parts)) ?: 'Address not specified';
     }
 
     public function shortAddress(): string
@@ -154,7 +147,7 @@ class CustomerDeliveryAddress extends Model
         if ($this->label) $parts[] = $this->label;
         if ($this->address) $parts[] = $this->address;
 
-        return implode(' - ', array_filter($parts)) ?: 'Adresse non spécifiée';
+        return implode(' - ', array_filter($parts)) ?: 'Address not specified';
     }
 
     public function getContactFullNameAttribute(): string

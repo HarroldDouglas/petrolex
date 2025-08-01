@@ -10,9 +10,16 @@ window.CustomerHandler = (function() {
 
         if (customerData && customerData.deliveryAddresses) {
             console.log("Found delivery addresses:", customerData.deliveryAddresses);
+            let defaultAddressId = null;
             customerData.deliveryAddresses.forEach(function(address) {
                 customerAddressSelect.append(`<option value="${address.id}">${address.address}</option>`);
+                if (address.is_default) {
+                    defaultAddressId = address.id;
+                }
             });
+            if (defaultAddressId) {
+                customerAddressSelect.val(defaultAddressId).trigger('change');
+            }
             console.log("Number of addresses appended:", customerData.deliveryAddresses.length);
         } else {
             console.log("No delivery addresses found for this customer.");

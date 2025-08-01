@@ -7,6 +7,7 @@ use OpenApi\Annotations as OA;
  *     schema="DeliveryTrackingData",
  *     title="Delivery Tracking Data",
  *     description="Schema for a delivery tracking record",
+ *
  *     @OA\Property(property="id", type="integer", format="int64", description="The ID of the delivery tracking record"),
  *     @OA\Property(property="order_id", type="integer", format="int64", description="The ID of the order being tracked"),
  *     @OA\Property(property="status", type="string", description="The current status of the delivery"),

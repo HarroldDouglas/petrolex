@@ -42,15 +42,15 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-4 fw-medium">Pays :</div>
-                            <div class="col-md-8">{{ $distributionCenter->country }}</div>
+                            <div class="col-md-8">{{ $distributionCenter->country->name ?? 'N/A' }}</div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-4 fw-medium">Ville :</div>
-                            <div class="col-md-8">{{ $distributionCenter->city }}</div>
+                            <div class="col-md-8">{{ $distributionCenter->city->name ?? 'N/A' }}</div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-4 fw-medium">Quartier :</div>
-                            <div class="col-md-8">{{ $distributionCenter->neighborhood }}</div>
+                            <div class="col-md-8">{{ $distributionCenter->neighborhood->name ?? 'N/A' }}</div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-4 fw-medium">Adresse :</div>

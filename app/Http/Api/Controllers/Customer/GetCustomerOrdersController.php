@@ -8,7 +8,6 @@ use App\Http\Api\Responses\Customer\CustomerOrdersResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Services\Customer\CustomerService;
-
 use Illuminate\Support\Arr;
 
 class GetCustomerOrdersController extends Controller
