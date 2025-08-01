@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property float|null $driver_lng
  * @property int|null $estimated_duration
  * @property float|null $distance_remaining
+ * @property float|null $current_speed
  * @property array<string, mixed>|null $route_geometry
  * @property \Illuminate\Support\Carbon|null $started_at
  * @property \Illuminate\Support\Carbon|null $delivered_at
@@ -40,6 +41,7 @@ final class DeliveryTracking extends Model
         'driver_lng',
         'estimated_duration',
         'distance_remaining',
+        'current_speed',
         'route_geometry',
         'started_at',
         'delivered_at',
@@ -57,6 +59,7 @@ final class DeliveryTracking extends Model
         'delivered_at' => 'datetime',
         'driver_lat' => 'decimal:8',
         'driver_lng' => 'decimal:8',
+        'current_speed' => 'decimal:2',
     ];
 
     public function order(): BelongsTo

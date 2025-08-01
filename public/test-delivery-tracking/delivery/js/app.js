@@ -21,7 +21,7 @@ class DeliveryPersonApp {
         this.orderManager = new OrderManager(this.services.api, this.ui, this.sessionManager);
         
         this.services.map.initialize('map');
-        this.services.tracking = new DeliveryTrackingService(this.services.api, this.services.map);
+        this.services.tracking = new DeliveryTrackingService(this.services.api, this.services.map, this.ui);
         
         this.deliveryManager = new DeliveryManager(
             this.services.map, 
@@ -42,6 +42,10 @@ class DeliveryPersonApp {
                 this.deliveryManager.stopDelivery();
             }
             this.sessionManager.logout();
+        });
+
+        this.ui.elements.completeDeliveryBtn.addEventListener('click', () => {
+            this.deliveryManager.completeDelivery();
         });
 
         this.orderManager.setupEventHandlers();

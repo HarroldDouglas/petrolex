@@ -15,6 +15,10 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $distribution_center_id
  * @property int $user_id
+ * @property string $delivery_number
+ * @property string $title
+ * @property string $description
+ * @property SupplierDeliveryStatus $status
  * @property float $total_amount
  * @property string|null $invoice_number
  * @property string|null $supplier_name

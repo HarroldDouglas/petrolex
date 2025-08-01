@@ -138,7 +138,7 @@ class DeliveryPersonApiService {
     }
 
     // Mettre à jour la position
-    async updatePosition(orderNumber, position) {
+    async updatePosition(orderNumber, position, speed = 0) {
         const orderId = this.getOrderIdFromCache(orderNumber);
         
         if (!orderId) {
@@ -151,6 +151,7 @@ class DeliveryPersonApiService {
             body: JSON.stringify({
                 driver_lat: position.lat,
                 driver_lng: position.lng,
+                current_speed: speed,
                 timestamp: new Date().toISOString()
             })
         });
@@ -165,6 +166,13 @@ class DeliveryPersonApiService {
         }
         
         return this.request(`/tracking/delivery/${orderId}`);
+    }
+
+    // Marquer le tracking comme terminé
+    async completeTracking(orderId) {
+        return this.request(`/tracking/delivery/${orderId}/complete`, {
+            method: 'PATCH',
+        });
     }
 }
 
@@ -206,7 +214,7 @@ class DeliveryPersonMapService {
         return this.map;
     }
 
-    updateDriverPosition(lat, lng, popupContent = null) {
+    updateDriverPosition(lat, lng, popupContent = null, speed = null) {
         if (this.driverMarker) {
             this.driverMarker.remove();
         }
@@ -359,9 +367,10 @@ class DeliveryPersonMapService {
 
 // Service pour la simulation de livraison réelle
 class DeliveryTrackingService {
-    constructor(apiService, mapService) {
+    constructor(apiService, mapService, ui) {
         this.apiService = apiService;
         this.mapService = mapService;
+        this.ui = ui;
         this.isTracking = false;
         this.isPaused = false;
         this.routeCoordinates = [];
@@ -501,7 +510,8 @@ class DeliveryTrackingService {
                 this.mapService.updateDriverPosition(
                     lat, 
                     lng,
-                    `<strong>En livraison</strong><br>${this.currentOrder?.order_number}<br>Position: ${lat.toFixed(4)}, ${lng.toFixed(4)}`
+                    `<strong>En livraison</strong><br>${this.currentOrder?.order_number}<br>Position: ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+                    speed
                 );
                 
                 // Calculer et déclencher les callbacks de progression
@@ -510,7 +520,8 @@ class DeliveryTrackingService {
                     progress: progress,
                     position: { lat, lng },
                     index: this.currentIndex,
-                    total: this.routeCoordinates.length
+                    total: this.routeCoordinates.length,
+                    speed: speed
                 });
                 
                 // Avancer selon la vitesse (comme dans livreur.html)
@@ -530,9 +541,10 @@ class DeliveryTrackingService {
             if (!this.isTracking || !this.currentOrder) return;
 
             const position = this.mapService.getCurrentPosition();
+            const currentSpeed = this.ui.getSimulationSpeed(); // Récupérer la vitesse actuelle via l'UI
             if (position) {
                 try {
-                    await this.apiService.updatePosition(this.currentOrder.order_number, position);
+                    await this.apiService.updatePosition(this.currentOrder.order_number, position, currentSpeed);
                 } catch (error) {
                     console.error('Error updating position:', error);
                 }

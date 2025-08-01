@@ -101,6 +101,12 @@ final class DeliveryPersonOrdersTest extends TestCase
                             'latitude',
                             'longitude',
                         ],
+                        'distribution_center' => [
+                            'id',
+                            'name',
+                            'latitude',
+                            'longitude',
+                        ],
                     ],
                 ],
             ])

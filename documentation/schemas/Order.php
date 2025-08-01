@@ -36,7 +36,11 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="name", type="string", example="place Guichard\n13682 Lelievre-la-Forêt, Cameroun")
  *     ),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-18T10:00:00Z"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-18T10:00:00Z")
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-18T10:00:00Z"),
+ *     @OA\Property(property="distribution_center", type="object",
+ *         @OA\Property(property="latitude", type="number", format="float", example=48.8566),
+ *         @OA\Property(property="longitude", type="number", format="float", example=2.3522)
+ *     )
  * )
  */
 class OrderSchema {}

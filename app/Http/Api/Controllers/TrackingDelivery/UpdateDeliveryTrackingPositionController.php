@@ -48,8 +48,9 @@ final class UpdateDeliveryTrackingPositionController extends Controller
         $validated = $request->validated();
         $driverLng = (float) $validated['driver_lng'];
         $driverLat = (float) $validated['driver_lat'];
+        $currentSpeed = (float) ($validated['current_speed'] ?? 0.0);
 
-        Log::info('Updating position for tracking ID ' . $deliveryTracking->id . ': Lat=' . $driverLat . ', Lng=' . $driverLng);
+        Log::info('Updating position for tracking ID ' . $deliveryTracking->id . ': Lat=' . $driverLat . ', Lng=' . $driverLng . ', Speed=' . $currentSpeed);
 
         if ($order->destination_lng === null || $order->destination_lat === null) {
             Log::error('Order destination coordinates missing for order ID: ' . $order->id);
@@ -71,6 +72,7 @@ final class UpdateDeliveryTrackingPositionController extends Controller
                 'estimated_duration' => $routeData->duration,
                 'distance_remaining' => $routeData->distance,
                 'status' => DeliveryTrackingStatus::IN_PROGRESS(),
+                'current_speed' => $currentSpeed,
             ]
         );
 

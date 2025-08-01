@@ -36,7 +36,9 @@ class DeliveryPersonUIComponents {
         this.elements.selectedOrderNumber = document.getElementById('selectedOrderNumber');
         this.elements.selectedCustomerName = document.getElementById('selectedCustomerName');
         this.elements.selectedCustomerPhone = document.getElementById('selectedCustomerPhone');
+        this.elements.selectedStartAddress = document.getElementById('selectedStartAddress');
         this.elements.selectedDeliveryAddress = document.getElementById('selectedDeliveryAddress');
+        this.elements.currentSpeed = document.getElementById('currentSpeed');
         this.elements.selectedOrderStatus = document.getElementById('selectedOrderStatus');
         this.elements.estimatedTime = document.getElementById('estimatedTime');
         this.elements.estimatedDistance = document.getElementById('estimatedDistance');
@@ -53,6 +55,7 @@ class DeliveryPersonUIComponents {
         this.elements.startDeliveryBtn = document.getElementById('startDeliveryBtn');
         this.elements.pauseDeliveryBtn = document.getElementById('pauseDeliveryBtn');
         this.elements.stopDeliveryBtn = document.getElementById('stopDeliveryBtn');
+        this.elements.completeDeliveryBtn = document.getElementById('completeDeliveryBtn');
         this.elements.progressPercent = document.getElementById('progressPercent');
         this.elements.progressBar = document.getElementById('progressBar');
         
@@ -224,6 +227,7 @@ class DeliveryPersonUIComponents {
         
         this.elements.selectedCustomerName.textContent = customerName;
         this.elements.selectedCustomerPhone.textContent = customerPhone;
+        this.elements.selectedStartAddress.textContent = order.distribution_center?.name || 'N/A';
         this.elements.selectedDeliveryAddress.textContent = deliveryAddress;
         
         const statusColor = CONFIG.STATUS.COLORS[order.status] || 'secondary';
@@ -242,9 +246,9 @@ class DeliveryPersonUIComponents {
             
             this.elements.estimatedTime.textContent = timeText;
             this.elements.estimatedDistance.textContent = distanceText;
-        } else {
-            this.elements.estimatedTime.textContent = 'Non disponible';
-            this.elements.estimatedDistance.textContent = 'Non disponible';
+        } else if (!isRealTime) { // Ne réinitialiser que si ce n'est pas une mise à jour en temps réel
+            this.elements.estimatedTime.textContent = 'Calcul...';
+            this.elements.estimatedDistance.textContent = 'Calcul...';
         }
     }
 
@@ -276,6 +280,7 @@ class DeliveryPersonUIComponents {
         this.elements.startDeliveryBtn.disabled = isTracking && !isPaused;
         this.elements.pauseDeliveryBtn.disabled = !isTracking || isPaused;
         this.elements.stopDeliveryBtn.disabled = !isTracking;
+        this.elements.completeDeliveryBtn.style.display = (isTracking && !isPaused) ? 'inline-block' : 'none';
         
         if (isPaused) {
             this.elements.startDeliveryBtn.innerHTML = '<i class="fas fa-play"></i> Reprendre';
@@ -289,11 +294,16 @@ class DeliveryPersonUIComponents {
     }
 
     // Position actuelle
-    updateCurrentPosition(position) {
+    updateCurrentPosition(position, speed = null) {
         if (position) {
             this.elements.currentPosition.textContent = `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`;
             this.elements.lastUpdate.textContent = new Date().toLocaleTimeString();
             this.elements.currentLocationSection.style.display = 'block';
+            if (speed !== null) {
+                this.elements.currentSpeed.textContent = `${speed} km/h`;
+            } else {
+                this.elements.currentSpeed.textContent = 'Non disponible';
+            }
         }
     }
 

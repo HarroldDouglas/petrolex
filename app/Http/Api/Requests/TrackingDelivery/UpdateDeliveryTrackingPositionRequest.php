@@ -14,6 +14,7 @@ final class UpdateDeliveryTrackingPositionRequest extends AbstractDeliveryTracki
         return [
             'driver_lat' => 'required|numeric',
             'driver_lng' => 'required|numeric',
+            'current_speed' => 'nullable|numeric|min:0',
         ];
     }
 }

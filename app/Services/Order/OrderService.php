@@ -218,4 +218,15 @@ class OrderService extends BaseServiceForEntity
     {
         $this->orderRepository->assignDeliveryPerson($order, $deliveryPersonId, $reason);
     }
+
+    /**
+     * Update the status of an order.
+     *
+     * @param  \App\Models\Order  $order  The order to update.
+     * @param  \App\Enums\OrderStatus  $status  The new status for the order.
+     */
+    public function updateOrderStatus(Order $order, OrderStatus $status): void
+    {
+        $this->orderRepository->update($order, ['status' => $status->value]);
+    }
 }

@@ -30,7 +30,7 @@ class DeliveryManager {
         
         this.trackingService.on('progressUpdate', (data) => {
             this.ui.updateProgress(data.progress);
-            this.ui.updateCurrentPosition(data.position);
+            this.ui.updateCurrentPosition(data.position, data.speed);
             
             if (data.progress > 0) {
                 const estimatedTimeElement = this.ui.elements.estimatedTime.textContent;
@@ -54,10 +54,11 @@ class DeliveryManager {
                 this.ui.updateSelectedOrderDetails(selectedOrder);
             }
             
-            setTimeout(() => {
-                this.resetDelivery();
-                this.orderManager.loadOrders();
-            }, 3000);
+            // Le bloc de commande ne sera masqué que lorsque l'utilisateur cliquera sur "Terminer"
+            // setTimeout(() => {
+            //     this.resetDelivery();
+            //     this.orderManager.loadOrders();
+            // }, 3000);
         });
         
         this.trackingService.on('trackingStopped', () => {
@@ -99,8 +100,11 @@ class DeliveryManager {
             
             if (routeInfo) {
                 this.ui.updateRouteEstimates(routeInfo.duration, routeInfo.distance);
+            } else {
+                this.ui.updateRouteEstimates(null, null);
             }
         } catch (error) {
+            console.error('Error calculating route:', error);
             this.ui.updateRouteEstimates(null, null);
         }
     }
@@ -147,11 +151,33 @@ class DeliveryManager {
         }
     }
 
+    async completeDelivery() {
+        const selectedOrder = this.orderManager.getSelectedOrder();
+        if (!selectedOrder) {
+            this.ui.showError('Veuillez sélectionner une commande à terminer.');
+            return;
+        }
+
+        if (confirm('Êtes-vous sûr de vouloir marquer cette livraison comme terminée ?')) {
+            this.ui.setLoadingState('completeDeliveryBtn', true);
+            try {
+                await this.trackingService.completeTracking(selectedOrder.id);
+                this.ui.showSuccess('Livraison marquée comme terminée!');
+                this.resetDelivery();
+                this.orderManager.loadOrders();
+                this.ui.hideSelectedOrderDetails();
+            } catch (error) {
+                this.ui.showError(error.message || 'Erreur lors de la finalisation de la livraison.');
+            } finally {
+                this.ui.setLoadingState('completeDeliveryBtn', false);
+            }
+        }
+    }
+
     resetDelivery() {
         const state = this.trackingService.getTrackingState();
         this.ui.setDeliveryControlsState(state.isTracking, state.isPaused);
         this.ui.updateProgress(0);
-        this.ui.hideDeliveryControls();
         this.orderManager.clearSelectedOrder();
     }
 

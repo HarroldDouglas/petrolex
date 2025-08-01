@@ -35,6 +35,7 @@ final class DeliveryTrackingResource extends JsonResource
             'destination_address' => $this->whenLoaded('order', fn () => $this->order->deliveryAddress->full_address ?? null),
             'estimated_duration' => $this->estimated_duration,
             'distance_remaining' => $this->distance_remaining,
+            'current_speed' => $this->current_speed,
             'route_geometry' => $this->route_geometry,
             'started_at' => $this->started_at,
             'delivered_at' => $this->delivered_at,

@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $supplier_delivery_product_type_id
  * @property int $bottle_id
- * @property string $movement_type
+ * @property SupplierDeliveryBottleMovementType $movement_type
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at

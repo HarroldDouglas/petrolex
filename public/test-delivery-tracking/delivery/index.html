@@ -104,7 +104,9 @@
                                             <h6 id="selectedOrderNumber" class="text-primary mb-2"></h6>
                                             <p class="mb-1"><strong>Client:</strong> <span id="selectedCustomerName"></span></p>
                                             <p class="mb-1"><strong>Téléphone:</strong> <span id="selectedCustomerPhone"></span></p>
-                                            <p class="mb-1"><strong>Adresse:</strong> <span id="selectedDeliveryAddress"></span></p>
+                                            <p class="mb-1"><strong>Adresse de départ:</strong> <span id="selectedStartAddress"></span></p>
+                                            <p class="mb-1"><strong>Adresse de livraison:</strong> <span id="selectedDeliveryAddress"></span></p>
+                                            
                                             <p class="mb-0"><strong>Statut:</strong> <span id="selectedOrderStatus" class="badge"></span></p>
                                         </div>
                                         <div class="col-md-4 text-end">
@@ -116,6 +118,10 @@
                                                 <div class="info-item">
                                                     <i class="fas fa-route text-info"></i>
                                                     <span id="estimatedDistance">Calcul...</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <i class="fas fa-tachometer-alt text-primary"></i>
+                                                    <span id="currentSpeed">Non disponible</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -184,6 +190,9 @@
                                     </button>
                                     <button class="btn btn-danger btn-control" id="stopDeliveryBtn" disabled>
                                         <i class="fas fa-stop"></i> Arrêter
+                                    </button>
+                                    <button class="btn btn-info btn-control" id="completeDeliveryBtn" style="display: none;">
+                                        <i class="fas fa-check"></i> Terminer
                                     </button>
                                 </div>
                                 <div class="mt-2">

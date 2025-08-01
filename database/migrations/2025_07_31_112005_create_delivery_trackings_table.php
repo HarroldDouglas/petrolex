@@ -13,6 +13,7 @@ return new class () extends Migration {
             $table->string('status', 30)->default('pending');
             $table->decimal('driver_lat', 10, 8)->nullable();
             $table->decimal('driver_lng', 11, 8)->nullable();
+            $table->decimal('current_speed', 8, 2)->nullable();
             $table->integer('estimated_duration')->nullable(); // In minutes
             $table->decimal('distance_remaining', 8, 2)->nullable(); // In kilometers
             $table->json('route_geometry')->nullable();
