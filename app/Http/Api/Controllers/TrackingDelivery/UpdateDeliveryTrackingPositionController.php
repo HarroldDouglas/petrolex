@@ -8,6 +8,7 @@ use App\Contracts\DeliveryTrackingServiceInterface;
 use App\Enums\DeliveryTrackingStatus;
 use App\Events\DeliveryPositionUpdated;
 use App\Http\Api\Requests\TrackingDelivery\UpdateDeliveryTrackingPositionRequest;
+use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
@@ -26,9 +27,9 @@ final class UpdateDeliveryTrackingPositionController extends Controller
      * Route: PATCH /api/tracking/delivery/{orderNumber}/position
      * Name: tracking.delivery.position.update
      */
-    public function __invoke(UpdateDeliveryTrackingPositionRequest $request, string $orderNumber): DeliveryTrackingResponse
+    public function __invoke(UpdateDeliveryTrackingPositionRequest $request, int $orderId): ApiResponse
     {
-        $deliveryTracking = $this->deliveryTrackingRepository->findByOrderNumber($orderNumber);
+        $deliveryTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
         if (! $deliveryTracking) {
             return DeliveryTrackingResponse::error('Delivery tracking not found.', null, Response::HTTP_NOT_FOUND);

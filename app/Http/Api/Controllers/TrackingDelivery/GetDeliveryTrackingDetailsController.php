@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Controllers\TrackingDelivery;
 
+use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
@@ -19,7 +20,7 @@ final class GetDeliveryTrackingDetailsController extends Controller
      * Route: GET /api/tracking/delivery/{orderNumber}
      * Name: tracking.delivery.details
      */
-    public function __invoke(string $orderNumber): DeliveryTrackingResponse
+    public function __invoke(string $orderNumber): ApiResponse
     {
         $deliveryTracking = $this->deliveryTrackingRepository->findByOrderNumber($orderNumber);
 

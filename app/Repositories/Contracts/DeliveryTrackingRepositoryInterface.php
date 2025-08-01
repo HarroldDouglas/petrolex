@@ -15,6 +15,8 @@ interface DeliveryTrackingRepositoryInterface extends BaseRepositoryInterface
 
     public function findByOrderNumber(string $orderNumber): ?DeliveryTracking;
 
+    public function findByOrder(int $orderId): ?DeliveryTracking;
+
     /**
      * @param  array<string, mixed>  $attributes
      */

@@ -91,21 +91,62 @@ class DeliveryPersonApiService {
 
     // Démarrer le tracking d'une commande
     async startTracking(orderNumber, position) {
-        const endpoint = CONFIG.API.ENDPOINTS.TRACKING_START.replace('{orderNumber}', orderNumber);
-        return this.request(endpoint, {
-            method: 'POST',
-            body: JSON.stringify({
-                driver_lat: position.lat,
-                driver_lng: position.lng,
-                timestamp: new Date().toISOString()
-            })
-        });
+        const orderId = this.getOrderIdFromCache(orderNumber);
+        
+        if (!orderId) {
+            throw new Error('Impossible de récupérer l\'ID de la commande. Rechargez les commandes.');
+        }
+        
+        try {
+            // Créer le tracking initial avec l'order_id
+            const createResponse = await this.request('/tracking/delivery', {
+                method: 'POST',
+                body: JSON.stringify({
+                    order_id: orderId,
+                    driver_lat: position.lat,
+                    driver_lng: position.lng,
+                    timestamp: new Date().toISOString()
+                })
+            });
+            
+            return createResponse;
+        } catch (error) {
+            // Si le tracking existe déjà, essayer de le démarrer directement avec l'orderId
+            const startResponse = await this.request(`/tracking/delivery/${orderId}/start`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    driver_lat: position.lat,
+                    driver_lng: position.lng,
+                    timestamp: new Date().toISOString()
+                })
+            });
+            
+            return startResponse;
+        }
+    }
+    
+    // Nouvelle méthode pour récupérer l'order_id depuis le cache
+    getOrderIdFromCache(orderNumber) {
+        const cachedOrders = JSON.parse(localStorage.getItem('cached_orders') || '[]');
+        const order = cachedOrders.find(o => o.order_number === orderNumber);
+        return order ? order.id : null;
+    }
+    
+    // Mettre en cache les order_id quand on charge les commandes
+    cacheOrderIds(orders) {
+        localStorage.setItem('cached_orders', JSON.stringify(orders));
     }
 
     // Mettre à jour la position
     async updatePosition(orderNumber, position) {
-        const endpoint = CONFIG.API.ENDPOINTS.TRACKING_POSITION.replace('{orderNumber}', orderNumber);
-        return this.request(endpoint, {
+        const orderId = this.getOrderIdFromCache(orderNumber);
+        
+        if (!orderId) {
+            console.warn('Order ID not found for position update:', orderNumber);
+            return;
+        }
+        
+        return this.request(`/tracking/delivery/${orderId}/position`, {
             method: 'PATCH',
             body: JSON.stringify({
                 driver_lat: position.lat,
@@ -117,8 +158,13 @@ class DeliveryPersonApiService {
 
     // Récupérer les détails du tracking
     async getTrackingDetails(orderNumber) {
-        const endpoint = CONFIG.API.ENDPOINTS.TRACKING_DETAILS.replace('{orderNumber}', orderNumber);
-        return this.request(endpoint);
+        const orderId = this.getOrderIdFromCache(orderNumber);
+        
+        if (!orderId) {
+            throw new Error('Order ID not found for tracking details');
+        }
+        
+        return this.request(`/tracking/delivery/${orderId}`);
     }
 }
 
@@ -351,35 +397,57 @@ class DeliveryTrackingService {
             // Démarrer le tracking via l'API
             const response = await this.apiService.startTracking(orderNumber, currentPosition);
             
-            if (response.success && response.data) {
-                this.currentOrder = response.data.order;
-                this.routeCoordinates = response.data.route?.geometry?.coordinates || [];
-                this.currentIndex = 0;
+            // Correction: utiliser _metadata.success au lieu de response.success
+            if (response._metadata?.success && response.data) {
+                this.currentOrder = response.data;
                 this.isTracking = true;
                 this.isPaused = false;
+                this.currentIndex = 0;
 
-                // Mettre à jour la carte
+                // Récupérer les détails de la commande pour avoir la destination
+                const orderDetails = this.getOrderDetailsFromCache(orderNumber);
+                
+                // Mettre à jour la carte avec la position de départ
                 this.mapService.updateDriverPosition(
                     currentPosition.lat, 
                     currentPosition.lng,
                     `<strong>Position de départ</strong><br>Livraison ${orderNumber}`
                 );
 
-                if (this.currentOrder.delivery_address_latitude && this.currentOrder.delivery_address_longitude) {
-                    this.mapService.setDestination(
-                        this.currentOrder.delivery_address_latitude,
-                        this.currentOrder.delivery_address_longitude,
-                        {
-                            customer: this.currentOrder.customer?.name,
-                            address: this.currentOrder.delivery_address,
-                            phone: this.currentOrder.customer?.phone
-                        }
-                    );
-                }
+                // Définir la destination si on a les coordonnées
+                if (orderDetails && orderDetails.delivery_address) {
+                    const destLat = parseFloat(orderDetails.delivery_address.latitude);
+                    const destLng = parseFloat(orderDetails.delivery_address.longitude);
+                    
+                    if (!isNaN(destLat) && !isNaN(destLng)) {
+                        this.mapService.setDestination(destLat, destLng, {
+                            customer: orderDetails.customer?.full_name,
+                            address: orderDetails.delivery_address.name || orderDetails.delivery_address.address,
+                            phone: orderDetails.customer?.phone_number
+                        });
 
-                // Démarrer la simulation de mouvement
-                if (this.routeCoordinates.length > 0) {
-                    this.runSimulation(speed);
+                        // Calculer et dessiner la route
+                        const routeData = await this.mapService.drawRoute(
+                            currentPosition, 
+                            { lat: destLat, lng: destLng }, 
+                            this.getTransportMode()
+                        );
+
+                        if (routeData) {
+                            // Utiliser les coordonnées de la route calculée par Mapbox
+                            this.routeCoordinates = routeData.geometry.coordinates;
+                            
+                            // Mettre à jour les estimations
+                            this.triggerCallback('routeCalculated', {
+                                duration: routeData.duration,
+                                distance: routeData.distance,
+                                coordinates: this.routeCoordinates
+                            });
+
+                            // Démarrer la simulation de mouvement
+                            this.runSimulation(speed);
+                        }
+                    }
                 }
                 
                 // Démarrer les mises à jour de position régulières
@@ -387,12 +455,13 @@ class DeliveryTrackingService {
                 
                 this.triggerCallback('trackingStarted', {
                     order: this.currentOrder,
-                    route: this.routeCoordinates
+                    route: this.routeCoordinates,
+                    position: currentPosition
                 });
 
                 return response;
             } else {
-                throw new Error('Impossible de démarrer le tracking');
+                throw new Error(response._metadata?.message || 'Impossible de démarrer le tracking');
             }
         } catch (error) {
             console.error('Error starting tracking:', error);
@@ -400,7 +469,22 @@ class DeliveryTrackingService {
         }
     }
 
+    getOrderDetailsFromCache(orderNumber) {
+        const cachedOrders = JSON.parse(localStorage.getItem('cached_orders') || '[]');
+        return cachedOrders.find(o => o.order_number === orderNumber);
+    }
+
+    getTransportMode() {
+        // Récupérer le mode de transport sélectionné dans l'UI
+        return document.querySelector('input[name="transportMode"]:checked')?.value || 'driving';
+    }
+
     runSimulation(speed) {
+        if (!this.routeCoordinates || this.routeCoordinates.length === 0) {
+            console.warn('No route coordinates available for simulation');
+            return;
+        }
+
         const interval = CONFIG.SIMULATION.BASE_INTERVAL / speed;
         
         this.intervalId = setInterval(() => {
@@ -429,7 +513,7 @@ class DeliveryTrackingService {
                     total: this.routeCoordinates.length
                 });
                 
-                // Avancer selon la vitesse
+                // Avancer selon la vitesse (comme dans livreur.html)
                 this.currentIndex += Math.max(1, Math.floor(speed / CONFIG.SIMULATION.ROUTE_STEP_MULTIPLIER));
                 
                 // Vérifier si la simulation est terminée

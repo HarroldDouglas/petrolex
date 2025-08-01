@@ -79,7 +79,7 @@ $(document).ready(function() {
         ApiService.storeOrder(orderData)
             .done(function(response) {
                 if (response && response.data) {
-                    alert('Commande enregistrée avec succès!');
+                    alert(`Commande créée avec succès! ID de la commande: ${response.data.id}`);
                     window.location.href = '/test-products/order.html';
                 } else {
                     alert('Erreur lors de l\'enregistrement de la commande.');

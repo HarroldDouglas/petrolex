@@ -30,6 +30,14 @@ final class DeliveryTrackingRepository extends BaseEloquentRepository implements
         return $deliveryTracking;
     }
 
+    public function findByOrder(int $orderId): ?DeliveryTracking
+    {
+        /** @var DeliveryTracking|null $deliveryTracking */
+        $deliveryTracking = $this->model->where('order_id', $orderId)->first();
+
+        return $deliveryTracking;
+    }
+
     public function update(\Illuminate\Database\Eloquent\Model $deliveryTracking, array $attributes): DeliveryTracking
     {
         /** @var DeliveryTracking $deliveryTracking */

@@ -8,6 +8,7 @@ use App\Contracts\DeliveryTrackingServiceInterface;
 use App\Enums\DeliveryTrackingStatus;
 use App\Events\DeliveryPositionUpdated;
 use App\Http\Api\Requests\TrackingDelivery\StartDeliveryTrackingRequest;
+use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
@@ -26,18 +27,17 @@ final class StartDeliveryTrackingController extends Controller
      * Route: POST /api/tracking/delivery/{orderNumber}/start
      * Name: tracking.delivery.start
      */
-    public function __invoke(StartDeliveryTrackingRequest $request, string $orderNumber): DeliveryTrackingResponse
+    public function __invoke(StartDeliveryTrackingRequest $request, int $orderId): ApiResponse
     {
-        $deliveryTracking = $this->deliveryTrackingRepository->findByOrderNumber($orderNumber);
-
-        if (! $deliveryTracking) {
-            return DeliveryTrackingResponse::error('Delivery tracking not found.', Response::HTTP_NOT_FOUND);
-        }
-
-        $order = $deliveryTracking->order;
+        $order = \App\Models\Order::find($orderId);
 
         if (! $order) {
-            return DeliveryTrackingResponse::error('Order not found for this tracking.', Response::HTTP_NOT_FOUND);
+            return DeliveryTrackingResponse::error('Order not found.', null, Response::HTTP_NOT_FOUND);
+        }
+
+        $existingTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
+        if ($existingTracking && $existingTracking->status->value !== 'completed') {
+            return DeliveryTrackingResponse::error('Delivery tracking already exists for this order.', null, Response::HTTP_CONFLICT);
         }
 
         $validated = $request->validated();
@@ -45,7 +45,7 @@ final class StartDeliveryTrackingController extends Controller
         $driverLat = (float) $validated['driver_lat'];
 
         if ($order->destination_lng === null || $order->destination_lat === null) {
-            return DeliveryTrackingResponse::error('Order destination coordinates are missing.', Response::HTTP_BAD_REQUEST);
+            return DeliveryTrackingResponse::error('Order destination coordinates are missing.', null, Response::HTTP_BAD_REQUEST);
         }
 
         $routeData = $this->deliveryTrackingService->calculateRoute(
@@ -55,18 +55,17 @@ final class StartDeliveryTrackingController extends Controller
             (float) $order->destination_lat
         );
 
-        $deliveryTracking = $this->deliveryTrackingRepository->update(
-            $deliveryTracking,
-            [
-                'status' => DeliveryTrackingStatus::STARTED(),
-                'driver_lat' => $driverLat,
-                'driver_lng' => $driverLng,
-                'estimated_duration' => $routeData->duration,
-                'distance_remaining' => $routeData->distance,
-                'route_geometry' => $routeData->geometry,
-                'started_at' => now(),
-            ]
-        );
+        // TODO: Think if this should not be moved to a listener
+        $deliveryTracking = $this->deliveryTrackingRepository->create([
+            'order_id' => $orderId,
+            'status' => DeliveryTrackingStatus::STARTED(),
+            'driver_lat' => $driverLat,
+            'driver_lng' => $driverLng,
+            'estimated_duration' => $routeData->duration,
+            'distance_remaining' => $routeData->distance,
+            'route_geometry' => $routeData->geometry,
+            'started_at' => now(),
+        ]);
 
         broadcast(new DeliveryPositionUpdated($deliveryTracking));
 

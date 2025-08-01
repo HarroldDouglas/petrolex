@@ -101,7 +101,12 @@ class DeliveryPersonUIComponents {
     }
 
     updateDeliveryPersonInfo(deliveryPerson) {
-        this.elements.currentDeliveryPersonName.textContent = deliveryPerson.name || 'N/A';
+        // Construire le nom complet à partir de first_name et last_name
+        const fullName = [deliveryPerson.first_name, deliveryPerson.last_name]
+            .filter(Boolean)
+            .join(' ') || 'N/A';
+        
+        this.elements.currentDeliveryPersonName.textContent = fullName;
         this.elements.currentDeliveryPersonEmail.textContent = deliveryPerson.email || 'N/A';
     }
 
@@ -131,13 +136,18 @@ class DeliveryPersonUIComponents {
         const statusColor = CONFIG.STATUS.COLORS[order.status] || 'secondary';
         const statusLabel = CONFIG.STATUS.TRANSLATIONS[order.status] || order.status;
 
+        // Extraire correctement les données du client et de l'adresse
+        const customerName = order.customer?.full_name || order.customer?.first_name + ' ' + order.customer?.last_name || 'N/A';
+        const customerPhone = order.customer?.phone_number || 'N/A';
+        const deliveryAddress = order.delivery_address?.name || order.delivery_address?.address || 'N/A';
+
         div.innerHTML = `
             <div class="d-flex justify-content-between align-items-start">
                 <div class="flex-grow-1">
                     <h6 class="mb-1 text-primary">${order.order_number}</h6>
-                    <p class="mb-1 text-sm"><strong>Client:</strong> ${order.customer?.name || 'N/A'}</p>
-                    <p class="mb-1 text-sm"><strong>Téléphone:</strong> ${order.customer?.phone || 'N/A'}</p>
-                    <p class="mb-1 text-sm"><strong>Adresse:</strong> ${order.delivery_address || 'N/A'}</p>
+                    <p class="mb-1 text-sm"><strong>Client:</strong> ${customerName}</p>
+                    <p class="mb-1 text-sm"><strong>Téléphone:</strong> ${customerPhone}</p>
+                    <p class="mb-1 text-sm"><strong>Adresse:</strong> ${deliveryAddress}</p>
                     <p class="mb-0 text-sm"><strong>Montant:</strong> ${order.total_amount || 0}€</p>
                 </div>
                 <div class="text-end">
@@ -206,9 +216,15 @@ class DeliveryPersonUIComponents {
     // Détails de la commande sélectionnée
     updateSelectedOrderDetails(order) {
         this.elements.selectedOrderNumber.textContent = order.order_number;
-        this.elements.selectedCustomerName.textContent = order.customer?.name || 'N/A';
-        this.elements.selectedCustomerPhone.textContent = order.customer?.phone || 'N/A';
-        this.elements.selectedDeliveryAddress.textContent = order.delivery_address || 'N/A';
+        
+        // Correction des données affichées
+        const customerName = order.customer?.full_name || order.customer?.first_name + ' ' + order.customer?.last_name || 'N/A';
+        const customerPhone = order.customer?.phone_number || 'N/A';
+        const deliveryAddress = order.delivery_address?.name || order.delivery_address?.address || 'N/A';
+        
+        this.elements.selectedCustomerName.textContent = customerName;
+        this.elements.selectedCustomerPhone.textContent = customerPhone;
+        this.elements.selectedDeliveryAddress.textContent = deliveryAddress;
         
         const statusColor = CONFIG.STATUS.COLORS[order.status] || 'secondary';
         const statusLabel = CONFIG.STATUS.TRANSLATIONS[order.status] || order.status;

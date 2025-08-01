@@ -6,6 +6,7 @@ namespace App\Http\Api\Controllers\TrackingDelivery;
 
 use App\Enums\DeliveryTrackingStatus;
 use App\Http\Api\Requests\TrackingDelivery\CreateDeliveryTrackingRequest;
+use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
@@ -25,7 +26,7 @@ final class CreateDeliveryTrackingController extends Controller
      * Route: POST /api/tracking/delivery
      * Name: tracking.delivery.create
      */
-    public function __invoke(CreateDeliveryTrackingRequest $request): DeliveryTrackingResponse
+    public function __invoke(CreateDeliveryTrackingRequest $request): ApiResponse
     {
         $orderId = filter_var($request->validated('order_id'), FILTER_VALIDATE_INT);
 

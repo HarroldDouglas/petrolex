@@ -108,4 +108,4 @@ use OpenApi\Annotations as OA;
  *     )
  * )
  */
-class DeliveryPersonOrdersControllerDoc {}
+class GetDeliveryPersonOrdersControllerDoc {}

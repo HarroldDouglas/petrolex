@@ -225,7 +225,6 @@ class Order extends Model
     {
         $this->update([
             'delivery_person_id' => $deliveryPersonId,
-            'status' => OrderStatus::PROCESSING(),
         ]);
 
         return $this;
@@ -345,7 +344,7 @@ class Order extends Model
         return in_array($this->status->value, [
             OrderStatus::CONFIRMED()->value,
             OrderStatus::PROCESSING()->value,
-        ]) && ! $this->deliveryTracking()->exists();
+        ]);
     }
 
     /**

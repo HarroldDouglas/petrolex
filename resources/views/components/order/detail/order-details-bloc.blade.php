@@ -15,7 +15,7 @@
                 <h6 class="f-w-600 text-dark"><i class="ti ti-credit-card f-s-18 me-2"></i>Paiement
                 </h6>
                 <div class="text-end">
-                    <p>{{ $order->payment_method->label }}</p>
+                    <p>{{ $order->payment_method?->label }}</p> {{-- Ajout de l'opérateur null-safe --}}
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-3">
@@ -25,6 +25,7 @@
                     <p>{{ $order->delivery_type->label }}</p>
                 </div>
             </div>
+            
             @if ($order->deliveryPerson)
                 <div class="d-flex justify-content-between mt-3">
                     <h6 class="f-w-600 text-dark"><i

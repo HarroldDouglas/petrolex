@@ -86,7 +86,7 @@ function initMap() {
     map = new mapboxgl.Map({
         container: 'delivery-map',
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: [2.3522, 48.8566],
+        center: [11.502, 3.848], // Yaoundé, Cameroun
         zoom: 12
     });
 
