@@ -129,56 +129,14 @@
                                 </div>
                             </div>
 
-                            <!-- Mode de transport -->
-                            <div id="transportModeSection" class="mb-3" style="display: none;">
-                                <div class="section-header">
-                                    <h6><i class="fas fa-motorcycle"></i> Mode de transport</h6>
-                                </div>
-                                <div class="transport-mode-card">
-                                    <div class="transport-options">
-                                        <div class="transport-option" data-mode="walking">
-                                            <input type="radio" id="transportWalking" name="transportMode" value="walking" checked>
-                                            <label for="transportWalking">
-                                                <div class="transport-icon">🚶‍♂️</div>
-                                                <div class="transport-info">
-                                                    <strong>À pied</strong>
-                                                    <small>Plus lent mais précis</small>
-                                                </div>
-                                            </label>
-                                        </div>
-                                        <div class="transport-option" data-mode="driving">
-                                            <input type="radio" id="transportDriving" name="transportMode" value="driving">
-                                            <label for="transportDriving">
-                                                <div class="transport-icon">🏍️</div>
-                                                <div class="transport-info">
-                                                    <strong>À moto</strong>
-                                                    <small>Rapide et efficace</small>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="transport-stats">
-                                        <div class="stat-item">
-                                            <span class="stat-label">Vitesse simulation:</span>
-                                            <span id="simulationSpeedInfo" class="stat-value">Normale</span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-label">Type de route:</span>
-                                            <span id="routeTypeInfo" class="stat-value">Piétonne</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Contrôles de livraison -->
                             <div id="deliveryControls" class="delivery-controls" style="display: none;">
                                 <h6><i class="fas fa-play-circle"></i> Contrôles de Livraison</h6>
                                 <div class="mb-3">
-                                    <label class="form-label">Vitesse de simulation</label>
-                                    <input type="range" class="form-range" id="simulationSpeed" min="1" max="10" value="3">
-                                    <div class="d-flex justify-content-between">
-                                        <small class="text-muted">Lent</small>
-                                        <small class="text-muted">Rapide</small>
+                                    <label class="form-label">Vitesse de déplacement: <span id="currentTravelSpeedDisplay"></span> km/h</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="simulationSpeed" min="0" max="150" value="40">
+                                        <button class="btn btn-outline-secondary" type="button" id="updateSpeedBtn">Mettre à jour</button>
                                     </div>
                                 </div>
                                 <div class="btn-group w-100 mb-3" role="group">
@@ -233,12 +191,12 @@
 
     <!-- JavaScript Files -->
     <!-- Scripts JavaScript optimisés et modulaires -->
-    <script src="js/config.js"></script>
-    <script src="js/services.js"></script>
-    <script src="js/components.js"></script>
-    <script src="js/session-manager.js"></script>
-    <script src="js/order-manager.js"></script>
-    <script src="js/delivery-manager.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/config.js?v=20250802-FIX"></script>
+    <script src="js/services.js?v=20250802-FIX"></script>
+    <script src="js/components.js?v=20250802-FIX"></script>
+    <script src="js/session-manager.js?v=20250802-FIX"></script>
+    <script src="js/order-manager.js?v=20250802-FIX"></script>
+    <script src="js/delivery-manager.js?v=20250802-FIX"></script>
+    <script src="js/app.js?v=20250802-FIX"></script>
 </body>
 </html>

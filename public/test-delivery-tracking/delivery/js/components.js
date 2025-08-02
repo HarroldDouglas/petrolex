@@ -43,15 +43,10 @@ class DeliveryPersonUIComponents {
         this.elements.estimatedTime = document.getElementById('estimatedTime');
         this.elements.estimatedDistance = document.getElementById('estimatedDistance');
         
-        // Mode de transport
-        this.elements.transportModeSection = document.getElementById('transportModeSection');
-        this.elements.transportWalking = document.getElementById('transportWalking');
-        this.elements.transportDriving = document.getElementById('transportDriving');
-        this.elements.simulationSpeedInfo = document.getElementById('simulationSpeedInfo');
-        this.elements.routeTypeInfo = document.getElementById('routeTypeInfo');
-        
         // Contrôles de livraison
         this.elements.simulationSpeed = document.getElementById('simulationSpeed');
+        this.elements.currentTravelSpeedDisplay = document.getElementById('currentTravelSpeedDisplay');
+        this.elements.updateSpeedBtn = document.getElementById('updateSpeedBtn');
         this.elements.startDeliveryBtn = document.getElementById('startDeliveryBtn');
         this.elements.pauseDeliveryBtn = document.getElementById('pauseDeliveryBtn');
         this.elements.stopDeliveryBtn = document.getElementById('stopDeliveryBtn');
@@ -80,12 +75,10 @@ class DeliveryPersonUIComponents {
 
     showSelectedOrderDetails() {
         this.elements.selectedOrderDetails.style.display = 'block';
-        this.elements.transportModeSection.style.display = 'block';
     }
 
     hideSelectedOrderDetails() {
         this.elements.selectedOrderDetails.style.display = 'none';
-        this.elements.transportModeSection.style.display = 'none';
         this.elements.deliveryControls.style.display = 'none';
     }
 
@@ -240,6 +233,7 @@ class DeliveryPersonUIComponents {
 
     // Estimations de route
     updateRouteEstimates(time, distance, isRealTime = false) {
+        console.log('updateRouteEstimates: time=', time, 'distance=', distance, 'isRealTime=', isRealTime);
         if (time !== null && distance !== null) {
             const timeText = isRealTime ? `${time} min restant` : `${time} min`;
             const distanceText = isRealTime ? `${distance} km restant` : `${distance} km`;
@@ -249,23 +243,6 @@ class DeliveryPersonUIComponents {
         } else if (!isRealTime) { // Ne réinitialiser que si ce n'est pas une mise à jour en temps réel
             this.elements.estimatedTime.textContent = 'Calcul...';
             this.elements.estimatedDistance.textContent = 'Calcul...';
-        }
-    }
-
-    // Mode de transport
-    getSelectedTransportMode() {
-        return this.elements.transportWalking.checked ? 'walking' : 'driving';
-    }
-
-    updateTransportInfo() {
-        const selectedMode = this.getSelectedTransportMode();
-        
-        if (selectedMode === 'driving') {
-            this.elements.simulationSpeedInfo.textContent = 'Très rapide';
-            this.elements.routeTypeInfo.textContent = 'Moto/Route';
-        } else {
-            this.elements.simulationSpeedInfo.textContent = 'Normale';
-            this.elements.routeTypeInfo.textContent = 'Piétonne';
         }
     }
 
@@ -289,12 +266,17 @@ class DeliveryPersonUIComponents {
         }
     }
 
-    getSimulationSpeed() {
+    getTravelSpeed() {
         return parseInt(this.elements.simulationSpeed.value);
+    }
+
+    updateTravelSpeedDisplay(speed) {
+        this.elements.currentTravelSpeedDisplay.textContent = speed;
     }
 
     // Position actuelle
     updateCurrentPosition(position, speed = null) {
+        console.log('updateCurrentPosition: position=', position, 'speed=', speed);
         if (position) {
             this.elements.currentPosition.textContent = `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`;
             this.elements.lastUpdate.textContent = new Date().toLocaleTimeString();

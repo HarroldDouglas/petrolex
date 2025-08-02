@@ -63,7 +63,7 @@ const CONFIG = {
         MAX_SPEED: 10,
         DEFAULT_SPEED: 3,
         BASE_INTERVAL: 1000,
-        ROUTE_STEP_MULTIPLIER: 2,
+        ROUTE_STEP_MULTIPLIER: 20,
         POSITION_UPDATE_INTERVAL: 10000, // 10 seconds
         TRANSPORT_MODES: {
             walking: {

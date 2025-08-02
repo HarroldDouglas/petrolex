@@ -137,6 +137,10 @@ class UserSeeder extends Seeder
             return;
         }
 
+        User::factory()
+            ->deliveryPerson($centers->first()->id, true)
+            ->create(['email' => 'delivery1@test.com']);
+
         foreach ($centers as $center) {
             User::factory()
                 ->deliveryPerson($center->id, true)
@@ -149,7 +153,7 @@ class UserSeeder extends Seeder
                 ->create();
         }
 
-        $this->command->info($centers->count() * 5 .' delivery persons created (4 active + 1 inactive per center).');
+        $this->command->info($centers->count() * 5 + 1 .' delivery persons created (4 active + 1 inactive per center, +1 specific).');
     }
 
     /**

@@ -1,4 +1,4 @@
-// Service pour les appels API avec authentification
+// Service pour les appels API avec authentification. Version nouvelle
 class DeliveryPersonApiService {
     constructor() {
         this.baseUrl = CONFIG.API.BASE_URL;
@@ -274,6 +274,14 @@ class DeliveryPersonMapService {
             if (result.routes && result.routes.length > 0) {
                 const route = result.routes[0];
                 
+                // Assurez-vous que la source et la couche sont bien supprimées avant d'ajouter
+                if (this.map.getLayer(layerId)) {
+                    this.map.removeLayer(layerId);
+                }
+                if (this.map.getSource(sourceId)) {
+                    this.map.removeSource(sourceId);
+                }
+
                 // Ajouter la nouvelle route
                 this.map.addSource(sourceId, {
                     type: 'geojson',
@@ -365,7 +373,7 @@ class DeliveryPersonMapService {
     }
 }
 
-// Service pour la simulation de livraison réelle
+// Service pour la simulation de livraison réelle - VERSION CORRIGÉE
 class DeliveryTrackingService {
     constructor(apiService, mapService, ui) {
         this.apiService = apiService;
@@ -379,6 +387,9 @@ class DeliveryTrackingService {
         this.positionUpdateIntervalId = null;
         this.currentOrder = null;
         this.callbacks = {};
+        
+        // DEBUG: Marquer que la nouvelle version est chargée
+        console.log('🔥 NOUVELLE VERSION DeliveryTrackingService chargée avec temps estimé !');
     }
 
     on(event, callback) {
@@ -394,7 +405,13 @@ class DeliveryTrackingService {
         }
     }
 
-    async startTracking(orderNumber, speed = CONFIG.SIMULATION.DEFAULT_SPEED) {
+    async startTracking(orderNumber, speed = CONFIG.SIMULATION.DEFAULT_SPEED, estimatedDurationMinutes = null) {
+        console.log('🚀 NOUVEAU startTracking appelé avec:', {
+            orderNumber, 
+            speed, 
+            estimatedDurationMinutes
+        });
+        
         if (this.isTracking) {
             throw new Error('Tracking already in progress');
         }
@@ -406,7 +423,6 @@ class DeliveryTrackingService {
             // Démarrer le tracking via l'API
             const response = await this.apiService.startTracking(orderNumber, currentPosition);
             
-            // Correction: utiliser _metadata.success au lieu de response.success
             if (response._metadata?.success && response.data) {
                 this.currentOrder = response.data;
                 this.isTracking = true;
@@ -446,15 +462,8 @@ class DeliveryTrackingService {
                             // Utiliser les coordonnées de la route calculée par Mapbox
                             this.routeCoordinates = routeData.geometry.coordinates;
                             
-                            // Mettre à jour les estimations
-                            this.triggerCallback('routeCalculated', {
-                                duration: routeData.duration,
-                                distance: routeData.distance,
-                                coordinates: this.routeCoordinates
-                            });
-
-                            // Démarrer la simulation de mouvement
-                            this.runSimulation(speed);
+                            // Démarrer la simulation avec la durée estimée
+                            this.runSimulationWithEstimatedTime(speed, estimatedDurationMinutes);
                         }
                     }
                 }
@@ -478,23 +487,44 @@ class DeliveryTrackingService {
         }
     }
 
-    getOrderDetailsFromCache(orderNumber) {
-        const cachedOrders = JSON.parse(localStorage.getItem('cached_orders') || '[]');
-        return cachedOrders.find(o => o.order_number === orderNumber);
-    }
+    // NOUVELLE MÉTHODE pour gérer la simulation basée sur le temps estimé
+    runSimulationWithEstimatedTime(speed, estimatedDurationMinutes) {
+        console.log('⭐ runSimulationWithEstimatedTime démarré !', {
+            speed,
+            estimatedDurationMinutes,
+            routeCoordinatesLength: this.routeCoordinates.length
+        });
 
-    getTransportMode() {
-        // Récupérer le mode de transport sélectionné dans l'UI
-        return document.querySelector('input[name="transportMode"]:checked')?.value || 'driving';
-    }
-
-    runSimulation(speed) {
         if (!this.routeCoordinates || this.routeCoordinates.length === 0) {
             console.warn('No route coordinates available for simulation');
             return;
         }
 
-        const interval = CONFIG.SIMULATION.BASE_INTERVAL / speed;
+        // Arrêter toute simulation précédente
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+        }
+
+        // Utiliser le temps estimé affiché
+        let totalDurationMs;
+        
+        if (estimatedDurationMinutes && estimatedDurationMinutes > 0) {
+            // Utiliser la durée estimée (temps affiché dans l'interface)
+            totalDurationMs = estimatedDurationMinutes * 60 * 1000; // minutes → millisecondes
+            console.log(`✅ Utilisation du temps estimé: ${estimatedDurationMinutes} minutes = ${totalDurationMs}ms`);
+        } else {
+            // Fallback si pas de temps estimé
+            totalDurationMs = 30 * 1000; // 30 secondes par défaut
+            console.log(`⚠️ Pas de temps estimé, utilisation de 30s par défaut`);
+        }
+        
+        // Calculer l'intervalle pour que la simulation dure exactement la durée estimée
+        const interval = totalDurationMs / this.routeCoordinates.length;
+        
+        console.log(`🎯 Simulation configurée:
+- Durée totale: ${estimatedDurationMinutes || 0.5} minutes
+- Points de route: ${this.routeCoordinates.length}
+- Intervalle entre points: ${interval.toFixed(0)}ms`);
         
         this.intervalId = setInterval(() => {
             if (this.isPaused || !this.isTracking) {
@@ -511,7 +541,7 @@ class DeliveryTrackingService {
                     lat, 
                     lng,
                     `<strong>En livraison</strong><br>${this.currentOrder?.order_number}<br>Position: ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-                    speed
+                    this.ui?.getTravelSpeed() || speed
                 );
                 
                 // Calculer et déclencher les callbacks de progression
@@ -521,18 +551,30 @@ class DeliveryTrackingService {
                     position: { lat, lng },
                     index: this.currentIndex,
                     total: this.routeCoordinates.length,
-                    speed: speed
+                    speed: this.ui?.getTravelSpeed() || speed
                 });
                 
-                // Avancer selon la vitesse (comme dans livreur.html)
-                this.currentIndex += Math.max(1, Math.floor(speed / CONFIG.SIMULATION.ROUTE_STEP_MULTIPLIER));
+                // Avancer d'un seul pas à la fois
+                this.currentIndex += 1;
+                
+                console.log(`🚚 Progression: ${this.currentIndex}/${this.routeCoordinates.length} (${progress.toFixed(1)}%)`);
                 
                 // Vérifier si la simulation est terminée
                 if (this.currentIndex >= this.routeCoordinates.length) {
+                    console.log('🏁 Simulation terminée !');
                     this.completeTracking();
                 }
             }
         }, interval);
+    }
+
+    getOrderDetailsFromCache(orderNumber) {
+        const cachedOrders = JSON.parse(localStorage.getItem('cached_orders') || '[]');
+        return cachedOrders.find(o => o.order_number === orderNumber);
+    }
+
+    getTransportMode() {
+        return 'driving';
     }
 
     startPositionUpdates() {
@@ -541,7 +583,7 @@ class DeliveryTrackingService {
             if (!this.isTracking || !this.currentOrder) return;
 
             const position = this.mapService.getCurrentPosition();
-            const currentSpeed = this.ui.getSimulationSpeed(); // Récupérer la vitesse actuelle via l'UI
+            const currentSpeed = this.ui?.getTravelSpeed() || 40; // Récupérer la vitesse actuelle via l'UI
             if (position) {
                 try {
                     await this.apiService.updatePosition(this.currentOrder.order_number, position, currentSpeed);
@@ -600,7 +642,6 @@ class DeliveryTrackingService {
             order: this.currentOrder
         });
         
-        // Nettoyer après un délai
         setTimeout(() => {
             this.currentOrder = null;
             this.routeCoordinates = [];

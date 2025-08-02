@@ -4,6 +4,8 @@ class DeliveryManager {
         this.trackingService = trackingService;
         this.ui = ui;
         this.orderManager = orderManager;
+        this.currentEstimatedDuration = 0; // Nouvelle propriété pour stocker la durée estimée
+        this.isCalculatingRoute = false; // Protection contre les appels multiples simultanés
         this.setupTrackingCallbacks();
     }
 
@@ -22,11 +24,8 @@ class DeliveryManager {
             this.ui.showInfo('Tracking démarré! La position sera mise à jour en temps réel.');
         });
 
-        // NOUVEAU: Callback pour quand la route est calculée
-        this.trackingService.on('routeCalculated', (data) => {
-            this.ui.updateRouteEstimates(data.duration, data.distance);
-            this.ui.showSuccess(`Route calculée: ${data.distance}km, ${data.duration}min estimées`);
-        });
+        // SUPPRIMÉ: Callback pour routeCalculated qui causait le conflit
+        // Ne plus écraser le calcul de route personnalisé
         
         this.trackingService.on('progressUpdate', (data) => {
             this.ui.updateProgress(data.progress);
@@ -54,7 +53,7 @@ class DeliveryManager {
                 this.ui.updateSelectedOrderDetails(selectedOrder);
             }
             
-            // Le bloc de commande ne sera masqué que lorsque l'utilisateur cliquera sur "Terminer"
+            // Ne pas rediriger automatiquement - sera exécuté que lorsque l'utilisateur cliquera sur "Terminer"
             // setTimeout(() => {
             //     this.resetDelivery();
             //     this.orderManager.loadOrders();
@@ -80,32 +79,68 @@ class DeliveryManager {
     }
 
     async calculateRouteForSelectedOrder() {
+        // Protection contre les appels multiples simultanés
+        if (this.isCalculatingRoute) {
+            console.log('calculateRouteForSelectedOrder: Calcul déjà en cours, ignorer');
+            return;
+        }
+        
+        this.isCalculatingRoute = true;
+        
+        console.log('calculateRouteForSelectedOrder: Début');
         const selectedOrder = this.orderManager.getSelectedOrder();
-        if (!selectedOrder || !selectedOrder.delivery_address_latitude || !selectedOrder.delivery_address_longitude) {
+        console.log('calculateRouteForSelectedOrder: selectedOrder', selectedOrder);
+        console.log('calculateRouteForSelectedOrder: latitude', selectedOrder?.delivery_address?.latitude);
+        console.log('calculateRouteForSelectedOrder: longitude', selectedOrder?.delivery_address?.longitude);
+        
+        if (!selectedOrder || !selectedOrder.delivery_address?.latitude || !selectedOrder.delivery_address?.longitude) {
+            console.warn('Commande non sélectionnée ou adresse de livraison manquante');
+            this.ui.updateRouteEstimates(null, null); // Réinitialiser les estimations si pas de commande
+            this.isCalculatingRoute = false;
             return;
         }
         
         try {
             const currentPosition = await this.mapService.getCurrentGPSPosition();
-            const transportMode = this.ui.getSelectedTransportMode();
+            // Le mode de transport est maintenant implicite (conduit) car la vitesse est directement contrôlée
+            console.log('calculateRouteForSelectedOrder: Position actuelle', currentPosition);
             
             const routeInfo = await this.mapService.drawRoute(
                 currentPosition,
                 {
-                    lat: selectedOrder.delivery_address_latitude,
-                    lng: selectedOrder.delivery_address_longitude
+                    lat: selectedOrder.delivery_address.latitude,
+                    lng: selectedOrder.delivery_address.longitude
                 },
-                transportMode
+                'driving' // Mode de transport par défaut
             );
             
+            console.log('calculateRouteForSelectedOrder: routeInfo', routeInfo);
+            
             if (routeInfo) {
-                this.ui.updateRouteEstimates(routeInfo.duration, routeInfo.distance);
-            } else {
-                this.ui.updateRouteEstimates(null, null);
+                const travelSpeed = this.ui.getTravelSpeed();
+                const TYPICAL_DRIVING_SPEED_KMH = 40; // Vitesse de référence pour les calculs
+                
+                let adjustedDuration = routeInfo.duration;
+                if (travelSpeed && travelSpeed !== TYPICAL_DRIVING_SPEED_KMH) {
+                    // Ajuster la durée en fonction de la vitesse sélectionnée
+                    // Formule: (distance / vitesse) * 60
+                    adjustedDuration = Math.round((parseFloat(routeInfo.distance) / travelSpeed) * 60);
+                }
+                
+                console.log('calculateRouteForSelectedOrder: Vitesse de déplacement', travelSpeed, 'Durée ajustée', adjustedDuration);
+                
+                this.ui.updateRouteEstimates(adjustedDuration, routeInfo.distance);
+                // Mettre à jour la durée estimée pour la simulation
+                this.currentEstimatedDuration = adjustedDuration;
+                
+                // AJOUT IMPORTANT : Afficher la vitesse après le calcul de route
+                this.ui.updateCurrentPosition(null, travelSpeed);
             }
         } catch (error) {
             console.error('Error calculating route:', error);
             this.ui.updateRouteEstimates(null, null);
+        } finally {
+            this.isCalculatingRoute = false;
         }
     }
 
@@ -131,8 +166,9 @@ class DeliveryManager {
         this.ui.setLoadingState('startDeliveryBtn', true);
         
         try {
-            const speed = this.ui.getSimulationSpeed();
-            await this.trackingService.startTracking(selectedOrder.order_number, speed);
+            const speed = this.ui.getTravelSpeed();
+            // IMPORTANT: Passer la durée estimée affichée pour que la simulation dure exactement ce temps
+            await this.trackingService.startTracking(selectedOrder.order_number, speed, this.currentEstimatedDuration);
             this.ui.showSuccess('Livraison démarrée!');
         } catch (error) {
             this.ui.showError(error.message || 'Erreur lors du démarrage de la livraison');
@@ -182,19 +218,32 @@ class DeliveryManager {
     }
 
     setupEventHandlers() {
-        this.ui.elements.transportWalking.addEventListener('change', () => {
-            this.ui.updateTransportInfo();
-            this.calculateRouteForSelectedOrder();
-        });
-        
-        this.ui.elements.transportDriving.addEventListener('change', () => {
-            this.ui.updateTransportInfo();
-            this.calculateRouteForSelectedOrder();
-        });
-        
         this.ui.elements.startDeliveryBtn.addEventListener('click', () => this.startDelivery());
         this.ui.elements.pauseDeliveryBtn.addEventListener('click', () => this.pauseDelivery());
         this.ui.elements.stopDeliveryBtn.addEventListener('click', () => this.stopDelivery());
+
+        // Mettre à jour l'affichage de la vitesse de déplacement et recalculer la route en temps réel
+        this.ui.elements.simulationSpeed.addEventListener('input', () => {
+            const speed = this.ui.getTravelSpeed();
+            this.ui.updateTravelSpeedDisplay(speed);
+            // Mettre à jour la vitesse affichée en bas du temps et de la distance
+            this.ui.updateCurrentPosition(null, speed); 
+            this.calculateRouteForSelectedOrder();
+        });
+
+        // Initialiser l'affichage de la vitesse dès le début
+        this.initializeSpeedDisplay();
+    }
+
+    // Nouvelle méthode pour initialiser l'affichage de la vitesse
+    initializeSpeedDisplay() {
+        // Attendre que l'élément soit disponible
+        setTimeout(() => {
+            const initialSpeed = this.ui.getTravelSpeed();
+            console.log('Vitesse initiale lue:', initialSpeed);
+            this.ui.updateTravelSpeedDisplay(initialSpeed);
+            this.ui.updateCurrentPosition(null, initialSpeed);
+        }, 100);
     }
 
     getTrackingState() {
