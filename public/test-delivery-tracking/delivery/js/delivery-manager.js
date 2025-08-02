@@ -87,11 +87,7 @@ class DeliveryManager {
         
         this.isCalculatingRoute = true;
         
-        console.log('calculateRouteForSelectedOrder: Début');
         const selectedOrder = this.orderManager.getSelectedOrder();
-        console.log('calculateRouteForSelectedOrder: selectedOrder', selectedOrder);
-        console.log('calculateRouteForSelectedOrder: latitude', selectedOrder?.delivery_address?.latitude);
-        console.log('calculateRouteForSelectedOrder: longitude', selectedOrder?.delivery_address?.longitude);
         
         if (!selectedOrder || !selectedOrder.delivery_address?.latitude || !selectedOrder.delivery_address?.longitude) {
             console.warn('Commande non sélectionnée ou adresse de livraison manquante');
@@ -102,9 +98,6 @@ class DeliveryManager {
         
         try {
             const currentPosition = await this.mapService.getCurrentGPSPosition();
-            // Le mode de transport est maintenant implicite (conduit) car la vitesse est directement contrôlée
-            console.log('calculateRouteForSelectedOrder: Position actuelle', currentPosition);
-            
             const routeInfo = await this.mapService.drawRoute(
                 currentPosition,
                 {
@@ -113,8 +106,6 @@ class DeliveryManager {
                 },
                 'driving' // Mode de transport par défaut
             );
-            
-            console.log('calculateRouteForSelectedOrder: routeInfo', routeInfo);
             
             if (routeInfo) {
                 const travelSpeed = this.ui.getTravelSpeed();
@@ -126,8 +117,6 @@ class DeliveryManager {
                     // Formule: (distance / vitesse) * 60
                     adjustedDuration = Math.round((parseFloat(routeInfo.distance) / travelSpeed) * 60);
                 }
-                
-                console.log('calculateRouteForSelectedOrder: Vitesse de déplacement', travelSpeed, 'Durée ajustée', adjustedDuration);
                 
                 this.ui.updateRouteEstimates(adjustedDuration, routeInfo.distance);
                 // Mettre à jour la durée estimée pour la simulation
@@ -240,7 +229,6 @@ class DeliveryManager {
         // Attendre que l'élément soit disponible
         setTimeout(() => {
             const initialSpeed = this.ui.getTravelSpeed();
-            console.log('Vitesse initiale lue:', initialSpeed);
             this.ui.updateTravelSpeedDisplay(initialSpeed);
             this.ui.updateCurrentPosition(null, initialSpeed);
         }, 100);

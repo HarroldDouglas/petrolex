@@ -68,7 +68,6 @@ class OrderManager {
             
             if (order) {
                 this.selectedOrder = order;
-                console.log('OrderManager: Commande sélectionnée', JSON.stringify(this.selectedOrder, null, 2));
                 this.ui.updateSelectedOrderDetails(order);
                 this.ui.highlightSelectedOrder(orderNumber);
                 

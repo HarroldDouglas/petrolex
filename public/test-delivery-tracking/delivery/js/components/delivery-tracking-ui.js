@@ -6,14 +6,6 @@ class DeliveryTrackingUI {
 
     // Estimations de route
     updateRouteEstimates(time, distance, isRealTime = false) {
-        console.log(
-            "updateRouteEstimates: time=",
-            time,
-            "distance=",
-            distance,
-            "isRealTime=",
-            isRealTime,
-        );
         if (time !== null && distance !== null) {
             const timeText = isRealTime ? `${time} min restant` : `${time} min`;
             const distanceText = isRealTime
@@ -61,12 +53,6 @@ class DeliveryTrackingUI {
 
     // Position actuelle
     updateCurrentPosition(position, speed = null) {
-        console.log(
-            "updateCurrentPosition: position=",
-            position,
-            "speed=",
-            speed,
-        );
         if (position) {
             this.ui.elements.currentPosition.textContent = `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`;
             this.ui.elements.lastUpdate.textContent =
@@ -87,7 +73,6 @@ class DeliveryTrackingUI {
     }
 
     showSuccess(message, title = "Succès") {
-        console.log(title + ":", message);
         this.showNotification("success", title, message, 4000);
     }
 
