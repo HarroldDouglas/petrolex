@@ -1,219 +1,231 @@
-// Application principale pour l'interface client avec vraies données
+// Application principale pour l'interface client simplifiée
 class CustomerApp {
     constructor() {
-        this.services = {
-            api: new CustomerApiService(),
-            map: new CustomerMapService(),
-            websocket: new CustomerWebSocketService()
-        };
-        
+        this.authService = new AuthService();
+        this.apiService = new CustomerApiService();
         this.ui = new CustomerUIComponents();
-        this.selectedCustomer = null;
-        this.selectedOrder = null;
+        this.mapService = new CustomerMapService();
+        this.websocketService = new CustomerWebSocketService();
+        
+        // État de l'application
+        this.currentUser = null;
         this.currentTrackingOrder = null;
-        this.currentPage = 1;
-        this.currentFilters = {};
+        this.isTracking = false;
         this.updateInterval = null;
         
-        this.init();
+        // Configuration de la relation AuthService <-> ApiService
+        this.apiService.setAuthService(this.authService);
     }
 
-    init() {
-        // Initialiser les services
-        this.initializeServices();
-        
-        // Configurer les gestionnaires d'événements
-        this.setupEventHandlers();
-        
-        // Charger les clients par défaut
-        this.loadCustomers();
-        
+    async init() {
         console.log('Customer App initialized');
+        
+        // Nettoyer les tokens expirés
+        this.authService.clearExpiredToken();
+        
+        // Vérifier si l'utilisateur est déjà connecté
+        if (this.authService.isAuthenticated()) {
+            this.currentUser = this.authService.getUser();
+            await this.initMainApp();
+        } else {
+            this.showLoginForm();
+        }
     }
 
-    initializeServices() {
-        // Initialiser la carte
-        this.services.map.initialize('map');
-        
-        // Initialiser WebSocket
-        this.services.websocket.initialize();
-        
-        // Configurer les callbacks WebSocket
-        this.services.websocket.on('connected', () => {
-            this.ui.updateWebSocketStatus(true);
-            this.ui.showSuccess('Connexion WebSocket établie');
-        });
-        
-        this.services.websocket.on('disconnected', () => {
-            this.ui.updateWebSocketStatus(false);
-            this.ui.showError('Connexion WebSocket perdue');
-        });
-        
-        this.services.websocket.on('error', (error) => {
-            this.ui.updateWebSocketStatus(false);
-            this.ui.showError('Erreur WebSocket: ' + error.message);
-        });
-        
-        this.services.websocket.on('locationUpdate', (data) => {
-            this.handleLocationUpdate(data);
-        });
-        
-        this.services.websocket.on('statusUpdate', (data) => {
-            this.handleStatusUpdate(data);
-        });
-        
-        this.services.websocket.on('deliveryCompleted', (data) => {
-            this.handleDeliveryCompleted(data);
+    showLoginForm() {
+        this.ui.showLoginPanel();
+        this.bindLoginEvents();
+    }
+
+    bindLoginEvents() {
+        // Événement de soumission du formulaire de connexion
+        this.ui.elements.loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleLogin();
         });
     }
 
-    setupEventHandlers() {
-        // Recherche de clients
-        this.ui.elements.customerSearchInput.addEventListener('input', () => {
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(() => {
-                this.currentPage = 1;
-                this.loadCustomers();
-            }, 500);
+    async handleLogin() {
+        const email = this.ui.elements.clientEmail.value.trim();
+        const password = this.ui.elements.clientPassword.value;
+
+        if (!email || !password) {
+            this.ui.showLoginError('Veuillez remplir tous les champs');
+            return;
+        }
+
+        this.ui.setLoginLoading(true);
+        this.ui.hideLoginError();
+
+        try {
+            const authData = await this.authService.login(email, password);
+            this.currentUser = authData.user;
+            
+            console.log('Login successful:', this.currentUser);
+            
+            // Initialiser l'application principale
+            await this.initMainApp();
+            
+        } catch (error) {
+            console.error('Login failed:', error);
+            this.ui.showLoginError('Email ou mot de passe incorrect');
+        } finally {
+            this.ui.setLoginLoading(false);
+        }
+    }
+
+    async initMainApp() {
+        try {
+            // Afficher le panneau principal
+            this.ui.showClientPanel();
+            
+            // Mettre à jour les informations client
+            this.ui.updateClientInfo(this.currentUser);
+            
+            // Initialiser les services
+            await this.initializeMap();
+            this.initializeWebSocket();
+            this.bindMainEvents();
+            
+            // Charger les commandes du client connecté
+            await this.loadMyOrders();
+            
+            this.ui.showSuccess(`Bienvenue ${this.currentUser.full_name || this.currentUser.email}!`, 'Connexion réussie');
+            
+            console.log('Main app initialized successfully');
+            
+        } catch (error) {
+            console.error('Error initializing main app:', error);
+            this.ui.showError('Erreur lors de l\'initialisation de l\'application');
+        }
+    }
+
+    async initializeMap() {
+        try {
+            this.mapService.initialize('map');
+            this.ui.elements.mapStatus.textContent = 'Connectée';
+            this.ui.elements.mapStatus.className = 'badge bg-success';
+        } catch (error) {
+            console.error('Map initialization failed:', error);
+            this.ui.elements.mapStatus.textContent = 'Erreur';
+            this.ui.elements.mapStatus.className = 'badge bg-danger';
+        }
+    }
+
+    initializeWebSocket() {
+        try {
+            this.websocketService.initialize();
+            
+            this.websocketService.on('connected', () => {
+                this.updateWebSocketStatus(true);
+                console.log('WebSocket connected');
+            });
+            
+            this.websocketService.on('disconnected', () => {
+                this.updateWebSocketStatus(false);
+                console.log('WebSocket disconnected');
+            });
+            
+            this.websocketService.on('locationUpdate', (data) => {
+                this.handleLocationUpdate(data);
+            });
+            
+            this.websocketService.on('statusUpdate', (data) => {
+                this.handleStatusUpdate(data);
+            });
+            
+        } catch (error) {
+            console.error('WebSocket initialization failed:', error);
+            this.updateWebSocketStatus(false);
+        }
+    }
+
+    bindMainEvents() {
+        // Déconnexion
+        this.ui.elements.logoutBtn.addEventListener('click', () => {
+            this.logout();
         });
         
-        // Changement de client
-        this.ui.elements.changeCustomerBtn.addEventListener('click', () => {
-            this.changeCustomer();
-        });
-        
-        // Actualisation des commandes
+        // Rafraîchissement des commandes
         this.ui.elements.refreshOrdersBtn.addEventListener('click', () => {
-            this.loadOrders();
+            this.loadMyOrders();
         });
         
-        // Filtres des commandes
+        // Filtres de commandes
         this.ui.elements.statusFilter.addEventListener('change', () => {
-            this.currentPage = 1;
-            this.loadOrders();
+            this.loadMyOrders(1);
         });
         
-        this.ui.elements.orderNumberFilter.addEventListener('input', () => {
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(() => {
-                this.currentPage = 1;
-                this.loadOrders();
-            }, 500);
-        });
+        this.ui.elements.orderNumberFilter.addEventListener('input',
+            this.debounce(() => this.loadMyOrders(1), 500)
+        );
         
-        // Arrêter le tracking
+        // Arrêt du tracking
         this.ui.elements.stopTrackingBtn.addEventListener('click', () => {
             this.stopTracking();
         });
-        
-        // Exposer les méthodes globalement
-        window.customerApp = this;
     }
 
-    async loadCustomers(page = 1) {
-        this.currentPage = page;
-        const search = this.ui.elements.customerSearchInput.value.trim();
-        
-        this.ui.setLoadingState('customerSearchInput', true);
-        
+    async logout() {
         try {
-            const response = await this.services.api.getCustomers(search, page);
-            
-            if (response.success && response.data) {
-                const customers = response.data.data || [];
-                const pagination = response.data;
-                
-                this.ui.renderCustomers(
-                    customers,
-                    pagination.current_page || 1,
-                    pagination.last_page || 1
-                );
-                
-                if (customers.length === 0 && page === 1) {
-                    this.ui.showInfo('Aucun client trouvé avec ce critère de recherche');
-                }
-            } else {
-                throw new Error('Impossible de charger les clients');
+            // Arrêter le tracking en cours
+            if (this.isTracking) {
+                this.stopTracking();
             }
-        } catch (error) {
-            console.error('Error loading customers:', error);
-            this.ui.showError(error.message || 'Erreur lors du chargement des clients');
-        } finally {
-            this.ui.setLoadingState('customerSearchInput', false);
-        }
-    }
-
-    async selectCustomer(customerId) {
-        try {
-            // Récupérer les détails du client depuis la liste actuelle
-            const customerCards = document.querySelectorAll('.customer-card');
-            let customerData = null;
             
-            customerCards.forEach(card => {
-                if (card.dataset.customerId == customerId) {
-                    const name = card.querySelector('h6').textContent;
-                    const email = card.querySelector('p:nth-child(2)').textContent.replace('Email: ', '');
-                    const phone = card.querySelector('p:nth-child(3)').textContent.replace('Téléphone: ', '');
-                    
-                    customerData = {
-                        id: customerId,
-                        name: name,
-                        email: email,
-                        phone: phone
-                    };
-                }
-            });
+            // Déconnecter les services
+            this.websocketService.disconnect();
             
-            if (customerData) {
-                this.selectedCustomer = customerData;
-                this.ui.updateSelectedCustomerInfo(customerData);
-                this.ui.showSelectedCustomer();
-                
-                // Charger les commandes du client
-                await this.loadOrders();
-                
-                this.ui.showSuccess(`Client "${customerData.name}" sélectionné`);
-            } else {
-                throw new Error('Client non trouvé');
-            }
+            // Déconnexion API
+            await this.authService.logout();
+            
+            // Réinitialiser l'état
+            this.currentUser = null;
+            this.currentTrackingOrder = null;
+            this.isTracking = false;
+            
+            // Afficher la page de connexion
+            this.showLoginForm();
+            
+            // Nettoyer l'interface
+            this.ui.elements.ordersList.innerHTML = '';
+            this.ui.hideOrderTracking();
+            this.mapService.clearMarkers();
+            this.mapService.clearRoute();
+            
         } catch (error) {
-            console.error('Error selecting customer:', error);
-            this.ui.showError(error.message || 'Erreur lors de la sélection du client');
+            console.error('Logout error:', error);
+            // Même en cas d'erreur, forcer la déconnexion locale
+            this.authService.clearExpiredToken();
+            window.location.reload();
         }
     }
 
-    changeCustomer() {
-        // Arrêter le tracking en cours
-        if (this.currentTrackingOrder) {
-            this.stopTracking();
+    async loadMyOrders(page = 1) {
+        if (!this.currentUser) {
+            console.error('No user connected');
+            return;
         }
         
-        this.selectedCustomer = null;
-        this.selectedOrder = null;
-        this.ui.showCustomerSelection();
-        this.ui.hideOrderTracking();
-        this.services.map.clearMarkers();
-        this.services.map.clearRoute();
-    }
-
-    async loadOrders(page = 1) {
-        if (!this.selectedCustomer) return;
-        
-        this.currentPage = page;
-        this.currentFilters = this.ui.getFilters();
-        
+        const filters = this.ui.getFilters();
         this.ui.setLoadingState('refreshOrdersBtn', true);
         
         try {
-            const response = await this.services.api.getCustomerOrders(
-                this.selectedCustomer.id,
-                this.currentFilters,
-                page
-            );
+            // Utiliser l'ID du client - d'abord essayer customer_id, puis user_id, puis id
+            let customerId = this.currentUser.customer_id || this.currentUser.id;
             
-            if (response.success && response.data) {
-                const orders = response.data.data || [];
-                const pagination = response.data;
+            console.log('Loading orders for customer ID:', customerId, 'User:', this.currentUser);
+            
+            const response = await this.apiService.getCustomerOrders(customerId, filters, page);
+            
+            console.log('Orders response:', response);
+            
+            if (response.data) {
+                // Les commandes sont directement dans response.data, pas dans response.data.data
+                const orders = Array.isArray(response.data) ? response.data : (response.data.data || []);
+                const pagination = response._metadata?.pagination || { current_page: 1, last_page: 1 };
+                
+                console.log('Parsed orders:', orders, 'Pagination:', pagination);
                 
                 this.ui.renderOrders(
                     orders,
@@ -223,6 +235,8 @@ class CustomerApp {
                 
                 if (orders.length === 0 && page === 1) {
                     this.ui.showInfo('Aucune commande trouvée avec les filtres appliqués');
+                } else {
+                    console.log(`${orders.length} commandes trouvées et affichées`);
                 }
             } else {
                 throw new Error('Impossible de charger les commandes');
@@ -248,35 +262,22 @@ class CustomerApp {
         
         try {
             // Récupérer les détails de la commande depuis la liste
-            const orderCards = document.querySelectorAll('.order-card');
-            let orderData = null;
-            
-            orderCards.forEach(card => {
-                if (card.dataset.orderNumber === orderNumber) {
-                    const orderNumber = card.querySelector('h6').textContent;
-                    const details = card.querySelectorAll('p');
-                    
-                    orderData = {
-                        order_number: orderNumber,
-                        delivery_address: details[3] ? details[3].textContent.replace('Adresse: ', '') : 'N/A',
-                        status: CONFIG.ORDER_STATUS.PROCESSING, // On suppose que c'est en cours
-                        customer: this.selectedCustomer
-                    };
-                }
-            });
-            
-            if (!orderData) {
-                throw new Error('Commande non trouvée');
+            const orderCard = document.querySelector(`[data-order-number="${orderNumber}"]`);
+            if (!orderCard) {
+                throw new Error('Commande non trouvée dans la liste');
             }
             
-            // Récupérer les détails du tracking
-            const trackingResponse = await this.services.api.getTrackingDetails(orderNumber);
+            // Extraire les informations de la commande depuis la carte
+            const orderData = this.extractOrderDataFromCard(orderCard);
             
-            if (trackingResponse.success && trackingResponse.data) {
+            // Récupérer les détails du tracking
+            const trackingResponse = await this.apiService.getTrackingDetails(orderNumber);
+            
+            if (trackingResponse.data) {
                 const trackingData = trackingResponse.data;
                 
                 this.currentTrackingOrder = orderNumber;
-                this.selectedOrder = orderData;
+                this.isTracking = true;
                 
                 // Mettre à jour l'interface
                 this.ui.updateTrackingInfo(orderData, trackingData);
@@ -285,11 +286,11 @@ class CustomerApp {
                 this.ui.clearTrackingHistory();
                 
                 // S'abonner aux mises à jour WebSocket
-                this.services.websocket.subscribeToDeliveryTracking(orderNumber);
+                this.websocketService.subscribeToDeliveryTracking(orderNumber);
                 
                 // Afficher la position initiale si disponible
                 if (trackingData.current_latitude && trackingData.current_longitude) {
-                    this.services.map.updateDriverPosition(
+                    this.mapService.updateDriverPosition(
                         trackingData.current_latitude,
                         trackingData.current_longitude,
                         { name: trackingData.driver_name }
@@ -298,11 +299,11 @@ class CustomerApp {
                 
                 // Afficher la destination si disponible
                 if (trackingData.destination_latitude && trackingData.destination_longitude) {
-                    this.services.map.setDestination(
+                    this.mapService.setDestination(
                         trackingData.destination_latitude,
                         trackingData.destination_longitude,
                         { 
-                            name: this.selectedCustomer.name,
+                            name: this.currentUser.full_name || this.currentUser.email,
                             address: orderData.delivery_address
                         }
                     );
@@ -323,24 +324,37 @@ class CustomerApp {
         }
     }
 
+    extractOrderDataFromCard(orderCard) {
+        const orderNumber = orderCard.dataset.orderNumber;
+        const orderNumberElement = orderCard.querySelector('h6');
+        const details = orderCard.querySelectorAll('p');
+        
+        return {
+            order_number: orderNumber,
+            delivery_address: details[3] ? details[3].textContent.replace('Adresse: ', '') : 'N/A',
+            status: CONFIG.ORDER_STATUS.PROCESSING, // Assumé en cours si on peut suivre
+            customer: this.currentUser
+        };
+    }
+
     stopTracking() {
         if (!this.currentTrackingOrder) return;
         
         // Désabonner du WebSocket
-        this.services.websocket.unsubscribeFromDeliveryTracking(this.currentTrackingOrder);
+        this.websocketService.unsubscribeFromDeliveryTracking(this.currentTrackingOrder);
         
         // Arrêter les mises à jour périodiques
         this.stopPeriodicUpdates();
         
         // Nettoyer l'interface
         this.ui.hideOrderTracking();
-        this.services.map.clearMarkers();
-        this.services.map.clearRoute();
+        this.mapService.clearMarkers();
+        this.mapService.clearRoute();
         
         this.ui.showInfo('Suivi arrêté pour la commande ' + this.currentTrackingOrder);
         
         this.currentTrackingOrder = null;
-        this.selectedOrder = null;
+        this.isTracking = false;
     }
 
     startPeriodicUpdates() {
@@ -364,9 +378,9 @@ class CustomerApp {
         if (!this.currentTrackingOrder) return;
         
         try {
-            const response = await this.services.api.getTrackingDetails(this.currentTrackingOrder);
+            const response = await this.apiService.getTrackingDetails(this.currentTrackingOrder);
             
-            if (response.success && response.data) {
+            if (response.data) {
                 const data = response.data;
                 
                 // Mettre à jour les statistiques
@@ -380,7 +394,7 @@ class CustomerApp {
                     this.ui.updateTrackingProgress(data.progress_percentage);
                 }
                 
-                this.ui.updateLastUpdateTime();
+                this.updateLastUpdateTime();
             }
         } catch (error) {
             console.error('Error updating tracking data:', error);
@@ -391,7 +405,7 @@ class CustomerApp {
     handleLocationUpdate(data) {
         if (data.order_number === this.currentTrackingOrder) {
             // Mettre à jour la position du livreur
-            this.services.map.updateDriverPosition(
+            this.mapService.updateDriverPosition(
                 data.latitude,
                 data.longitude,
                 { name: data.driver_name }
@@ -439,30 +453,36 @@ class CustomerApp {
             // Arrêter le suivi après un délai
             setTimeout(() => {
                 this.stopTracking();
-                this.loadOrders(); // Recharger pour voir les changements
+                this.loadMyOrders(); // Recharger pour voir les changements
             }, 5000);
         }
     }
 
-    // Méthodes utilitaires
-    getCurrentCustomer() {
-        return this.selectedCustomer;
+    // Utilitaires
+    updateWebSocketStatus(connected) {
+        this.ui.elements.websocketStatus.textContent = connected ? 'Connecté' : 'Déconnecté';
+        this.ui.elements.websocketStatus.className = `badge bg-${connected ? 'success' : 'secondary'}`;
     }
 
-    getCurrentTrackingOrder() {
-        return this.currentTrackingOrder;
+    updateLastUpdateTime() {
+        this.ui.elements.lastUpdateTime.textContent = new Date().toLocaleTimeString();
     }
 
-    isTracking() {
-        return this.currentTrackingOrder !== null;
-    }
-
-    getWebSocketStatus() {
-        return this.services.websocket.isConnected();
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     }
 }
 
 // Initialiser l'application quand le DOM est prêt
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     window.customerApp = new CustomerApp();
+    await window.customerApp.init();
 });

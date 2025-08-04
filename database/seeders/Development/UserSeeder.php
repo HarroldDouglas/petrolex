@@ -6,6 +6,7 @@ namespace Database\Seeders\Development;
 
 use App\Enums\UserRole;
 use App\Models\Customer;
+use App\Models\CustomerDeliveryAddress;
 use App\Models\DistributionCenter;
 use App\Models\User;
 use App\Models\UserDistributionCenter;
@@ -161,6 +162,8 @@ class UserSeeder extends Seeder
      */
     private function createCustomers(): void
     {
+        $this->createTestCustomer();
+
         User::factory()
             ->customer()
             ->count(20)
@@ -180,7 +183,42 @@ class UserSeeder extends Seeder
             ->count(10)
             ->create();
 
-        $this->command->info('50 customers created (30 random + 10 VIP + 10 new).');
+        $this->command->info('51 customers created (1 specific + 30 random + 10 VIP + 10 new).');
+    }
+
+    /**
+     * Create a specific customer for testing purposes
+     */
+    private function createTestCustomer(): void
+    {
+        $customerUser = User::factory()
+            ->customer()
+            ->create([
+                'first_name' => 'Customer',
+                'last_name' => 'Test',
+                'email' => 'customer1@test.com',
+            ]);
+
+        $customer = $customerUser->customer;
+
+        $customer->deliveryAddresses()->create([
+            'address' => 'Nkoabang',
+            'latitude' => 3.8617882,
+            'longitude' => 11.5835694,
+            'is_default' => true,
+        ]);
+
+        $customer->deliveryAddresses()->create([
+            'address' => 'Poste Centrale',
+            'latitude' => 3.8741355,
+            'longitude' => 11.5173166,
+        ]);
+
+        $customer->deliveryAddresses()->create([
+            'address' => 'Essos',
+            'latitude' => 3.868779,
+            'longitude' => 11.542277,
+        ]);
     }
 
     /**

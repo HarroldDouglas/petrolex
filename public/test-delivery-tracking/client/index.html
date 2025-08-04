@@ -24,40 +24,49 @@
                         <h5><span class="status-indicator status-offline" id="connectionStatus"></span>Interface Client - Système Réel</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Sélection du client -->
-                        <div id="customerSelectionPanel">
+                        <!-- Connexion client -->
+                        <div id="loginPanel">
                             <div class="section-header">
-                                <h6><i class="fas fa-user-friends"></i> Sélection Client</h6>
+                                <h6><i class="fas fa-user-circle"></i> Connexion Client</h6>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Rechercher un client</label>
-                                <input type="text" class="form-control" id="customerSearchInput" 
-                                       placeholder="Nom, email ou téléphone...">
-                            </div>
-                            <div id="customersList"></div>
-                            <div id="customerPagination" class="d-flex justify-content-center mt-3"></div>
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="clientEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="clientPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100" id="loginBtn">
+                                    <i class="fas fa-sign-in-alt"></i> Se connecter
+                                </button>
+                            </form>
+                            <div id="loginError" class="alert alert-danger mt-3" style="display: none;"></div>
                         </div>
 
-                        <!-- Panel client sélectionné -->
-                        <div id="selectedCustomerPanel" style="display: none;">
-                            <div class="selected-customer-info">
-                                <div class="section-header d-flex justify-content-between align-items-center">
-                                    <h6><i class="fas fa-user"></i> Client Sélectionné</h6>
-                                    <button class="btn btn-outline-secondary btn-sm" id="changeCustomerBtn">
-                                        <i class="fas fa-exchange-alt"></i> Changer
-                                    </button>
+                        <!-- Panel principal client -->
+                        <div id="clientPanel" style="display: none;">
+                            <div class="client-info-section">
+                                <div class="section-header">
+                                    <h6><i class="fas fa-user"></i> Informations Client</h6>
                                 </div>
-                                <div class="customer-info-card">
-                                    <p class="mb-1"><strong>Nom:</strong> <span id="selectedCustomerName"></span></p>
-                                    <p class="mb-1"><strong>Email:</strong> <span id="selectedCustomerEmail"></span></p>
-                                    <p class="mb-0"><strong>Téléphone:</strong> <span id="selectedCustomerPhone"></span></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-1"><strong>Nom:</strong> <span id="currentClientName"></span></p>
+                                        <p class="mb-1"><strong>Email:</strong> <span id="currentClientEmail"></span></p>
+                                        <p class="mb-0"><strong>Statut:</strong> <span id="currentStatus" class="badge bg-success">Connecté</span></p>
+                                    </div>
+                                    <button class="btn btn-outline-danger btn-sm" id="logoutBtn">
+                                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Commandes du client -->
+                            <!-- Mes commandes -->
                             <div class="mb-3">
                                 <div class="section-header d-flex justify-content-between align-items-center">
-                                    <h6><i class="fas fa-shopping-cart"></i> Commandes</h6>
+                                    <h6><i class="fas fa-shopping-cart"></i> Mes Commandes</h6>
                                     <button class="btn btn-outline-primary btn-sm" id="refreshOrdersBtn">
                                         <i class="fas fa-sync-alt"></i> Actualiser
                                     </button>

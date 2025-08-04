@@ -307,10 +307,15 @@ class WebSocketService {
     }
 }
 
-// Service pour les appels API côté client (sans authentification)
+// Service pour les appels API côté client (avec authentification)
 class CustomerApiService {
     constructor() {
         this.baseUrl = CONFIG.API.BASE_URL;
+        this.authService = null; // Sera initialisé plus tard pour éviter les références circulaires
+    }
+
+    setAuthService(authService) {
+        this.authService = authService;
     }
 
     async request(endpoint, options = {}) {
@@ -322,10 +327,23 @@ class CustomerApiService {
             }
         };
 
+        // Ajouter le token d'authentification si disponible
+        if (this.authService && this.authService.isAuthenticated()) {
+            const token = this.authService.getToken();
+            defaultOptions.headers['Authorization'] = `Bearer ${token}`;
+        }
+
         try {
             const response = await fetch(url, { ...defaultOptions, ...options });
             
             if (!response.ok) {
+                if (response.status === 401) {
+                    // Token expiré ou invalide
+                    if (this.authService) {
+                        await this.authService.logout();
+                        window.location.reload(); // Recharger pour afficher la page de connexion
+                    }
+                }
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
             
@@ -587,13 +605,14 @@ class CustomerWebSocketService {
 
     initialize() {
         try {
-            this.pusher = new Pusher(CONFIG.WEBSOCKET.APP_KEY, {
+            this.pusher = new Pusher(CONFIG.WEBSOCKET.PUSHER_APP_KEY, {
                 wsHost: CONFIG.WEBSOCKET.HOST,
                 wsPort: CONFIG.WEBSOCKET.PORT,
                 wssPort: CONFIG.WEBSOCKET.PORT,
                 forceTLS: CONFIG.WEBSOCKET.FORCE_TLS,
                 enabledTransports: CONFIG.WEBSOCKET.ENABLED_TRANSPORTS,
-                cluster: 'mt1'
+                cluster: CONFIG.WEBSOCKET.PUSHER_APP_CLUSTER,
+                disableStats: true
             });
 
             this.pusher.connection.bind('connected', () => {
@@ -684,5 +703,140 @@ class CustomerWebSocketService {
 
     isConnected() {
         return this.connected;
+    }
+}
+
+// Service pour l'authentification client
+class AuthService {
+    constructor() {
+        this.apiService = new CustomerApiService();
+        this.storageKey = 'delivery-tracking-client-auth';
+        this.tokenDuration = 2 * 60 * 60 * 1000; // 2 heures en millisecondes
+    }
+
+    /**
+     * Connexion client avec email/mot de passe
+     */
+    async login(email, password) {
+        try {
+            const response = await fetch(`${CONFIG.API.BASE_URL}${CONFIG.API.ENDPOINTS.LOGIN}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    login: email,
+                    password: password
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur de connexion: ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            const data = responseData.data;
+            
+            // Stocker les informations d'authentification avec expiration
+            const authData = {
+                token: data.access_token,
+                user: data.user,
+                loginTime: Date.now(),
+                expiresAt: Date.now() + this.tokenDuration
+            };
+            
+            localStorage.setItem(this.storageKey, JSON.stringify(authData));
+            
+            return authData;
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Déconnexion
+     */
+    async logout() {
+        try {
+            const authData = this.getAuthData();
+            if (authData && authData.token && !this.isTokenExpired()) {
+                await fetch(`${CONFIG.API.BASE_URL}${CONFIG.API.ENDPOINTS.LOGOUT}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authData.token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            localStorage.removeItem(this.storageKey);
+        }
+    }
+
+    /**
+     * Récupérer les données d'authentification stockées
+     */
+    getAuthData() {
+        try {
+            const stored = localStorage.getItem(this.storageKey);
+            return stored ? JSON.parse(stored) : null;
+        } catch (error) {
+            console.error('Error parsing auth data:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Vérifier si le token est expiré
+     */
+    isTokenExpired() {
+        const authData = this.getAuthData();
+        if (!authData || !authData.expiresAt) {
+            return true;
+        }
+        return Date.now() > authData.expiresAt;
+    }
+
+    /**
+     * Vérifier si l'utilisateur est connecté avec un token valide
+     */
+    isAuthenticated() {
+        const authData = this.getAuthData();
+        return authData && authData.token && !this.isTokenExpired();
+    }
+
+    /**
+     * Récupérer le token d'authentification si valide
+     */
+    getToken() {
+        if (this.isAuthenticated()) {
+            const authData = this.getAuthData();
+            return authData.token;
+        }
+        return null;
+    }
+
+    /**
+     * Récupérer les informations utilisateur si token valide
+     */
+    getUser() {
+        if (this.isAuthenticated()) {
+            const authData = this.getAuthData();
+            return authData.user;
+        }
+        return null;
+    }
+
+    /**
+     * Nettoyer le token expiré
+     */
+    clearExpiredToken() {
+        if (this.isTokenExpired()) {
+            localStorage.removeItem(this.storageKey);
+        }
     }
 }

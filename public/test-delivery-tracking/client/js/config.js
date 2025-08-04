@@ -4,12 +4,16 @@ const CONFIG = {
     API: {
         BASE_URL: 'http://127.0.0.1:8000/api',
         ENDPOINTS: {
-            // Customer endpoints
+            // Auth endpoints
+            LOGIN: '/login',
+            LOGOUT: '/logout',
+            
+            // Customer endpoints (vraies routes API)
             CUSTOMERS: '/customers',
             CUSTOMER_ORDERS: '/customers/{id}/orders',
             
             // Tracking endpoints  
-            TRACKING_DETAILS: '/tracking/delivery/{orderNumber}'
+            TRACKING_DETAILS: '/tracking/delivery/{orderId}'
         }
     },
 
@@ -55,13 +59,18 @@ const CONFIG = {
         DEFAULT_PAGINATION: 10
     },
 
-    // WebSocket Configuration
+    // WebSocket Configuration pour Laravel Reverb
     WEBSOCKET: {
-        APP_KEY: 'local',
+        APP_KEY: 'your-app-key', // Doit correspondre à REVERB_APP_KEY dans .env
         HOST: '127.0.0.1',
         PORT: 8080,
         FORCE_TLS: false,
-        ENABLED_TRANSPORTS: ['ws', 'wss']
+        ENABLED_TRANSPORTS: ['ws', 'wss'],
+        // Configuration spécifique pour Laravel Reverb
+        PUSHER_APP_ID: 'your-app-id',
+        PUSHER_APP_KEY: 'your-app-key',
+        PUSHER_APP_SECRET: 'your-app-secret',
+        PUSHER_APP_CLUSTER: 'mt1'
     }
 };
 
