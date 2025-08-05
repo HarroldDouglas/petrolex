@@ -9,6 +9,7 @@ use App\Http\Api\Requests\TrackingDelivery\CreateDeliveryTrackingRequest;
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,6 +35,7 @@ final class CreateDeliveryTrackingController extends Controller
             return DeliveryTrackingResponse::error('Invalid order ID.', Response::HTTP_BAD_REQUEST);
         }
 
+        /** @var Order */
         $order = $this->orderRepository->find($orderId);
 
         if (! $order) {

@@ -67,12 +67,37 @@ class DeliveryTrackingService {
             if (selectedOrder && selectedOrder.trackingData && selectedOrder.id === orderIdentifier) {
                 const trackingData = selectedOrder.trackingData;
                 
+                // 🔧 CORRECTION CRITIQUE: Validation plus stricte des coordonnées
+                console.log('🔍 [TrackingService] Vérification des coordonnées du livreur:', {
+                    driver_lat: trackingData.driver_lat,
+                    driver_lng: trackingData.driver_lng,
+                    types: {
+                        lat: typeof trackingData.driver_lat,
+                        lng: typeof trackingData.driver_lng
+                    }
+                });
+                
                 if (trackingData.driver_lat && trackingData.driver_lng) {
-                    currentPosition = {
-                        lat: parseFloat(trackingData.driver_lat),
-                        lng: parseFloat(trackingData.driver_lng)
-                    };
+                    const driverLat = parseFloat(trackingData.driver_lat);
+                    const driverLng = parseFloat(trackingData.driver_lng);
+                    
+                    // Vérification supplémentaire pour s'assurer que les coordonnées sont valides
+                    if (!isNaN(driverLat) && !isNaN(driverLng) && 
+                        driverLat !== 0 && driverLng !== 0 &&
+                        Math.abs(driverLat) <= 90 && Math.abs(driverLng) <= 180) {
+                        
+                        currentPosition = {
+                            lat: driverLat,
+                            lng: driverLng
+                        };
+                        
+                        console.log('✅ [TrackingService] Utilisation de la position exacte du livreur:', currentPosition);
+                    } else {
+                        console.warn('⚠️ [TrackingService] Coordonnées du livreur invalides, fallback vers GPS');
+                        currentPosition = await this.mapService.getCurrentGPSPosition();
+                    }
                 } else {
+                    console.warn('⚠️ [TrackingService] Coordonnées du livreur manquantes, fallback vers GPS');
                     currentPosition = await this.mapService.getCurrentGPSPosition();
                 }
                 

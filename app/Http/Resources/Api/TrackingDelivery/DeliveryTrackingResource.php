@@ -23,6 +23,7 @@ final class DeliveryTrackingResource extends JsonResource
             'driver_lat' => $this->driver_lat,
             'driver_lng' => $this->driver_lng,
         ]);
+
         return [
             'id' => $this->id,
             'order_id' => $this->order_id,
@@ -52,22 +53,23 @@ final class DeliveryTrackingResource extends JsonResource
     private function calculateProgressPercentage(): ?float
     {
         if (! $this->distance_remaining || ! $this->total_distance) {
-            Log::info("Cannot calculate progress - missing data", [
+            Log::info('Cannot calculate progress - missing data', [
                 'distance_remaining' => $this->distance_remaining,
-                'total_distance' => $this->total_distance
+                'total_distance' => $this->total_distance,
             ]);
+
             return null;
         }
 
         $distanceTraveled = max(0, $this->total_distance - $this->distance_remaining);
         $progress = ($distanceTraveled / $this->total_distance) * 100;
         $finalProgress = max(0, min(100, $progress));
-        
-        Log::info("Progress calculated", [
+
+        Log::info('Progress calculated', [
             'total_distance' => $this->total_distance,
             'distance_remaining' => $this->distance_remaining,
             'distance_traveled' => $distanceTraveled,
-            'progress_percentage' => $finalProgress
+            'progress_percentage' => $finalProgress,
         ]);
 
         return $finalProgress;

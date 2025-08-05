@@ -27,8 +27,7 @@ final class StartDeliveryTrackingController extends Controller
         private readonly DeliveryTrackingServiceInterface $deliveryTrackingService,
         private readonly DeliveryTrackingRepositoryInterface $deliveryTrackingRepository,
         private readonly OrderService $orderService,
-    ) {
-    }
+    ) {}
 
     /**
      * Start a delivery tracking.
@@ -70,11 +69,12 @@ final class StartDeliveryTrackingController extends Controller
     {
         $order = $this->orderService->find($orderId);
 
-        if (!$order) {
+        if (! $order) {
             Log::warning('Order not found', ['order_id' => $orderId]);
             throw new \InvalidArgumentException('Order not found');
         }
 
+        /** @var Order */
         return $order;
     }
 
@@ -101,7 +101,7 @@ final class StartDeliveryTrackingController extends Controller
 
         return [
             'lat' => (float) $validated['driver_lat'],
-            'lng' => (float) $validated['driver_lng']
+            'lng' => (float) $validated['driver_lng'],
         ];
     }
 
