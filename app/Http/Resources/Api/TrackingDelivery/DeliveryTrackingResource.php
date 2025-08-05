@@ -13,11 +13,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 final class DeliveryTrackingResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -35,12 +30,26 @@ final class DeliveryTrackingResource extends JsonResource
             'destination_address' => $this->whenLoaded('order', fn () => $this->order->deliveryAddress->full_address ?? null),
             'estimated_duration' => $this->estimated_duration,
             'distance_remaining' => $this->distance_remaining,
+            'total_distance' => $this->total_distance,
             'current_speed' => $this->current_speed,
             'route_geometry' => $this->route_geometry,
             'started_at' => $this->started_at,
             'delivered_at' => $this->delivered_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'progress_percentage' => $this->calculateProgressPercentage(),
         ];
+    }
+
+    private function calculateProgressPercentage(): ?float
+    {
+        if (! $this->distance_remaining || ! $this->total_distance) {
+            return null;
+        }
+
+        $distanceTraveled = max(0, $this->total_distance - $this->distance_remaining);
+        $progress = ($distanceTraveled / $this->total_distance) * 100;
+
+        return max(0, min(100, $progress));
     }
 }

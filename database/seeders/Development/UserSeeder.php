@@ -6,7 +6,6 @@ namespace Database\Seeders\Development;
 
 use App\Enums\UserRole;
 use App\Models\Customer;
-use App\Models\CustomerDeliveryAddress;
 use App\Models\DistributionCenter;
 use App\Models\User;
 use App\Models\UserDistributionCenter;
@@ -202,6 +201,7 @@ class UserSeeder extends Seeder
         $customer = $customerUser->customer;
 
         $customer->deliveryAddresses()->create([
+            'label' => 'Nkoabang',
             'address' => 'Nkoabang',
             'latitude' => 3.8617882,
             'longitude' => 11.5835694,
@@ -209,12 +209,14 @@ class UserSeeder extends Seeder
         ]);
 
         $customer->deliveryAddresses()->create([
+            'label' => 'Poste Centrale',
             'address' => 'Poste Centrale',
             'latitude' => 3.8741355,
             'longitude' => 11.5173166,
         ]);
 
         $customer->deliveryAddresses()->create([
+            'label' => 'Essos',
             'address' => 'Essos',
             'latitude' => 3.868779,
             'longitude' => 11.542277,

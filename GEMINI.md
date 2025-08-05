@@ -145,7 +145,7 @@ pr créer un controller explore les autres controllers et comprend comment on fo
 pareil pour les autres classes et tout! tout est important , il faut dabord analyser lexistant avant toute chose
 
 
-Lorsque je te donne une tâche à faire, tu as obligation stricte de voir comment on fait dans le code avant de faire, c'est        │
-│   non négociable pour éviter dhalluciner! si tu dois créer une vue, tu dois voir comment les autres vues sont dans le système       │
-│   (environ 2) et voir quel layout par exemple est utilisé pour éviter de me sortir des trucs qui nexistent pas, voir les            │
-│   standards, que ce soit pour le nommage, le formattage, et tout autre!
+    Lorsque je te donne une tâche à faire, tu as obligation stricte de voir comment on fait dans le code avant de faire, c'est        │
+    │   non négociable pour éviter dhalluciner! si tu dois créer une vue, tu dois voir comment les autres vues sont dans le système       │
+    │   (environ 2) et voir quel layout par exemple est utilisé pour éviter de me sortir des trucs qui nexistent pas, voir les            │
+    │   standards, que ce soit pour le nommage, le formattage, et tout autre!

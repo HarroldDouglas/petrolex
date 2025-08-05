@@ -1,12 +1,11 @@
-// Service pour la simulation de livraison en temps réel
 class DeliveryTrackingService {
-    constructor(apiService, mapService, ui) {
+    constructor(apiService, mapService, ui, orderManager = null) {
         this.apiService = apiService;
         this.trackingApi = new DeliveryTrackingApiService(apiService);
         this.mapService = mapService;
         this.ui = ui;
+        this.orderManager = orderManager;
 
-        // État de tracking
         this.state = {
             isTracking: false,
             isPaused: false,
@@ -15,17 +14,14 @@ class DeliveryTrackingService {
             currentIndex: 0,
         };
 
-        // Intervalles
         this.intervals = {
             simulation: null,
             positionUpdate: null,
         };
 
-        // Callbacks
         this.callbacks = {};
     }
 
-    // Gestion des événements
     on(event, callback) {
         if (!this.callbacks[event]) {
             this.callbacks[event] = [];
@@ -45,31 +41,16 @@ class DeliveryTrackingService {
         }
     }
 
-    // Démarrage du tracking
-    async startTracking(
-        orderNumber,
-        speed = CONFIG.SIMULATION.DEFAULT_SPEED,
-        estimatedDurationMinutes = null,
-    ) {
+    async startTracking(orderIdentifier, speed = DELIVERY_CONFIG.SIMULATION.DEFAULT_SPEED, estimatedDurationMinutes = null) {
         if (this.state.isTracking) {
             throw new Error("Tracking already in progress");
         }
 
         try {
-            const trackingData = await this.initializeTracking(
-                orderNumber,
-                estimatedDurationMinutes,
-            );
-            await this.setupRoute(
-                trackingData.orderDetails,
-                trackingData.currentPosition,
-                speed,
-                estimatedDurationMinutes,
-            );
-
+            const trackingData = await this.initializeTracking(orderIdentifier, estimatedDurationMinutes);
+            await this.setupRoute(trackingData.orderDetails, trackingData.currentPosition, speed, estimatedDurationMinutes);
             this.startPositionUpdates();
             this.emit("trackingStarted", trackingData);
-
             return trackingData.apiResponse;
         } catch (error) {
             this.resetState();
@@ -77,42 +58,113 @@ class DeliveryTrackingService {
         }
     }
 
-    async initializeTracking(orderNumber, estimatedDurationMinutes) {
-        const currentPosition = await this.mapService.getCurrentGPSPosition();
-        const apiResponse = await this.trackingApi.startTracking(
-            orderNumber,
-            currentPosition,
-        );
+    async initializeTracking(orderIdentifier, estimatedDurationMinutes) {
+        let currentPosition;
+        
+        if (this.orderManager) {
+            const selectedOrder = this.orderManager.getSelectedOrder();
+            
+            if (selectedOrder && selectedOrder.trackingData && selectedOrder.id === orderIdentifier) {
+                const trackingData = selectedOrder.trackingData;
+                
+                if (trackingData.driver_lat && trackingData.driver_lng) {
+                    currentPosition = {
+                        lat: parseFloat(trackingData.driver_lat),
+                        lng: parseFloat(trackingData.driver_lng)
+                    };
+                } else {
+                    currentPosition = await this.mapService.getCurrentGPSPosition();
+                }
+                
+                const apiResponse = {
+                    _metadata: { success: true },
+                    data: selectedOrder.trackingData
+                };
+                
+                this.state.currentOrder = apiResponse.data;
+                this.state.isTracking = true;
+                this.state.isPaused = false;
+                
+                const orderDetails = {
+                    id: this.state.currentOrder.order_id,
+                    order_number: this.state.currentOrder.order_number,
+                    delivery_address: {
+                        latitude: this.state.currentOrder.destination_lat,
+                        longitude: this.state.currentOrder.destination_lng,
+                        name: this.state.currentOrder.destination_address || "Adresse de livraison"
+                    },
+                    customer: {
+                        full_name: this.state.currentOrder.customer_name || "Client",
+                        phone_number: this.state.currentOrder.driver_phone
+                    }
+                };
+                
+                this.mapService.updateDriverPosition(
+                    currentPosition.lat,
+                    currentPosition.lng,
+                    `Reprise de livraison - ${this.state.currentOrder?.order_number}`,
+                );
+                
+                return { apiResponse, orderDetails, currentPosition };
+            }
+        }
+        
+        currentPosition = await this.mapService.getCurrentGPSPosition();
+        const apiResponse = await this.trackingApi.startTracking(orderIdentifier, currentPosition);
 
         if (!apiResponse._metadata?.success || !apiResponse.data) {
-            throw new Error(
-                apiResponse._metadata?.message ||
-                    "Impossible de démarrer le tracking",
-            );
+            throw new Error(apiResponse._metadata?.message || "Impossible de démarrer le tracking");
         }
 
         this.state.currentOrder = apiResponse.data;
         this.state.isTracking = true;
         this.state.isPaused = false;
-        this.state.currentIndex = 0;
 
-        const orderDetails = this.apiService.getOrderFromCache(orderNumber);
+        let orderDetails;
+        
+        if (this.state.currentOrder.destination_lat && this.state.currentOrder.destination_lng) {
+            orderDetails = {
+                id: this.state.currentOrder.order_id,
+                order_number: this.state.currentOrder.order_number,
+                delivery_address: {
+                    latitude: this.state.currentOrder.destination_lat,
+                    longitude: this.state.currentOrder.destination_lng,
+                    name: this.state.currentOrder.destination_address || "Adresse de livraison"
+                },
+                customer: {
+                    full_name: this.state.currentOrder.customer_name || "Client",
+                    phone_number: this.state.currentOrder.driver_phone
+                }
+            };
+        } else {
+            const orderNumber = this.state.currentOrder.order_number;
+            orderDetails = this.apiService.getOrderFromCache(orderNumber);
+            
+            if (!orderDetails) {
+                const orderId = this.state.currentOrder.order_id;
+                if (orderId) {
+                    const convertedOrderNumber = this.apiService.getOrderNumberFromId(orderId);
+                    if (convertedOrderNumber) {
+                        orderDetails = this.apiService.getOrderFromCache(convertedOrderNumber);
+                    }
+                }
+            }
+        }
+        
+        if (!orderDetails || !orderDetails.delivery_address) {
+            throw new Error("Détails de commande introuvables. Veuillez recharger.");
+        }
 
         this.mapService.updateDriverPosition(
             currentPosition.lat,
             currentPosition.lng,
-            `<strong>Début de livraison</strong><br>Commande: ${orderNumber}`,
+            `Début de livraison - ${this.state.currentOrder?.order_number}`,
         );
 
         return { apiResponse, orderDetails, currentPosition };
     }
 
-    async setupRoute(
-        orderDetails,
-        currentPosition,
-        speed,
-        estimatedDurationMinutes,
-    ) {
+    async setupRoute(orderDetails, currentPosition, speed, estimatedDurationMinutes) {
         if (!orderDetails?.delivery_address) {
             throw new Error("Adresse de livraison non trouvée");
         }
@@ -122,21 +174,13 @@ class DeliveryTrackingService {
             throw new Error("Coordonnées de destination invalides");
         }
 
-        // Configurer la destination sur la carte
         this.mapService.setDestination(destination.lat, destination.lng, {
             customer: orderDetails.customer?.full_name,
-            address:
-                orderDetails.delivery_address.name ||
-                orderDetails.delivery_address.address,
+            address: orderDetails.delivery_address.name || orderDetails.delivery_address.address,
             phone: orderDetails.customer?.phone_number,
         });
 
-        // Calculer et dessiner la route
-        const routeData = await this.mapService.drawRoute(
-            currentPosition,
-            destination,
-            this.getTransportMode(),
-        );
+        const routeData = await this.mapService.drawRoute(currentPosition, destination, this.getTransportMode());
 
         if (routeData?.geometry?.coordinates) {
             this.state.routeCoordinates = routeData.geometry.coordinates;
@@ -149,19 +193,15 @@ class DeliveryTrackingService {
     extractDestinationCoords(orderDetails) {
         const lat = parseFloat(orderDetails.delivery_address.latitude);
         const lng = parseFloat(orderDetails.delivery_address.longitude);
-
         return !isNaN(lat) && !isNaN(lng) ? { lat, lng } : null;
     }
 
-    // Simulation de mouvement
     startSimulation(speed, estimatedDurationMinutes) {
         if (this.intervals.simulation) {
             clearInterval(this.intervals.simulation);
         }
 
-        const totalDurationMs = this.calculateSimulationDuration(
-            estimatedDurationMinutes,
-        );
+        const totalDurationMs = this.calculateSimulationDuration(estimatedDurationMinutes);
         const interval = totalDurationMs / this.state.routeCoordinates.length;
 
         this.intervals.simulation = setInterval(() => {
@@ -171,9 +211,9 @@ class DeliveryTrackingService {
 
     calculateSimulationDuration(estimatedDurationMinutes) {
         if (estimatedDurationMinutes && estimatedDurationMinutes > 0) {
-            return estimatedDurationMinutes * 60 * 1000; // minutes → ms
+            return estimatedDurationMinutes * 60 * 1000;
         }
-        return 30 * 1000; // 30 secondes par défaut
+        return 30 * 1000;
     }
 
     executeSimulationStep(speed) {
@@ -189,18 +229,10 @@ class DeliveryTrackingService {
         const coord = this.state.routeCoordinates[this.state.currentIndex];
         const [lng, lat] = coord;
 
-        // Mettre à jour la position
         this.updateCurrentPosition(lat, lng, speed);
 
-        // Calculer et émettre la progression
-        const progress =
-            (this.state.currentIndex / this.state.routeCoordinates.length) *
-            100;
         this.emit("progressUpdate", {
-            progress: Math.round(progress),
             position: { lat, lng },
-            index: this.state.currentIndex,
-            total: this.state.routeCoordinates.length,
             speed: this.ui?.getTravelSpeed() || speed,
         });
 
@@ -211,19 +243,15 @@ class DeliveryTrackingService {
         this.mapService.updateDriverPosition(
             lat,
             lng,
-            `<strong>En livraison</strong><br>
-             Commande: ${this.state.currentOrder?.order_number}<br>
-             Position: ${lat.toFixed(4)}, ${lng.toFixed(4)}<br>
-             Vitesse: ${this.ui?.getTravelSpeed() || speed} km/h`,
+            `En livraison - ${this.state.currentOrder?.order_number}`,
             this.ui?.getTravelSpeed() || speed,
         );
     }
 
-    // Mises à jour de position
     startPositionUpdates() {
         this.intervals.positionUpdate = setInterval(async () => {
             await this.sendPositionUpdate();
-        }, CONFIG.SIMULATION.POSITION_UPDATE_INTERVAL);
+        }, DELIVERY_CONFIG.SIMULATION.POSITION_UPDATE_INTERVAL);
     }
 
     async sendPositionUpdate() {
@@ -232,19 +260,32 @@ class DeliveryTrackingService {
         const position = this.mapService.getCurrentPosition();
         if (position) {
             const currentSpeed = this.ui?.getTravelSpeed() || 40;
+            
             try {
-                await this.trackingApi.updatePosition(
-                    this.state.currentOrder.order_number,
+                const orderId = this.state.currentOrder.order_id || this.state.currentOrder.id;
+                
+                const response = await this.trackingApi.updatePosition(
+                    orderId,
                     position,
-                    currentSpeed,
+                    currentSpeed
                 );
+                
+                if (response && response._metadata?.success && response.data) {
+                    const serverData = response.data;
+                    this.emit("progressUpdate", {
+                        progress: serverData.progress_percentage || 0,
+                        position: position,
+                        speed: currentSpeed,
+                        remainingDistance: serverData.distance_remaining,
+                        remainingTime: serverData.estimated_duration
+                    });
+                }
             } catch (error) {
                 console.error("Position update failed:", error);
             }
         }
     }
 
-    // Contrôles
     pauseTracking() {
         this.state.isPaused = true;
         this.emit("trackingPaused");
@@ -262,9 +303,8 @@ class DeliveryTrackingService {
 
     async completeTracking() {
         try {
-            await this.trackingApi.completeTracking(
-                this.state.currentOrder.order_number,
-            );
+            const orderId = this.state.currentOrder.order_id || this.state.currentOrder.id;
+            await this.trackingApi.completeTracking(orderId);
         } catch (error) {
             console.error("Error completing tracking:", error);
         }
@@ -276,7 +316,6 @@ class DeliveryTrackingService {
         }, 2000);
     }
 
-    // Utilitaires
     resetState() {
         this.state.isTracking = false;
         this.state.isPaused = false;
@@ -297,18 +336,9 @@ class DeliveryTrackingService {
     }
 
     getTrackingState() {
-        const progress =
-            this.state.routeCoordinates.length > 0
-                ? Math.round(
-                      (this.state.currentIndex /
-                          this.state.routeCoordinates.length) *
-                          100,
-                  )
-                : 0;
-
         return {
             ...this.state,
-            progress,
+            progress: 0,
         };
     }
 }

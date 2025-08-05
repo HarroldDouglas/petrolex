@@ -34,7 +34,6 @@ final class CreateDeliveryTrackingController extends Controller
             return DeliveryTrackingResponse::error('Invalid order ID.', Response::HTTP_BAD_REQUEST);
         }
 
-        /** @var \App\Models\Order|null $order */
         $order = $this->orderRepository->find($orderId);
 
         if (! $order) {
@@ -45,9 +44,13 @@ final class CreateDeliveryTrackingController extends Controller
             return DeliveryTrackingResponse::error('Order cannot be tracked.', Response::HTTP_BAD_REQUEST);
         }
 
+        $totalDistance = $this->calculateTotalDistance($order);
+
         $deliveryTracking = $this->deliveryTrackingRepository->create([
             'order_id' => $order->id,
             'status' => DeliveryTrackingStatus::PENDING(),
+            'total_distance' => $totalDistance,
+            'distance_remaining' => $totalDistance,
         ]);
 
         return DeliveryTrackingResponse::make(
@@ -55,5 +58,29 @@ final class CreateDeliveryTrackingController extends Controller
             'Delivery tracking created successfully.',
             Response::HTTP_CREATED
         );
+    }
+
+    private function calculateTotalDistance($order): float
+    {
+        if (! $order->distributionCenter || ! $order->deliveryAddress) {
+            return 0.0;
+        }
+
+        $startLat = (float) $order->distributionCenter->latitude;
+        $startLng = (float) $order->distributionCenter->longitude;
+        $endLat = (float) $order->deliveryAddress->latitude;
+        $endLng = (float) $order->deliveryAddress->longitude;
+
+        $earthRadius = 6371;
+
+        $dLat = deg2rad($endLat - $startLat);
+        $dLng = deg2rad($endLng - $startLng);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($startLat)) * cos(deg2rad($endLat)) *
+             sin($dLng / 2) * sin($dLng / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return round($earthRadius * $c, 2);
     }
 }

@@ -6,6 +6,7 @@ namespace App\Http\Api\Controllers\TrackingDelivery;
 
 use App\Enums\DeliveryTrackingStatus;
 use App\Enums\OrderStatus;
+use App\Events\DeliveryStatusUpdated;
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
 use App\Http\Controllers\Controller;
@@ -29,24 +30,29 @@ final class CompleteDeliveryTrackingController extends Controller
      */
     public function __invoke(int $orderId): ApiResponse
     {
-        Log::info('Attempting to complete delivery tracking for order ID: ' . $orderId);
+        Log::info('Attempting to complete delivery tracking for order ID: '.$orderId);
 
         $deliveryTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
         if (! $deliveryTracking) {
-            Log::warning('Delivery tracking not found for order ID: ' . $orderId);
+            Log::warning('Delivery tracking not found for order ID: '.$orderId);
+
             return DeliveryTrackingResponse::error('Delivery tracking not found.', null, Response::HTTP_NOT_FOUND);
         }
 
-        if ($deliveryTracking->status->value === DeliveryTrackingStatus::COMPLETED()->value) {
-            Log::info('Delivery tracking for order ID ' . $orderId . ' is already completed.');
+        if ($deliveryTracking->status->value === DeliveryTrackingStatus::DELIVERED()->value) {
+            Log::info('Delivery tracking for order ID '.$orderId.' is already completed.');
+
             return DeliveryTrackingResponse::error('Delivery tracking is already completed.', null, Response::HTTP_CONFLICT);
         }
+
+        // CORRECTION CRITIQUE: Capturer le statut précédent pour l'événement
+        $previousStatus = $deliveryTracking->status->value;
 
         $deliveryTracking = $this->deliveryTrackingRepository->update(
             $deliveryTracking,
             [
-                'status' => DeliveryTrackingStatus::COMPLETED(),
+                'status' => DeliveryTrackingStatus::DELIVERED(),
                 'delivered_at' => now(),
             ]
         );
@@ -54,10 +60,13 @@ final class CompleteDeliveryTrackingController extends Controller
         $order = $deliveryTracking->order;
         if ($order) {
             $this->orderService->updateOrderStatus($order, OrderStatus::DELIVERED());
-            Log::info('Order status updated to DELIVERED for order ID: ' . $orderId);
+            Log::info('Order status updated to DELIVERED for order ID: '.$orderId);
         }
 
-        Log::info('Delivery tracking completed successfully for order ID: ' . $orderId);
+        // AMÉLIORATION CRITIQUE: Déclencher l'événement de changement de statut
+        broadcast(new DeliveryStatusUpdated($deliveryTracking->fresh(), $previousStatus));
+
+        Log::info('Delivery tracking completed successfully for order ID: '.$orderId);
 
         return DeliveryTrackingResponse::make(
             $deliveryTracking,

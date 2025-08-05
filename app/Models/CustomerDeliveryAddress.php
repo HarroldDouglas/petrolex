@@ -143,9 +143,13 @@ class CustomerDeliveryAddress extends Model
     public function shortAddress(): string
     {
         $parts = [];
-        
-        if ($this->label) $parts[] = $this->label;
-        if ($this->address) $parts[] = $this->address;
+
+        if ($this->label) {
+            $parts[] = $this->label;
+        }
+        if ($this->address) {
+            $parts[] = $this->address;
+        }
 
         return implode(' - ', array_filter($parts)) ?: 'Address not specified';
     }

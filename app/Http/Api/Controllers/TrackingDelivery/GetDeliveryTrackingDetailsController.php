@@ -8,8 +8,8 @@ use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 final class GetDeliveryTrackingDetailsController extends Controller
 {
@@ -23,15 +23,24 @@ final class GetDeliveryTrackingDetailsController extends Controller
      */
     public function __invoke(int $orderId): ApiResponse
     {
-        Log::info('Attempting to get delivery tracking details for order ID: ' . $orderId);
+        Log::info('Attempting to get delivery tracking details for order ID: '.$orderId);
         $deliveryTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
         if (! $deliveryTracking) {
-            Log::warning('Delivery tracking not found for order ID: ' . $orderId);
+            Log::warning('Delivery tracking not found for order ID: '.$orderId);
+
             return DeliveryTrackingResponse::error('Delivery tracking not found.', Response::HTTP_NOT_FOUND);
         }
 
-        Log::info('Delivery tracking details retrieved successfully for order ID: ' . $orderId);
+        // CORRECTION CRITIQUE: Charger toutes les relations nécessaires
+        $deliveryTracking->load([
+            'order.customer',
+            'order.deliveryAddress',
+            'order.deliveryPerson',
+        ]);
+
+        Log::info('Delivery tracking details retrieved successfully for order ID: '.$orderId);
+
         return DeliveryTrackingResponse::make(
             $deliveryTracking,
             'Delivery tracking details retrieved successfully.'

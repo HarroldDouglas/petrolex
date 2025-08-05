@@ -1,8 +1,9 @@
-// Configuration globale pour l'interface client avec vraies données
-const CONFIG = {
-    // API Configuration
+const CUSTOMER_CONFIG = {
     API: {
         BASE_URL: 'http://127.0.0.1:8000/api',
+        TIMEOUT: 30000,
+        RETRY_ATTEMPTS: 3,
+        RETRY_DELAY: 1000,
         ENDPOINTS: {
             // Auth endpoints
             LOGIN: '/login',
@@ -25,30 +26,40 @@ const CONFIG = {
         DEFAULT_ZOOM: 12
     },
 
-    // Order Status Configuration (matching backend)
     ORDER_STATUS: {
+        PENDING: 'pending',
         CONFIRMED: 'confirmed',
-        PROCESSING: 'in_progress', 
+        IN_PROGRESS: 'in_progress',
         DELIVERED: 'delivered',
         CANCELLED: 'cancelled',
-        PENDING: 'pending'
+        
+        // Helper methods pour validation
+        isTrackable: function(status) { 
+            return status === this.IN_PROGRESS; 
+        },
+        isActive: function(status) { 
+            return [this.CONFIRMED, this.IN_PROGRESS].includes(status); 
+        },
+        isFinal: function(status) { 
+            return [this.DELIVERED, this.CANCELLED].includes(status); 
+        }
     },
 
     // Status Labels and Colors
     STATUS: {
         TRANSLATIONS: {
+            'pending': 'En attente',
             'confirmed': 'Confirmée',
             'in_progress': 'En cours de livraison',
             'delivered': 'Livrée',
-            'cancelled': 'Annulée',
-            'pending': 'En attente'
+            'cancelled': 'Annulée'
         },
         COLORS: {
+            'pending': 'warning',
             'confirmed': 'dark',
             'in_progress': 'primary',
             'delivered': 'success',
-            'cancelled': 'danger', 
-            'pending': 'warning'
+            'cancelled': 'danger'
         }
     },
 
@@ -61,20 +72,22 @@ const CONFIG = {
 
     // WebSocket Configuration pour Laravel Reverb
     WEBSOCKET: {
-        APP_KEY: 'your-app-key', // Doit correspondre à REVERB_APP_KEY dans .env
+        ENABLED: true,
+        APP_KEY: 'local',
+        APP_SECRET: 'local',
         HOST: '127.0.0.1',
         PORT: 8080,
         FORCE_TLS: false,
-        ENABLED_TRANSPORTS: ['ws', 'wss'],
+        ENABLED_TRANSPORTS: ['websocket', 'polling'],
         // Configuration spécifique pour Laravel Reverb
-        PUSHER_APP_ID: 'your-app-id',
-        PUSHER_APP_KEY: 'your-app-key',
-        PUSHER_APP_SECRET: 'your-app-secret',
+        PUSHER_APP_ID: 'local',
+        PUSHER_APP_KEY: 'local',
+        PUSHER_APP_SECRET: 'local',
         PUSHER_APP_CLUSTER: 'mt1'
     }
 };
 
 // Export pour utilisation dans d'autres modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CONFIG;
+    module.exports = CUSTOMER_CONFIG;
 }

@@ -41,6 +41,7 @@ final class DeliveryTracking extends Model
         'driver_lng',
         'estimated_duration',
         'distance_remaining',
+        'total_distance',
         'current_speed',
         'route_geometry',
         'started_at',

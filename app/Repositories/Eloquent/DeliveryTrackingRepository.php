@@ -19,13 +19,27 @@ final class DeliveryTrackingRepository extends BaseEloquentRepository implements
         /** @var DeliveryTracking $deliveryTracking */
         $deliveryTracking = $this->model->create($attributes);
 
-        return $deliveryTracking;
+        // OPTIMISATION: Charger automatiquement les relations essentielles
+        return $deliveryTracking->load([
+            'order.customer',
+            'order.deliveryAddress',
+            'order.deliveryPerson',
+        ]);
     }
 
     public function findByOrderNumber(string $orderNumber): ?DeliveryTracking
     {
         /** @var DeliveryTracking|null $deliveryTracking */
-        $deliveryTracking = $this->model->where('order_number', $orderNumber)->first();
+        $deliveryTracking = $this->model
+            ->with([
+                'order.customer',
+                'order.deliveryAddress',
+                'order.deliveryPerson',
+            ])
+            ->whereHas('order', function ($query) use ($orderNumber) {
+                $query->where('order_number', $orderNumber);
+            })
+            ->first();
 
         return $deliveryTracking;
     }
@@ -33,7 +47,14 @@ final class DeliveryTrackingRepository extends BaseEloquentRepository implements
     public function findByOrder(int $orderId): ?DeliveryTracking
     {
         /** @var DeliveryTracking|null $deliveryTracking */
-        $deliveryTracking = $this->model->where('order_id', $orderId)->first();
+        $deliveryTracking = $this->model
+            ->with([
+                'order.customer',
+                'order.deliveryAddress',
+                'order.deliveryPerson',
+            ])
+            ->where('order_id', $orderId)
+            ->first();
 
         return $deliveryTracking;
     }
@@ -43,16 +64,27 @@ final class DeliveryTrackingRepository extends BaseEloquentRepository implements
         /** @var DeliveryTracking $deliveryTracking */
         $deliveryTracking->update($attributes);
 
-        return $deliveryTracking;
+        // OPTIMISATION: Recharger les relations après mise à jour
+        return $deliveryTracking->load([
+            'order.customer',
+            'order.deliveryAddress',
+            'order.deliveryPerson',
+        ]);
     }
 
     public function getActives(): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->model->whereIn('status', [
-            \App\Enums\DeliveryTrackingStatus::PENDING(),
-            \App\Enums\DeliveryTrackingStatus::STARTED(),
-            \App\Enums\DeliveryTrackingStatus::IN_PROGRESS(),
-        ])
+        return $this->model
+            ->with([
+                'order.customer',
+                'order.deliveryAddress',
+                'order.deliveryPerson',
+            ])
+            ->whereIn('status', [
+                \App\Enums\DeliveryTrackingStatus::PENDING(),
+                \App\Enums\DeliveryTrackingStatus::STARTED(),
+                \App\Enums\DeliveryTrackingStatus::IN_PROGRESS(),
+            ])
             ->orderByDesc('created_at')
             ->get();
     }

@@ -4,10 +4,24 @@ class OrderManager {
         this.ui = ui;
         this.sessionManager = sessionManager;
         this.selectedOrder = null;
+        this.selectedOrderId = null;
+        this.selectedOrderData = null;
         this.currentPage = 1;
         this.currentFilters = {};
         this.searchTimeout = null;
         this.cachedOrders = []; // Cache des commandes chargées
+        this.deliveryManager = null;
+        this.trackingService = null; // Sera initialisé par setTrackingService
+    }
+
+    // NOUVEAU: Méthode pour définir le service de tracking
+    setTrackingService(trackingService) {
+        this.trackingService = trackingService;
+    }
+
+    // NOUVEAU: Méthode pour définir le gestionnaire de livraison
+    setDeliveryManager(deliveryManager) {
+        this.deliveryManager = deliveryManager;
     }
 
     async loadOrders(page = 1) {
@@ -45,47 +59,74 @@ class OrderManager {
         }
     }
 
-    async selectOrder(orderNumber) {
+    async selectOrder(orderId) {
+        if (this.trackingService && this.trackingService.getTrackingState().isTracking) {
+            this.ui.showError('Une livraison est déjà en cours. Terminez-la d\'abord.');
+            return;
+        }
+        
         try {
-            // D'abord chercher dans le cache des commandes déjà chargées
-            let order = this.cachedOrders.find(o => o.order_number === orderNumber);
+            if (this.selectedOrderId && this.selectedOrderId !== orderId) {
+                this.clearSelectedOrder();
+            }
             
-            if (!order) {
-                // Si pas trouvé dans le cache, faire un appel API avec le bon ID
-                const deliveryPerson = this.sessionManager.getCurrentDeliveryPerson();
-                if (!deliveryPerson) return;
-                
-                const deliveryPersonId = deliveryPerson.delivery_person_id || deliveryPerson.id;
-                const response = await this.apiService.getOrders(deliveryPersonId, { order_number: orderNumber });
-                
-                if (response._metadata?.success && response.data) {
-                    const orders = response.data.data || response.data || [];
-                    if (orders.length > 0) {
-                        order = orders[0];
+            this.selectedOrderId = orderId;
+            
+            this.ui.setLoadingState('orderDetails', true);
+            const response = await this.apiService.getOrder(orderId);
+            
+            if (!response || !response.data) {
+                throw new Error('Impossible de charger les détails de la commande');
+            }
+            
+            const orderData = response.data;
+            this.selectedOrderData = orderData;
+            this.selectedOrder = orderData;
+            
+            if (orderData.status === DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS) {
+                try {
+                    const trackingResponse = await this.apiService.getOrderTracking(orderId);
+                    if (trackingResponse && trackingResponse.data) {
+                        orderData.trackingData = trackingResponse.data;
+                        
+                        const trackingData = trackingResponse.data;
+                        if (trackingData.status === DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS || trackingData.status === 'started') {
+                            // Initialiser l'affichage des estimations avec les données existantes
+                            if (trackingData.progress_percentage !== undefined && 
+                                trackingData.distance_remaining !== undefined && 
+                                trackingData.estimated_duration !== undefined) {
+                                    
+                                this.ui.updateProgress(trackingData.progress_percentage);
+                                this.ui.updateRouteEstimates(
+                                    trackingData.estimated_duration,
+                                    trackingData.distance_remaining,
+                                    true
+                                );
+                            }
+                        }
                     }
+                } catch (trackingError) {
+                    console.warn('Tracking data not available for in-progress order:', trackingError.message);
                 }
+            } else {
+                // Pour les commandes confirmées, pas de tracking à récupérer
+                console.log(`📦 Commande ${orderData.order_number} sélectionnée (statut: ${orderData.status}) - pas de tracking requis`);
             }
             
-            if (order) {
-                this.selectedOrder = order;
-                this.ui.updateSelectedOrderDetails(order);
-                this.ui.highlightSelectedOrder(orderNumber);
-                
-                if (order.status === CONFIG.ORDER_STATUS.CONFIRMED) {
-                    this.ui.showDeliveryControls();
-                    this.ui.showInfo('Commande sélectionnée! Vous pouvez maintenant démarrer la livraison.');
-                } else if (order.status === CONFIG.ORDER_STATUS.PROCESSING) {
-                    this.ui.showInfo('Cette commande est déjà en cours de livraison');
-                } else {
-                    this.ui.showInfo('Cette commande ne peut plus être modifiée');
-                }
-                
-                return order;
-            } else {
-                throw new Error('Commande non trouvée');
+            this.ui.updateSelectedOrderDetails(orderData);
+            this.ui.highlightSelectedOrder(orderId);
+            
+            if (this.deliveryManager) {
+                await this.deliveryManager.calculateRouteForSelectedOrder();
             }
+            
+            return orderData;
         } catch (error) {
-            this.ui.showError(error.message || 'Erreur lors de la sélection de la commande');
+            this.ui.showError(`Erreur lors du chargement de la commande: ${error.message}`);
+            this.clearSelectedOrder();
+            return null;
+        } finally {
+            this.ui.setLoadingState('orderDetails', false);
         }
     }
 

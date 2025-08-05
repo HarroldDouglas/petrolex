@@ -1,7 +1,7 @@
 // Service pour les appels API
 class ApiService {
     constructor() {
-        this.baseUrl = CONFIG.API.BASE_URL;
+        this.baseUrl = CUSTOMER_CONFIG.API.BASE_URL;
     }
 
     async request(endpoint, options = {}) {
@@ -26,15 +26,15 @@ class ApiService {
     }
 
     async getActiveDeliveries() {
-        return this.request(CONFIG.API.ENDPOINTS.DELIVERY_ACTIVE);
+        return this.request(CUSTOMER_CONFIG.API.ENDPOINTS.DELIVERY_ACTIVE);
     }
 
     async getDelivery(orderNumber) {
-        return this.request(`${CONFIG.API.ENDPOINTS.DELIVERY_GET}/${orderNumber}`);
+        return this.request(`${CUSTOMER_CONFIG.API.ENDPOINTS.DELIVERY_GET}/${orderNumber}`);
     }
 
     async createDelivery(deliveryData) {
-        return this.request(CONFIG.API.ENDPOINTS.DELIVERY_CREATE, {
+        return this.request(CUSTOMER_CONFIG.API.ENDPOINTS.DELIVERY_CREATE, {
             method: 'POST',
             body: JSON.stringify(deliveryData)
         });
@@ -57,13 +57,13 @@ class MapService {
             return;
         }
 
-        mapboxgl.accessToken = CONFIG.MAPBOX.ACCESS_TOKEN;
+        mapboxgl.accessToken = CUSTOMER_CONFIG.MAPBOX.ACCESS_TOKEN;
         
         this.map = new mapboxgl.Map({
             container: containerId,
-            style: CONFIG.MAPBOX.STYLE,
-            center: CONFIG.MAPBOX.DEFAULT_CENTER,
-            zoom: CONFIG.MAPBOX.DEFAULT_ZOOM
+            style: CUSTOMER_CONFIG.MAPBOX.STYLE,
+            center: CUSTOMER_CONFIG.MAPBOX.DEFAULT_CENTER,
+            zoom: CUSTOMER_CONFIG.MAPBOX.DEFAULT_ZOOM
         });
 
         this.map.on('load', () => {
@@ -143,7 +143,7 @@ class MapService {
     async drawRoute(start, end) {
         try {
             const query = await fetch(
-                `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${CONFIG.MAPBOX.ACCESS_TOKEN}`
+                `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${CUSTOMER_CONFIG.MAPBOX.ACCESS_TOKEN}`
             );
             const json = await query.json();
             
@@ -187,7 +187,7 @@ class MapService {
             this.map.flyTo({
                 center: [lng, lat],
                 zoom: zoom,
-                duration: CONFIG.UI.ANIMATION_DURATION
+                duration: CUSTOMER_CONFIG.UI.ANIMATION_DURATION
             });
         }
     }
@@ -212,14 +212,14 @@ class WebSocketService {
     connect() {
         try {
             // Configuration pour Laravel Reverb
-            this.pusher = new Pusher(CONFIG.WEBSOCKET.PUSHER_APP_KEY, {
-                wsHost: CONFIG.WEBSOCKET.PUSHER_HOST,
-                wsPort: CONFIG.WEBSOCKET.PUSHER_PORT,
-                wssPort: CONFIG.WEBSOCKET.PUSHER_PORT,
-                forceTLS: CONFIG.WEBSOCKET.PUSHER_FORCE_TLS,
-                enabledTransports: CONFIG.WEBSOCKET.ENABLED_TRANSPORTS,
+            this.pusher = new Pusher(CUSTOMER_CONFIG.WEBSOCKET.PUSHER_APP_KEY, {
+                wsHost: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_HOST,
+                wsPort: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_PORT,
+                wssPort: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_PORT,
+                forceTLS: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_FORCE_TLS,
+                enabledTransports: CUSTOMER_CONFIG.WEBSOCKET.ENABLED_TRANSPORTS,
                 disableStats: true,
-                cluster: CONFIG.WEBSOCKET.CLUSTER
+                cluster: CUSTOMER_CONFIG.WEBSOCKET.CLUSTER
             });
 
             this.pusher.connection.bind('connected', () => {
@@ -310,7 +310,7 @@ class WebSocketService {
 // Service pour les appels API côté client (avec authentification)
 class CustomerApiService {
     constructor() {
-        this.baseUrl = CONFIG.API.BASE_URL;
+        this.baseUrl = CUSTOMER_CONFIG.API.BASE_URL;
         this.authService = null; // Sera initialisé plus tard pour éviter les références circulaires
     }
 
@@ -356,11 +356,11 @@ class CustomerApiService {
 
     // Récupérer la liste des clients
     async getCustomers(search = '', page = 1) {
-        let endpoint = CONFIG.API.ENDPOINTS.CUSTOMERS;
+        let endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.CUSTOMERS;
         
         const params = new URLSearchParams({
             page: page.toString(),
-            per_page: CONFIG.UI.DEFAULT_PAGINATION.toString()
+            per_page: CUSTOMER_CONFIG.UI.DEFAULT_PAGINATION.toString()
         });
         
         if (search.trim()) {
@@ -373,11 +373,11 @@ class CustomerApiService {
 
     // Récupérer les commandes d'un client
     async getCustomerOrders(customerId, filters = {}, page = 1) {
-        let endpoint = CONFIG.API.ENDPOINTS.CUSTOMER_ORDERS.replace('{id}', customerId);
+        let endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.CUSTOMER_ORDERS.replace('{id}', customerId);
         
         const params = new URLSearchParams({
             page: page.toString(),
-            per_page: CONFIG.UI.DEFAULT_PAGINATION.toString(),
+            per_page: CUSTOMER_CONFIG.UI.DEFAULT_PAGINATION.toString(),
             ...filters
         });
         
@@ -386,8 +386,8 @@ class CustomerApiService {
     }
 
     // Récupérer les détails du tracking d'une commande
-    async getTrackingDetails(orderNumber) {
-        const endpoint = CONFIG.API.ENDPOINTS.TRACKING_DETAILS.replace('{orderNumber}', orderNumber);
+    async getTrackingDetails(orderId) {
+        const endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.TRACKING_DETAILS.replace('{orderId}', orderId);
         return this.request(endpoint);
     }
 }
@@ -408,13 +408,13 @@ class CustomerMapService {
             return;
         }
 
-        mapboxgl.accessToken = CONFIG.MAPBOX.ACCESS_TOKEN;
+        mapboxgl.accessToken = CUSTOMER_CONFIG.MAPBOX.ACCESS_TOKEN;
         
         this.map = new mapboxgl.Map({
             container: containerId,
-            style: CONFIG.MAPBOX.STYLE,
-            center: CONFIG.MAPBOX.DEFAULT_CENTER,
-            zoom: CONFIG.MAPBOX.DEFAULT_ZOOM
+            style: CUSTOMER_CONFIG.MAPBOX.STYLE,
+            center: CUSTOMER_CONFIG.MAPBOX.DEFAULT_CENTER,
+            zoom: CUSTOMER_CONFIG.MAPBOX.DEFAULT_ZOOM
         });
 
         this.map.on('load', () => {
@@ -479,7 +479,7 @@ class CustomerMapService {
         this.map.flyTo({
             center: [lng, lat],
             zoom: 14,
-            duration: CONFIG.UI.ANIMATION_DURATION
+            duration: CUSTOMER_CONFIG.UI.ANIMATION_DURATION
         });
     }
 
@@ -501,7 +501,7 @@ class CustomerMapService {
     async drawRoute(start, end) {
         try {
             const query = await fetch(
-                `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${CONFIG.MAPBOX.ACCESS_TOKEN}`
+                `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${CUSTOMER_CONFIG.MAPBOX.ACCESS_TOKEN}`
             );
             const json = await query.json();
             
@@ -545,7 +545,7 @@ class CustomerMapService {
             this.map.flyTo({
                 center: [lng, lat],
                 zoom: zoom,
-                duration: CONFIG.UI.ANIMATION_DURATION
+                duration: CUSTOMER_CONFIG.UI.ANIMATION_DURATION
             });
         }
     }
@@ -573,6 +573,36 @@ class CustomerMapService {
             });
         }
     }
+    
+    // NOUVELLE MÉTHODE: Ajuster la vue pour montrer les deux marqueurs
+    fitBounds(coordinates) {
+        if (!this.map || !coordinates || coordinates.length < 2) {
+            console.warn('⚠️ [CustomerMapService] Impossible d\'ajuster la carte avec des coordonnées invalides');
+            return;
+        }
+        
+        try {
+            // Créer un "bounding box" pour inclure tous les points
+            const bounds = coordinates.reduce((bounds, coord) => {
+                return bounds.extend(coord);
+            }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+            
+            // Ajuster la vue pour inclure tous les points avec padding
+            this.map.fitBounds(bounds, {
+                padding: 80, // Padding autour des points (en pixels)
+                maxZoom: 15, // Zoom maximum
+                duration: 1000 // Animation en ms
+            });
+            
+            console.log('🗺️ [CustomerMapService] Vue ajustée pour montrer le trajet complet');
+        } catch (error) {
+            console.error('❌ [CustomerMapService] Erreur lors de l\'ajustement de la vue:', error);
+            // Fallback: centrer sur le premier point
+            if (coordinates.length > 0) {
+                this.centerOnLocation(coordinates[0][1], coordinates[0][0]);
+            }
+        }
+    }
 
     destroy() {
         this.clearMarkers();
@@ -581,128 +611,371 @@ class CustomerMapService {
     }
 }
 
-// Service pour la gestion WebSocket côté client
+// Service de gestion des erreurs - NOUVEAU
+class ErrorHandlingService {
+    constructor() {
+        this.retryAttempts = new Map();
+        this.maxRetries = 3;
+        this.retryDelay = 1000; // 1 seconde
+        this.networkErrorCount = 0;
+    }
+
+    async handleApiError(error, context, retryData = null) {
+        console.error(`API Error in ${context}:`, error);
+        
+        const errorKey = `${context}_${JSON.stringify(retryData)}`;
+        const attempts = this.retryAttempts.get(errorKey) || 0;
+        
+        // Analyser le type d'erreur
+        const errorType = this.categorizeError(error);
+        
+        switch (errorType) {
+            case 'NETWORK':
+                this.networkErrorCount++;
+                if (attempts < this.maxRetries) {
+                    this.retryAttempts.set(errorKey, attempts + 1);
+                    this.showNotification(
+                        `Problème de connexion (tentative ${attempts + 1}/${this.maxRetries})`, 
+                        'warning'
+                    );
+                    return { shouldRetry: true, delay: this.retryDelay * (attempts + 1) };
+                }
+                this.showNotification('Connexion impossible. Vérifiez votre réseau.', 'error');
+                break;
+                
+            case 'AUTHENTICATION':
+                this.showNotification('Session expirée. Reconnexion...', 'warning');
+                // Rediriger vers la page de connexion
+                setTimeout(() => window.location.reload(), 2000);
+                return { shouldRetry: false };
+                
+            case 'NOT_FOUND':
+                this.showNotification('Ressource non trouvée', 'error');
+                break;
+                
+            case 'VALIDATION':
+                this.showNotification('Données invalides', 'error');
+                break;
+                
+            case 'SERVER':
+                if (attempts < 2) { // Retry une fois pour les erreurs serveur
+                    this.retryAttempts.set(errorKey, attempts + 1);
+                    return { shouldRetry: true, delay: 2000 };
+                }
+                this.showNotification('Erreur serveur. Veuillez réessayer plus tard.', 'error');
+                break;
+                
+            default:
+                this.showNotification('Une erreur inattendue s\'est produite', 'error');
+        }
+        
+        return { shouldRetry: false };
+    }
+
+    categorizeError(error) {
+        if (!navigator.onLine || error.message.includes('fetch')) {
+            return 'NETWORK';
+        }
+        
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+            return 'AUTHENTICATION';
+        }
+        
+        if (error.message.includes('404') || error.message.includes('Not Found')) {
+            return 'NOT_FOUND';
+        }
+        
+        if (error.message.includes('422') || error.message.includes('validation')) {
+            return 'VALIDATION';
+        }
+        
+        if (error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
+            return 'SERVER';
+        }
+        
+        return 'UNKNOWN';
+    }
+
+    showNotification(message, type = 'info', duration = 5000) {
+        // Créer une notification toast
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${this.getBootstrapClass(type)} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 350px;';
+        
+        notification.innerHTML = `
+            <strong>${this.getIcon(type)}</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after duration
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, duration);
+    }
+
+    getBootstrapClass(type) {
+        const classes = {
+            'success': 'success',
+            'error': 'danger',
+            'warning': 'warning',
+            'info': 'info'
+        };
+        return classes[type] || 'info';
+    }
+
+    getIcon(type) {
+        const icons = {
+            'success': '✅',
+            'error': '❌',
+            'warning': '⚠️',
+            'info': 'ℹ️'
+        };
+        return icons[type] || 'ℹ️';
+    }
+
+    clearRetries(context) {
+        // Nettoyer les tentatives pour un contexte spécifique
+        for (const [key] of this.retryAttempts) {
+            if (key.startsWith(context)) {
+                this.retryAttempts.delete(key);
+            }
+        }
+    }
+
+    getNetworkStatus() {
+        return {
+            online: navigator.onLine,
+            errorCount: this.networkErrorCount
+        };
+    }
+}
+
+// Service de cache côté client - NOUVEAU
+class ClientCacheService {
+    constructor() {
+        this.cache = new Map();
+        this.cacheExpiry = new Map();
+        this.defaultTTL = 30000; // 30 secondes par défaut
+    }
+
+    set(key, data, ttl = this.defaultTTL) {
+        this.cache.set(key, data);
+        this.cacheExpiry.set(key, Date.now() + ttl);
+        
+        // Nettoyer automatiquement après expiration
+        setTimeout(() => this.delete(key), ttl);
+    }
+
+    get(key) {
+        const expiry = this.cacheExpiry.get(key);
+        
+        if (!expiry || Date.now() > expiry) {
+            this.delete(key);
+            return null;
+        }
+        
+        return this.cache.get(key);
+    }
+
+    delete(key) {
+        this.cache.delete(key);
+        this.cacheExpiry.delete(key);
+    }
+
+    clear() {
+        this.cache.clear();
+        this.cacheExpiry.clear();
+    }
+
+    // Cache spécialisé pour les positions du livreur
+    cacheDriverPosition(orderNumber, position) {
+        this.set(`driver_position_${orderNumber}`, position, 10000); // 10 secondes
+    }
+
+    getDriverPosition(orderNumber) {
+        return this.get(`driver_position_${orderNumber}`);
+    }
+
+    // Cache pour les détails de tracking
+    cacheTrackingDetails(orderId, details) {
+        this.set(`tracking_${orderId}`, details, 15000); // 15 secondes
+    }
+
+    getTrackingDetails(orderId) {
+        return this.get(`tracking_${orderId}`);
+    }
+}
+
+// Service WebSocket amélioré - MISE À JOUR
 class CustomerWebSocketService {
     constructor() {
         this.pusher = null;
         this.channels = new Map();
         this.connected = false;
-        this.callbacks = {};
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.reconnectDelay = 2000;
+        this.heartbeatInterval = null;
+        this.cache = new ClientCacheService();
     }
 
-    on(event, callback) {
-        if (!this.callbacks[event]) {
-            this.callbacks[event] = [];
+    initialize(config) {
+        if (!config.key) {
+            console.warn('⚠️ Configuration WebSocket manquante');
+            return false;
         }
-        this.callbacks[event].push(callback);
-    }
 
-    triggerCallback(event, data = null) {
-        if (this.callbacks[event]) {
-            this.callbacks[event].forEach(callback => callback(data));
-        }
-    }
-
-    initialize() {
         try {
-            this.pusher = new Pusher(CONFIG.WEBSOCKET.PUSHER_APP_KEY, {
-                wsHost: CONFIG.WEBSOCKET.HOST,
-                wsPort: CONFIG.WEBSOCKET.PORT,
-                wssPort: CONFIG.WEBSOCKET.PORT,
-                forceTLS: CONFIG.WEBSOCKET.FORCE_TLS,
-                enabledTransports: CONFIG.WEBSOCKET.ENABLED_TRANSPORTS,
-                cluster: CONFIG.WEBSOCKET.PUSHER_APP_CLUSTER,
-                disableStats: true
+            this.pusher = new Pusher(config.key, {
+                ...config.options,
+                enableLogging: true,
+                forceTLS: true
             });
 
-            this.pusher.connection.bind('connected', () => {
-                console.log('Connected to WebSocket');
-                this.connected = true;
-                this.triggerCallback('connected');
-            });
-
-            this.pusher.connection.bind('disconnected', () => {
-                console.log('Disconnected from WebSocket');
-                this.connected = false;
-                this.triggerCallback('disconnected');
-            });
-
-            this.pusher.connection.bind('error', (error) => {
-                console.error('WebSocket error:', error);
-                this.triggerCallback('error', error);
-            });
-
+            this.setupConnectionHandlers();
+            this.setupHeartbeat();
+            
+            return true;
         } catch (error) {
-            console.error('Error initializing WebSocket:', error);
-            this.triggerCallback('error', error);
+            console.error('❌ Erreur initialisation WebSocket:', error);
+            return false;
         }
+    }
+
+    setupConnectionHandlers() {
+        this.pusher.connection.bind('connected', () => {
+            console.log('✅ WebSocket connecté');
+            this.connected = true;
+            this.reconnectAttempts = 0;
+            this.emit('connected');
+        });
+
+        this.pusher.connection.bind('disconnected', () => {
+            console.log('🔌 WebSocket déconnecté');
+            this.connected = false;
+            this.emit('disconnected');
+            this.attemptReconnect();
+        });
+
+        this.pusher.connection.bind('error', (error) => {
+            console.error('❌ Erreur WebSocket:', error);
+            this.emit('error', error);
+        });
+    }
+
+    setupHeartbeat() {
+        this.heartbeatInterval = setInterval(() => {
+            if (this.connected && this.pusher) {
+                // Envoyer un ping pour maintenir la connexion
+                this.pusher.connection.send_event('pusher:ping', {});
+            }
+        }, 30000); // Toutes les 30 secondes
+    }
+
+    attemptReconnect() {
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            console.error('❌ Reconnexion WebSocket échouée après', this.maxReconnectAttempts, 'tentatives');
+            this.emit('reconnect_failed');
+            return;
+        }
+
+        this.reconnectAttempts++;
+        console.log(`🔄 Tentative de reconnexion ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
+        
+        setTimeout(() => {
+            if (this.pusher) {
+                this.pusher.connect();
+            }
+        }, this.reconnectDelay * this.reconnectAttempts);
     }
 
     subscribeToDeliveryTracking(orderNumber) {
         if (!this.pusher || !this.connected) {
-            console.warn('WebSocket not connected, cannot subscribe');
-            return;
+            console.warn('⚠️ WebSocket non connecté pour l\'abonnement');
+            return null;
         }
 
-        const channelName = `delivery.${orderNumber}`;
+        const channelName = `delivery-${orderNumber}`;
         
         if (this.channels.has(channelName)) {
-            console.log('Already subscribed to', channelName);
-            return;
+            return this.channels.get(channelName);
         }
 
-        try {
-            const channel = this.pusher.subscribe(channelName);
-            
-            channel.bind('location-updated', (data) => {
-                this.triggerCallback('locationUpdate', data);
-            });
+        const channel = this.pusher.subscribe(channelName);
+        this.channels.set(channelName, channel);
 
-            channel.bind('status-changed', (data) => {
-                this.triggerCallback('statusUpdate', data);
-            });
+        // Écouter les événements spécifiques à cette commande
+        channel.bind('delivery-position-updated', (data) => {
+            // Mettre en cache la position
+            this.cache.cacheDriverPosition(orderNumber, data);
+            this.emit('position_updated', data);
+        });
 
-            channel.bind('delivery-completed', (data) => {
-                this.triggerCallback('deliveryCompleted', data);
-            });
+        channel.bind('delivery-status-updated', (data) => {
+            this.emit('status_updated', data);
+        });
 
-            this.channels.set(channelName, channel);
-            console.log('Subscribed to delivery tracking:', channelName);
-            
-        } catch (error) {
-            console.error('Error subscribing to delivery tracking:', error);
-        }
+        console.log(`📡 Abonné au canal ${channelName}`);
+        return channel;
     }
 
     unsubscribeFromDeliveryTracking(orderNumber) {
-        const channelName = `delivery.${orderNumber}`;
+        const channelName = `delivery-${orderNumber}`;
+        const channel = this.channels.get(channelName);
         
-        if (this.channels.has(channelName)) {
-            try {
-                this.pusher.unsubscribe(channelName);
-                this.channels.delete(channelName);
-                console.log('Unsubscribed from delivery tracking:', channelName);
-            } catch (error) {
-                console.error('Error unsubscribing from delivery tracking:', error);
-            }
+        if (channel && this.pusher) {
+            this.pusher.unsubscribe(channelName);
+            this.channels.delete(channelName);
+            console.log(`📡 Désabonné du canal ${channelName}`);
         }
     }
 
     disconnect() {
-        if (this.pusher) {
-            // Désabonner de tous les channels
-            this.channels.forEach((channel, channelName) => {
-                this.pusher.unsubscribe(channelName);
-            });
-            this.channels.clear();
-            
-            this.pusher.disconnect();
-            this.connected = false;
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
         }
+
+        this.channels.forEach((channel, channelName) => {
+            if (this.pusher) {
+                this.pusher.unsubscribe(channelName);
+            }
+        });
+        
+        this.channels.clear();
+        
+        if (this.pusher) {
+            this.pusher.disconnect();
+            this.pusher = null;
+        }
+        
+        this.connected = false;
+        console.log('🔌 WebSocket déconnecté et nettoyé');
+    }
+
+    // Système d'événements simple
+    emit(event, data = null) {
+        const customEvent = new CustomEvent(`websocket_${event}`, { detail: data });
+        document.dispatchEvent(customEvent);
+    }
+
+    on(event, callback) {
+        document.addEventListener(`websocket_${event}`, (e) => callback(e.detail));
     }
 
     isConnected() {
         return this.connected;
+    }
+
+    getConnectionInfo() {
+        return {
+            connected: this.connected,
+            reconnectAttempts: this.reconnectAttempts,
+            channelsCount: this.channels.size
+        };
     }
 }
 
@@ -719,7 +992,7 @@ class AuthService {
      */
     async login(email, password) {
         try {
-            const response = await fetch(`${CONFIG.API.BASE_URL}${CONFIG.API.ENDPOINTS.LOGIN}`, {
+            const response = await fetch(`${CUSTOMER_CONFIG.API.BASE_URL}${CUSTOMER_CONFIG.API.ENDPOINTS.LOGIN}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -762,7 +1035,7 @@ class AuthService {
         try {
             const authData = this.getAuthData();
             if (authData && authData.token && !this.isTokenExpired()) {
-                await fetch(`${CONFIG.API.BASE_URL}${CONFIG.API.ENDPOINTS.LOGOUT}`, {
+                await fetch(`${CUSTOMER_CONFIG.API.BASE_URL}${CUSTOMER_CONFIG.API.ENDPOINTS.LOGOUT}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${authData.token}`,

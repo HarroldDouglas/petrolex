@@ -1,147 +1,160 @@
-// Service spécialisé pour les API de tracking
 class DeliveryTrackingApiService {
-    constructor(baseApiService) {
-        this.api = baseApiService;
+    constructor(apiService) {
+        this.apiService = apiService;
+        this.baseUrl = DELIVERY_CONFIG.API.BASE_URL;
     }
 
-    // Démarrer le tracking d'une commande
-    async startTracking(orderNumber, position) {
-        const orderId = this.api.getOrderIdFromCache(orderNumber);
-
-        if (!orderId) {
-            throw new Error(
-                "Impossible de récupérer l'ID de la commande. Rechargez les commandes.",
-            );
+    async startTracking(orderIdentifier, position) {
+        let orderId;
+        if (typeof orderIdentifier === 'number') {
+            orderId = orderIdentifier;
+        } else {
+            orderId = await this.getOrderId(orderIdentifier);
         }
-
-        return await this.createOrStartTracking(orderId, position);
+        
+        try {
+            const existingTracking = await this.apiService.request(`/tracking/delivery/${orderId}`);
+            if (existingTracking && existingTracking.data) {
+                if (existingTracking.data.progress_percentage) {
+                    const resumeData = {
+                        driver_lat: position.lat,
+                        driver_lng: position.lng,
+                        timestamp: new Date().toISOString(),
+                        progress_percentage: existingTracking.data.progress_percentage
+                    };
+                    
+                    return await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
+                        method: 'POST',
+                        body: JSON.stringify(resumeData)
+                    });
+                }
+            }
+        } catch (error) {
+            // If tracking doesn't exist or other error, continue normally
+        }
+        
+        return this.createOrStartTracking(orderId, position);
     }
-
+    
     async createOrStartTracking(orderId, position) {
-        const trackingData = this.buildTrackingData(position);
-
-        try {
-            // Tenter de créer un nouveau tracking
-            return await this.api.request("/tracking/delivery", {
-                method: "POST",
-                body: JSON.stringify({
-                    order_id: orderId,
-                    ...trackingData,
-                }),
-            });
-        } catch (error) {
-            // Si le tracking existe déjà, le démarrer
-            console.log("Tracking exists, attempting to start:", error.message);
-            return await this.api.request(
-                `/tracking/delivery/${orderId}/start`,
-                {
-                    method: "POST",
-                    body: JSON.stringify(trackingData),
-                },
-            );
-        }
-    }
-
-    // Mettre à jour la position
-    async updatePosition(orderNumber, position, speed = 0) {
-        const orderId = this.api.getOrderIdFromCache(orderNumber);
-
-        if (!orderId) {
-            console.warn(
-                "Order ID not found for position update:",
-                orderNumber,
-            );
-            return null;
-        }
-
-        const updateData = {
-            ...this.buildTrackingData(position),
-            current_speed: speed,
-        };
-
-        try {
-            return await this.api.request(
-                `/tracking/delivery/${orderId}/position`,
-                {
-                    method: "PATCH",
-                    body: JSON.stringify(updateData),
-                },
-            );
-        } catch (error) {
-            console.error("Position update failed:", error);
-            return null;
-        }
-    }
-
-    // Récupérer les détails du tracking
-    async getTrackingDetails(orderNumber) {
-        const orderId = this.api.getOrderIdFromCache(orderNumber);
-
-        if (!orderId) {
-            throw new Error("Order ID not found for tracking details");
-        }
-
-        return await this.api.request(`/tracking/delivery/${orderId}`);
-    }
-
-    // Marquer le tracking comme terminé
-    async completeTracking(orderNumber) {
-        const orderId = this.api.getOrderIdFromCache(orderNumber);
-
-        if (!orderId) {
-            throw new Error("Order ID not found for completion");
-        }
-
-        return await this.api.request(
-            `/tracking/delivery/${orderId}/complete`,
-            {
-                method: "PATCH",
-            },
-        );
-    }
-
-    // Utilitaires
-    buildTrackingData(position) {
-        return {
+        const trackingData = {
             driver_lat: position.lat,
             driver_lng: position.lng,
-            timestamp: new Date().toISOString(),
+            timestamp: new Date().toISOString()
         };
-    }
-
-    // Vérifier le statut du tracking
-    async getTrackingStatus(orderNumber) {
+        
         try {
-            const details = await this.getTrackingDetails(orderNumber);
-            return {
-                isActive: details.data?.status === "active",
-                lastUpdate: details.data?.last_update,
-                totalDistance: details.data?.total_distance,
-            };
+            const createResponse = await this.apiService.request('/tracking/delivery', {
+                method: 'POST',
+                body: JSON.stringify({
+                    order_id: orderId,
+                    ...trackingData
+                })
+            });
+            
+            if (createResponse._metadata?.success) {
+                const startResponse = await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
+                    method: 'POST',
+                    body: JSON.stringify(trackingData)
+                });
+                
+                return startResponse;
+            }
+            
+            return createResponse;
         } catch (error) {
-            return {
-                isActive: false,
-                error: error.message,
-            };
+            if (error.response?.status === 409) {
+                try {
+                    const trackingDetails = await this.apiService.request(`/tracking/delivery/${orderId}`);
+                    
+                    if (trackingDetails && trackingDetails.data) {
+                        const startResponse = await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                ...trackingData,
+                                progress_percentage: trackingDetails.data.progress_percentage
+                            })
+                        });
+                        
+                        return startResponse;
+                    }
+                    
+                    const startResponse = await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
+                        method: 'POST',
+                        body: JSON.stringify(trackingData)
+                    });
+                    
+                    return startResponse;
+                } catch (startError) {
+                    console.error('Error during resume:', startError);
+                    throw startError;
+                }
+            }
+            
+            console.error('Error during creation/start:', error);
+            throw error;
         }
     }
 
-    // Batch update pour plusieurs positions
-    async batchUpdatePositions(updates) {
-        const promises = updates.map((update) =>
-            this.updatePosition(
-                update.orderNumber,
-                update.position,
-                update.speed,
-            ),
-        );
+    async updatePosition(orderId, position, speed, additionalData = null) {
+        if (!orderId) {
+            console.error('Missing order ID for updatePosition');
+            return;
+        }
 
-        const results = await Promise.allSettled(promises);
+        try {
+            const updateData = {
+                driver_lat: position.lat,
+                driver_lng: position.lng,
+                timestamp: new Date().toISOString(),
+                current_speed: speed,
+                ...(additionalData || {}),
+            };
+            
+            const response = await this.apiService.request(`/tracking/delivery/${orderId}/position`, {
+                method: 'PATCH',
+                body: JSON.stringify(updateData)
+            });
+            
+            if (response && response.data) {
+                if (response.data.progress_percentage !== undefined) {
+                    const serverProgress = parseFloat(response.data.progress_percentage);
+                    if (Math.abs(serverProgress - (additionalData?.progress_percentage || 0)) > 1) {
+                        console.log(`Progress difference: local=${additionalData?.progress_percentage}%, server=${serverProgress}%`);
+                    }
+                }
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('Error updating position:', error);
+            throw error;
+        }
+    }
 
-        return results.map((result, index) => ({
-            orderNumber: updates[index].orderNumber,
-            success: result.status === "fulfilled",
-            error: result.status === "rejected" ? result.reason.message : null,
-        }));
+    async completeTracking(orderId) {
+        try {
+            return await this.apiService.request(`/tracking/delivery/${orderId}/complete`, {
+                method: 'PATCH',
+            });
+        } catch (error) {
+            console.error('Error completing tracking:', error);
+            throw error;
+        }
+    }
+
+    async getOrderId(orderNumber) {
+        if (typeof orderNumber === 'number') return orderNumber;
+        
+        try {
+            if (this.apiService.getOrderIdFromCache) {
+                return this.apiService.getOrderIdFromCache(orderNumber);
+            }
+            
+            throw new Error(`Conversion method number -> ID not found in apiService`);
+        } catch (error) {
+            console.error('Error retrieving ID:', error);
+            throw error;
+        }
     }
 }

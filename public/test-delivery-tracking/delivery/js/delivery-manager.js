@@ -4,8 +4,8 @@ class DeliveryManager {
         this.trackingService = trackingService;
         this.ui = ui;
         this.orderManager = orderManager;
-        this.currentEstimatedDuration = 0; // Nouvelle propriété pour stocker la durée estimée
-        this.isCalculatingRoute = false; // Protection contre les appels multiples simultanés
+        this.currentEstimatedDuration = 0;
+        this.isCalculatingRoute = false;
         this.setupTrackingCallbacks();
     }
 
@@ -13,33 +13,41 @@ class DeliveryManager {
         this.trackingService.on('trackingStarted', (data) => {
             const state = this.trackingService.getTrackingState();
             this.ui.setDeliveryControlsState(state.isTracking, state.isPaused);
-            this.ui.updateProgress(0);
+            
+            if (data && data.apiResponse && data.apiResponse.data) {
+                const trackingData = data.apiResponse.data;
+                if (trackingData.progress_percentage) {
+                    const progress = parseFloat(trackingData.progress_percentage);
+                    if (!isNaN(progress)) {
+                        this.ui.updateProgress(progress);
+                    } else {
+                        this.ui.updateProgress(0);
+                    }
+                } else {
+                    this.ui.updateProgress(0);
+                }
+            } else {
+                this.ui.updateProgress(0);
+            }
             
             const selectedOrder = this.orderManager.getSelectedOrder();
             if (selectedOrder) {
-                selectedOrder.status = CONFIG.ORDER_STATUS.PROCESSING;
+                selectedOrder.status = DELIVERY_CONFIG.ORDER_STATUS.PROCESSING;
                 this.ui.updateSelectedOrderDetails(selectedOrder);
             }
             
-            this.ui.showInfo('Tracking démarré! La position sera mise à jour en temps réel.');
+            this.ui.showInfo('Tracking démarré!');
         });
-
-        // SUPPRIMÉ: Callback pour routeCalculated qui causait le conflit
-        // Ne plus écraser le calcul de route personnalisé
         
         this.trackingService.on('progressUpdate', (data) => {
-            this.ui.updateProgress(data.progress);
-            this.ui.updateCurrentPosition(data.position, data.speed);
-            
-            if (data.progress > 0) {
-                const estimatedTimeElement = this.ui.elements.estimatedTime.textContent;
-                if (estimatedTimeElement && estimatedTimeElement !== 'Non disponible') {
-                    const totalTime = parseInt(estimatedTimeElement);
-                    if (!isNaN(totalTime)) {
-                        const remainingTime = Math.round(totalTime * ((100 - data.progress) / 100));
-                        this.ui.updateRouteEstimates(remainingTime, null, true);
-                    }
-                }
+            if (data.progress !== undefined) {
+                this.ui.updateProgress(data.progress);
+            }
+            if (data.position) {
+                this.ui.updateCurrentPosition(data.position, data.speed);
+            }
+            if (data.remainingDistance !== undefined && data.remainingTime !== undefined) {
+                this.ui.updateRouteEstimates(data.remainingTime, data.remainingDistance, true);
             }
         });
         
@@ -49,15 +57,9 @@ class DeliveryManager {
             
             const selectedOrder = this.orderManager.getSelectedOrder();
             if (selectedOrder) {
-                selectedOrder.status = CONFIG.ORDER_STATUS.DELIVERED;
+                selectedOrder.status = DELIVERY_CONFIG.ORDER_STATUS.DELIVERED;
                 this.ui.updateSelectedOrderDetails(selectedOrder);
             }
-            
-            // Ne pas rediriger automatiquement - sera exécuté que lorsque l'utilisateur cliquera sur "Terminer"
-            // setTimeout(() => {
-            //     this.resetDelivery();
-            //     this.orderManager.loadOrders();
-            // }, 3000);
         });
         
         this.trackingService.on('trackingStopped', () => {
@@ -79,9 +81,7 @@ class DeliveryManager {
     }
 
     async calculateRouteForSelectedOrder() {
-        // Protection contre les appels multiples simultanés
         if (this.isCalculatingRoute) {
-            console.log('calculateRouteForSelectedOrder: Calcul déjà en cours, ignorer');
             return;
         }
         
@@ -90,43 +90,90 @@ class DeliveryManager {
         const selectedOrder = this.orderManager.getSelectedOrder();
         
         if (!selectedOrder || !selectedOrder.delivery_address?.latitude || !selectedOrder.delivery_address?.longitude) {
-            console.warn('Commande non sélectionnée ou adresse de livraison manquante');
-            this.ui.updateRouteEstimates(null, null); // Réinitialiser les estimations si pas de commande
+            this.ui.updateRouteEstimates(null, null);
             this.isCalculatingRoute = false;
             return;
         }
         
         try {
-            const currentPosition = await this.mapService.getCurrentGPSPosition();
+            if (selectedOrder.status === DELIVERY_CONFIG.ORDER_STATUS.PROCESSING && selectedOrder.trackingData) {
+                const trackingData = selectedOrder.trackingData;
+                
+                this.ui.updateRouteEstimates(
+                    parseInt(trackingData.estimated_duration),
+                    parseFloat(trackingData.distance_remaining).toFixed(2),
+                    true
+                );
+                
+                this.currentEstimatedDuration = parseInt(trackingData.estimated_duration);
+                
+                if (trackingData.progress_percentage !== undefined && trackingData.progress_percentage !== null) {
+                    const progress = parseFloat(trackingData.progress_percentage);
+                    if (!isNaN(progress)) {
+                        this.ui.updateProgress(progress);
+                    }
+                }
+                
+                if (trackingData.current_speed && trackingData.current_speed > 0) {
+                    const speed = parseFloat(trackingData.current_speed);
+                    if (!isNaN(speed)) {
+                        this.ui.elements.simulationSpeed.value = speed;
+                        this.ui.updateTravelSpeedDisplay(speed);
+                        this.ui.updateCurrentPosition(null, speed);
+                    }
+                }
+                
+                this.ui.showDeliveryControls();
+                this.ui.trackingUI.updateDeliveryButtonsForInProgressOrder();
+                
+                if (trackingData.driver_lat && trackingData.driver_lng) {
+                    const driverLat = parseFloat(trackingData.driver_lat);
+                    const driverLng = parseFloat(trackingData.driver_lng);
+                    
+                    if (!isNaN(driverLat) && !isNaN(driverLng)) {
+                        const driverPosition = { lat: driverLat, lng: driverLng };
+                        const destPosition = {
+                            lat: selectedOrder.delivery_address.latitude,
+                            lng: selectedOrder.delivery_address.longitude
+                        };
+                        
+                        this.mapService.drawRoute(driverPosition, destPosition, 'driving');
+                    }
+                }
+                
+                this.isCalculatingRoute = false;
+                return;
+            }
+            
+            let currentPosition = await this.mapService.getCurrentGPSPosition();
+            let defaultSpeed = this.ui.getTravelSpeed();
+            
             const routeInfo = await this.mapService.drawRoute(
                 currentPosition,
                 {
                     lat: selectedOrder.delivery_address.latitude,
                     lng: selectedOrder.delivery_address.longitude
                 },
-                'driving' // Mode de transport par défaut
+                'driving'
             );
             
             if (routeInfo) {
-                const travelSpeed = this.ui.getTravelSpeed();
-                const TYPICAL_DRIVING_SPEED_KMH = 40; // Vitesse de référence pour les calculs
+                const travelSpeed = defaultSpeed;
+                const TYPICAL_DRIVING_SPEED_KMH = 40;
                 
                 let adjustedDuration = routeInfo.duration;
                 if (travelSpeed && travelSpeed !== TYPICAL_DRIVING_SPEED_KMH) {
-                    // Ajuster la durée en fonction de la vitesse sélectionnée
-                    // Formule: (distance / vitesse) * 60
                     adjustedDuration = Math.round((parseFloat(routeInfo.distance) / travelSpeed) * 60);
                 }
                 
                 this.ui.updateRouteEstimates(adjustedDuration, routeInfo.distance);
-                // Mettre à jour la durée estimée pour la simulation
                 this.currentEstimatedDuration = adjustedDuration;
-                
-                // AJOUT IMPORTANT : Afficher la vitesse après le calcul de route
                 this.ui.updateCurrentPosition(null, travelSpeed);
+            } else {
+                this.ui.updateRouteEstimates(null, null);
             }
         } catch (error) {
-            console.error('Error calculating route:', error);
+            console.error('Erreur lors du calcul de route:', error);
             this.ui.updateRouteEstimates(null, null);
         } finally {
             this.isCalculatingRoute = false;
@@ -135,6 +182,7 @@ class DeliveryManager {
 
     async startDelivery() {
         const selectedOrder = this.orderManager.getSelectedOrder();
+        
         if (!selectedOrder) {
             this.ui.showError('Veuillez sélectionner une commande');
             return;
@@ -156,8 +204,10 @@ class DeliveryManager {
         
         try {
             const speed = this.ui.getTravelSpeed();
-            // IMPORTANT: Passer la durée estimée affichée pour que la simulation dure exactement ce temps
-            await this.trackingService.startTracking(selectedOrder.order_number, speed, this.currentEstimatedDuration);
+            const orderIdentifier = selectedOrder.id;
+            
+            await this.trackingService.startTracking(orderIdentifier, speed, this.currentEstimatedDuration);
+            
             this.ui.showSuccess('Livraison démarrée!');
         } catch (error) {
             this.ui.showError(error.message || 'Erreur lors du démarrage de la livraison');
@@ -210,23 +260,19 @@ class DeliveryManager {
         this.ui.elements.startDeliveryBtn.addEventListener('click', () => this.startDelivery());
         this.ui.elements.pauseDeliveryBtn.addEventListener('click', () => this.pauseDelivery());
         this.ui.elements.stopDeliveryBtn.addEventListener('click', () => this.stopDelivery());
+        this.ui.elements.completeDeliveryBtn.addEventListener('click', () => this.completeDelivery());
 
-        // Mettre à jour l'affichage de la vitesse de déplacement et recalculer la route en temps réel
         this.ui.elements.simulationSpeed.addEventListener('input', () => {
             const speed = this.ui.getTravelSpeed();
             this.ui.updateTravelSpeedDisplay(speed);
-            // Mettre à jour la vitesse affichée en bas du temps et de la distance
             this.ui.updateCurrentPosition(null, speed); 
             this.calculateRouteForSelectedOrder();
         });
 
-        // Initialiser l'affichage de la vitesse dès le début
         this.initializeSpeedDisplay();
     }
 
-    // Nouvelle méthode pour initialiser l'affichage de la vitesse
     initializeSpeedDisplay() {
-        // Attendre que l'élément soit disponible
         setTimeout(() => {
             const initialSpeed = this.ui.getTravelSpeed();
             this.ui.updateTravelSpeedDisplay(initialSpeed);

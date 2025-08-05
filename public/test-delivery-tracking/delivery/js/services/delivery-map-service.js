@@ -7,9 +7,9 @@ class DeliveryPersonMapService {
         this.initialized = false;
         this.currentPosition = null;
         this.mapConfig = {
-            style: CONFIG.MAPBOX.STYLE,
-            center: CONFIG.MAPBOX.DEFAULT_CENTER,
-            zoom: CONFIG.MAPBOX.DEFAULT_ZOOM,
+            style: DELIVERY_CONFIG.MAPBOX.STYLE,
+            center: DELIVERY_CONFIG.MAPBOX.DEFAULT_CENTER,
+            zoom: DELIVERY_CONFIG.MAPBOX.DEFAULT_ZOOM,
         };
     }
 
@@ -21,7 +21,7 @@ class DeliveryPersonMapService {
         }
 
         return new Promise((resolve, reject) => {
-            mapboxgl.accessToken = CONFIG.MAPBOX.ACCESS_TOKEN;
+            mapboxgl.accessToken = DELIVERY_CONFIG.MAPBOX.ACCESS_TOKEN;
 
             this.map = new mapboxgl.Map({
                 container: containerId,
@@ -99,9 +99,14 @@ class DeliveryPersonMapService {
     // Gestion des routes
     async drawRoute(startCoords, endCoords, transportMode = "driving") {
         const routeId = "delivery-route";
-        await this.removeRoute(routeId);
-
+        
         try {
+            // CORRECTION : S'assurer que la suppression est terminée avant d'ajouter une nouvelle route
+            await this.removeRoute(routeId);
+            
+            // Une courte pause pour s'assurer que Mapbox a bien enregistré la suppression
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
             const routeData = await this.fetchRouteData(
                 startCoords,
                 endCoords,
@@ -110,6 +115,14 @@ class DeliveryPersonMapService {
             if (!routeData) return null;
 
             this.addRouteToMap(routeId, routeData.geometry);
+            
+            // AJOUT: Ajouter explicitement les marqueurs après avoir dessiné la route
+            this.updateDriverPosition(startCoords.lat, startCoords.lng, "Position de départ");
+            this.setDestination(endCoords.lat, endCoords.lng, {
+                customer: "Client",
+                address: "Adresse de livraison"
+            });
+            
             this.fitBounds(routeData.geometry.coordinates);
 
             return {
@@ -125,9 +138,9 @@ class DeliveryPersonMapService {
 
     async fetchRouteData(startCoords, endCoords, transportMode) {
         const profile =
-            CONFIG.SIMULATION.TRANSPORT_MODES[transportMode]?.mapboxProfile ||
+            DELIVERY_CONFIG.SIMULATION.TRANSPORT_MODES[transportMode]?.mapboxProfile ||
             "driving";
-        const url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${startCoords.lng},${startCoords.lat};${endCoords.lng},${endCoords.lat}?geometries=geojson&access_token=${CONFIG.MAPBOX.ACCESS_TOKEN}`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${startCoords.lng},${startCoords.lat};${endCoords.lng},${endCoords.lat}?geometries=geojson&access_token=${DELIVERY_CONFIG.MAPBOX.ACCESS_TOKEN}`;
 
         const response = await fetch(url);
         const result = await response.json();
@@ -138,6 +151,16 @@ class DeliveryPersonMapService {
     addRouteToMap(routeId, geometry) {
         const sourceId = `${routeId}-source`;
         const layerId = `${routeId}-layer`;
+
+        // CORRECTION : Vérifier d'abord si la source existe déjà et la supprimer si nécessaire
+        if (this.map.getSource(sourceId)) {
+            // Si une source avec cet ID existe déjà, il faut d'abord supprimer sa couche
+            if (this.map.getLayer(layerId)) {
+                this.map.removeLayer(layerId);
+            }
+            this.map.removeSource(sourceId);
+            console.log(`Source existante ${sourceId} supprimée avant l'ajout`);
+        }
 
         this.map.addSource(sourceId, {
             type: "geojson",
@@ -169,16 +192,31 @@ class DeliveryPersonMapService {
     async removeRoute(routeId) {
         if (this.layers.has(routeId)) {
             const { sourceId, layerId } = this.layers.get(routeId);
-
-            if (this.map.getLayer(layerId)) {
-                this.map.removeLayer(layerId);
-            }
-            if (this.map.getSource(sourceId)) {
-                this.map.removeSource(sourceId);
-            }
-
-            this.layers.delete(routeId);
+            
+            return new Promise(resolve => {
+                try {
+                    // Supprimer la couche si elle existe
+                    if (this.map.getLayer(layerId)) {
+                        this.map.removeLayer(layerId);
+                        console.log(`Layer ${layerId} supprimée avec succès`);
+                    }
+                    
+                    // Supprimer la source si elle existe
+                    if (this.map.getSource(sourceId)) {
+                        this.map.removeSource(sourceId);
+                        console.log(`Source ${sourceId} supprimée avec succès`);
+                    }
+                    
+                    this.layers.delete(routeId);
+                } catch (error) {
+                    console.warn(`Erreur lors de la suppression de la route ${routeId}:`, error);
+                }
+                
+                // Résoudre la promesse après une courte pause pour s'assurer que Mapbox a bien enregistré les modifications
+                setTimeout(resolve, 10);
+            });
         }
+        return Promise.resolve();
     }
 
     // Utilitaires
@@ -209,8 +247,8 @@ class DeliveryPersonMapService {
 
     getDefaultPosition() {
         return {
-            lat: CONFIG.MAPBOX.DEFAULT_CENTER[1],
-            lng: CONFIG.MAPBOX.DEFAULT_CENTER[0],
+            lat: DELIVERY_CONFIG.MAPBOX.DEFAULT_CENTER[1],
+            lng: DELIVERY_CONFIG.MAPBOX.DEFAULT_CENTER[0],
         };
     }
 

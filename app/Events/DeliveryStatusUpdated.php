@@ -8,19 +8,21 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
-class DeliveryPositionUpdated implements ShouldBroadcast
+class DeliveryStatusUpdated implements ShouldBroadcast
 {
     use Dispatchable;
     use InteractsWithSockets;
     use SerializesModels;
 
     public $delivery;
+    public $previousStatus;
 
-    public function __construct(DeliveryTracking $delivery)
+    public function __construct(DeliveryTracking $delivery, ?string $previousStatus = null)
     {
+        // Charger les relations nécessaires
         $this->delivery = $delivery->load(['order.customer', 'order.deliveryPerson', 'order.deliveryAddress']);
+        $this->previousStatus = $previousStatus;
     }
 
     public function broadcastOn()
@@ -33,28 +35,24 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     public function broadcastAs()
     {
-        return 'delivery-position-updated';
+        return 'delivery-status-updated';
     }
 
     public function broadcastWith()
     {
-        // OPTIMISATION: Calculer la distance totale et la progression
-        $totalDistance = $this->delivery->route_geometry ?
-            $this->calculateRouteDistance($this->delivery->route_geometry) : null;
-
-        $progressPercentage = null;
-        if ($totalDistance && $this->delivery->distance_remaining) {
-            $progressPercentage = max(0, min(100,
-                (($totalDistance - $this->delivery->distance_remaining) / $totalDistance) * 100
-            ));
-        }
-
         return [
             'id' => $this->delivery->id,
             'order_id' => $this->delivery->order_id,
             'order_number' => $this->delivery->order->order_number,
 
-            // Position actuelle du livreur
+            // Statut
+            'status' => [
+                'value' => $this->delivery->status->value,
+                'label' => $this->delivery->status->getLabel(),
+            ],
+            'previous_status' => $this->previousStatus,
+
+            // Position actuelle
             'current_latitude' => (float) $this->delivery->driver_lat,
             'current_longitude' => (float) $this->delivery->driver_lng,
             'driver_position' => [
@@ -78,11 +76,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
             'eta' => $this->delivery->estimated_duration,
             'distance_remaining' => (float) $this->delivery->distance_remaining,
             'current_speed' => (float) ($this->delivery->current_speed ?? 0),
-            'status' => $this->delivery->status->value,
-
-            // Progression
-            'total_distance' => $totalDistance,
-            'progress_percentage' => $progressPercentage,
 
             // Informations du livreur
             'driver_name' => $this->delivery->order->deliveryPerson->full_name ??
@@ -94,64 +87,15 @@ class DeliveryPositionUpdated implements ShouldBroadcast
                              $this->delivery->order->customer->name ?? null,
             'customer_phone' => $this->delivery->order->customer->phone_number ?? null,
 
-            // Données de route et timing
-            'route_geometry' => $this->delivery->route_geometry,
+            // Timing
             'started_at' => $this->delivery->started_at?->toISOString(),
+            'delivered_at' => $this->delivery->delivered_at?->toISOString(),
             'updated_at' => $this->delivery->updated_at->toISOString(),
 
-            // Métadonnées pour le debugging
-            '_event_type' => 'position_update',
+            // Métadonnées
+            '_event_type' => 'status_update',
             '_timestamp' => now()->toISOString(),
+            '_is_completed' => $this->delivery->status->value === 'completed',
         ];
-    }
-
-    /**
-     * Calculer approximativement la distance totale depuis la géométrie de route
-     */
-    private function calculateRouteDistance($routeGeometry): ?float
-    {
-        if (! $routeGeometry) {
-            return null;
-        }
-
-        try {
-            $geometry = is_string($routeGeometry) ? json_decode($routeGeometry, true) : $routeGeometry;
-
-            if (! isset($geometry['coordinates']) || ! is_array($geometry['coordinates'])) {
-                return null;
-            }
-
-            $coordinates = $geometry['coordinates'];
-            $totalDistance = 0;
-
-            for ($i = 1; $i < count($coordinates); $i++) {
-                $totalDistance += $this->haversineDistance(
-                    $coordinates[$i - 1][1], $coordinates[$i - 1][0],
-                    $coordinates[$i][1], $coordinates[$i][0]
-                );
-            }
-
-            return $totalDistance;
-        } catch (\Exception $e) {
-            Log::warning('Error calculating route distance: '.$e->getMessage());
-
-            return null;
-        }
-    }
-
-    /**
-     * Calculer la distance entre deux points GPS (formule de haversine)
-     */
-    private function haversineDistance($lat1, $lon1, $lat2, $lon2): float
-    {
-        $earthRadius = 6371; // Rayon de la Terre en kilomètres
-
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLon = deg2rad($lon2 - $lon1);
-
-        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-
-        return $earthRadius * $c;
     }
 }

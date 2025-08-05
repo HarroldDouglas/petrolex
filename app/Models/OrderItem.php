@@ -105,8 +105,6 @@ class OrderItem extends Model
             ->withTimestamps();
     }
 
-    
-
     /**
      * Get the number of bottles scanned for this order item.
      */

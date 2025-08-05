@@ -54,4 +54,9 @@ class DeliveryPersonUIComponents extends DeliveryUIBase {
     showInfo(message, title) {
         return this.trackingUI.showInfo(message, title);
     }
+
+    // AJOUT: Méthode showWarning manquante
+    showWarning(message, title) {
+        return this.trackingUI.showWarning(message, title);
+    }
 }

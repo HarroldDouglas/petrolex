@@ -4,7 +4,7 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Post(
- *     path="/api/tracking/delivery/{orderNumber}/start",
+ *     path="/api/tracking/delivery/{orderId}/start",
  *     summary="Start delivery tracking",
  *     description="Marks a delivery as started.",
  *     operationId="api.tracking.delivery.start",
@@ -12,12 +12,12 @@ use OpenApi\Annotations as OA;
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
- *         name="orderNumber",
+ *         name="orderId",
  *         in="path",
  *         required=true,
- *         description="The order number of the delivery to start tracking",
+ *         description="The order ID of the delivery to start tracking",
  *
- *         @OA\Schema(type="string")
+ *         @OA\Schema(type="integer")
  *     ),
  *
  *     @OA\Response(

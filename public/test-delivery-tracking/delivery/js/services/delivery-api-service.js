@@ -1,12 +1,11 @@
-// Service pour les appels API avec authentification
 class DeliveryPersonApiService {
     constructor() {
-        this.baseUrl = CONFIG.API.BASE_URL;
+        this.baseUrl = DELIVERY_CONFIG.API.BASE_URL;
         this.token = localStorage.getItem("delivery_person_token");
         this.cachedOrders = new Map();
+        this.trackingApi = new DeliveryTrackingApiService(this);
     }
 
-    // Gestion des tokens
     setToken(token) {
         this.token = token;
         localStorage.setItem("delivery_person_token", token);
@@ -30,7 +29,6 @@ class DeliveryPersonApiService {
         return headers;
     }
 
-    // Méthode de requête centrale optimisée
     async request(endpoint, options = {}) {
         const url = `${this.baseUrl}${endpoint}`;
         const config = {
@@ -60,9 +58,8 @@ class DeliveryPersonApiService {
         }
     }
 
-    // Authentification
     async login(email, password) {
-        const response = await this.request(CONFIG.API.ENDPOINTS.LOGIN, {
+        const response = await this.request(DELIVERY_CONFIG.API.ENDPOINTS.LOGIN, {
             method: "POST",
             body: JSON.stringify({
                 login: email,
@@ -78,7 +75,6 @@ class DeliveryPersonApiService {
         throw new Error(response._metadata?.message || "Erreur de connexion");
     }
 
-    // Gestion des commandes
     async getOrders(deliveryPersonId, filters = {}, page = 1) {
         const endpoint = this.buildOrdersEndpoint(
             deliveryPersonId,
@@ -87,7 +83,6 @@ class DeliveryPersonApiService {
         );
         const response = await this.request(endpoint);
 
-        // Mettre en cache les commandes
         if (response.data?.orders) {
             this.cacheOrderIds(response.data.orders);
         }
@@ -96,27 +91,25 @@ class DeliveryPersonApiService {
     }
 
     buildOrdersEndpoint(deliveryPersonId, filters, page) {
-        let endpoint = CONFIG.API.ENDPOINTS.DELIVERY_PERSON_ORDERS.replace(
+        let endpoint = DELIVERY_CONFIG.API.ENDPOINTS.DELIVERY_PERSON_ORDERS.replace(
             "{id}",
             deliveryPersonId,
         );
 
         const params = new URLSearchParams({
             page: page.toString(),
-            per_page: CONFIG.UI.DEFAULT_PAGINATION.toString(),
+            per_page: DELIVERY_CONFIG.UI.DEFAULT_PAGINATION.toString(),
             ...filters,
         });
 
         return `${endpoint}?${params.toString()}`;
     }
 
-    // Cache management optimisé
     cacheOrderIds(orders) {
         orders.forEach((order) => {
             this.cachedOrders.set(order.order_number, order);
         });
 
-        // Persister en localStorage
         localStorage.setItem(
             "cached_orders",
             JSON.stringify(Array.from(this.cachedOrders.values())),
@@ -128,7 +121,6 @@ class DeliveryPersonApiService {
             return this.cachedOrders.get(orderNumber);
         }
 
-        // Fallback sur localStorage
         const cached = JSON.parse(
             localStorage.getItem("cached_orders") || "[]",
         );
@@ -141,13 +133,88 @@ class DeliveryPersonApiService {
         return order;
     }
 
-    getOrderIdFromCache(orderNumber) {
-        const order = this.getOrderFromCache(orderNumber);
-        return order?.id || null;
+    async getOrder(orderNumberOrId) {
+        try {
+            const cachedOrder = this.getOrderFromCache(orderNumberOrId);
+            
+            if (cachedOrder) {
+                return {
+                    _metadata: {
+                        success: true,
+                        message: "Commande récupérée du cache"
+                    },
+                    data: cachedOrder
+                };
+            }
+            
+            const deliveryPerson = JSON.parse(localStorage.getItem("delivery_person"));
+            if (!deliveryPerson) {
+                throw new Error("Livreur non connecté");
+            }
+            
+            const deliveryPersonId = deliveryPerson.delivery_person_id || deliveryPerson.id;
+            await this.getOrders(deliveryPersonId, {}, 1);
+            
+            const refreshedOrder = this.getOrderFromCache(orderNumberOrId);
+            
+            if (refreshedOrder) {
+                return {
+                    _metadata: {
+                        success: true,
+                        message: "Commande récupérée après actualisation"
+                    },
+                    data: refreshedOrder
+                };
+            }
+            
+            throw new Error(`Commande ${orderNumberOrId} non trouvée`);
+        } catch (error) {
+            console.error(`Failed to get order ${orderNumberOrId}:`, error);
+            throw error;
+        }
+    }
+    
+    async getOrderTracking(orderNumber) {
+        try {
+            const orderData = this.getOrderFromCache(orderNumber);
+            if (!orderData || !orderData.id) {
+                throw new Error(`Impossible de trouver l'ID numérique pour la commande ${orderNumber}`);
+            }
+            
+            const numericOrderId = orderData.id;
+            const endpoint = DELIVERY_CONFIG.API.ENDPOINTS.TRACKING_DETAILS.replace("{orderId}", numericOrderId);
+            return await this.request(endpoint);
+        } catch (error) {
+            console.error(`Failed to get tracking for order ${orderNumber}:`, error);
+            throw error;
+        }
+    }
+    
+    getOrderNumberFromId(orderIdOrNumber) {
+        if (typeof orderIdOrNumber === 'string' && orderIdOrNumber.startsWith('CMD-')) {
+            return orderIdOrNumber;
+        }
+        
+        for (const [orderNumber, orderData] of this.cachedOrders.entries()) {
+            if (orderData.id == orderIdOrNumber) {
+                return orderNumber;
+            }
+        }
+        
+        return null;
     }
 
-    clearCache() {
-        this.cachedOrders.clear();
-        localStorage.removeItem("cached_orders");
+    getOrderIdFromCache(orderNumber) {
+        if (typeof orderNumber === 'number' || (typeof orderNumber === 'string' && !orderNumber.startsWith('CMD-'))) {
+            return parseInt(orderNumber, 10);
+        }
+        
+        const orderData = this.getOrderFromCache(orderNumber);
+        if (orderData && orderData.id) {
+            return orderData.id;
+        }
+        
+        console.warn(`Impossible de trouver l'ID pour la commande ${orderNumber}`);
+        return null;
     }
 }

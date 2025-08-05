@@ -4,7 +4,7 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Get(
- *     path="/api/tracking/delivery/{orderNumber}",
+ *     path="/api/tracking/delivery/{orderId}",
  *     summary="Get delivery tracking details",
  *     description="Retrieves the tracking details for a specific delivery.",
  *     operationId="api.tracking.delivery.details",
@@ -12,12 +12,12 @@ use OpenApi\Annotations as OA;
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
- *         name="orderNumber",
+ *         name="orderId",
  *         in="path",
  *         required=true,
- *         description="The order number of the delivery to track",
+ *         description="The order ID of the delivery to track",
  *
- *         @OA\Schema(type="string")
+ *         @OA\Schema(type="integer")
  *     ),
  *
  *     @OA\Response(

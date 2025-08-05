@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Api\Controllers\TrackingDelivery\CompleteDeliveryTrackingController;
 use App\Http\Api\Controllers\TrackingDelivery\CreateDeliveryTrackingController;
 use App\Http\Api\Controllers\TrackingDelivery\GetActiveDeliveriesController;
 use App\Http\Api\Controllers\TrackingDelivery\GetDeliveryTrackingDetailsController;
 use App\Http\Api\Controllers\TrackingDelivery\StartDeliveryTrackingController;
 use App\Http\Api\Controllers\TrackingDelivery\UpdateDeliveryTrackingPositionController;
-use App\Http\Api\Controllers\TrackingDelivery\CompleteDeliveryTrackingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('tracking/delivery')->name('tracking.delivery.')->group(function () {
