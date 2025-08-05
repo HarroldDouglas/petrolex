@@ -7,6 +7,7 @@ namespace App\Http\Resources\Api\TrackingDelivery;
 use App\Models\DeliveryTracking;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @mixin DeliveryTracking
@@ -15,6 +16,13 @@ final class DeliveryTrackingResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        logger()->debug('DeliveryTrackingResource toArray called', [
+            'id' => $this->id,
+            'order_id' => $this->order_id,
+            'status' => $this->status->value,
+            'driver_lat' => $this->driver_lat,
+            'driver_lng' => $this->driver_lng,
+        ]);
         return [
             'id' => $this->id,
             'order_id' => $this->order_id,
@@ -44,12 +52,24 @@ final class DeliveryTrackingResource extends JsonResource
     private function calculateProgressPercentage(): ?float
     {
         if (! $this->distance_remaining || ! $this->total_distance) {
+            Log::info("Cannot calculate progress - missing data", [
+                'distance_remaining' => $this->distance_remaining,
+                'total_distance' => $this->total_distance
+            ]);
             return null;
         }
 
         $distanceTraveled = max(0, $this->total_distance - $this->distance_remaining);
         $progress = ($distanceTraveled / $this->total_distance) * 100;
+        $finalProgress = max(0, min(100, $progress));
+        
+        Log::info("Progress calculated", [
+            'total_distance' => $this->total_distance,
+            'distance_remaining' => $this->distance_remaining,
+            'distance_traveled' => $distanceTraveled,
+            'progress_percentage' => $finalProgress
+        ]);
 
-        return max(0, min(100, $progress));
+        return $finalProgress;
     }
 }

@@ -261,29 +261,102 @@ class DeliveryTrackingService {
         if (position) {
             const currentSpeed = this.ui?.getTravelSpeed() || 40;
             
+            // 🔧 CALCUL DE PROGRESSION côté client
+            const progressData = this.calculateProgress(position);
+            
             try {
                 const orderId = this.state.currentOrder.order_id || this.state.currentOrder.id;
                 
+                // 🔧 ENVOYER les données calculées au serveur
                 const response = await this.trackingApi.updatePosition(
                     orderId,
                     position,
-                    currentSpeed
+                    currentSpeed,
+                    progressData.progressPercentage,
+                    progressData.distanceRemaining,
+                    progressData.estimatedDuration
                 );
                 
                 if (response && response._metadata?.success && response.data) {
                     const serverData = response.data;
                     this.emit("progressUpdate", {
-                        progress: serverData.progress_percentage || 0,
+                        progress: serverData.progress_percentage || progressData.progressPercentage,
                         position: position,
                         speed: currentSpeed,
-                        remainingDistance: serverData.distance_remaining,
-                        remainingTime: serverData.estimated_duration
+                        remainingDistance: serverData.distance_remaining || progressData.distanceRemaining,
+                        remainingTime: serverData.estimated_duration || progressData.estimatedDuration
                     });
                 }
             } catch (error) {
                 console.error("Position update failed:", error);
             }
         }
+    }
+    
+    // 🔧 NOUVELLE MÉTHODE : Calculer la progression basée sur la position actuelle
+    calculateProgress(currentPosition) {
+        if (!this.state.routeCoordinates || this.state.routeCoordinates.length === 0) {
+            return {
+                progressPercentage: 0,
+                distanceRemaining: null,
+                estimatedDuration: null
+            };
+        }
+        
+        // Calculer la progression basée sur l'index actuel dans la route
+        const totalSteps = this.state.routeCoordinates.length;
+        const completedSteps = this.state.currentIndex;
+        const progressPercentage = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
+        
+        // Calculer la distance restante approximative
+        const remainingSteps = totalSteps - completedSteps;
+        const totalRouteDistance = this.estimateRouteDistance();
+        const distanceRemaining = (remainingSteps / totalSteps) * totalRouteDistance;
+        
+        // Calculer le temps estimé restant
+        const currentSpeed = this.ui?.getTravelSpeed() || 40;
+        const estimatedDuration = distanceRemaining > 0 ? Math.round((distanceRemaining / currentSpeed) * 60) : 0;
+        
+        console.log(`📊 Progression calculée: ${progressPercentage}% - ${distanceRemaining.toFixed(2)}km restants - ${estimatedDuration}min`);
+        
+        return {
+            progressPercentage,
+            distanceRemaining: parseFloat(distanceRemaining.toFixed(2)),
+            estimatedDuration
+        };
+    }
+    
+    // 🔧 NOUVELLE MÉTHODE : Estimer la distance totale de la route
+    estimateRouteDistance() {
+        if (!this.state.routeCoordinates || this.state.routeCoordinates.length < 2) {
+            return 10; // Distance par défaut en km
+        }
+        
+        // Calcul simple basé sur les coordonnées (approximation)
+        let totalDistance = 0;
+        for (let i = 1; i < this.state.routeCoordinates.length; i++) {
+            const [lng1, lat1] = this.state.routeCoordinates[i - 1];
+            const [lng2, lat2] = this.state.routeCoordinates[i];
+            totalDistance += this.haversineDistance(lat1, lng1, lat2, lng2);
+        }
+        
+        return totalDistance;
+    }
+    
+    // 🔧 NOUVELLE MÉTHODE : Calcul de distance Haversine
+    haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Rayon de la Terre en km
+        const dLat = this.toRadians(lat2 - lat1);
+        const dLon = this.toRadians(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+    
+    toRadians(degrees) {
+        return degrees * (Math.PI / 180);
     }
 
     pauseTracking() {

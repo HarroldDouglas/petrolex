@@ -42,7 +42,7 @@ class DeliveryPersonMapService {
     }
 
     // Gestion des marqueurs optimisée
-    updateDriverPosition(lat, lng, popupContent = null, speed = null) {
+    updateDriverPosition(lat, lng, popupContent = null, speed = null, shouldUpdateRoute = true) {
         const markerId = "driver";
         this.removeMarker(markerId);
 
@@ -60,6 +60,12 @@ class DeliveryPersonMapService {
         // Centrer la carte sur le conducteur
         this.map.setCenter([lng, lat]);
 
+        // 🔧 CORRECTION: Redessiner la route depuis la nouvelle position si une destination existe
+        if (shouldUpdateRoute && this.getDestinationPosition()) {
+            const destination = this.getDestinationPosition();
+            this.updateRouteFromCurrentPosition(destination);
+        }
+
         return marker;
     }
 
@@ -75,7 +81,45 @@ class DeliveryPersonMapService {
         });
 
         this.markers.set(markerId, marker);
+        this.destinationPosition = { lat, lng }; // 🔧 AJOUT: Stocker la position de destination
         return marker;
+    }
+
+    // 🔧 NOUVELLE MÉTHODE: Redessiner la route depuis la position actuelle
+    async updateRouteFromCurrentPosition(destination) {
+        if (!this.currentPosition || !destination) {
+            return;
+        }
+
+        const routeId = "delivery-route";
+        
+        try {
+            // Supprimer l'ancienne route
+            await this.removeRoute(routeId);
+            
+            // Attendre un peu pour s'assurer que la suppression est terminée
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            // Calculer la nouvelle route depuis la position actuelle
+            const routeData = await this.fetchRouteData(
+                { lat: this.currentPosition.lat, lng: this.currentPosition.lng },
+                { lat: destination.lat, lng: destination.lng },
+                "driving"
+            );
+            
+            if (routeData) {
+                this.addRouteToMap(routeId, routeData.geometry);
+                console.log(`🔄 Route mise à jour depuis position actuelle: ${this.currentPosition.lat}, ${this.currentPosition.lng}`);
+            }
+            
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour de la route:", error);
+        }
+    }
+
+    // 🔧 NOUVELLE MÉTHODE: Récupérer la position de destination
+    getDestinationPosition() {
+        return this.destinationPosition || null;
     }
 
     createMarker({ id, color, coordinates, popupContent }) {

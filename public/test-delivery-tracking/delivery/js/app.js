@@ -5,6 +5,9 @@ class DeliveryPersonApp {
         this.initManagers();
         this.setupEventHandlers();
         this.init();
+        
+        // Initialisation de la Facade pour simplifier la gestion des contrôles
+        this.controlsFacade = null; // Sera initialisé après les autres services
     }
 
     initServices() {
@@ -66,6 +69,16 @@ class DeliveryPersonApp {
         if (deliveryPerson) {
             await this.orderManager.loadOrders();
         }
+        
+        // Initialiser la facade après tous les autres services
+        this.controlsFacade = new DeliveryControlsFacade(
+            this.ui, 
+            this.orderManager, 
+            this.deliveryManager
+        );
+        
+        // Injecter la facade dans le DeliveryManager pour les transitions d'état
+        this.deliveryManager.setControlsFacade(this.controlsFacade);
     }
 
     async handleLogin() {
@@ -86,69 +99,16 @@ class DeliveryPersonApp {
     }
 
     async selectOrder(orderNumber) {
-        const order = await this.orderManager.selectOrder(orderNumber);
-        if (!order) {
-            console.error('❌ [App] Impossible de sélectionner la commande:', orderNumber);
-            return;
-        }
+        // 🎯 ULTRA SIMPLE maintenant grâce à la Facade !
+        // Une seule ligne remplace toute la logique complexe
+        await this.controlsFacade.handleOrderSelection(orderNumber);
         
-        console.log('✅ [App] Commande sélectionnée:', order);
+        console.log(`✅ [App] Commande sélectionnée:`, this.orderManager.getSelectedOrder());
         
-        // Calculer la route pour la commande sélectionnée
-        await this.deliveryManager.calculateRouteForSelectedOrder();
-        
-        // Si la commande est en cours ou confirmée
-        if (order.status === DELIVERY_CONFIG.ORDER_STATUS.PROCESSING || 
-            order.status === DELIVERY_CONFIG.ORDER_STATUS.CONFIRMED) {
-            
-            // Vérifier si la commande est en cours de livraison
-            if (order.status === DELIVERY_CONFIG.ORDER_STATUS.PROCESSING) {
-                console.log('🚚 [App] Commande en cours de livraison détectée');
-                
-                // Vérifier si cette commande est déjà en tracking actif
-                const trackingState = this.deliveryManager.getTrackingState();
-                
-                if (trackingState.isTracking && 
-                    trackingState.currentOrder && 
-                    trackingState.currentOrder.order_number === orderNumber) {
-                    // C'est la commande actuellement suivie
-                    console.log('🔄 [App] Commande déjà en suivi actif');
-                    this.ui.trackingUI.setDeliveryControlsState(true, trackingState.isPaused);
-                    this.ui.trackingUI.updateProgress(trackingState.currentProgress || 0);
-                } else {
-                    // Commande en cours mais pas actuellement suivie
-                    console.log('⏳ [App] Commande en cours mais pas en suivi actif');
-                    
-                    // Mettre à jour les boutons pour une commande en cours
-                    this.ui.trackingUI.updateDeliveryButtonsForInProgressOrder();
-                    
-                    // IMPORTANT: Si la commande a des données de tracking, les utiliser pour l'affichage
-                    if (order.trackingData) {
-                        const trackingData = order.trackingData;
-                        console.log('📊 [App] Données de tracking disponibles:', trackingData);
-                        
-                        // Mettre à jour les estimations avec les données existantes
-                        if (trackingData.estimated_duration !== undefined &&
-                            trackingData.distance_remaining !== undefined) {
-                            this.ui.trackingUI.updateRouteEstimates(
-                                trackingData.estimated_duration,
-                                trackingData.distance_remaining,
-                                true
-                            );
-                        }
-                    }
-                }
-            } else {
-                // Pour les nouvelles commandes (CONFIRMED)
-                console.log('🆕 [App] Nouvelle commande confirmée');
-                this.ui.trackingUI.setDeliveryControlsState(false, false);
-            }
-            
-            // S'assurer que la section de contrôle est visible
-            const controlsSection = document.getElementById('deliveryControlsSection');
-            if (controlsSection) {
-                controlsSection.style.display = 'block';
-            }
+        // Vérifier si c'est une nouvelle commande confirmée
+        const selectedOrder = this.orderManager.getSelectedOrder();
+        if (selectedOrder && selectedOrder.status === DELIVERY_CONFIG.ORDER_STATUS.CONFIRMED) {
+            console.log('🆕 [App] Nouvelle commande confirmée');
         }
     }
 

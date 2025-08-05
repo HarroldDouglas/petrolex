@@ -8,6 +8,8 @@ class TrackingController {
         this.currentTrackingOrder = null;
         this.isTracking = false;
         this.updateInterval = null;
+
+        this.initialTotalDistance = null;
     }
 
     bindEvents() {
@@ -56,6 +58,16 @@ class TrackingController {
             if (response.data) {
                 const trackingData = response.data;
                 console.log("🔍 [TrackingController] Données initiales de tracking chargées:", trackingData);
+                
+                // Utiliser la vraie distance totale du trajet
+                if (trackingData.total_distance && !this.initialTotalDistance) {
+                    this.initialTotalDistance = parseFloat(trackingData.total_distance);
+                    console.log(`📏 [TrackingController] Distance totale du trajet: ${this.initialTotalDistance}km`);
+                } else if (trackingData.distance_remaining && !this.initialTotalDistance) {
+                    // Fallback si total_distance n'est pas disponible
+                    this.initialTotalDistance = parseFloat(trackingData.distance_remaining);
+                    console.log(`📏 [TrackingController] Distance restante utilisée comme référence: ${this.initialTotalDistance}km`);
+                }
                 
                 // Mise à jour des informations de suivi
                 this.updateTrackingDisplay(trackingData);
@@ -108,11 +120,15 @@ class TrackingController {
                         
                         // Centrer la vue pour voir les deux points
                         try {
-                            // CORRECTION: Utiliser correctement fitBounds avec des coordonnées LngLat
-                            this.mapService.fitBounds([
-                                [driverLng, driverLat],
-                                [destLng, destLat]
-                            ]);
+                            // 🔧 CORRECTION: Créer les bounds correctement pour le service de carte
+                            const bounds = new mapboxgl.LngLatBounds();
+                            bounds.extend([driverLng, driverLat]);
+                            bounds.extend([destLng, destLat]);
+                            
+                            this.mapService.map.fitBounds(bounds, {
+                                padding: { top: 50, bottom: 50, left: 50, right: 50 },
+                                duration: CUSTOMER_CONFIG.UI.ANIMATION_DURATION,
+                            });
                         } catch (error) {
                             console.warn("⚠️ [TrackingController] Impossible d'ajuster la vue:", error);
                             // Fallback: centrer sur le livreur
@@ -204,30 +220,86 @@ class TrackingController {
     }
 
     updateTrackingDisplay(data) {
+        // 🔍 DEBUG: Afficher TOUTES les propriétés reçues
+        console.log("🔍 [TrackingController] TOUTES les données reçues du backend:", data);
+        console.log("🔍 [TrackingController] Propriétés spécifiques:", {
+            progress_percentage: data.progress_percentage,
+            estimated_duration: data.estimated_duration,
+            estimated_time_remaining: data.estimated_time_remaining,
+            distance_remaining: data.distance_remaining,
+            current_speed: data.current_speed,
+            total_distance: data.total_distance
+        });
+
         // Corriger les noms de propriétés pour correspondre à l'API
         this.ui.updateTrackingStats({
             eta: data.estimated_duration || data.estimated_time_remaining,
             distance: data.distance_remaining,
             speed: data.current_speed,
         });
+        console.log("📊 [TrackingController] Stats envoyées à l'UI:", {
+            eta: data.estimated_duration || data.estimated_time_remaining,
+            distance: data.distance_remaining,
+            speed: data.current_speed,
+        });
 
-        // CORRECTION: Mettre à jour correctement la barre de progression
-        // Vérifier explicitement si progress_percentage est défini et est un nombre
+        // 🔧 CORRECTION FINALE: Utiliser DIRECTEMENT la progression du backend
         if (data.progress_percentage !== undefined && data.progress_percentage !== null) {
             const progressValue = parseFloat(data.progress_percentage);
             if (!isNaN(progressValue)) {
-                console.log(`📊 [TrackingController] Mise à jour de la progression: ${progressValue}%`);
+                console.log(`📊 [TrackingController] Progression du backend: ${progressValue}%`);
                 this.ui.updateTrackingProgress(progressValue);
             } else {
-                console.warn(`⚠️ [TrackingController] Valeur de progression invalide:`, data.progress_percentage);
+                console.warn(`⚠️ [TrackingController] Progression invalide du backend:`, data.progress_percentage);
+                this.ui.updateTrackingProgress(0);
             }
         } else {
-            // Calculer la progression basée sur les données disponibles
-            console.log(`🔄 [TrackingController] Calcul de progression basé sur les distances`);
-            const calculatedProgress = this.calculateProgress(data);
-            if (calculatedProgress !== null) {
-                console.log(`📊 [TrackingController] Progression calculée: ${calculatedProgress.toFixed(1)}%`);
-                this.ui.updateTrackingProgress(calculatedProgress);
+            console.warn(`⚠️ [TrackingController] Aucune progression renvoyée par le backend`);
+            console.warn(`⚠️ [TrackingController] Tentative de calcul manuel...`);
+            
+            // Fallback: essayer de calculer la progression manuellement si possible
+            if (data.total_distance && data.distance_remaining) {
+                const totalDist = parseFloat(data.total_distance);
+                const remainingDist = parseFloat(data.distance_remaining);
+                if (!isNaN(totalDist) && !isNaN(remainingDist) && totalDist > 0) {
+                    const traveled = totalDist - remainingDist;
+                    const progressCalculated = Math.max(0, Math.min(100, (traveled / totalDist) * 100));
+                    console.log(`📊 [TrackingController] Progression calculée manuellement: ${progressCalculated}% (${traveled}km / ${totalDist}km)`);
+                    this.ui.updateTrackingProgress(progressCalculated);
+                } else {
+                    console.warn(`⚠️ [TrackingController] Impossible de calculer la progression: total=${totalDist}, remaining=${remainingDist}`);
+                    this.ui.updateTrackingProgress(0);
+                }
+            } else {
+                console.warn(`⚠️ [TrackingController] Données manquantes pour calculer la progression`);
+                this.ui.updateTrackingProgress(0);
+            }
+        }
+
+        // 🔧 CORRECTION: Mettre à jour aussi la position du livreur depuis les requêtes périodiques
+        if (data.driver_lat && data.driver_lng) {
+            const driverLat = parseFloat(data.driver_lat);
+            const driverLng = parseFloat(data.driver_lng);
+            
+            if (!isNaN(driverLat) && !isNaN(driverLng)) {
+                console.log(`📍 [TrackingController] Mise à jour position livreur: ${driverLat}, ${driverLng}`);
+                
+                this.mapService.updateDriverPosition(driverLat, driverLng, {
+                    name: data.driver_name || "Livreur"
+                });
+                
+                // Redessiner la route si on a la destination
+                if (data.destination_lat && data.destination_lng) {
+                    const destLat = parseFloat(data.destination_lat);
+                    const destLng = parseFloat(data.destination_lng);
+                    
+                    if (!isNaN(destLat) && !isNaN(destLng)) {
+                        this.mapService.drawRoute(
+                            [driverLng, driverLat],
+                            [destLng, destLat]
+                        );
+                    }
+                }
             }
         }
 
@@ -236,25 +308,27 @@ class TrackingController {
 
     // Nouvelle méthode pour calculer la progression
     calculateProgress(data) {
-        // Si on a les coordonnées du livreur et de la destination
-        if (data.driver_lat && data.driver_lng && data.destination_lat && data.destination_lng) {
-            // Récupérer la distance totale depuis les données de commande ou calculer
-            const orderCard = document.querySelector(`[data-order-number="${this.currentTrackingOrder}"]`);
-            if (orderCard) {
-                // Pour l'instant, utiliser une estimation basée sur la distance restante
-                // Une meilleure approche serait de stocker la distance totale initiale
-                const remainingDistance = parseFloat(data.distance_remaining);
-                if (remainingDistance && remainingDistance > 0) {
-                    // Estimation : si distance restante = 1.1km et on sait que c'était ~1.88km au total
-                    // On peut estimer la progression
-                    const estimatedTotalDistance = 1.88; // À améliorer avec vraies données
-                    const traveledDistance = estimatedTotalDistance - remainingDistance;
-                    const progress = (traveledDistance / estimatedTotalDistance) * 100;
-                    return Math.max(0, Math.min(100, progress)); // Entre 0 et 100
-                }
+        // D'abord, vérifier si la progression est directement fournie par le serveur
+        if (data.progress_percentage !== undefined && data.progress_percentage !== null) {
+            const serverProgress = parseFloat(data.progress_percentage);
+            if (!isNaN(serverProgress)) {
+                return serverProgress;
             }
         }
-        return null;
+        
+        // Si pas de progression directe, essayer de calculer basé sur la distance
+        if (data.distance_remaining !== undefined && data.distance_remaining !== null) {
+            const remainingKm = parseFloat(data.distance_remaining);
+            
+            // Récupérer la distance totale stockée au début du tracking
+            if (this.initialTotalDistance && remainingKm >= 0) {
+                const traveledDistance = this.initialTotalDistance - remainingKm;
+                const progress = (traveledDistance / this.initialTotalDistance) * 100;
+                return Math.max(0, Math.min(100, progress));
+            }
+        }
+        
+        return 0; // Par défaut, retourner 0% si aucun calcul possible
     }
 
     handleLocationUpdate(data) {

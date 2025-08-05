@@ -34,7 +34,7 @@ class DeliveryTrackingCacheService
                 'order_id' => $tracking->order_id,
                 'order_number' => $tracking->order->order_number,
                 'status' => $tracking->status->value,
-                'status_label' => $tracking->status->getLabel(),
+                'status_label' => $tracking->status->label,
                 'driver_lat' => $tracking->driver_lat,
                 'driver_lng' => $tracking->driver_lng,
                 'estimated_duration' => $tracking->estimated_duration,

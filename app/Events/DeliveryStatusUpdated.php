@@ -48,7 +48,7 @@ class DeliveryStatusUpdated implements ShouldBroadcast
             // Statut
             'status' => [
                 'value' => $this->delivery->status->value,
-                'label' => $this->delivery->status->getLabel(),
+                'label' => $this->delivery->status->label,
             ],
             'previous_status' => $this->previousStatus,
 

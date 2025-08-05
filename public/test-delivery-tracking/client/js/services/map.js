@@ -163,6 +163,30 @@ class CustomerMapService {
         }
     }
 
+    clearMarkers() {
+        if (this.driverMarker) {
+            this.driverMarker.remove();
+            this.driverMarker = null;
+        }
+        if (this.destinationMarker) {
+            this.destinationMarker.remove();
+            this.destinationMarker = null;
+        }
+    }
+
+    clearRoute() {
+        if (this.map && this.map.getSource("route")) {
+            this.map.getSource("route").setData({
+                type: "Feature",
+                properties: {},
+                geometry: {
+                    type: "LineString",
+                    coordinates: [],
+                },
+            });
+        }
+    }
+
     destroy() {
         if (this.driverMarker) this.driverMarker.remove();
         if (this.destinationMarker) this.destinationMarker.remove();

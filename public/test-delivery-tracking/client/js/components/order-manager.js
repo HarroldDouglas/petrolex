@@ -77,7 +77,7 @@ class CustomerOrderManager {
 
     getTrackingActionButton(order) {
         switch (order.status) {
-            case CUSTOMER_CONFIG.ORDER_STATUS.PROCESSING:
+            case CUSTOMER_CONFIG.ORDER_STATUS.IN_PROGRESS:  // 🔧 CORRECTION: IN_PROGRESS au lieu de PROCESSING
                 return `<button class="btn btn-sm btn-success w-100" onclick="window.customerApp.startTracking('${order.order_number}')">
                     <i class="fas fa-map-marker-alt"></i> Suivre
                 </button>`;

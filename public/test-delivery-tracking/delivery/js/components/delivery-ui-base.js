@@ -192,3 +192,167 @@ class DeliveryUIBase {
         return filters;
     }
 }
+
+// Strategies pour l'affichage des contrôles selon l'état
+class ButtonDisplayStrategy {
+    configure(context = {}) {
+        throw new Error('Must implement configure method');
+    }
+}
+
+class ConfirmedOrderStrategy extends ButtonDisplayStrategy {
+    configure(context = {}) {
+        return {
+            showSpeedControl: true,
+            showProgressBar: false,
+            buttons: {
+                start: { 
+                    visible: true, 
+                    enabled: true, 
+                    text: '<i class="fas fa-play"></i> Démarrer',
+                    class: 'btn btn-success'
+                },
+                pause: { visible: false },
+                stop: { visible: false },
+                complete: { visible: false }
+            }
+        };
+    }
+}
+
+class InProgressOrderStrategy extends ButtonDisplayStrategy {
+    configure(context = {}) {
+        return {
+            showSpeedControl: true,
+            showProgressBar: true,
+            buttons: {
+                start: { 
+                    visible: true, 
+                    enabled: true, 
+                    text: '<i class="fas fa-play"></i> Continuer',
+                    class: 'btn btn-primary'
+                },
+                pause: { visible: false },
+                stop: { visible: false },
+                complete: { visible: false }
+            }
+        };
+    }
+}
+
+class ActiveTrackingStrategy extends ButtonDisplayStrategy {
+    configure(context = {}) {
+        const progress = context.progress || 0;
+        const isPaused = context.isPaused || false;
+        
+        return {
+            showSpeedControl: false,
+            showProgressBar: true,
+            buttons: {
+                start: { visible: false },
+                pause: { 
+                    visible: !isPaused, 
+                    enabled: true, 
+                    text: '<i class="fas fa-pause"></i> Pause',
+                    class: 'btn btn-warning'
+                },
+                stop: { 
+                    visible: true, 
+                    enabled: true, 
+                    text: '<i class="fas fa-stop"></i> Arrêter',
+                    class: 'btn btn-danger'
+                },
+                complete: { 
+                    visible: progress >= 100, 
+                    enabled: progress >= 100,
+                    text: '<i class="fas fa-check"></i> Terminer',
+                    class: 'btn btn-success'
+                }
+            }
+        };
+    }
+}
+
+class PausedTrackingStrategy extends ButtonDisplayStrategy {
+    configure(context = {}) {
+        const progress = context.progress || 0;
+        
+        return {
+            showSpeedControl: false,
+            showProgressBar: true,
+            buttons: {
+                start: { 
+                    visible: true, 
+                    enabled: true, 
+                    text: '<i class="fas fa-play"></i> Reprendre',
+                    class: 'btn btn-success'
+                },
+                pause: { visible: false },
+                stop: { 
+                    visible: true, 
+                    enabled: true, 
+                    text: '<i class="fas fa-stop"></i> Arrêter',
+                    class: 'btn btn-danger'
+                },
+                complete: { 
+                    visible: progress >= 100, 
+                    enabled: progress >= 100,
+                    text: '<i class="fas fa-check"></i> Terminer',
+                    class: 'btn btn-success'
+                }
+            }
+        };
+    }
+}
+
+// Gestionnaire des contrôles avec les stratégies
+class DeliveryControlsManager {
+    constructor(elements) {
+        this.elements = elements;
+        this.strategies = {
+            'confirmed': new ConfirmedOrderStrategy(),
+            'in_progress': new InProgressOrderStrategy(),
+            'tracking_active': new ActiveTrackingStrategy(),
+            'tracking_paused': new PausedTrackingStrategy()
+        };
+    }
+    
+    updateControlsForState(stateName, context = {}) {
+        const strategy = this.strategies[stateName];
+        if (!strategy) {
+            console.warn(`No strategy found for state: ${stateName}`);
+            return;
+        }
+        
+        const config = strategy.configure(context);
+        this.applyConfiguration(config);
+    }
+    
+    applyConfiguration(config) {
+        // Afficher/masquer la section des contrôles
+        this.elements.deliveryControls.style.display = 'block';
+        
+        // Configurer la vitesse de simulation
+        const speedSection = this.elements.simulationSpeed?.closest('.mb-3');
+        if (speedSection) {
+            speedSection.style.display = config.showSpeedControl ? 'block' : 'none';
+        }
+        
+        // Configurer la barre de progression
+        const progressSection = this.elements.progressBar?.closest('.progress-container, .mb-3');
+        if (progressSection) {
+            progressSection.style.display = config.showProgressBar ? 'block' : 'none';
+        }
+        
+        // Configurer les boutons
+        Object.entries(config.buttons).forEach(([buttonName, settings]) => {
+            const element = this.elements[`${buttonName}DeliveryBtn`];
+            if (element && settings) {
+                element.style.display = settings.visible ? 'inline-block' : 'none';
+                element.disabled = !settings.enabled;
+                if (settings.text) element.innerHTML = settings.text;
+                if (settings.class) element.className = settings.class;
+            }
+        });
+    }
+}

@@ -12,31 +12,8 @@ class DeliveryTrackingApiService {
             orderId = await this.getOrderId(orderIdentifier);
         }
         
-        try {
-            const existingTracking = await this.apiService.request(`/tracking/delivery/${orderId}`);
-            if (existingTracking && existingTracking.data) {
-                if (existingTracking.data.progress_percentage) {
-                    const resumeData = {
-                        driver_lat: position.lat,
-                        driver_lng: position.lng,
-                        timestamp: new Date().toISOString(),
-                        progress_percentage: existingTracking.data.progress_percentage
-                    };
-                    
-                    return await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
-                        method: 'POST',
-                        body: JSON.stringify(resumeData)
-                    });
-                }
-            }
-        } catch (error) {
-            // If tracking doesn't exist or other error, continue normally
-        }
-        
-        return this.createOrStartTracking(orderId, position);
-    }
-    
-    async createOrStartTracking(orderId, position) {
+        // 🔧 CORRECTION: Démarrer directement sans vérification inutile
+        // Le serveur gère déjà les cas de tracking existant vs nouveau
         const trackingData = {
             driver_lat: position.lat,
             driver_lng: position.lng,
@@ -44,59 +21,20 @@ class DeliveryTrackingApiService {
         };
         
         try {
-            const createResponse = await this.apiService.request('/tracking/delivery', {
+            // Appeler directement l'endpoint start - le serveur gère tout
+            const response = await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
                 method: 'POST',
-                body: JSON.stringify({
-                    order_id: orderId,
-                    ...trackingData
-                })
+                body: JSON.stringify(trackingData)
             });
             
-            if (createResponse._metadata?.success) {
-                const startResponse = await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
-                    method: 'POST',
-                    body: JSON.stringify(trackingData)
-                });
-                
-                return startResponse;
-            }
-            
-            return createResponse;
+            return response;
         } catch (error) {
-            if (error.response?.status === 409) {
-                try {
-                    const trackingDetails = await this.apiService.request(`/tracking/delivery/${orderId}`);
-                    
-                    if (trackingDetails && trackingDetails.data) {
-                        const startResponse = await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                ...trackingData,
-                                progress_percentage: trackingDetails.data.progress_percentage
-                            })
-                        });
-                        
-                        return startResponse;
-                    }
-                    
-                    const startResponse = await this.apiService.request(`/tracking/delivery/${orderId}/start`, {
-                        method: 'POST',
-                        body: JSON.stringify(trackingData)
-                    });
-                    
-                    return startResponse;
-                } catch (startError) {
-                    console.error('Error during resume:', startError);
-                    throw startError;
-                }
-            }
-            
-            console.error('Error during creation/start:', error);
+            console.error('Erreur lors du démarrage du tracking:', error);
             throw error;
         }
     }
 
-    async updatePosition(orderId, position, speed, additionalData = null) {
+    async updatePosition(orderId, position, speed, progressPercentage = null, distanceRemaining = null, estimatedDuration = null) {
         if (!orderId) {
             console.error('Missing order ID for updatePosition');
             return;
@@ -108,8 +46,18 @@ class DeliveryTrackingApiService {
                 driver_lng: position.lng,
                 timestamp: new Date().toISOString(),
                 current_speed: speed,
-                ...(additionalData || {}),
             };
+            
+            // 🔧 AJOUTER les données calculées côté client si disponibles
+            if (progressPercentage !== null) {
+                updateData.progress_percentage = progressPercentage;
+            }
+            if (distanceRemaining !== null) {
+                updateData.distance_remaining = distanceRemaining;
+            }
+            if (estimatedDuration !== null) {
+                updateData.estimated_duration = estimatedDuration;
+            }
             
             const response = await this.apiService.request(`/tracking/delivery/${orderId}/position`, {
                 method: 'PATCH',
@@ -119,8 +67,8 @@ class DeliveryTrackingApiService {
             if (response && response.data) {
                 if (response.data.progress_percentage !== undefined) {
                     const serverProgress = parseFloat(response.data.progress_percentage);
-                    if (Math.abs(serverProgress - (additionalData?.progress_percentage || 0)) > 1) {
-                        console.log(`Progress difference: local=${additionalData?.progress_percentage}%, server=${serverProgress}%`);
+                    if (Math.abs(serverProgress - (progressPercentage || 0)) > 1) {
+                        console.log(`📊 Progress difference: local=${progressPercentage}%, server=${serverProgress}%`);
                     }
                 }
             }

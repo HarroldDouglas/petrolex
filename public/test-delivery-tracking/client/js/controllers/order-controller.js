@@ -102,7 +102,7 @@ class OrderController {
             delivery_address: details[3]
                 ? details[3].textContent.replace("Adresse: ", "")
                 : "N/A",
-            status: CUSTOMER_CONFIG.ORDER_STATUS.PROCESSING,
+            status: CUSTOMER_CONFIG.ORDER_STATUS.IN_PROGRESS, // 🔧 CORRECTION: IN_PROGRESS au lieu de PROCESSING
             customer: window.customerApp.currentUser,
         };
     }

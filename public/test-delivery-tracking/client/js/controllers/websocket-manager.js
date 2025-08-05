@@ -100,6 +100,9 @@ class WebSocketManager {
             this.trackingChannel.bind("delivery-status-updated", (data) => {
                 console.log("[WebSocket] Événement reçu: 'delivery-status-updated'", data);
                 this.trackingController.handleStatusUpdate(data);
+                
+                // 🔧 CORRECTION CRITIQUE: Mettre à jour la liste des commandes aussi !
+                this.updateOrderCardStatus(data);
             });
 
         } catch (error) {
@@ -148,5 +151,69 @@ class WebSocketManager {
         }
         this.wsConnected = false;
         this.pendingSubscriptions = [];
+    }
+
+    // === NOUVELLE MÉTHODE : Mise à jour des cartes de commandes ===
+    updateOrderCardStatus(data) {
+        if (!data.order_number) return;
+        
+        console.log(`[WebSocket] Mise à jour du statut de la commande ${data.order_number}:`, data);
+        
+        // Trouver la carte de commande dans la liste
+        const orderCard = document.querySelector(`[data-order-number="${data.order_number}"]`);
+        if (!orderCard) {
+            console.log(`[WebSocket] Carte de commande ${data.order_number} non trouvée dans la liste`);
+            return;
+        }
+        
+        const status = data.status?.value || data.status;
+        const statusLabel = data.status?.label || CUSTOMER_CONFIG.STATUS.TRANSLATIONS[status] || status;
+        const statusColor = CUSTOMER_CONFIG.STATUS.COLORS[status] || "secondary";
+        
+        // Mettre à jour le badge de statut
+        const statusBadge = orderCard.querySelector('.badge');
+        if (statusBadge) {
+            statusBadge.textContent = statusLabel;
+            statusBadge.className = `badge bg-${statusColor} mb-2`;
+        }
+        
+        // Mettre à jour le bouton d'action selon le nouveau statut
+        const actionContainer = orderCard.querySelector('.text-end');
+        if (actionContainer) {
+            const newButton = this.generateTrackingButton(status, data.order_number);
+            const oldButton = actionContainer.querySelector('button');
+            if (oldButton && newButton) {
+                oldButton.outerHTML = newButton;
+                console.log(`[WebSocket] ✅ Bouton mis à jour pour ${data.order_number}: ${status} -> ${newButton.includes('Suivre') ? 'SUIVRE' : 'AUTRE'}`);
+            }
+        }
+        
+        // Afficher une notification à l'utilisateur
+        if (status === CUSTOMER_CONFIG.ORDER_STATUS.IN_PROGRESS) {  // 🔧 CORRECTION: IN_PROGRESS au lieu de PROCESSING
+            this.ui.showSuccess(`📦 Votre commande ${data.order_number} est maintenant en cours de livraison ! Vous pouvez la suivre.`, 5000);
+        }
+    }
+
+    // === NOUVELLE MÉTHODE : Générer le bon bouton selon le statut ===
+    generateTrackingButton(status, orderNumber) {
+        switch (status) {
+            case CUSTOMER_CONFIG.ORDER_STATUS.IN_PROGRESS:  // 🔧 CORRECTION: IN_PROGRESS au lieu de PROCESSING
+                return `<button class="btn btn-sm btn-success w-100" onclick="window.customerApp.startTracking('${orderNumber}')">
+                    <i class="fas fa-map-marker-alt"></i> Suivre
+                </button>`;
+            case CUSTOMER_CONFIG.ORDER_STATUS.CONFIRMED:
+                return `<button class="btn btn-sm btn-warning w-100" disabled>
+                    <i class="fas fa-clock"></i> En attente
+                </button>`;
+            case CUSTOMER_CONFIG.ORDER_STATUS.DELIVERED:
+                return `<button class="btn btn-sm btn-outline-success w-100" disabled>
+                    <i class="fas fa-check"></i> Livrée
+                </button>`;
+            default:
+                const statusLabel = CUSTOMER_CONFIG.STATUS.TRANSLATIONS[status] || status;
+                return `<button class="btn btn-sm btn-outline-secondary w-100" disabled>
+                    ${statusLabel}
+                </button>`;
+        }
     }
 }
