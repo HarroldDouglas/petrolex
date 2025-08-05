@@ -31,15 +31,6 @@
         @if ($order)
             <!-- Order Details start -->
             <div class="row order-details">
-
-                <div class="col-12 mb-3">
-                    <div class="collapse" id="collapseMap">
-                        <div class="card card-body">
-                            @livewire('components.route-map')
-                        </div>
-                    </div>
-                </div>
-
                 @if ($order->canScanBottles())
                     <div class="collapse mt-3" id="collapseScanBottles">
                         <div class="card card-body border border-primary">

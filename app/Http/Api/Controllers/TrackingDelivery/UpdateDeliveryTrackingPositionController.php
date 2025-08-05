@@ -17,7 +17,6 @@ use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
 use App\Services\Shared\Cache\CacheServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Response;
 
 final class UpdateDeliveryTrackingPositionController extends Controller
 {
@@ -29,8 +28,7 @@ final class UpdateDeliveryTrackingPositionController extends Controller
         private readonly DeliveryTrackingServiceInterface $deliveryTrackingService,
         private readonly DeliveryTrackingRepositoryInterface $deliveryTrackingRepository,
         private readonly CacheServiceInterface $cacheService
-    ) {
-    }
+    ) {}
 
     /**
      * Update delivery tracking position.
@@ -88,7 +86,7 @@ final class UpdateDeliveryTrackingPositionController extends Controller
     {
         $deliveryTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
-        if (!$deliveryTracking) {
+        if (! $deliveryTracking) {
             Log::warning('Delivery tracking not found', ['order_id' => $orderId]);
             throw new \InvalidArgumentException('Delivery tracking not found.');
         }

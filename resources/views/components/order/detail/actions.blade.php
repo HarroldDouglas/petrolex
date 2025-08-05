@@ -15,8 +15,7 @@
                         </a>
                     </li>
                 @endif
-                <li><a class="dropdown-item" href="#" data-bs-toggle="collapse" data-bs-target="#collapseMap"
-                        aria-expanded="false" aria-controls="collapseMap">
+                <li><a class="dropdown-item" href="{{ route('orders.track.realtime', $order->id) }}" target="_blank">
                         <i class="ti ti-map-pin me-2"></i>Voir en temps réel
                     </a></li>
                 <li><a class="dropdown-item text-success" href="#" onclick="printOrder({{ $order->id }})">

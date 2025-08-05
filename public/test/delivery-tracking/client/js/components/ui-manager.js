@@ -64,19 +64,6 @@ class UIManager {
         }
     }
 
-    // Méthode manquante pour le statut WebSocket
-    updateWebSocketStatus(connected) {
-        if (this.elements.websocketStatus) {
-            if (connected) {
-                this.elements.websocketStatus.textContent = "Connecté";
-                this.elements.websocketStatus.className = "badge bg-success";
-            } else {
-                this.elements.websocketStatus.textContent = "Déconnecté";
-                this.elements.websocketStatus.className = "badge bg-secondary";
-            }
-        }
-    }
-
     updateLastUpdateTime() {
         if (this.elements.lastUpdateTime) {
             this.elements.lastUpdateTime.textContent =

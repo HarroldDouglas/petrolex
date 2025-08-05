@@ -73,16 +73,16 @@ const CUSTOMER_CONFIG = {
     // WebSocket Configuration pour Laravel Reverb
     WEBSOCKET: {
         ENABLED: true,
-        APP_KEY: 'local-key', // Clé Reverb correcte
-        APP_SECRET: 'local-secret',
+        APP_KEY: 'your-app-key', // Clé Reverb correcte depuis .env
+        APP_SECRET: 'your-app-secret',
         HOST: '127.0.0.1',
         PORT: 8080,
         FORCE_TLS: false,
         ENABLED_TRANSPORTS: ['websocket', 'polling'],
         // Configuration spécifique pour Laravel Reverb
-        PUSHER_APP_ID: 'local',
-        PUSHER_APP_KEY: 'local-key',
-        PUSHER_APP_SECRET: 'local-secret',
+        PUSHER_APP_ID: 'your-app-id',
+        PUSHER_APP_KEY: 'your-app-key',
+        PUSHER_APP_SECRET: 'your-app-secret',
         PUSHER_APP_CLUSTER: 'mt1'
     }
 };
