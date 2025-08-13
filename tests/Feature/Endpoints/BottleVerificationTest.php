@@ -12,7 +12,6 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 final class BottleVerificationTest extends TestCase
@@ -23,6 +22,7 @@ final class BottleVerificationTest extends TestCase
     private string $authToken;
     private DistributionCenter $distributionCenter;
     private BottleType $bottleType;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -58,13 +58,13 @@ final class BottleVerificationTest extends TestCase
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
         ])->getJson(route('api.bottles.verify', ['barcode' => $bottle->barcode]));
-        
+
         $response->dump();
-        
+
         $response->assertStatus(200)
             ->assertJsonPath('_metadata.success', true)
             ->assertJsonPath('data.authentic', true);
-            //->assertJsonPath('data.status', BottleStatus::IN_STOCK()->value);
+        // ->assertJsonPath('data.status', BottleStatus::IN_STOCK()->value);
     }
 
     /** @test */

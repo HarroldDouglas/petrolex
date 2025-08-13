@@ -3,6 +3,7 @@
 namespace App\Services\Bottle;
 
 use App\DTOs\Bottle\BottleStatsDTO;
+use App\Enums\BottleStatus;
 use App\Events\BottleStatusUpdatedEvent;
 use App\Models\Bottle;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
@@ -14,7 +15,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Enums\BottleStatus;
 
 class BottleService extends BaseServiceWithMedia
 {
