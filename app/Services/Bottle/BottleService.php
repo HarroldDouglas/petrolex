@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Enums\BottleStatus;
 
 class BottleService extends BaseServiceWithMedia
 {
@@ -23,6 +24,26 @@ class BottleService extends BaseServiceWithMedia
         protected MediaServiceInterface $mediaService,
     ) {
         parent::__construct($bottleRepository, $mediaService);
+    }
+
+    public function checkBottleStatusByBarcode(string $barcode): array
+    {
+        $bottle = $this->bottleRepository->findByBarcodeAndStatus($barcode, [
+            BottleStatus::IN_STOCK(),
+            BottleStatus::WITH_DELIVERY_PERSON(),
+        ]);
+
+        if ($bottle && $bottle->is_filled) {
+            return [
+                'authentic' => true,
+                'status' => $bottle->status->value,
+            ];
+        }
+
+        return [
+            'authentic' => false,
+            'status' => null,
+        ];
     }
 
     public function getBottleHistory($bottleId): Collection
