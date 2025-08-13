@@ -248,6 +248,17 @@ class Order extends Model
     }
 
     /**
+     * Check if this order can be delivered
+     */
+    public function canBeDelivered(): bool
+    {
+        return in_array($this->status->value, [
+            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PROCESSING()->value,
+        ]);
+    }
+
+    /**
      * Check if the delivery person can be changed for this order
      */
     public function canChangeDeliveryPerson(): bool
