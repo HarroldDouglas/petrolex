@@ -19,7 +19,7 @@ use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Event; // Added
+use Illuminate\Support\Facades\Event;
 
 class OrderService extends BaseServiceForEntity
 {
