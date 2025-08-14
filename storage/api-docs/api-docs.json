@@ -168,6 +168,65 @@
                 }
             }
         },
+        "/api/bottles/{barcode}/verify": {
+            "get": {
+                "tags": [
+                    "Bottles"
+                ],
+                "summary": "Verify bottle authenticity",
+                "description": "Checks if a bottle exists in the distribution center, has status WITH_DELIVERY_PERSON, and is_filled to true.",
+                "operationId": "api.bottles.verify",
+                "parameters": [
+                    {
+                        "name": "barcode",
+                        "in": "path",
+                        "description": "The barcode of the bottle to verify.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "BTG3SQ8FPZ"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bottle verification successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BottleVerificationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/customers/{customerId}": {
             "get": {
                 "tags": [
@@ -1173,6 +1232,35 @@
                             "message": {
                                 "type": "string",
                                 "example": "Authentification réussie"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "BottleVerificationData": {
+                "properties": {
+                    "authentic": {
+                        "description": "Indicates if the bottle is authentic and meets criteria.",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "BottleVerificationResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/BottleVerificationData"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Bottle verification result"
                             }
                         },
                         "type": "object"
@@ -2377,6 +2465,10 @@
         {
             "name": "Authentification",
             "description": "Authentification"
+        },
+        {
+            "name": "Bottles",
+            "description": "Bottles"
         },
         {
             "name": "Clients",
