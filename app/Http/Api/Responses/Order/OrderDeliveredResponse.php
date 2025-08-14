@@ -16,12 +16,14 @@ final class OrderDeliveredResponse extends ApiResponse
     public static function delivered(
         Order $order,
         ?string $message = null,
+        bool $success = true,
         int $statusCode = 200
     ): self {
+
         return new self(
             new OrderResource($order),
-            $message ?? 'Order marked as delivered successfully.',
-            true,
+            $message,
+            $success,
             $statusCode
         );
     }

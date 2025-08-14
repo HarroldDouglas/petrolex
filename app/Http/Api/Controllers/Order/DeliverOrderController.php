@@ -23,8 +23,10 @@ final class DeliverOrderController extends Controller
      */
     public function __invoke(Order $order): OrderDeliveredResponse
     {
-        $this->orderService->deliverOrder($order);
+        $updatedOrder = $this->orderService->deliverOrder($order);
+        $message = empty($updatedOrder) ? 'This order cannot be marked as delivered.'
+           : 'Order marked as delivered successfully.';
 
-        return OrderDeliveredResponse::delivered($order);
+        return OrderDeliveredResponse::delivered($order, $message, ! empty($updatedOrder));
     }
 }

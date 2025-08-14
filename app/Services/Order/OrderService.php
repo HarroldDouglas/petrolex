@@ -100,7 +100,7 @@ class OrderService extends BaseServiceForEntity
             return null;
         }
 
-        /** @var \App\Models\Order $updatedOrder */ // Added for PHPStan
+        /** @var \App\Models\Order $updatedOrder */
         $updatedOrder = parent::update($order, ['status' => OrderStatus::DELIVERED()->value]);
 
         Event::dispatch(new OrderDeliveredEvent($updatedOrder));
