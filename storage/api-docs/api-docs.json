@@ -173,8 +173,8 @@
                 "tags": [
                     "Bottles"
                 ],
-                "summary": "Verify bottle authenticity and status",
-                "description": "Checks if a bottle exists in the distribution center, has status IN_STOCK or WITH_DELIVERY_PERSON, and is_filled to true.",
+                "summary": "Verify bottle authenticity",
+                "description": "Checks if a bottle exists in the distribution center, has status WITH_DELIVERY_PERSON, and is_filled to true.",
                 "operationId": "api.bottles.verify",
                 "parameters": [
                     {
@@ -1244,12 +1244,6 @@
                         "description": "Indicates if the bottle is authentic and meets criteria.",
                         "type": "boolean",
                         "example": true
-                    },
-                    "status": {
-                        "description": "The status of the bottle if authentic, otherwise null.",
-                        "type": "string",
-                        "example": "IN_STOCK",
-                        "nullable": true
                     }
                 },
                 "type": "object"
