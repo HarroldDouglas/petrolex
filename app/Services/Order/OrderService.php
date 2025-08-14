@@ -9,6 +9,7 @@ use App\DTOs\Order\OrderItemDTO;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Events\OrderCreatedEvent;
+use App\Events\OrderDeliveredEvent;
 use App\Models\AccessoryType;
 use App\Models\BottleType;
 use App\Models\Order;
@@ -84,6 +85,27 @@ class OrderService extends BaseServiceForEntity
 
             return $order;
         });
+    }
+
+    /**
+     * Mark an order as delivered.
+     *
+     * @param  Order  $order  The order to mark as delivered.
+     * @return ?Order The updated order.
+     */
+    public function deliverOrder(Order $order): ?Order
+    {
+
+        if (! $order->canBeDelivered()) {
+            return null;
+        }
+
+        /** @var \App\Models\Order $updatedOrder */
+        $updatedOrder = parent::update($order, ['status' => OrderStatus::DELIVERED()->value]);
+
+        Event::dispatch(new OrderDeliveredEvent($updatedOrder));
+
+        return $updatedOrder;
     }
 
     public function getOrderWithGroupedItems(int $orderId): ?OrderDetailsDTO
