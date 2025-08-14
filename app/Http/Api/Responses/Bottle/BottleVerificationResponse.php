@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Responses\Bottle;
 
-use App\Http\Api\Resources\Bottle\BottleVerificationResource;
 use App\Http\Api\Responses\ApiResponse;
 
 final class BottleVerificationResponse extends ApiResponse
@@ -18,7 +17,7 @@ final class BottleVerificationResponse extends ApiResponse
         int $statusCode = 200
     ): self {
         return new self(
-            new BottleVerificationResource($data),
+            ['authentic' => $data['authentic']],
             $message ?? 'Résultat de la vérification de la bouteille',
             true,
             $statusCode

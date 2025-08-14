@@ -6,8 +6,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="BottleVerificationData",
  *
- *     @OA\Property(property="authentic", type="boolean", example=true, description="Indicates if the bottle is authentic and meets criteria."),
- *     @OA\Property(property="status", type="string", nullable=true, example="IN_STOCK", description="The status of the bottle if authentic, otherwise null.")
+ *     @OA\Property(property="authentic", type="boolean", example=true, description="Indicates if the bottle is authentic and meets criteria.")
  * )
  *
  * @OA\Schema(
@@ -31,8 +30,8 @@ use OpenApi\Annotations as OA;
  *
  * @OA\Get(
  *     path="/api/bottles/{barcode}/verify",
- *     summary="Verify bottle authenticity and status",
- *     description="Checks if a bottle exists in the distribution center, has status IN_STOCK or WITH_DELIVERY_PERSON, and is_filled to true.",
+ *     summary="Verify bottle authenticity",
+ *     description="Checks if a bottle exists in the distribution center, has status WITH_DELIVERY_PERSON, and is_filled to true.",
  *     operationId="api.bottles.verify",
  *     tags={"Bottles"},
  *     security={{"bearerAuth":{}}},
