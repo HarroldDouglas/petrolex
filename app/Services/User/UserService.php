@@ -76,6 +76,10 @@ class UserService extends BaseServiceWithMedia
             unset($attributes['password']);
         }
 
+        if (! isset($attributes['is_active'])) {
+            unset($attributes['is_active']);
+        }
+
         try {
             /** @var User $user */
             $user = parent::updateWithMedia($user, $attributes);
