@@ -14,9 +14,6 @@ final class EmptyBottleReturned
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(
         public readonly Bottle $bottle,
         public readonly Order $order,
