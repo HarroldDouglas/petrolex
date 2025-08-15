@@ -4,11 +4,13 @@ namespace App\Providers;
 
 use App\Events\CustomerCreatedEvent;
 use App\Events\DistributionCenterUpdatedEvent;
+use App\Events\EmptyBottleReturned;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
 use App\Listeners\AddOrderItemsToOrderListener;
+use App\Listeners\CreateBottleMovementForReturnedBottleListener;
 use App\Listeners\LogCustomerCreatedListener;
 use App\Listeners\LogDistributionCenterUpdated;
 use App\Listeners\LogOrderCreatedListener;
@@ -27,6 +29,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
+        EmptyBottleReturned::class => [
+            CreateBottleMovementForReturnedBottleListener::class,
+        ],
         OrderDeliveredEvent::class => [
             UpdateBottleStatusAndMovementOnOrderDelivered::class,
             LogOrderDelivered::class,

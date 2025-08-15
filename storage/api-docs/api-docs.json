@@ -967,6 +967,96 @@
                 ]
             }
         },
+        "/api/orders/{order}/scan-empty-bottle": {
+            "post": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Scan a returned empty bottle",
+                "description": "Associates a returned empty bottle with an order item by scanning its barcode. If the bottle doesn't exist, it will be created.",
+                "operationId": "api.orders.scan-empty-bottle",
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "description": "ID of the order.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Barcode of the returned bottle and the associated order item ID.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ScanEmptyBottleRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Empty bottle scanned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ScanEmptyBottleResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., validation error, or no available scan record to update)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Order or OrderItem not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/payment-methods": {
             "get": {
                 "tags": [
@@ -1693,6 +1783,46 @@
                             "message": {
                                 "type": "string",
                                 "example": "Order marked as delivered successfully."
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ScanEmptyBottleRequest": {
+                "required": [
+                    "barcode",
+                    "order_item_id"
+                ],
+                "properties": {
+                    "barcode": {
+                        "description": "The barcode of the empty bottle being returned.",
+                        "type": "string",
+                        "example": "BOTTLE-12345"
+                    },
+                    "order_item_id": {
+                        "description": "The ID of the order item to associate the returned bottle with.",
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "ScanEmptyBottleResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "example": null,
+                                "nullable": true
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Empty bottle scanned successfully."
                             }
                         },
                         "type": "object"

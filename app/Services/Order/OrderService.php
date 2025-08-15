@@ -6,15 +6,21 @@ use App\DTOs\Order\CreateOrderDTO;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
 use App\DTOs\Order\OrderItemDTO;
+use App\DTOs\Order\ScanEmptyBottleDTO;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
+use App\Events\EmptyBottleReturned;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
 use App\Models\AccessoryType;
+use App\Models\Bottle;
 use App\Models\BottleType;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Repositories\Contracts\BottleRepositoryInterface;
+use App\Repositories\Contracts\OrderBottleScanRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -25,7 +31,10 @@ class OrderService extends BaseServiceForEntity
 {
     public function __construct(
         protected OrderRepositoryInterface $orderRepository,
-        private ProductCategoryService $productCategoryService
+        private readonly BottleRepositoryInterface $bottleRepository,
+        private readonly OrderBottleScanRepositoryInterface $orderBottleScanRepository,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly ProductCategoryService $productCategoryService
     ) {
         parent::__construct($this->orderRepository);
     }
@@ -33,6 +42,58 @@ class OrderService extends BaseServiceForEntity
     protected function getModel(): string
     {
         return Order::class;
+    }
+
+    /**
+     * Handle the return of an empty bottle.
+     */
+    public function handleEmptyBottleReturn(ScanEmptyBottleDTO $dto, Order $order): bool
+    {
+        return $this->executeInTransaction(function () use ($dto, $order) {
+            /** @var Bottle|null $emptyBottle */
+            $emptyBottle = $this->bottleRepository->findByBarcode($dto->barcode);
+
+            if (! $emptyBottle) {
+                /** @var OrderItem $orderItem */
+                $orderItem = OrderItem::query()->findOrFail($dto->orderItemId);
+
+                /** @var \App\Models\Product $product */
+                $product = $this->productRepository->create([
+                    'product_category_id' => $orderItem->product_category_id,
+                ]);
+
+                /** @var \App\Models\Bottle $emptyBottle */
+                $emptyBottle = $this->bottleRepository->create([
+                    'barcode' => $dto->barcode,
+                    'product_id' => $product->id,
+                    'distribution_center_id' => $order->distribution_center_id,
+                    'is_filled' => false,
+                ]);
+            } else {
+                $this->bottleRepository->update($emptyBottle, [
+                    'is_filled' => false,
+                    'distribution_center_id' => $order->distribution_center_id,
+                ]);
+            }
+
+            if ($this->orderBottleScanRepository->existsEmptyBottleForOrderItem($dto->orderItemId, $emptyBottle->id)) {
+                return false;
+            }
+
+            $scanToUpdate = $this->orderBottleScanRepository->findUnassignedEmptyBottleScan($dto->orderItemId);
+
+            if (! $scanToUpdate) {
+                return false;
+            }
+
+            $this->orderBottleScanRepository->update($scanToUpdate, [
+                'empty_bottle_id' => $emptyBottle->id,
+            ]);
+
+            Event::dispatch(new EmptyBottleReturned($emptyBottle, $order, $dto->orderItemId));
+
+            return true;
+        });
     }
 
     /**

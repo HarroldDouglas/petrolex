@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_item_id')->constrained()->onDelete('cascade');
             $table->foreignId('bottle_id')->constrained()->onDelete('cascade');
+            $table->foreignId('empty_bottle_id')->nullable()->constrained('bottles')->onDelete('set null');
             $table->timestamps();
-            
+
             $table->unique(['order_item_id', 'bottle_id']);
         });
     }
