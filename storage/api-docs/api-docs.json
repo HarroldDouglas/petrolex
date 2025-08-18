@@ -68,6 +68,74 @@
                 }
             }
         },
+        "/api/password": {
+            "patch": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Update authenticated user's password",
+                "description": "Allows the authenticated user to update their password.",
+                "operationId": "api.password.update",
+                "requestBody": {
+                    "description": "Old and new password details.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdatePasswordResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error (e.g., old password incorrect, new password mismatch, or too weak)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/profile": {
             "patch": {
                 "tags": [
@@ -1379,6 +1447,55 @@
                             "message": {
                                 "type": "string",
                                 "example": "Authentification réussie"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "UpdatePasswordRequest": {
+                "required": [
+                    "old_password",
+                    "new_password",
+                    "new_password_confirmation"
+                ],
+                "properties": {
+                    "old_password": {
+                        "description": "User's current password",
+                        "type": "string",
+                        "format": "password",
+                        "example": "password"
+                    },
+                    "new_password": {
+                        "description": "User's new password",
+                        "type": "string",
+                        "format": "password",
+                        "example": "new_strong_password"
+                    },
+                    "new_password_confirmation": {
+                        "description": "Confirmation of the new password",
+                        "type": "string",
+                        "format": "password",
+                        "example": "new_strong_password"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdatePasswordResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "example": null,
+                                "nullable": true
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Mot de passe mis à jour avec succès."
                             }
                         },
                         "type": "object"

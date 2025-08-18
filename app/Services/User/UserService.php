@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\DTOs\User\UpdatePasswordDTO;
 use App\Enums\UserRole;
 use App\Events\UserCreatedEvent;
 use App\Events\UserDeletedEvent;
@@ -11,6 +12,7 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseServiceWithMedia
@@ -107,6 +109,24 @@ class UserService extends BaseServiceWithMedia
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Update a user's password.
+     *
+     * @param  User  $user  The user to update.
+     * @param  UpdatePasswordDTO  $dto  The DTO containing old and new passwords.
+     * @return bool True if the password was updated, false otherwise.
+     */
+    public function updatePassword(User $user, UpdatePasswordDTO $dto): bool
+    {
+        if (! Hash::check($dto->old_password, $user->password)) {
+            throw new \Exception('L\'ancien mot de passe est incorrect.');
+        }
+
+        return (bool) $this->userRepository->update($user, [
+            'password' => Hash::make($dto->new_password),
+        ]);
     }
 
     /**

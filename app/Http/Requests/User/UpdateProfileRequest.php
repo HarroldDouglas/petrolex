@@ -33,7 +33,6 @@ class UpdateProfileRequest extends FormRequest
                 'max:20',
                 Rule::unique('users', 'phone_number')->ignore($userId),
             ],
-            'password' => ['nullable', 'string', 'min:8'],
         ];
     }
 
@@ -44,7 +43,6 @@ class UpdateProfileRequest extends FormRequest
             'last_name.required' => 'Le nom de famille est obligatoire.',
             'email.required' => 'L\'email est obligatoire.',
             'phone_number.required' => 'Le numéro de téléphone est obligatoire.',
-            'password.required' => 'Le mot de passe est obligatoire.',
         ];
     }
 }
