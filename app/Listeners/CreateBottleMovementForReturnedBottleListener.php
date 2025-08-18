@@ -6,7 +6,7 @@ namespace App\Listeners;
 
 use App\Enums\BottleMovementType;
 use App\Enums\BottleStatus;
-use App\Events\EmptyBottleReturned;
+use App\Events\EmptyBottleReturnedEvent;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
 
 final class CreateBottleMovementForReturnedBottleListener
@@ -21,13 +21,12 @@ final class CreateBottleMovementForReturnedBottleListener
     /**
      * Handle the event.
      */
-    public function handle(EmptyBottleReturned $event): void
+    public function handle(EmptyBottleReturnedEvent $event): void
     {
-        $movementType = BottleStatus::IN_STOCK();
 
         $this->bottleMovementRepository->create([
             'bottle_id' => $event->bottle->id,
-            'movement_type' => $movementType,
+            'movement_type' => BottleStatus::IN_STOCK(),
             'distribution_center_id' => $event->order->distribution_center_id,
             'type' => BottleMovementType::RETURN_FROM_CUSTOMER(),
             'notes' => 'Empty bottle returned for order #'.$event->order->order_number,

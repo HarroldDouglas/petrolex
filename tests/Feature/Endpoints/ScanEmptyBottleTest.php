@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Endpoints;
 
-use App\Enums\BottleStatus;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Models\Bottle;
@@ -99,7 +98,7 @@ final class ScanEmptyBottleTest extends TestCase
         ]);
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->authToken,
+            'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
         ])->postJson(route('api.orders.scan-empty-bottle', $this->order), [
             'barcode' => $emptyBottleToReturn->barcode,
@@ -107,7 +106,7 @@ final class ScanEmptyBottleTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-        ->assertJsonPath('_metadata.success', true);
+            ->assertJsonPath('_metadata.success', true);
 
         $this->assertDatabaseHas('order_bottle_scans', [
             'order_item_id' => $this->orderItem->id,
@@ -137,10 +136,10 @@ final class ScanEmptyBottleTest extends TestCase
             'empty_bottle_id' => null,
         ]);
 
-        $newBarcode = 'NEW-BOTTLE-BARCODE-' . rand(1000, 9999);
+        $newBarcode = 'NEW-BOTTLE-BARCODE-'.rand(1000, 9999);
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->authToken,
+            'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
         ])->postJson(route('api.orders.scan-empty-bottle', $this->order), [
             'barcode' => $newBarcode,
@@ -148,8 +147,7 @@ final class ScanEmptyBottleTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-        ->assertJsonPath('_metadata.success', true);
-
+            ->assertJsonPath('_metadata.success', true);
 
         $newBottle = Bottle::where('barcode', $newBarcode)->first();
         $this->assertNotNull($newBottle);
@@ -164,8 +162,7 @@ final class ScanEmptyBottleTest extends TestCase
             'id' => $newBottle->id,
             'barcode' => $newBarcode,
             'is_filled' => 0,
-            'distribution_center_id' => $this->distributionCenter->id
+            'distribution_center_id' => $this->distributionCenter->id,
         ]);
     }
-
 }

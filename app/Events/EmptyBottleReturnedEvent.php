@@ -10,7 +10,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class EmptyBottleReturned
+final class EmptyBottleReturnedEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
