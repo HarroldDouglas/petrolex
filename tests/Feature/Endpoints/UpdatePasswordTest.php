@@ -65,7 +65,7 @@ final class UpdatePasswordTest extends TestCase
             'new_password_confirmation' => $newPassword,
         ]);
 
-        $response->assertStatus(422); // Validation error from custom rule
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['old_password']);
     }
 
