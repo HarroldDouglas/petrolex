@@ -14,6 +14,7 @@ use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Event;
 
 class UserService extends BaseServiceWithMedia
 {
@@ -124,9 +125,15 @@ class UserService extends BaseServiceWithMedia
             throw new \Exception('L\'ancien mot de passe est incorrect.');
         }
 
-        return (bool) $this->userRepository->update($user, [
+        $updated = (bool) $this->userRepository->update($user, [
             'password' => Hash::make($dto->new_password),
         ]);
+
+        if ($updated) {
+            Event::dispatch(new \App\Events\PasswordUpdatedEvent($user));
+        }
+
+        return $updated;
     }
 
     /**
