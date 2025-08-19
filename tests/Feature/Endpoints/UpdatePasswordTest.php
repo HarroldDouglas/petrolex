@@ -8,8 +8,8 @@ use App\Mail\User\PasswordUpdatedMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Mail;
+use Tests\TestCase;
 
 final class UpdatePasswordTest extends TestCase
 {
@@ -40,7 +40,6 @@ final class UpdatePasswordTest extends TestCase
             'password' => 'password',
         ]);
         $this->authToken = $response->json('data.access_token');
-
 
         $this->actingAs($this->user);
 
@@ -122,7 +121,7 @@ final class UpdatePasswordTest extends TestCase
         $response->assertStatus(401);
     }
 
-     /** @test */
+    /** @test */
     public function it_sends_a_notification_when_password_is_updated()
     {
         Mail::fake();

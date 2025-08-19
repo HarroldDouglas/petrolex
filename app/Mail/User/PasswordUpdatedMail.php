@@ -19,8 +19,7 @@ final class PasswordUpdatedMail extends Mailable
      */
     public function __construct(
         public readonly User $user,
-    ) {
-    }
+    ) {}
 
     /**
      * Get the message envelope.

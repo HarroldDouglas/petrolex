@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Mail;
 
 final class SendPasswordUpdatedNotification
 {
-    /**
-     * Handle the event.
-     */
     public function handle(PasswordUpdatedEvent $event): void
     {
         Mail::to($event->user->email)->send(new PasswordUpdatedMail($event->user));

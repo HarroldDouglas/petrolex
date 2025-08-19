@@ -12,9 +12,9 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Event;
 
 class UserService extends BaseServiceWithMedia
 {
