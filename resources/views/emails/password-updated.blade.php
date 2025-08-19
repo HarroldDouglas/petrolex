@@ -1,53 +1,14 @@
-<!DOCTYPE html>
-<html>
+@extends('emails.layout')
 
-<head>
-    <meta charset="utf-8">
-    <title>Mis à jour de votre mot de passe</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+@section('title', 'Mise à jour de votre mot de passe')
 
-        .otp-container {
-            text-align: center;
-            margin: 30px 0;
-        }
+@section('header-title', 'Mise à jour de votre mot de passe')
 
-        .otp-code {
-            font-size: 32px;
-            font-weight: bold;
-            letter-spacing: 5px;
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
-        }
-
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #777;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-    </style>
-</head>
-
-<body>
-    <h2>Mis à jour de votre mot de passe</h2>
-    
+@section('content')
     <p>Bonjour {{ $user->first_name }},</p>
 
     <p>Votre mot de passe a été mis à jour avec succès.</p>
 
     <p>Si vous n'êtes pas à l'origine de ce changement, veuillez nous contacter immédiatement.</p>
+@endsection
 
-    <p>Cordialement,</p>
-    <p>Votre équipe</p>
-</body>
-
-</html>

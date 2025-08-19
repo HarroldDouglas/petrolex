@@ -21,6 +21,14 @@ final class PasswordUpdatedMail extends Mailable
         public readonly User $user,
     ) {}
 
+    public function build()
+    {
+        return $this
+            ->to($this->user->email)
+            ->subject('Votre mot de passe a été mis à jour')
+            ->view('emails.user.password-updated');
+    }
+
     /**
      * Get the message envelope.
      */

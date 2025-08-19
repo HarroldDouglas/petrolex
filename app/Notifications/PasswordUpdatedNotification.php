@@ -20,7 +20,6 @@ final class PasswordUpdatedNotification extends Notification
 
     public function toMail(object $notifiable): PasswordUpdatedMail
     {
-        return new PasswordUpdatedMail($this->user)
-                ->to($notifiable->email);
+        return new PasswordUpdatedMail($this->user);
     }
 }
