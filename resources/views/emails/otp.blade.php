@@ -10,7 +10,7 @@
         compléter le processus :</p>
 
     <div class="otp-container">
-        <div class="otp-code">{{ $otp }}</div>
+        <strong class="otp-code">{{ $otp }}</strong>
     </div>
 
     <p>Ce code expirera dans <strong>10 minutes</strong> pour des raisons de sécurité.</p>
