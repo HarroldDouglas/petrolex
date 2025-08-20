@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Endpoints;
 
+use App\Mail\User\PasswordUpdatedMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 final class UpdatePasswordTest extends TestCase
@@ -15,6 +16,8 @@ final class UpdatePasswordTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
+    private string $authToken;
     private string $oldPassword = 'password';
 
     protected function setUp(): void
@@ -32,11 +35,20 @@ final class UpdatePasswordTest extends TestCase
             'password' => Hash::make($this->oldPassword),
         ]);
 
+        $response = $this->postJson(route('api.login'), [
+            'login' => $this->user->email,
+            'password' => 'password',
+        ]);
+        $this->authToken = $response->json('data.access_token');
+
         $this->actingAs($this->user);
 
         $newPassword = 'new_strong_password';
 
-        $response = $this->patchJson(route('api.password.update'), [
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->authToken,
+            'Accept' => 'application/json',
+        ])->patchJson(route('api.password.update'), [
             'old_password' => $this->oldPassword,
             'new_password' => $newPassword,
             'new_password_confirmation' => $newPassword,
@@ -107,5 +119,23 @@ final class UpdatePasswordTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+    }
+
+    /** @test */
+    public function it_sends_a_notification_when_password_is_updated()
+    {
+        Mail::fake();
+
+        $this->actingAs($this->user, 'sanctum')
+            ->patchJson(route('api.password.update'), [
+                'old_password' => $this->oldPassword,
+                'new_password' => 'new_strong_password',
+                'new_password_confirmation' => 'new_strong_password',
+            ])
+            ->assertStatus(200);
+
+        Mail::assertSent(PasswordUpdatedMail::class, function ($mail) {
+            return $mail->hasTo($this->user->email);
+        });
     }
 }
