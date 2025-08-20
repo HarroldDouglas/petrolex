@@ -30,7 +30,7 @@
  *
  *         @OA\Schema(ref="#/components/schemas/OrderStatus")
  *     ),
- * 
+ *
  *     @OA\Parameter(
  *         name="ticket_url",
  *         in="query",

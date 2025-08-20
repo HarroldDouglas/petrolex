@@ -14,7 +14,6 @@ class CancelOrderController extends Controller
         private readonly OrderService $orderService
     ) {}
 
-   
     public function __invoke(Request $request, Order $order): RedirectResponse
     {
         try {

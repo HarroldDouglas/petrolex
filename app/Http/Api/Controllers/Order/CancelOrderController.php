@@ -15,7 +15,7 @@ class CancelOrderController extends Controller
 {
     public function __construct(private readonly OrderService $orderService) {}
 
-     /**
+    /**
      * Cancel the specified order.
      *
      * Route: PATCH /orders/{order}/cancel
@@ -25,9 +25,9 @@ class CancelOrderController extends Controller
     {
         $data = [
             'cancelled_reason' => $request->input('cancelled_reason'),
-            'cancelled_by'     => (int) $request->input('cancelled_by'),
-            'status'           => OrderStatus::CANCELLED(),
-            'cancelled_at'     => now(),
+            'cancelled_by' => (int) $request->input('cancelled_by'),
+            'status' => OrderStatus::CANCELLED(),
+            'cancelled_at' => now(),
         ];
 
         $order = $this->orderService->update($order, $data);
