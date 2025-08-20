@@ -10,8 +10,7 @@ final class PasswordUpdatedNotification extends Notification
 {
     public function __construct(
         public readonly User $user,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {

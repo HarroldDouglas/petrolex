@@ -3,8 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\PasswordUpdatedEvent;
-use Illuminate\Support\Facades\Notification;
 use App\Notifications\PasswordUpdatedNotification;
+use Illuminate\Support\Facades\Notification;
 
 final class SendPasswordUpdatedNotification
 {
