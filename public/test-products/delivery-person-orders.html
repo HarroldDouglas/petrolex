@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commandes Livreur - Test API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/test-products/assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container-fluid">
+        <h1 class="my-4">Commandes à livrer par <span id="deliveryPersonName"></span></h1>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="orderNumberSearch" placeholder="Rechercher par numéro de commande...">
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" id="orderStatusFilter">
+                            <option value="">Filtrer par statut</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Numéro de Commande</th>
+                                <th>Centre de Distribution</th>
+                                <th>Nom du Client</th>
+                                <th>Adresse du Client</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Orders will be loaded here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <nav>
+                    <ul class="pagination justify-content-center" id="paginationControls">
+                        <!-- Pagination controls will be loaded here by JavaScript -->
+                    </ul>
+                </nav>
+                <div id="noOrdersMessage" class="alert alert-info text-center" style="display: none;">
+                    Aucune commande trouvée.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/test-products/assets/js/api.js"></script>
+    <script src="/test-products/assets/js/delivery-person-orders.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

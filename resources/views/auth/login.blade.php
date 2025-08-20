@@ -30,7 +30,7 @@
                         <div class="welcome-header">
                             <h4>Bienvenue sur <span class="epena-red">l'administration</span></h4>
                             <div class="logo-badge">
-                                <img src="{{ asset('assets/images/logo/isogaz-no-bg.png') }}" alt="logo"
+                                <img src="{{ asset('assets/images/logo/isogaz-white-bg.png') }}" alt="logo"
                                     class="welcome-logo">
                             </div>
                         </div>

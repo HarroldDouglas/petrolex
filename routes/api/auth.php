@@ -12,4 +12,6 @@ Route::post('/verify-otp', VerifyOtpController::class)->name('api.verify-otp');
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', LogoutController::class)->name('api.logout');
     Route::get('/user', GetProfileController::class)->name('api.user');
+    Route::patch('/profile', \App\Http\Api\Controllers\UpdateProfileController::class)->name('api.profile.update');
+    Route::patch('/password', \App\Http\Api\Controllers\Auth\UpdatePasswordController::class)->name('api.password.update');
 });

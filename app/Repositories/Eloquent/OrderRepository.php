@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Order\AddCustomerCommentToOrderDTO;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Exceptions\OrderNotFoundException;
@@ -176,5 +177,13 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
             ->get();
 
         return $results;
+    }
+
+    public function assignDeliveryPerson(Order $order, int $deliveryPersonId, ?string $reason): bool
+    {
+        $order->delivery_person_id = $deliveryPersonId;
+        $order->delivery_person_update_reason = $reason;
+
+        return $order->save();
     }
 }

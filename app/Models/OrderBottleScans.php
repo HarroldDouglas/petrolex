@@ -12,12 +12,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $order_item_id
  * @property int $bottle_id
+ * @property int|null $empty_bottle_id
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  *
  * // Relations
  * @property-read OrderItem $orderItem
  * @property-read Bottle $bottle
+ * @property-read Bottle|null $emptyBottle
  *
  * // Accessors
  *
@@ -35,6 +37,7 @@ class OrderBottleScans extends Model
     protected $fillable = [
         'order_item_id',
         'bottle_id',
+        'empty_bottle_id',
     ];
 
     /**
@@ -51,5 +54,13 @@ class OrderBottleScans extends Model
     public function bottle(): BelongsTo
     {
         return $this->belongsTo(Bottle::class);
+    }
+
+    /**
+     * Get the empty bottle associated with this scan, if any.
+     */
+    public function emptyBottle(): BelongsTo
+    {
+        return $this->belongsTo(Bottle::class, 'empty_bottle_id');
     }
 }

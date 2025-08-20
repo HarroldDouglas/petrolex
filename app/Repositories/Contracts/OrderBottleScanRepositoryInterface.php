@@ -64,4 +64,10 @@ interface OrderBottleScanRepositoryInterface extends BaseRepositoryInterface
      * Find a suitable OrderItem for a scanned bottle
      */
     public function findOrderItemForBottle(Order $order, Bottle $bottle): ?OrderItem;
+
+    public function getLatestOrderBottleScanForBottle(int $bottleId): ?OrderBottleScans;
+
+    public function findUnassignedEmptyBottleScan(int $orderItemId): ?OrderBottleScans;
+
+    public function existsEmptyBottleForOrderItem(int $orderItemId, int $emptyBottleId): bool;
 }

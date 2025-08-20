@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Controllers\Order;
 
-use App\DTOs\Order\UpdateOrderDTO;
 use App\Enums\OrderStatus;
 use App\Http\Api\Responses\Order\CancelOrderResponse;
 use App\Http\Controllers\Controller;
@@ -17,22 +16,21 @@ class CancelOrderController extends Controller
     public function __construct(private readonly OrderService $orderService) {}
 
     /**
-     * Handle the incoming request to cancel an order.
+     * Cancel the specified order.
      *
-     * @param  \App\Http\Requests\Order\CancelOrderRequest  $request
-     * @param  \App\Models\Order  $order
-     * @return \App\Http\Api\Responses\Order\CancelOrderResponse
+     * Route: PATCH /orders/{order}/cancel
+     * Name: orders.cancel
      */
     public function __invoke(CancelOrderRequest $request, Order $order): CancelOrderResponse
     {
-        $dto = new UpdateOrderDTO(
-            cancelled_reason: $request->input('cancelled_reason'),
-            cancelled_by: (int) $request->input('cancelled_by'),
-            status: OrderStatus::CANCELLED(),
-            cancelled_at: now()
-        );
+        $data = [
+            'cancelled_reason' => $request->input('cancelled_reason'),
+            'cancelled_by' => (int) $request->input('cancelled_by'),
+            'status' => OrderStatus::CANCELLED(),
+            'cancelled_at' => now(),
+        ];
 
-        $order = $this->orderService->update($order, $dto->toArray());
+        $order = $this->orderService->update($order, $data);
 
         return CancelOrderResponse::withOrder($order);
     }

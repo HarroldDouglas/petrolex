@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
+use App\DTOs\Order\AddCustomerCommentToOrderDTO;
 use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
 use App\Models\Refund;
@@ -70,4 +71,9 @@ interface OrderRepositoryInterface extends BaseRepositoryInterface
         string $aggregationColumn,
         string $aggregationType
     ): Collection;
+
+    /**
+     * Assigns a delivery person to an order.
+     */
+    public function assignDeliveryPerson(Order $order, int $deliveryPersonId, ?string $reason): bool;
 }
