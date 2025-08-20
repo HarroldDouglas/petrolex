@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\DTOs\User\UpdatePasswordDTO;
 use App\Enums\UserRole;
 use App\Events\UserCreatedEvent;
 use App\Events\UserDeletedEvent;
@@ -11,6 +12,9 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseServiceWithMedia
@@ -66,15 +70,34 @@ class UserService extends BaseServiceWithMedia
         if (! $user instanceof User) {
             throw new \InvalidArgumentException('Expected User model');
         }
+
         if (empty($attributes)) {
             return $user;
         }
 
         $originalValues = $user->only(array_keys($attributes));
 
+        $originalRole = $user->getRoleNames()->first();
+        $originalDistributionCenterIds = $user->distributionCenters()->pluck('id')->toArray();
+
         if (empty($attributes['password'])) {
             unset($attributes['password']);
         }
+
+        if (! isset($attributes['role']) || UserRole::from($originalRole)->equals($attributes['role'])) {
+            $attributes['role'] = null;
+        }
+
+        if (isset($attributes['distribution_center_id'])
+            && empty(array_diff($attributes['distribution_center_id'], $originalDistributionCenterIds))) {
+            $attributes['distribution_center_ids'] = [];
+        }
+
+        if (! isset($attributes['is_active'])) {
+            unset($attributes['is_active']);
+        }
+
+        DB::beginTransaction();
 
         try {
             /** @var User $user */
@@ -93,6 +116,8 @@ class UserService extends BaseServiceWithMedia
                 );
             }
 
+            DB::commit();
+
             return $user;
         } catch (\Exception $e) {
             Log::error('User update failed', [
@@ -101,8 +126,35 @@ class UserService extends BaseServiceWithMedia
                 'attributes' => $attributes,
                 'trace' => $e->getTraceAsString(),
             ]);
+
+            DB::rollBack();
+
             throw $e;
         }
+    }
+
+    /**
+     * Update a user's password.
+     *
+     * @param  User  $user  The user to update.
+     * @param  UpdatePasswordDTO  $dto  The DTO containing old and new passwords.
+     * @return bool True if the password was updated, false otherwise.
+     */
+    public function updatePassword(User $user, UpdatePasswordDTO $dto): bool
+    {
+        if (! Hash::check($dto->old_password, $user->password)) {
+            throw new \Exception('L\'ancien mot de passe est incorrect.');
+        }
+
+        $updated = (bool) $this->userRepository->update($user, [
+            'password' => Hash::make($dto->new_password),
+        ]);
+
+        if ($updated) {
+            Event::dispatch(new \App\Events\PasswordUpdatedEvent($user));
+        }
+
+        return $updated;
     }
 
     /**
