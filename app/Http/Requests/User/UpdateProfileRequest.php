@@ -21,6 +21,7 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         $userId = auth()->id();
+
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -31,10 +32,10 @@ class UpdateProfileRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($userId),
             ],
             'phone_number' => [
-                'required', 
-                'string', 
+                'required',
+                'string',
                 'max:20',
-                Rule::unique('users', 'phone_number')->ignore($userId)
+                Rule::unique('users', 'phone_number')->ignore($userId),
             ],
             'password' => ['nullable', 'string', 'min:8'],
             'image' => [

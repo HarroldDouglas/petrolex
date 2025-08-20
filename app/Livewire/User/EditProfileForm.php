@@ -77,7 +77,7 @@ class EditProfileForm extends Component
 
     protected function customRequest(): FormRequest
     {
-        return new UpdateProfileRequest();
+        return new UpdateProfileRequest;
     }
 
     public function getImagePreviewStyleProperty(): string

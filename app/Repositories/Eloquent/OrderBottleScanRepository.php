@@ -183,4 +183,23 @@ class OrderBottleScanRepository extends BaseEloquentRepository implements OrderB
 
         return $orderBottleScan;
     }
+
+    public function findUnassignedEmptyBottleScan(int $orderItemId): ?OrderBottleScans
+    {
+        /** @var OrderBottleScans|null $orderBottleScan */
+        $orderBottleScan = $this->model
+            ->where('order_item_id', $orderItemId)
+            ->whereNull('empty_bottle_id')
+            ->first();
+
+        return $orderBottleScan;
+    }
+
+    public function existsEmptyBottleForOrderItem(int $orderItemId, int $emptyBottleId): bool
+    {
+        return $this->model
+            ->where('order_item_id', $orderItemId)
+            ->where('empty_bottle_id', $emptyBottleId)
+            ->exists();
+    }
 }
