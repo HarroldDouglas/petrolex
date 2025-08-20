@@ -33,9 +33,10 @@ class GeographicSeeder extends Seeder
                     ['name' => $municipalityData['name'], 'city_id' => $city->id]
                 );
 
-                foreach ($municipalityData['neighborhoods'] as $neighborhoodKey => $neighborhoodName) {
+                foreach ($municipalityData['neighborhoods'] as $neighborhoodKey => $neighborhoodData) {
                     Neighborhood::firstOrCreate(
-                        ['name' => $neighborhoodName, 'municipality_id' => $municipality->id]
+                        ['name' => $neighborhoodData['name'], 'municipality_id' => $municipality->id,
+                            'latitude' => $neighborhoodData['latitude'] ?? null, 'longitude' => $neighborhoodData['longitude'] ?? null]
                     );
                 }
             }

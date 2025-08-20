@@ -71,4 +71,9 @@ interface OrderRepositoryInterface extends BaseRepositoryInterface
         string $aggregationColumn,
         string $aggregationType
     ): Collection;
+
+    /**
+     * Assigns a delivery person to an order.
+     */
+    public function assignDeliveryPerson(Order $order, int $deliveryPersonId, ?string $reason): bool;
 }

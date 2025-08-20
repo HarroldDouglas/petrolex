@@ -3,10 +3,12 @@
 namespace App\Services\Bottle;
 
 use App\DTOs\Bottle\BottleStatsDTO;
+use App\Enums\BottleStatus;
 use App\Events\BottleStatusUpdatedEvent;
 use App\Models\Bottle;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
 use App\Repositories\Contracts\BottleRepositoryInterface;
+use App\Repositories\Contracts\OrderBottleScanRepositoryInterface;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Carbon\Carbon;
@@ -21,8 +23,31 @@ class BottleService extends BaseServiceWithMedia
         private BottleRepositoryInterface $bottleRepository,
         private BottleMovementRepositoryInterface $bottleMovementRepository,
         protected MediaServiceInterface $mediaService,
+        private OrderBottleScanRepositoryInterface $orderBottleScanRepository
     ) {
         parent::__construct($bottleRepository, $mediaService);
+    }
+
+    public function checkBottleStatusByBarcode(string $barcode): array
+    {
+        $bottle = $this->bottleRepository->findByBarcodeAndStatus(
+            $barcode,
+            [BottleStatus::WITH_DELIVERY_PERSON()]
+        );
+
+        if (! $bottle || ! $bottle->is_filled) {
+            return ['authentic' => false];
+        }
+
+        $orderBottleScan = $this->orderBottleScanRepository
+            ->getLatestOrderBottleScanForBottle($bottle->id);
+
+        $order = $orderBottleScan->orderItem->order ?? null;
+
+        return [
+            'authentic' => $order &&
+                        $bottle->distribution_center_id === $order->distribution_center_id,
+        ];
     }
 
     public function getBottleHistory($bottleId): Collection

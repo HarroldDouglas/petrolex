@@ -10,6 +10,26 @@ use Illuminate\Support\Collection;
 class DistributionCenterResponse extends ApiResponse
 {
     /**
+     * Create a success response.
+     *
+     * @param  mixed  $data
+     */
+    public static function success($data = null, ?string $message = null, int $statusCode = 200): self
+    {
+        return new self($data, $message, true, $statusCode);
+    }
+
+    /**
+     * Create an error response.
+     *
+     * @param  mixed  $data
+     */
+    public static function error(?string $message = null, $data = null, int $statusCode = 400): self
+    {
+        return new self($data, $message, false, $statusCode);
+    }
+
+    /**
      * Return response with multiple distribution centers.
      *
      * @param  Collection<int, DistributionCenter>|array<int, DistributionCenter>  $distributionCenters

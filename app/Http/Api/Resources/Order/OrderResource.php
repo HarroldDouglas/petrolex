@@ -3,6 +3,7 @@
 namespace App\Http\Api\Resources\Order;
 
 use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
+use App\Http\Api\Resources\CustomerResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -47,11 +48,19 @@ class OrderResource extends JsonResource
             'order_date' => $this->order_date,
             'delivery_date' => $this->delivery_date,
             'status' => $this->status,
+            'ticket_url' => route('orders.download.invoice', ['order' => $this->id]),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'comments' => $this->comments,
             'rating' => $this->rating,
             'payment' => OrderPaymentResource::make($this->whenLoaded('payment')),
             'delivery_address' => CustomerDeliveryAddressResource::make($this->deliveryAddress),
+            'customer' => CustomerResource::make($this->customer),
+            'distribution_center' => $this->whenLoaded('distributionCenter', function () {
+                return [
+                    'id' => $this->distributionCenter->id,
+                    'name' => $this->distributionCenter->name,
+                ];
+            }),
         ];
     }
 }

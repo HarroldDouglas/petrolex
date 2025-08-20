@@ -129,4 +129,9 @@ class DistributionCenterService
 
         return $distributionCenter->productCategories;
     }
+
+    public function findClosest(float $latitude, float $longitude): ?DistributionCenter
+    {
+        return $this->distributionCenterRepository->findClosest($latitude, $longitude);
+    }
 }

@@ -178,4 +178,12 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
 
         return $results;
     }
+
+    public function assignDeliveryPerson(Order $order, int $deliveryPersonId, ?string $reason): bool
+    {
+        $order->delivery_person_id = $deliveryPersonId;
+        $order->delivery_person_update_reason = $reason;
+
+        return $order->save();
+    }
 }

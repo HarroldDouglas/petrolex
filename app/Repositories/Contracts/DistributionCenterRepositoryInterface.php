@@ -19,4 +19,9 @@ interface DistributionCenterRepositoryInterface extends BaseRepositoryInterface
      * Find a distribution center by ID with its related bottle types.
      */
     public function findWithRelation(int $id): ?DistributionCenter;
+
+    /**
+     * Find the closest distribution center to a given point.
+     */
+    public function findClosest(float $latitude, float $longitude): ?DistributionCenter;
 }

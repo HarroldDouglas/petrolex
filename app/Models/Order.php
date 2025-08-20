@@ -65,6 +65,7 @@ class Order extends Model
         'customer_id',
         'delivery_address_id',
         'delivery_person_id',
+        'delivery_person_update_reason',
         'distribution_center_id',
         'order_number',
         'delivery_type',
@@ -239,6 +240,17 @@ class Order extends Model
      * Check if this order can be cancelled
      */
     public function canBeCancelled(): bool
+    {
+        return in_array($this->status->value, [
+            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PROCESSING()->value,
+        ]);
+    }
+
+    /**
+     * Check if this order can be delivered
+     */
+    public function canBeDelivered(): bool
     {
         return in_array($this->status->value, [
             OrderStatus::CONFIRMED()->value,

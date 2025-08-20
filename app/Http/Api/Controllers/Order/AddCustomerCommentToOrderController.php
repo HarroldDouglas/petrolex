@@ -15,6 +15,12 @@ class AddCustomerCommentToOrderController extends Controller
 {
     public function __construct(private readonly OrderService $orderService) {}
 
+    /**
+     * Add customer feedback to the specified order.
+     *
+     * Route: POST /{order}/customer-feedback
+     * Name: orders.customer-feedback
+     */
     public function __invoke(AddCustomerCommentToOrderRequest $request, Order $order): AddCustomerCommentToOrderResponse
     {
         $dto = new AddCustomerCommentToOrderDTO(
@@ -22,7 +28,7 @@ class AddCustomerCommentToOrderController extends Controller
             rating: (float) $request->input('rating'),
         );
 
-        $order = $this->orderService->update($order, $dto->toArray());
+        $order = $this->orderService->update($order, $dto->toArrayFiltered());
 
         return AddCustomerCommentToOrderResponse::withOrder($order);
     }
