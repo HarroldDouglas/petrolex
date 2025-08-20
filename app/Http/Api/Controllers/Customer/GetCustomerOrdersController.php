@@ -15,6 +15,12 @@ class GetCustomerOrdersController extends Controller
         protected CustomerService $customerService
     ) {}
 
+     /**
+     * Get customer orders with optional filters.
+     *
+     * Route: GET customers/{customer}/orders
+     * Name: customers.orders.index
+     */
     public function __invoke(Request $request, Customer $customer): CustomerOrdersResponse
     {
         $filters = GetOrdersFilterDTO::from($request->only(['order_number', 'status', 'delivery_type', 'payment_method']));

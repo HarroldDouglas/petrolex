@@ -2,6 +2,7 @@
 
 namespace App\Services\Order;
 
+use App\DTOs\Order\AddCustomerCommentToOrderDTO;
 use App\DTOs\Order\CreateOrderDTO;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
@@ -301,4 +302,5 @@ class OrderService extends BaseServiceForEntity
     {
         $this->orderRepository->assignDeliveryPerson($order, $deliveryPersonId, $reason);
     }
+
 }

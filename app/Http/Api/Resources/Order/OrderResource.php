@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Resources\Order;
 
+use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Http\Api\Resources\CustomerResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -22,7 +23,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $delivery_date
  * @property \App\Enums\OrderStatus $status
  * @property OrderItemResource[] $items
- * @property array $delivery_address
+ * @property OrderPaymentResource $payment
+ * @property string|null $comments
+ * @property float|null $rating
+ * @property OrderItemResource[] $items
+ * @property CustomerDeliveryAddressResource $delivery_address
  */
 class OrderResource extends JsonResource
 {
@@ -45,25 +50,10 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'ticket_url' => route('orders.download.invoice', ['order' => $this->id]),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
-            'payment' => [
-                'id' => $this->payment?->id,
-                'status' => $this->payment?->payment_status,
-                'date' => $this->payment?->payment_date,
-                'reference' => $this->payment?->payment_reference,
-                'method' => $this->payment?->payment_method,
-            ],
-            'delivery_address' => [
-                'id' => $this->delivery_address_id,
-                'name' => $this->deliveryAddress->fullAddress(),
-                'contact_name' => $this->deliveryAddress->contact_full_name,
-                'email' => $this->deliveryAddress->email,
-                'city' => $this->deliveryAddress->city,
-                'country' => $this->deliveryAddress->country,
-                'neighborhood' => $this->deliveryAddress->neighborhood,
-                'address_precision' => $this->deliveryAddress->address_precision,
-                'latitude' => $this->deliveryAddress->latitude,
-                'longitude' => $this->deliveryAddress->longitude,
-            ],
+            'comments' => $this->comments,
+            'rating' => $this->rating,
+            'payment' => OrderPaymentResource::make($this->whenLoaded('payment')),
+            'delivery_address' => CustomerDeliveryAddressResource::make($this->deliveryAddress),
             'customer' => CustomerResource::make($this->customer),
             'distribution_center' => $this->whenLoaded('distributionCenter', function () {
                 return [
