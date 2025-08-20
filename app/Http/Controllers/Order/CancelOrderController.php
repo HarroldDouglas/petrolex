@@ -14,12 +14,7 @@ class CancelOrderController extends Controller
         private readonly OrderService $orderService
     ) {}
 
-    /**
-     * Cancel the specified order.
-     *
-     * Route: PATCH /orders/{order}/cancel
-     * Name: orders.cancel
-     */
+   
     public function __invoke(Request $request, Order $order): RedirectResponse
     {
         try {

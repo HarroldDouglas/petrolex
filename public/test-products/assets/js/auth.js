@@ -21,8 +21,25 @@ $(document).ready(function() {
 
                 if (response && response.data && response.data.access_token) {
                     localStorage.setItem('api_token', response.data.access_token);
+                    localStorage.setItem('user_full_name', response.data.user.first_name + ' ' + response.data.user.last_name);
+                    
+                    const user = response.data.user;
+                    if (user && user.roles) {
+                        if (user.roles.includes('delivery_person') && user.delivery_person_id) {
+                            localStorage.setItem('delivery_person_id', user.delivery_person_id);
+                            window.location.href = '/test-products/delivery-person-orders.html';
+                        } else if (user.roles.includes('customer') && user.customer_id) {
+                            localStorage.setItem('customer_id', user.customer_id);
+                            window.location.href = '/test-products/order.html';
+                        } else {
+                            // Default redirection if no specific role or ID is found
+                            window.location.href = '/test-products/order.html';
+                        }
+                    } else {
+                        // Fallback if roles are not present
+                        window.location.href = '/test-products/order.html';
+                    }
                     loginStatus.text("Connexion réussie! Redirection...").removeClass("alert-warning").addClass("alert-success");
-                    window.location.href = '/test-products/order.html';
                 } else {
                     loginStatus.text("Échec de la connexion: Jeton non reçu. Vérifiez la console pour la réponse.").removeClass("alert-warning").addClass("alert-danger");
                 }

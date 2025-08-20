@@ -18,6 +18,8 @@ class DistributionCenterFactory extends Factory
             'address' => $this->faker->address,
             'phone' => $this->faker->phoneNumber,
             'email' => $this->faker->unique()->safeEmail,
+            'latitude' => $this->faker->latitude(3.0, 6.0),
+            'longitude' => $this->faker->longitude(9.0, 12.0),
             'is_active' => true,
         ];
     }

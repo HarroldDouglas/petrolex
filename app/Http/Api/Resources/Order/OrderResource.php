@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Resources\Order;
 
+use App\Http\Api\Resources\CustomerResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -45,11 +46,11 @@ class OrderResource extends JsonResource
             'ticket_url' => route('orders.download.invoice', ['order' => $this->id]),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'payment' => [
-                'id' => $this->payment->id,
-                'status' => $this->payment->payment_status,
-                'date' => $this->payment->payment_date,
-                'reference' => $this->payment->payment_reference,
-                'method' => $this->payment->payment_method,
+                'id' => $this->payment?->id,
+                'status' => $this->payment?->payment_status,
+                'date' => $this->payment?->payment_date,
+                'reference' => $this->payment?->payment_reference,
+                'method' => $this->payment?->payment_method,
             ],
             'delivery_address' => [
                 'id' => $this->delivery_address_id,
@@ -63,6 +64,13 @@ class OrderResource extends JsonResource
                 'latitude' => $this->deliveryAddress->latitude,
                 'longitude' => $this->deliveryAddress->longitude,
             ],
+            'customer' => CustomerResource::make($this->customer),
+            'distribution_center' => $this->whenLoaded('distributionCenter', function () {
+                return [
+                    'id' => $this->distributionCenter->id,
+                    'name' => $this->distributionCenter->name,
+                ];
+            }),
         ];
     }
 }
