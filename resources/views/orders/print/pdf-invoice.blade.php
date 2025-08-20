@@ -118,7 +118,7 @@
 <body>
     <div class="header">
         <div class="logo-container">
-            <h2>PETROLEX CAMEROUN SA</h2>
+            <img src="{{ public_path('assets/images/logo/isogaz-no-bg.png') }}" alt="Petrolex Logo" style="width: 150px;">
         </div>
         <div class="company-info">
             <p>

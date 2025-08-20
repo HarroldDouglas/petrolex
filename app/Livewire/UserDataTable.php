@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\DTOs\User\UpdateUserDTO;
 use App\Enums\EntityStatus;
+use App\Enums\UserRole;
 use App\Models\DistributionCenter;
 use App\Models\User;
 use App\Services\DistributionCenter\DistributionCenterService;
@@ -40,8 +41,18 @@ class UserDataTable extends BaseDataTable
         if (! empty($centerIds)) {
             // If user doesn't have access to all centers, only show users of their centers
             if ($centers->count() < $allCenters) {
-                $query->whereHas('accessibleDistributionCenters', function ($subQ) use ($centerIds) {
-                    $subQ->whereIn('distribution_centers.id', $centerIds);
+                $query->where(function (Builder $query) use ($centerIds) {
+                    $query->whereHas('accessibleDistributionCenters', function ($subQ) use ($centerIds) {
+                        $subQ->whereIn('distribution_centers.id', $centerIds);
+                    });
+
+                    if (auth()->user()->hasRole(UserRole::CENTER_MANAGER()->value)) {
+                        $query->orWhereHas('customer', function ($q) use ($centerIds) {
+                            $q->whereHas('orders', function ($subQ) use ($centerIds) {
+                                $subQ->whereIn('distribution_center_id', $centerIds);
+                            });
+                        });
+                    }
                 });
             } else {
                 // User has access to all centers, show all users including global users

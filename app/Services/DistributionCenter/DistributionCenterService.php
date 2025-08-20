@@ -122,4 +122,16 @@ class DistributionCenterService
 
         return $distributionCenters;
     }
+
+    public function getProducts(int $distributionCenterId): Collection
+    {
+        $distributionCenter = $this->find($distributionCenterId);
+
+        return $distributionCenter->productCategories;
+    }
+
+    public function findClosest(float $latitude, float $longitude): ?DistributionCenter
+    {
+        return $this->distributionCenterRepository->findClosest($latitude, $longitude);
+    }
 }

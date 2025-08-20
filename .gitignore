@@ -21,3 +21,5 @@ npm-debug.log
 /.fleet
 /.idea
 /.vscode
+bin/
+tests/Curl/token.txt

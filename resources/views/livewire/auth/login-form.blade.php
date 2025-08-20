@@ -9,11 +9,11 @@
     <div class="form-group mb-3">
         <label class="form-label">{{ __('auth.email_or_phone') }}</label>
         <input
-            class="form-control @error('identifier') is-invalid @enderror"
-            type="text"
-            wire:model="identifier"
-            required
-        >
+                class="form-control @error('identifier') is-invalid @enderror"
+                type="text"
+                wire:model="identifier"
+                required
+            >
         @error('identifier')
             <div class="invalid-feedback">{{ __($message) }}</div>
         @enderror

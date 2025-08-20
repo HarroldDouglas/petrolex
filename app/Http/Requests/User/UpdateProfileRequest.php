@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\User;
 
 use Closure;
@@ -9,10 +11,16 @@ use Illuminate\Validation\Rule;
 
 class UpdateProfileRequest extends FormRequest
 {
-    public function __construct(protected $id) {}
+    public function __construct() {}
+
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     public function rules(): array
     {
+        $userId = auth()->id();
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -20,9 +28,14 @@ class UpdateProfileRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->id),
+                Rule::unique('users', 'email')->ignore($userId),
             ],
-            'phone_number' => ['required', 'string', 'max:20'],
+            'phone_number' => [
+                'required', 
+                'string', 
+                'max:20',
+                Rule::unique('users', 'phone_number')->ignore($userId)
+            ],
             'password' => ['nullable', 'string', 'min:8'],
             'image' => [
                 'nullable',

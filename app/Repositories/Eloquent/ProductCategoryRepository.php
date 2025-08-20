@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Enums\ProductType;
 use App\Models\ProductCategory;
+use App\Models\ProductCategoryDistributionCenter;
 use App\Repositories\Contracts\ProductCategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -11,7 +12,7 @@ class ProductCategoryRepository extends BaseEloquentRepository implements Produc
 {
     public function __construct(ProductCategory $productCategory)
     {
-        $this->model = $productCategory;
+        parent::__construct($productCategory);
     }
 
     /**
@@ -69,6 +70,17 @@ class ProductCategoryRepository extends BaseEloquentRepository implements Produc
             ->where('product_type', $type)
             ->with(['distributionCenters.distributionCenter'])
             ->get();
+    }
+
+    public function getAvailableStock(int $productCategoryId, int $distributionCenterId): int
+    {
+
+        $pivot = ProductCategoryDistributionCenter::with('productCategory')
+            ->where('product_category_id', $productCategoryId)
+            ->where('distribution_center_id', $distributionCenterId)
+            ->first();
+
+        return $pivot?->available_stock ?? 0;
     }
 
     /**

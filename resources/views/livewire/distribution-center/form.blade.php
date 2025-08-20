@@ -7,33 +7,47 @@
                 @error('name') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
-                <label for="country" class="form-label">Pays</label>
-                <select class="form-select" id="country" wire:model="country" disabled>
-                    @foreach($countries as $key => $value)
-                    <option value="{{ $key }}">{{ $value }}</option>
+                <label for="country_id" class="form-label">Pays</label>
+                <select class="form-select" id="country_id" wire:model.live="country_id">
+                    @foreach($countries as $country)
+                    <option value="{{ $country->id }}">{{ $country->name }}</option>
                     @endforeach
                 </select>
-                @error('country') <span class="text-danger">{{ $message }}</span> @enderror
+                @error('country_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
-                <label for="city" class="form-label">Ville</label>
-                <select class="form-select select2 searchable" id="city" wire:model.live="city" data-placeholder="Rechercher une ville">
-                    <option value="">Sélectionnez une ville</option>
-                    @foreach($cities as $key => $value)
-                    <option value="{{ $key }}">{{ $value }}</option>
-                    @endforeach
-                </select>
-                @error('city') <span class="text-danger">{{ $message }}</span> @enderror
+                <label for="city_id" class="form-label">Ville</label>
+                <div wire:loading.remove wire:target="country_id">
+                    <select class="form-select select2 searchable" id="city_id" wire:model.live="city_id" data-placeholder="Rechercher une ville">
+                        <option value="">Sélectionner une ville</option>
+                        @foreach($cities as $city)
+                        <option value="{{ $city->id }}">{{ $city->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div wire:loading wire:target="country_id">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div> Chargement des villes...
+                </div>
+                @error('city_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
-                <label for="neighborhood" class="form-label">Quartier</label>
-                <select class="form-select select2 searchable" id="neighborhood" wire:model.live="neighborhood" data-placeholder="Rechercher un quartier">
-                    <option value="">Sélectionnez un quartier</option>
-                    @foreach($neighborhoods as $key => $value)
-                    <option value="{{ $key }}">{{ $value }}</option>
-                    @endforeach
-                </select>
-                @error('neighborhood') <span class="text-danger">{{ $message }}</span> @enderror
+                <label for="neighborhood_id" class="form-label">Quartier</label>
+                <div wire:loading.remove wire:target="city_id">
+                    <select class="form-select select2 searchable" id="neighborhood_id" wire:model.live="neighborhood_id" data-placeholder="Rechercher un quartier">
+                        <option value="">Sélectionnez un quartier</option>
+                        @foreach($neighborhoods as $neighborhood)
+                        <option value="{{ $neighborhood->id }}">{{ $neighborhood->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div wire:loading wire:target="city_id">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div> Chargement des quartiers...
+                </div>
+                @error('neighborhood_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
             <div class="col-md-6 mb-3">
                 <label for="address" class="form-label">Adresse</label>
@@ -81,9 +95,11 @@
             <div class="col-12">
                 <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
                     <a href="{{ route('distribution-centers.list') }}" class="btn btn-light-danger">
-                        Annuler
+                        <i class="ti ti-x"></i> Annuler
                     </a>
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="ti ti-check"></i> Enregistrer
+                    </button>
                 </div>
             </div>
         </div>

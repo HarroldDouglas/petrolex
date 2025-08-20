@@ -16,13 +16,14 @@ return new class extends Migration
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->string('label');
             $table->string('address');
-            $table->string('neighborhood')->nullable();
-            $table->string('city')->nullable();
-            $table->string('country')->default('Cameroun');
+            $table->foreignId('neighborhood_id')->nullable()->constrained()->onDelete('set null');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 10, 8)->nullable();
             $table->string('phone')->nullable();
-            $table->string('contact_name')->nullable();
+            $table->string('contact_firstname')->nullable();
+            $table->string('contact_lastname')->nullable();
+            $table->string('email')->nullable();
+            $table->text('address_precision')->nullable();
             $table->boolean('is_default')->default(false);
             $table->timestamps();
             $table->softDeletes();

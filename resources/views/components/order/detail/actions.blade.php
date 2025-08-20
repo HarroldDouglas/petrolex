@@ -1,3 +1,4 @@
+<div>
 <div class="d-inline-block">
     <div class="dropdown">
         <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -28,8 +29,12 @@
 
             @if ($order->canBeCancelled())
                 <li>
-                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
-                        data-bs-target="#cancelOrderModal">
+                    <a class="dropdown-item text-danger" href="#" 
+                        onclick="promptForCancellationReason({ 
+                            method: 'cancelOrder', 
+                            parameters: [{{ $order->id }}], 
+                            componentId: '{{ $this->getId() }}' 
+                        })">
                         <i class="ti ti-receipt-refund me-2"></i>Annuler
                     </a>
                 </li>
@@ -40,70 +45,55 @@
                     </a>
                 </li>
             @endif
+
+            @if ($order->canChangeDeliveryPerson())
+            <li>
+                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
+                    data-bs-target="#changeDeliveryPersonModal">
+                    <i class="ti ti-user me-2"></i>Changer le livreur
+                </a>
+            </li>
+            @endif
         </ul>
     </div>
 </div>
 
-@if ($order->canBeCancelled())
-    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header justify-content-center">
-                    <h5 class="modal-title" id="cancelOrderModalLabel">Confirmation d'annulation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <p class="mb-0">Êtes-vous sûr de vouloir annuler cette commande ? Cette action est irréversible.
-                    </p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <form action="{{ route('orders.cancel', $order) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="btn btn-danger">Confirmer l'annulation</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-@endif
+
 
 
 <!-- Modal pour changer de livreur -->
 @if ($order->canChangeDeliveryPerson())
     <div class="modal fade" id="changeDeliveryPersonModal" tabindex="-1"
-        aria-labelledby="changeDeliveryPersonModalLabel" aria-hidden="true">
+        aria-labelledby="changeDeliveryPersonModalLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="changeDeliveryPersonModalLabel">Changer le livreur</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="#" method="POST">
-                    @csrf
-                    @method('GET')
+                <form wire:submit.prevent="assignDeliveryPerson">
                     <div class="modal-body" style="text-align: left;">
                         <div class="mb-3">
                             <label class="form-label">Livreur actuel</label>
                             <input type="text" class="form-control"
-                                value="{{ $order->deliveryPerson ? $order->deliveryPerson->name : 'Kelvin Ngoh' }}"
+                                value="{{ $order->deliveryPerson ? $order->deliveryPerson->user->fullname : 'Non assigné' }}"
                                 readonly>
                         </div>
                         <div class="mb-3">
                             <label for="delivery_person_id" class="form-label">Nouveau livreur</label>
-                            <select class="form-select" id="delivery_person_id" name="delivery_person_id" required>
+                             
+                            <select class="form-select" id="delivery_person_id" wire:model="newDeliveryPersonId" required>
                                 <option value="">Sélectionner un livreur</option>
-                                <option value="1">John Doe</option>
-                                <option value="2">Jane Smith</option>
-                                <option value="3">Michael Brown</option>
-                                <option value="4">Sarah Johnson</option>
+                                @foreach($allDeliveryPersons as $key=>$person)
+                                    <option value="{{ $person->id }}">{{ $person->user->fullname }}</option>
+                                @endforeach
                             </select>
+                            @error('newDeliveryPersonId') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                         <div class="mb-3">
                             <label for="change_reason" class="form-label">Raison du changement</label>
-                            <textarea class="form-control" id="change_reason" name="change_reason" rows="3"></textarea>
+                            <textarea class="form-control" id="change_reason" wire:model="updateReason" rows="3"></textarea>
+                            @error('updateReason') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -135,3 +125,4 @@
         }
     </script>
 @endpush
+</div>

@@ -96,4 +96,23 @@ class DeliveryPerson extends Model
     {
         return $this->hasMany(BottleMovement::class);
     }
+
+    /**
+     * Calculate the rating of the delivery person.
+     * This is a placeholder and should be replaced with actual rating logic.
+     */
+    public function calculateRating(): float
+    {
+        // Get all delivered orders for this delivery person that have a rating
+        $ratedOrders = $this->orders()
+            ->where('status', \App\Enums\OrderStatus::DELIVERED())
+            ->whereNotNull('rating')
+            ->get();
+
+        if ($ratedOrders->isEmpty()) {
+            return 0.0; // Or a default rating if no rated orders yet
+        }
+
+        return round($ratedOrders->avg('rating'), 1);
+    }
 }

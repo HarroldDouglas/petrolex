@@ -9,7 +9,7 @@ interface HasMediaServiceInterface extends BaseServiceForEntityInterface
 {
     public function createWithMedia(array $data): Model;
 
-    public function updateWithMedia(Model $model, array $data): Model;
+    public function updateWithMedia(Model $model, array $data, ?array $imagesIdsToDelete = null): Model;
 
     public function getWithMediaData(int $id): ?ModelWithImagesDTO;
 }

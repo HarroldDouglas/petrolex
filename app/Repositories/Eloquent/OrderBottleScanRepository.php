@@ -171,4 +171,16 @@ class OrderBottleScanRepository extends BaseEloquentRepository implements OrderB
             ->whereIn('order_item_id', $orderItemIds)
             ->get();
     }
+
+    public function getLatestOrderBottleScanForBottle(int $bottleId): ?OrderBottleScans
+    {
+        /** @var OrderBottleScans|null $orderBottleScan */
+        $orderBottleScan = $this->model
+            ->where('bottle_id', $bottleId)
+            ->latest()
+            ->with('orderItem.order')
+            ->first();
+
+        return $orderBottleScan;
+    }
 }

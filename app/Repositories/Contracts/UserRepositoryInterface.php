@@ -2,7 +2,9 @@
 
 namespace App\Repositories\Contracts;
 
+use App\Enums\UserRole;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 interface UserRepositoryInterface extends BaseRepositoryInterface
 {
@@ -25,4 +27,12 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
      * Find a user by phone number
      */
     public function findByPhone(string $phone): ?User;
+
+    /**
+     * Finds and returns a collection of users based on their assigned role.
+     *
+     * @param  UserRole  $userRole  The role to search for (e.g., UserRole::ADMIN, UserRole::EDITOR).
+     * @return Collection<User> Returns a collection of User models that match the specified role.
+     */
+    public function findByRole(UserRole $userRole): Collection;
 }

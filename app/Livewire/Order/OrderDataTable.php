@@ -38,26 +38,14 @@ class OrderDataTable extends BaseDataTable
 
             Column::make('Centre de distr.', 'distribution_center_id')
                 ->sortable()
-                ->searchable(function (Builder $query, string $searchTerm) {
-                    return $query->whereHas('distributionCenter', function (Builder $q) use ($searchTerm) {
-                        $q->where('name', 'like', '%'.$searchTerm.'%');
-                    });
-                })
+                ->searchable()
                 ->format(function ($value, $row) {
                     return $row->distributionCenter->name ?? '-';
                 }),
 
             Column::make('Client', 'customer_id')
                 ->sortable()
-                ->searchable(function (Builder $query, string $searchTerm) {
-                    return $query->whereHas('customer.user', function (Builder $q) use ($searchTerm) {
-                        $q->where(function ($subQuery) use ($searchTerm) {
-                            $subQuery->where('first_name', 'like', '%'.$searchTerm.'%')
-                                ->orWhere('last_name', 'like', '%'.$searchTerm.'%')
-                                ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%'.$searchTerm.'%']);
-                        });
-                    });
-                })
+                ->searchable()
                 ->format(function ($value, $row) {
                     $user = optional(optional($row->customer)->user);
                     if (! $user->first_name && ! $user->last_name) {
@@ -113,11 +101,7 @@ class OrderDataTable extends BaseDataTable
                 ->format(fn ($value) => number_format($value, 0, ',', ' ').' CFA'),
 
             Column::make('Réf. Paiement', 'id')
-                ->searchable(function (Builder $query, string $searchTerm) {
-                    return $query->whereHas('payment', function (Builder $q) use ($searchTerm) {
-                        $q->where('payment_reference', 'like', '%'.$searchTerm.'%');
-                    });
-                })
+                ->searchable()
                 ->format(function ($value, $row) {
                     if ($row->payment) {
                         return new HtmlString(
@@ -130,15 +114,7 @@ class OrderDataTable extends BaseDataTable
 
             Column::make('Livreur', 'delivery_person_id')
                 ->sortable()
-                ->searchable(function (Builder $query, string $searchTerm) {
-                    return $query->whereHas('deliveryPerson.user', function (Builder $q) use ($searchTerm) {
-                        $q->where(function ($subQuery) use ($searchTerm) {
-                            $subQuery->where('first_name', 'like', '%'.$searchTerm.'%')
-                                ->orWhere('last_name', 'like', '%'.$searchTerm.'%')
-                                ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%'.$searchTerm.'%']);
-                        });
-                    });
-                })
+                ->searchable()
                 ->format(function ($value, $row) {
                     if (! $row->deliveryPerson) {
                         return '-';

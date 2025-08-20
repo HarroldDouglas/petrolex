@@ -18,8 +18,11 @@ abstract class BaseBottleTypeRequest extends FormRequest
             'bottle_with_content_price' => ['required', 'numeric', 'min:0', 'gt:content_price'],
             'is_active' => ['required', 'boolean'],
 
+            'product_images.*' => ['nullable', 'image', 'max:5120'], // 5MB max par image
+            'product_images' => ['nullable', 'array', 'max:10'], // Maximum 10 images
+
             'cityPrices' => ['nullable', 'array'],
-            'cityPrices.*.city' => ['required_with:cityPrices', 'string', 'max:255'],
+            'cityPrices.*.city_id' => ['required_with:cityPrices', 'integer', 'exists:cities,id'], // Changement ici
             'cityPrices.*.content_price' => ['required_with:cityPrices', 'numeric', 'min:0'],
             'cityPrices.*.content_with_bottle_price' => ['required_with:cityPrices', 'numeric',
                 'min:0', 'gte:cityPrices.*.content_price'],
@@ -65,9 +68,14 @@ abstract class BaseBottleTypeRequest extends FormRequest
 
             'is_active.boolean' => 'Le statut doit être vrai ou faux.',
 
-            'cityPrices.*.city.required_with' => 'Le nom de la ville est requis.',
-            'cityPrices.*.city.string' => 'Le nom de la ville doit être une chaîne de caractères.',
-            'cityPrices.*.city.max' => 'Le nom de la ville ne doit pas dépasser 255 caractères.',
+            'product_images.*.image' => 'Chaque fichier doit être une image.',
+            'product_images.*.max' => 'Chaque image ne doit pas dépasser 5 Mo.',
+            'product_images.array' => 'Les images doivent être un tableau.',
+            'product_images.max' => 'Vous ne pouvez télécharger que 10 images maximum.',
+
+            'cityPrices.*.city_id.required_with' => 'L\'ID de la ville est requis.',
+            'cityPrices.*.city_id.integer' => 'L\'ID de la ville doit être un entier.',
+            'cityPrices.*.city_id.exists' => 'L\'ID de la ville sélectionnée n\'existe pas.',
 
             'cityPrices.*.content_price.required_with' => 'Le prix de la recharge est requis pour chaque ville.',
             'cityPrices.*.content_price.numeric' => 'Le prix de la recharge doit être un nombre.',

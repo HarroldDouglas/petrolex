@@ -3,6 +3,8 @@
 namespace App\DTOs\BottleType;
 
 use App\DTOs\BaseDTO;
+use App\DTOs\ProductCategory\ProductCategoryCityPriceDTO;
+use Illuminate\Http\UploadedFile;
 
 class UpdateBottleTypeDTO extends BaseDTO
 {
@@ -17,5 +19,7 @@ class UpdateBottleTypeDTO extends BaseDTO
         public readonly ?bool $is_active = null,
         public readonly ?string $description = null,
         public readonly ?float $weight = null,
+        /** @var UploadedFile[]|null */
+        public readonly ?array $images = null,
     ) {}
 }

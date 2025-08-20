@@ -13,7 +13,6 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 
 // TODO: Move database request to repository and call service instead of repository
-
 class GasBottleForm extends Component
 {
     public $showForm = false;

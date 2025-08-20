@@ -26,7 +26,7 @@
 
 <!-- Order Status start -->
 <div class="col-xxl-4 mt-3">
-    <div class="card equal-card">
+    <div class="card">
         <div class="card-header">
             <h5>Statut de la Commande</h5>
         </div>
@@ -109,7 +109,7 @@
                         <h6 class="f-w-600 text-dark">
                             <i class="ti ti-message f-s-18 me-2 text-info"></i>Commentaire client
                         </h6>
-                        <p class="mt-2 bg-light p-2 rounded">{{ $order->comments }}</p>
+                        <p class="mt-2 bg-dark p-2 rounded">{{ $order->comments }}</p>
                     </div>
                 @endif
 
@@ -119,11 +119,10 @@
                             <i class="ti ti-message-circle f-s-18 me-2 text-primary"></i>
                             {{ $centerCommentsLabel }}
                         </h6>
-                        <p class="mt-2 bg-light p-2 rounded">{{ $order->center_comments }}</p>
+                        <p class="mt-2 bg-dark p-2 rounded">{{ $order->center_comments }}</p>
                     </div>
                 @endif
             </div>
         </div>
     @endif
-</div>
 <!-- Order Status end -->

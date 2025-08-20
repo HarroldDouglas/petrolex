@@ -3,18 +3,15 @@
 namespace App\Livewire\Bottle;
 
 use App\DTOs\BottleType\CreateBottleTypeDTO;
-use App\DTOs\BottleType\ProductCategoryCityPriceDTO;
+use App\DTOs\ProductCategory\ProductCategoryCityPriceDTO;
 use App\Http\Requests\Bottletype\StoreBottleTypeRequest;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Config;
 
 class CreateBottleTypeForm extends AbstractBottleTypeForm
 {
     public function mount()
     {
-        $this->availableCities = $this->geographyService
-            ->getCities(Config::get('geography.authorized-countries.CM.name'));
-
+        parent::mount();
     }
 
     protected function customRequest(): FormRequest
@@ -24,15 +21,15 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
 
     public function save()
     {
-        $validatedData = $this->validate();
         try {
-            /** @var array<int, ProductCategoryCityPriceDTO> */
+            $validatedData = $this->validate();
+
+            /** @var ProductCategoryCityPriceDTO[] */
             $bottleTypeCityPrices = array_map(
-                /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
+                /** @param array{city_id: int, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
                 fn (array $cityPrice): ProductCategoryCityPriceDTO => new ProductCategoryCityPriceDTO(
-                    bottle_type_id: null,
                     product_category_id: null,
-                    city: $cityPrice['city'],
+                    city_id: $cityPrice['city_id'],
                     content_price: (float) $cityPrice['content_price'],
                     content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
                 ),
@@ -48,9 +45,10 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
                 is_active: $validatedData['is_active'],
                 description: $validatedData['description'],
                 weight: $validatedData['weight'] ? (float) $validatedData['weight'] : null,
+                images: $this->product_images ?: null,
             );
 
-            $this->bottleTypeService->create($bottleTypeDTO);
+            $this->bottleTypeService->create($bottleTypeDTO->toArray());
 
             session()->flash('success', 'Type de bouteille créé avec succès!');
 

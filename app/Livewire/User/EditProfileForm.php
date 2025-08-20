@@ -77,7 +77,7 @@ class EditProfileForm extends Component
 
     protected function customRequest(): FormRequest
     {
-        return new UpdateProfileRequest($this->user->id);
+        return new UpdateProfileRequest();
     }
 
     public function getImagePreviewStyleProperty(): string
@@ -98,6 +98,7 @@ class EditProfileForm extends Component
 
         return '';
     }
+
     public function updated($propertyName)
     {
         $this->validateOnly($propertyName);

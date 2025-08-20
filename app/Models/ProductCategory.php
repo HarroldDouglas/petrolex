@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Product> $products
  * @property-read Collection<int, OrderItem> $orderItems
  * @property-read Collection<int, ProductCategoryDistributionCenter> $distributionCenters
+ * @property-read Collection<int, ProductCategoryCityPrice> $cityPrices
  *
  * // Accessors
  * @property-read BottleType|AccessoryType|null $productTypeInstance
@@ -71,15 +72,24 @@ class ProductCategory extends Model
         return $this->hasMany(ProductCategoryDistributionCenter::class);
     }
 
+    public function cityPrices(): HasMany
+    {
+        return $this->hasMany(ProductCategoryCityPrice::class, 'product_category_id', 'id');
+    }
+
     // ===== ACCESSORS =====
 
     public function getProductTypeInstanceAttribute(): BottleType|AccessoryType|null
     {
-        return match ($this->attributes['product_type']) {
+        $instance = match ($this->attributes['product_type']) {
             ProductType::BOTTLE()->value => BottleType::find($this->product_type_id),
             ProductType::ACCESSORY()->value => AccessoryType::find($this->product_type_id),
             default => null,
         };
+
+        $this->setRelation('productTypeInstance', $instance);
+
+        return $instance;
     }
 
     public function getNameAttribute(): string

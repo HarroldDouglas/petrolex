@@ -31,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
+ * @property string $order_number
  *
  * // Relations
  * @property-read Customer $customer
@@ -53,6 +54,7 @@ class Order extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    // TODO take into account tax
 
     /**
      * The attributes that are mass assignable.
@@ -63,6 +65,7 @@ class Order extends Model
         'customer_id',
         'delivery_address_id',
         'delivery_person_id',
+        'delivery_person_update_reason',
         'distribution_center_id',
         'order_number',
         'delivery_type',
@@ -168,6 +171,48 @@ class Order extends Model
             ->withTimestamps();
     }
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (self $order): void {
+            $order->setDefaultValues();
+        });
+    }
+
+    /**
+     * Set default values for empty fields
+     */
+    private function setDefaultValues(): void
+    {
+        if (empty($this->order_number)) {
+            $this->order_number = self::generateOrderNumber();
+        }
+    }
+
+    /**
+     * Generate a unique order number
+     */
+    public static function generateOrderNumber(): string
+    {
+        $prefix = 'CMD';
+        $year = now()->format('Y');
+        $month = now()->format('m');
+
+        $lastOrder = self::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastOrder && preg_match('/(\d+)$/', $lastOrder->order_number, $matches)) {
+            $nextNumber = (int) $matches[1] + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return sprintf('%s-%s%s-%04d', $prefix, $year, $month, $nextNumber);
+    }
+
     /**
      * Assign a delivery person to this order
      *
@@ -188,7 +233,7 @@ class Order extends Model
      */
     public function canBeRated(): bool
     {
-        return in_array($this->status, [OrderStatus::DELIVERED(), OrderStatus::CANCELLED()]);
+        return in_array($this->status->value, [OrderStatus::DELIVERED()->value, OrderStatus::CANCELLED()->value]);
     }
 
     /**
@@ -196,9 +241,20 @@ class Order extends Model
      */
     public function canBeCancelled(): bool
     {
-        return in_array($this->status, [
-            OrderStatus::CONFIRMED(),
-            OrderStatus::PROCESSING(),
+        return in_array($this->status->value, [
+            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PROCESSING()->value,
+        ]);
+    }
+
+    /**
+     * Check if this order can be delivered
+     */
+    public function canBeDelivered(): bool
+    {
+        return in_array($this->status->value, [
+            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PROCESSING()->value,
         ]);
     }
 
@@ -207,10 +263,18 @@ class Order extends Model
      */
     public function canChangeDeliveryPerson(): bool
     {
-        return in_array($this->status, [
-            OrderStatus::CONFIRMED(),
-            OrderStatus::PROCESSING(),
+        return in_array($this->status->value, [
+            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PROCESSING()->value,
         ]);
+    }
+
+    /**
+     * Check if this order is eligible for bottle scanning
+     */
+    public function canScanBottles(): bool
+    {
+        return $this->status === OrderStatus::CONFIRMED() && $this->hasBottleItems();
     }
 
     /**
@@ -268,17 +332,9 @@ class Order extends Model
     {
         return $this->items()
             ->whereHas('productCategory', function (Builder $query): void {
-                $query->where('product_type', ProductType::BOTTLE());
+                $query->where('product_type', ProductType::BOTTLE()->value);
             })
             ->exists();
-    }
-
-    /**
-     * Check if this order is eligible for bottle scanning
-     */
-    public function canScanBottles(): bool
-    {
-        return $this->status === OrderStatus::CONFIRMED() && $this->hasBottleItems();
     }
 
     /**
@@ -292,7 +348,7 @@ class Order extends Model
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
         $bottleItems = $this->items()->whereHas('productCategory', function (Builder $query): void {
-            $query->where('product_type', ProductType::BOTTLE());
+            $query->where('product_type', ProductType::BOTTLE()->value);
         })->get();
 
         foreach ($bottleItems as $item) {
@@ -318,7 +374,7 @@ class Order extends Model
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, OrderItem> $bottleItems */
         $bottleItems = $this->items()->whereHas('productCategory', function (Builder $query): void {
-            $query->where('product_type', ProductType::BOTTLE());
+            $query->where('product_type', ProductType::BOTTLE()->value);
         })->get();
 
         foreach ($bottleItems as $item) {

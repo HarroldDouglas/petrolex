@@ -2,8 +2,10 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 
 class UserRepository extends BaseEloquentRepository implements UserRepositoryInterface
 {
@@ -35,7 +37,7 @@ class UserRepository extends BaseEloquentRepository implements UserRepositoryInt
      */
     public function findByEmail(string $email): ?User
     {
-        return User::where('email', $email)->first();
+        return User::where('email', $email)->with(['customer', 'deliveryPerson'])->first();
     }
 
     /**
@@ -43,6 +45,17 @@ class UserRepository extends BaseEloquentRepository implements UserRepositoryInt
      */
     public function findByPhone(string $phone): ?User
     {
-        return User::where('phone_number', $phone)->first();
+        return User::where('phone_number', $phone)->with(['customer', 'deliveryPerson'])->first();
+    }
+
+    /**
+     * Finds and returns a collection of users based on their assigned role.
+     *
+     * @param  UserRole  $userRole  The role to search for (e.g., UserRole::ADMIN, UserRole::EDITOR).
+     * @return Collection<User> Returns a collection of User models that match the specified role.
+     */
+    public function findByRole(UserRole $userRole): Collection
+    {
+        return User::role($userRole)->get();
     }
 }
