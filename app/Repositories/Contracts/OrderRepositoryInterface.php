@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Enums\OrderStatus;
+use App\DTOs\Order\AddCustomerCommentToOrderDTO;
 use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
 use App\Models\Refund;
@@ -27,15 +27,6 @@ interface OrderRepositoryInterface extends BaseRepositoryInterface
     public function getById(int $id): Order;
 
     /**
-     * Update the status of an order
-     *
-     * @param  Order  $order  The order to update
-     * @param  OrderStatus  $status  The new status
-     * @return bool Success status
-     */
-    public function updateStatus(Order $order, OrderStatus $status): bool;
-
-    /**
      * Get the most recent paid refund for an order
      *
      * @param  Order  $order  The order to get the refund for
@@ -46,7 +37,7 @@ interface OrderRepositoryInterface extends BaseRepositoryInterface
     /**
      * Calculate total revenue from delivered orders
      */
-    public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): string;
+    public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): float;
 
     /**
      * Count pending orders
@@ -80,4 +71,9 @@ interface OrderRepositoryInterface extends BaseRepositoryInterface
         string $aggregationColumn,
         string $aggregationType
     ): Collection;
+
+    /**
+     * Assigns a delivery person to an order.
+     */
+    public function assignDeliveryPerson(Order $order, int $deliveryPersonId, ?string $reason): bool;
 }

@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('distribution_centers', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->string('country', 100);
-            $table->string('city', 100);
-            $table->string('neighborhood', 100);
+            $table->foreignId('neighborhood_id')->constrained()->onDelete('cascade');
             $table->text('address');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->string('phone', 20)->nullable();

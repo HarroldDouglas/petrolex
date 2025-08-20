@@ -14,12 +14,12 @@ class GetProductsController extends Controller
     /**
      * Get all products for a distribution-center.
      *
-     * Route: GET /distribution-centers/{id}/products
+     * Route: GET /distribution-centers/{distributionCenterId}/products
      * Name: api.distribution-centers.products
      */
-    public function __invoke(Request $request, int $id): ProductResponse
+    public function __invoke(Request $request, int $distributionCenterId): ProductResponse
     {
-        $products = $this->distributionCenterService->getProducts($id);
+        $products = $this->distributionCenterService->getProducts($distributionCenterId);
 
         return ProductResponse::withCollection($products);
     }

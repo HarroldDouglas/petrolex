@@ -10,8 +10,6 @@ use App\Services\Auth\Contracts\OtpServiceInterface;
 use App\Services\Auth\OtpService;
 use App\Services\BaseServiceForEntity;
 use App\Services\BaseServiceForEntityInterface;
-use App\Services\Geography\GeographyServiceInterface;
-use App\Services\Geography\StaticGeographyService;
 use App\Services\Permissions\PermissionService;
 use App\Services\Permissions\PermissionServiceInterface;
 use App\Services\Shared\Media\MediaServiceInterface;
@@ -33,7 +31,6 @@ class ServiceServiceProvider extends ServiceProvider implements DeferrableProvid
         PermissionServiceInterface::class => PermissionService::class,
         StockMovementRepositoryInterface::class => StockMovementRepository::class,
         BaseServiceForEntityInterface::class => BaseServiceForEntity::class,
-        GeographyServiceInterface::class => StaticGeographyService::class,
         MediaServiceInterface::class => SpatieMediaService::class,
     ];
 

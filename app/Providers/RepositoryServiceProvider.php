@@ -11,6 +11,9 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
      * @var array<class-string, class-string>
      */
     public array $bindings = [
+        \App\Repositories\Contracts\BaseRepositoryInterface::class => \App\Repositories\Eloquent\BaseEloquentRepository::class,
+        \App\Repositories\Contracts\CustomerRepositoryInterface::class => \App\Repositories\Eloquent\CustomerRepository::class,
+        \App\Repositories\Contracts\ProductCategoryRepositoryInterface::class => \App\Repositories\Eloquent\ProductCategoryRepository::class,
         \App\Repositories\Contracts\UserRepositoryInterface::class => \App\Repositories\Eloquent\UserRepository::class,
         \App\Repositories\Contracts\OrderRepositoryInterface::class => \App\Repositories\Eloquent\OrderRepository::class,
         \App\Repositories\Contracts\TokenRepositoryInterface::class => \App\Repositories\Eloquent\TokenRepositoryEloquent::class,
@@ -21,9 +24,11 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
         \App\Repositories\Contracts\BottleTypeRepositoryInterface::class => \App\Repositories\Eloquent\BottleTypeRepository::class,
         \App\Repositories\Contracts\SupplierDeliveryRepositoryInterface::class => \App\Repositories\Eloquent\SupplierDeliveryRepository::class,
         \App\Repositories\Contracts\OrderBottleScanRepositoryInterface::class => \App\Repositories\Eloquent\OrderBottleScanRepository::class,
-        \App\Repositories\Contracts\ProductCategoryRepositoryInterface::class => \App\Repositories\Eloquent\ProductCategoryRepository::class,
         \App\Repositories\Contracts\NotificationRepositoryInterface::class => \App\Repositories\Eloquent\NotificationRepository::class,
         \App\Repositories\Contracts\ProductCategoryCityPriceRepositoryInterface::class => \App\Repositories\ProductCategoryCityPriceRepository::class,
+        \App\Repositories\Geography\GeographyRepositoryInterface::class => \App\Repositories\Geography\EloquentGeographicRepository::class,
+        \App\Repositories\Contracts\DeliveryPersonRepositoryInterface::class => \App\Repositories\Eloquent\DeliveryPersonRepository::class,
+        \App\Repositories\Contracts\ProductRepositoryInterface::class => \App\Repositories\Eloquent\ProductRepository::class,
     ];
 
     /**

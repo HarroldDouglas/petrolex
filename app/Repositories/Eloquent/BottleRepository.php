@@ -9,7 +9,6 @@ use App\Repositories\Contracts\BottleRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BottleRepository extends BaseEloquentRepository implements BottleRepositoryInterface
 {
@@ -27,16 +26,6 @@ class BottleRepository extends BaseEloquentRepository implements BottleRepositor
                 'customer_id', 'user_id', 'movement_date', 'notes', 'type', 'created_at')
             ->orderBy('created_at', 'desc')
             ->get();
-    }
-
-    public function updateStatus($bottleId, BottleStatus $status): void
-    {
-        $bottle = Bottle::find($bottleId);
-
-        if (! $bottle) {
-            throw new ModelNotFoundException("Bottle with ID {$bottleId} not found.");
-        }
-        $bottle->update(['status' => $status->value]);
     }
 
     /**
@@ -112,5 +101,16 @@ class BottleRepository extends BaseEloquentRepository implements BottleRepositor
     {
         /** @var Bottle|null */
         return $this->model->where('barcode', $barcode)->first();
+    }
+
+    /**
+     * Find a bottle by its barcode and status
+     */
+    public function findByBarcodeAndStatus(string $barcode, array $statuses): ?Bottle
+    {
+        /** @var Bottle|null */
+        return $this->model->where('barcode', $barcode)
+            ->whereIn('status', $statuses)
+            ->first();
     }
 }

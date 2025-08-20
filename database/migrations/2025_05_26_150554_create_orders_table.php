@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->constrained()->onDelete('restrict');
             $table->foreignId('delivery_address_id')->constrained('customer_delivery_addresses')->onDelete('restrict');
             $table->unsignedBigInteger('delivery_person_id')->nullable();
+            $table->text('delivery_person_update_reason')->nullable();
             $table->foreignId('distribution_center_id')->constrained()->onDelete('restrict');
             
             $table->string('order_number', 255)->unique();

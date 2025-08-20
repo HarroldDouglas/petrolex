@@ -23,9 +23,7 @@ class StoreDistributionCenterRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:distribution_centers,name',
-            'country' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'neighborhood' => 'required|string|max:255',
+            'neighborhood_id' => 'required|integer|exists:neighborhoods,id',
             'address' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -47,9 +45,9 @@ class StoreDistributionCenterRequest extends FormRequest
         return [
             'name.required' => 'Le nom du centre de distribution est requis',
             'name.unique' => 'Ce nom de centre de distribution existe déjà',
-            'country.required' => 'Le pays est requis',
-            'city.required' => 'La ville est requise',
-            'neighborhood.required' => 'Le quartier est requis',
+            'neighborhood_id.required' => 'Le quartier est requis',
+            'neighborhood_id.integer' => 'L\'ID du quartier doit être un entier',
+            'neighborhood_id.exists' => 'Le quartier sélectionné n\'existe pas',
             'address.required' => 'L\'adresse est requise',
             'phone.required' => 'Le numéro de téléphone est requis',
             'email.required' => 'L\'email est requis',

@@ -2,11 +2,25 @@
 
 namespace App\Http\Api\Resources;
 
+use App\Enums\BottleOrderType;
 use App\Enums\ProductType;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property int $id
+ * @property string $type
+ * @property string $name
+ * @property string|null $description
+ * @property int $quantity
+ * @property float|null $price
+ * @property float|null $capacity
+ * @property float|null $height
+ * @property float|null $weight
+ * @property float|null $radius
+ * @property array<array{value: string, label: string, price: float}>|null $options
+ */
 class ProductResource extends JsonResource
 {
     /**
@@ -46,15 +60,25 @@ class ProductResource extends JsonResource
 
     private function getBottleDetails(): array
     {
-        $productTypeInstance = $this->resource->productTypeInstance;
+        $bottleType = $this->resource->productTypeInstance;
 
         return [
-            'capacity' => $productTypeInstance->capacity,
-            'height' => $productTypeInstance->height,
-            'weight' => $productTypeInstance->weight,
-            'radius' => $productTypeInstance->radius,
-            'content_price' => $productTypeInstance->content_price,
-            'bottle_with_content_price' => $productTypeInstance->bottle_with_content_price,
+            'capacity' => $bottleType->capacity,
+            'height' => $bottleType->height,
+            'weight' => $bottleType->weight,
+            'radius' => $bottleType->radius,
+            'options' => [
+                [
+                    'value' => BottleOrderType::FULL()->value,
+                    'label' => BottleOrderType::FULL()->label,
+                    'price' => $bottleType->bottle_with_content_price,
+                ],
+                [
+                    'value' => BottleOrderType::RECHARGE()->value,
+                    'label' => BottleOrderType::RECHARGE()->label,
+                    'price' => $bottleType->content_price,
+                ],
+            ],
         ];
     }
 

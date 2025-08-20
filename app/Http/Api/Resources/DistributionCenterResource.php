@@ -8,6 +8,19 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @mixin DistributionCenter
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $country
+ * @property string $city
+ * @property string|null $neighborhood
+ * @property string|null $address
+ * @property string|null $description
+ * @property float|null $latitude
+ * @property float|null $longitude
+ * @property string|null $phone
+ * @property string|null $email
+ * @property int|null $storage_capacity
  */
 class DistributionCenterResource extends JsonResource
 {
@@ -18,25 +31,19 @@ class DistributionCenterResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        /** @var DistributionCenter&\Illuminate\Database\Eloquent\Model $distributionCenter */
-        $distributionCenter = $this->resource;
-
         return [
-            'id' => $distributionCenter->id,
-            'name' => $distributionCenter->name,
-            'country' => $distributionCenter->country,
-            'city' => $distributionCenter->city,
-            'neighborhood' => $distributionCenter->neighborhood,
-            'address' => $distributionCenter->address,
-            'description' => $distributionCenter->description,
-            'latitude' => $distributionCenter->latitude,
-            'longitude' => $distributionCenter->longitude,
-            'phone' => $distributionCenter->phone,
-            'email' => $distributionCenter->email,
-            'is_active' => $distributionCenter->is_active,
-            'storage_capacity' => $distributionCenter->storage_capacity,
-            'created_at' => $distributionCenter->created_at->toISOString(),
-            'updated_at' => $distributionCenter->updated_at->toISOString(),
+            'id' => $this->id,
+            'name' => $this->name,
+            'country' => new CountryResource($this->country),
+            'city' => new CityResource($this->city),
+            'neighborhood' => new NeighborhoodResource($this->neighborhood),
+            'address' => $this->address,
+            'description' => $this->description,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'phone' => $this->phone,
+            'email' => $this->email,
+            'storage_capacity' => $this->storage_capacity,
         ];
     }
 }

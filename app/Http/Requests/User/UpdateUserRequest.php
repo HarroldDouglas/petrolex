@@ -31,6 +31,12 @@ class UpdateUserRequest extends BaseUserRequest
                     'max:255',
                     Rule::unique('users', 'email')->ignore($this->id),
                 ],
+                'phone_number' => [
+                    'required',
+                    'string',
+                    'max:20',
+                    Rule::unique('users', 'phone_number')->ignore($this->id),
+                ],
                 'password' => ['nullable', 'string', 'min:8'],
             ]
         );

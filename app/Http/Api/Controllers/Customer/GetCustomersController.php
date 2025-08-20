@@ -4,11 +4,11 @@ namespace App\Http\Api\Controllers\Customer;
 
 use App\Http\Api\Responses\Customer\CustomerResponse;
 use App\Http\Controllers\Controller;
-use App\Services\User\UserService;
+use App\Services\Customer\CustomerService;
 
 class GetCustomersController extends Controller
 {
-    public function __construct(protected UserService $userService) {}
+    public function __construct(protected CustomerService $customerService) {}
 
     /**
      * Get all customers.
@@ -18,8 +18,8 @@ class GetCustomersController extends Controller
      */
     public function __invoke(): CustomerResponse
     {
-        $customers = $this->userService->getAllCustomers();
+        $customers = $this->customerService->getAll();
 
-        return CustomerResponse::withCollection($customers);
+        return CustomerResponse::many($customers);
     }
 }

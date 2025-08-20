@@ -9,7 +9,6 @@ use Illuminate\Validation\Rule;
 
 abstract class BaseUserRequest extends FormRequest
 {
-    // TODO refaire une revue par Douglas
     public function rules(): array
     {
         return [
@@ -21,7 +20,12 @@ abstract class BaseUserRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email'),
             ],
-            'phone_number' => ['required', 'string', 'max:20'],
+            'phone_number' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('users', 'phone_number'),
+            ],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', Rule::in(UserRole::values())],
             'image' => [
@@ -68,6 +72,7 @@ abstract class BaseUserRequest extends FormRequest
             'email.max' => 'L\'email ne doit pas dépasser 255 caractères.',
             'phone_number.required' => 'Le téléphone est obligatoire.',
             'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
+            'phone_number.unique' => 'Ce numéro de téléphone est déjà utilisé.',
             'phone_number.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
             'password.required' => 'Le mot de passe est obligatoire.',
             'password.string' => 'Le mot de passe doit être une chaîne de caractères.',

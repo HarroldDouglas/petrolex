@@ -12,14 +12,21 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            GeographicSeeder::class,
             RolePermissionSeeder::class,
             UserSeeder::class,
             Production\BottleTypeSeeder::class,
+            Production\AccessoryTypeSeeder::class,
         ]);
 
         if (app()->environment('local', 'development', 'testing')) {
             $this->call(DevelopmentSeeder::class);
             $this->command->info('Development data seeded successfully!');
         }
+
+        $this->call([
+            Production\ProductCategorySeeder::class,
+            Production\ProductSeeder::class,
+        ]);
     }
 }

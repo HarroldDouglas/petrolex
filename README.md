@@ -394,8 +394,65 @@ Documenter les cas de test complexes
 - [Documentation Laravel](https://laravel.com/docs)
 - [Guide de Contribution](CONTRIBUTING.md)
 - [Documentation API](API.md)
+- **API Documentation Generation**: For every new API endpoint or modification, ensure to add Swagger documentation in the `documentation/` directory and run `php artisan l5-swagger:generate` to update the API documentation. if unknown error found, run composer dump-autoload first please
 - [Guide du Projet](guide.md) - Document essentiel détaillant les spécifications techniques, 
   les phases du projet et la stack technique complète du projet ISOGAZ
+
+### Interface de Test du Flux de Commande API
+
+Une interface de test interactive est disponible pour simuler le flux de création de commande via les endpoints API. Cette interface permet de :
+- Se connecter et gérer le token d'authentification.
+- Sélectionner un client et visualiser/ajouter ses adresses de livraison.
+- Choisir un centre de distribution et les produits associés (avec gestion des options et quantités en stock).
+- Sélectionner le mode de paiement et le type de livraison.
+
+Pour accéder à l'interface, ouvrez votre navigateur et naviguez vers : `http://127.0.0.1:8000/test-products/order.html` (assurez-vous que votre serveur Laravel est en cours d'exécution).
+
+## 📧 Configuration des Emails Locaux avec Mailpit
+
+Pour le développement local et les tests, il est recommandé d'utiliser [Mailpit](https://mailpit.axllent.org/) pour intercepter et visualiser les emails envoyés par l'application.
+
+### Installation de Mailpit
+
+Vous pouvez installer Mailpit de plusieurs manières :
+
+- **Via Homebrew (macOS)**:
+  ```bash
+  brew install mailpit
+  brew services start mailpit
+  ```
+
+- **Via script (Linux & macOS)**:
+  ```bash
+  sudo sh < <(curl -sL https://raw.githubusercontent.com/axllent/mailpit/develop/install.sh)
+  ```
+
+- **Via Docker**:
+  ```bash
+  docker run -d -p 8025:8025 -p 1025:1025 axllent/mailpit
+  ```
+  Pour d'autres méthodes d'installation (binaires statiques, compilation), consultez la [documentation officielle de Mailpit](https://mailpit.axllent.org/docs/install/).
+
+### Configuration de l'environnement (.env)
+
+Une fois Mailpit installé et en cours d'exécution, configurez votre fichier `.env` pour que Laravel utilise Mailpit comme serveur SMTP :
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=127.0.0.1
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+### Utilisation
+
+1.  Assurez-vous que Mailpit est en cours d'exécution (par exemple, via `brew services start mailpit` ou `docker run ...`).
+2.  Accédez à l'interface web de Mailpit dans votre navigateur : `http://localhost:8025`.
+3.  Tous les emails envoyés par votre application Laravel (par exemple, lors de l'inscription, de la réinitialisation de mot de passe, etc.) seront interceptés et affichés dans l'interface de Mailpit.
 
 ## 🧰 Maintenance
 

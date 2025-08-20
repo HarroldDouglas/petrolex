@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\DTOs\User\UpdatePasswordDTO;
 use App\Enums\UserRole;
 use App\Events\UserCreatedEvent;
 use App\Events\UserDeletedEvent;
@@ -11,8 +12,9 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\BaseServiceWithMedia;
 use App\Services\Shared\Media\MediaServiceInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseServiceWithMedia
@@ -34,23 +36,15 @@ class UserService extends BaseServiceWithMedia
      */
     public function createWithMedia(array $attributes): User
     {
-        DB::beginTransaction();
         try {
-            if ($attributes['image'] instanceof \Illuminate\Http\UploadedFile) {
-                /** @var User $user */
-                $user = parent::createWithMedia($attributes);
-            } else {
-                /** @var User $user */
-                $user = parent::create($attributes);
-            }
+            /** @var User $user */
+            $user = parent::createWithMedia($attributes);
 
             UserCreatedEvent::dispatch(
                 $user,
                 $attributes['role'],
-                $attributes['distribution_center_ids']
+                $attributes['distribution_center_ids'] ?? []
             );
-
-            DB::commit();
 
             return $user;
         } catch (\Exception $e) {
@@ -59,10 +53,8 @@ class UserService extends BaseServiceWithMedia
                 'attributes' => $attributes,
                 'trace' => $e->getTraceAsString(),
             ]);
-            DB::rollBack();
             throw $e;
         }
-
     }
 
     /**
@@ -74,31 +66,42 @@ class UserService extends BaseServiceWithMedia
      */
     public function update(Model $user, array $attributes): Model
     {
-
         /** @var User $user */
         if (! $user instanceof User) {
             throw new \InvalidArgumentException('Expected User model');
         }
+
         if (empty($attributes)) {
             return $user;
         }
 
         $originalValues = $user->only(array_keys($attributes));
 
+        $originalRole = $user->getRoleNames()->first();
+        $originalDistributionCenterIds = $user->distributionCenters()->pluck('id')->toArray();
+
         if (empty($attributes['password'])) {
             unset($attributes['password']);
+        }
+
+        if (! isset($attributes['role']) || UserRole::from($originalRole)->equals($attributes['role'])) {
+            $attributes['role'] = null;
+        }
+
+        if (isset($attributes['distribution_center_id'])
+            && empty(array_diff($attributes['distribution_center_id'], $originalDistributionCenterIds))) {
+            $attributes['distribution_center_ids'] = [];
+        }
+
+        if (! isset($attributes['is_active'])) {
+            unset($attributes['is_active']);
         }
 
         DB::beginTransaction();
 
         try {
-            if (isset($attributes['image']) && $attributes['image'] instanceof UploadedFile) {
-                /** @var User $user */
-                $user = parent::updateWithMedia($user, $attributes);
-            } else {
-                /** @var User $user */
-                $user = parent::update($user, $attributes);
-            }
+            /** @var User $user */
+            $user = parent::updateWithMedia($user, $attributes);
 
             if ($user) {
                 $user->refresh();
@@ -123,9 +126,35 @@ class UserService extends BaseServiceWithMedia
                 'attributes' => $attributes,
                 'trace' => $e->getTraceAsString(),
             ]);
+
             DB::rollBack();
+
             throw $e;
         }
+    }
+
+    /**
+     * Update a user's password.
+     *
+     * @param  User  $user  The user to update.
+     * @param  UpdatePasswordDTO  $dto  The DTO containing old and new passwords.
+     * @return bool True if the password was updated, false otherwise.
+     */
+    public function updatePassword(User $user, UpdatePasswordDTO $dto): bool
+    {
+        if (! Hash::check($dto->old_password, $user->password)) {
+            throw new \Exception('L\'ancien mot de passe est incorrect.');
+        }
+
+        $updated = (bool) $this->userRepository->update($user, [
+            'password' => Hash::make($dto->new_password),
+        ]);
+
+        if ($updated) {
+            Event::dispatch(new \App\Events\PasswordUpdatedEvent($user));
+        }
+
+        return $updated;
     }
 
     /**
@@ -136,8 +165,6 @@ class UserService extends BaseServiceWithMedia
      */
     public function delete(Model $user): bool
     {
-        DB::beginTransaction();
-
         try {
             $result = $this->userRepository->delete($user);
 
@@ -145,11 +172,8 @@ class UserService extends BaseServiceWithMedia
                 UserDeletedEvent::dispatch($user);
             }
 
-            DB::commit();
-
             return $result;
         } catch (\Exception $e) {
-            DB::rollBack();
             throw $e;
         }
     }
@@ -157,6 +181,19 @@ class UserService extends BaseServiceWithMedia
     protected function getMediaFields(): array
     {
         return ['image'];
+    }
+
+    protected function getMediaStrategy(): string
+    {
+        return 'conditional_single';
+    }
+
+    protected function processMediaWithStrategy($model, array $data): void
+    {
+        // Only process media if there's actually an image in the data
+        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+            $this->mediaService->handleSingleImageStrategy($model, $data['image']);
+        }
     }
 
     /**
@@ -181,6 +218,21 @@ class UserService extends BaseServiceWithMedia
     public function getAllCustomers()
     {
         return $this->userRepository->findByRole(UserRole::CUSTOMER());
+    }
+
+    public function findUserByIdentifier(string $identifier): ?User
+    {
+        return $this->userRepository->findByEmailOrPhone($identifier);
+    }
+
+    public function markEmailAsVerified(User $user): Model
+    {
+        return $this->userRepository->update($user, ['email_verified_at' => now()]);
+    }
+
+    public function markPhoneAsVerified(User $user): Model
+    {
+        return $this->userRepository->update($user, ['phone_verified_at' => now()]);
     }
 
     protected function getModel(): string

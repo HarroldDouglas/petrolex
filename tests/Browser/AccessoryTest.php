@@ -27,13 +27,9 @@ class AccessoryTest extends DuskTestCase
             $currentUrl = $browser->driver->getCurrentURL();
             echo 'URL après tentative d\'accès: '.$currentUrl."\n";
 
-            if (str_contains($currentUrl, '/login')) {
-                echo "✅ Redirection vers login confirmée\n";
-                $browser->assertSee('Se connecter');
-                echo "✅ Page de login affichée\n";
-            } else {
-                echo "❌ Pas de redirection vers login\n";
-            }
+            $browser->assertPathIs('/login')
+                ->assertSee('Se connecter');
+            echo "✅ Redirection vers login confirmée et page de login affichée\n";
         });
     }
 

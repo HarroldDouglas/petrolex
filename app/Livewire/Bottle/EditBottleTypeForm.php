@@ -10,25 +10,21 @@ use App\Models\ProductCategory;
 use App\Models\ProductCategoryCityPrice;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Config;
 
 class EditBottleTypeForm extends AbstractBottleTypeForm
 {
     public BottleType $bottleType;
     public int $id;
 
-    public function mount(BottleType $bottleType)
+    public function mount(?BottleType $bottleType = null)
     {
-        $this->bottleType = $bottleType;
-        $this->availableCities = $this->geographyService
-            ->getCities(Config::get('geography.authorized-countries.CM.name'));
-
-        $this->loadBottleTypeData();
+        parent::mount();
+        if ($bottleType) {
+            $this->bottleType = $bottleType;
+            $this->loadBottleTypeData();
+        }
     }
 
-    /**
-     * Transform ProductCategoryCityPrice models to DTOs for editing
-     */
     protected function loadBottleTypeData()
     {
         $this->id = $this->bottleType->id;
@@ -58,21 +54,21 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
 
         if ($productCategory) {
             /** @var Collection<int, ProductCategoryCityPrice> $cityPrices */
-            $cityPrices = ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->get(); // TODO: move this into the repository
+            $cityPrices = ProductCategoryCityPrice::where('product_category_id', $productCategory->id)->get();
 
-            /** @var ProductCategoryCityPriceDTO[] $cityPriceDTOs */
-            $cityPriceDTOs = $cityPrices->map(
-                function (ProductCategoryCityPrice $cityPrice) use ($productCategory): ProductCategoryCityPriceDTO {
-                    return new ProductCategoryCityPriceDTO(
-                        product_category_id: $productCategory->id,
-                        city: $cityPrice->city,
-                        content_price: (float) $cityPrice->content_price,
-                        content_with_bottle_price: (float) $cityPrice->content_with_bottle_price
-                    );
-                }
-            )->toArray();
+            $this->cityPrices = $cityPrices->map(function (ProductCategoryCityPrice $cityPrice) {
+                $city = $cityPrice->city;
+                $country = $city->country;
 
-            $this->cityPrices = $cityPriceDTOs;
+                return [
+                    'city_id' => $cityPrice->city_id,
+                    'city_name' => $city->name ?? 'N/A',
+                    'country_id' => $country->id ?? 'N/A',
+                    'country_name' => $country->name ?? 'N/A',
+                    'content_price' => (float) $cityPrice->content_price,
+                    'content_with_bottle_price' => (float) $cityPrice->content_with_bottle_price,
+                ];
+            })->toArray();
         } else {
             $this->cityPrices = [];
         }
@@ -85,9 +81,9 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
 
     public function save()
     {
-        $validatedData = $this->validate();
-
         try {
+            $validatedData = $this->validate();
+
             /** @var ProductCategory $productCategory */
             $productCategory = ProductCategory::bottles()
                 ->where('product_type_id', $this->bottleType->id)
@@ -95,10 +91,10 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
 
             /** @var ProductCategoryCityPriceDTO[] */
             $bottleTypeCityPrices = array_map(
-                /** @param array{city: string, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
+                /** @param array{city_id: int, content_price: string|float, content_with_bottle_price: string|float} $cityPrice */
                 fn (array $cityPrice): ProductCategoryCityPriceDTO => new ProductCategoryCityPriceDTO(
                     product_category_id: $productCategory->id,
-                    city: $cityPrice['city'],
+                    city_id: $cityPrice['city_id'],
                     content_price: (float) $cityPrice['content_price'],
                     content_with_bottle_price: (float) $cityPrice['content_with_bottle_price'],
                 ),

@@ -4,7 +4,10 @@ namespace App\Http\Requests\Order;
 
 use App\Enums\BottleOrderType;
 use App\Enums\DeliveryType;
+use App\Enums\PaymentMethod;
+use App\Rules\AvailableStock;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
 
 class AbstractOrderRequest extends FormRequest
@@ -21,10 +24,17 @@ class AbstractOrderRequest extends FormRequest
             'delivery_address_id' => ['nullable', 'exists:customer_delivery_addresses,id'],
             'distribution_center_id' => ['required', 'exists:distribution_centers,id'],
             'delivery_type' => ['required', Rule::in(DeliveryType::values())],
+            'payment_method' => ['required', Rule::in(PaymentMethod::values())],
             'items' => ['required', 'array'],
             'items.*.product_category_id' => ['required', 'exists:product_categories,id'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'items.*.option' => ['required', Rule::in(BottleOrderType::values())],
+            'items.*.quantity' => [
+                'required', 'integer', 'min:1',
+                App::make(AvailableStock::class, [
+                    'distributionCenterId' => $this->input('distribution_center_id'),
+                ]),
+            ],
+
+            'items.*.option' => ['nullable', Rule::in(BottleOrderType::values())],
         ];
     }
 
@@ -45,7 +55,6 @@ class AbstractOrderRequest extends FormRequest
             'items.*.quantity.required' => 'La quantité est requise pour chaque article.',
             'items.*.quantity.integer' => 'La quantité doit être un entier pour chaque article.',
             'items.*.quantity.min' => 'La quantité doit être au moins 1 pour chaque article.',
-            'items.*.option.required' => "L'option est requise pour chaque article.",
             'items.*.option.in' => "L'option sélectionnée pour un article est invalide.",
         ];
     }
