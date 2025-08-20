@@ -41,7 +41,9 @@ final class ScanEmptyBottleTest extends TestCase
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
 
-        $this->adminUser = User::factory()->create();
+        $this->adminUser = User::factory()->create([
+            'password' => bcrypt('password'),
+        ]);
         $this->adminUser->assignRole('admin');
 
         $response = $this->postJson(route('api.login'), [
@@ -92,7 +94,7 @@ final class ScanEmptyBottleTest extends TestCase
         ]);
 
         $emptyBottleToReturn = Bottle::factory()->create([
-            'is_filled' => 1,
+            'is_filled' => 0,
             'product_id' => $this->product->id,
             'distribution_center_id' => $this->distributionCenter->id,
         ]);
