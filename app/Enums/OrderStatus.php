@@ -38,6 +38,8 @@ class OrderStatus extends Enum
             'DELIVERED' => 'delivered',
             'CANCELLED' => 'cancelled',
             'PENDING' => 'pending',
+            'PAID' => 'Payée',
+            'FAILED' => 'Paiement échoué',
         ];
     }
 
@@ -52,6 +54,8 @@ class OrderStatus extends Enum
             self::DELIVERED() => 'bg-success',
             self::CANCELLED() => 'bg-danger',
             self::PENDING() => 'bg-warning',
+            self::PAID() => 'bg-info',
+            self::FAILED() => 'bg-secondary',
             default => 'bg-secondary',
         };
     }
