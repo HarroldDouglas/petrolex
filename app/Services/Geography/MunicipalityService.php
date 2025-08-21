@@ -2,11 +2,11 @@
 
 namespace App\Services\Geography;
 
-use App\Models\Municipality;
+use App\Models\Geography\Municipality;
 use App\Repositories\Contracts\MunicipalityRepositoryInterface;
-use App\Services\BaseService;
+use App\Services\BaseServiceForEntity;
 
-class MunicipalityService extends BaseService
+class MunicipalityService extends BaseServiceForEntity
 {
     public function __construct(protected MunicipalityRepositoryInterface $municipalityRepository)
     {
@@ -71,6 +71,7 @@ class MunicipalityService extends BaseService
      */
     public function updateMunicipality(Municipality $municipality, array $attributes, array $neighborhoodIds = []): Municipality
     {
+        /** @var Municipality $municipality */
         $municipality = $this->municipalityRepository->update($municipality, $attributes);
 
         if (! empty($neighborhoodIds)) {

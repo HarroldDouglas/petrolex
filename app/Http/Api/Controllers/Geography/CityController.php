@@ -4,7 +4,7 @@ namespace App\Http\Api\Controllers\Geography;
 
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\City;
+use App\Models\Geography\City;
 use App\Services\Geography\CityService;
 use Illuminate\Http\Request;
 
@@ -30,6 +30,9 @@ class CityController extends Controller
      */
     public function show(int $cityId): ApiResponse
     {
+        /**
+         * @var City $city
+         */
         $city = $this->cityService->find($cityId);
 
         return ApiResponse::success(

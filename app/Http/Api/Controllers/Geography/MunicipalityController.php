@@ -4,7 +4,7 @@ namespace App\Http\Api\Controllers\Geography;
 
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\Municipality;
+use App\Models\Geography\Municipality;
 use App\Services\Geography\MunicipalityService;
 use Illuminate\Http\Request;
 
@@ -114,7 +114,7 @@ class MunicipalityController extends Controller
 
         $this->municipalityService->updateMunicipality(
             $municipality,
-            [], // No attributes to update, just sync neighborhoods
+            [],
             $request->input('neighborhood_ids')
         );
 

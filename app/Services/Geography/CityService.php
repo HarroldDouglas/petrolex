@@ -2,11 +2,11 @@
 
 namespace App\Services\Geography;
 
-use App\Models\City;
+use App\Models\Geography\City;
 use App\Repositories\Contracts\CityRepositoryInterface;
-use App\Services\BaseService;
+use App\Services\BaseServiceForEntity;
 
-class CityService extends BaseService
+class CityService extends BaseServiceForEntity
 {
     public function __construct(protected CityRepositoryInterface $cityRepository)
     {

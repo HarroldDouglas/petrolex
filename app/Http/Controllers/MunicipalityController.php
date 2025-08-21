@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Municipality;
+use App\Models\Geography\Municipality;
 use Illuminate\Contracts\View\View;
 
 class MunicipalityController extends Controller

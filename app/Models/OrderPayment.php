@@ -10,50 +10,48 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * OrderPayment model represents the payment details for an order.
- *
  * @property int $id
  * @property int $order_id
- * @property string $payment_reference
- * @property PaymentStatus $payment_status
  * @property PaymentMethod $payment_method
  * @property float $amount_paid
  * @property float $amount_due
+ * @property PaymentStatus $payment_status
+ * @property string $payment_reference
+ * @property string|null $transaction_reference
+ * @property string|null $payment_url
+ * @property array|null $gateway_response
  * @property \Illuminate\Support\Carbon|null $payment_date
  * @property string|null $payment_notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- *
- * // Relations
- * @property-read Order $order
- *
- * // Accessors
- *
- * // Query Scopes
+ * @property-read \App\Models\Order $order
  */
 class OrderPayment extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'order_id',
-        'payment_reference',
-        'payment_status',
         'payment_method',
         'amount_paid',
         'amount_due',
+        'payment_status',
+        'payment_reference',
+        'transaction_reference',
+        'payment_url',
+        'gateway_response',
         'payment_date',
         'payment_notes',
     ];
 
     protected $casts = [
-        'payment_status' => PaymentStatus::class,
-        'payment_method' => PaymentMethod::class,
-        'payment_date' => 'datetime',
         'amount_paid' => 'decimal:2',
         'amount_due' => 'decimal:2',
+        'payment_date' => 'datetime',
+        'gateway_response' => 'array',
+        'payment_method' => PaymentMethod::class,
+        'payment_status' => PaymentStatus::class,
     ];
 
     /**

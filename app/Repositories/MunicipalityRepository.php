@@ -2,48 +2,36 @@
 
 namespace App\Repositories;
 
-use App\Models\Municipality;
+use App\Models\Geography\Municipality;
+use App\Models\Geography\Neighborhood;
 use App\Repositories\Contracts\MunicipalityRepositoryInterface;
+use App\Repositories\Eloquent\BaseEloquentRepository;
 
-class MunicipalityRepository extends BaseRepository implements MunicipalityRepositoryInterface
+class MunicipalityRepository extends BaseEloquentRepository implements MunicipalityRepositoryInterface
 {
     public function __construct(Municipality $model)
     {
         parent::__construct($model);
     }
-
-    public function find(int $id): ?Municipality
-    {
-        return $this->model->find($id);
-    }
-
     public function create(array $attributes): Municipality
     {
         /** @var Municipality $municipality */
         $municipality = $this->model->create($attributes);
 
         return $municipality;
-    }
-
-    public function update(Municipality $municipality, array $attributes): Municipality
-    {
-        $municipality->update($attributes);
-
-        return $municipality;
-    }
-
-    public function delete(Municipality $municipality): bool
-    {
-        return $municipality->delete();
-    }
+    } 
 
     public function attachNeighborhoods(Municipality $municipality, array $neighborhoodIds): void
     {
-        $municipality->neighborhoods()->attach($neighborhoodIds);
+        Neighborhood::whereIn('id', $neighborhoodIds)->update(['municipality_id' => $municipality->id]);
     }
 
     public function syncNeighborhoods(Municipality $municipality, array $neighborhoodIds): void
     {
-        $municipality->neighborhoods()->sync($neighborhoodIds);
+        // 1. Unset municipality_id for neighborhoods that are no longer associated
+        $municipality->neighborhoods()->whereNotIn('id', $neighborhoodIds)->update(['municipality_id' => null]);
+
+        // 2. Set municipality_id for the new list of neighborhoods
+        Neighborhood::whereIn('id', $neighborhoodIds)->update(['municipality_id' => $municipality->id]);
     }
 }

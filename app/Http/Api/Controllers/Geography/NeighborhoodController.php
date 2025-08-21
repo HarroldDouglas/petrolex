@@ -4,7 +4,7 @@ namespace App\Http\Api\Controllers\Geography;
 
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\Neighborhood;
+use App\Models\Geography\Neighborhood;
 use App\Services\Geography\NeighborhoodService;
 use Illuminate\Http\Request;
 
@@ -33,7 +33,7 @@ class NeighborhoodController extends Controller
         $neighborhood = $this->neighborhoodService->find($neighborhoodId);
 
         return ApiResponse::success(
-            data: ['id' => $neighborhood->id, 'name' => $neighborhood->name, 'city_id' => $neighborhood->city_id],
+            data: ['id' => $neighborhood->id, 'name' => $neighborhood->name, 'city_id' => $neighborhood->municipality->city->id],
             message: 'Neighborhood retrieved successfully.'
         );
     }

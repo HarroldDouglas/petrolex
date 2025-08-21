@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Municipality;
 
-use App\Models\City;
-use App\Models\Municipality;
-use App\Models\Neighborhood;
+use App\Models\Geography\City;
+use App\Models\Geography\Municipality;
+use App\Models\Geography\Neighborhood;
 use App\Services\Geography\CityService;
 use App\Services\Geography\MunicipalityService;
 use App\Services\Geography\NeighborhoodService;
@@ -23,6 +23,10 @@ class MunicipalityForm extends Component
     public array $cities = [];
 
     public array $neighborhoods = [];
+
+    public CityService $cityService;
+    public NeighborhoodService $neighborhoodService;
+    public MunicipalityService $municipalityService;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -55,7 +59,6 @@ class MunicipalityForm extends Component
             $this->selectedNeighborhoods = $this->municipality->neighborhoods->pluck('id')->toArray();
         }
 
-        // Load cities for Cameroon (assuming Cameroon is the default country)
         $this->cities = $this->cityService->getCitiesByCountry('Cameroon')->toArray();
 
         if ($this->cityId) {
@@ -65,7 +68,7 @@ class MunicipalityForm extends Component
 
     public function updatedCityId($value)
     {
-        $this->selectedNeighborhoods = []; // Reset selected neighborhoods when city changes
+        $this->selectedNeighborhoods = [];
         $this->loadNeighborhoods();
     }
 

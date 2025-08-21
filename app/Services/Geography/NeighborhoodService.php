@@ -2,11 +2,11 @@
 
 namespace App\Services\Geography;
 
-use App\Models\Neighborhood;
+use App\Models\Geography\Neighborhood;
 use App\Repositories\Contracts\NeighborhoodRepositoryInterface;
-use App\Services\BaseService;
+use App\Services\BaseServiceForEntity;
 
-class NeighborhoodService extends BaseService
+class NeighborhoodService extends BaseServiceForEntity
 {
     public function __construct(protected NeighborhoodRepositoryInterface $neighborhoodRepository)
     {
@@ -33,7 +33,7 @@ class NeighborhoodService extends BaseService
      */
     public function find(int $neighborhoodId): Neighborhood
     {
-        /** @var Neighborhood $neighborhood */
+        /** @var Neighborhood|null $neighborhood */
         $neighborhood = $this->neighborhoodRepository->find($neighborhoodId);
 
         if (! $neighborhood) {

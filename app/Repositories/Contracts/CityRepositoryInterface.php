@@ -2,10 +2,9 @@
 
 namespace App\Repositories\Contracts;
 
-use App\Models\City;
+use App\Models\Geography\City;
 
 interface CityRepositoryInterface extends BaseRepositoryInterface
 {
-    public function find(int $id): ?City;
     public function findByCountry(string $country): \Illuminate\Database\Eloquent\Collection;
 }
