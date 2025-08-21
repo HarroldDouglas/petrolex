@@ -44,6 +44,8 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self PAYMENTS_MANAGE()
  * @method static self REPORTS_MANAGE()
  * @method static self GAS_MANAGE()
+ * @method static self MUNICIPALITIES_VIEW()
+ * @method static self MUNICIPALITIES_CREATE()
  * @method static self COMMENTS_VIEW()
  * @method static self COMMENTS_MANAGE()
  * @method static self MOBILE_ACCESS()
@@ -126,6 +128,10 @@ class PermissionEnum extends Enum
             'DELIVERY_TRACK_LOCATION' => 'delivery.track_location',
             'PROFILE_EDIT' => 'profile.edit',
             'HISTORY_VIEW_OWN' => 'history.view_own',
+
+            // MUNICIPALITIES
+            'MUNICIPALITIES_VIEW' => 'municipalities.view',
+            'MUNICIPALITIES_CREATE' => 'municipalities.create',
         ];
     }
 }

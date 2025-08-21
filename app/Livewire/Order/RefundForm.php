@@ -42,7 +42,7 @@ class RefundForm extends Component
         $this->order = $order;
         $this->availablePaymentMethods = [
             PaymentMethod::ORANGE_MONEY()->value => PaymentMethod::ORANGE_MONEY()->label,
-            PaymentMethod::MOBILE_MONEY()->value => PaymentMethod::MOBILE_MONEY()->label,
+            PaymentMethod::MTN_MONEY()->value => PaymentMethod::MTN_MONEY()->label,
         ];
     }
 
