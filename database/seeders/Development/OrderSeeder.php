@@ -904,7 +904,7 @@ class OrderSeeder extends Seeder
     {
         return match ($paymentMethod) {
             PaymentMethod::ORANGE_MONEY() => $this->generateOrangeMoneyReference($paymentDate),
-            PaymentMethod::MOBILE_MONEY() => $this->generateMobileMoneyReference(),
+            PaymentMethod::MTN_MONEY() => $this->generateMobileMoneyReference(),
             PaymentMethod::CREDIT_CARD() => $this->generateCreditCardReference(),
             default => 'PAY-'.strtoupper(substr(md5(uniqid()), 0, 10))
         };
