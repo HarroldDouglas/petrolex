@@ -1,23 +1,5 @@
 {
     "openapi": "3.0.0",
-    "info": {
-        "title": "API Documentation",
-        "description": "Documentation de l'API",
-        "contact": {
-            "email": "contact@example.com"
-        },
-        "version": "1.0.0"
-    },
-    "servers": [
-        {
-            "url": "http://localhost:8000",
-            "description": "Local Development Server"
-        },
-        {
-            "url": "https://api.example.com",
-            "description": "Production Server"
-        }
-    ],
     "paths": {
         "/user": {
             "get": {
@@ -4578,13 +4560,6 @@
                     }
                 },
                 "type": "object"
-            }
-        },
-        "securitySchemes": {
-            "bearerAuth": {
-                "type": "http",
-                "bearerFormat": "JWT",
-                "scheme": "bearer"
             }
         }
     },
