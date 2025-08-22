@@ -33,11 +33,15 @@ use OpenApi\Annotations as OA;
  *         @OA\JsonContent(
  *
  *             @OA\Property(property="_metadata", type="object",
- *                 @OA\Property(property="success", type="boolean", example=true),
- *                 @OA\Property(property="message", type="string", example="OTP verified successfully.")
+ *                 properties={
+ *                     @OA\Property(property="success", type="boolean", example=true),
+ *                     @OA\Property(property="message", type="string", example="OTP verified successfully.")
+ *                 }
  *             ),
  *             @OA\Property(property="data", type="object",
- *                 @OA\Property(property="identifier", type="string", example="jean.dupont@example.com")
+ *                 properties={
+ *                     @OA\Property(property="identifier", type="string", example="jean.dupont@example.com")
+ *                 }
  *             )
  *         )
  *     ),

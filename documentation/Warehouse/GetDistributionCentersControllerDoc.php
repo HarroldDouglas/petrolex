@@ -5,7 +5,6 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(
  *     schema="DistributionCenterData",
- *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Centre Principal"),
  *     @OA\Property(property="country", type="string", example="Cameroun"),
@@ -20,29 +19,23 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="is_active", type="boolean", example=true),
  *     @OA\Property(property="storage_capacity", type="string", nullable=true, example=null),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T14:47:11.000000Z"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T14:47:11.000000Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T14:47:11.000000Z")
  * )
  *
  * @OA\Schema(
  *     schema="DistributionCentersResponse",
- *     allOf={
- *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
- *         @OA\Schema(
- *
- *             @OA\Property(
- *                 property="data",
- *                 type="array",
- *
- *                 @OA\Items(ref="#/components/schemas/DistributionCenterData")
- *             ),
- *
- *             @OA\Property(
- *                 property="message",
- *                 type="string",
- *                 example="Liste des centres de distribution récupérée avec succès"
- *             )
- *         )
- *     }
+ *     type="object",
+ *     @OA\Property(
+ *         property="_metadata",
+ *         type="object",
+ *         @OA\Property(property="success", type="boolean", example=true),
+ *         @OA\Property(property="message", type="string", example="Liste des centres de distribution récupérée avec succès")
+ *     ),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/DistributionCenterData")
+ *     )
  * )
  *
  * @OA\Get(
@@ -51,27 +44,20 @@ use OpenApi\Annotations as OA;
  *     description="Récupérer la liste de tous les centres de distribution.",
  *     operationId="api.distribution-centers.index",
  *     tags={"Centres de Distribution"},
- *
  *     security={{"bearerAuth":{}}},
- *
  *     @OA\Response(
  *         response=200,
  *         description="Liste récupérée avec succès",
- *
  *         @OA\JsonContent(ref="#/components/schemas/DistributionCentersResponse")
  *     ),
- *
  *     @OA\Response(
  *         response=401,
  *         description="Non autorisé",
- *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
- *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur interne du serveur",
- *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )
