@@ -94,7 +94,10 @@ class OtpService implements OtpServiceInterface
 
         if ($storedOtp === $otp) {
             $this->invalidateOtp($identifier);
-
+            $customer = $this->userRepository->findByEmailOrPhone($identifier);
+            if ($customer) {
+                $this->userRepository->update($customer, ['is_active' => true]);
+            }
             return true;
         }
 

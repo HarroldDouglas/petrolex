@@ -16,17 +16,15 @@ class StoreCustomerRequest extends BaseUserRequest
         $rules = parent::rules();
 
         unset($rules['role']);
-
-        $rules['current_balance'] = ['nullable', 'numeric', 'min:0'];
-
+        unset($rules['is_active']);
+        unset($rules['address']);
+        
         return $rules;
     }
 
     public function messages(): array
     {
         $messages = parent::messages();
-        $messages['current_balance.numeric'] = 'Le solde actuel doit être un nombre';
-        $messages['current_balance.min'] = 'Le solde actuel doit être supérieur ou égal à 0';
 
         return $messages;
     }
