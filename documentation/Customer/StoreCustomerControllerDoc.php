@@ -29,8 +29,6 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(property="email", type="string", format="email", example="jean.dupont@example.com"),
  *             @OA\Property(property="phone_number", type="string", example="+237677123456"),
  *             @OA\Property(property="password", type="string", format="password", example="password123"),
- *             @OA\Property(property="address", type="string", nullable=true, example="123 Rue Principale, Douala"),
- *             @OA\Property(property="current_balance", type="number", format="float", nullable=true, example=0.0)
  *         )
  *     ),
  *
