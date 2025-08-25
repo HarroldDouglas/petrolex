@@ -638,17 +638,6 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "password123"
-                                    },
-                                    "address": {
-                                        "type": "string",
-                                        "example": "123 Rue Principale, Douala",
-                                        "nullable": true
-                                    },
-                                    "current_balance": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 0,
-                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
