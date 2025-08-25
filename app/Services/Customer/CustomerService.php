@@ -47,6 +47,7 @@ class CustomerService extends BaseServiceWithMedia
         return $this->executeInTransaction(function () use ($attributes) {
             $attributes = array_merge($attributes, [
                 'role' => UserRole::CUSTOMER(),
+                'is_active' => false,
             ]);
             /** @var User $user */
             $user = $this->userService->createWithMedia($attributes);
