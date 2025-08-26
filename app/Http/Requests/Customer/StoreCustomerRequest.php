@@ -18,7 +18,7 @@ class StoreCustomerRequest extends BaseUserRequest
         unset($rules['role']);
         unset($rules['is_active']);
         unset($rules['address']);
-        
+
         return $rules;
     }
 

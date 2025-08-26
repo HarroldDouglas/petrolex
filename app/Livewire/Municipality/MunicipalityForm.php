@@ -2,9 +2,7 @@
 
 namespace App\Livewire\Municipality;
 
-use App\Models\Geography\City;
 use App\Models\Geography\Municipality;
-use App\Models\Geography\Neighborhood;
 use App\Services\Geography\CityService;
 use App\Services\Geography\MunicipalityService;
 use App\Services\Geography\NeighborhoodService;

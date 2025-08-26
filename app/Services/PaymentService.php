@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use App\Contracts\PaymentGateway;
-use App\Models\Order;
-use App\Models\OrderPayment;
 use App\DTOs\PaymentCallbackData;
 use App\DTOs\PaymentResponse;
+use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
-use App\Enums\OrderStatus;
+use App\Models\Order;
+use App\Models\OrderPayment;
 use Illuminate\Support\Facades\DB;
 
 class PaymentService
@@ -90,7 +89,7 @@ class PaymentService
         $payment = OrderPayment::where('payment_reference', $reference)->first();
 
         if (! $payment) {
-            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException())->setModel(OrderPayment::class, [$reference]);
+            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(OrderPayment::class, [$reference]);
         }
 
         return $payment;

@@ -13,13 +13,14 @@ class MunicipalityRepository extends BaseEloquentRepository implements Municipal
     {
         parent::__construct($model);
     }
+
     public function create(array $attributes): Municipality
     {
         /** @var Municipality $municipality */
         $municipality = $this->model->create($attributes);
 
         return $municipality;
-    } 
+    }
 
     public function attachNeighborhoods(Municipality $municipality, array $neighborhoodIds): void
     {

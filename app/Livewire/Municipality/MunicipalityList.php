@@ -28,7 +28,7 @@ class MunicipalityList extends Component
     {
         $municipalities = Municipality::query()
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%'. $this->search .'%');
+                $query->where('name', 'like', '%'.$this->search.'%');
             })
             ->paginate(10);
 

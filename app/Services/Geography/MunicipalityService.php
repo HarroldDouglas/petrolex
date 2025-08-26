@@ -26,8 +26,8 @@ class MunicipalityService extends BaseServiceForEntity
     /**
      * Find a municipality by its ID.
      *
-     * @param  int  $municipalityId
      * @return Municipality The found municipality model.
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If the municipality is not found.
      */
     public function find(int $municipalityId): Municipality
@@ -36,7 +36,7 @@ class MunicipalityService extends BaseServiceForEntity
         $municipality = $this->municipalityRepository->find($municipalityId);
 
         if (! $municipality) {
-            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException())->setModel(Municipality::class, [$municipalityId]);
+            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(Municipality::class, [$municipalityId]);
         }
 
         return $municipality;
@@ -44,10 +44,6 @@ class MunicipalityService extends BaseServiceForEntity
 
     /**
      * Create a new municipality.
-     *
-     * @param  array  $attributes
-     * @param  array  $neighborhoodIds
-     * @return Municipality
      */
     public function createMunicipality(array $attributes, array $neighborhoodIds = []): Municipality
     {
@@ -63,11 +59,6 @@ class MunicipalityService extends BaseServiceForEntity
 
     /**
      * Update an existing municipality.
-     *
-     * @param  Municipality  $municipality
-     * @param  array  $attributes
-     * @param  array  $neighborhoodIds
-     * @return Municipality
      */
     public function updateMunicipality(Municipality $municipality, array $attributes, array $neighborhoodIds = []): Municipality
     {
@@ -85,9 +76,6 @@ class MunicipalityService extends BaseServiceForEntity
 
     /**
      * Delete a municipality.
-     *
-     * @param  Municipality  $municipality
-     * @return bool
      */
     public function deleteMunicipality(Municipality $municipality): bool
     {

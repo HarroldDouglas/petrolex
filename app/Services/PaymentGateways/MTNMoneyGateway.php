@@ -3,10 +3,10 @@
 namespace App\Services\PaymentGateways;
 
 use App\Contracts\PaymentGateway;
-use App\Models\OrderPayment;
-use App\DTOs\PaymentResponse;
 use App\DTOs\PaymentCallbackData;
+use App\DTOs\PaymentResponse;
 use App\Enums\PaymentStatus;
+use App\Models\OrderPayment;
 
 class MTNMoneyGateway implements PaymentGateway
 {
