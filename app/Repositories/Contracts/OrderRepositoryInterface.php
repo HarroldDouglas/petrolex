@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Contracts;
 
-use App\DTOs\Order\AddCustomerCommentToOrderDTO;
 use App\Exceptions\OrderNotFoundException;
 use App\Models\Order;
 use App\Models\Refund;

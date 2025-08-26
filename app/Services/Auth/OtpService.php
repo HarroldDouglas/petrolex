@@ -98,6 +98,7 @@ class OtpService implements OtpServiceInterface
             if ($customer) {
                 $this->userRepository->update($customer, ['is_active' => true]);
             }
+
             return true;
         }
 

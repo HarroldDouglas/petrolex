@@ -29,7 +29,7 @@ final class CustomerOrdersTest extends TestCase
 
         $response = $this->postJson(route('api.login'), [
             'login' => $this->adminUser->email,
-            'password' => 'password', 
+            'password' => 'password',
         ]);
         $this->authToken = $response->json('data.access_token');
     }
@@ -63,8 +63,8 @@ final class CustomerOrdersTest extends TestCase
                         'status',
                         'total_amount',
                         // Add other order fields as needed
-                    ]
-                ]
+                    ],
+                ],
             ])
             ->assertJsonPath('_metadata.success', true);
 

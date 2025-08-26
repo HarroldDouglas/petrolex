@@ -16,7 +16,6 @@ class NeighborhoodService extends BaseServiceForEntity
     /**
      * Get all neighborhoods for a given city.
      *
-     * @param  int  $cityId
      * @return \Illuminate\Database\Eloquent\Collection|Neighborhood[]
      */
     public function getNeighborhoodsByCity(int $cityId)
@@ -27,8 +26,8 @@ class NeighborhoodService extends BaseServiceForEntity
     /**
      * Find a neighborhood by its ID.
      *
-     * @param  int  $neighborhoodId
      * @return Neighborhood The found neighborhood model.
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If the neighborhood is not found.
      */
     public function find(int $neighborhoodId): Neighborhood
@@ -37,7 +36,7 @@ class NeighborhoodService extends BaseServiceForEntity
         $neighborhood = $this->neighborhoodRepository->find($neighborhoodId);
 
         if (! $neighborhood) {
-            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException())->setModel(Neighborhood::class, [$neighborhoodId]);
+            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(Neighborhood::class, [$neighborhoodId]);
         }
 
         return $neighborhood;

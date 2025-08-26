@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\DTOs\Order\AddCustomerCommentToOrderDTO;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Exceptions\OrderNotFoundException;

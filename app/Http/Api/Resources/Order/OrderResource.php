@@ -2,8 +2,8 @@
 
 namespace App\Http\Api\Resources\Order;
 
-use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Http\Api\Resources\CustomerResource;
+use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
