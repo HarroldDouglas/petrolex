@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Contracts\PaymentGateway;
-use App\Services\PaymentGateways\{OrangeMoneyGateway, MTNMoneyGateway, CreditCardGateway};
+use App\Services\PaymentGateways\CreditCardGateway;
+use App\Services\PaymentGateways\MTNMoneyGateway;
+use App\Services\PaymentGateways\OrangeMoneyGateway;
 
 class PaymentGatewayFactory
 {
@@ -12,9 +14,9 @@ class PaymentGatewayFactory
     public function __construct()
     {
         $this->gateways = [
-            new OrangeMoneyGateway(),
-            new MTNMoneyGateway(),
-            new CreditCardGateway(),
+            new OrangeMoneyGateway,
+            new MTNMoneyGateway,
+            new CreditCardGateway,
         ];
     }
 
@@ -26,6 +28,6 @@ class PaymentGatewayFactory
             }
         }
 
-        throw new \InvalidArgumentException("Unsupported payment method: {\$paymentMethod}");
+        throw new \InvalidArgumentException('Unsupported payment method: {$paymentMethod}');
     }
 }

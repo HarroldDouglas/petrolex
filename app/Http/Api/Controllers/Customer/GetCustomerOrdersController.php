@@ -15,7 +15,7 @@ class GetCustomerOrdersController extends Controller
         protected CustomerService $customerService
     ) {}
 
-     /**
+    /**
      * Get customer orders with optional filters.
      *
      * Route: GET customers/{customer}/orders

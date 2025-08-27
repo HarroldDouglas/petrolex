@@ -4,22 +4,34 @@ namespace App\Http\Api\Responses;
 
 class OtpResponse extends ApiResponse
 {
-    public static function otpSent(string $identifier): self
+    public static function otpSent(string $identifier, ?string $token = null): self
     {
+        $data = [
+            'identifier' => $identifier,
+        ];
+        
+        if ($token) {
+            $data['reset_token'] = $token;
+        }
+        
         return new self(
-            [
-                'identifier' => $identifier,
-            ],
+            $data,
             'OTP sent successfully for verification.'
         );
     }
 
-    public static function otpVerified(string $identifier): self
+    public static function otpVerified(string $identifier, ?string $token = null): self
     {
+        $data = [
+            'identifier' => $identifier,
+        ];
+        
+        if ($token) {
+            $data['reset_token'] = $token;
+        }
+        
         return new self(
-            [
-                'identifier' => $identifier,
-            ],
+            $data,
             'OTP verified successfully.'
         );
     }

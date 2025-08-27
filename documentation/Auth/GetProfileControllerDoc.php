@@ -6,10 +6,13 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Get(
- *     path="/user",
+ *     path="/api/user",
  *     operationId="getProfile",
- *     summary="Get user profile",
+ *     summary="Récupérer le profil de l'utilisateur authentifié",
+ *     description="Récupérer le profil de l'utilisateur authentifié",
+ *     operationId="api.get-profile",
  *     tags={"Authentification"},
+ *     security={{"bearerAuth":{}}},
  *     @OA\Response(
  *         response=200,
  *         description="User profile",

@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Endpoints;
 
-use App\Models\Order;
-use App\Models\User;
 use App\Models\Customer;
 use App\Models\DistributionCenter;
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 final class OrderCustomerFeedbackTest extends TestCase
@@ -18,8 +17,6 @@ final class OrderCustomerFeedbackTest extends TestCase
 
     private User $adminUser;
     private string $authToken;
-
-    
 
     protected function setUp(): void
     {
@@ -74,8 +71,8 @@ final class OrderCustomerFeedbackTest extends TestCase
                 ],
                 'data' => [],
             ])
-           ->assertJsonPath('_metadata.success', true)
-           ->assertJsonPath('_metadata.message', 'Commentaire ajouté à la commande avec succès');
+            ->assertJsonPath('_metadata.success', true)
+            ->assertJsonPath('_metadata.message', 'Commentaire ajouté à la commande avec succès');
 
         // Assert that the order in the database has been updated
         $this->assertDatabaseHas('orders', [

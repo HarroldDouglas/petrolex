@@ -16,7 +16,6 @@ class CityService extends BaseServiceForEntity
     /**
      * Get all cities for a given country.
      *
-     * @param  string  $country
      * @return \Illuminate\Database\Eloquent\Collection|City[]
      */
     public function getCitiesByCountry(string $country)
@@ -27,8 +26,8 @@ class CityService extends BaseServiceForEntity
     /**
      * Find a city by its ID.
      *
-     * @param  int  $cityId
      * @return City The found city model.
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If the city is not found.
      */
     public function find(int $cityId): City
@@ -37,7 +36,7 @@ class CityService extends BaseServiceForEntity
         $city = $this->cityRepository->find($cityId);
 
         if (! $city) {
-            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException())->setModel(City::class, [$cityId]);
+            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(City::class, [$cityId]);
         }
 
         return $city;

@@ -8,7 +8,7 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/api/verify-otp",
  *     summary="Vérifier le code OTP",
- *     description="Vérifie le code OTP envoyé à l'utilisateur et marque son compte comme vérifié.",
+ *     description="Vérifie le code OTP envoyé à l'utilisateur, marque son compte comme vérifié et retourne un token de réinitialisation de mot de passe.",
  *     operationId="api.verify-otp",
  *     tags={"Authentification"},
  *
@@ -40,7 +40,8 @@ use OpenApi\Annotations as OA;
  *             ),
  *             @OA\Property(property="data", type="object",
  *                 properties={
- *                     @OA\Property(property="identifier", type="string", example="jean.dupont@example.com")
+ *                     @OA\Property(property="identifier", type="string", example="jean.dupont@example.com"),
+ *                     @OA\Property(property="reset_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImplYW4uZHVwb250QGV4YW1wbGUuY29tIiwiZXhwIjoxNzM0NTY3ODAwLCJpYXQiOjE3MzQ1Njc0MDAsImlzcyI6IlBldHJvbGV4In0.signature")
  *                 }
  *             )
  *         )

@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Api\Controllers\Geography\CityController;
-use App\Http\Api\Controllers\Geography\NeighborhoodController;
 use App\Http\Api\Controllers\Geography\MunicipalityController;
+use App\Http\Api\Controllers\Geography\NeighborhoodController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('geography')->name('api.geography.')->group(function () {

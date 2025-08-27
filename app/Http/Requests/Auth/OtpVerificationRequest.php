@@ -24,6 +24,7 @@ class OtpVerificationRequest extends FormRequest
     public function rules()
     {
         return [
+            'identifier' => 'required|string',
             'otp' => 'required|digits:6',
         ];
     }
@@ -36,6 +37,7 @@ class OtpVerificationRequest extends FormRequest
     public function messages()
     {
         return [
+            'identifier.required' => __('auth.identifier_required'),
             'otp.required' => __('auth.otp_required'),
             'otp.digits' => __('auth.otp_digits'),
         ];

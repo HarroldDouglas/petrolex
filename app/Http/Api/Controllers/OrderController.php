@@ -2,12 +2,12 @@
 
 namespace App\Http\Api\Controllers;
 
+use App\Enums\PaymentMethod;
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Services\PaymentService;
-use App\Enums\PaymentMethod;
 use App\Models\OrderPayment;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +29,7 @@ class OrderController extends Controller
             'delivery_address_id' => ['required', 'exists:customer_delivery_addresses,id'],
         ]);
 
-        return DB::transaction(function() use ($request) {
+        return DB::transaction(function () use ($request) {
             // 1. Créer la commande (Logique à implémenter ou à appeler d'un service existant)
             // Pour l'exemple, je vais créer une commande simple
             $order = Order::create([
