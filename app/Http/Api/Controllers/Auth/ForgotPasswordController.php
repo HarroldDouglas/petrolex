@@ -27,7 +27,6 @@ class ForgotPasswordController extends Controller
         $token = $request->input('token');
         $newPassword = $request->input('password');
 
-        // Verify the reset token
         $tokenData = $this->otpService->verifyResetToken($token);
         
         if (!$tokenData) {
@@ -37,7 +36,6 @@ class ForgotPasswordController extends Controller
             );
         }
 
-        // Reset the password
         $success = $this->userService->resetPassword($tokenData['email'], $newPassword);
         
         if (!$success) {

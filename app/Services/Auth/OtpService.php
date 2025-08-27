@@ -19,6 +19,7 @@ class OtpService implements OtpServiceInterface
     private const OTP_CACHE_PREFIX = 'otp_';
     private const SMS_MESSAGE_TEMPLATE = 'Votre code de vérification est %s. Ce code expirera dans 10 minutes.';
     private const RESET_TOKEN_TTL_MINUTES = 10;
+    private const SECONDS_PER_MINUTE = 60;
 
     public function __construct(
         private UserRepositoryInterface $userRepository,
@@ -219,7 +220,7 @@ class OtpService implements OtpServiceInterface
         $payload = [
             'user_id' => $user->id,
             'email' => $user->email,
-            'exp' => time() + (self::RESET_TOKEN_TTL_MINUTES * 60), // 10 minutes from now
+            'exp' => time() + (self::RESET_TOKEN_TTL_MINUTES * self::SECONDS_PER_MINUTE),
             'iat' => time(),
             'iss' => config('app.name'),
         ];
