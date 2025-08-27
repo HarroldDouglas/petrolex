@@ -252,12 +252,10 @@ class OtpService implements OtpServiceInterface
                 return null;
             }
 
-            // Check if token has expired
             if ($decodedPayload['exp'] < time()) {
                 return null;
             }
 
-            // Verify signature
             $expectedSignature = base64_encode(hash_hmac('sha256', "{$header}.{$payload}", config('app.key'), true));
             
             if (!hash_equals($signature, $expectedSignature)) {
