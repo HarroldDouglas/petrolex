@@ -60,4 +60,21 @@ interface OtpServiceInterface
      * @return string Masked identifier (e.g. j***@e***le.com or +123****890)
      */
     public function maskIdentifier(string $identifier): string;
+
+    /**
+     * Verify OTP and return a reset token for password reset
+     *
+     * @param  string  $identifier  User's email or phone number
+     * @param  string  $otp  OTP code to verify
+     * @return string|null Reset token if OTP is valid, null otherwise
+     */
+    public function verifyOtpWithToken(string $identifier, string $otp): ?string;
+
+    /**
+     * Verify a reset token and return decoded data
+     *
+     * @param  string  $token  The reset token to verify
+     * @return array|null Decoded token data or null if invalid
+     */
+    public function verifyResetToken(string $token): ?array;
 }
