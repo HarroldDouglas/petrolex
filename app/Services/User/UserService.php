@@ -143,7 +143,7 @@ class UserService extends BaseServiceWithMedia
     public function updatePassword(User $user, UpdatePasswordDTO $dto): bool
     {
         if (! Hash::check($dto->old_password, $user->password)) {
-            throw new \Exception('L\'ancien mot de passe est iold_passwordncorrect.');
+            throw new \Exception('L\'ancien mot de passe est incorrect.');
         }
 
         $updated = (bool) $this->userRepository->update($user, [
