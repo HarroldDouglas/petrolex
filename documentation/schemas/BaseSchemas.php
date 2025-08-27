@@ -43,10 +43,28 @@ use OpenApi\Annotations as OA;
  *                 property="data",
  *                 type="object",
  *                 description="Détail des erreurs de validation",
- *                 @OA\Property(property="field_name", ref="#/components/schemas/ValidationErrorDetail")
+ *                 properties={
+ *                     @OA\Property(property="field_name", ref="#/components/schemas/ValidationErrorDetail")
+ *                 }
  *             )
  *         )
  *     }
+ * )
+ *
+ * @OA\Schema(
+ *     schema="User",
+ *     title="User",
+ *     description="User data",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="first_name", type="string", example="Jean"),
+ *     @OA\Property(property="last_name", type="string", example="Dupont"),
+ *     @OA\Property(property="email", type="string", format="email", example="jean.dupont@example.com"),
+ *     @OA\Property(property="phone_number", type="string", example="+237677123456"),
+ *     @OA\Property(property="address", type="string", nullable=true, example="123 Rue Principale, Douala"),
+ *     @OA\Property(property="current_balance", type="number", format="float", example=1500.00),
+ *     @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true, example="2024-01-01T12:00:00Z"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T12:00:00Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T12:00:00Z")
  * )
  */
 class BaseSchemas {}

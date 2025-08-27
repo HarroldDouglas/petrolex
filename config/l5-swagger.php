@@ -315,7 +315,7 @@ return [
          * Constants which can be used in annotations
          */
         'constants' => [
-            'L5_SWAGGER_CONST_HOST' => env('APP_URL', 'http://localhost:8000'),
+            'L5_SWAGGER_CONST_HOST' => env('APP_URL', 'http://localhost:8000'), 
         ],
     ],
 ];

@@ -30,10 +30,14 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="payment_method", type="string", example="cash"),
  *     @OA\Property(property="total_amount", type="number", format="float", example=6000.00),
  *     @OA\Property(property="status", type="string", example="pending"),
- *     @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/OrderItemData")),
+ *     @OA\Property(property="items", type="array", 
+ *         @OA\Items(ref="#/components/schemas/OrderItemData")
+ *     ),
  *     @OA\Property(property="delivery_address", type="object",
- *         @OA\Property(property="id", type="integer", example=7),
- *         @OA\Property(property="name", type="string", example="place Guichard\n13682 Lelievre-la-Forêt, Cameroun")
+ *         properties={
+ *             @OA\Property(property="id", type="integer", example=7),
+ *             @OA\Property(property="name", type="string", example="place Guichard\n13682 Lelievre-la-Forêt, Cameroun")
+ *         }
  *     ),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-18T10:00:00Z"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-18T10:00:00Z")

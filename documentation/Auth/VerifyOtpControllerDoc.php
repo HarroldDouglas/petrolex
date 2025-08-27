@@ -33,12 +33,16 @@ use OpenApi\Annotations as OA;
  *         @OA\JsonContent(
  *
  *             @OA\Property(property="_metadata", type="object",
- *                 @OA\Property(property="success", type="boolean", example=true),
- *                 @OA\Property(property="message", type="string", example="OTP verified successfully.")
+ *                 properties={
+ *                     @OA\Property(property="success", type="boolean", example=true),
+ *                     @OA\Property(property="message", type="string", example="OTP verified successfully.")
+ *                 }
  *             ),
  *             @OA\Property(property="data", type="object",
- *                 @OA\Property(property="identifier", type="string", example="jean.dupont@example.com"),
- *                 @OA\Property(property="reset_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImplYW4uZHVwb250QGV4YW1wbGUuY29tIiwiZXhwIjoxNzM0NTY3ODAwLCJpYXQiOjE3MzQ1Njc0MDAsImlzcyI6IlBldHJvbGV4In0.signature")
+ *                 properties={
+ *                     @OA\Property(property="identifier", type="string", example="jean.dupont@example.com"),
+ *                     @OA\Property(property="reset_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImplYW4uZHVwb250QGV4YW1wbGUuY29tIiwiZXhwIjoxNzM0NTY3ODAwLCJpYXQiOjE3MzQ1Njc0MDAsImlzcyI6IlBldHJvbGV4In0.signature")
+ *                 }
  *             )
  *         )
  *     ),

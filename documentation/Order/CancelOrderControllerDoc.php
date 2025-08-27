@@ -34,8 +34,10 @@ use OpenApi\Annotations as OA;
  *         @OA\JsonContent(
  *
  *             @OA\Property(property="_metadata", type="object",
- *                 @OA\Property(property="success", type="boolean", example=true),
- *                 @OA\Property(property="message", type="string", example="Order cancelled successfully.")
+ *                 properties={
+ *                     @OA\Property(property="success", type="boolean", example=true),
+ *                     @OA\Property(property="message", type="string", example="Order cancelled successfully.")
+ *                 }
  *             ),
  *             @OA\Property(property="data", type="object", example={})
  *         )

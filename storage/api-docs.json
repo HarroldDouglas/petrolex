@@ -1,178 +1,13 @@
 {
     "openapi": "3.0.0",
-    "info": {
-        "title": "Petrolex API",
-        "description": "Documentation API pour Petrolex",
-        "contact": {
-            "email": "contact@example.com"
-        },
-        "version": "1.0"
-    },
-    "servers": [
-        {
-            "url": "http://localhost:8000",
-            "description": "API Server"
-        }
-    ],
     "paths": {
-        "/api/forgot-password": {
-            "post": {
-                "tags": [
-                    "Authentification"
-                ],
-                "summary": "Réinitialiser le mot de passe",
-                "description": "Réinitialiser le mot de passe de l'utilisateur en utilisant le token de réinitialisation obtenu après vérification OTP. Aucune authentification requise.",
-                "operationId": "api.forgot-password",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "token",
-                                    "password",
-                                    "password_confirmation"
-                                ],
-                                "properties": {
-                                    "token": {
-                                        "description": "Token de réinitialisation obtenu après vérification OTP",
-                                        "type": "string",
-                                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
-                                    },
-                                    "password": {
-                                        "description": "Nouveau mot de passe (minimum 8 caractères)",
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "nouveauMotDePasse123"
-                                    },
-                                    "password_confirmation": {
-                                        "description": "Confirmation du nouveau mot de passe",
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "nouveauMotDePasse123"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Mot de passe réinitialisé avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Mot de passe réinitialisé avec succès."
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "email": {
-                                                    "description": "Email de l'utilisateur dont le mot de passe a été réinitialisé",
-                                                    "type": "string",
-                                                    "example": "user@example.com"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Token invalide ou expiré",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": false
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Token de réinitialisation invalide ou expiré."
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreurs de validation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": false
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Échec de la réinitialisation du mot de passe."
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": []
-            }
-        },
-        "/api/user": {
+        "/user": {
             "get": {
                 "tags": [
                     "Authentification"
                 ],
-                "summary": "Récupérer le profil de l'utilisateur authentifié",
-                "description": "Récupérer le profil de l'utilisateur authentifié",
-                "operationId": "api.get-profile",
+                "summary": "Get user profile",
+                "operationId": "getProfile",
                 "responses": {
                     "200": {
                         "description": "User profile",
@@ -187,12 +22,7 @@
                     "401": {
                         "description": "Unauthenticated"
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/login": {
@@ -321,143 +151,6 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/resend-otp": {
-            "post": {
-                "tags": [
-                    "Authentification"
-                ],
-                "summary": "Renvoyer le code OTP",
-                "description": "Renvoyer un nouveau code OTP à l'utilisateur via son email. Aucune authentification requise.",
-                "operationId": "api.resend-otp",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "email"
-                                ],
-                                "properties": {
-                                    "email": {
-                                        "description": "Email de l'utilisateur",
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "user@example.com"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OTP renvoyé avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "OTP sent successfully for verification."
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "identifier": {
-                                                    "description": "Identifiant masqué de l'utilisateur (email ou téléphone)",
-                                                    "type": "string",
-                                                    "example": "u***@e***le.com"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Erreur de validation ou utilisateur non trouvé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": false
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Utilisateur non trouvé."
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreurs de validation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": false
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Echec lors de l'envoi de l'OTP. Veuillez réessayer plus tard."
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": []
             }
         },
         "/api/password": {
@@ -602,7 +295,7 @@
                     "Authentification"
                 ],
                 "summary": "Vérifier le code OTP",
-                "description": "Vérifie le code OTP envoyé à l'utilisateur, marque son compte comme vérifié et retourne un token de réinitialisation de mot de passe.",
+                "description": "Vérifie le code OTP envoyé à l'utilisateur et marque son compte comme vérifié.",
                 "operationId": "api.verify-otp",
                 "requestBody": {
                     "required": true,
@@ -653,10 +346,6 @@
                                                 "identifier": {
                                                     "type": "string",
                                                     "example": "jean.dupont@example.com"
-                                                },
-                                                "reset_token": {
-                                                    "type": "string",
-                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImplYW4uZHVwb250QGV4YW1wbGUuY29tIiwiZXhwIjoxNzM0NTY3ODAwLCJpYXQiOjE3MzQ1Njc0MDAsImlzcyI6IlBldHJvbGV4In0.signature"
                                                 }
                                             },
                                             "type": "object"
@@ -1034,6 +723,17 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "password123"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "123 Rue Principale, Douala",
+                                        "nullable": true
+                                    },
+                                    "current_balance": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0,
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -4860,13 +4560,6 @@
                     }
                 },
                 "type": "object"
-            }
-        },
-        "securitySchemes": {
-            "bearerAuth": {
-                "type": "http",
-                "bearerFormat": "JWT",
-                "scheme": "bearer"
             }
         }
     },

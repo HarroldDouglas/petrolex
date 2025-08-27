@@ -20,8 +20,10 @@ use OpenApi\Annotations as OA;
  *         @OA\JsonContent(
  *
  *             @OA\Property(property="_metadata", type="object",
- *                 @OA\Property(property="success", type="boolean", example=true),
- *                 @OA\Property(property="message", type="string", example="Liste des commandes récupérée avec succès.")
+ *                 properties={
+ *                     @OA\Property(property="success", type="boolean", example=true),
+ *                     @OA\Property(property="message", type="string", example="Liste des commandes récupérée avec succès.")
+ *                 }
  *             ),
  *             @OA\Property(property="data", type="array",
  *
