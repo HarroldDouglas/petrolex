@@ -143,7 +143,7 @@ class UserService extends BaseServiceWithMedia
     public function updatePassword(User $user, UpdatePasswordDTO $dto): bool
     {
         if (! Hash::check($dto->old_password, $user->password)) {
-            throw new \Exception('L\'ancien mot de passe est incorrect.');
+            throw new \Exception('L\'ancien mot de passe est iold_passwordncorrect.');
         }
 
         $updated = (bool) $this->userRepository->update($user, [
@@ -233,6 +233,32 @@ class UserService extends BaseServiceWithMedia
     public function markPhoneAsVerified(User $user): Model
     {
         return $this->userRepository->update($user, ['phone_verified_at' => now()]);
+    }
+
+    /**
+     * Reset user password by email
+     *
+     * @param  string  $email  User's email
+     * @param  string  $newPassword  New password
+     * @return bool Whether the password reset was successful
+     */
+    public function resetPassword(string $email, string $newPassword): bool
+    {
+        $user = $this->userRepository->findByEmail($email);
+        
+        if (!$user) {
+            return false;
+        }
+
+        $updated = (bool) $this->userRepository->update($user, [
+            'password' => Hash::make($newPassword),
+        ]);
+
+        if ($updated) {
+            Event::dispatch(new \App\Events\PasswordUpdatedEvent($user));
+        }
+
+        return $updated;
     }
 
     protected function getModel(): string
