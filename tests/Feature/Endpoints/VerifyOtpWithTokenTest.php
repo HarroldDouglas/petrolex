@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Services\Auth\OtpService;
 use App\Services\User\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 use Tests\TestCase;
 
 final class VerifyOtpWithTokenTest extends TestCase
@@ -26,7 +25,7 @@ final class VerifyOtpWithTokenTest extends TestCase
         // Create a user
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'is_active' => false
+            'is_active' => false,
         ]);
 
         // Mock the OtpService to return a valid token
@@ -43,7 +42,7 @@ final class VerifyOtpWithTokenTest extends TestCase
                 ->once()
                 ->with('test@example.com')
                 ->andReturn($user);
-            
+
             $mock->shouldReceive('markEmailAsVerified')
                 ->once()
                 ->with($user);
@@ -51,7 +50,7 @@ final class VerifyOtpWithTokenTest extends TestCase
 
         $response = $this->postJson('/api/verify-otp', [
             'identifier' => 'test@example.com',
-            'otp' => '123456'
+            'otp' => '123456',
         ]);
 
         $response->assertStatus(200)
@@ -74,7 +73,7 @@ final class VerifyOtpWithTokenTest extends TestCase
 
         $response = $this->postJson('/api/verify-otp', [
             'identifier' => 'test@example.com',
-            'otp' => '000000'
+            'otp' => '000000',
         ]);
 
         $response->assertStatus(400)
@@ -86,7 +85,7 @@ final class VerifyOtpWithTokenTest extends TestCase
     public function it_returns_error_for_missing_identifier(): void
     {
         $response = $this->postJson('/api/verify-otp', [
-            'otp' => '123456'
+            'otp' => '123456',
         ]);
 
         $response->assertStatus(422)
@@ -97,7 +96,7 @@ final class VerifyOtpWithTokenTest extends TestCase
     public function it_returns_error_for_missing_otp(): void
     {
         $response = $this->postJson('/api/verify-otp', [
-            'identifier' => 'test@example.com'
+            'identifier' => 'test@example.com',
         ]);
 
         $response->assertStatus(422)
@@ -109,7 +108,7 @@ final class VerifyOtpWithTokenTest extends TestCase
     {
         $response = $this->postJson('/api/verify-otp', [
             'identifier' => 'test@example.com',
-            'otp' => '12345' // Only 5 digits, should be 6
+            'otp' => '12345', // Only 5 digits, should be 6
         ]);
 
         $response->assertStatus(422)
@@ -121,7 +120,7 @@ final class VerifyOtpWithTokenTest extends TestCase
     {
         $response = $this->postJson('/api/verify-otp', [
             'identifier' => 'test@example.com',
-            'otp' => 'abcdef' // Non-numeric
+            'otp' => 'abcdef', // Non-numeric
         ]);
 
         $response->assertStatus(422)
@@ -149,7 +148,7 @@ final class VerifyOtpWithTokenTest extends TestCase
 
         $response = $this->postJson('/api/verify-otp', [
             'identifier' => 'nonexistent@example.com',
-            'otp' => '123456'
+            'otp' => '123456',
         ]);
 
         // Should still succeed since OTP was valid, but no user operations performed
@@ -164,7 +163,7 @@ final class VerifyOtpWithTokenTest extends TestCase
         // Create a user
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'is_active' => false
+            'is_active' => false,
         ]);
 
         // Mock the OtpService to return a valid token
@@ -181,7 +180,7 @@ final class VerifyOtpWithTokenTest extends TestCase
                 ->once()
                 ->with('test@example.com')
                 ->andReturn($user);
-            
+
             $mock->shouldReceive('markEmailAsVerified')
                 ->once()
                 ->with($user);
@@ -189,7 +188,7 @@ final class VerifyOtpWithTokenTest extends TestCase
 
         $response = $this->postJson('/api/verify-otp', [
             'identifier' => 'test@example.com',
-            'otp' => '123456'
+            'otp' => '123456',
         ]);
 
         $response->assertStatus(200)

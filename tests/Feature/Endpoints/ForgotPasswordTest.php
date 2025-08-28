@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Services\Auth\OtpService;
 use App\Services\User\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 use Tests\TestCase;
 
 final class ForgotPasswordTest extends TestCase
@@ -26,7 +25,7 @@ final class ForgotPasswordTest extends TestCase
         // Create a user
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => bcrypt('oldpassword123')
+            'password' => bcrypt('oldpassword123'),
         ]);
 
         // Mock the OtpService to return valid user data
@@ -39,7 +38,7 @@ final class ForgotPasswordTest extends TestCase
                     'email' => $user->email,
                     'exp' => time() + 3600, // 1 hour from now
                     'iat' => time(),
-                    'iss' => config('app.name')
+                    'iss' => config('app.name'),
                 ]);
         });
 
@@ -54,7 +53,7 @@ final class ForgotPasswordTest extends TestCase
         $response = $this->postJson('/api/forgot-password', [
             'token' => 'valid.token.here',
             'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123'
+            'password_confirmation' => 'newpassword123',
         ]);
 
         $response->assertStatus(200)
@@ -76,7 +75,7 @@ final class ForgotPasswordTest extends TestCase
         $response = $this->postJson('/api/forgot-password', [
             'token' => 'invalid.token.here',
             'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123'
+            'password_confirmation' => 'newpassword123',
         ]);
 
         $response->assertStatus(400)
@@ -97,14 +96,14 @@ final class ForgotPasswordTest extends TestCase
                     'email' => 'test@example.com',
                     'exp' => time() - 3600, // 1 hour ago (expired)
                     'iat' => time() - 7200,
-                    'iss' => config('app.name')
+                    'iss' => config('app.name'),
                 ]);
         });
 
         $response = $this->postJson('/api/forgot-password', [
             'token' => 'expired.token.here',
             'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123'
+            'password_confirmation' => 'newpassword123',
         ]);
 
         $response->assertStatus(500)
@@ -117,7 +116,7 @@ final class ForgotPasswordTest extends TestCase
     {
         $response = $this->postJson('/api/forgot-password', [
             'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123'
+            'password_confirmation' => 'newpassword123',
         ]);
 
         $response->assertStatus(422)
@@ -129,7 +128,7 @@ final class ForgotPasswordTest extends TestCase
     {
         $response = $this->postJson('/api/forgot-password', [
             'token' => 'valid.token.here',
-            'password_confirmation' => 'newpassword123'
+            'password_confirmation' => 'newpassword123',
         ]);
 
         $response->assertStatus(422)
@@ -142,7 +141,7 @@ final class ForgotPasswordTest extends TestCase
         $response = $this->postJson('/api/forgot-password', [
             'token' => 'valid.token.here',
             'password' => 'newpassword123',
-            'password_confirmation' => 'differentpassword123'
+            'password_confirmation' => 'differentpassword123',
         ]);
 
         $response->assertStatus(422)
@@ -155,7 +154,7 @@ final class ForgotPasswordTest extends TestCase
         $response = $this->postJson('/api/forgot-password', [
             'token' => 'valid.token.here',
             'password' => '123',
-            'password_confirmation' => '123'
+            'password_confirmation' => '123',
         ]);
 
         $response->assertStatus(422)
@@ -167,7 +166,7 @@ final class ForgotPasswordTest extends TestCase
     {
         // Create a user
         $user = User::factory()->create([
-            'email' => 'test@example.com'
+            'email' => 'test@example.com',
         ]);
 
         // Mock the OtpService to return valid user data
@@ -180,7 +179,7 @@ final class ForgotPasswordTest extends TestCase
                     'email' => $user->email,
                     'exp' => time() + 3600,
                     'iat' => time(),
-                    'iss' => config('app.name')
+                    'iss' => config('app.name'),
                 ]);
         });
 
@@ -195,7 +194,7 @@ final class ForgotPasswordTest extends TestCase
         $response = $this->postJson('/api/forgot-password', [
             'token' => 'valid.token.here',
             'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123'
+            'password_confirmation' => 'newpassword123',
         ]);
 
         $response->assertStatus(500)

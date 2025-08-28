@@ -7,6 +7,7 @@ use OpenApi\Annotations as OA;
  *     schema="PaymentMethod",
  *     title="Payment Method",
  *     description="Represents a single payment method",
+ *
  *     @OA\Property(
  *         property="value",
  *         type="string",
@@ -26,11 +27,14 @@ use OpenApi\Annotations as OA;
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
+ *
  *             @OA\Property(
  *                 property="data",
  *                 type="array",
+ *
  *                 @OA\Items(ref="#/components/schemas/PaymentMethod")
  *             ),
+ *
  *             @OA\Property(
  *                 property="message",
  *                 type="string",
@@ -47,19 +51,25 @@ use OpenApi\Annotations as OA;
  *     operationId="api.payment-methods.index",
  *     tags={"Paiement"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Liste récupérée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/PaymentMethodsResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non autorisé",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur interne du serveur",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

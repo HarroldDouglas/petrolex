@@ -7,6 +7,7 @@ use OpenApi\Annotations as OA;
  *     title="Petrolex API",
  *     version="1.0",
  *     description="Documentation API pour Petrolex",
+ *
  *     @OA\Contact(
  *         email="contact@example.com"
  *     )

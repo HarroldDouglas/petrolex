@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 /**
  * @mixin Customer
  *
- * @property int $id
+ * @property int $customer_id
  * @property string $first_name
  * @property string $last_name
  * @property string $full_name
@@ -43,7 +43,7 @@ class CustomerResource extends UserResource
         return array_merge(
             $userData,
             [
-                'id' => $customer->id, // Override user ID with customer ID
+                'customer_id' => $customer->id,
                 'deliveryAddresses' => CustomerDeliveryAddressResource::collection($customer->deliveryAddresses) ?? [],
                 'current_balance' => $customer->current_balance ?? null,
             ]

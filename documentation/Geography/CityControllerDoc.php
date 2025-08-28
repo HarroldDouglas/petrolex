@@ -6,6 +6,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="CityData",
  *     description="Informations sur une ville",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Douala"),
  *     @OA\Property(property="country_id", type="integer", example=1),
@@ -17,6 +18,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="CitiesResponse",
  *     type="object",
+ *
  *     @OA\Property(
  *         property="_metadata",
  *         type="object",
@@ -26,6 +28,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="data",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/CityData")
  *     )
  * )
@@ -37,26 +40,34 @@ use OpenApi\Annotations as OA;
  *     operationId="api.geography.countries.cities.index",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Parameter(
  *         name="country",
  *         in="path",
  *         required=true,
  *         description="ID du pays",
+ *
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Liste des villes récupérée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/CitiesResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=404,
  *         description="Pays non trouvé",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

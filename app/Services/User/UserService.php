@@ -245,8 +245,8 @@ class UserService extends BaseServiceWithMedia
     public function resetPassword(string $email, string $newPassword): bool
     {
         $user = $this->userRepository->findByEmail($email);
-        
-        if (!$user) {
+
+        if (! $user) {
             return false;
         }
 

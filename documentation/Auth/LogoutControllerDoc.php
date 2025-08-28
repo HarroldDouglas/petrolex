@@ -10,11 +10,14 @@ use OpenApi\Annotations as OA;
  *     operationId="api.logout",
  *     tags={"Authentification"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Déconnexion réussie",
+ *
  *         @OA\JsonContent(
  *             type="object",
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
@@ -28,11 +31,14 @@ use OpenApi\Annotations as OA;
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(
  *             type="object",
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",

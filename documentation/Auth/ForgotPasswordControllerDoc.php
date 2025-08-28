@@ -47,6 +47,7 @@ use OpenApi\Annotations as OA;
  *         description="Mot de passe réinitialisé avec succès",
  *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
@@ -71,6 +72,7 @@ use OpenApi\Annotations as OA;
  *         description="Token invalide ou expiré",
  *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
@@ -93,6 +95,7 @@ use OpenApi\Annotations as OA;
  *         description="Erreur interne du serveur",
  *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",

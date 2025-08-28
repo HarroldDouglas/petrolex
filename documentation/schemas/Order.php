@@ -30,9 +30,11 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="payment_method", type="string", example="cash"),
  *     @OA\Property(property="total_amount", type="number", format="float", example=6000.00),
  *     @OA\Property(property="status", type="string", example="pending"),
- *     @OA\Property(property="items", type="array", 
+ *     @OA\Property(property="items", type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/OrderItemData")
  *     ),
+ *
  *     @OA\Property(property="delivery_address", type="object",
  *         properties={
  *             @OA\Property(property="id", type="integer", example=7),

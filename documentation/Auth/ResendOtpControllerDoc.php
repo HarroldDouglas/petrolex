@@ -34,6 +34,7 @@ use OpenApi\Annotations as OA;
  *         description="OTP renvoyé avec succès",
  *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
@@ -46,6 +47,7 @@ use OpenApi\Annotations as OA;
  *                 @OA\Property(
  *                     property="identifier",
  *                     type="string",
+ *
  *                     example="u***@e***le.com",
  *                     description="Identifiant masqué de l'utilisateur (email ou téléphone)"
  *                 )
@@ -58,6 +60,7 @@ use OpenApi\Annotations as OA;
  *         description="Erreur de validation ou utilisateur non trouvé",
  *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
@@ -80,6 +83,7 @@ use OpenApi\Annotations as OA;
  *         description="Erreur interne du serveur",
  *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
