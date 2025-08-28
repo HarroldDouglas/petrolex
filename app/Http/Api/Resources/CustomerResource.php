@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 /**
  * @mixin Customer
  *
- * @property int $customer_id
+ * @property int $id
  * @property string $first_name
  * @property string $last_name
  * @property string $full_name
@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
  * @property string|null $last_login_at
  * @property string[] $roles
  * @property string $created_at
+ * @property int $customer_id
  * @property \App\Http\Resources\Customer\CustomerDeliveryAddressResource[] $deliveryAddresses
  * @property float|null $current_balance
  */

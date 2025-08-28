@@ -3309,6 +3309,11 @@
                     },
                     {
                         "properties": {
+                            "customer_id": {
+                                "description": "Unique identifier for the customer record",
+                                "type": "integer",
+                                "example": 1
+                            },
                             "deliveryAddresses": {
                                 "type": "array",
                                 "items": {
