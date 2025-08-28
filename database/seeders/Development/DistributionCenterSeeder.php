@@ -50,14 +50,14 @@ class DistributionCenterSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'Centre Nord',
+                'name' => 'Centre de Yaoundé',
                 'neighborhood_id' => $bastos->id ?? null,
                 'address' => '45 Avenue Nord, Yaoundé',
                 'description' => 'Centre de distribution pour la région du Nord',
                 'phone' => '+237623456789',
                 'email' => 'centre.nord@petrolex.cm',
-                'latitude' => 4.0622,
-                'longitude' => 9.7895,
+                'latitude' => 3.850,
+                'longitude' => 11.550,
                 'is_active' => true,
             ],
             [
@@ -67,8 +67,8 @@ class DistributionCenterSeeder extends Seeder
                 'description' => 'Centre de distribution pour la région du Sud',
                 'phone' => '+237634567890',
                 'email' => 'centre.sud@petrolex.cm',
-                'latitude' => 4.0433,
-                'longitude' => 9.7486,
+                'latitude' => 10.580,
+                'longitude' => 14.320,
                 'is_active' => true,
             ],
         ];
