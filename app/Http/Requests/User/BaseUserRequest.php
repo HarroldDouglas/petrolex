@@ -23,7 +23,8 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number' => [
                 'required',
                 'string',
-                'max:20',
+                'min:8',
+                'max:15',
                 Rule::unique('users', 'phone_number'),
             ],
             'password' => ['required', 'string', 'min:8'],
