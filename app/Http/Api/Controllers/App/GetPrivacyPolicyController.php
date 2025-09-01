@@ -16,11 +16,9 @@ class GetPrivacyPolicyController extends Controller
      */
     public function __invoke(): ApiResponse
     {
-        $htmlContent = Config::get('privacy.content');
-        
         return ApiResponse::success(
             data: [
-                'html_content' => $htmlContent,
+                'html_content' => Config::get('privacy.content')
             ],
             message: 'Politique de confidentialité récupérée avec succès.'
         );

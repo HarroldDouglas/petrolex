@@ -16,11 +16,10 @@ class GetTermsAndConditionsController extends Controller
      */
     public function __invoke(): ApiResponse
     {
-        $htmlContent = Config::get('terms.content');
         
         return ApiResponse::success(
             data: [
-                'html_content' => $htmlContent,
+                'html_content' => Config::get('terms.content'),
             ],
             message: 'Conditions d\'utilisation récupérées avec succès.'
         );
