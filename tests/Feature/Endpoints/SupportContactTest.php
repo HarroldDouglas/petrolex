@@ -21,12 +21,12 @@ final class SupportContactTest extends TestCase
             ->assertJsonStructure([
                 '_metadata' => [
                     'success',
-                    'message'
+                    'message',
                 ],
                 'data' => [
                     'phone_number',
-                    'email'
-                ]
+                    'email',
+                ],
             ])
             ->assertJsonPath('_metadata.success', true)
             ->assertJsonPath('_metadata.message', 'Informations de contact du support récupérées avec succès.');
@@ -60,7 +60,7 @@ final class SupportContactTest extends TestCase
         // Vérifier que le numéro de téléphone est présent et non vide
         $this->assertNotEmpty($phoneNumber);
         $this->assertIsString($phoneNumber);
-        
+
         // Vérifier qu'il contient des caractères typiques d'un numéro de téléphone
         $this->assertMatchesRegularExpression('/^[\+\d\s\-\(\)]+$/', $phoneNumber);
     }
@@ -89,8 +89,8 @@ final class SupportContactTest extends TestCase
             ->assertJson([
                 '_metadata' => [
                     'success' => true,
-                    'message' => 'Informations de contact du support récupérées avec succès.'
-                ]
+                    'message' => 'Informations de contact du support récupérées avec succès.',
+                ],
             ]);
 
         // Vérifier que les données obligatoires sont présentes

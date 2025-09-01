@@ -5,6 +5,7 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(
  *     schema="TermsAndConditionsData",
+ *
  *     @OA\Property(
  *         property="html_content",
  *         type="string",
@@ -30,6 +31,7 @@ use OpenApi\Annotations as OA;
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
+ *
  *             @OA\Property(
  *                 property="data",
  *                 ref="#/components/schemas/TermsAndConditionsData"
@@ -49,15 +51,20 @@ use OpenApi\Annotations as OA;
  *     description="Retourne les conditions d'utilisation de l'application au format HTML structuré",
  *     operationId="api.app.terms-and-conditions",
  *     tags={"App"},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Conditions d'utilisation récupérées avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/TermsAndConditionsResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur serveur",
+ *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",

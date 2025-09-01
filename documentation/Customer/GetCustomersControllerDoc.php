@@ -51,7 +51,6 @@ use OpenApi\Annotations as OA;
  *                 example=1,
  *                 description="Unique identifier for the customer record"
  *             ),
- *
  *             @OA\Property(
  *                 property="deliveryAddresses",
  *                 type="array",

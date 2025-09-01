@@ -21,13 +21,13 @@ final class TermsAndConditionsTest extends TestCase
             ->assertJsonStructure([
                 '_metadata' => [
                     'success',
-                    'message'
+                    'message',
                 ],
                 'data' => [
                     'html_content',
                     'last_updated',
-                    'sections'
-                ]
+                    'sections',
+                ],
             ])
             ->assertJsonPath('_metadata.success', true)
             ->assertJsonPath('_metadata.message', 'Conditions d\'utilisation récupérées avec succès.');
@@ -43,7 +43,7 @@ final class TermsAndConditionsTest extends TestCase
         $data = $response->json('data');
 
         $this->assertNotEmpty($data['html_content']);
-        
+
         $htmlContent = $data['html_content'];
         $this->assertStringContainsString('<h1 style=', $htmlContent, 'Le titre principal doit être présent');
         $this->assertStringContainsString('Conditions d\'utilisation', $htmlContent, 'Le titre doit contenir "Conditions d\'utilisation"');
@@ -92,8 +92,8 @@ final class TermsAndConditionsTest extends TestCase
             ->assertJson([
                 '_metadata' => [
                     'success' => true,
-                    'message' => 'Conditions d\'utilisation récupérées avec succès.'
-                ]
+                    'message' => 'Conditions d\'utilisation récupérées avec succès.',
+                ],
             ]);
 
         $this->assertArrayHasKey('html_content', $response->json('data'));

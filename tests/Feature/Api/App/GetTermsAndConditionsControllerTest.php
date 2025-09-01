@@ -19,11 +19,11 @@ class GetTermsAndConditionsControllerTest extends TestCase
             'sections' => [
                 [
                     'title' => 'Test Section',
-                    'content' => 'Test content'
-                ]
-            ]
+                    'content' => 'Test content',
+                ],
+            ],
         ];
-        
+
         Config::set('terms', $expectedTerms);
 
         $response = $this->getJson('/api/app/terms-and-conditions');
@@ -32,23 +32,23 @@ class GetTermsAndConditionsControllerTest extends TestCase
             ->assertJsonStructure([
                 '_metadata' => [
                     'success',
-                    'message'
+                    'message',
                 ],
                 'data' => [
                     'html_content',
                     'last_updated',
-                    'sections'
-                ]
+                    'sections',
+                ],
             ])
             ->assertJson([
                 '_metadata' => [
                     'success' => true,
-                    'message' => 'Conditions d\'utilisation récupérées avec succès.'
+                    'message' => 'Conditions d\'utilisation récupérées avec succès.',
                 ],
                 'data' => [
                     'last_updated' => '2025-09-01',
-                    'sections' => 1
-                ]
+                    'sections' => 1,
+                ],
             ]);
 
         $responseData = $response->json('data');
@@ -63,9 +63,9 @@ class GetTermsAndConditionsControllerTest extends TestCase
         $response = $this->getJson('/api/app/terms-and-conditions');
 
         $response->assertStatus(200);
-        
+
         $htmlContent = $response->json('data.html_content');
-        
+
         $this->assertStringContainsString('<h1 style=', $htmlContent, 'Le titre principal doit être présent');
         $this->assertStringContainsString('Dernière mise à jour', $htmlContent, 'La date de mise à jour doit être présente');
         $this->assertStringContainsString('<h2 style=', $htmlContent, 'Les sous-titres de section doivent être présents');
@@ -78,10 +78,10 @@ class GetTermsAndConditionsControllerTest extends TestCase
         $response = $this->getJson('/api/app/terms-and-conditions');
 
         $response->assertStatus(200);
-        
+
         $sectionsCount = $response->json('data.sections');
         $configSections = Config::get('terms.sections');
-        
+
         $this->assertEquals(count($configSections), $sectionsCount);
     }
 }

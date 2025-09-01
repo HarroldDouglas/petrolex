@@ -21,7 +21,7 @@ class GetSupportContactController extends Controller
         return ApiResponse::success(
             data: [
                 'phone_number' => $contact['phone_number'],
-                'email' => $contact['email']
+                'email' => $contact['email'],
             ],
             message: 'Informations de contact du support récupérées avec succès.'
         );

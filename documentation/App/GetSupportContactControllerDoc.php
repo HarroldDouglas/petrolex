@@ -11,10 +11,13 @@ use OpenApi\Annotations as OA;
  *     description="Returns the contact information (phone number and email) for the support team",
  *     operationId="getSupportContact",
  *     tags={"App"},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Support contact information retrieved successfully",
+ *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
@@ -29,10 +32,13 @@ use OpenApi\Annotations as OA;
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Internal server error",
+ *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
