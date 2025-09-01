@@ -32,7 +32,6 @@ final class GetDeliveryTrackingDetailsController extends Controller
             return DeliveryTrackingResponse::error('Delivery tracking not found.', Response::HTTP_NOT_FOUND);
         }
 
-        // CORRECTION CRITIQUE: Charger toutes les relations nécessaires
         $deliveryTracking->load([
             'order.customer',
             'order.deliveryAddress',

@@ -62,7 +62,7 @@ final class CreateDeliveryTrackingController extends Controller
         );
     }
 
-    private function calculateTotalDistance($order): float
+    private function calculateTotalDistance(Order $order): float
     {
         if (! $order->distributionCenter || ! $order->deliveryAddress) {
             return 0.0;

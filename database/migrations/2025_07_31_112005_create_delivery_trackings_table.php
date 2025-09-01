@@ -14,8 +14,8 @@ return new class () extends Migration {
             $table->decimal('driver_lat', 10, 8)->nullable();
             $table->decimal('driver_lng', 11, 8)->nullable();
             $table->decimal('current_speed', 8, 2)->nullable();
-            $table->decimal('progress_percentage', 5, 2)->nullable(); // Nouveau champ pour la progression (0.00 à 100.00)
-            $table->integer('estimated_duration')->nullable(); // In minutes
+            $table->decimal('progress_percentage', 5, 2)->nullable();
+            $table->integer('estimated_duration')->nullable();
             $table->decimal('distance_remaining', 8, 2)->nullable(); // In kilometers
             $table->decimal('total_distance', 8, 2)->nullable();
             $table->json('route_geometry')->nullable();

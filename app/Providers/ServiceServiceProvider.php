@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\DeliveryTrackingServiceInterface;
+use App\Contracts\RouteCalculatorInterface;
 use App\Repositories\Contracts\StockMovementRepositoryInterface;
 use App\Repositories\Eloquent\StockMovementRepository;
 use App\Services\Auth\AuthenticationService;
@@ -11,6 +12,7 @@ use App\Services\Auth\Contracts\OtpServiceInterface;
 use App\Services\Auth\OtpService;
 use App\Services\BaseServiceForEntity;
 use App\Services\BaseServiceForEntityInterface;
+use App\Services\DeliveryTrackingService;
 use App\Services\MapboxService;
 use App\Services\Permissions\PermissionService;
 use App\Services\Permissions\PermissionServiceInterface;
@@ -34,7 +36,8 @@ class ServiceServiceProvider extends ServiceProvider implements DeferrableProvid
         StockMovementRepositoryInterface::class => StockMovementRepository::class,
         BaseServiceForEntityInterface::class => BaseServiceForEntity::class,
         MediaServiceInterface::class => SpatieMediaService::class,
-        DeliveryTrackingServiceInterface::class => MapboxService::class,
+        DeliveryTrackingServiceInterface::class => DeliveryTrackingService::class,
+        RouteCalculatorInterface::class => MapboxService::class,
     ];
 
     /**

@@ -15,90 +15,6 @@
         }
     ],
     "paths": {
-        "/api/auth/check": {
-            "get": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Check authentication status",
-                "description": "Verifies if the current user session is valid and authenticated. This endpoint is ideal for session validation in mobile applications.",
-                "operationId": "api.auth.check",
-                "responses": {
-                    "200": {
-                        "description": "User is authenticated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiResponse"
-                                        },
-                                        {
-                                            "properties": {
-                                                "data": {
-                                                    "properties": {
-                                                        "authenticated": {
-                                                            "type": "boolean",
-                                                            "example": true
-                                                        },
-                                                        "user_id": {
-                                                            "type": "integer",
-                                                            "example": 8
-                                                        },
-                                                        "roles": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "type": "string",
-                                                                "enum": [
-                                                                    "delivery_person",
-                                                                    "customer"
-                                                                ],
-                                                                "example": "delivery_person"
-                                                            }
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "User is authenticated."
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Token missing or invalid",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/app/privacy-policy": {
             "get": {
                 "tags": [
@@ -5872,16 +5788,16 @@
     },
     "tags": [
         {
-            "name": "Authentication",
-            "description": "Authentication"
-        },
-        {
             "name": "App",
             "description": "App"
         },
         {
             "name": "Authentification",
             "description": "Authentification"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
         },
         {
             "name": "Bottles",

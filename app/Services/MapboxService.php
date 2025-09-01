@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Contracts\DeliveryTrackingServiceInterface;
+use App\Contracts\RouteCalculatorInterface;
 use App\DTOs\RouteDTO;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-final class MapboxService implements DeliveryTrackingServiceInterface
+final class MapboxService implements RouteCalculatorInterface
 {
     private string $accessToken;
+    private const API_URL = 'https://api.mapbox.com/directions/v5/mapbox/driving';
 
     public function __construct()
     {
@@ -31,7 +32,7 @@ final class MapboxService implements DeliveryTrackingServiceInterface
         }
 
         try {
-            $response = Http::get("https://api.mapbox.com/directions/v5/mapbox/driving/{$fromLng},{$fromLat};{$toLng},{$toLat}", [
+            $response = Http::get(self::API_URL."/{$fromLng},{$fromLat};{$toLng},{$toLat}", [
                 'access_token' => $this->accessToken,
                 'steps' => 'true',
                 'geometries' => 'geojson',
@@ -77,7 +78,7 @@ final class MapboxService implements DeliveryTrackingServiceInterface
     private function fallbackRoute(): RouteDTO
     {
         return new RouteDTO(
-            duration: 30, // estimation basique
+            duration: 30, // basic estimation
             distance: 5.0,
             geometry: null
         );

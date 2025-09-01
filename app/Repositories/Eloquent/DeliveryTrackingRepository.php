@@ -19,7 +19,6 @@ final class DeliveryTrackingRepository extends BaseEloquentRepository implements
         /** @var DeliveryTracking $deliveryTracking */
         $deliveryTracking = $this->model->create($attributes);
 
-        // OPTIMISATION: Charger automatiquement les relations essentielles
         return $deliveryTracking->load([
             'order.customer',
             'order.deliveryAddress',
@@ -64,7 +63,6 @@ final class DeliveryTrackingRepository extends BaseEloquentRepository implements
         /** @var DeliveryTracking $deliveryTracking */
         $deliveryTracking->update($attributes);
 
-        // OPTIMISATION: Recharger les relations après mise à jour
         return $deliveryTracking->load([
             'order.customer',
             'order.deliveryAddress',

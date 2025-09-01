@@ -42,4 +42,9 @@ final class DeliveryTrackingStatus extends Enum
             'CANCELLED' => 'cancelled',
         ];
     }
+
+    public function isCompleted(): bool
+    {
+        return in_array($this->value, ['delivered', 'cancelled'], true);
+    }
 }

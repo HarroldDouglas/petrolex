@@ -9,18 +9,18 @@ use Illuminate\Http\Request;
 class RealTimeTrackingController extends Controller
 {
     /**
-     * Afficher la page de suivi en temps réel pour une commande
+     * Display the real-time tracking page for an order
      */
     public function __invoke(Request $request, $orderId)
     {
-        // Récupérer la commande par ID
+        // Get the order by ID
         $order = Order::find($orderId);
 
         if (! $order) {
-            abort(404, 'Commande non trouvée');
+            abort(404, 'Order not found');
         }
 
-        // Charger les relations nécessaires
+        // Load necessary relations
         $order->load([
             'customer',
             'deliveryAddress',
@@ -29,7 +29,7 @@ class RealTimeTrackingController extends Controller
             'deliveryTracking',
         ]);
 
-        // Données pour la vue
+        // Data for the view
         $trackingConfig = [
             'order_id' => $order->id,
             'order_number' => $order->order_number,
@@ -37,11 +37,11 @@ class RealTimeTrackingController extends Controller
                 'access_token' => config('services.mapbox.token'),
             ],
             'websocket' => [
-                'enabled' => true, // Toujours activé puisque Reverb fonctionne
+                'enabled' => true, // Always enabled since Reverb works
                 'key' => config('broadcasting.connections.reverb.key', 'local-key'),
                 'cluster' => config('broadcasting.connections.reverb.options.cluster', 'mt1'),
                 'host' => config('broadcasting.connections.reverb.options.host', '127.0.0.1'),
-                'port' => config('broadcasting.connections.reverb.port', 8080), // Port Reverb correct
+                'port' => config('broadcasting.connections.reverb.port', 8080), // Correct Reverb port
                 'force_tls' => false,
             ],
             'api_endpoints' => [

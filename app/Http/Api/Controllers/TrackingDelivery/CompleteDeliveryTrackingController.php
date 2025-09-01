@@ -46,9 +46,7 @@ final class CompleteDeliveryTrackingController extends Controller
             return DeliveryTrackingResponse::error('Delivery tracking is already completed.', null, Response::HTTP_CONFLICT);
         }
 
-        // CORRECTION CRITIQUE: Capturer le statut précédent pour l'événement
         $previousStatus = $deliveryTracking->status->value;
-
         $deliveryTracking = $this->deliveryTrackingRepository->update(
             $deliveryTracking,
             [
@@ -63,7 +61,6 @@ final class CompleteDeliveryTrackingController extends Controller
             Log::info('Order status updated to DELIVERED for order ID: '.$orderId);
         }
 
-        // AMÉLIORATION CRITIQUE: Déclencher l'événement de changement de statut
         broadcast(new DeliveryStatusUpdated($deliveryTracking->fresh(), $previousStatus));
 
         Log::info('Delivery tracking completed successfully for order ID: '.$orderId);
