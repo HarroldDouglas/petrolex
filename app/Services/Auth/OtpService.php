@@ -88,12 +88,13 @@ class OtpService implements OtpServiceInterface
     public function verifyOtp(string $identifier, string $otp): bool
     {
         $user = $this->verifyOtpAndGetUser($identifier, $otp);
-        
+
         if ($user) {
             $this->userRepository->update($user, ['is_active' => true]);
+
             return true;
         }
-        
+
         return false;
     }
 
@@ -103,11 +104,11 @@ class OtpService implements OtpServiceInterface
     public function verifyOtpWithToken(string $identifier, string $otp): ?string
     {
         $user = $this->verifyOtpAndGetUser($identifier, $otp);
-        
+
         if ($user) {
             return $this->generateSecureResetToken($user, $identifier);
         }
-        
+
         return null;
     }
 
@@ -160,9 +161,10 @@ class OtpService implements OtpServiceInterface
         if ($storedOtp === $otp) {
             $this->invalidateOtp($identifier);
             $user = $this->userRepository->findByEmailOrPhone($identifier);
-            
+
             if ($user) {
                 $this->userRepository->update($user, ['is_active' => true]);
+
                 return $user;
             }
         }
@@ -196,7 +198,7 @@ class OtpService implements OtpServiceInterface
 
             $maskedDomain = substr($domainName, 0, 1).str_repeat('*', strlen($domainName) - 1).'.'.$tld;
 
-                    return $maskedName.'@'.$maskedDomain;
+            return $maskedName.'@'.$maskedDomain;
         } else {
             // Mask phone number: +123****890
             $length = strlen($identifier);
@@ -243,7 +245,7 @@ class OtpService implements OtpServiceInterface
     public function verifyResetToken(string $token): ?array
     {
         $parts = explode('.', $token);
-        
+
         if (count($parts) !== 3) {
             return null;
         }
@@ -252,8 +254,8 @@ class OtpService implements OtpServiceInterface
 
         try {
             $decodedPayload = json_decode(base64_decode($payload), true);
-            
-            if (!$decodedPayload || !isset($decodedPayload['exp']) || !isset($decodedPayload['user_id']) || !isset($decodedPayload['email'])) {
+
+            if (! $decodedPayload || ! isset($decodedPayload['exp']) || ! isset($decodedPayload['user_id']) || ! isset($decodedPayload['email'])) {
                 return null;
             }
 
@@ -262,8 +264,8 @@ class OtpService implements OtpServiceInterface
             }
 
             $expectedSignature = base64_encode(hash_hmac('sha256', "{$header}.{$payload}", config('app.key'), true));
-            
-            if (!hash_equals($signature, $expectedSignature)) {
+
+            if (! hash_equals($signature, $expectedSignature)) {
                 return null;
             }
 

@@ -9,11 +9,11 @@ class OtpResponse extends ApiResponse
         $data = [
             'identifier' => $identifier,
         ];
-        
+
         if ($token) {
             $data['reset_token'] = $token;
         }
-        
+
         return new self(
             $data,
             'OTP sent successfully for verification.'
@@ -25,11 +25,11 @@ class OtpResponse extends ApiResponse
         $data = [
             'identifier' => $identifier,
         ];
-        
+
         if ($token) {
             $data['reset_token'] = $token;
         }
-        
+
         return new self(
             $data,
             'OTP verified successfully.'

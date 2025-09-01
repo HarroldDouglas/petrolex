@@ -42,7 +42,8 @@ use OpenApi\Annotations as OA;
  *                     @OA\Property(property="message", type="string", example="Commentaire ajouté à la commande avec succès")
  *                 }
  *             ),
- *             @OA\Property(property="data", type="array", 
+ *             @OA\Property(property="data", type="array",
+ *
  *                 @OA\Items()
  *             )
  *         )

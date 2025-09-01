@@ -5,6 +5,7 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(
  *     schema="DistributionCenterData",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Centre Principal"),
  *     @OA\Property(property="country", type="string", example="Cameroun"),
@@ -25,6 +26,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="DistributionCentersResponse",
  *     type="object",
+ *
  *     @OA\Property(
  *         property="_metadata",
  *         type="object",
@@ -34,6 +36,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="data",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/DistributionCenterData")
  *     )
  * )
@@ -45,19 +48,25 @@ use OpenApi\Annotations as OA;
  *     operationId="api.distribution-centers.index",
  *     tags={"Centres de Distribution"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Liste récupérée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/DistributionCentersResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non autorisé",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur interne du serveur",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

@@ -1,11 +1,12 @@
 <?php
+
 use OpenApi\Annotations as OA;
 
 /**
- *
  * @OA\Schema(
  *     schema="MunicipalityData",
  *     description="Informations sur une municipalité",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Douala 1er"),
  *     @OA\Property(property="city_id", type="integer", example=1),
@@ -17,6 +18,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="MunicipalitiesResponse",
  *     type="object",
+ *
  *     @OA\Property(
  *         property="_metadata",
  *         type="object",
@@ -26,6 +28,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="data",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/MunicipalityData")
  *     )
  * )
@@ -33,6 +36,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="MunicipalityResponse",
  *     type="object",
+ *
  *     @OA\Property(
  *         property="_metadata",
  *         type="object",
@@ -44,6 +48,7 @@ use OpenApi\Annotations as OA;
  *         ref="#/components/schemas/MunicipalityData"
  *     )
  * )
+ *
  * @OA\Get(
  *     path="/api/geography/municipalities",
  *     summary="Lister les municipalités",
@@ -51,14 +56,18 @@ use OpenApi\Annotations as OA;
  *     operationId="api.geography.municipalities.index",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Liste des municipalités récupérée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/MunicipalitiesResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )
@@ -70,26 +79,34 @@ use OpenApi\Annotations as OA;
  *     operationId="api.geography.municipalities.show",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Parameter(
  *         name="municipality",
  *         in="path",
  *         required=true,
  *         description="ID de la municipalité",
+ *
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Municipalité récupérée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/MunicipalityResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=404,
  *         description="Municipalité non trouvée",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )
@@ -101,27 +118,36 @@ use OpenApi\Annotations as OA;
  *     operationId="api.geography.municipalities.store",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\RequestBody(
  *         required=true,
+ *
  *         @OA\JsonContent(
  *             required={"name", "city_id"},
+ *
  *             @OA\Property(property="name", type="string", example="Douala 1er"),
  *             @OA\Property(property="city_id", type="integer", example=1)
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=201,
  *         description="Municipalité créée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/MunicipalityResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=422,
  *         description="Erreur de validation",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )
@@ -133,38 +159,51 @@ use OpenApi\Annotations as OA;
  *     operationId="api.geography.municipalities.update",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Parameter(
  *         name="municipality",
  *         in="path",
  *         required=true,
  *         description="ID de la municipalité",
+ *
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ *
  *     @OA\RequestBody(
  *         required=true,
+ *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(property="name", type="string", example="Douala 1er"),
  *             @OA\Property(property="city_id", type="integer", example=1)
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Municipalité mise à jour avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/MunicipalityResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=404,
  *         description="Municipalité non trouvée",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=422,
  *         description="Erreur de validation",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )
@@ -176,13 +215,16 @@ use OpenApi\Annotations as OA;
  *     operationId="api.geography.municipalities.destroy",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Parameter(
  *         name="municipality",
  *         in="path",
  *         required=true,
  *         description="ID de la municipalité",
+ *
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ *
  *     @OA\Response(
  *         response=204,
  *         description="Municipalité supprimée avec succès"
@@ -190,11 +232,14 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=404,
  *         description="Municipalité non trouvée",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

@@ -13,11 +13,14 @@ use OpenApi\Annotations as OA;
  *     operationId="api.get-profile",
  *     tags={"Authentification"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="User profile",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/User")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Unauthenticated"

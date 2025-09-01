@@ -1,10 +1,12 @@
 <?php
+
 use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
  *     schema="NeighborhoodShowResponse",
  *     type="object",
+ *
  *     @OA\Property(
  *         property="_metadata",
  *         type="object",
@@ -26,26 +28,34 @@ use OpenApi\Annotations as OA;
  *     operationId="api.geography.neighborhoods.show",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Parameter(
  *         name="neighborhoodId",
  *         in="path",
  *         required=true,
  *         description="ID du quartier",
+ *
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Détails du quartier récupérés avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/NeighborhoodShowResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=404,
  *         description="Quartier non trouvé",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

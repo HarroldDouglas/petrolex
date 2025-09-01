@@ -2,8 +2,8 @@
 
 namespace App\Http\Api\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Http\Api\Responses\ApiResponse;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Services\Auth\OtpService;
 use App\Services\User\UserService;
@@ -28,8 +28,8 @@ class ForgotPasswordController extends Controller
         $newPassword = $request->input('password');
 
         $tokenData = $this->otpService->verifyResetToken($token);
-        
-        if (!$tokenData) {
+
+        if (! $tokenData) {
             return ApiResponse::error(
                 message: 'Token de réinitialisation invalide ou expiré.',
                 statusCode: JsonResponse::HTTP_BAD_REQUEST
@@ -37,8 +37,8 @@ class ForgotPasswordController extends Controller
         }
 
         $success = $this->userService->resetPassword($tokenData['email'], $newPassword);
-        
-        if (!$success) {
+
+        if (! $success) {
             return ApiResponse::error(
                 message: 'Échec de la réinitialisation du mot de passe.',
                 statusCode: JsonResponse::HTTP_INTERNAL_SERVER_ERROR

@@ -6,6 +6,7 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="NeighborhoodData",
  *     description="Informations sur un quartier",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Bonapriso"),
  *     @OA\Property(property="city_id", type="integer", example=1),
@@ -19,11 +20,14 @@ use OpenApi\Annotations as OA;
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
+ *
  *             @OA\Property(
  *                 property="data",
  *                 type="array",
+ *
  *                 @OA\Items(ref="#/components/schemas/NeighborhoodData")
  *             ),
+ *
  *             @OA\Property(
  *                 property="message",
  *                 type="string",
@@ -40,26 +44,34 @@ use OpenApi\Annotations as OA;
  *     operationId="api.geography.cities.neighborhoods.index",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
+ *
  *     @OA\Parameter(
  *         name="cityId",
  *         in="path",
  *         required=true,
  *         description="ID de la ville",
+ *
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Liste des quartiers récupérée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/NeighborhoodsResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=404,
  *         description="Ville non trouvée",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )

@@ -55,6 +55,7 @@ use OpenApi\Annotations as OA;
  *     schema="User",
  *     title="User",
  *     description="User data",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="first_name", type="string", example="Jean"),
  *     @OA\Property(property="last_name", type="string", example="Dupont"),

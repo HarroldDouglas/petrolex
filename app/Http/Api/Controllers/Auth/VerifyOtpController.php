@@ -27,8 +27,8 @@ class VerifyOtpController extends Controller
         $otp = $request->input('otp');
 
         $token = $this->otpService->verifyOtpWithToken($identifier, $otp);
-        
-        if (!$token) {
+
+        if (! $token) {
             return OtpResponse::error('Invalid OTP or identifier.', null, 400);
         }
 
