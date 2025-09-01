@@ -19,7 +19,7 @@ class SessionManager {
         
         if (token && deliveryPersonData) {
             try {
-                const testResponse = await this.apiService.request('/tracking/delivery/active');
+                const testResponse = await this.apiService.request('/auth/check');
                 if (testResponse._metadata?.success !== false) {
                     this.currentDeliveryPerson = deliveryPersonData;
                     this.ui.updateDeliveryPersonInfo(deliveryPersonData);

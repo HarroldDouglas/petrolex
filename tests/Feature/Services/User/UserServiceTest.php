@@ -62,9 +62,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_create_user_without_image(): void
+    public function test_it_can_create_user_without_image(): void
     {
         // Arrange
         $userData = $this->createUserData();
@@ -86,9 +86,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_create_user_with_image(): void
+    public function test_it_can_create_user_with_image(): void
     {
         // Arrange
         Storage::fake('public');
@@ -108,9 +108,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_find_user_by_id(): void
+    public function test_it_can_find_user_by_id(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -125,9 +125,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_returns_null_when_user_not_found(): void
+    public function test_it_returns_null_when_user_not_found(): void
     {
         // Act
         $foundUser = $this->userService->find(999);
@@ -137,9 +137,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_update_user_without_image(): void
+    public function test_it_can_update_user_without_image(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -165,9 +165,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_update_user_with_image(): void
+    public function test_it_can_update_user_with_image(): void
     {
         // Arrange
         Storage::fake('public');
@@ -187,9 +187,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_update_user_password(): void
+    public function test_it_can_update_user_password(): void
     {
         // Arrange
         $user = User::factory()->create(['password' => Hash::make('oldpassword')]);
@@ -203,9 +203,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_ignores_empty_password_on_update(): void
+    public function test_it_ignores_empty_password_on_update(): void
     {
         // Arrange
         $originalPassword = Hash::make('password123');
@@ -224,9 +224,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_returns_user_unchanged_when_no_attributes_provided(): void
+    public function test_it_returns_user_unchanged_when_no_attributes_provided(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -241,9 +241,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_delete_user(): void
+    public function test_it_can_delete_user(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -257,9 +257,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_all_customers(): void
+    public function test_it_can_get_all_customers(): void
     {
         // Arrange
         $customerUser1 = User::factory()->create();
@@ -284,9 +284,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_throws_exception_for_invalid_model_type_on_update(): void
+    public function test_it_throws_exception_for_invalid_model_type_on_update(): void
     {
         // Arrange
         $customer = Customer::factory()->create();
@@ -299,9 +299,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_create_user_with_different_roles(): void
+    public function test_it_can_create_user_with_different_roles(): void
     {
         // Arrange
         $adminData = $this->createUserData([
@@ -321,9 +321,9 @@ class UserServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_handles_media_functionality_correctly(): void
+    public function test_it_handles_media_functionality_correctly(): void
     {
         // Arrange
         Storage::fake('public');

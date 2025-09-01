@@ -71,5 +71,4 @@ final class DeliveryTrackingRepository extends BaseEloquentRepository implements
             'order.deliveryPerson',
         ]);
     }
-
 }

@@ -15,6 +15,90 @@
         }
     ],
     "paths": {
+        "/api/auth/check": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Check authentication status",
+                "description": "Verifies if the current user session is valid and authenticated. This endpoint is ideal for session validation in mobile applications.",
+                "operationId": "api.auth.check",
+                "responses": {
+                    "200": {
+                        "description": "User is authenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "authenticated": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "user_id": {
+                                                            "type": "integer",
+                                                            "example": 8
+                                                        },
+                                                        "roles": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "delivery_person",
+                                                                    "customer"
+                                                                ],
+                                                                "example": "delivery_person"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "User is authenticated."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token missing or invalid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/login": {
             "post": {
                 "tags": [
@@ -238,51 +322,6 @@
             }
         },
         "/api/customers": {
-            "get": {
-                "tags": [
-                    "Clients"
-                ],
-                "summary": "Récupérer tous les clients",
-                "description": "Récupérer la liste de tous les clients avec leurs informations utilisateur et adresses de livraison.",
-                "operationId": "api.customers.index",
-                "responses": {
-                    "200": {
-                        "description": "Liste récupérée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CustomersResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non autorisé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
             "post": {
                 "tags": [
                     "Clients"
@@ -876,6 +915,155 @@
                 ]
             }
         },
+        "/api/tracking/delivery/{orderId}/complete": {
+            "patch": {
+                "tags": [
+                    "Suivi de Livraison"
+                ],
+                "summary": "Complete delivery tracking",
+                "description": "Marks a delivery as completed with optional final position and notes.",
+                "operationId": "api.tracking.delivery.complete",
+                "parameters": [
+                    {
+                        "name": "orderId",
+                        "in": "path",
+                        "description": "The order ID of the delivery to complete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Optional completion data",
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "final_latitude": {
+                                        "description": "Final delivery latitude",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 90,
+                                        "minimum": -90,
+                                        "example": 3.8512
+                                    },
+                                    "final_longitude": {
+                                        "description": "Final delivery longitude",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 180,
+                                        "minimum": -180,
+                                        "example": 11.5098
+                                    },
+                                    "notes": {
+                                        "description": "Delivery completion notes",
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "Livraison effectuée avec succès. Client satisfait, bouteilles livrées à domicile."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Delivery completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/DeliveryTrackingData"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Delivery completed successfully."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Not authorized to complete this delivery",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Delivery tracking not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - Delivery already completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/tracking/delivery": {
             "post": {
                 "tags": [
@@ -970,73 +1158,7 @@
                 ]
             }
         },
-        "/api/tracking/delivery/active": {
-            "get": {
-                "tags": [
-                    "Suivi de Livraison"
-                ],
-                "summary": "Get all active deliveries",
-                "description": "Retrieves a list of all deliveries that are currently active.",
-                "operationId": "api.tracking.delivery.active",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiResponse"
-                                        },
-                                        {
-                                            "properties": {
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/DeliveryTrackingData"
-                                                    }
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Active deliveries retrieved successfully."
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/tracking/delivery/{orderNumber}": {
+        "/api/tracking/delivery/{orderId}": {
             "get": {
                 "tags": [
                     "Suivi de Livraison"
@@ -1046,12 +1168,12 @@
                 "operationId": "api.tracking.delivery.details",
                 "parameters": [
                     {
-                        "name": "orderNumber",
+                        "name": "orderId",
                         "in": "path",
-                        "description": "The order number of the delivery to track",
+                        "description": "The order ID of the delivery to track",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -1120,7 +1242,7 @@
                 ]
             }
         },
-        "/api/tracking/delivery/{orderNumber}/start": {
+        "/api/tracking/delivery/{orderId}/start": {
             "post": {
                 "tags": [
                     "Suivi de Livraison"
@@ -1130,15 +1252,48 @@
                 "operationId": "api.tracking.delivery.start",
                 "parameters": [
                     {
-                        "name": "orderNumber",
+                        "name": "orderId",
                         "in": "path",
-                        "description": "The order number of the delivery to start tracking",
+                        "description": "The order ID of the delivery to start tracking",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
+                "requestBody": {
+                    "description": "Initial GPS coordinates to start delivery tracking",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "driver_lat",
+                                    "driver_lng"
+                                ],
+                                "properties": {
+                                    "driver_lat": {
+                                        "description": "Initial latitude of the delivery person",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 90,
+                                        "minimum": -90,
+                                        "example": 3.848
+                                    },
+                                    "driver_lng": {
+                                        "description": "Initial longitude of the delivery person",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 180,
+                                        "minimum": -180,
+                                        "example": 11.5021
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -1204,7 +1359,7 @@
                 ]
             }
         },
-        "/api/tracking/delivery/{orderNumber}/position": {
+        "/api/tracking/delivery/{orderId}/position": {
             "patch": {
                 "tags": [
                     "Suivi de Livraison"
@@ -1214,35 +1369,69 @@
                 "operationId": "api.tracking.delivery.position.update",
                 "parameters": [
                     {
-                        "name": "orderNumber",
+                        "name": "orderId",
                         "in": "path",
-                        "description": "The order number of the delivery to update",
+                        "description": "The order ID of the delivery to update position",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
                 "requestBody": {
-                    "description": "Geographical coordinates of the delivery",
+                    "description": "Real-time position and tracking data",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "latitude",
-                                    "longitude"
+                                    "driver_lat",
+                                    "driver_lng"
                                 ],
                                 "properties": {
-                                    "latitude": {
-                                        "description": "The latitude of the delivery",
+                                    "driver_lat": {
+                                        "description": "Current latitude of the delivery person",
                                         "type": "number",
-                                        "format": "float"
+                                        "format": "float",
+                                        "maximum": 90,
+                                        "minimum": -90,
+                                        "example": 3.8495
                                     },
-                                    "longitude": {
-                                        "description": "The longitude of the delivery",
+                                    "driver_lng": {
+                                        "description": "Current longitude of the delivery person",
                                         "type": "number",
-                                        "format": "float"
+                                        "format": "float",
+                                        "maximum": 180,
+                                        "minimum": -180,
+                                        "example": 11.5035
+                                    },
+                                    "current_speed": {
+                                        "description": "Current speed in km/h (optional)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "minimum": 0,
+                                        "example": 35.5
+                                    },
+                                    "progress_percentage": {
+                                        "description": "Delivery progress percentage (optional)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 100,
+                                        "minimum": 0,
+                                        "example": 75.2
+                                    },
+                                    "distance_remaining": {
+                                        "description": "Remaining distance in kilometers (optional)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "minimum": 0,
+                                        "example": 2.8
+                                    },
+                                    "estimated_duration": {
+                                        "description": "Estimated duration in minutes (optional)",
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 8
                                     }
                                 },
                                 "type": "object"
@@ -1302,7 +1491,43 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Erreur de validation."
+                                                },
+                                                "data": {
+                                                    "properties": {
+                                                        "driver_lat": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "Le champ driver_lat est requis."
+                                                            }
+                                                        },
+                                                        "driver_lng": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "Le champ driver_lng est requis."
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -1511,53 +1736,6 @@
                     }
                 ]
             }
-        },
-        "/api/distribution-centers": {
-            "get": {
-                "tags": [
-                    "Centres de Distribution"
-                ],
-                "summary": "Récupérer tous les centres de distribution",
-                "description": "Récupérer la liste de tous les centres de distribution.",
-                "operationId": "api.distribution-centers.index",
-                "responses": {
-                    "200": {
-                        "description": "Liste récupérée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DistributionCentersResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non autorisé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
         }
     },
     "components": {
@@ -1646,129 +1824,6 @@
                         "type": "object"
                     }
                 ]
-            },
-            "DeliveryAddress": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "label": {
-                        "type": "string",
-                        "example": "Maison principale"
-                    },
-                    "address": {
-                        "type": "string",
-                        "example": "123 Rue Principale"
-                    },
-                    "neighborhood": {
-                        "type": "string",
-                        "example": "Bonapriso"
-                    },
-                    "city": {
-                        "type": "string",
-                        "example": "Douala"
-                    },
-                    "country": {
-                        "type": "string",
-                        "example": "Cameroun"
-                    },
-                    "latitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 4.0511
-                    },
-                    "longitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 9.7679
-                    },
-                    "phone": {
-                        "type": "string",
-                        "example": "+237612345678"
-                    },
-                    "contact_name": {
-                        "type": "string",
-                        "example": "Jean Dupont"
-                    },
-                    "is_default": {
-                        "type": "boolean",
-                        "example": true
-                    }
-                },
-                "type": "object"
-            },
-            "UserData": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 5
-                    },
-                    "first_name": {
-                        "type": "string",
-                        "example": "Jean"
-                    },
-                    "last_name": {
-                        "type": "string",
-                        "example": "Dupont"
-                    },
-                    "full_name": {
-                        "type": "string",
-                        "example": "Jean Dupont"
-                    },
-                    "email": {
-                        "type": "string",
-                        "example": "jean.dupont@example.com"
-                    },
-                    "phone_number": {
-                        "type": "string",
-                        "example": "+237612345678"
-                    },
-                    "address": {
-                        "type": "string",
-                        "example": "123 Rue Principale, Douala"
-                    },
-                    "is_active": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "roles": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "customer"
-                        }
-                    },
-                    "email_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z",
-                        "nullable": true
-                    },
-                    "phone_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z",
-                        "nullable": true
-                    },
-                    "last_login_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z",
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z"
-                    }
-                },
-                "type": "object"
             },
             "CustomerData": {
                 "allOf": [
@@ -2435,7 +2490,7 @@
                 "type": "array",
                 "items": {
                     "type": "string",
-                    "example": "Le champ email est requis."
+                    "example": "Le champ driver_lat est requis."
                 }
             },
             "ValidationErrorResponse": {
@@ -2456,7 +2511,10 @@
                             "data": {
                                 "description": "Détail des erreurs de validation",
                                 "properties": {
-                                    "field_name": {
+                                    "driver_lat": {
+                                        "$ref": "#/components/schemas/ValidationErrorDetail"
+                                    },
+                                    "driver_lng": {
                                         "$ref": "#/components/schemas/ValidationErrorDetail"
                                     }
                                 },
@@ -2589,31 +2647,151 @@
             },
             "DeliveryTrackingData": {
                 "title": "Delivery Tracking Data",
-                "description": "Schema for a delivery tracking record",
+                "description": "Schema for a delivery tracking record with real-time position data",
                 "properties": {
                     "id": {
                         "description": "The ID of the delivery tracking record",
                         "type": "integer",
-                        "format": "int64"
+                        "example": 15
                     },
                     "order_id": {
                         "description": "The ID of the order being tracked",
                         "type": "integer",
-                        "format": "int64"
+                        "example": 127
+                    },
+                    "delivery_person_id": {
+                        "description": "The ID of the delivery person",
+                        "type": "integer",
+                        "example": 8,
+                        "nullable": true
                     },
                     "status": {
                         "description": "The current status of the delivery",
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "started",
+                            "in_progress",
+                            "delivered",
+                            "cancelled"
+                        ],
+                        "example": "in_progress"
+                    },
+                    "driver_lat": {
+                        "description": "Current latitude of the delivery person",
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.848
+                    },
+                    "driver_lng": {
+                        "description": "Current longitude of the delivery person",
+                        "type": "number",
+                        "format": "float",
+                        "example": 11.5021
+                    },
+                    "final_latitude": {
+                        "description": "Final delivery latitude",
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "final_longitude": {
+                        "description": "Final delivery longitude",
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "current_speed": {
+                        "description": "Current speed in km/h",
+                        "type": "number",
+                        "format": "float",
+                        "example": 28.5
+                    },
+                    "total_distance": {
+                        "description": "Total distance in kilometers",
+                        "type": "number",
+                        "format": "float",
+                        "example": 12.8
+                    },
+                    "distance_remaining": {
+                        "description": "Remaining distance in kilometers",
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.2
+                    },
+                    "progress_percentage": {
+                        "description": "Delivery progress percentage",
+                        "type": "number",
+                        "format": "float",
+                        "maximum": 100,
+                        "minimum": 0,
+                        "example": 67.2
+                    },
+                    "estimated_duration": {
+                        "description": "Estimated duration in minutes",
+                        "type": "integer",
+                        "example": 18
+                    },
+                    "route_geometry": {
+                        "description": "GeoJSON route geometry",
+                        "type": "object"
+                    },
+                    "delivery_notes": {
+                        "description": "Delivery completion notes",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "started_at": {
+                        "description": "When the delivery was started",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-09T14:30:00Z",
+                        "nullable": true
+                    },
+                    "completed_at": {
+                        "description": "When the delivery was completed",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
                     },
                     "created_at": {
                         "description": "The date and time the record was created",
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "example": "2025-01-09T14:25:12Z"
                     },
                     "updated_at": {
                         "description": "The date and time the record was last updated",
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "example": "2025-01-09T14:47:35Z"
+                    },
+                    "order": {
+                        "$ref": "#/components/schemas/OrderData"
+                    },
+                    "delivery_person": {
+                        "$ref": "#/components/schemas/UserData"
+                    },
+                    "route": {
+                        "description": "Calculated route information",
+                        "properties": {
+                            "distance": {
+                                "description": "Route distance in kilometers",
+                                "type": "number",
+                                "format": "float",
+                                "example": 12.8
+                            },
+                            "duration": {
+                                "description": "Route duration in minutes",
+                                "type": "integer",
+                                "example": 25
+                            },
+                            "geometry": {
+                                "description": "GeoJSON route geometry",
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -2645,7 +2823,11 @@
                     },
                     "option": {
                         "type": "string",
-                        "example": "full",
+                        "enum": [
+                            "bottle_with_content",
+                            "content"
+                        ],
+                        "example": "bottle_with_content",
                         "nullable": true
                     },
                     "created_at": {
@@ -2662,19 +2844,28 @@
                 "properties": {
                     "id": {
                         "type": "integer",
-                        "example": 1
+                        "example": 127
                     },
                     "order_number": {
                         "type": "string",
-                        "example": "ORD-123456"
+                        "example": "ORD-127-20250109"
                     },
                     "delivery_type": {
                         "type": "string",
-                        "example": "home_delivery"
+                        "enum": [
+                            "normal",
+                            "fast"
+                        ],
+                        "example": "normal"
                     },
                     "payment_method": {
                         "type": "string",
-                        "example": "cash"
+                        "enum": [
+                            "credit_card",
+                            "mobile_money",
+                            "orange_money"
+                        ],
+                        "example": "mobile_money"
                     },
                     "total_amount": {
                         "type": "number",
@@ -2683,7 +2874,14 @@
                     },
                     "status": {
                         "type": "string",
-                        "example": "pending"
+                        "enum": [
+                            "confirmed",
+                            "in_progress",
+                            "delivered",
+                            "cancelled",
+                            "pending"
+                        ],
+                        "example": "in_progress"
                     },
                     "items": {
                         "type": "array",
@@ -2695,11 +2893,11 @@
                         "properties": {
                             "id": {
                                 "type": "integer",
-                                "example": 7
+                                "example": 42
                             },
                             "name": {
                                 "type": "string",
-                                "example": "place Guichard\\n13682 Lelievre-la-Forêt, Cameroun"
+                                "example": "Maison familiale, Quartier Mvog-Ada, Yaoundé, Cameroun"
                             }
                         },
                         "type": "object"
@@ -2707,12 +2905,27 @@
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2025-07-18T10:00:00Z"
+                        "example": "2025-01-09T10:15:00Z"
                     },
                     "updated_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2025-07-18T10:00:00Z"
+                        "example": "2025-01-09T14:25:12Z"
+                    },
+                    "distribution_center": {
+                        "properties": {
+                            "latitude": {
+                                "type": "number",
+                                "format": "float",
+                                "example": 3.848
+                            },
+                            "longitude": {
+                                "type": "number",
+                                "format": "float",
+                                "example": 11.5021
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -2731,6 +2944,10 @@
                     },
                     "product_type": {
                         "type": "string",
+                        "enum": [
+                            "bottle",
+                            "accessory"
+                        ],
                         "example": "bottle"
                     }
                 },
@@ -2836,6 +3053,133 @@
                         "type": "number",
                         "format": "float",
                         "example": 2500
+                    }
+                },
+                "type": "object"
+            },
+            "DeliveryAddress": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "Maison principale"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 Rue Principale"
+                    },
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Bonapriso"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Douala"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Cameroun"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.0511
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 9.7679
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+237612345678"
+                    },
+                    "contact_name": {
+                        "type": "string",
+                        "example": "Jean Dupont"
+                    },
+                    "is_default": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "UserData": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 8
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Jean"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Dupont"
+                    },
+                    "full_name": {
+                        "type": "string",
+                        "example": "Jean Dupont"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "jean.dupont@example.com"
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "example": "+237612345678"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 Rue Principale, Douala"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "delivery_person",
+                                "customer"
+                            ],
+                            "example": "delivery_person"
+                        }
+                    },
+                    "email_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-05T09:30:00Z",
+                        "nullable": true
+                    },
+                    "phone_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-05T09:32:15Z",
+                        "nullable": true
+                    },
+                    "last_login_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-09T08:45:22Z",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-05T09:28:43Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-09T08:45:22Z"
                     }
                 },
                 "type": "object"

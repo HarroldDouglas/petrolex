@@ -16,10 +16,10 @@ class AddOrderItemsToOrderListener
         if ($event->order->items()->count() > 0) {
             return;
         }
-        
+
         $itemsForCreation = array_map(function (OrderItemDTO $dto) {
             $data = $dto->toArray();
-            
+
             // Map 'option' field to 'bottle_type' for the database
             if (isset($data['option'])) {
                 $data['bottle_type'] = $data['option'];
@@ -28,7 +28,7 @@ class AddOrderItemsToOrderListener
 
             return $data;
         }, $event->orderItemsData);
-        
+
         $event->order->items()->createMany($itemsForCreation);
     }
 }

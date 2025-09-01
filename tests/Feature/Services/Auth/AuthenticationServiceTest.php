@@ -24,9 +24,9 @@ class AuthenticationServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_authenticate_a_user_with_email(): void
+    public function test_it_can_authenticate_a_user_with_email(): void
     {
         // Arrange
         $password = 'password';
@@ -46,9 +46,9 @@ class AuthenticationServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_authenticate_a_user_with_phone(): void
+    public function test_it_can_authenticate_a_user_with_phone(): void
     {
         // Arrange
         $password = 'password';
@@ -68,9 +68,9 @@ class AuthenticationServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_throws_authentication_exception_for_invalid_credentials(): void
+    public function test_it_throws_authentication_exception_for_invalid_credentials(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -88,9 +88,9 @@ class AuthenticationServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_revoke_current_token(): void
+    public function test_it_can_revoke_current_token(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -106,9 +106,9 @@ class AuthenticationServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_revoke_all_tokens(): void
+    public function test_it_can_revoke_all_tokens(): void
     {
         // Arrange
         $user = User::factory()->create();
@@ -123,9 +123,9 @@ class AuthenticationServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_authenticated_user(): void
+    public function test_it_can_get_authenticated_user(): void
     {
         // Arrange
         $user = User::factory()->create();

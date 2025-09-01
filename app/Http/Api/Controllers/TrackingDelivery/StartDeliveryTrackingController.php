@@ -67,6 +67,7 @@ final class StartDeliveryTrackingController extends Controller
 
     private function getValidatedOrder(int $orderId): Order
     {
+        /** @var Order */
         $order = $this->orderService->find($orderId);
 
         if (! $order) {
@@ -74,8 +75,9 @@ final class StartDeliveryTrackingController extends Controller
             throw new \InvalidArgumentException('Order not found');
         }
 
-        /** @var Order */
+        
         $order->load('deliveryAddress');
+
         return $order;
     }
 

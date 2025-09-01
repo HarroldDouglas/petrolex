@@ -28,7 +28,7 @@ use OpenApi\Annotations as OA;
  *     schema="ValidationErrorDetail",
  *     type="array",
  *
- *     @OA\Items(type="string", example="Le champ email est requis.")
+ *     @OA\Items(type="string", example="Le champ driver_lat est requis.")
  * )
  *
  * @OA\Schema(
@@ -43,7 +43,8 @@ use OpenApi\Annotations as OA;
  *                 property="data",
  *                 type="object",
  *                 description="Détail des erreurs de validation",
- *                 @OA\Property(property="field_name", ref="#/components/schemas/ValidationErrorDetail")
+ *                 @OA\Property(property="driver_lat", ref="#/components/schemas/ValidationErrorDetail"),
+ *                 @OA\Property(property="driver_lng", ref="#/components/schemas/ValidationErrorDetail")
  *             )
  *         )
  *     }

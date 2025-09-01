@@ -3,11 +3,11 @@
 namespace Tests\Unit\Services;
 
 use App\Constants\AuthConstants;
-use App\Contracts\Repositories\UserRepositoryInterface;
+use App\DTOs\Auth\AuthDTO;
 use App\DTOs\Auth\LoginCredentialsDTO;
-use App\DTOs\Auth\TokenDTO;
 use App\Models\User;
 use App\Repositories\Contracts\TokenRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\Auth\AuthenticationService;
 use App\Services\Auth\Contracts\AuthenticationServiceInterface;
 use Illuminate\Auth\AuthenticationException;
@@ -93,9 +93,10 @@ class AuthenticationServiceTest extends TestCase
 
         $result = $this->authService->authenticate($credentials);
 
-        $this->assertInstanceOf(TokenDTO::class, $result);
-        $this->assertEquals(self::MOCK_TOKEN, $result->accessToken);
-        $this->assertEquals(AuthConstants::TOKEN_TYPE, $result->tokenType);
+        $this->assertInstanceOf(AuthDTO::class, $result);
+        $this->assertEquals(self::MOCK_TOKEN, $result->token->accessToken);
+        $this->assertEquals(AuthConstants::TOKEN_TYPE, $result->token->tokenType);
+        $this->assertEquals($this->user->id, $result->user->id);
     }
 
     #[Test]

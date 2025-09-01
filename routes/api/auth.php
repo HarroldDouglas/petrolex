@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Api\Controllers\Auth\CheckAuthController;
 use App\Http\Api\Controllers\Auth\GetProfileController;
 use App\Http\Api\Controllers\Auth\LoginController;
 use App\Http\Api\Controllers\Auth\LogoutController;
@@ -10,6 +11,7 @@ Route::post('/login', LoginController::class)->name('api.login');
 Route::post('/verify-otp', VerifyOtpController::class)->name('api.verify-otp');
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/auth/check', CheckAuthController::class)->name('api.auth.check');
     Route::post('/logout', LogoutController::class)->name('api.logout');
     Route::get('/user', GetProfileController::class)->name('api.user');
 });

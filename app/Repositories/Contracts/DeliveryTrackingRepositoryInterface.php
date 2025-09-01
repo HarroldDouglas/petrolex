@@ -21,5 +21,4 @@ interface DeliveryTrackingRepositoryInterface extends BaseRepositoryInterface
      * @param  array<string, mixed>  $attributes
      */
     public function update(\Illuminate\Database\Eloquent\Model $deliveryTracking, array $attributes): DeliveryTracking;
-
 }

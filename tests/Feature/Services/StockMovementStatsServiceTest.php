@@ -30,9 +30,9 @@ class StockMovementStatsServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_stock_stats_for_a_single_distribution_center(): void
+    public function test_it_can_get_stock_stats_for_a_single_distribution_center(): void
     {
         // Arrange
         $startDate = Carbon::now()->subDays(2)->format('Y-m-d');
@@ -100,9 +100,9 @@ class StockMovementStatsServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_stock_stats_for_all_distribution_centers(): void
+    public function test_it_can_get_stock_stats_for_all_distribution_centers(): void
     {
         // Arrange
         $startDate = Carbon::now()->subDays(2)->format('Y-m-d');
@@ -156,9 +156,9 @@ class StockMovementStatsServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_stock_stats_for_multiple_distribution_centers(): void
+    public function test_it_can_get_stock_stats_for_multiple_distribution_centers(): void
     {
         // Arrange
         $startDate = Carbon::now()->subDays(2)->format('Y-m-d');

@@ -4,6 +4,7 @@ const DELIVERY_CONFIG = {
         ENDPOINTS: {
             // Auth
             LOGIN: "/login",
+            AUTH_CHECK: "/auth/check",
 
             // Customer endpoints
             CUSTOMERS: "/customers",
@@ -13,7 +14,6 @@ const DELIVERY_CONFIG = {
             DELIVERY_PERSON_ORDERS: "/delivery-persons/{id}/orders",
 
             // Tracking endpoints (standardisés avec orderId)
-            TRACKING_ACTIVE: "/tracking/delivery/active",
             TRACKING_START: "/tracking/delivery/{orderId}/start",
             TRACKING_POSITION: "/tracking/delivery/{orderId}/position",
             TRACKING_DETAILS: "/tracking/delivery/{orderId}",

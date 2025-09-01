@@ -44,36 +44,39 @@ use OpenApi\Annotations as OA;
  *         )
  *     }
  * )
- *
- * @OA\Get(
- *     path="/api/distribution-centers",
- *     summary="Récupérer tous les centres de distribution",
- *     description="Récupérer la liste de tous les centres de distribution.",
- *     operationId="api.distribution-centers.index",
- *     tags={"Centres de Distribution"},
- *
- *     security={{"bearerAuth":{}}},
- *
- *     @OA\Response(
- *         response=200,
- *         description="Liste récupérée avec succès",
- *
- *         @OA\JsonContent(ref="#/components/schemas/DistributionCentersResponse")
- *     ),
- *
- *     @OA\Response(
- *         response=401,
- *         description="Non autorisé",
- *
- *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
- *     ),
- *
- *     @OA\Response(
- *         response=500,
- *         description="Erreur interne du serveur",
- *
- *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
- *     )
- * )
  */
+
+/*
+// Documentation supprimée - endpoint réservé aux tests internes uniquement
+// @OA\Get(
+//     path="/api/distribution-centers",
+//     summary="Récupérer tous les centres de distribution",
+//     description="Récupérer la liste de tous les centres de distribution.",
+//     operationId="api.distribution-centers.index",
+//     tags={"Centres de Distribution"},
+//
+//     security={{"bearerAuth":{}}},
+//
+//     @OA\Response(
+//         response=200,
+//         description="Liste récupérée avec succès",
+//
+//         @OA\JsonContent(ref="#/components/schemas/DistributionCentersResponse")
+//     ),
+//
+//     @OA\Response(
+//         response=401,
+//         description="Non autorisé",
+//
+//         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+//     ),
+//
+//     @OA\Response(
+//         response=500,
+//         description="Erreur interne du serveur",
+//
+//         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+//     )
+// )
+*/
 class GetDistributionCentersControllerDoc {}
