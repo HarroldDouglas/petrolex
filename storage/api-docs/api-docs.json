@@ -10,12 +10,11 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://127.0.0.1:8000",
             "description": "API Server"
         }
     ],
     "paths": {
-<<<<<<< HEAD
         "/api/auth/check": {
             "get": {
                 "tags": [
@@ -68,7 +67,38 @@
                                             "type": "object"
                                         }
                                     ]
-=======
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token missing or invalid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/app/privacy-policy": {
             "get": {
                 "tags": [
@@ -84,19 +114,10 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PrivacyPolicyResponse"
->>>>>>> dev
                                 }
                             }
                         }
                     },
-<<<<<<< HEAD
-                    "401": {
-                        "description": "Unauthorized - Token missing or invalid",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-=======
                     "500": {
                         "description": "Erreur serveur",
                         "content": {
@@ -169,7 +190,6 @@
                                         }
                                     },
                                     "type": "object"
->>>>>>> dev
                                 }
                             }
                         }
@@ -179,9 +199,6 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-<<<<<<< HEAD
-                                    "$ref": "#/components/schemas/ErrorResponse"
-=======
                                     "properties": {
                                         "_metadata": {
                                             "properties": {
@@ -198,13 +215,10 @@
                                         }
                                     },
                                     "type": "object"
->>>>>>> dev
                                 }
                             }
                         }
                     }
-<<<<<<< HEAD
-=======
                 }
             }
         },
@@ -419,7 +433,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User"
+                                    "$ref": "#/components/schemas/UserData"
                                 }
                             }
                         }
@@ -427,7 +441,6 @@
                     "401": {
                         "description": "Unauthenticated"
                     }
->>>>>>> dev
                 },
                 "security": [
                     {
@@ -2317,7 +2330,9 @@
                                         },
                                         "data": {
                                             "type": "array",
-                                            "items": {}
+                                            "items": {
+                                                "type": "string"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -3959,14 +3974,12 @@
                     }
                 ]
             },
-<<<<<<< HEAD
-=======
             "CustomerOrdersResponse": {
                 "properties": {
                     "data": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/Order"
+                            "$ref": "#/components/schemas/OrderData"
                         }
                     },
                     "meta": {
@@ -3993,160 +4006,6 @@
                 },
                 "type": "object"
             },
-            "Order": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "order_number": {
-                        "type": "string",
-                        "example": "ORD-123456"
-                    },
-                    "status": {
-                        "type": "string",
-                        "example": "delivered"
-                    },
-                    "delivery_type": {
-                        "type": "string",
-                        "example": "fast"
-                    },
-                    "payment_method": {
-                        "type": "string",
-                        "example": "mobile_money"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2024-06-01T12:00:00Z"
-                    }
-                },
-                "type": "object"
-            },
-            "DeliveryAddress": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "label": {
-                        "type": "string",
-                        "example": "Maison principale"
-                    },
-                    "address": {
-                        "type": "string",
-                        "example": "123 Rue Principale"
-                    },
-                    "neighborhood": {
-                        "type": "string",
-                        "example": "Bonapriso"
-                    },
-                    "city": {
-                        "type": "string",
-                        "example": "Douala"
-                    },
-                    "country": {
-                        "type": "string",
-                        "example": "Cameroun"
-                    },
-                    "latitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 4.0511
-                    },
-                    "longitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 9.7679
-                    },
-                    "phone": {
-                        "type": "string",
-                        "example": "+237612345678"
-                    },
-                    "contact_name": {
-                        "type": "string",
-                        "example": "Jean Dupont"
-                    },
-                    "is_default": {
-                        "type": "boolean",
-                        "example": true
-                    }
-                },
-                "type": "object"
-            },
-            "UserData": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 5
-                    },
-                    "first_name": {
-                        "type": "string",
-                        "example": "Jean"
-                    },
-                    "last_name": {
-                        "type": "string",
-                        "example": "Dupont"
-                    },
-                    "full_name": {
-                        "type": "string",
-                        "example": "Jean Dupont"
-                    },
-                    "email": {
-                        "type": "string",
-                        "example": "jean.dupont@example.com"
-                    },
-                    "phone_number": {
-                        "type": "string",
-                        "example": "+237612345678"
-                    },
-                    "address": {
-                        "type": "string",
-                        "example": "123 Rue Principale, Douala"
-                    },
-                    "is_active": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "roles": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "customer"
-                        }
-                    },
-                    "email_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z",
-                        "nullable": true
-                    },
-                    "phone_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z",
-                        "nullable": true
-                    },
-                    "last_login_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z",
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z"
-                    }
-                },
-                "type": "object"
-            },
->>>>>>> dev
             "CustomerData": {
                 "allOf": [
                     {
@@ -5324,10 +5183,7 @@
                             "data": {
                                 "description": "Détail des erreurs de validation",
                                 "properties": {
-                                    "driver_lat": {
-                                        "$ref": "#/components/schemas/ValidationErrorDetail"
-                                    },
-                                    "driver_lng": {
+                                    "field_name": {
                                         "$ref": "#/components/schemas/ValidationErrorDetail"
                                     }
                                 },
@@ -5338,9 +5194,9 @@
                     }
                 ]
             },
-            "User": {
-                "title": "User",
-                "description": "User data",
+            "UserData": {
+                "title": "UserData",
+                "description": "User data for API responses",
                 "properties": {
                     "id": {
                         "type": "integer",
@@ -5377,6 +5233,65 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2024-01-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "DeliveryAddress": {
+                "title": "DeliveryAddress",
+                "description": "Delivery address data",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "address_line_1": {
+                        "type": "string",
+                        "example": "123 Rue Principale"
+                    },
+                    "address_line_2": {
+                        "type": "string",
+                        "example": "Appartement 5",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Douala"
+                    },
+                    "region": {
+                        "type": "string",
+                        "example": "Littoral"
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "example": "00237",
+                        "nullable": true
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Cameroun"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 4.0435,
+                        "nullable": true
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 9.7098,
                         "nullable": true
                     },
                     "created_at": {
@@ -5945,133 +5860,6 @@
                     }
                 },
                 "type": "object"
-            },
-            "DeliveryAddress": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "label": {
-                        "type": "string",
-                        "example": "Maison principale"
-                    },
-                    "address": {
-                        "type": "string",
-                        "example": "123 Rue Principale"
-                    },
-                    "neighborhood": {
-                        "type": "string",
-                        "example": "Bonapriso"
-                    },
-                    "city": {
-                        "type": "string",
-                        "example": "Douala"
-                    },
-                    "country": {
-                        "type": "string",
-                        "example": "Cameroun"
-                    },
-                    "latitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 4.0511
-                    },
-                    "longitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 9.7679
-                    },
-                    "phone": {
-                        "type": "string",
-                        "example": "+237612345678"
-                    },
-                    "contact_name": {
-                        "type": "string",
-                        "example": "Jean Dupont"
-                    },
-                    "is_default": {
-                        "type": "boolean",
-                        "example": true
-                    }
-                },
-                "type": "object"
-            },
-            "UserData": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 8
-                    },
-                    "first_name": {
-                        "type": "string",
-                        "example": "Jean"
-                    },
-                    "last_name": {
-                        "type": "string",
-                        "example": "Dupont"
-                    },
-                    "full_name": {
-                        "type": "string",
-                        "example": "Jean Dupont"
-                    },
-                    "email": {
-                        "type": "string",
-                        "example": "jean.dupont@example.com"
-                    },
-                    "phone_number": {
-                        "type": "string",
-                        "example": "+237612345678"
-                    },
-                    "address": {
-                        "type": "string",
-                        "example": "123 Rue Principale, Douala"
-                    },
-                    "is_active": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "roles": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "delivery_person",
-                                "customer"
-                            ],
-                            "example": "delivery_person"
-                        }
-                    },
-                    "email_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-01-05T09:30:00Z",
-                        "nullable": true
-                    },
-                    "phone_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-01-05T09:32:15Z",
-                        "nullable": true
-                    },
-                    "last_login_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-01-09T08:45:22Z",
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-01-05T09:28:43Z"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-01-09T08:45:22Z"
-                    }
-                },
-                "type": "object"
             }
         },
         "securitySchemes": {
@@ -6084,16 +5872,16 @@
     },
     "tags": [
         {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
             "name": "App",
             "description": "App"
         },
         {
             "name": "Authentification",
             "description": "Authentification"
-        },
-        {
-            "name": "Authentication",
-            "description": "Authentication"
         },
         {
             "name": "Bottles",
