@@ -4,7 +4,6 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Geography\City;
 use App\Repositories\Contracts\CityRepositoryInterface;
-use App\Repositories\Eloquent\BaseEloquentRepository;
 
 class CityRepository extends BaseEloquentRepository implements CityRepositoryInterface
 {

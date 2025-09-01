@@ -140,7 +140,7 @@ class OrderServiceTest extends TestCase
             'delivery_address_id' => $this->deliveryAddress->id,
             'distribution_center_id' => $this->distributionCenter->id,
             'delivery_type' => DeliveryType::FAST(),
-            'payment_method' => PaymentMethod::MOBILE_MONEY(),
+            'payment_method' => PaymentMethod::MTN_MONEY(),
             'items' => [
                 [
                     'product_category_id' => $accessoryCategory->id,

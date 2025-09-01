@@ -4,7 +4,6 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\ProductCategoryCityPrice;
 use App\Repositories\Contracts\ProductCategoryCityPriceRepositoryInterface;
-use App\Repositories\Eloquent\BaseEloquentRepository;
 
 class ProductCategoryCityPriceRepository extends BaseEloquentRepository implements ProductCategoryCityPriceRepositoryInterface
 {

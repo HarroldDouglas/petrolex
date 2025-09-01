@@ -18,6 +18,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class DeliverOrderTest extends TestCase
@@ -60,7 +61,7 @@ final class DeliverOrderTest extends TestCase
         $this->customer = Customer::factory()->create();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_mark_an_order_as_delivered_and_update_bottle_status(): void
     {
         $order = Order::factory()->create([
@@ -115,7 +116,7 @@ final class DeliverOrderTest extends TestCase
 
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_404_if_order_not_found(): void
     {
         $response = $this->withHeaders([
@@ -126,7 +127,7 @@ final class DeliverOrderTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_deliver_an_order_that_cannot_be_delivered(): void
     {
         $order = Order::factory()->create([

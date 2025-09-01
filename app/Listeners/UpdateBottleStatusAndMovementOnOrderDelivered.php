@@ -26,7 +26,7 @@ final class UpdateBottleStatusAndMovementOnOrderDelivered
         $order->load('items.bottles');
 
         foreach ($order->items as $orderItem) {
-            foreach ($orderItem->bottles as $bottle) {
+            foreach ($orderItem->bottles()->get() as $bottle) {
                 /** @var \App\Models\Bottle $bottle */
                 try {
                     $this->bottleRepository->update($bottle, ['status' => BottleStatus::WITH_CLIENT()]);

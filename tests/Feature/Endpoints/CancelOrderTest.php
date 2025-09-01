@@ -10,6 +10,7 @@ use App\Models\DistributionCenter;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class CancelOrderTest extends TestCase
@@ -48,7 +49,7 @@ final class CancelOrderTest extends TestCase
         $this->authToken = $response->json('data.access_token');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_cancel_an_order(): void
     {
 
@@ -79,7 +80,7 @@ final class CancelOrderTest extends TestCase
         $this->assertNotNull($updatedOrder->cancelled_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_an_error_if_cancellation_reason_is_missing(): void
     {
         $response = $this->actingAs($this->adminUser, 'sanctum')

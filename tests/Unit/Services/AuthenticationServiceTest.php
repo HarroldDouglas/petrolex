@@ -41,6 +41,9 @@ class AuthenticationServiceTest extends TestCase
     /** @var UserRepositoryInterface|LegacyMockInterface */
     private UserRepositoryInterface $userRepository;
 
+    /** @var \App\Services\Auth\Contracts\OtpServiceInterface|LegacyMockInterface */
+    private \App\Services\Auth\Contracts\OtpServiceInterface $otpService;
+
     private AuthenticationServiceInterface $authService;
     private User $user;
 
@@ -50,7 +53,8 @@ class AuthenticationServiceTest extends TestCase
 
         $this->tokenRepository = Mockery::mock(TokenRepositoryInterface::class);
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
-        $this->authService = new AuthenticationService($this->userRepository, $this->tokenRepository);
+        $this->otpService = Mockery::mock(\App\Services\Auth\Contracts\OtpServiceInterface::class);
+        $this->authService = new AuthenticationService($this->userRepository, $this->tokenRepository, $this->otpService);
 
         $this->user = User::factory()->create([
             'email' => self::TEST_EMAIL,

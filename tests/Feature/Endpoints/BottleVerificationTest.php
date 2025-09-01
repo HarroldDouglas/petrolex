@@ -15,6 +15,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class BottleVerificationTest extends TestCase
@@ -52,7 +53,7 @@ final class BottleVerificationTest extends TestCase
         Product::factory()->create();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_verify_an_authentic_with_delivery_person_filled_bottle_and_matching_distribution_center(): void
     {
         $bottle = Bottle::factory()->create([
@@ -92,14 +93,12 @@ final class BottleVerificationTest extends TestCase
             'barcode' => $bottle->barcode,
         ]));
 
-        $response->dump();
-
         $response->assertStatus(200)
             ->assertJsonPath('_metadata.success', true)
             ->assertJsonPath('data.authentic', true);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_not_authentic_for_non_existent_barcode(): void
     {
         $response = $this->withHeaders([
@@ -112,7 +111,7 @@ final class BottleVerificationTest extends TestCase
             ->assertJsonPath('data.authentic', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_not_authentic_for_unfilled_bottle(): void
     {
         $bottle = Bottle::factory()->create([
@@ -132,7 +131,7 @@ final class BottleVerificationTest extends TestCase
             ->assertJsonPath('data.authentic', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_not_authentic_for_bottle_with_wrong_status(): void
     {
         $bottle = Bottle::factory()->create([
@@ -152,7 +151,7 @@ final class BottleVerificationTest extends TestCase
             ->assertJsonPath('data.authentic', false);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_401_for_unauthenticated_access(): void
     {
         $response = $this->getJson(route('api.bottles.verify', ['barcode' => 'ANYBARCODE']));

@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Api\Controllers\App\GetPrivacyPolicyController;
 use App\Http\Api\Controllers\App\GetSupportContactController;
 use App\Http\Api\Controllers\App\GetTermsAndConditionsController;
-use App\Http\Api\Controllers\App\GetPrivacyPolicyController;
-use App\Http\Api\Controllers\App\PreviewTermsAndConditionsController;
 use App\Http\Api\Controllers\App\PreviewPrivacyPolicyController;
+use App\Http\Api\Controllers\App\PreviewTermsAndConditionsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('app')->name('api.app.')->group(function () {

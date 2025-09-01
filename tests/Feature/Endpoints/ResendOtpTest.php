@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\Auth\OtpService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class ResendOtpTest extends TestCase
@@ -36,7 +37,7 @@ final class ResendOtpTest extends TestCase
         $this->app->instance(OtpService::class, $this->otpService);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_resend_otp_successfully(): void
     {
         // Mock the OTP service to return success
@@ -54,7 +55,7 @@ final class ResendOtpTest extends TestCase
             ->assertJsonPath('data.identifier', 'test@example.com');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_422_for_invalid_email_format(): void
     {
         $response = $this->postJson('/api/resend-otp', [
@@ -65,7 +66,7 @@ final class ResendOtpTest extends TestCase
             ->assertJsonValidationErrors(['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_422_when_email_is_missing(): void
     {
         $response = $this->postJson('/api/resend-otp', []);
@@ -74,7 +75,7 @@ final class ResendOtpTest extends TestCase
             ->assertJsonValidationErrors(['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_422_when_user_not_found(): void
     {
         $response = $this->postJson('/api/resend-otp', [
@@ -85,7 +86,7 @@ final class ResendOtpTest extends TestCase
             ->assertJsonValidationErrors(['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_500_when_otp_service_fails(): void
     {
         // Mock the OTP service to throw an exception

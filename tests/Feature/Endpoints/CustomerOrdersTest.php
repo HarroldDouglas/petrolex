@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class CustomerOrdersTest extends TestCase
@@ -34,7 +35,7 @@ final class CustomerOrdersTest extends TestCase
         $this->authToken = $response->json('data.access_token');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_list_all_orders_of_a_customer(): void
     {
         $customer = Customer::factory()->create();

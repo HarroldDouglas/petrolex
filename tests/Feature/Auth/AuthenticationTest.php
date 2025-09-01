@@ -122,7 +122,7 @@ class AuthenticationTest extends TestCase
             ->assertJson([
                 '_metadata' => [
                     'success' => false,
-                    'message' => 'Les identifiants fournits sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.',
+                    'message' => 'Les identifiants fournis sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.',
                 ],
             ]);
     }

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Endpoints;
 
-use App\Mail\User\PasswordUpdatedMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class UpdatePasswordTest extends TestCase
@@ -28,7 +27,7 @@ final class UpdatePasswordTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_authenticated_user_password(): void
     {
         $this->user = User::factory()->create([
@@ -60,7 +59,7 @@ final class UpdatePasswordTest extends TestCase
         $this->assertTrue(Hash::check($newPassword, $this->user->fresh()->password));
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_update_password_with_incorrect_old_password(): void
     {
         $this->user = User::factory()->create([
@@ -81,7 +80,7 @@ final class UpdatePasswordTest extends TestCase
         $response->assertJsonValidationErrors(['old_password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_update_password_with_invalid_new_password(): void
     {
         $this->user = User::factory()->create([
@@ -109,7 +108,7 @@ final class UpdatePasswordTest extends TestCase
         $response->assertJsonValidationErrors(['new_password']);
     }
 
-    /** @test */
+    #[Test]
     public function unauthenticated_user_cannot_update_password(): void
     {
         $response = $this->patchJson(route('api.password.update'), [
@@ -121,10 +120,10 @@ final class UpdatePasswordTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function it_sends_a_notification_when_password_is_updated()
     {
-        Mail::fake();
+        \Illuminate\Support\Facades\Notification::fake();
 
         $this->actingAs($this->user, 'sanctum')
             ->patchJson(route('api.password.update'), [
@@ -134,8 +133,9 @@ final class UpdatePasswordTest extends TestCase
             ])
             ->assertStatus(200);
 
-        Mail::assertSent(PasswordUpdatedMail::class, function ($mail) {
-            return $mail->hasTo($this->user->email);
-        });
+        \Illuminate\Support\Facades\Notification::assertSentTo(
+            $this->user,
+            \App\Notifications\PasswordUpdatedNotification::class
+        );
     }
 }

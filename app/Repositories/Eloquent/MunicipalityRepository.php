@@ -5,7 +5,6 @@ namespace App\Repositories\Eloquent;
 use App\Models\Geography\Municipality;
 use App\Models\Geography\Neighborhood;
 use App\Repositories\Contracts\MunicipalityRepositoryInterface;
-use App\Repositories\Eloquent\BaseEloquentRepository;
 
 class MunicipalityRepository extends BaseEloquentRepository implements MunicipalityRepositoryInterface
 {

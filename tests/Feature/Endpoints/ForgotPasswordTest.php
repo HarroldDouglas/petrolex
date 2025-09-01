@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\Auth\OtpService;
 use App\Services\User\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class ForgotPasswordTest extends TestCase
@@ -19,7 +20,7 @@ final class ForgotPasswordTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function it_successfully_resets_password_with_valid_token(): void
     {
         // Create a user
@@ -61,7 +62,7 @@ final class ForgotPasswordTest extends TestCase
             ->assertJsonPath('_metadata.message', 'Mot de passe réinitialisé avec succès.');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_invalid_token(): void
     {
         // Mock the OtpService to return null for invalid token
@@ -83,7 +84,7 @@ final class ForgotPasswordTest extends TestCase
             ->assertJsonPath('_metadata.message', 'Token de réinitialisation invalide ou expiré.');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_expired_token(): void
     {
         // Mock the OtpService to return expired token data
@@ -111,7 +112,7 @@ final class ForgotPasswordTest extends TestCase
             ->assertJsonPath('_metadata.message', 'Échec de la réinitialisation du mot de passe.');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_missing_token(): void
     {
         $response = $this->postJson('/api/forgot-password', [
@@ -123,7 +124,7 @@ final class ForgotPasswordTest extends TestCase
             ->assertJsonValidationErrors(['token']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_missing_password(): void
     {
         $response = $this->postJson('/api/forgot-password', [
@@ -135,7 +136,7 @@ final class ForgotPasswordTest extends TestCase
             ->assertJsonValidationErrors(['password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_password_confirmation_mismatch(): void
     {
         $response = $this->postJson('/api/forgot-password', [
@@ -148,7 +149,7 @@ final class ForgotPasswordTest extends TestCase
             ->assertJsonValidationErrors(['password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_short_password(): void
     {
         $response = $this->postJson('/api/forgot-password', [
@@ -161,7 +162,7 @@ final class ForgotPasswordTest extends TestCase
             ->assertJsonValidationErrors(['password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_when_password_reset_fails(): void
     {
         // Create a user

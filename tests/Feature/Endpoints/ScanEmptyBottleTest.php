@@ -78,7 +78,7 @@ final class ScanEmptyBottleTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_scan_existing_empty_bottle_and_associate_with_order(): void
     {
         $filledBottle = Bottle::factory()->create([
@@ -123,7 +123,7 @@ final class ScanEmptyBottleTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_scan_new_empty_bottle_and_associate_with_order(): void
     {
         $filledBottle = Bottle::factory()->create([

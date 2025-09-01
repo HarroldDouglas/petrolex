@@ -81,7 +81,7 @@ class AuthenticationServiceTest extends TestCase
 
         // Assert
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('Les identifiants fournits sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
+        $this->expectExceptionMessage('Les identifiants fournis sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
 
         // Act
         $this->authenticationService->authenticate($credentials);
