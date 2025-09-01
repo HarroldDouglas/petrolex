@@ -20,7 +20,7 @@ class PreviewPrivacyPolicyController extends Controller
         
         $fullHtml = $this->wrapInHtmlDocument($htmlContent);
         
-        return new Response($fullHtml, 200, [
+        return new Response($fullHtml, Response::HTTP_OK, [
             'Content-Type' => 'text/html; charset=utf-8'
         ]);
     }
