@@ -72,20 +72,4 @@ final class DeliveryTrackingRepository extends BaseEloquentRepository implements
         ]);
     }
 
-    public function getActives(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->model
-            ->with([
-                'order.customer',
-                'order.deliveryAddress',
-                'order.deliveryPerson',
-            ])
-            ->whereIn('status', [
-                \App\Enums\DeliveryTrackingStatus::PENDING(),
-                \App\Enums\DeliveryTrackingStatus::STARTED(),
-                \App\Enums\DeliveryTrackingStatus::IN_PROGRESS(),
-            ])
-            ->orderByDesc('created_at')
-            ->get();
-    }
 }

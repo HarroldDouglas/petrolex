@@ -22,5 +22,4 @@ interface DeliveryTrackingRepositoryInterface extends BaseRepositoryInterface
      */
     public function update(\Illuminate\Database\Eloquent\Model $deliveryTracking, array $attributes): DeliveryTracking;
 
-    public function getActives(): \Illuminate\Database\Eloquent\Collection;
 }
