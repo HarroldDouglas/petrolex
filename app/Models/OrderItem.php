@@ -28,7 +28,7 @@ use Illuminate\Support\Carbon;
  * @property-read Order $order
  * @property-read ProductCategory $productCategory
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderBottleScans> $orderBottleScans
- *  * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bottle, \App\Models\OrderBottleScans> $bottles
+ * @property-read \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bottle, \App\Models\OrderBottleScans> $bottles
  *
  * // Accessors
  * @property-read int $scanned_bottles_count
@@ -103,16 +103,6 @@ class OrderItem extends Model
     {
         return $this->belongsToMany(Bottle::class, 'order_bottle_scans')
             ->withTimestamps();
-    }
-
-    // ===== ACCESSORS =====
-
-    /**
-     * Get the product type for this item.
-     */
-    public function getProductTypeAttribute(): ProductType
-    {
-        return $this->productCategory->product_type;
     }
 
     /**

@@ -19,7 +19,7 @@ final class VerifyOtpWithTokenTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function it_successfully_verifies_otp_and_returns_token(): void
     {
         // Create a user
@@ -60,7 +60,7 @@ final class VerifyOtpWithTokenTest extends TestCase
             ->assertJsonPath('data.reset_token', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.valid.token.here');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_invalid_otp(): void
     {
         // Mock the OtpService to return null for invalid OTP
@@ -81,7 +81,7 @@ final class VerifyOtpWithTokenTest extends TestCase
             ->assertJsonPath('_metadata.message', 'Invalid OTP or identifier.');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_missing_identifier(): void
     {
         $response = $this->postJson('/api/verify-otp', [
@@ -92,7 +92,7 @@ final class VerifyOtpWithTokenTest extends TestCase
             ->assertJsonValidationErrors(['identifier']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_missing_otp(): void
     {
         $response = $this->postJson('/api/verify-otp', [
@@ -103,7 +103,7 @@ final class VerifyOtpWithTokenTest extends TestCase
             ->assertJsonValidationErrors(['otp']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_invalid_otp_format(): void
     {
         $response = $this->postJson('/api/verify-otp', [
@@ -115,7 +115,7 @@ final class VerifyOtpWithTokenTest extends TestCase
             ->assertJsonValidationErrors(['otp']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_error_for_non_numeric_otp(): void
     {
         $response = $this->postJson('/api/verify-otp', [
@@ -127,7 +127,7 @@ final class VerifyOtpWithTokenTest extends TestCase
             ->assertJsonValidationErrors(['otp']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_user_not_found_gracefully(): void
     {
         // Mock the OtpService to return a valid token
@@ -157,7 +157,7 @@ final class VerifyOtpWithTokenTest extends TestCase
             ->assertJsonPath('data.reset_token', 'valid.token.here');
     }
 
-    /** @test */
+    #[Test]
     public function it_marks_email_as_verified_when_user_exists(): void
     {
         // Create a user

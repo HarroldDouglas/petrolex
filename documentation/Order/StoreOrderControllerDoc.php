@@ -49,7 +49,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="quantity", type="integer", example=2),
  *     @OA\Property(property="unit_price", type="number", format="float", example=5000.00),
  *     @OA\Property(property="total_price", type="number", format="float", example=10000.00),
- *     @OA\Property(property="option", type="string", example="bottle_with_content", nullable=true),
+ *     @OA\Property(property="option", type="string", enum={"content_only", "bottle_with_content"}, example="bottle_with_content", nullable=true),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
  *     @OA\Property(property="updated_at", type="string", format="date-time"),
  * )
@@ -85,10 +85,10 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="delivery_address", ref="#/components/schemas/DeliveryAddress"),
  *     @OA\Property(property="distribution_center_id", type="integer", example=1),
  *     @OA\Property(property="distribution_center", ref="#/components/schemas/DistributionCenterResource"),
- *     @OA\Property(property="delivery_type", type="string", example="normal"),
- *     @OA\Property(property="payment_method", type="string", example="mobile_money"),
+ *     @OA\Property(property="delivery_type", type="string", enum={"normal", "fast"}, example="normal"),
+ *     @OA\Property(property="payment_method", type="string", enum={"credit_card", "mobile_money", "orange_money"}, example="mobile_money"),
  *     @OA\Property(property="total_amount", type="number", format="float", example=23500.00),
- *     @OA\Property(property="status", type="string", example="pending"),
+ *     @OA\Property(property="status", type="string", enum={"pending", "confirmed", "in_progress", "delivered", "cancelled"}, example="pending"),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
  *     @OA\Property(property="updated_at", type="string", format="date-time"),
  *     @OA\Property(

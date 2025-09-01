@@ -12,7 +12,7 @@ final class SupportContactTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_retrieve_support_contact_information(): void
     {
         $response = $this->getJson('/api/app/support/contact');
@@ -32,7 +32,7 @@ final class SupportContactTest extends TestCase
             ->assertJsonPath('_metadata.message', 'Informations de contact du support récupérées avec succès.');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_correct_contact_information(): void
     {
         $response = $this->getJson('/api/app/support/contact');
@@ -48,7 +48,7 @@ final class SupportContactTest extends TestCase
         $this->assertEquals($configEmail, $data['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_valid_phone_number_format(): void
     {
         $response = $this->getJson('/api/app/support/contact');
@@ -65,7 +65,7 @@ final class SupportContactTest extends TestCase
         $this->assertMatchesRegularExpression('/^[\+\d\s\-\(\)]+$/', $phoneNumber);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_valid_email_format(): void
     {
         $response = $this->getJson('/api/app/support/contact');
@@ -80,7 +80,7 @@ final class SupportContactTest extends TestCase
         $this->assertTrue(filter_var($email, FILTER_VALIDATE_EMAIL) !== false);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_valid_json_structure(): void
     {
         $response = $this->getJson('/api/app/support/contact');

@@ -10,21 +10,21 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Property(property="id", type="integer", example=12),
  *     @OA\Property(property="order_number", type="string", example="ORD-802583"),
- *     @OA\Property(property="delivery_type", type="string", example="fast"),
+ *     @OA\Property(property="delivery_type", type="string", enum={"normal", "fast"}, example="fast"),
  *     @OA\Property(property="subtotal", type="string", example="29000.00"),
  *     @OA\Property(property="delivery_fee", type="string", example="1000.00"),
  *     @OA\Property(property="total_amount", type="string", example="30000.00"),
  *     @OA\Property(property="order_date", type="string", format="date-time", example="2025-07-24T16:21:54.000000Z"),
  *     @OA\Property(property="delivery_date", type="string", format="date-time", nullable=true, example=null),
- *     @OA\Property(property="status", type="string", example="in_progress"),
+ *     @OA\Property(property="status", type="string", enum={"pending", "confirmed", "in_progress", "delivered", "cancelled"}, example="in_progress"),
  *     @OA\Property(
  *         property="payment",
  *         type="object",
  *         @OA\Property(property="id", type="integer", example=12),
- *         @OA\Property(property="status", type="string", example="paid"),
+ *         @OA\Property(property="status", type="string", enum={"pending", "paid", "failed", "cancelled"}, example="paid"),
  *         @OA\Property(property="date", type="string", format="date-time", example="2025-07-24T16:21:54.000000Z"),
  *         @OA\Property(property="reference", type="string", example="VISA-PUR @ 68845213-636474827797144"),
- *         @OA\Property(property="method", type="string", example="credit_card")
+ *         @OA\Property(property="method", type="string", enum={"credit_card", "mobile_money", "orange_money"}, example="credit_card")
  *     ),
  *     @OA\Property(
  *         property="delivery_address",

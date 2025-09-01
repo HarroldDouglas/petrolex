@@ -18,7 +18,7 @@ use OpenApi\Annotations as OA;
  *         response=200,
  *         description="User profile",
  *
- *         @OA\JsonContent(ref="#/components/schemas/User")
+ *         @OA\JsonContent(ref="#/components/schemas/UserData")
  *     ),
  *
  *     @OA\Response(

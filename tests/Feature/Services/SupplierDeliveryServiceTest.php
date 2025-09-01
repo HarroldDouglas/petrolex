@@ -40,9 +40,9 @@ class SupplierDeliveryServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_create_a_supplier_delivery(): void
+    public function test_it_can_create_a_supplier_delivery(): void
     {
         // Arrange
         $deliveryData = [
@@ -66,9 +66,9 @@ class SupplierDeliveryServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_find_a_supplier_delivery(): void
+    public function test_it_can_find_a_supplier_delivery(): void
     {
         // Arrange
         $delivery = $this->createSupplierDelivery();
@@ -82,9 +82,9 @@ class SupplierDeliveryServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_update_a_supplier_delivery(): void
+    public function test_it_can_update_a_supplier_delivery(): void
     {
         // Arrange
         $delivery = $this->createSupplierDelivery();
@@ -102,9 +102,9 @@ class SupplierDeliveryServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_delete_a_supplier_delivery(): void
+    public function test_it_can_delete_a_supplier_delivery(): void
     {
         // Arrange
         $delivery = $this->createSupplierDelivery();
@@ -118,9 +118,9 @@ class SupplierDeliveryServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_all_supplier_deliveries(): void
+    public function test_it_can_get_all_supplier_deliveries(): void
     {
         // Arrange
         $this->createSupplierDelivery();
@@ -134,9 +134,9 @@ class SupplierDeliveryServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_paginate_supplier_deliveries(): void
+    public function test_it_can_paginate_supplier_deliveries(): void
     {
         // Arrange
         for ($i = 0; $i < 20; $i++) {

@@ -6,6 +6,7 @@ namespace Tests\Feature\Endpoints;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class LoginTest extends TestCase
@@ -23,7 +24,7 @@ final class LoginTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_login_with_valid_credentials(): void
     {
         $response = $this->postJson(route('api.login'), [
@@ -49,7 +50,7 @@ final class LoginTest extends TestCase
             ->assertJsonPath('_metadata.success', true);
     }
 
-    /** @test */
+    #[Test]
     public function it_fails_login_with_invalid_credentials(): void
     {
         $response = $this->postJson(route('api.login'), [

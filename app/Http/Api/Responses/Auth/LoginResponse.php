@@ -24,6 +24,7 @@ class LoginResponse extends ApiResponse
         $data = [
             'access_token' => $authDTO->token->accessToken,
             'token_type' => $authDTO->token->tokenType,
+            'expires_in' => $authDTO->token->expiresIn ?? 3600,
             'user' => $userResource,
         ];
 

@@ -124,6 +124,7 @@ public function createUser(CreateUserDTO $userData): User
     ]);
 }
 
+
 9. GESTION D'ERREURS
 Toujours valider les entrées
 Lancer des exceptions spécifiques
@@ -138,3 +139,13 @@ CONSÉQUENCE DU NON-RESPECT
 Le non-respect de ces règles entraînera le rejet de la réponse et la demande de refaire en respectant ces standards.
 
 Objectif Final : Produire un code de qualité production, maintenable, testable et digne d'un développeur senior expérimenté.
+
+TU dois strictement suivre et rigoureusement suivre les standards actuels, si je te donne une tâche sur une vue, avant de créer une vue explore les autres vues et comprend quel layout on utilise! 
+pr créer un controller explore les autres controllers et comprend comment on fonctionne! 
+pareil pour les autres classes et tout! tout est important , il faut dabord analyser lexistant avant toute chose
+
+
+    Lorsque je te donne une tâche à faire, tu as obligation stricte de voir comment on fait dans le code avant de faire, c'est        │
+    │   non négociable pour éviter dhalluciner! si tu dois créer une vue, tu dois voir comment les autres vues sont dans le système       │
+    │   (environ 2) et voir quel layout par exemple est utilisé pour éviter de me sortir des trucs qui nexistent pas, voir les            │
+    │   standards, que ce soit pour le nommage, le formattage, et tout autre!

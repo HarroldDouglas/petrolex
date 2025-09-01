@@ -1,0 +1,1115 @@
+// Service pour les appels API
+class ApiService {
+    constructor() {
+        this.baseUrl = CUSTOMER_CONFIG.API.BASE_URL;
+    }
+
+    async request(endpoint, options = {}) {
+        const url = `${this.baseUrl}${endpoint}`;
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        };
+
+        try {
+            const response = await fetch(url, { ...defaultOptions, ...options });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return (await response.json()).data;
+        } catch (error) {
+            console.error('API Request failed:', error);
+            throw error;
+        }
+    }
+
+    async getActiveDeliveries() {
+        return this.request(CUSTOMER_CONFIG.API.ENDPOINTS.DELIVERY_ACTIVE);
+    }
+
+    async getDelivery(orderNumber) {
+        return this.request(`${CUSTOMER_CONFIG.API.ENDPOINTS.DELIVERY_GET}/${orderNumber}`);
+    }
+
+    async createDelivery(deliveryData) {
+        return this.request(CUSTOMER_CONFIG.API.ENDPOINTS.DELIVERY_CREATE, {
+            method: 'POST',
+            body: JSON.stringify(deliveryData)
+        });
+    }
+}
+
+// Service pour la gestion de la carte Mapbox
+class MapService {
+    constructor() {
+        this.map = null;
+        this.driverMarker = null;
+        this.destinationMarker = null;
+        this.routeSource = null;
+        this.initialized = false;
+    }
+
+    initialize(containerId) {
+        if (this.initialized) {
+            console.warn('Map already initialized');
+            return;
+        }
+
+        mapboxgl.accessToken = CUSTOMER_CONFIG.MAPBOX.ACCESS_TOKEN;
+        
+        this.map = new mapboxgl.Map({
+            container: containerId,
+            style: CUSTOMER_CONFIG.MAPBOX.STYLE,
+            center: CUSTOMER_CONFIG.MAPBOX.DEFAULT_CENTER,
+            zoom: CUSTOMER_CONFIG.MAPBOX.DEFAULT_ZOOM
+        });
+
+        this.map.on('load', () => {
+            this.addRouteSource();
+            this.initialized = true;
+            console.log('Map initialized successfully');
+        });
+
+        this.map.on('error', (e) => {
+            console.error('Map error:', e);
+        });
+
+        return this.map;
+    }
+
+    addRouteSource() {
+        if (!this.map.getSource('route')) {
+            this.map.addSource('route', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'properties': {},
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': []
+                    }
+                }
+            });
+
+            this.map.addLayer({
+                'id': 'route',
+                'type': 'line',
+                'source': 'route',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': '#3887be',
+                    'line-width': 5,
+                    'line-opacity': 0.75
+                }
+            });
+        }
+    }
+
+    updateDriverPosition(lat, lng, driverInfo = {}) {
+        if (this.driverMarker) {
+            this.driverMarker.remove();
+        }
+        
+        this.driverMarker = new mapboxgl.Marker({ color: 'blue' })
+            .setLngLat([lng, lat])
+            .setPopup(new mapboxgl.Popup().setHTML(`
+                <strong>Livreur</strong><br>
+                ${driverInfo.name || 'En cours...'}<br>
+                Position actuelle
+            `))
+            .addTo(this.map);
+    }
+
+    setDestination(lat, lng, customerInfo = {}) {
+        if (this.destinationMarker) {
+            this.destinationMarker.remove();
+        }
+        
+        this.destinationMarker = new mapboxgl.Marker({ color: 'green' })
+            .setLngLat([lng, lat])
+            .setPopup(new mapboxgl.Popup().setHTML(`
+                <strong>Destination</strong><br>
+                ${customerInfo.name || 'Client'}<br>
+                ${customerInfo.address || 'Adresse de livraison'}
+            `))
+            .addTo(this.map);
+    }
+
+    async drawRoute(start, end) {
+        try {
+            const query = await fetch(
+                `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${CUSTOMER_CONFIG.MAPBOX.ACCESS_TOKEN}`
+            );
+            const json = await query.json();
+            
+            if (json.routes && json.routes.length > 0) {
+                const route = json.routes[0];
+                
+                // Vérifier que la source existe avant de l'utiliser
+                if (this.map.getSource('route')) {
+                    this.map.getSource('route').setData({
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': route.geometry
+                    });
+                } else {
+                    console.warn('Route source not found, recreating...');
+                    this.addRouteSource();
+                    
+                    // Essayer à nouveau après création
+                    if (this.map.getSource('route')) {
+                        this.map.getSource('route').setData({
+                            'type': 'Feature',
+                            'properties': {},
+                            'geometry': route.geometry
+                        });
+                    }
+                }
+
+                return {
+                    duration: Math.round(route.duration / 60), // en minutes
+                    distance: (route.distance / 1000).toFixed(1) // en km
+                };
+            }
+        } catch (error) {
+            console.error('Error getting route:', error);
+            return null;
+        }
+    }
+
+    centerOnLocation(lat, lng, zoom = 14) {
+        if (this.map) {
+            this.map.flyTo({
+                center: [lng, lat],
+                zoom: zoom,
+                duration: CUSTOMER_CONFIG.UI.ANIMATION_DURATION
+            });
+        }
+    }
+
+    destroy() {
+        if (this.driverMarker) this.driverMarker.remove();
+        if (this.destinationMarker) this.destinationMarker.remove();
+        if (this.map) this.map.remove();
+        this.initialized = false;
+    }
+}
+
+// Service pour la gestion WebSocket (Laravel Reverb)
+class WebSocketService {
+    constructor() {
+        this.pusher = null;
+        this.channel = null;
+        this.connected = false;
+        this.callbacks = {};
+    }
+
+    connect() {
+        try {
+            // Configuration pour Laravel Reverb
+            this.pusher = new Pusher(CUSTOMER_CONFIG.WEBSOCKET.PUSHER_APP_KEY, {
+                wsHost: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_HOST,
+                wsPort: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_PORT,
+                wssPort: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_PORT,
+                forceTLS: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_FORCE_TLS,
+                enabledTransports: CUSTOMER_CONFIG.WEBSOCKET.ENABLED_TRANSPORTS,
+                disableStats: true,
+                cluster: CUSTOMER_CONFIG.WEBSOCKET.CLUSTER
+            });
+
+            this.pusher.connection.bind('connected', () => {
+                this.connected = true;
+                this.triggerCallback('connected');
+                console.log('Connected to Laravel Reverb WebSocket');
+            });
+
+            this.pusher.connection.bind('disconnected', () => {
+                this.connected = false;
+                this.triggerCallback('disconnected');
+                console.log('Disconnected from WebSocket');
+            });
+
+            this.pusher.connection.bind('error', (error) => {
+                console.error('WebSocket error:', error);
+                this.triggerCallback('error', error);
+            });
+
+            // S'abonner au channel de livraisons
+            this.channel = this.pusher.subscribe('delivery-tracking');
+            
+            // Écouter les événements de mise à jour de position
+            this.channel.bind('delivery-position-updated', (data) => {
+                this.triggerCallback('positionUpdate', data);
+            });
+
+            // Écouter les événements de changement de statut
+            this.channel.bind('delivery-status-updated', (data) => {
+                this.triggerCallback('statusUpdate', data);
+            });
+
+        } catch (error) {
+            console.error('WebSocket connection failed:', error);
+            this.triggerCallback('error', error);
+        }
+    }
+
+    subscribeToDelivery(orderNumber) {
+        if (!this.pusher) {
+            console.warn('WebSocket not initialized');
+            return;
+        }
+
+        if (this.channel) {
+            this.pusher.unsubscribe(this.channel.name);
+        }
+
+        this.channel = this.pusher.subscribe(`delivery.${orderNumber}`);
+        
+        this.channel.bind('DeliveryLocationUpdated', (data) => {
+            this.triggerCallback('locationUpdated', data);
+        });
+
+        this.channel.bind('DeliveryStatusUpdated', (data) => {
+            this.triggerCallback('statusUpdated', data);
+        });
+
+        console.log(`Subscribed to delivery.${orderNumber}`);
+    }
+
+    on(event, callback) {
+        if (!this.callbacks[event]) {
+            this.callbacks[event] = [];
+        }
+        this.callbacks[event].push(callback);
+    }
+
+    triggerCallback(event, data = null) {
+        if (this.callbacks[event]) {
+            this.callbacks[event].forEach(callback => callback(data));
+        }
+    }
+
+    disconnect() {
+        if (this.channel) {
+            this.pusher.unsubscribe(this.channel.name);
+            this.channel = null;
+        }
+        if (this.pusher) {
+            this.pusher.disconnect();
+            this.pusher = null;
+        }
+        this.connected = false;
+    }
+}
+
+// Service pour les appels API côté client (avec authentification)
+class CustomerApiService {
+    constructor() {
+        this.baseUrl = CUSTOMER_CONFIG.API.BASE_URL;
+        this.authService = null; // Sera initialisé plus tard pour éviter les références circulaires
+    }
+
+    setAuthService(authService) {
+        this.authService = authService;
+    }
+
+    async request(endpoint, options = {}) {
+        const url = `${this.baseUrl}${endpoint}`;
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        };
+
+        // Ajouter le token d'authentification si disponible
+        if (this.authService && this.authService.isAuthenticated()) {
+            const token = this.authService.getToken();
+            defaultOptions.headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        try {
+            const response = await fetch(url, { ...defaultOptions, ...options });
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    // Token expiré ou invalide
+                    if (this.authService) {
+                        await this.authService.logout();
+                        window.location.reload(); // Recharger pour afficher la page de connexion
+                    }
+                }
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('API Request failed:', error);
+            throw error;
+        }
+    }
+
+    // Récupérer la liste des clients
+    async getCustomers(search = '', page = 1) {
+        let endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.CUSTOMERS;
+        
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: CUSTOMER_CONFIG.UI.DEFAULT_PAGINATION.toString()
+        });
+        
+        if (search.trim()) {
+            params.append('search', search.trim());
+        }
+        
+        endpoint += `?${params.toString()}`;
+        return this.request(endpoint);
+    }
+
+    // Récupérer les commandes d'un client
+    async getCustomerOrders(customerId, filters = {}, page = 1) {
+        let endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.CUSTOMER_ORDERS.replace('{id}', customerId);
+        
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: CUSTOMER_CONFIG.UI.DEFAULT_PAGINATION.toString(),
+            ...filters
+        });
+        
+        endpoint += `?${params.toString()}`;
+        return this.request(endpoint);
+    }
+
+    // Récupérer les détails du tracking d'une commande
+    async getTrackingDetails(orderId) {
+        const endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.TRACKING_DETAILS.replace('{orderId}', orderId);
+        return this.request(endpoint);
+    }
+}
+
+// Service pour la gestion de la carte Mapbox côté client
+class CustomerMapService {
+    constructor() {
+        this.map = null;
+        this.driverMarker = null;
+        this.destinationMarker = null;
+        this.routeLayer = null;
+        this.initialized = false;
+    }
+
+    initialize(containerId) {
+        if (this.initialized) {
+            console.warn('Map already initialized');
+            return;
+        }
+
+        mapboxgl.accessToken = CUSTOMER_CONFIG.MAPBOX.ACCESS_TOKEN;
+        
+        this.map = new mapboxgl.Map({
+            container: containerId,
+            style: CUSTOMER_CONFIG.MAPBOX.STYLE,
+            center: CUSTOMER_CONFIG.MAPBOX.DEFAULT_CENTER,
+            zoom: CUSTOMER_CONFIG.MAPBOX.DEFAULT_ZOOM
+        });
+
+        this.map.on('load', () => {
+            this.addRouteSource();
+            this.initialized = true;
+            console.log('Customer map initialized successfully');
+        });
+
+        this.map.on('error', (e) => {
+            console.error('Map error:', e);
+        });
+
+        return this.map;
+    }
+
+    addRouteSource() {
+        if (!this.map.getSource('route')) {
+            this.map.addSource('route', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'properties': {},
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': []
+                    }
+                }
+            });
+
+            this.map.addLayer({
+                'id': 'route',
+                'type': 'line',
+                'source': 'route',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': '#3887be',
+                    'line-width': 5,
+                    'line-opacity': 0.75
+                }
+            });
+        }
+    }
+
+    updateDriverPosition(lat, lng, driverInfo = {}) {
+        if (this.driverMarker) {
+            this.driverMarker.remove();
+        }
+        
+        this.driverMarker = new mapboxgl.Marker({ color: '#1E88E5' })
+            .setLngLat([lng, lat])
+            .setPopup(new mapboxgl.Popup().setHTML(`
+                <strong>Livreur</strong><br>
+                ${driverInfo.name || 'En cours...'}<br>
+                Position actuelle
+            `))
+            .addTo(this.map);
+
+        // Centrer la carte sur le livreur
+        this.map.flyTo({
+            center: [lng, lat],
+            zoom: 14,
+            duration: CUSTOMER_CONFIG.UI.ANIMATION_DURATION
+        });
+    }
+
+    setDestination(lat, lng, customerInfo = {}) {
+        if (this.destinationMarker) {
+            this.destinationMarker.remove();
+        }
+        
+        this.destinationMarker = new mapboxgl.Marker({ color: '#E53935' })
+            .setLngLat([lng, lat])
+            .setPopup(new mapboxgl.Popup().setHTML(`
+                <strong>Destination</strong><br>
+                ${customerInfo.name || 'Client'}<br>
+                ${customerInfo.address || 'Adresse de livraison'}
+            `))
+            .addTo(this.map);
+    }
+
+    async drawRoute(start, end) {
+        try {
+            const query = await fetch(
+                `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${CUSTOMER_CONFIG.MAPBOX.ACCESS_TOKEN}`
+            );
+            const json = await query.json();
+            
+            if (json.routes && json.routes.length > 0) {
+                const route = json.routes[0];
+                
+                // Vérifier que la source existe avant de l'utiliser
+                if (this.map.getSource('route')) {
+                    this.map.getSource('route').setData({
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': route.geometry
+                    });
+                } else {
+                    console.warn('Route source not found, recreating...');
+                    this.addRouteSource();
+                    
+                    // Essayer à nouveau après création
+                    if (this.map.getSource('route')) {
+                        this.map.getSource('route').setData({
+                            'type': 'Feature',
+                            'properties': {},
+                            'geometry': route.geometry
+                        });
+                    }
+                }
+
+                return {
+                    duration: Math.round(route.duration / 60), // en minutes
+                    distance: (route.distance / 1000).toFixed(1) // en km
+                };
+            }
+        } catch (error) {
+            console.error('Error getting route:', error);
+            return null;
+        }
+    }
+
+    centerOnLocation(lat, lng, zoom = 14) {
+        if (this.map) {
+            this.map.flyTo({
+                center: [lng, lat],
+                zoom: zoom,
+                duration: CUSTOMER_CONFIG.UI.ANIMATION_DURATION
+            });
+        }
+    }
+
+    clearMarkers() {
+        if (this.driverMarker) {
+            this.driverMarker.remove();
+            this.driverMarker = null;
+        }
+        if (this.destinationMarker) {
+            this.destinationMarker.remove();
+            this.destinationMarker = null;
+        }
+    }
+
+    clearRoute() {
+        if (this.map.getSource('route')) {
+            this.map.getSource('route').setData({
+                'type': 'Feature',
+                'properties': {},
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': []
+                }
+            });
+        }
+    }
+    
+    // NOUVELLE MÉTHODE: Ajuster la vue pour montrer les deux marqueurs
+    fitBounds(coordinates) {
+        if (!this.map || !coordinates || coordinates.length < 2) {
+            console.warn('⚠️ [CustomerMapService] Impossible d\'ajuster la carte avec des coordonnées invalides');
+            return;
+        }
+        
+        try {
+            // Créer un "bounding box" pour inclure tous les points
+            const bounds = coordinates.reduce((bounds, coord) => {
+                return bounds.extend(coord);
+            }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+            
+            // Ajuster la vue pour inclure tous les points avec padding
+            this.map.fitBounds(bounds, {
+                padding: 80, // Padding autour des points (en pixels)
+                maxZoom: 15, // Zoom maximum
+                duration: 1000 // Animation en ms
+            });
+            
+            console.log('🗺️ [CustomerMapService] Vue ajustée pour montrer le trajet complet');
+        } catch (error) {
+            console.error('❌ [CustomerMapService] Erreur lors de l\'ajustement de la vue:', error);
+            // Fallback: centrer sur le premier point
+            if (coordinates.length > 0) {
+                this.centerOnLocation(coordinates[0][1], coordinates[0][0]);
+            }
+        }
+    }
+
+    destroy() {
+        this.clearMarkers();
+        if (this.map) this.map.remove();
+        this.initialized = false;
+    }
+}
+
+// Service de gestion des erreurs - NOUVEAU
+class ErrorHandlingService {
+    constructor() {
+        this.retryAttempts = new Map();
+        this.maxRetries = 3;
+        this.retryDelay = 1000; // 1 seconde
+        this.networkErrorCount = 0;
+    }
+
+    async handleApiError(error, context, retryData = null) {
+        console.error(`API Error in ${context}:`, error);
+        
+        const errorKey = `${context}_${JSON.stringify(retryData)}`;
+        const attempts = this.retryAttempts.get(errorKey) || 0;
+        
+        // Analyser le type d'erreur
+        const errorType = this.categorizeError(error);
+        
+        switch (errorType) {
+            case 'NETWORK':
+                this.networkErrorCount++;
+                if (attempts < this.maxRetries) {
+                    this.retryAttempts.set(errorKey, attempts + 1);
+                    this.showNotification(
+                        `Problème de connexion (tentative ${attempts + 1}/${this.maxRetries})`, 
+                        'warning'
+                    );
+                    return { shouldRetry: true, delay: this.retryDelay * (attempts + 1) };
+                }
+                this.showNotification('Connexion impossible. Vérifiez votre réseau.', 'error');
+                break;
+                
+            case 'AUTHENTICATION':
+                this.showNotification('Session expirée. Reconnexion...', 'warning');
+                // Rediriger vers la page de connexion
+                setTimeout(() => window.location.reload(), 2000);
+                return { shouldRetry: false };
+                
+            case 'NOT_FOUND':
+                this.showNotification('Ressource non trouvée', 'error');
+                break;
+                
+            case 'VALIDATION':
+                this.showNotification('Données invalides', 'error');
+                break;
+                
+            case 'SERVER':
+                if (attempts < 2) { // Retry une fois pour les erreurs serveur
+                    this.retryAttempts.set(errorKey, attempts + 1);
+                    return { shouldRetry: true, delay: 2000 };
+                }
+                this.showNotification('Erreur serveur. Veuillez réessayer plus tard.', 'error');
+                break;
+                
+            default:
+                this.showNotification('Une erreur inattendue s\'est produite', 'error');
+        }
+        
+        return { shouldRetry: false };
+    }
+
+    categorizeError(error) {
+        if (!navigator.onLine || error.message.includes('fetch')) {
+            return 'NETWORK';
+        }
+        
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+            return 'AUTHENTICATION';
+        }
+        
+        if (error.message.includes('404') || error.message.includes('Not Found')) {
+            return 'NOT_FOUND';
+        }
+        
+        if (error.message.includes('422') || error.message.includes('validation')) {
+            return 'VALIDATION';
+        }
+        
+        if (error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
+            return 'SERVER';
+        }
+        
+        return 'UNKNOWN';
+    }
+
+    showNotification(message, type = 'info', duration = 5000) {
+        // Créer une notification toast
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${this.getBootstrapClass(type)} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 350px;';
+        
+        notification.innerHTML = `
+            <strong>${this.getIcon(type)}</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after duration
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, duration);
+    }
+
+    getBootstrapClass(type) {
+        const classes = {
+            'success': 'success',
+            'error': 'danger',
+            'warning': 'warning',
+            'info': 'info'
+        };
+        return classes[type] || 'info';
+    }
+
+    getIcon(type) {
+        const icons = {
+            'success': '✅',
+            'error': '❌',
+            'warning': '⚠️',
+            'info': 'ℹ️'
+        };
+        return icons[type] || 'ℹ️';
+    }
+
+    clearRetries(context) {
+        // Nettoyer les tentatives pour un contexte spécifique
+        for (const [key] of this.retryAttempts) {
+            if (key.startsWith(context)) {
+                this.retryAttempts.delete(key);
+            }
+        }
+    }
+
+    getNetworkStatus() {
+        return {
+            online: navigator.onLine,
+            errorCount: this.networkErrorCount
+        };
+    }
+}
+
+// Service de cache côté client - NOUVEAU
+class ClientCacheService {
+    constructor() {
+        this.cache = new Map();
+        this.cacheExpiry = new Map();
+        this.defaultTTL = 30000; // 30 secondes par défaut
+    }
+
+    set(key, data, ttl = this.defaultTTL) {
+        this.cache.set(key, data);
+        this.cacheExpiry.set(key, Date.now() + ttl);
+        
+        // Nettoyer automatiquement après expiration
+        setTimeout(() => this.delete(key), ttl);
+    }
+
+    get(key) {
+        const expiry = this.cacheExpiry.get(key);
+        
+        if (!expiry || Date.now() > expiry) {
+            this.delete(key);
+            return null;
+        }
+        
+        return this.cache.get(key);
+    }
+
+    delete(key) {
+        this.cache.delete(key);
+        this.cacheExpiry.delete(key);
+    }
+
+    clear() {
+        this.cache.clear();
+        this.cacheExpiry.clear();
+    }
+
+    // Cache spécialisé pour les positions du livreur
+    cacheDriverPosition(orderNumber, position) {
+        this.set(`driver_position_${orderNumber}`, position, 10000); // 10 secondes
+    }
+
+    getDriverPosition(orderNumber) {
+        return this.get(`driver_position_${orderNumber}`);
+    }
+
+    // Cache pour les détails de tracking
+    cacheTrackingDetails(orderId, details) {
+        this.set(`tracking_${orderId}`, details, 15000); // 15 secondes
+    }
+
+    getTrackingDetails(orderId) {
+        return this.get(`tracking_${orderId}`);
+    }
+}
+
+// Service WebSocket amélioré - MISE À JOUR
+class CustomerWebSocketService {
+    constructor() {
+        this.pusher = null;
+        this.channels = new Map();
+        this.connected = false;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.reconnectDelay = 2000;
+        this.heartbeatInterval = null;
+        this.cache = new ClientCacheService();
+    }
+
+    initialize(config) {
+        if (!config.key) {
+            console.warn('⚠️ Configuration WebSocket manquante');
+            return false;
+        }
+
+        try {
+            this.pusher = new Pusher(config.key, {
+                ...config.options,
+                enableLogging: true,
+                forceTLS: true
+            });
+
+            this.setupConnectionHandlers();
+            this.setupHeartbeat();
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Erreur initialisation WebSocket:', error);
+            return false;
+        }
+    }
+
+    setupConnectionHandlers() {
+        this.pusher.connection.bind('connected', () => {
+            console.log('✅ WebSocket connecté');
+            this.connected = true;
+            this.reconnectAttempts = 0;
+            this.emit('connected');
+        });
+
+        this.pusher.connection.bind('disconnected', () => {
+            console.log('🔌 WebSocket déconnecté');
+            this.connected = false;
+            this.emit('disconnected');
+            this.attemptReconnect();
+        });
+
+        this.pusher.connection.bind('error', (error) => {
+            console.error('❌ Erreur WebSocket:', error);
+            this.emit('error', error);
+        });
+    }
+
+    setupHeartbeat() {
+        this.heartbeatInterval = setInterval(() => {
+            if (this.connected && this.pusher) {
+                // Envoyer un ping pour maintenir la connexion
+                this.pusher.connection.send_event('pusher:ping', {});
+            }
+        }, 30000); // Toutes les 30 secondes
+    }
+
+    attemptReconnect() {
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            console.error('❌ Reconnexion WebSocket échouée après', this.maxReconnectAttempts, 'tentatives');
+            this.emit('reconnect_failed');
+            return;
+        }
+
+        this.reconnectAttempts++;
+        console.log(`🔄 Tentative de reconnexion ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
+        
+        setTimeout(() => {
+            if (this.pusher) {
+                this.pusher.connect();
+            }
+        }, this.reconnectDelay * this.reconnectAttempts);
+    }
+
+    subscribeToDeliveryTracking(orderNumber) {
+        if (!this.pusher || !this.connected) {
+            console.warn('⚠️ WebSocket non connecté pour l\'abonnement');
+            return null;
+        }
+
+        const channelName = `delivery-${orderNumber}`;
+        
+        if (this.channels.has(channelName)) {
+            return this.channels.get(channelName);
+        }
+
+        const channel = this.pusher.subscribe(channelName);
+        this.channels.set(channelName, channel);
+
+        // Écouter les événements spécifiques à cette commande
+        channel.bind('delivery-position-updated', (data) => {
+            // Mettre en cache la position
+            this.cache.cacheDriverPosition(orderNumber, data);
+            this.emit('position_updated', data);
+        });
+
+        channel.bind('delivery-status-updated', (data) => {
+            this.emit('status_updated', data);
+        });
+
+        console.log(`📡 Abonné au canal ${channelName}`);
+        return channel;
+    }
+
+    unsubscribeFromDeliveryTracking(orderNumber) {
+        const channelName = `delivery-${orderNumber}`;
+        const channel = this.channels.get(channelName);
+        
+        if (channel && this.pusher) {
+            this.pusher.unsubscribe(channelName);
+            this.channels.delete(channelName);
+            console.log(`📡 Désabonné du canal ${channelName}`);
+        }
+    }
+
+    disconnect() {
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+        }
+
+        this.channels.forEach((channel, channelName) => {
+            if (this.pusher) {
+                this.pusher.unsubscribe(channelName);
+            }
+        });
+        
+        this.channels.clear();
+        
+        if (this.pusher) {
+            this.pusher.disconnect();
+            this.pusher = null;
+        }
+        
+        this.connected = false;
+        console.log('🔌 WebSocket déconnecté et nettoyé');
+    }
+
+    // Système d'événements simple
+    emit(event, data = null) {
+        const customEvent = new CustomEvent(`websocket_${event}`, { detail: data });
+        document.dispatchEvent(customEvent);
+    }
+
+    on(event, callback) {
+        document.addEventListener(`websocket_${event}`, (e) => callback(e.detail));
+    }
+
+    isConnected() {
+        return this.connected;
+    }
+
+    getConnectionInfo() {
+        return {
+            connected: this.connected,
+            reconnectAttempts: this.reconnectAttempts,
+            channelsCount: this.channels.size
+        };
+    }
+}
+
+// Service pour l'authentification client
+class AuthService {
+    constructor() {
+        this.apiService = new CustomerApiService();
+        this.storageKey = 'delivery-tracking-client-auth';
+        this.tokenDuration = 2 * 60 * 60 * 1000; // 2 heures en millisecondes
+    }
+
+    /**
+     * Connexion client avec email/mot de passe
+     */
+    async login(email, password) {
+        try {
+            const response = await fetch(`${CUSTOMER_CONFIG.API.BASE_URL}${CUSTOMER_CONFIG.API.ENDPOINTS.LOGIN}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    login: email,
+                    password: password
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur de connexion: ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            const data = responseData.data;
+            
+            // Stocker les informations d'authentification avec expiration
+            const authData = {
+                token: data.access_token,
+                user: data.user,
+                loginTime: Date.now(),
+                expiresAt: Date.now() + this.tokenDuration
+            };
+            
+            localStorage.setItem(this.storageKey, JSON.stringify(authData));
+            
+            return authData;
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Déconnexion
+     */
+    async logout() {
+        try {
+            const authData = this.getAuthData();
+            if (authData && authData.token && !this.isTokenExpired()) {
+                await fetch(`${CUSTOMER_CONFIG.API.BASE_URL}${CUSTOMER_CONFIG.API.ENDPOINTS.LOGOUT}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authData.token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            localStorage.removeItem(this.storageKey);
+        }
+    }
+
+    /**
+     * Récupérer les données d'authentification stockées
+     */
+    getAuthData() {
+        try {
+            const stored = localStorage.getItem(this.storageKey);
+            return stored ? JSON.parse(stored) : null;
+        } catch (error) {
+            console.error('Error parsing auth data:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Vérifier si le token est expiré
+     */
+    isTokenExpired() {
+        const authData = this.getAuthData();
+        if (!authData || !authData.expiresAt) {
+            return true;
+        }
+        return Date.now() > authData.expiresAt;
+    }
+
+    /**
+     * Vérifier si l'utilisateur est connecté avec un token valide
+     */
+    isAuthenticated() {
+        const authData = this.getAuthData();
+        return authData && authData.token && !this.isTokenExpired();
+    }
+
+    /**
+     * Récupérer le token d'authentification si valide
+     */
+    getToken() {
+        if (this.isAuthenticated()) {
+            const authData = this.getAuthData();
+            return authData.token;
+        }
+        return null;
+    }
+
+    /**
+     * Récupérer les informations utilisateur si token valide
+     */
+    getUser() {
+        if (this.isAuthenticated()) {
+            const authData = this.getAuthData();
+            return authData.user;
+        }
+        return null;
+    }
+
+    /**
+     * Nettoyer le token expiré
+     */
+    clearExpiredToken() {
+        if (this.isTokenExpired()) {
+            localStorage.removeItem(this.storageKey);
+        }
+    }
+}

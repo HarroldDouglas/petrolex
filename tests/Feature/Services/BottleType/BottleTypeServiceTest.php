@@ -35,9 +35,9 @@ class BottleTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_create_a_bottle_type(): void
+    public function test_it_can_create_a_bottle_type(): void
     {
         // Arrange
         $city = City::factory()->create();
@@ -83,9 +83,9 @@ class BottleTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_find_a_bottle_type(): void
+    public function test_it_can_find_a_bottle_type(): void
     {
         // Arrange
         $bottleType = $this->createBottleType();
@@ -99,9 +99,9 @@ class BottleTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_update_a_bottle_type(): void
+    public function test_it_can_update_a_bottle_type(): void
     {
         // Arrange
         $bottleType = $this->createBottleType();
@@ -137,9 +137,9 @@ class BottleTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_delete_a_bottle_type(): void
+    public function test_it_can_delete_a_bottle_type(): void
     {
         // Arrange
         $bottleType = $this->createBottleType();
@@ -153,9 +153,9 @@ class BottleTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_all_bottle_types(): void
+    public function test_it_can_get_all_bottle_types(): void
     {
         // Arrange
         $this->createBottleType();
@@ -169,9 +169,9 @@ class BottleTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_paginate_bottle_types(): void
+    public function test_it_can_paginate_bottle_types(): void
     {
         // Arrange
         for ($i = 0; $i < 20; $i++) {
@@ -186,9 +186,9 @@ class BottleTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_bottle_type_with_media(): void
+    public function test_it_can_get_bottle_type_with_media(): void
     {
         // Arrange
         $bottleType = $this->createBottleType();

@@ -17,11 +17,11 @@ class PreviewTermsAndConditionsController extends Controller
     public function __invoke(): Response
     {
         $htmlContent = Config::get('terms.content');
-        
+
         $fullHtml = $this->wrapInHtmlDocument($htmlContent);
-        
+
         return new Response($fullHtml, Response::HTTP_OK, [
-            'Content-Type' => 'text/html; charset=utf-8'
+            'Content-Type' => 'text/html; charset=utf-8',
         ]);
     }
 
@@ -78,7 +78,7 @@ class PreviewTermsAndConditionsController extends Controller
         </div>
         
         <div class="content">
-            ' . $content . '
+            '.$content.'
         </div>
     </div>
 </body>

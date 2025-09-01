@@ -9,6 +9,7 @@ use App\Models\DistributionCenter;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class OrderCustomerFeedbackTest extends TestCase
@@ -49,7 +50,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         $this->authToken = $response->json('data.access_token');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_customer_feedback_to_order(): void
     {
         $order = Order::factory()->create();
@@ -82,7 +83,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_422_if_validation_fails(): void
     {
         $order = Order::factory()->create();
@@ -101,7 +102,7 @@ final class OrderCustomerFeedbackTest extends TestCase
             ->assertJsonValidationErrors(['comments', 'rating']);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_404_if_order_not_found(): void
     {
         $nonExistentOrderId = 99999;
@@ -119,7 +120,7 @@ final class OrderCustomerFeedbackTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_401_if_unauthenticated(): void
     {
         $order = Order::factory()->create();

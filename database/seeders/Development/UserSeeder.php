@@ -137,6 +137,10 @@ class UserSeeder extends Seeder
             return;
         }
 
+        User::factory()
+            ->deliveryPerson($centers->first()->id, true)
+            ->create(['email' => 'delivery1@test.com']);
+
         foreach ($centers as $center) {
             User::factory()
                 ->deliveryPerson($center->id, true)
@@ -149,7 +153,7 @@ class UserSeeder extends Seeder
                 ->create();
         }
 
-        $this->command->info($centers->count() * 5 .' delivery persons created (4 active + 1 inactive per center).');
+        $this->command->info($centers->count() * 5 + 1 .' delivery persons created (4 active + 1 inactive per center, +1 specific).');
     }
 
     /**
@@ -157,6 +161,8 @@ class UserSeeder extends Seeder
      */
     private function createCustomers(): void
     {
+        $this->createTestCustomer();
+
         User::factory()
             ->customer()
             ->count(20)
@@ -176,7 +182,45 @@ class UserSeeder extends Seeder
             ->count(10)
             ->create();
 
-        $this->command->info('50 customers created (30 random + 10 VIP + 10 new).');
+        $this->command->info('51 customers created (1 specific + 30 random + 10 VIP + 10 new).');
+    }
+
+    /**
+     * Create a specific customer for testing purposes
+     */
+    private function createTestCustomer(): void
+    {
+        $customerUser = User::factory()
+            ->customer()
+            ->create([
+                'first_name' => 'Customer',
+                'last_name' => 'Test',
+                'email' => 'customer1@test.com',
+            ]);
+
+        $customer = $customerUser->customer;
+
+        $customer->deliveryAddresses()->create([
+            'label' => 'Nkoabang',
+            'address' => 'Nkoabang',
+            'latitude' => 3.8617882,
+            'longitude' => 11.5835694,
+            'is_default' => true,
+        ]);
+
+        $customer->deliveryAddresses()->create([
+            'label' => 'Poste Centrale',
+            'address' => 'Poste Centrale',
+            'latitude' => 3.8741355,
+            'longitude' => 11.5173166,
+        ]);
+
+        $customer->deliveryAddresses()->create([
+            'label' => 'Essos',
+            'address' => 'Essos',
+            'latitude' => 3.868779,
+            'longitude' => 11.542277,
+        ]);
     }
 
     /**

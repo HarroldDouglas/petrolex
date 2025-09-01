@@ -59,6 +59,8 @@ class OrderResource extends JsonResource
                 return [
                     'id' => $this->distributionCenter->id,
                     'name' => $this->distributionCenter->name,
+                    'latitude' => $this->distributionCenter->latitude,
+                    'longitude' => $this->distributionCenter->longitude,
                 ];
             }),
         ];

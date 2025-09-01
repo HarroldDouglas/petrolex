@@ -10,6 +10,7 @@ use App\Http\Api\Responses\Warehouse\DistributionCenterResponse;
 use App\Http\Controllers\Controller;
 use App\Services\DistributionCenter\DistributionCenterService;
 
+// TODO: update this to be sure that we have at least one distribution center in the same municipality as the customer delivery address
 final class GetClosestDistributionCenterController extends Controller
 {
     public function __construct(private readonly DistributionCenterService $distributionCenterService) {}

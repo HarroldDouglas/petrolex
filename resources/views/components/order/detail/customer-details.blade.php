@@ -1,3 +1,6 @@
+@php 
+     use Illuminate\Support\Str;
+@endphp
 <div class="col-lg-6">
     <div class="card order-details-card">
         <div class="card-header">
@@ -17,7 +20,7 @@
             <div class="d-flex justify-content-between mt-3">
                 <h6 class="f-w-600 text-dark"><i class="ti ti-map-pin f-s-18 text-secondary me-2"></i>Adresse de la commande</h6>
                 <div class="text-end">
-                    <p>{{ $order->deliveryAddress->fullAddress() ?? 'Non spécifiée' }}</p>
+                    <p>{{ $order->deliveryAddress?->fullAddress() ?? 'Non spécifiée' }}</p>
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-3">

@@ -31,7 +31,7 @@ final class UpdateProfileTest extends TestCase
         $this->authToken = $response->json('data.access_token');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_authenticated_user_profile(): void
     {
         $newFirstName = 'UpdatedFirstName';
@@ -61,7 +61,7 @@ final class UpdateProfileTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_update_profile_with_invalid_data(): void
     {
         $response = $this->withHeaders([
@@ -76,7 +76,7 @@ final class UpdateProfileTest extends TestCase
         $response->assertJsonValidationErrors(['email', 'password']);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_update_profile_with_duplicate_email(): void
     {
         User::factory()->create(['email' => 'existing@example.com']);
@@ -92,7 +92,7 @@ final class UpdateProfileTest extends TestCase
         $response->assertJsonValidationErrors(['email']);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_update_profile_with_duplicate_phone_number(): void
     {
         User::factory()->create(['phone_number' => '+237699000000']);
@@ -108,7 +108,7 @@ final class UpdateProfileTest extends TestCase
         $response->assertJsonValidationErrors(['phone_number']);
     }
 
-    /** @test */
+    #[Test]
     public function unauthenticated_user_cannot_update_profile(): void
     {
         $response = $this->patchJson(route('api.profile.update'), [

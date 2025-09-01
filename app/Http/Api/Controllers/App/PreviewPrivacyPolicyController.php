@@ -17,14 +17,14 @@ class PreviewPrivacyPolicyController extends Controller
     public function __invoke(): Response
     {
         $htmlContent = Config::get('privacy.content');
-        
+
         $fullHtml = $this->wrapInHtmlDocument($htmlContent);
-        
+
         return new Response($fullHtml, Response::HTTP_OK, [
-            'Content-Type' => 'text/html; charset=utf-8'
+            'Content-Type' => 'text/html; charset=utf-8',
         ]);
     }
-    
+
     /**
      * Wrap content in a complete HTML document for preview.
      */
@@ -78,7 +78,7 @@ class PreviewPrivacyPolicyController extends Controller
         </div>
         
         <div class="content">
-            ' . $content . '
+            '.$content.'
         </div>
     </div>
 </body>

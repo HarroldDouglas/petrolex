@@ -132,13 +132,17 @@ class OrderService extends BaseServiceForEntity
 
             $subtotal = array_sum(array_column($orderItemsData, 'total_price'));
 
+            $deliveryFee = $orderDTO->delivery_type->fee();
+            $totalAmount = $subtotal + $deliveryFee;
+
             $orderData = $orderDTO->toArray();
             if (isset($orderData['items'])) {
                 unset($orderData['items']);
             }
 
-            $orderData['total_amount'] = $subtotal;
             $orderData['subtotal'] = $subtotal;
+            $orderData['delivery_fee'] = $deliveryFee;
+            $orderData['total_amount'] = $totalAmount;
             $orderData['status'] = OrderStatus::PENDING()->value;
 
             /** @var Order $order */
@@ -300,5 +304,16 @@ class OrderService extends BaseServiceForEntity
     public function assignDeliveryPerson(Order $order, int $deliveryPersonId, ?string $reason = null): void
     {
         $this->orderRepository->assignDeliveryPerson($order, $deliveryPersonId, $reason);
+    }
+
+    /**
+     * Update the status of an order.
+     *
+     * @param  \App\Models\Order  $order  The order to update.
+     * @param  \App\Enums\OrderStatus  $status  The new status for the order.
+     */
+    public function updateOrderStatus(Order $order, OrderStatus $status): void
+    {
+        $this->orderRepository->update($order, ['status' => $status->value]);
     }
 }

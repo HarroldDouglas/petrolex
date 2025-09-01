@@ -5,6 +5,7 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(
  *     schema="PrivacyPolicyData",
+ *
  *     @OA\Property(
  *         property="html_content",
  *         type="string",
@@ -18,6 +19,7 @@ use OpenApi\Annotations as OA;
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
+ *
  *             @OA\Property(
  *                 property="data",
  *                 ref="#/components/schemas/PrivacyPolicyData"
@@ -37,15 +39,20 @@ use OpenApi\Annotations as OA;
  *     description="Retourne la politique de confidentialité de l'application au format HTML structuré",
  *     operationId="api.app.privacy-policy",
  *     tags={"App"},
+ *
  *     @OA\Response(
  *         response=200,
  *         description="Politique de confidentialité récupérée avec succès",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/PrivacyPolicyResponse")
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
  *         description="Erreur serveur",
+ *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",

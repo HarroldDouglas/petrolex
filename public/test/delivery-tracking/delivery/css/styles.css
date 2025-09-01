@@ -1,0 +1,673 @@
+/* Styles pour la simulation livreur */
+
+/* Variables CSS pour la cohérence */
+:root {
+    --primary-color: #007bff;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --secondary-color: #6c757d;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    
+    --border-radius: 8px;
+    --box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --transition: all 0.3s ease;
+}
+
+/* Carte principale */
+#map { 
+    height: 400px; 
+    width: 100%; 
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    cursor: crosshair;
+}
+
+/* Indicateurs de statut */
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    transition: var(--transition);
+}
+
+.status-offline { 
+    background-color: var(--danger-color);
+    animation: pulse-red 2s infinite;
+}
+
+.status-online { 
+    background-color: var(--success-color);
+    animation: pulse-green 2s infinite;
+}
+
+.status-delivering { 
+    background-color: var(--warning-color);
+    animation: pulse-yellow 2s infinite;
+}
+
+/* Animations pour les indicateurs */
+@keyframes pulse-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes pulse-green {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes pulse-yellow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Cards avec animations */
+.card {
+    border: none;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    border-bottom: 1px solid #dee2e6;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.card-header.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%) !important;
+}
+
+/* Formulaires */
+.form-control {
+    border-radius: var(--border-radius);
+    border: 1px solid #ced4da;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Boutons */
+.btn {
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Groupe de boutons de simulation */
+.btn-group .btn {
+    position: relative;
+}
+
+.btn-group .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Barre de progression personnalisée */
+.progress {
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--warning-color), #fd7e14);
+    transition: width 0.6s ease;
+}
+
+/* Informations du livreur */
+.driver-info-section {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Liste des livraisons */
+#deliveriesList .border {
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+#deliveriesList .border:hover {
+    background-color: var(--light-color);
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Badges de statut */
+.badge {
+    font-size: 0.75em;
+    font-weight: 500;
+    border-radius: 4px;
+}
+
+/* Configuration initiale */
+.setup-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Contrôles de simulation */
+.simulation-controls {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-top: 1rem;
+    border: 1px solid #ffc107;
+}
+
+.simulation-controls h6 {
+    color: #856404;
+    margin-bottom: 1rem;
+}
+
+/* Curseur de vitesse */
+.form-range {
+    width: 100%;
+}
+
+.form-range::-webkit-slider-thumb {
+    background: var(--warning-color);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.form-range::-moz-range-thumb {
+    background: var(--warning-color);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Coordonnées GPS */
+.coordinates-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.coordinates-input .form-control {
+    flex: 1;
+}
+
+/* Messages d'aide */
+.help-text {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #map {
+        height: 300px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+    }
+    
+    .coordinates-input {
+        flex-direction: column;
+    }
+}
+
+/* États de chargement */
+.loading-overlay {
+    position: relative;
+}
+
+.loading-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+    border-radius: var(--border-radius);
+}
+
+.loading-overlay::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2rem;
+    height: 2rem;
+    margin: -1rem 0 0 -1rem;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 11;
+}
+
+/* Animations d'entrée */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Indicateurs visuels pour les sections */
+.section-header {
+    border-left: 4px solid var(--primary-color);
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section-header h6 {
+    margin: 0;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Styles pour les popups Mapbox */
+.mapboxgl-popup-content {
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-family: inherit;
+}
+
+.mapboxgl-popup-close-button {
+    font-size: 16px;
+    padding: 4px;
+}
+
+/* Position actuelle du livreur */
+.current-position {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border: 1px solid var(--success-color);
+}
+
+.current-position strong {
+    color: var(--success-color);
+}
+
+/* États des boutons de contrôle */
+.btn-control {
+    min-width: 120px;
+    justify-content: center;
+}
+
+.btn-control:disabled {
+    transform: none !important;
+}
+
+/* Animation de pulsation pour les éléments actifs */
+.pulsing {
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+/* Styles pour les alertes et notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    min-width: 350px;
+    max-width: 450px;
+    animation: slideInRight 0.3s ease-out;
+    transition: all 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.notification.success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+    color: white;
+    border-left: 4px solid #ffffff;
+}
+
+.notification.error {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #e74c3c 100%);
+    color: white;
+    border-left: 4px solid #ffffff;
+}
+
+.notification.warning {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #f39c12 100%);
+    color: #856404;
+    border-left: 4px solid #856404;
+}
+
+.notification.info {
+    background: linear-gradient(135deg, var(--info-color) 0%, #3498db 100%);
+    color: white;
+    border-left: 4px solid #ffffff;
+}
+
+/* Amélioration de l'animation de fermeture */
+.notification.closing {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* Détails de l'ordre sélectionné */
+.selected-order-card {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    animation: slideIn 0.3s ease-out;
+}
+
+.route-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.info-item i {
+    width: 16px;
+    text-align: center;
+}
+
+/* Mise en surbrillance de l'ordre sélectionné */
+#deliveriesList .delivery-item {
+    transition: var(--transition);
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+#deliveriesList .delivery-item:hover {
+    background-color: var(--light-color);
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#deliveriesList .delivery-item.selected {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    border-color: var(--success-color) !important;
+    box-shadow: 0 0 15px rgba(40, 167, 69, 0.3);
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+#deliveriesList .delivery-item.selected::before {
+    content: "✅ ";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.2em;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+#deliveriesList .delivery-item {
+    position: relative;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+/* Section des détails cachée par défaut */
+#selectedOrderDetails {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Amélioration des icônes FontAwesome (si disponible) */
+.fas, .fa {
+    font-family: "Font Awesome 5 Free", sans-serif;
+    font-weight: 900;
+}
+
+/* Fallback pour les icônes si FontAwesome n'est pas chargé */
+.info-item i.fa-clock::before { content: "🕒"; }
+.info-item i.fa-route::before { content: "🛣️"; }
+
+/* Status badge dans les détails */
+#selectedStatus {
+    font-size: 0.8em;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Responsive pour les détails de l'ordre */
+@media (max-width: 768px) {
+    .selected-order-card .row {
+        flex-direction: column;
+    }
+    
+    .route-info {
+        flex-direction: row;
+        justify-content: space-around;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(0,123,255,0.2);
+    }
+}
+
+/* Mode de transport */
+.transport-mode-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    animation: slideIn 0.3s ease-out;
+}
+
+.transport-options {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.transport-option {
+    flex: 1;
+    position: relative;
+}
+
+.transport-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.transport-option label {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    background: white;
+    gap: 0.75rem;
+}
+
+.transport-option input[type="radio"]:checked + label {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+}
+
+.transport-option label:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.transport-icon {
+    font-size: 2rem;
+    min-width: 3rem;
+    text-align: center;
+}
+
+.transport-info {
+    flex: 1;
+}
+
+.transport-info strong {
+    display: block;
+    color: var(--dark-color);
+    margin-bottom: 0.25rem;
+}
+
+.transport-info small {
+    color: var(--secondary-color);
+    font-size: 0.85em;
+}
+
+.transport-stats {
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.8em;
+    color: var(--secondary-color);
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9em;
+}
+
+/* Animation pour le changement de mode */
+.transport-option.switching {
+    animation: modeSwitch 0.3s ease-in-out;
+}
+
+@keyframes modeSwitch {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Section du mode de transport cachée par défaut */
+#transportModeSection {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Responsive pour le mode de transport */
+@media (max-width: 768px) {
+    .transport-options {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .transport-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

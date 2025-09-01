@@ -12,19 +12,8 @@ class GetTermsAndConditionsControllerTest extends TestCase
 
     public function test_can_get_terms_and_conditions()
     {
-        $expectedTerms = [
-            'title' => 'Test Conditions',
-            'last_updated' => '2025-09-01',
-            'introduction' => 'Test introduction',
-            'sections' => [
-                [
-                    'title' => 'Test Section',
-                    'content' => 'Test content',
-                ],
-            ],
-        ];
-
-        Config::set('terms', $expectedTerms);
+        Config::set('terms.content', '<h1>Test Conditions</h1><p>Test content from 2025-09-01</p>');
+        Config::set('terms.last_updated', '2025-09-01');
 
         $response = $this->getJson('/api/app/terms-and-conditions');
 
@@ -37,7 +26,6 @@ class GetTermsAndConditionsControllerTest extends TestCase
                 'data' => [
                     'html_content',
                     'last_updated',
-                    'sections',
                 ],
             ])
             ->assertJson([
@@ -47,7 +35,6 @@ class GetTermsAndConditionsControllerTest extends TestCase
                 ],
                 'data' => [
                     'last_updated' => '2025-09-01',
-                    'sections' => 1,
                 ],
             ]);
 
@@ -78,10 +65,5 @@ class GetTermsAndConditionsControllerTest extends TestCase
         $response = $this->getJson('/api/app/terms-and-conditions');
 
         $response->assertStatus(200);
-
-        $sectionsCount = $response->json('data.sections');
-        $configSections = Config::get('terms.sections');
-
-        $this->assertEquals(count($configSections), $sectionsCount);
     }
 }

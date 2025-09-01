@@ -102,7 +102,7 @@ use OpenApi\Annotations as OA;
  *         property="data",
  *         type="array",
  *
- *         @OA\Items(ref="#/components/schemas/Order")
+ *         @OA\Items(ref="#/components/schemas/OrderData")
  *     ),
  *
  *     @OA\Property(
@@ -115,16 +115,5 @@ use OpenApi\Annotations as OA;
  *     )
  * )
  *
- * @OA\Schema(
- *     schema="Order",
- *     type="object",
- *
- *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="order_number", type="string", example="ORD-123456"),
- *     @OA\Property(property="status", type="string", example="delivered"),
- *     @OA\Property(property="delivery_type", type="string", example="fast"),
- *     @OA\Property(property="payment_method", type="string", example="mobile_money"),
- *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-06-01T12:00:00Z")
- * )
  */
 class GetCustomerOrdersControllerDoc {}

@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\DB;
  * @property string $address
  * @property string|null $phone
  * @property string|null $email
+ * @property float|null $latitude
+ * @property float|null $longitude
  * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at

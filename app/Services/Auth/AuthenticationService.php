@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Repositories\Contracts\TokenRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\Auth\Contracts\AuthenticationServiceInterface;
+use App\Services\Auth\Contracts\OtpServiceInterface;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +20,7 @@ class AuthenticationService implements AuthenticationServiceInterface
     public function __construct(
         protected UserRepositoryInterface $userRepository,
         protected TokenRepositoryInterface $tokenRepository,
-        protected OtpService $otpService
+        protected OtpServiceInterface $otpService
     ) {}
 
     /**

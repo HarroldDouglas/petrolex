@@ -44,7 +44,7 @@ use OpenApi\Annotations as OA;
  *             ),
  *             @OA\Property(property="data", type="array",
  *
- *                 @OA\Items()
+ *                 @OA\Items(type="string")
  *             )
  *         )
  *     ),

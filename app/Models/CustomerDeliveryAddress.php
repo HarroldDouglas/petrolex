@@ -16,10 +16,16 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $customer_id
  * @property int|null $neighborhood_id
+ * @property string $label
  * @property string $address
- * @property string|null $instructions
+ * @property float|null $latitude
+ * @property float|null $longitude
+ * @property string|null $phone
+ * @property string|null $contact_firstname
+ * @property string|null $contact_lastname
+ * @property string|null $email
+ * @property string|null $address_precision
  * @property bool $is_default
- * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -32,8 +38,10 @@ use Illuminate\Support\Carbon;
  * @property-read Country|null $country
  *
  * // Accessors
+ * @property-read string $contact_full_name
  *
- * // Query Scopes
+ * @method string fullAddress()
+ * @method string shortAddress()
  */
 class CustomerDeliveryAddress extends Model
 {
@@ -116,21 +124,34 @@ class CustomerDeliveryAddress extends Model
      */
     public function fullAddress(): string
     {
+        $parts = [
+            $this->label,
+            $this->address,
+            $this->address_precision,
+            $this->neighborhood->name ?? null,
+            $this->city->name ?? null,
+            $this->country->name ?? null,
+        ];
+
+        if ($this->latitude && $this->longitude) {
+            $parts[] = "GPS: {$this->latitude}, {$this->longitude}";
+        }
+
+        return implode(', ', array_filter($parts)) ?: 'Address not specified';
+    }
+
+    public function shortAddress(): string
+    {
         $parts = [];
+
+        if ($this->label) {
+            $parts[] = $this->label;
+        }
         if ($this->address) {
             $parts[] = $this->address;
         }
-        if ($this->neighborhood) {
-            $parts[] = $this->neighborhood->name;
-        }
-        if ($this->city) {
-            $parts[] = $this->city->name;
-        }
-        if ($this->country) {
-            $parts[] = $this->country->name;
-        }
 
-        return implode(', ', $parts);
+        return implode(' - ', array_filter($parts)) ?: 'Address not specified';
     }
 
     public function getContactFullNameAttribute(): string

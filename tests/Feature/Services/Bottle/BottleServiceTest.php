@@ -58,9 +58,9 @@ class BottleServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_create_a_bottle(): void
+    public function test_it_can_create_a_bottle(): void
     {
         // Arrange
         $bottleData = [
@@ -84,9 +84,9 @@ class BottleServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_find_a_bottle(): void
+    public function test_it_can_find_a_bottle(): void
     {
         // Arrange
         $bottle = $this->createBottle();
@@ -100,9 +100,9 @@ class BottleServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_update_a_bottle(): void
+    public function test_it_can_update_a_bottle(): void
     {
         // Arrange
         $bottle = $this->createBottle();
@@ -121,9 +121,9 @@ class BottleServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_delete_a_bottle(): void
+    public function test_it_can_delete_a_bottle(): void
     {
         // Arrange
         $bottle = $this->createBottle();
@@ -138,9 +138,9 @@ class BottleServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_all_bottles(): void
+    public function test_it_can_get_all_bottles(): void
     {
         // Arrange
         $this->createBottle();
@@ -154,9 +154,9 @@ class BottleServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_paginate_bottles(): void
+    public function test_it_can_paginate_bottles(): void
     {
         // Arrange
         for ($i = 0; $i < 20; $i++) {
@@ -171,9 +171,9 @@ class BottleServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_bottle_stats(): void
+    public function test_it_can_get_bottle_stats(): void
     {
         // Arrange
         $this->createBottle(['status' => BottleStatus::IN_STOCK()]);

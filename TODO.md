@@ -1,0 +1,1 @@
+## Dans BottleProduct, changé bottle_with_content_price par full_price!

@@ -12,7 +12,7 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Bouteille de 6Kg"),
- *     @OA\Property(property="product_type", type="string", example="bottle")
+ *     @OA\Property(property="product_type", type="string", enum={"bottle", "accessory"}, example="bottle")
  * )
  *
  * @OA\Schema(

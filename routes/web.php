@@ -28,3 +28,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     require __DIR__.'/web/orders.php';
     require __DIR__.'/web/municipalities.php';
 });
+
+Route::get('/test/manager/dashboard', function () {
+    return view('manager.dashboard');
+})->name('manager.dashboard');

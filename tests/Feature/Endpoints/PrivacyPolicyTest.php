@@ -6,13 +6,14 @@ namespace Tests\Feature\Endpoints;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class PrivacyPolicyTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_retrieve_privacy_policy(): void
     {
         $response = $this->getJson('/api/app/privacy-policy');
@@ -21,17 +22,17 @@ final class PrivacyPolicyTest extends TestCase
             ->assertJsonStructure([
                 '_metadata' => [
                     'success',
-                    'message'
+                    'message',
                 ],
                 'data' => [
-                    'html_content'
-                ]
+                    'html_content',
+                ],
             ])
             ->assertJsonPath('_metadata.success', true)
             ->assertJsonPath('_metadata.message', 'Politique de confidentialité récupérée avec succès.');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_properly_formatted_html_content(): void
     {
         $response = $this->getJson('/api/app/privacy-policy');
@@ -42,7 +43,7 @@ final class PrivacyPolicyTest extends TestCase
 
         // Vérifier que le contenu HTML est présent
         $this->assertNotEmpty($data['html_content']);
-        
+
         // Vérifier la structure HTML
         $htmlContent = $data['html_content'];
         $this->assertStringContainsString('<h1 style=', $htmlContent, 'Le titre principal doit être présent');
@@ -52,7 +53,7 @@ final class PrivacyPolicyTest extends TestCase
         $this->assertStringContainsString('<p style=', $htmlContent, 'Les paragraphes doivent être stylés');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_correct_metadata(): void
     {
         $response = $this->getJson('/api/app/privacy-policy');
@@ -66,7 +67,7 @@ final class PrivacyPolicyTest extends TestCase
         $this->assertEquals($configContent, $data['html_content']);
     }
 
-    /** @test */
+    #[Test]
     public function it_includes_all_required_sections(): void
     {
         $response = $this->getJson('/api/app/privacy-policy');
@@ -78,13 +79,13 @@ final class PrivacyPolicyTest extends TestCase
         // Vérifier que les sections essentielles sont présentes dans le HTML
         $this->assertStringContainsString('Collecte de données', $htmlContent, "La section 'Collecte de données' doit être présente");
         $this->assertStringContainsString('Protection des données', $htmlContent, "La section 'Protection des données' doit être présente");
-        
+
         // Vérifier le contenu spécifique des sections
         $this->assertStringContainsString('informations d\'identification', $htmlContent, "Le contenu sur les informations d'identification doit être présent");
-        $this->assertStringContainsString('mesures de sécurité', $htmlContent, "Le contenu sur les mesures de sécurité doit être présent");
+        $this->assertStringContainsString('mesures de sécurité', $htmlContent, 'Le contenu sur les mesures de sécurité doit être présent');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_valid_json_structure(): void
     {
         $response = $this->getJson('/api/app/privacy-policy');
@@ -93,8 +94,8 @@ final class PrivacyPolicyTest extends TestCase
             ->assertJson([
                 '_metadata' => [
                     'success' => true,
-                    'message' => 'Politique de confidentialité récupérée avec succès.'
-                ]
+                    'message' => 'Politique de confidentialité récupérée avec succès.',
+                ],
             ]);
 
         // Vérifier que les données obligatoires sont présentes

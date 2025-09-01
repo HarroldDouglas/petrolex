@@ -22,6 +22,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $email
  * @property string|null $phone_number
  * @property string|null $address
+ * @property string $password
+ * @property string|null $remember_token
  * @property Carbon|null $email_verified_at
  * @property Carbon|null $phone_verified_at
  * @property Carbon|null $last_login_at

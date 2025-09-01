@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Tests\Feature\Endpoints;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 final class TermsAndConditionsTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_retrieve_terms_and_conditions(): void
     {
         $response = $this->getJson('/api/app/terms-and-conditions');
@@ -24,14 +23,14 @@ final class TermsAndConditionsTest extends TestCase
                     'message',
                 ],
                 'data' => [
-                    'html_content'
-                ]
+                    'html_content',
+                ],
             ])
             ->assertJsonPath('_metadata.success', true)
             ->assertJsonPath('_metadata.message', 'Conditions d\'utilisation récupérées avec succès.');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_properly_formatted_html_content(): void
     {
         $response = $this->getJson('/api/app/terms-and-conditions');
@@ -50,7 +49,7 @@ final class TermsAndConditionsTest extends TestCase
         $this->assertStringContainsString('<p style=', $htmlContent, 'Les paragraphes doivent être stylés');
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_correct_metadata(): void
     {
         $response = $this->getJson('/api/app/terms-and-conditions');
@@ -58,14 +57,14 @@ final class TermsAndConditionsTest extends TestCase
         $response->assertStatus(200);
 
         $data = $response->json('data');
-        
+
         // Vérifier que le contenu HTML est présent et non vide
         $this->assertNotEmpty($data['html_content']);
         $this->assertStringContainsString('Conditions d\'utilisation', $data['html_content']);
         $this->assertStringContainsString('2025-09-01', $data['html_content']);
     }
 
-    /** @test */
+    #[Test]
     public function it_includes_all_required_sections(): void
     {
         $response = $this->getJson('/api/app/terms-and-conditions');
@@ -73,13 +72,13 @@ final class TermsAndConditionsTest extends TestCase
         $response->assertStatus(200);
 
         $htmlContent = $response->json('data.html_content');
-        
+
         // Vérifier que toutes les sections requises sont présentes dans le HTML
         $this->assertStringContainsString('Collecte des données', $htmlContent, "La section 'Collecte des données' doit être présente");
         $this->assertStringContainsString('Protection des données', $htmlContent, "La section 'Protection des données' doit être présente");
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_valid_json_structure(): void
     {
         $response = $this->getJson('/api/app/terms-and-conditions');

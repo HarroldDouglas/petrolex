@@ -25,9 +25,9 @@ class AccessoryTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_create_an_accessory_type(): void
+    public function test_it_can_create_an_accessory_type(): void
     {
         // Arrange
         $accessoryTypeData = [
@@ -49,9 +49,9 @@ class AccessoryTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_find_an_accessory_type(): void
+    public function test_it_can_find_an_accessory_type(): void
     {
         // Arrange
         $accessoryType = $this->createAccessoryType();
@@ -65,9 +65,9 @@ class AccessoryTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_update_an_accessory_type(): void
+    public function test_it_can_update_an_accessory_type(): void
     {
         // Arrange
         $accessoryType = $this->createAccessoryType();
@@ -85,9 +85,9 @@ class AccessoryTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_delete_an_accessory_type(): void
+    public function test_it_can_delete_an_accessory_type(): void
     {
         // Arrange
         $accessoryType = $this->createAccessoryType();
@@ -101,9 +101,9 @@ class AccessoryTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_all_accessory_types(): void
+    public function test_it_can_get_all_accessory_types(): void
     {
         // Arrange
         $this->createAccessoryType();
@@ -117,9 +117,9 @@ class AccessoryTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_paginate_accessory_types(): void
+    public function test_it_can_paginate_accessory_types(): void
     {
         // Arrange
         for ($i = 0; $i < 20; $i++) {
@@ -134,9 +134,9 @@ class AccessoryTypeServiceTest extends TestCase
     }
 
     /**
-     * @test
+     * Test method
      */
-    public function it_can_get_accessory_stats(): void
+    public function test_it_can_get_accessory_stats(): void
     {
         // Arrange
         $this->createAccessoryType(['is_active' => true]);
