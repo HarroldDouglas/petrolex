@@ -8,8 +8,18 @@ use OpenApi\Annotations as OA;
  *     title="Payment Method",
  *     description="Represents a single payment method",
  *
- *     @OA\Property(property="value", type="string", description="The unique identifier for the payment method", example="credit_card"),
- *     @OA\Property(property="label", type="string", description="The human-readable label for the payment method", example="Carte de Crédit")
+ *     @OA\Property(
+ *         property="value",
+ *         type="string",
+ *         description="The unique identifier for the payment method",
+ *         example="credit_card"
+ *     ),
+ *     @OA\Property(
+ *         property="label",
+ *         type="string",
+ *         description="The human-readable label for the payment method",
+ *         example="Carte de Crédit"
+ *     )
  * )
  *
  * @OA\Schema(

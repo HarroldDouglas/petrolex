@@ -26,7 +26,9 @@ class VerifyOtpController extends Controller
         $identifier = $request->input('identifier');
         $otp = $request->input('otp');
 
-        if (! $this->otpService->verifyOtp($identifier, $otp)) {
+        $token = $this->otpService->verifyOtpWithToken($identifier, $otp);
+
+        if (! $token) {
             return OtpResponse::error('Invalid OTP or identifier.', null, 400);
         }
 
@@ -36,6 +38,6 @@ class VerifyOtpController extends Controller
             $this->userService->markEmailAsVerified($user);
         }
 
-        return OtpResponse::otpVerified($identifier);
+        return OtpResponse::otpVerified($identifier, $token);
     }
 }

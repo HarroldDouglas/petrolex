@@ -10,6 +10,8 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self DELIVERED()
  * @method static self CANCELLED()
  * @method static self PENDING()
+ * @method static self PAID()
+ * @method static self FAILED()
  */
 class OrderStatus extends Enum
 {
@@ -23,7 +25,9 @@ class OrderStatus extends Enum
             'PROCESSING' => 'En cours de livraison',
             'DELIVERED' => 'Livrée',
             'CANCELLED' => 'Annulée',
-            'PENDING' => 'En attente',
+            'PENDING' => 'En attente de paiement',
+            'PAID' => 'Payée',
+            'FAILED' => 'Paiement échoué',
         ];
     }
 
@@ -38,6 +42,8 @@ class OrderStatus extends Enum
             'DELIVERED' => 'delivered',
             'CANCELLED' => 'cancelled',
             'PENDING' => 'pending',
+            'PAID' => 'paid',
+            'FAILED' => 'failed',
         ];
     }
 
@@ -52,6 +58,8 @@ class OrderStatus extends Enum
             self::DELIVERED() => 'bg-success',
             self::CANCELLED() => 'bg-danger',
             self::PENDING() => 'bg-warning',
+            self::PAID() => 'bg-success',
+            self::FAILED() => 'bg-danger',
             default => 'bg-secondary',
         };
     }

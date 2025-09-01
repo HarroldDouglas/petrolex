@@ -29,8 +29,6 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(property="email", type="string", format="email", example="jean.dupont@example.com"),
  *             @OA\Property(property="phone_number", type="string", example="+237677123456"),
  *             @OA\Property(property="password", type="string", format="password", example="password123"),
- *             @OA\Property(property="address", type="string", nullable=true, example="123 Rue Principale, Douala"),
- *             @OA\Property(property="current_balance", type="number", format="float", nullable=true, example=0.0)
  *         )
  *     ),
  *
@@ -41,11 +39,15 @@ use OpenApi\Annotations as OA;
  *         @OA\JsonContent(
  *
  *             @OA\Property(property="_metadata", type="object",
- *                 @OA\Property(property="success", type="boolean", example=true),
- *                 @OA\Property(property="message", type="string", example="Client created successfully. An OTP has been sent to your email/phone for verification.")
+ *                 properties={
+ *                     @OA\Property(property="success", type="boolean", example=true),
+ *                     @OA\Property(property="message", type="string", example="Client created successfully. An OTP has been sent to your email/phone for verification.")
+ *                 }
  *             ),
  *             @OA\Property(property="data", type="object",
- *                 @OA\Property(property="identifier", type="string", example="jean.dupont@example.com")
+ *                 properties={
+ *                     @OA\Property(property="identifier", type="string", example="jean.dupont@example.com")
+ *                 }
  *             )
  *         )
  *     ),

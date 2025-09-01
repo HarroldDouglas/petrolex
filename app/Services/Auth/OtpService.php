@@ -18,6 +18,8 @@ class OtpService implements OtpServiceInterface
     private const OTP_TTL_MINUTES = 10;
     private const OTP_CACHE_PREFIX = 'otp_';
     private const SMS_MESSAGE_TEMPLATE = 'Votre code de vérification est %s. Ce code expirera dans 10 minutes.';
+    private const RESET_TOKEN_TTL_MINUTES = 10;
+    private const SECONDS_PER_MINUTE = 60;
 
     public function __construct(
         private UserRepositoryInterface $userRepository,
@@ -85,20 +87,29 @@ class OtpService implements OtpServiceInterface
      */
     public function verifyOtp(string $identifier, string $otp): bool
     {
-        $cacheKey = $this->generateCacheKey($identifier);
-        $storedOtp = Cache::get($cacheKey);
+        $user = $this->verifyOtpAndGetUser($identifier, $otp);
 
-        if (! $storedOtp) {
-            return false;
-        }
-
-        if ($storedOtp === $otp) {
-            $this->invalidateOtp($identifier);
+        if ($user) {
+            $this->userRepository->update($user, ['is_active' => true]);
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function verifyOtpWithToken(string $identifier, string $otp): ?string
+    {
+        $user = $this->verifyOtpAndGetUser($identifier, $otp);
+
+        if ($user) {
+            return $this->generateSecureResetToken($user, $identifier);
+        }
+
+        return null;
     }
 
     /**
@@ -129,6 +140,36 @@ class OtpService implements OtpServiceInterface
     private function generateCacheKey(string $identifier): string
     {
         return self::OTP_CACHE_PREFIX.md5($identifier);
+    }
+
+    /**
+     * Common OTP verification logic that returns the user if OTP is valid
+     *
+     * @param  string  $identifier  Email or phone number
+     * @param  string  $otp  OTP code to verify
+     * @return \App\Models\User|null User if OTP is valid, null otherwise
+     */
+    private function verifyOtpAndGetUser(string $identifier, string $otp): ?\App\Models\User
+    {
+        $cacheKey = $this->generateCacheKey($identifier);
+        $storedOtp = Cache::get($cacheKey);
+
+        if (! $storedOtp) {
+            return null;
+        }
+
+        if ($storedOtp === $otp) {
+            $this->invalidateOtp($identifier);
+            $user = $this->userRepository->findByEmailOrPhone($identifier);
+
+            if ($user) {
+                $this->userRepository->update($user, ['is_active' => true]);
+
+                return $user;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -171,6 +212,66 @@ class OtpService implements OtpServiceInterface
             $masked = str_repeat('*', $length - 7);
 
             return $start.$masked.$end;
+        }
+    }
+
+    /**
+     * Generate a secure reset token containing user ID, email, and expiration
+     *
+     * @param  \App\Models\User  $user  The user to generate token for
+     * @param  string  $identifier  User's email or phone number
+     * @return string JWT-like token
+     */
+    private function generateSecureResetToken(\App\Models\User $user, string $identifier): string
+    {
+        $payload = [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'exp' => time() + (self::RESET_TOKEN_TTL_MINUTES * self::SECONDS_PER_MINUTE),
+            'iat' => time(),
+            'iss' => config('app.name'),
+        ];
+
+        $header = base64_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
+        $payload = base64_encode(json_encode($payload));
+        $signature = base64_encode(hash_hmac('sha256', "{$header}.{$payload}", config('app.key'), true));
+
+        return "{$header}.{$payload}.{$signature}";
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function verifyResetToken(string $token): ?array
+    {
+        $parts = explode('.', $token);
+
+        if (count($parts) !== 3) {
+            return null;
+        }
+
+        [$header, $payload, $signature] = $parts;
+
+        try {
+            $decodedPayload = json_decode(base64_decode($payload), true);
+
+            if (! $decodedPayload || ! isset($decodedPayload['exp']) || ! isset($decodedPayload['user_id']) || ! isset($decodedPayload['email'])) {
+                return null;
+            }
+
+            if ($decodedPayload['exp'] < time()) {
+                return null;
+            }
+
+            $expectedSignature = base64_encode(hash_hmac('sha256', "{$header}.{$payload}", config('app.key'), true));
+
+            if (! hash_equals($signature, $expectedSignature)) {
+                return null;
+            }
+
+            return $decodedPayload;
+        } catch (\Exception $e) {
+            return null;
         }
     }
 }

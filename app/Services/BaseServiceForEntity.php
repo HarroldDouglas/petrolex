@@ -32,7 +32,8 @@ abstract class BaseServiceForEntity implements BaseServiceForEntityInterface
     public function update(Model $model, array $data): Model
     {
         return $this->executeInTransaction(function () use ($model, $data) {
-            $updatedModel = $this->repository->update($model, $data);
+            $filteredData = array_filter($data, fn ($v) => ! is_null($v));
+            $updatedModel = $this->repository->update($model, $filteredData);
 
             return $updatedModel;
         });

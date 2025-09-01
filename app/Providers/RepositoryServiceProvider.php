@@ -25,10 +25,14 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
         \App\Repositories\Contracts\SupplierDeliveryRepositoryInterface::class => \App\Repositories\Eloquent\SupplierDeliveryRepository::class,
         \App\Repositories\Contracts\OrderBottleScanRepositoryInterface::class => \App\Repositories\Eloquent\OrderBottleScanRepository::class,
         \App\Repositories\Contracts\NotificationRepositoryInterface::class => \App\Repositories\Eloquent\NotificationRepository::class,
-        \App\Repositories\Contracts\ProductCategoryCityPriceRepositoryInterface::class => \App\Repositories\ProductCategoryCityPriceRepository::class,
+        \App\Repositories\Contracts\ProductCategoryCityPriceRepositoryInterface::class => \App\Repositories\Eloquent\ProductCategoryCityPriceRepository::class,
         \App\Repositories\Geography\GeographyRepositoryInterface::class => \App\Repositories\Geography\EloquentGeographicRepository::class,
         \App\Repositories\Contracts\DeliveryPersonRepositoryInterface::class => \App\Repositories\Eloquent\DeliveryPersonRepository::class,
         \App\Repositories\Contracts\DeliveryTrackingRepositoryInterface::class => \App\Repositories\Eloquent\DeliveryTrackingRepository::class,
+        \App\Repositories\Contracts\ProductRepositoryInterface::class => \App\Repositories\Eloquent\ProductRepository::class,
+        \App\Repositories\Contracts\CityRepositoryInterface::class => \App\Repositories\Eloquent\CityRepository::class,
+        \App\Repositories\Contracts\NeighborhoodRepositoryInterface::class => \App\Repositories\Eloquent\NeighborhoodRepository::class,
+        \App\Repositories\Contracts\MunicipalityRepositoryInterface::class => \App\Repositories\Eloquent\MunicipalityRepository::class,
     ];
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Eloquent;
 
 use App\Models\ProductCategoryCityPrice;
 use App\Repositories\Contracts\ProductCategoryCityPriceRepositoryInterface;

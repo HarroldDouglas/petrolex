@@ -19,6 +19,7 @@ class AuthenticationService implements AuthenticationServiceInterface
     public function __construct(
         protected UserRepositoryInterface $userRepository,
         protected TokenRepositoryInterface $tokenRepository,
+        protected OtpService $otpService
     ) {}
 
     /**
@@ -32,7 +33,14 @@ class AuthenticationService implements AuthenticationServiceInterface
 
         // TODO : instead of directly writing text, let's start using quickly translation!
         if (! $user || ! Hash::check($credentials->password, $user->password)) {
-            throw new AuthenticationException('Les identifiants fournits sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
+            throw new AuthenticationException('Les identifiants fournis sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
+        }
+
+        if (! $user?->is_active) {
+
+            $this->otpService->sendOtp($user->email ?? $user->phone_number);
+
+            throw new AuthenticationException("Votre compte n'est pas encore activé, nous vous avons envoyé un code d'activation par mail.");
         }
 
         $plainTextToken = $this->tokenRepository->createToken($user, AuthConstants::API_TOKEN_NAME);

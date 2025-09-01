@@ -16,6 +16,12 @@ class GetCustomerOrdersController extends Controller
         protected CustomerService $customerService
     ) {}
 
+    /**
+     * Get customer orders.
+     *
+     * Route: GET /customers/{customer}/orders
+     * Name: api.customers.orders.index
+     */
     public function __invoke(GetCustomerOrdersRequest $request, Customer $customer): CustomerOrdersResponse
     {
         $validated = $request->validated();

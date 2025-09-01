@@ -34,4 +34,9 @@ interface BottleRepositoryInterface extends BaseRepositoryInterface
      * Count bottles with lost_stolen status
      */
     public function countLostStolenBottles(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int;
+
+    /**
+     * Find a bottle by its barcode and status
+     */
+    public function findByBarcodeAndStatus(string $barcode, array $statuses): ?Bottle;
 }

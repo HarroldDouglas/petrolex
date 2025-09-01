@@ -20,29 +20,25 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="is_active", type="boolean", example=true),
  *     @OA\Property(property="storage_capacity", type="string", nullable=true, example=null),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T14:47:11.000000Z"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T14:47:11.000000Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T14:47:11.000000Z")
  * )
  *
  * @OA\Schema(
  *     schema="DistributionCentersResponse",
- *     allOf={
- *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
- *         @OA\Schema(
+ *     type="object",
  *
- *             @OA\Property(
- *                 property="data",
- *                 type="array",
+ *     @OA\Property(
+ *         property="_metadata",
+ *         type="object",
+ *         @OA\Property(property="success", type="boolean", example=true),
+ *         @OA\Property(property="message", type="string", example="Liste des centres de distribution récupérée avec succès")
+ *     ),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
  *
- *                 @OA\Items(ref="#/components/schemas/DistributionCenterData")
- *             ),
- *
- *             @OA\Property(
- *                 property="message",
- *                 type="string",
- *                 example="Liste des centres de distribution récupérée avec succès"
- *             )
- *         )
- *     }
+ *         @OA\Items(ref="#/components/schemas/DistributionCenterData")
+ *     )
  * )
  */
 

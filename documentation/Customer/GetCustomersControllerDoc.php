@@ -12,6 +12,12 @@ use OpenApi\Annotations as OA;
  *         @OA\Schema(
  *
  *             @OA\Property(
+ *                 property="customer_id",
+ *                 type="integer",
+ *                 example=1,
+ *                 description="Unique identifier for the customer record"
+ *             ),
+ *             @OA\Property(
  *                 property="deliveryAddresses",
  *                 type="array",
  *

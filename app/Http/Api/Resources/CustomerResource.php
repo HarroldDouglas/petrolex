@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
  * @property string|null $last_login_at
  * @property string[] $roles
  * @property string $created_at
+ * @property int $customer_id
  * @property \App\Http\Resources\Customer\CustomerDeliveryAddressResource[] $deliveryAddresses
  * @property float|null $current_balance
  */
@@ -43,7 +44,7 @@ class CustomerResource extends UserResource
         return array_merge(
             $userData,
             [
-                'id' => $customer->id, // Override user ID with customer ID
+                'customer_id' => $customer->id,
                 'deliveryAddresses' => CustomerDeliveryAddressResource::collection($customer->deliveryAddresses) ?? [],
                 'current_balance' => $customer->current_balance ?? null,
             ]

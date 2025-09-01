@@ -4,16 +4,23 @@ namespace App\Providers;
 
 use App\Events\CustomerCreatedEvent;
 use App\Events\DistributionCenterUpdatedEvent;
+use App\Events\EmptyBottleReturnedEvent;
 use App\Events\OrderCreatedEvent;
+use App\Events\OrderDeliveredEvent;
+use App\Events\PasswordUpdatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
 use App\Listeners\AddOrderItemsToOrderListener;
+use App\Listeners\CreateBottleMovementForReturnedBottleListener;
 use App\Listeners\LogCustomerCreatedListener;
 use App\Listeners\LogDistributionCenterUpdated;
 use App\Listeners\LogOrderCreatedListener;
+use App\Listeners\LogOrderDelivered;
 use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
 use App\Listeners\Order\AssignDeliveryPersonToOrderListener;
+use App\Listeners\SendPasswordUpdatedNotification;
+use App\Listeners\UpdateBottleStatusAndMovementOnOrderDelivered;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -24,6 +31,16 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
+        EmptyBottleReturnedEvent::class => [
+            CreateBottleMovementForReturnedBottleListener::class,
+        ],
+        PasswordUpdatedEvent::class => [
+            SendPasswordUpdatedNotification::class,
+        ],
+        OrderDeliveredEvent::class => [
+            UpdateBottleStatusAndMovementOnOrderDelivered::class,
+            LogOrderDelivered::class,
+        ],
         UserUpdatedEvent::class => [
             LogUserUpdated::class,
         ],

@@ -46,6 +46,7 @@ return [
                 'annotations' => [
                     base_path('documentation'),
                     base_path('documentation/Customer'),
+                    base_path('documentation/App'),
                     base_path('documentation/schemas'),
                     base_path('documentation/schemas/shared'),
                     base_path('app/Http/Api/Controllers/'),
@@ -316,7 +317,7 @@ return [
          * Constants which can be used in annotations
          */
         'constants' => [
-            'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://my-default-host.com'),
+            'L5_SWAGGER_CONST_HOST' => env('APP_URL', 'http://localhost:8000'),
         ],
     ],
 ];

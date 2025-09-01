@@ -107,6 +107,23 @@
                     </ul>
                 </li>
             @endcanany
+
+            @canany([$permissionEnum::MUNICIPALITIES_VIEW()->value,
+                $permissionEnum::MUNICIPALITIES_CREATE()->value])
+                <li>
+                    <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#municipalities">
+                        <i class="iconoir-building"></i> Municipalités
+                    </a>
+                    <ul class="collapse" id="municipalities">
+                        @can($permissionEnum::MUNICIPALITIES_VIEW()->value)
+                            <li><a href="{{ route('municipalities.index') }}"> Liste</a></li>
+                        @endcan
+                        @can($permissionEnum::MUNICIPALITIES_CREATE()->value)
+                            <li><a href="{{ route('municipalities.create') }}"> Nouveau</a></li>
+                        @endcan
+                    </ul>
+                </li>
+            @endcanany
         </ul>
     </div>
 

@@ -99,6 +99,12 @@ class User extends Authenticatable implements HasMedia
         return "{$this->first_name} {$this->last_name}";
     }
 
+    public function getAvatar(): string
+    {
+        return $this->getMedia('images')->first()?->getUrl()
+            ?: 'assets/images/avtar/woman.jpg';
+    }
+
     /**
      * Get the customer associated with the user.
      */
