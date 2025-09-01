@@ -15,6 +15,53 @@
         }
     ],
     "paths": {
+        "/api/app/terms-and-conditions": {
+            "get": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Récupérer les conditions d'utilisation",
+                "description": "Retourne les conditions d'utilisation de l'application au format HTML structuré",
+                "operationId": "api.app.terms-and-conditions",
+                "responses": {
+                    "200": {
+                        "description": "Conditions d'utilisation récupérées avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TermsAndConditionsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Erreur lors de la récupération des conditions d'utilisation"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/forgot-password": {
             "post": {
                 "tags": [
@@ -2834,6 +2881,45 @@
     },
     "components": {
         "schemas": {
+            "TermsAndConditionsData": {
+                "properties": {
+                    "html_content": {
+                        "description": "Contenu HTML structuré des conditions d'utilisation",
+                        "type": "string",
+                        "example": "<h1>Conditions d'utilisation</h1><p>Dernière mise à jour : 2025-09-01</p>..."
+                    },
+                    "last_updated": {
+                        "description": "Date de dernière mise à jour",
+                        "type": "string",
+                        "example": "2025-09-01"
+                    },
+                    "sections": {
+                        "description": "Nombre de sections dans les conditions",
+                        "type": "integer",
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            },
+            "TermsAndConditionsResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/TermsAndConditionsData"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Conditions d'utilisation récupérées avec succès."
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "LoginRequest": {
                 "required": [
                     "login",
@@ -4876,6 +4962,10 @@
         }
     },
     "tags": [
+        {
+            "name": "App",
+            "description": "App"
+        },
         {
             "name": "Authentification",
             "description": "Authentification"
