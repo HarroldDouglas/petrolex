@@ -10,19 +10,7 @@ use OpenApi\Annotations as OA;
  *         property="html_content",
  *         type="string",
  *         description="Contenu HTML structuré des conditions d'utilisation",
- *         example="<h1>Conditions d'utilisation</h1><p>Dernière mise à jour : 2025-09-01</p>..."
- *     ),
- *     @OA\Property(
- *         property="last_updated",
- *         type="string",
- *         description="Date de dernière mise à jour",
- *         example="2025-09-01"
- *     ),
- *     @OA\Property(
- *         property="sections",
- *         type="integer",
- *         description="Nombre de sections dans les conditions",
- *         example=2
+ *         example="<h1 style=""font-weight: bold; font-size: 18px; margin-bottom: 12px;"">Conditions d'utilisation</h1><p style=""margin-bottom: 16px; color: #666; font-size: 14px;"">Dernière mise à jour : 2025-09-01</p><p style=""margin-bottom: 20px; line-height: 1.6;"">Bienvenue dans l'application Petrolex...</p>"
  *     )
  * )
  *

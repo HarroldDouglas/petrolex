@@ -15,6 +15,53 @@
         }
     ],
     "paths": {
+        "/api/app/privacy-policy": {
+            "get": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Récupérer la politique de confidentialité",
+                "description": "Retourne la politique de confidentialité de l'application au format HTML structuré",
+                "operationId": "api.app.privacy-policy",
+                "responses": {
+                    "200": {
+                        "description": "Politique de confidentialité récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrivacyPolicyResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Erreur lors de la récupération de la politique de confidentialité"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/app/support/contact": {
             "get": {
                 "tags": [
@@ -2957,22 +3004,41 @@
     },
     "components": {
         "schemas": {
+            "PrivacyPolicyData": {
+                "properties": {
+                    "html_content": {
+                        "description": "Contenu HTML structuré de la politique de confidentialité",
+                        "type": "string",
+                        "example": "<h1 style=\"font-weight: bold; font-size: 18px; margin-bottom: 12px;\">Politique de confidentialité</h1><p style=\"margin-bottom: 16px; color: #666; font-size: 14px;\">Dernière mise à jour : 2025-09-01</p><p style=\"margin-bottom: 20px; line-height: 1.6;\">Votre vie privée est importante pour nous...</p>"
+                    }
+                },
+                "type": "object"
+            },
+            "PrivacyPolicyResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/PrivacyPolicyData"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Politique de confidentialité récupérée avec succès."
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "TermsAndConditionsData": {
                 "properties": {
                     "html_content": {
                         "description": "Contenu HTML structuré des conditions d'utilisation",
                         "type": "string",
-                        "example": "<h1>Conditions d'utilisation</h1><p>Dernière mise à jour : 2025-09-01</p>..."
-                    },
-                    "last_updated": {
-                        "description": "Date de dernière mise à jour",
-                        "type": "string",
-                        "example": "2025-09-01"
-                    },
-                    "sections": {
-                        "description": "Nombre de sections dans les conditions",
-                        "type": "integer",
-                        "example": 2
+                        "example": "<h1 style=\"font-weight: bold; font-size: 18px; margin-bottom: 12px;\">Conditions d'utilisation</h1><p style=\"margin-bottom: 16px; color: #666; font-size: 14px;\">Dernière mise à jour : 2025-09-01</p><p style=\"margin-bottom: 20px; line-height: 1.6;\">Bienvenue dans l'application Petrolex...</p>"
                     }
                 },
                 "type": "object"

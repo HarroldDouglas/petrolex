@@ -6,23 +6,23 @@ use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Config;
 
-class GetTermsAndConditionsController extends Controller
+class GetPrivacyPolicyController extends Controller
 {
     /**
-     * Get the application terms and conditions.
+     * Get the application privacy policy.
      *
-     * Route: GET /terms-and-conditions
-     * Name: api.terms-and-conditions
+     * Route: GET /privacy-policy
+     * Name: api.privacy-policy
      */
     public function __invoke(): ApiResponse
     {
-        $htmlContent = Config::get('terms.content');
+        $htmlContent = Config::get('privacy.content');
         
         return ApiResponse::success(
             data: [
                 'html_content' => $htmlContent,
             ],
-            message: 'Conditions d\'utilisation récupérées avec succès.'
+            message: 'Politique de confidentialité récupérée avec succès.'
         );
     }
 }
