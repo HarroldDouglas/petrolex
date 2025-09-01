@@ -16,12 +16,10 @@ class GetSupportContactController extends Controller
      */
     public function __invoke(): ApiResponse
     {
-        $contact = Config::get('support');
-
         return ApiResponse::success(
             data: [
-                'phone_number' => $contact['phone_number'],
-                'email' => $contact['email'],
+                'phone_number' => Config::get('support.phone_number'),
+                'email' => Config::get('support.email'),
             ],
             message: 'Informations de contact du support récupérées avec succès.'
         );
