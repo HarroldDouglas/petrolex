@@ -75,6 +75,7 @@ final class StartDeliveryTrackingController extends Controller
         }
 
         /** @var Order */
+        $order->load('deliveryAddress');
         return $order;
     }
 

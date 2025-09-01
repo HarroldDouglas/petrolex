@@ -43,6 +43,7 @@ final class DeliveryTracking extends Model
         'distance_remaining',
         'total_distance',
         'current_speed',
+        'progress_percentage',
         'route_geometry',
         'started_at',
         'delivered_at',
@@ -61,6 +62,7 @@ final class DeliveryTracking extends Model
         'driver_lat' => 'decimal:8',
         'driver_lng' => 'decimal:8',
         'current_speed' => 'decimal:2',
+        'progress_percentage' => 'decimal:2',
     ];
 
     public function order(): BelongsTo
