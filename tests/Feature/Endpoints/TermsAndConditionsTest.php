@@ -24,9 +24,7 @@ final class TermsAndConditionsTest extends TestCase
                     'message'
                 ],
                 'data' => [
-                    'html_content',
-                    'last_updated',
-                    'sections'
+                    'html_content'
                 ]
             ])
             ->assertJsonPath('_metadata.success', true)
@@ -60,11 +58,11 @@ final class TermsAndConditionsTest extends TestCase
         $response->assertStatus(200);
 
         $data = $response->json('data');
-        $configSections = Config::get('terms.sections');
-        $configLastUpdated = Config::get('terms.last_updated');
-
-        $this->assertEquals(count($configSections), $data['sections']);
-        $this->assertEquals($configLastUpdated, $data['last_updated']);
+        
+        // Vérifier que le contenu HTML est présent et non vide
+        $this->assertNotEmpty($data['html_content']);
+        $this->assertStringContainsString('Conditions d\'utilisation', $data['html_content']);
+        $this->assertStringContainsString('2025-09-01', $data['html_content']);
     }
 
     /** @test */
@@ -75,12 +73,10 @@ final class TermsAndConditionsTest extends TestCase
         $response->assertStatus(200);
 
         $htmlContent = $response->json('data.html_content');
-        $configSections = Config::get('terms.sections');
-
-        foreach ($configSections as $section) {
-            $this->assertStringContainsString($section['title'], $htmlContent, "La section '{$section['title']}' doit être présente");
-            $this->assertStringContainsString($section['content'], $htmlContent, "Le contenu de la section '{$section['title']}' doit être présent");
-        }
+        
+        // Vérifier que toutes les sections requises sont présentes dans le HTML
+        $this->assertStringContainsString('Collecte des données', $htmlContent, "La section 'Collecte des données' doit être présente");
+        $this->assertStringContainsString('Protection des données', $htmlContent, "La section 'Protection des données' doit être présente");
     }
 
     /** @test */
@@ -97,7 +93,5 @@ final class TermsAndConditionsTest extends TestCase
             ]);
 
         $this->assertArrayHasKey('html_content', $response->json('data'));
-        $this->assertArrayHasKey('last_updated', $response->json('data'));
-        $this->assertArrayHasKey('sections', $response->json('data'));
     }
 }

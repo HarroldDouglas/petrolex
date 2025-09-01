@@ -24,9 +24,7 @@ final class PrivacyPolicyTest extends TestCase
                     'message'
                 ],
                 'data' => [
-                    'html_content',
-                    'last_updated',
-                    'sections'
+                    'html_content'
                 ]
             ])
             ->assertJsonPath('_metadata.success', true)
@@ -62,12 +60,10 @@ final class PrivacyPolicyTest extends TestCase
         $response->assertStatus(200);
 
         $data = $response->json('data');
-        $configSections = Config::get('privacy.sections');
-        $configLastUpdated = Config::get('privacy.last_updated');
+        $configContent = Config::get('privacy.content');
 
-        // Vérifier que les métadonnées correspondent à la configuration
-        $this->assertEquals(count($configSections), $data['sections']);
-        $this->assertEquals($configLastUpdated, $data['last_updated']);
+        // Vérifier que le contenu HTML correspond à la configuration
+        $this->assertEquals($configContent, $data['html_content']);
     }
 
     /** @test */
@@ -78,13 +74,14 @@ final class PrivacyPolicyTest extends TestCase
         $response->assertStatus(200);
 
         $htmlContent = $response->json('data.html_content');
-        $configSections = Config::get('privacy.sections');
 
-        // Vérifier que toutes les sections de configuration sont présentes dans le HTML
-        foreach ($configSections as $section) {
-            $this->assertStringContainsString($section['title'], $htmlContent, "La section '{$section['title']}' doit être présente");
-            $this->assertStringContainsString($section['content'], $htmlContent, "Le contenu de la section '{$section['title']}' doit être présent");
-        }
+        // Vérifier que les sections essentielles sont présentes dans le HTML
+        $this->assertStringContainsString('Collecte de données', $htmlContent, "La section 'Collecte de données' doit être présente");
+        $this->assertStringContainsString('Protection des données', $htmlContent, "La section 'Protection des données' doit être présente");
+        
+        // Vérifier le contenu spécifique des sections
+        $this->assertStringContainsString('informations d\'identification', $htmlContent, "Le contenu sur les informations d'identification doit être présent");
+        $this->assertStringContainsString('mesures de sécurité', $htmlContent, "Le contenu sur les mesures de sécurité doit être présent");
     }
 
     /** @test */
@@ -102,7 +99,5 @@ final class PrivacyPolicyTest extends TestCase
 
         // Vérifier que les données obligatoires sont présentes
         $this->assertArrayHasKey('html_content', $response->json('data'));
-        $this->assertArrayHasKey('last_updated', $response->json('data'));
-        $this->assertArrayHasKey('sections', $response->json('data'));
     }
 }

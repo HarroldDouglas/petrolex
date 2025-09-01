@@ -16,37 +16,13 @@ class PreviewPrivacyPolicyController extends Controller
      */
     public function __invoke(): Response
     {
-        $privacy = Config::get('privacy');
-        
-        $htmlContent = $this->buildHtmlContent($privacy);
+        $htmlContent = Config::get('privacy.content');
         
         $fullHtml = $this->wrapInHtmlDocument($htmlContent);
         
         return new Response($fullHtml, 200, [
             'Content-Type' => 'text/html; charset=utf-8'
         ]);
-    }
-    
-    /**
-     * Build structured HTML content for privacy policy.
-     */
-    private function buildHtmlContent(array $privacy): string
-    {
-        $html = '';
-        
-        $html .= '<h1 style="font-weight: bold; font-size: 18px; margin-bottom: 12px;">' . $privacy['title'] . '</h1>';
-        
-        $html .= '<p style="margin-bottom: 16px; color: #666; font-size: 14px;">Dernière mise à jour : ' . $privacy['last_updated'] . '</p>';
-        
-        $html .= '<p style="margin-bottom: 20px; line-height: 1.6;">' . $privacy['introduction'] . '</p>';
-        
-        foreach ($privacy['sections'] as $section) {
-            $html .= '<h2 style="font-weight: bold; font-size: 16px; margin-bottom: 8px; margin-top: 20px;">' . $section['title'] . '</h2>';
-            
-            $html .= '<p style="margin-bottom: 16px; line-height: 1.6;">' . $section['content'] . '</p>';
-        }
-        
-        return $html;
     }
     
     /**
