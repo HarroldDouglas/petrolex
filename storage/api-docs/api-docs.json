@@ -15,6 +15,82 @@
         }
     ],
     "paths": {
+        "/api/app/support/contact": {
+            "get": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Get support team contact information",
+                "description": "Returns the contact information (phone number and email) for the support team",
+                "operationId": "getSupportContact",
+                "responses": {
+                    "200": {
+                        "description": "Support contact information retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Informations de contact du support récupérées avec succès."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "phone_number": {
+                                                    "type": "string",
+                                                    "example": "+237 6 77 88 99 00"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "support@petrolex.cm"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Une erreur interne s'est produite."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/app/terms-and-conditions": {
             "get": {
                 "tags": [
