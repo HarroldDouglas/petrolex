@@ -75,7 +75,6 @@ final class StartDeliveryTrackingController extends Controller
             throw new \InvalidArgumentException('Order not found');
         }
 
-        
         $order->load('deliveryAddress');
 
         return $order;
