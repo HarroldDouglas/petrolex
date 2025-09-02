@@ -5,24 +5,24 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Get(
  *     path="/api/tracking/delivery/{orderId}",
- *     summary="Get delivery tracking details",
- *     description="Retrieves the tracking details for a specific delivery.",
+ *     summary="Obtenir les détails de suivi de livraison",
+ *     description="Récupère les détails de suivi pour une livraison spécifique.",
  *     operationId="api.tracking.delivery.details",
- *     tags={"Suivi de Livraison"},
+ *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
  *         name="orderId",
  *         in="path",
  *         required=true,
- *         description="The order ID of the delivery to track",
+ *         description="L'ID de la commande de la livraison à suivre",
  *
  *         @OA\Schema(type="integer")
  *     ),
  *
  *     @OA\Response(
  *         response=200,
- *         description="Successful operation",
+ *         description="Opération réussie",
  *
  *         @OA\JsonContent(
  *             allOf={
@@ -31,7 +31,7 @@ use OpenApi\Annotations as OA;
  *                 @OA\Schema(
  *
  *                     @OA\Property(property="data", ref="#/components/schemas/DeliveryTrackingData"),
- *                     @OA\Property(property="message", type="string", example="Delivery tracking details retrieved successfully.")
+ *                     @OA\Property(property="message", type="string", example="Détails de suivi de livraison récupérés avec succès.")
  *                 )
  *             }
  *         )
@@ -39,21 +39,21 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=401,
- *         description="Unauthorized",
+ *         description="Non autorisé",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=404,
- *         description="Delivery not found",
+ *         description="Livraison introuvable",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=500,
- *         description="Internal server error",
+ *         description="Erreur serveur interne",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )

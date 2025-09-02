@@ -54,6 +54,27 @@
             padding: 15px;
         }
 
+        .otp-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #227093;
+        }
+
+        .otp-code {
+            font-size: 32px;
+            letter-spacing: 8px;
+            color: #227093;
+            font-weight: bold;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            border: 2px solid #227093;
+        }
+
     </style>
 </head>
 
@@ -76,8 +97,12 @@
         </div>
         
         <div class="email-footer">
-            <p>Cordialement,</p>
-            <p><strong>L'équipe Petrolex</strong></p>
+            @hasSection('footer')
+                @yield('footer')
+            @else
+                <p>{{ __('email.regards') }}</p>
+                <p><strong>{{ __('email.team_signature', ['app' => config('app.name')]) }}</strong></p>
+            @endif
         </div>
     </div>
     

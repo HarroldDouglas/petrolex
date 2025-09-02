@@ -9,9 +9,9 @@ class DeliveryProgressHelper
     /**
      * Calculate delivery progress percentage based on total distance and remaining distance
      *
-     * @param float|null $totalDistance Total distance in kilometers
-     * @param float|null $remainingDistance Remaining distance in kilometers
-     * @param bool $enableLogging Whether to log the calculation details
+     * @param  float|null  $totalDistance  Total distance in kilometers
+     * @param  float|null  $remainingDistance  Remaining distance in kilometers
+     * @param  bool  $enableLogging  Whether to log the calculation details
      * @return float|null Progress percentage (0-100) or null if calculation is not possible
      */
     public static function calculateProgressPercentage(
@@ -19,7 +19,7 @@ class DeliveryProgressHelper
         ?float $remainingDistance,
         bool $enableLogging = false
     ): ?float {
-        if (!$totalDistance || !$remainingDistance || $totalDistance <= 0) {
+        if (! $totalDistance || ! $remainingDistance || $totalDistance <= 0) {
             if ($enableLogging) {
                 Log::info('Cannot calculate progress - missing or invalid data', [
                     'total_distance' => $totalDistance,
@@ -49,8 +49,8 @@ class DeliveryProgressHelper
     /**
      * Calculate delivery progress percentage with automatic logging
      *
-     * @param float|null $totalDistance Total distance in kilometers
-     * @param float|null $remainingDistance Remaining distance in kilometers
+     * @param  float|null  $totalDistance  Total distance in kilometers
+     * @param  float|null  $remainingDistance  Remaining distance in kilometers
      * @return float|null Progress percentage (0-100) or null if calculation is not possible
      */
     public static function calculateProgressPercentageWithLogging(

@@ -15,6 +15,7 @@ class CustomerDeliveryAddressDTO extends BaseDTO
         public ?float $latitude,
         public ?float $longitude,
         public ?string $phone,
+        public ?string $phone_country_code,
         public ?string $contact_firstname,
         public ?string $contact_lastname,
         public ?string $email,

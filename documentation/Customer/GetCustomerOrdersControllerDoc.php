@@ -99,6 +99,12 @@ use OpenApi\Annotations as OA;
  *     type="object",
  *
  *     @OA\Property(
+ *         property="_metadata",
+ *         type="object",
+ *         @OA\Property(property="success", type="boolean", example=true),
+ *         @OA\Property(property="message", type="string", example="Liste des commandes du client récupérée avec succès")
+ *     ),
+ *     @OA\Property(
  *         property="data",
  *         type="array",
  *
@@ -114,6 +120,5 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="total", type="integer", example=100)
  *     )
  * )
- *
  */
 class GetCustomerOrdersControllerDoc {}

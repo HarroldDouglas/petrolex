@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\Enums\Language;
 use App\Enums\UserRole;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,6 +29,7 @@ abstract class BaseUserRequest extends FormRequest
                 Rule::unique('users', 'phone_number'),
             ],
             'password' => ['required', 'string', 'min:8'],
+            'language' => ['nullable', Rule::in(Language::getValues())],
             'role' => ['required', Rule::in(UserRole::values())],
             'image' => [
                 'nullable',
@@ -78,6 +80,7 @@ abstract class BaseUserRequest extends FormRequest
             'password.required' => 'Le mot de passe est obligatoire.',
             'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'language.in' => 'La langue sélectionnée n\'est pas valide.',
             'role.enum' => 'Le rôle sélectionné n\'est pas valide.',
             'role.required' => 'Le rôle est obligatoire.',
             'image.image' => 'L\'image doit être un fichier image valide.',

@@ -15,6 +15,7 @@ class UpdateUserDTO extends BaseDTO
         public ?string $email = null,
         public ?string $phone_number = null,
         public ?string $password = null,
+        public ?string $language = null,
         public ?bool $is_active = null,
         public ?UserRole $role = null,
         /** @var array<int> $distribution_center_ids */

@@ -35,7 +35,7 @@ class ResendOtpController extends Controller
         try {
             $this->otpService->sendOtp($user->email);
 
-            return OtpResponse::otpSent($user->email);
+            return OtpResponse::otpSent($user->email, null, 200);
         } catch (\Exception $e) {
             return OtpResponse::error('Echec lors de l\'envoi de l\'OTP. Veuillez réessayer plus tard.', null, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }

@@ -3,14 +3,14 @@
 /**
  * @OA\Get(
  *     path="/api/customers/{customer}/orders",
- *     summary="Get orders for a specific customer",
- *     tags={"Customers"},
+ *     summary="Obtenir les commandes d'un client spécifique",
+ *     tags={"Clients"},
  *
  *     @OA\Parameter(
  *         name="customer",
  *         in="path",
  *         required=true,
- *         description="The ID of the customer",
+ *         description="L'ID du client",
  *
  *         @OA\Schema(type="integer")
  *     ),
@@ -18,7 +18,7 @@
  *     @OA\Parameter(
  *         name="order_number",
  *         in="query",
- *         description="Filter by order number",
+ *         description="Filtrer par numéro de commande",
  *
  *         @OA\Schema(type="string")
  *     ),
@@ -26,7 +26,7 @@
  *     @OA\Parameter(
  *         name="status",
  *         in="query",
- *         description="Filter by order status",
+ *         description="Filtrer par statut de commande",
  *
  *         @OA\Schema(ref="#/components/schemas/OrderStatus")
  *     ),
@@ -34,7 +34,7 @@
  *     @OA\Parameter(
  *         name="ticket_url",
  *         in="query",
- *         description="Filter by ticket URL",
+ *         description="Filtrer par URL du ticket",
  *
  *         @OA\Schema(type="string")
  *     ),
@@ -42,7 +42,7 @@
  *      @OA\Parameter(
  *         name="delivery_type",
  *         in="query",
- *         description="Filter by delivery type",
+ *         description="Filtrer par type de livraison",
  *
  *         @OA\Schema(ref="#/components/schemas/DeliveryType")
  *     ),
@@ -50,7 +50,7 @@
  *      @OA\Parameter(
  *         name="payment_method",
  *         in="query",
- *         description="Filter by payment method",
+ *         description="Filtrer par méthode de paiement",
  *
  *         @OA\Schema(ref="#/components/schemas/PaymentMethod")
  *     ),
@@ -58,21 +58,21 @@
  *     @OA\Parameter(
  *         name="per_page",
  *         in="query",
- *         description="Number of items per page",
+ *         description="Nombre d'éléments par page",
  *
  *         @OA\Schema(type="integer", default=10)
  *     ),
  *
  *     @OA\Response(
  *         response=200,
- *         description="Successful operation",
+ *         description="Opération réussie",
  *
  *         @OA\JsonContent(ref="#/components/schemas/CustomerOrdersResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=404,
- *         description="Customer not found"
+ *         description="Client introuvable"
  *     )
  * )
  */

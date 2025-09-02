@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Event fired when a delivery position is updated
- * 
+ *
  * This event broadcasts real-time position updates for delivery tracking,
  * providing comprehensive delivery information to connected clients.
  */
@@ -35,14 +35,14 @@ class DeliveryPositionUpdated implements ShouldBroadcast
     /**
      * Create a new delivery position updated event
      *
-     * @param DeliveryTracking $delivery The delivery tracking instance
+     * @param  DeliveryTracking  $delivery  The delivery tracking instance
      */
     public function __construct(DeliveryTracking $delivery)
     {
         $this->delivery = $delivery->load([
             'order.customer',
             'order.deliveryPerson',
-            'order.deliveryAddress'
+            'order.deliveryAddress',
         ]);
     }
 
@@ -55,14 +55,12 @@ class DeliveryPositionUpdated implements ShouldBroadcast
     {
         return [
             new Channel('delivery-tracking'),
-            new Channel('delivery-' . $this->delivery->order->order_number),
+            new Channel('delivery-'.$this->delivery->order->order_number),
         ];
     }
 
     /**
      * Get the broadcast event name
-     *
-     * @return string
      */
     public function broadcastAs(): string
     {
@@ -148,19 +146,19 @@ class DeliveryPositionUpdated implements ShouldBroadcast
     /**
      * Calculate the total route distance from route geometry
      *
-     * @param mixed $routeGeometry The route geometry data
+     * @param  mixed  $routeGeometry  The route geometry data
      * @return float|null The total distance in kilometers, or null if calculation fails
      */
     private function calculateRouteDistance(mixed $routeGeometry): ?float
     {
-        if (!$routeGeometry) {
+        if (! $routeGeometry) {
             return null;
         }
 
         try {
             $geometry = $this->parseRouteGeometry($routeGeometry);
-            
-            if (!$this->isValidGeometry($geometry)) {
+
+            if (! $this->isValidGeometry($geometry)) {
                 return null;
             }
 
@@ -168,7 +166,7 @@ class DeliveryPositionUpdated implements ShouldBroadcast
         } catch (Exception $e) {
             Log::warning('Error calculating route distance', [
                 'error' => $e->getMessage(),
-                'delivery_id' => $this->delivery->id
+                'delivery_id' => $this->delivery->id,
             ]);
 
             return null;
@@ -178,8 +176,8 @@ class DeliveryPositionUpdated implements ShouldBroadcast
     /**
      * Parse route geometry from string or array format
      *
-     * @param mixed $routeGeometry
      * @return array<string, mixed>
+     *
      * @throws Exception
      */
     private function parseRouteGeometry(mixed $routeGeometry): array
@@ -189,10 +187,11 @@ class DeliveryPositionUpdated implements ShouldBroadcast
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception('Invalid JSON in route geometry');
             }
+
             return $decoded;
         }
 
-        if (!is_array($routeGeometry)) {
+        if (! is_array($routeGeometry)) {
             throw new Exception('Route geometry must be string or array');
         }
 
@@ -202,8 +201,7 @@ class DeliveryPositionUpdated implements ShouldBroadcast
     /**
      * Validate that geometry has required structure
      *
-     * @param array<string, mixed> $geometry
-     * @return bool
+     * @param  array<string, mixed>  $geometry
      */
     private function isValidGeometry(array $geometry): bool
     {
@@ -213,8 +211,7 @@ class DeliveryPositionUpdated implements ShouldBroadcast
     /**
      * Calculate total distance from coordinate array
      *
-     * @param array<int, array<int, float>> $coordinates
-     * @return float
+     * @param  array<int, array<int, float>>  $coordinates
      */
     private function calculateDistanceFromCoordinates(array $coordinates): float
     {
@@ -236,10 +233,10 @@ class DeliveryPositionUpdated implements ShouldBroadcast
     /**
      * Calculate distance between two GPS points using the Haversine formula
      *
-     * @param float $lat1 First point latitude
-     * @param float $lon1 First point longitude
-     * @param float $lat2 Second point latitude
-     * @param float $lon2 Second point longitude
+     * @param  float  $lat1  First point latitude
+     * @param  float  $lon1  First point longitude
+     * @param  float  $lat2  Second point latitude
+     * @param  float  $lon2  Second point longitude
      * @return float Distance in kilometers
      */
     private function calculateHaversineDistance(
@@ -262,8 +259,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get driver's current latitude as float
-     *
-     * @return float
      */
     private function getDriverLatitude(): float
     {
@@ -272,8 +267,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get driver's current longitude as float
-     *
-     * @return float
      */
     private function getDriverLongitude(): float
     {
@@ -295,8 +288,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get destination latitude as float
-     *
-     * @return float
      */
     private function getDestinationLatitude(): float
     {
@@ -305,8 +296,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get destination longitude as float
-     *
-     * @return float
      */
     private function getDestinationLongitude(): float
     {
@@ -328,8 +317,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get formatted destination address
-     *
-     * @return string|null
      */
     private function getDestinationAddress(): ?string
     {
@@ -339,8 +326,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get remaining distance as float
-     *
-     * @return float
      */
     private function getDistanceRemaining(): float
     {
@@ -349,8 +334,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get current speed as float
-     *
-     * @return float
      */
     private function getCurrentSpeed(): float
     {
@@ -359,8 +342,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get driver's full name
-     *
-     * @return string|null
      */
     private function getDriverName(): ?string
     {
@@ -370,8 +351,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get driver's phone number
-     *
-     * @return string|null
      */
     private function getDriverPhone(): ?string
     {
@@ -380,8 +359,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get customer's full name
-     *
-     * @return string|null
      */
     private function getCustomerName(): ?string
     {
@@ -391,8 +368,6 @@ class DeliveryPositionUpdated implements ShouldBroadcast
 
     /**
      * Get customer's phone number
-     *
-     * @return string|null
      */
     private function getCustomerPhone(): ?string
     {

@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property float|null $latitude
  * @property float|null $longitude
  * @property string|null $phone
+ * @property string|null $phone_country_code
  * @property string|null $contact_firstname
  * @property string|null $contact_lastname
  * @property string|null $email
@@ -61,6 +62,7 @@ class CustomerDeliveryAddress extends Model
         'latitude',
         'longitude',
         'phone',
+        'phone_country_code',
         'contact_firstname',
         'contact_lastname',
         'email',

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Enums\Language;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -19,6 +20,7 @@ class OtpMail extends Mailable
     public function __construct(
         public string $otp,
         public string $maskedIdentifier,
+        public ?string $userLanguage = null,
     ) {}
 
     /**
@@ -27,8 +29,21 @@ class OtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Votre mot de passe à usage unique',
+            subject: $this->getLocalizedSubject(),
         );
+    }
+
+    /**
+     * Get the localized subject for the email
+     */
+    private function getLocalizedSubject(): string
+    {
+        $locale = $this->userLanguage ?? Language::default();
+
+        return match ($locale) {
+            'en' => __('email.otp_subject', [], 'en'),
+            default => __('email.otp_subject', [], 'fr'),
+        };
     }
 
     /**
@@ -37,10 +52,11 @@ class OtpMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.otp',
+            view: 'emails.otp-final',
             with: [
                 'otp' => $this->otp,
                 'maskedIdentifier' => $this->maskedIdentifier,
+                'userLanguage' => $this->userLanguage ?? Language::default(),
             ],
         );
     }

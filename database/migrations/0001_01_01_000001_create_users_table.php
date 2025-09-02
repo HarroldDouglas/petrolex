@@ -19,7 +19,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
+            $table->foreignId('country_id')->nullable()->constrained()->onDelete('set null');
             $table->boolean('is_active')->default(true);
+            $table->string('language', 2)->nullable()->default('fr')->index();
             $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

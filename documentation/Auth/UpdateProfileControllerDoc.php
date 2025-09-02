@@ -17,13 +17,16 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
  *         @OA\Property(property="phone_number", type="string", example="+237677123456"),
  *         @OA\Property(property="address", type="string", nullable=true, example="123 Main St"),
- *         @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
- *         @OA\Property(property="phone_verified_at", type="string", format="date-time", nullable=true),
- *         @OA\Property(property="last_login_at", type="string", format="date-time", nullable=true),
- *         @OA\Property(property="roles", type="array", @OA\Items(type="string"), example={"admin"}),
- *         @OA\Property(property="customer_id", type="integer", nullable=true),
- *         @OA\Property(property="delivery_person_id", type="integer", nullable=true),
- *         @OA\Property(property="created_at", type="string", format="date-time"),
+ *         @OA\Property(property="language", type="string", enum={"fr", "en"}, example="fr", description="User's preferred language"),
+ *         @OA\Property(property="current_balance", type="number", format="float", nullable=true, example=1500.00, description="Customer current balance (only for customers)"),
+ *         @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true, example="2024-01-15T10:30:00.000000Z"),
+ *         @OA\Property(property="phone_verified_at", type="string", format="date-time", nullable=true, example="2024-01-15T10:30:00.000000Z"),
+ *         @OA\Property(property="last_login_at", type="string", format="date-time", nullable=true, example="2024-12-01T08:45:00.000000Z"),
+ *         @OA\Property(property="roles", type="array", @OA\Items(type="string"), example={"customer"}),
+ *         @OA\Property(property="customer_id", type="integer", nullable=true, example=123, description="Customer ID if user is a customer"),
+ *         @OA\Property(property="delivery_person_id", type="integer", nullable=true, example=456, description="Delivery person ID if user is a delivery person"),
+ *         @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-15T10:30:00.000000Z"),
+ *         @OA\Property(property="updated_at", type="string", format="date-time", example="2024-12-01T08:45:00.000000Z"),
  *     }
  * )
  *
@@ -34,6 +37,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="last_name", type="string", nullable=true, example="Doe", description="User's last name"),
  *     @OA\Property(property="email", type="string", format="email", nullable=true, example="john.doe@example.com", description="User's email address"),
  *     @OA\Property(property="phone_number", type="string", nullable=true, example="+237677123456", description="User's phone number"),
+ *     @OA\Property(property="address", type="string", nullable=true, example="123 Main St", description="User's address"),
+ *     @OA\Property(property="language", type="string", enum={"fr", "en"}, nullable=true, example="fr", description="User's preferred language (fr for French, en for English)"),
  * )
  *
  * @OA\Schema(

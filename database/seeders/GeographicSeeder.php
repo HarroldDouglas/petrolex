@@ -18,7 +18,12 @@ class GeographicSeeder extends Seeder
     {
         $cameroon = Country::firstOrCreate(
             ['code' => 'CM'],
-            ['name' => 'Cameroun', 'is_active' => true]
+            [
+                'name' => 'Cameroun',
+                'phone_code' => '+237',
+                'currency' => 'XAF',
+                'is_active' => true,
+            ]
         );
 
         $citiesConfig = Config::get('geography.cameroon-cities.cities');

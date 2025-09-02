@@ -5,19 +5,19 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Schema(
  *     schema="PaymentMethod",
- *     title="Payment Method",
- *     description="Represents a single payment method",
+ *     title="Méthode de Paiement",
+ *     description="Représente une méthode de paiement",
  *
  *     @OA\Property(
  *         property="value",
  *         type="string",
- *         description="The unique identifier for the payment method",
+ *         description="L'identifiant unique de la méthode de paiement",
  *         example="credit_card"
  *     ),
  *     @OA\Property(
  *         property="label",
  *         type="string",
- *         description="The human-readable label for the payment method",
+ *         description="Le libellé lisible de la méthode de paiement",
  *         example="Carte de Crédit"
  *     )
  * )
@@ -38,7 +38,7 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(
  *                 property="message",
  *                 type="string",
- *                 example="Payment methods retrieved successfully."
+ *                 example="Méthodes de paiement récupérées avec succès."
  *             )
  *         )
  *     }

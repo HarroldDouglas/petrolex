@@ -5,24 +5,24 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Patch(
  *     path="/api/tracking/delivery/{orderId}/position",
- *     summary="Update delivery tracking position",
- *     description="Updates the geographical position of a delivery.",
+ *     summary="Mettre à jour la position de suivi de livraison",
+ *     description="Met à jour la position géographique d'une livraison.",
  *     operationId="api.tracking.delivery.position.update",
- *     tags={"Suivi de Livraison"},
+ *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
  *         name="orderId",
  *         in="path",
  *         required=true,
- *         description="The order ID of the delivery to update position",
+ *         description="L'ID de la commande de la livraison pour mettre à jour la position",
  *
  *         @OA\Schema(type="integer")
  *     ),
  *
  *     @OA\RequestBody(
  *         required=true,
- *         description="Real-time position and tracking data",
+ *         description="Données de position et de suivi en temps réel",
  *
  *         @OA\JsonContent(
  *             required={"driver_lat", "driver_lng"},
@@ -33,7 +33,7 @@ use OpenApi\Annotations as OA;
  *                 format="float",
  *                 minimum=-90,
  *                 maximum=90,
- *                 description="Current latitude of the delivery person",
+ *                 description="Latitude actuelle du livreur",
  *                 example=3.8495
  *             ),
  *             @OA\Property(
@@ -42,7 +42,7 @@ use OpenApi\Annotations as OA;
  *                 format="float",
  *                 minimum=-180,
  *                 maximum=180,
- *                 description="Current longitude of the delivery person",
+ *                 description="Longitude actuelle du livreur",
  *                 example=11.5035
  *             ),
  *             @OA\Property(
@@ -50,7 +50,7 @@ use OpenApi\Annotations as OA;
  *                 type="number",
  *                 format="float",
  *                 minimum=0,
- *                 description="Current speed in km/h (optional)",
+ *                 description="Vitesse actuelle en km/h (optionnel)",
  *                 example=35.5
  *             ),
  *             @OA\Property(
@@ -59,7 +59,7 @@ use OpenApi\Annotations as OA;
  *                 format="float",
  *                 minimum=0,
  *                 maximum=100,
- *                 description="Delivery progress percentage (optional)",
+ *                 description="Pourcentage de progression de la livraison (optionnel)",
  *                 example=75.2
  *             ),
  *             @OA\Property(
@@ -67,14 +67,14 @@ use OpenApi\Annotations as OA;
  *                 type="number",
  *                 format="float",
  *                 minimum=0,
- *                 description="Remaining distance in kilometers (optional)",
+ *                 description="Distance restante en kilomètres (optionnel)",
  *                 example=2.8
  *             ),
  *             @OA\Property(
  *                 property="estimated_duration",
  *                 type="integer",
  *                 minimum=0,
- *                 description="Estimated duration in minutes (optional)",
+ *                 description="Durée estimée en minutes (optionnel)",
  *                 example=8
  *             )
  *         )
@@ -82,7 +82,7 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=200,
- *         description="Successful operation",
+ *         description="Opération réussie",
  *
  *         @OA\JsonContent(
  *             allOf={
@@ -91,7 +91,7 @@ use OpenApi\Annotations as OA;
  *                 @OA\Schema(
  *
  *                     @OA\Property(property="data", ref="#/components/schemas/DeliveryTrackingData"),
- *                     @OA\Property(property="message", type="string", example="Delivery tracking position updated successfully.")
+ *                     @OA\Property(property="message", type="string", example="Position de suivi de livraison mise à jour avec succès.")
  *                 )
  *             }
  *         )
@@ -99,21 +99,21 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=401,
- *         description="Unauthorized",
+ *         description="Non autorisé",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=404,
- *         description="Delivery not found",
+ *         description="Livraison introuvable",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=422,
- *         description="Validation error",
+ *         description="Erreur de validation",
  *
  *         @OA\JsonContent(
  *             allOf={
@@ -147,7 +147,7 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=500,
- *         description="Internal server error",
+ *         description="Erreur serveur interne",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )

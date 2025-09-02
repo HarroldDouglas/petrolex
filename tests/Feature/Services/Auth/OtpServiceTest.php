@@ -47,6 +47,57 @@ class OtpServiceTest extends TestCase
         });
     }
 
+    public function test_it_sends_otp_email_with_user_language_french(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create([
+            'email' => 'french.user@example.com',
+            'language' => 'fr',
+        ]);
+
+        $result = $this->otpService->sendOtp($user->email);
+
+        $this->assertTrue($result);
+        Mail::assertSent(OtpMail::class, function ($mail) use ($user) {
+            return $mail->hasTo($user->email) && $mail->userLanguage === 'fr';
+        });
+    }
+
+    public function test_it_sends_otp_email_with_user_language_english(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create([
+            'email' => 'english.user@example.com',
+            'language' => 'en',
+        ]);
+
+        $result = $this->otpService->sendOtp($user->email);
+
+        $this->assertTrue($result);
+        Mail::assertSent(OtpMail::class, function ($mail) use ($user) {
+            return $mail->hasTo($user->email) && $mail->userLanguage === 'en';
+        });
+    }
+
+    public function test_it_defaults_to_french_when_user_has_no_language(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create([
+            'email' => 'nolang.user@example.com',
+            'language' => null,
+        ]);
+
+        $result = $this->otpService->sendOtp($user->email);
+
+        $this->assertTrue($result);
+        Mail::assertSent(OtpMail::class, function ($mail) use ($user) {
+            return $mail->hasTo($user->email) && $mail->userLanguage === 'fr';
+        });
+    }
+
     public function test_it_can_send_otp_via_sms(): void
     {
         $mockTwilioService = Mockery::mock(TwilioService::class);

@@ -5,24 +5,24 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Post(
  *     path="/api/tracking/delivery/{orderId}/start",
- *     summary="Start delivery tracking",
- *     description="Marks a delivery as started.",
+ *     summary="Démarrer le suivi de livraison",
+ *     description="Marque une livraison comme démarrée.",
  *     operationId="api.tracking.delivery.start",
- *     tags={"Suivi de Livraison"},
+ *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
  *         name="orderId",
  *         in="path",
  *         required=true,
- *         description="The order ID of the delivery to start tracking",
+ *         description="L'ID de la commande de la livraison pour démarrer le suivi",
  *
  *         @OA\Schema(type="integer")
  *     ),
  *
  *     @OA\RequestBody(
  *         required=true,
- *         description="Initial GPS coordinates to start delivery tracking",
+ *         description="Coordonnées GPS initiales pour démarrer le suivi de livraison",
  *
  *         @OA\JsonContent(
  *             required={"driver_lat", "driver_lng"},
@@ -33,7 +33,7 @@ use OpenApi\Annotations as OA;
  *                 format="float",
  *                 minimum=-90,
  *                 maximum=90,
- *                 description="Initial latitude of the delivery person",
+ *                 description="Latitude initiale du livreur",
  *                 example=3.8480
  *             ),
  *             @OA\Property(
@@ -42,7 +42,7 @@ use OpenApi\Annotations as OA;
  *                 format="float",
  *                 minimum=-180,
  *                 maximum=180,
- *                 description="Initial longitude of the delivery person",
+ *                 description="Longitude initiale du livreur",
  *                 example=11.5021
  *             )
  *         )
@@ -59,7 +59,7 @@ use OpenApi\Annotations as OA;
  *                 @OA\Schema(
  *
  *                     @OA\Property(property="data", ref="#/components/schemas/DeliveryTrackingData"),
- *                     @OA\Property(property="message", type="string", example="Delivery tracking started successfully.")
+ *                     @OA\Property(property="message", type="string", example="Suivi de livraison démarré avec succès.")
  *                 )
  *             }
  *         )

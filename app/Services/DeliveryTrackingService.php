@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\DeliveryTrackingServiceInterface;
+use App\Contracts\RouteCalculatorInterface;
 use App\DTOs\RouteDTO;
 use App\Enums\DeliveryTrackingStatus;
 use App\Events\DeliveryPositionUpdated;
@@ -13,7 +14,6 @@ use App\Http\Api\Requests\TrackingDelivery\UpdateDeliveryTrackingPositionRequest
 use App\Models\DeliveryTracking;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
 use App\Services\Shared\Cache\CacheServiceInterface;
-use App\Contracts\RouteCalculatorInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -80,7 +80,7 @@ final class DeliveryTrackingService implements DeliveryTrackingServiceInterface
     {
         $deliveryTracking = $this->repository->findByOrder($orderId);
 
-        if (!$deliveryTracking) {
+        if (! $deliveryTracking) {
             Log::warning('Delivery tracking not found', ['order_id' => $orderId]);
             throw new InvalidArgumentException('Delivery tracking not found.');
         }

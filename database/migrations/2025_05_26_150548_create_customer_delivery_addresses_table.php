@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 10, 8)->nullable();
             $table->string('phone')->nullable();
+            $table->string('phone_country_code')->nullable();
             $table->string('contact_firstname')->nullable();
             $table->string('contact_lastname')->nullable();
             $table->string('email')->nullable();

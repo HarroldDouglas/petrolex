@@ -41,37 +41,49 @@ use OpenApi\Annotations as OA;
  *
  * @OA\Schema(
  *     schema="AuthData",
- *     description="Objet de transfert de données contenant le token et les informations de l'utilisateur authentifié",
+ *     description="Authentication response data with token and user information",
  *
  *     @OA\Property(
- *         property="token",
- *         ref="#/components/schemas/TokenData",
- *         description="Informations du token"
+ *         property="access_token",
+ *         type="string",
+ *         description="Bearer access token",
+ *         example="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+ *     ),
+ *     @OA\Property(
+ *         property="token_type",
+ *         type="string",
+ *         description="Token type",
+ *         example="bearer"
+ *     ),
+ *     @OA\Property(
+ *         property="expires_in",
+ *         type="integer",
+ *         description="Token expiration time in seconds",
+ *         example=3600
  *     ),
  *     @OA\Property(
  *         property="user",
- *         ref="#/components/schemas/CustomerData",
- *         description="Informations de l'utilisateur authentifié"
+ *         oneOf={
+ *
+ *             @OA\Schema(ref="#/components/schemas/UserData"),
+ *             @OA\Schema(ref="#/components/schemas/UserData")
+ *         },
+ *         description="Authenticated user information (UserData for regular users, UserData for customers)"
  *     )
  * )
- *
  * @OA\Schema(
  *     schema="LoginResponse",
- *     allOf={
- *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
- *         @OA\Schema(
  *
- *             @OA\Property(
- *                 property="data",
- *                 ref="#/components/schemas/AuthData"
- *             ),
- *             @OA\Property(
- *                 property="message",
- *                 type="string",
- *                 example="Authentification réussie"
- *             )
- *         )
- *     }
+ *     @OA\Property(
+ *         property="_metadata",
+ *         type="object",
+ *         @OA\Property(property="success", type="boolean", example=true),
+ *         @OA\Property(property="message", type="string", example="Authentification réussie")
+ *     ),
+ *     @OA\Property(
+ *         property="data",
+ *         ref="#/components/schemas/AuthData"
+ *     )
  * )
  *
  * @OA\Post(
@@ -79,7 +91,7 @@ use OpenApi\Annotations as OA;
  *     summary="Authentification utilisateur",
  *     description="Authentifie un utilisateur et génère un token d'accès API",
  *     operationId="api.login",
- *     tags={"Authentication"},
+ *     tags={"Authentification"},
  *
  *     @OA\RequestBody(
  *         description="Informations d'authentification",

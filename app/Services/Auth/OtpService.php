@@ -44,7 +44,8 @@ class OtpService implements OtpServiceInterface
 
         try {
             if ($channel->equals(LoginChannel::EMAIL())) {
-                Mail::to($identifier)->send(new OtpMail($otp, $maskedIdentifier));
+                $userLanguage = $user->language ?? 'fr';
+                Mail::to($identifier)->send(new OtpMail($otp, $maskedIdentifier, $userLanguage));
             } else {
                 $twilioService = app('twilio');
                 $message = sprintf(self::SMS_MESSAGE_TEMPLATE, $otp);

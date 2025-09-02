@@ -19,6 +19,7 @@ class GetProfileController extends Controller
     public function __invoke(): ProfileResponse
     {
         $user = $this->authService->getAuthenticatedUser();
+        $user->loadMissing('country');
 
         return ProfileResponse::withUser($user);
     }

@@ -11,6 +11,6 @@ use App\Models\DeliveryTracking;
 interface DeliveryTrackingServiceInterface
 {
     public function calculateRoute(float $fromLng, float $fromLat, float $toLng, float $toLat): RouteDTO;
-    
+
     public function updatePosition(int $orderId, UpdateDeliveryTrackingPositionRequest $request): DeliveryTracking;
 }

@@ -80,7 +80,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="order_number", type="string", example="ORDER-123456789"),
  *     @OA\Property(property="customer_id", type="integer", example=1),
- *     @OA\Property(property="customer", ref="#/components/schemas/CustomerData"),
+ *     @OA\Property(property="customer", ref="#/components/schemas/UserData"),
  *     @OA\Property(property="delivery_address_id", type="integer", example=1),
  *     @OA\Property(property="delivery_address", ref="#/components/schemas/DeliveryAddress"),
  *     @OA\Property(property="distribution_center_id", type="integer", example=1),

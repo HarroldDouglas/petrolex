@@ -117,4 +117,72 @@ final class UpdateProfileTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    #[Test]
+    public function it_can_update_user_language_to_english(): void
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->authToken,
+            'Accept' => 'application/json',
+        ])->patchJson(route('api.profile.update'), [
+            'language' => 'en',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('_metadata.success', true)
+            ->assertJsonPath('data.language', 'en');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $this->adminUser->id,
+            'language' => 'en',
+        ]);
+    }
+
+    #[Test]
+    public function it_can_update_user_language_to_french(): void
+    {
+        $this->adminUser->update(['language' => 'en']);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->authToken,
+            'Accept' => 'application/json',
+        ])->patchJson(route('api.profile.update'), [
+            'language' => 'fr',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.language', 'fr');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $this->adminUser->id,
+            'language' => 'fr',
+        ]);
+    }
+
+    #[Test]
+    public function it_validates_language_enum_values(): void
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->authToken,
+            'Accept' => 'application/json',
+        ])->patchJson(route('api.profile.update'), [
+            'language' => 'invalid',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['language']);
+    }
+
+    #[Test]
+    public function it_accepts_null_language_value(): void
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->authToken,
+            'Accept' => 'application/json',
+        ])->patchJson(route('api.profile.update'), [
+            'language' => null,
+        ]);
+
+        $response->assertOk();
+    }
 }
