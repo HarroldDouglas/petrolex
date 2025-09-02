@@ -26,8 +26,11 @@ abstract class BaseUserRequest extends FormRequest
                 'string',
                 'min:8',
                 'max:15',
-                Rule::unique('users', 'phone_number'),
+                Rule::unique('users', 'phone_number')->where(function ($query) {
+                    return $query->where('country_id', $this->input('country_id'));
+                }),
             ],
+            'country_id' => ['required', 'integer', 'exists:countries,id'],
             'password' => ['required', 'string', 'min:8'],
             'language' => ['nullable', Rule::in(Language::getValues())],
             'role' => ['required', Rule::in(UserRole::values())],
@@ -77,6 +80,9 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
             'phone_number.unique' => 'Ce numéro de téléphone est déjà utilisé.',
             'phone_number.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'country_id.required' => 'Le pays est obligatoire.',
+            'country_id.integer' => 'Le pays doit être un identifiant valide.',
+            'country_id.exists' => 'Le pays sélectionné n\'existe pas.',
             'password.required' => 'Le mot de passe est obligatoire.',
             'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',

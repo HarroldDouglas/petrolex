@@ -25,7 +25,7 @@ final class LoginTest extends TestCase
     }
 
     #[Test]
-    public function it_can_login_with_valid_credentials(): void
+    public function it_can_login_with_email(): void
     {
         $response = $this->postJson(route('api.login'), [
             'login' => $this->user->email,
@@ -47,6 +47,44 @@ final class LoginTest extends TestCase
                     ],
                 ],
             ])
+            ->assertJsonPath('_metadata.success', true);
+    }
+
+    #[Test]
+    public function it_can_login_with_phone_and_country_id(): void
+    {
+        $response = $this->postJson(route('api.login'), [
+            'login' => $this->user->phone_number,
+            'country_id' => $this->user->country_id,
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                '_metadata' => ['success', 'message'],
+                'data' => [
+                    'access_token',
+                    'token_type',
+                    'expires_in',
+                    'user' => [
+                        'id',
+                        'phone_number',
+                        'country',
+                    ],
+                ],
+            ])
+            ->assertJsonPath('_metadata.success', true);
+    }
+
+    #[Test]
+    public function it_can_login_with_phone_only_legacy(): void
+    {
+        $response = $this->postJson(route('api.login'), [
+            'login' => $this->user->phone_number,
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(200)
             ->assertJsonPath('_metadata.success', true);
     }
 

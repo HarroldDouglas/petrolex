@@ -21,7 +21,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="phone_country_code", type="string", example="+237", nullable=true, description="Country code for the phone number"),
  *     @OA\Property(property="contact_firstname", type="string", example="Marie", nullable=true, description="Contact person's first name"),
  *     @OA\Property(property="contact_lastname", type="string", example="Curie", nullable=true, description="Contact person's last name"),
- *     @OA\Property(property="email", type="string", format="email", example="marie.curie@example.com", nullable=true, description="Contact person's email address"),
+ *     @OA\Property(property="email", type="string", format="email", example="test@example.com", nullable=true, description="Contact person's email address"),
  *     @OA\Property(property="address_precision", type="string", example="Bâtiment C, 3ème étage", nullable=true, description="Additional details for address precision"),
  *     @OA\Property(property="is_default", type="boolean", example=false, nullable=true, description="Whether this is the default delivery address for the customer"),
  * )

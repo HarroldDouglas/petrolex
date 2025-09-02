@@ -16,6 +16,8 @@ class LoginResponse extends ApiResponse
         /** @var User $user */
         $user = $authDTO->user;
 
+        $user->loadMissing('country');
+
         $userResource = match (true) {
             $user->hasRole(UserRole::CUSTOMER()->value) => new CustomerResource($user->customer),
             default => new UserResource($user),
@@ -28,7 +30,6 @@ class LoginResponse extends ApiResponse
             'user' => $userResource,
         ];
 
-        // TODO: move this hard coded text to translation files
         return new self($data, __('Authentification réussie'));
     }
 }

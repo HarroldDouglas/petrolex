@@ -15,7 +15,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="description", type="string", example="Centre de distribution principal avec toutes les commodités"),
  *     @OA\Property(property="latitude", type="string", example="4.05110000"),
  *     @OA\Property(property="longitude", type="string", example="9.76790000"),
- *     @OA\Property(property="phone", type="string", example="+237612345678"),
+ *     @OA\Property(property="phone", type="string", example="677123456"),
  *     @OA\Property(property="email", type="string", example="centre.principal@petrolex.cm"),
  *     @OA\Property(property="is_active", type="boolean", example=true),
  *     @OA\Property(property="storage_capacity", type="string", nullable=true, example=null),

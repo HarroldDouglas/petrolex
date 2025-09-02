@@ -30,9 +30,8 @@ class AuthenticationService implements AuthenticationServiceInterface
      */
     public function authenticate(LoginCredentialsDTO $credentials): AuthDTO
     {
-        $user = $this->findUser($credentials->login);
+        $user = $this->findUser($credentials);
 
-        // TODO : instead of directly writing text, let's start using quickly translation!
         if (! $user || ! Hash::check($credentials->password, $user->password)) {
             throw new AuthenticationException('Les identifiants fournis sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
         }
@@ -57,13 +56,17 @@ class AuthenticationService implements AuthenticationServiceInterface
         );
     }
 
-    private function findUser(string $login): ?User
+    private function findUser(LoginCredentialsDTO $credentials): ?User
     {
-        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
-            return $this->userRepository->findByEmail($login);
-        } else {
-            return $this->userRepository->findByPhone($login);
+        if (filter_var($credentials->login, FILTER_VALIDATE_EMAIL)) {
+            return $this->userRepository->findByEmail($credentials->login);
         }
+
+        if ($credentials->countryId) {
+            return $this->userRepository->findByPhoneAndCountry($credentials->login, $credentials->countryId);
+        }
+
+        return $this->userRepository->findByPhone($credentials->login);
     }
 
     /**

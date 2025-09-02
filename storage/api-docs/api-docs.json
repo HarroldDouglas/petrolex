@@ -4,7 +4,7 @@
         "title": "Petrolex API",
         "description": "Documentation API pour Petrolex",
         "contact": {
-            "email": "contact@example.com"
+            "email": "test@example.com"
         },
         "version": "1.0"
     },
@@ -1116,199 +1116,14 @@
                 ]
             }
         },
-        "/api/customers/{customer}/orders": {
-            "get": {
-                "tags": [
-                    "Clients"
-                ],
-                "summary": "Lister les commandes d'un client",
-                "description": "Récupère la liste paginée des commandes d'un client avec des filtres optionnels.",
-                "operationId": "api.customers.orders.index",
-                "parameters": [
-                    {
-                        "name": "customer",
-                        "in": "path",
-                        "description": "ID du client",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    },
-                    {
-                        "name": "order_number",
-                        "in": "query",
-                        "description": "Numéro de commande à filtrer",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "ORD-123456"
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Statut de la commande à filtrer",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "delivered"
-                        }
-                    },
-                    {
-                        "name": "delivery_type",
-                        "in": "query",
-                        "description": "Type de livraison à filtrer",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "fast"
-                        }
-                    },
-                    {
-                        "name": "payment_method",
-                        "in": "query",
-                        "description": "Méthode de paiement à filtrer",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "example": "mobile_money"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Nombre d'éléments par page (pagination)",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "example": 10
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Liste paginée des commandes du client",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CustomerOrdersResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non autorisé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Client non trouvé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/customers": {
-            "get": {
-                "tags": [
-                    "🔧 Tests (Masqués)"
-                ],
-                "summary": "Récupérer tous les clients",
-                "description": "Récupérer la liste de tous les clients avec leurs informations utilisateur et adresses de livraison. ENDPOINT MASQUÉ - POUR TESTS UNIQUEMENT",
-                "operationId": "api.customers.index",
-                "responses": {
-                    "200": {
-                        "description": "Liste récupérée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Clients récupérés avec succès"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/UserData"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non autorisé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
+        "/api/register/customer": {
             "post": {
                 "tags": [
-                    "Clients"
+                    "Authentification"
                 ],
-                "summary": "Créer un nouveau client",
+                "summary": "Inscription client",
                 "description": "Enregistre un nouvel utilisateur en tant que client et envoie un code OTP pour vérification.",
-                "operationId": "api.customers.store",
+                "operationId": "api.register.customer",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1319,7 +1134,8 @@
                                     "last_name",
                                     "email",
                                     "phone_number",
-                                    "password"
+                                    "password",
+                                    "country_id"
                                 ],
                                 "properties": {
                                     "first_name": {
@@ -1333,11 +1149,17 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "jean.dupont@example.com"
+                                        "example": "test@example.com"
                                     },
                                     "phone_number": {
+                                        "description": "Numéro de téléphone sans code pays",
                                         "type": "string",
-                                        "example": "+237677123456"
+                                        "example": "677123456"
+                                    },
+                                    "country_id": {
+                                        "description": "ID du pays",
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "password": {
                                         "type": "string",
@@ -1384,7 +1206,7 @@
                                             "properties": {
                                                 "identifier": {
                                                     "type": "string",
-                                                    "example": "jean.dupont@example.com"
+                                                    "example": "test@example.com"
                                                 }
                                             },
                                             "type": "object"
@@ -1821,6 +1643,43 @@
                     },
                     "404": {
                         "description": "Ville non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/geography/countries": {
+            "get": {
+                "tags": [
+                    "Géographie"
+                ],
+                "summary": "Récupérer la liste de tous les pays actifs",
+                "description": "Retourne la liste de tous les pays actifs avec leur code téléphonique et devise",
+                "operationId": "api.geography.countries.index",
+                "responses": {
+                    "200": {
+                        "description": "Liste des pays récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CountryListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3792,7 +3651,7 @@
                 ],
                 "properties": {
                     "login": {
-                        "description": "Email ou téléphone de l'utilisateur (+237690000000)",
+                        "description": "Email ou numéro de téléphone de l'utilisateur (sans code pays si country_id fourni)",
                         "type": "string",
                         "example": "admin@petrolex.com"
                     },
@@ -3801,6 +3660,12 @@
                         "type": "string",
                         "format": "password",
                         "example": "password"
+                    },
+                    "country_id": {
+                        "description": "ID du pays (optionnel, requis pour login par téléphone avec nouveau format)",
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -3943,11 +3808,11 @@
                     "email": {
                         "type": "string",
                         "format": "email",
-                        "example": "john.doe@example.com"
+                        "example": "test@example.com"
                     },
                     "phone_number": {
                         "type": "string",
-                        "example": "+237677123456"
+                        "example": "677123456"
                     },
                     "address": {
                         "type": "string",
@@ -4040,13 +3905,13 @@
                         "description": "User's email address",
                         "type": "string",
                         "format": "email",
-                        "example": "john.doe@example.com",
+                        "example": "test@example.com",
                         "nullable": true
                     },
                     "phone_number": {
                         "description": "User's phone number",
                         "type": "string",
-                        "example": "+237677123456",
+                        "example": "677123456",
                         "nullable": true
                     },
                     "address": {
@@ -4135,51 +4000,6 @@
                     }
                 ]
             },
-            "CustomerOrdersResponse": {
-                "properties": {
-                    "_metadata": {
-                        "properties": {
-                            "success": {
-                                "type": "boolean",
-                                "example": true
-                            },
-                            "message": {
-                                "type": "string",
-                                "example": "Liste des commandes du client récupérée avec succès"
-                            }
-                        },
-                        "type": "object"
-                    },
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/OrderData"
-                        }
-                    },
-                    "meta": {
-                        "properties": {
-                            "current_page": {
-                                "type": "integer",
-                                "example": 1
-                            },
-                            "last_page": {
-                                "type": "integer",
-                                "example": 10
-                            },
-                            "per_page": {
-                                "type": "integer",
-                                "example": 10
-                            },
-                            "total": {
-                                "type": "integer",
-                                "example": 100
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
             "StoreCustomerDeliveryAddressRequest": {
                 "required": [
                     "label",
@@ -4256,7 +4076,7 @@
                         "description": "Contact person's email address",
                         "type": "string",
                         "format": "email",
-                        "example": "marie.curie@example.com",
+                        "example": "test@example.com",
                         "nullable": true
                     },
                     "address_precision": {
@@ -4387,6 +4207,28 @@
                     }
                 },
                 "type": "object"
+            },
+            "CountryListResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Country"
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Liste des pays récupérée avec succès"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
             },
             "MunicipalityData": {
                 "description": "Informations sur une municipalité",
@@ -4968,7 +4810,7 @@
                     },
                     "phone": {
                         "type": "string",
-                        "example": "+237612345678"
+                        "example": "677123456"
                     },
                     "email": {
                         "type": "string",
@@ -5196,7 +5038,7 @@
                     },
                     "phone": {
                         "type": "string",
-                        "example": "+237612345678"
+                        "example": "677123456"
                     },
                     "email": {
                         "type": "string",
@@ -5361,11 +5203,13 @@
                     "email": {
                         "type": "string",
                         "format": "email",
-                        "example": "jean.dupont@example.com"
+                        "example": "test@example.com"
                     },
                     "phone_number": {
+                        "description": "Numéro de téléphone sans code pays",
                         "type": "string",
-                        "example": "+237677123456"
+                        "example": "677123456",
+                        "nullable": true
                     },
                     "address": {
                         "type": "string",
@@ -5388,7 +5232,7 @@
                             }
                         ],
                         "nullable": true,
-                        "description": "User's country with phone code and currency"
+                        "description": "User's country information including phone code and currency"
                     },
                     "current_balance": {
                         "description": "Customer current balance (only for customers)",
@@ -5515,7 +5359,7 @@
                     "email": {
                         "type": "string",
                         "format": "email",
-                        "example": "marie.curie@example.com",
+                        "example": "test@example.com",
                         "nullable": true
                     },
                     "address_precision": {
@@ -6152,10 +5996,6 @@
         {
             "name": "Clients",
             "description": "Clients"
-        },
-        {
-            "name": "🔧 Tests (Masqués)",
-            "description": "🔧 Tests (Masqués)"
         },
         {
             "name": "Livraison",

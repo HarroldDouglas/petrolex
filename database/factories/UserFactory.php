@@ -34,11 +34,11 @@ class UserFactory extends Factory
             'first_name' => $firstName,
             'last_name' => $lastName,
             'email' => strtolower($firstName.'.'.$lastName.'@example.com'),
-            'phone_number' => fake()->phoneNumber(),
+            'phone_number' => '6'.fake()->numerify('#########'),
             'address' => fake()->address(),
             'country_id' => $cameroon?->id,
             'email_verified_at' => now(),
-            'password' => Hash::make('password'), // Default password for test users
+            'password' => Hash::make('password'),
             'language' => fake()->randomElement(Language::getValues()),
             'remember_token' => Str::random(10),
             'is_active' => true,

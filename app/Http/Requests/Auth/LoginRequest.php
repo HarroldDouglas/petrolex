@@ -16,6 +16,7 @@ class LoginRequest extends FormRequest
         return [
             'login' => 'required|string',
             'password' => 'required|string',
+            'country_id' => 'nullable|integer|exists:countries,id',
         ];
     }
 }

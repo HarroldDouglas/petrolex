@@ -10,6 +10,7 @@ use App\Http\Api\Controllers\Auth\VerifyOtpController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', LoginController::class)->name('api.login');
+Route::post('/register/customer', \App\Http\Api\Controllers\Customer\StoreCustomerController::class)->name('api.register.customer');
 Route::post('/verify-otp', VerifyOtpController::class)->name('api.verify-otp');
 Route::post('/resend-otp', ResendOtpController::class)->name('api.resend-otp');
 Route::post('/forgot-password', ForgotPasswordController::class)->name('api.forgot-password');
