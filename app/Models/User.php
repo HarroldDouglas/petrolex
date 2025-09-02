@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Enums\Language;
+use App\Models\Geography\Country;
 use App\Traits\HasMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -24,6 +26,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $phone_number
  * @property string|null $address
  * @property string $language
+ * @property int|null $country_id
  * @property string $password
  * @property string|null $remember_token
  * @property Carbon|null $email_verified_at
@@ -35,6 +38,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $deleted_at
  *
  * // Relations
+ * @property-read Country|null $country
  * @property-read Customer|null $customer
  * @property-read DeliveryPerson|null $deliveryPerson
  * @property-read \Illuminate\Database\Eloquent\Collection<int, UserDistributionCenter> $distributionCenters
@@ -71,6 +75,7 @@ class User extends Authenticatable implements HasMedia
         'address',
         'language',
         'password',
+        'country_id',
         'is_active',
     ];
 
@@ -117,6 +122,14 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->getMedia('images')->first()?->getUrl()
             ?: 'assets/images/avtar/woman.jpg';
+    }
+
+    /**
+     * Get the country associated with the user.
+     */
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     /**

@@ -3,12 +3,14 @@
 use OpenApi\Annotations as OA;
 
 /**
+ * Documentation masquée - Endpoint pour tests uniquement
+ *
  * @OA\Get(
  *     path="/api/customers",
  *     summary="Récupérer tous les clients",
- *     description="Récupérer la liste de tous les clients avec leurs informations utilisateur et adresses de livraison.",
+ *     description="Récupérer la liste de tous les clients avec leurs informations utilisateur et adresses de livraison. ENDPOINT MASQUÉ - POUR TESTS UNIQUEMENT",
  *     operationId="api.customers.index",
- *     tags={"Clients"},
+ *     tags={"🔧 Tests (Masqués)"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Response(

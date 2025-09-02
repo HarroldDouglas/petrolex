@@ -48,6 +48,16 @@ class UserResource extends JsonResource
             'email' => $user->email,
             'phone_number' => $user->phone_number,
             'address' => $user->address,
+            'country' => $this->whenLoaded('country', function () use ($user) {
+                return [
+                    'id' => $user->country->id,
+                    'name' => $user->country->name,
+                    'code' => $user->country->code,
+                    'phone_code' => $user->country->phone_code,
+                    'currency' => $user->country->currency,
+                    'is_active' => $user->country->is_active,
+                ];
+            }),
             'language' => $user->language,
             'current_balance' => $this->when($user->isCustomer(), $user->customer->current_balance ?? 0.0),
             'email_verified_at' => $user->email_verified_at instanceof CarbonInterface ? $user->email_verified_at->toISOString() : null,

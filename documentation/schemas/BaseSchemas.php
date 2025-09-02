@@ -74,6 +74,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="phone_number", type="string", example="+237677123456"),
  *     @OA\Property(property="address", type="string", nullable=true, example="123 Rue Principale, Douala"),
  *     @OA\Property(property="language", type="string", enum={"fr", "en"}, example="fr", description="User's preferred language"),
+ *     @OA\Property(property="country", ref="#/components/schemas/Country", nullable=true, description="User's country with phone code and currency"),
  *     @OA\Property(property="current_balance", type="number", format="float", nullable=true, example=1500.00, description="Customer current balance (only for customers)"),
  *     @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true, example="2024-01-01T12:00:00.000000Z"),
  *     @OA\Property(property="phone_verified_at", type="string", format="date-time", nullable=true, example="2024-01-01T12:00:00.000000Z"),
@@ -88,19 +89,38 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="DeliveryAddress",
  *     title="DeliveryAddress",
- *     description="Delivery address data",
+ *     description="Customer delivery address data",
  *
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="address_line_1", type="string", example="123 Rue Principale"),
- *     @OA\Property(property="address_line_2", type="string", nullable=true, example="Appartement 5"),
- *     @OA\Property(property="city", type="string", example="Douala"),
- *     @OA\Property(property="region", type="string", example="Littoral"),
- *     @OA\Property(property="postal_code", type="string", nullable=true, example="00237"),
- *     @OA\Property(property="country", type="string", example="Cameroun"),
- *     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=4.0435),
- *     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=9.7098),
+ *     @OA\Property(property="label", type="string", example="Maison"),
+ *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté"),
+ *     @OA\Property(property="neighborhood", type="string", nullable=true, example="Bali"),
+ *     @OA\Property(property="city", type="string", nullable=true, example="Yaoundé"),
+ *     @OA\Property(property="country", type="string", nullable=true, example="Cameroun"),
+ *     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=3.848),
+ *     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=11.502),
+ *     @OA\Property(property="phone", type="string", nullable=true, example="699887766"),
+ *     @OA\Property(property="phone_country_code", type="string", nullable=true, example="+237"),
+ *     @OA\Property(property="contact_firstname", type="string", nullable=true, example="Marie"),
+ *     @OA\Property(property="contact_lastname", type="string", nullable=true, example="Curie"),
+ *     @OA\Property(property="email", type="string", format="email", nullable=true, example="marie.curie@example.com"),
+ *     @OA\Property(property="address_precision", type="string", nullable=true, example="Bâtiment C, 3ème étage"),
+ *     @OA\Property(property="is_default", type="boolean", example=false),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T12:00:00Z"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T12:00:00Z")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="Country",
+ *     title="Country",
+ *     description="Country data with phone code and currency",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Cameroun"),
+ *     @OA\Property(property="code", type="string", example="CM"),
+ *     @OA\Property(property="phone_code", type="string", nullable=true, example="+237"),
+ *     @OA\Property(property="currency", type="string", nullable=true, example="XAF"),
+ *     @OA\Property(property="is_active", type="boolean", example=true)
  * )
  */
 class BaseSchemas {}

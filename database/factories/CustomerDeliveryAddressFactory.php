@@ -22,6 +22,7 @@ class CustomerDeliveryAddressFactory extends Factory
             'latitude' => fake()->latitude(-4.3, -4.2), // Abidjan coords
             'longitude' => fake()->longitude(-4.1, -3.9),
             'phone' => fake()->phoneNumber(),
+            'phone_country_code' => '+237',
             'contact_firstname' => fake()->firstName(),
             'contact_lastname' => fake()->lastName(),
             'email' => fake()->safeEmail(),

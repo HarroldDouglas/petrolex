@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\CustomerDeliveryAddress;
 use App\Models\DeliveryPerson;
 use App\Models\DistributionCenter;
+use App\Models\Geography\Country;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -27,6 +28,7 @@ class UserFactory extends Factory
     {
         $firstName = fake()->firstName();
         $lastName = fake()->lastName();
+        $cameroon = Country::where('code', 'CM')->first();
 
         return [
             'first_name' => $firstName,
@@ -34,6 +36,7 @@ class UserFactory extends Factory
             'email' => strtolower($firstName.'.'.$lastName.'@example.com'),
             'phone_number' => fake()->phoneNumber(),
             'address' => fake()->address(),
+            'country_id' => $cameroon?->id,
             'email_verified_at' => now(),
             'password' => Hash::make('password'), // Default password for test users
             'language' => fake()->randomElement(Language::getValues()),

@@ -17,7 +17,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="country", type="string", example="Cameroun", nullable=true, description="Country"),
  *     @OA\Property(property="latitude", type="number", format="float", example=3.848, nullable=true, description="Latitude coordinate"),
  *     @OA\Property(property="longitude", type="number", format="float", example=11.502, nullable=true, description="Longitude coordinate"),
- *     @OA\Property(property="phone", type="string", example="+237699887766", nullable=true, description="Contact phone number"),
+ *     @OA\Property(property="phone", type="string", example="699887766", nullable=true, description="Contact phone number without country code"),
+ *     @OA\Property(property="phone_country_code", type="string", example="+237", nullable=true, description="Country code for the phone number"),
  *     @OA\Property(property="contact_firstname", type="string", example="Marie", nullable=true, description="Contact person's first name"),
  *     @OA\Property(property="contact_lastname", type="string", example="Curie", nullable=true, description="Contact person's last name"),
  *     @OA\Property(property="email", type="string", format="email", example="marie.curie@example.com", nullable=true, description="Contact person's email address"),
@@ -49,7 +50,7 @@ use OpenApi\Annotations as OA;
  *     summary="Créer une nouvelle adresse de livraison pour un client",
  *     description="Permet de créer une nouvelle adresse de livraison associée à un client spécifique.",
  *     operationId="api.customers.delivery-addresses.store",
- *     tags={"Clients"},
+ *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(

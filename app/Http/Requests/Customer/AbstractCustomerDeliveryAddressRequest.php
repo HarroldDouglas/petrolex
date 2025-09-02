@@ -30,6 +30,7 @@ class AbstractCustomerDeliveryAddressRequest extends FormRequest
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'phone' => ['nullable', 'string', 'max:255'],
+            'phone_country_code' => ['nullable', 'string', 'max:10'],
             'contact_firstname' => ['nullable', 'string', 'max:255'],
             'contact_lastname' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
