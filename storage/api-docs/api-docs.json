@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000",
+            "url": "http://127.0.0.1:8001",
             "description": "API Server"
         }
     ],
@@ -67,12 +67,12 @@
                 "tags": [
                     "App"
                 ],
-                "summary": "Get support team contact information",
-                "description": "Returns the contact information (phone number and email) for the support team",
+                "summary": "Obtenir les informations de contact du support",
+                "description": "Retourne les informations de contact (numéro de téléphone et email) de l'équipe de support",
                 "operationId": "getSupportContact",
                 "responses": {
                     "200": {
-                        "description": "Support contact information retrieved successfully",
+                        "description": "Informations de contact du support récupérées avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -111,7 +111,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Erreur serveur interne",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -183,6 +183,43 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/auth/check": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Check user authentication status",
+                "description": "Verify if the current user is authenticated and return basic user information.",
+                "operationId": "api.auth.check",
+                "responses": {
+                    "200": {
+                        "description": "Authentication status retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CheckAuthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/forgot-password": {
@@ -297,7 +334,48 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Erreur de validation."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Le champ token est requis."
+                                                    }
+                                                },
+                                                "password": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Le mot de passe doit contenir au moins 8 caractères."
+                                                    }
+                                                },
+                                                "password_confirmation": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "La confirmation du mot de passe ne correspond pas."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -345,17 +423,57 @@
                 "operationId": "api.get-profile",
                 "responses": {
                     "200": {
-                        "description": "User profile",
+                        "description": "Profil utilisateur récupéré avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/UserData"
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Profil récupéré avec succès."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserData"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Unauthenticated"
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Non authentifié."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -368,7 +486,7 @@
         "/api/login": {
             "post": {
                 "tags": [
-                    "Authentication"
+                    "Authentification"
                 ],
                 "summary": "Authentification utilisateur",
                 "description": "Authentifie un utilisateur et génère un token d'accès API",
@@ -635,11 +753,11 @@
                 "tags": [
                     "Authentification"
                 ],
-                "summary": "Update authenticated user's password",
-                "description": "Allows the authenticated user to update their password.",
+                "summary": "Mettre à jour le mot de passe de l'utilisateur authentifié",
+                "description": "Permet à l'utilisateur authentifié de mettre à jour son mot de passe.",
                 "operationId": "api.password.update",
                 "requestBody": {
-                    "description": "Old and new password details.",
+                    "description": "Détails de l'ancien et du nouveau mot de passe.",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -651,7 +769,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Password updated successfully",
+                        "description": "Mot de passe mis à jour avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -661,7 +779,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Non autorisé",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -671,7 +789,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error (e.g., old password incorrect, new password mismatch, or too weak)",
+                        "description": "Erreur de validation (ex: ancien mot de passe incorrect, nouveau mot de passe non conforme, ou trop faible)",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -681,7 +799,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Erreur serveur interne",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -873,10 +991,10 @@
         "/api/bottles/{barcode}/verify": {
             "get": {
                 "tags": [
-                    "Bottles"
+                    "Bouteilles"
                 ],
-                "summary": "Verify bottle authenticity",
-                "description": "Checks if a bottle exists in the distribution center, has status WITH_DELIVERY_PERSON, and is_filled to true.",
+                "summary": "Vérifier l'authenticité d'une bouteille",
+                "description": "Vérifie si une bouteille existe dans le centre de distribution, a le statut WITH_DELIVERY_PERSON, et is_filled à true.",
                 "operationId": "api.bottles.verify",
                 "parameters": [
                     {
@@ -1118,6 +1236,72 @@
             }
         },
         "/api/customers": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Récupérer tous les clients",
+                "description": "Récupérer la liste de tous les clients avec leurs informations utilisateur et adresses de livraison.",
+                "operationId": "api.customers.index",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Clients récupérés avec succès"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UserData"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Clients"
@@ -1159,6 +1343,16 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "password123"
+                                    },
+                                    "language": {
+                                        "description": "User's preferred language (fr for French, en for English). Defaults to 'fr' if not provided.",
+                                        "type": "string",
+                                        "enum": [
+                                            "fr",
+                                            "en"
+                                        ],
+                                        "example": "fr",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -1364,16 +1558,16 @@
         "/api/delivery-persons/{deliveryPersonId}/orders": {
             "get": {
                 "tags": [
-                    "Livreurs"
+                    "Commandes"
                 ],
-                "summary": "Get all orders for a specific delivery person",
-                "description": "Retrieves a paginated list of orders for a given delivery person, with optional filtering by status, order number, and delivery type.",
+                "summary": "Obtenir toutes les commandes d'un livreur spécifique",
+                "description": "Récupère une liste paginée des commandes pour un livreur donné, avec filtrage optionnel par statut, numéro de commande et type de livraison.",
                 "operationId": "api.delivery-persons.orders",
                 "parameters": [
                     {
                         "name": "deliveryPersonId",
                         "in": "path",
-                        "description": "ID of the delivery person",
+                        "description": "ID du livreur",
                         "required": true,
                         "schema": {
                             "type": "integer",
@@ -1383,7 +1577,7 @@
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "Filter orders by status",
+                        "description": "Filtrer les commandes par statut",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -1399,7 +1593,7 @@
                     {
                         "name": "order_number",
                         "in": "query",
-                        "description": "Filter orders by order number (partial match)",
+                        "description": "Filtrer les commandes par numéro de commande (correspondance partielle)",
                         "required": false,
                         "schema": {
                             "type": "string"
@@ -1408,7 +1602,7 @@
                     {
                         "name": "delivery_type",
                         "in": "query",
-                        "description": "Filter orders by delivery type",
+                        "description": "Filtrer les commandes par type de livraison",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -1421,7 +1615,7 @@
                     {
                         "name": "per_page",
                         "in": "query",
-                        "description": "Number of orders per page",
+                        "description": "Nombre de commandes par page",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -1433,7 +1627,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Opération réussie",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1462,7 +1656,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Non autorisé",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1472,7 +1666,7 @@
                         }
                     },
                     "404": {
-                        "description": "Delivery person not found",
+                        "description": "Livreur introuvable",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1482,7 +1676,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error",
+                        "description": "Erreur de validation",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1492,7 +1686,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Erreur serveur interne",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2344,150 +2538,6 @@
                 ]
             }
         },
-        "/api/orders": {
-            "get": {
-                "tags": [
-                    "Commandes"
-                ],
-                "summary": "Lister toutes les commandes",
-                "description": "Récupère une liste de toutes les commandes existantes, incluant leurs articles.",
-                "operationId": "api.orders.index",
-                "responses": {
-                    "200": {
-                        "description": "Liste des commandes récupérée avec succès.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Liste des commandes récupérée avec succès."
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/OrderData"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non autorisé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Commandes"
-                ],
-                "summary": "Créer une nouvelle commande",
-                "description": "Permet de créer une nouvelle commande avec ses articles.",
-                "operationId": "api.orders.store",
-                "requestBody": {
-                    "description": "Données de la commande à créer",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/StoreOrderRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Commande créée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/StoreOrderResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non autorisé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Ressource non trouvée (client, adresse de livraison, centre de distribution, produit)",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreur de validation ou stock insuffisant",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/orders/checkout": {
             "post": {
                 "tags": [
@@ -2677,6 +2727,84 @@
                 ]
             }
         },
+        "/api/orders": {
+            "post": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Créer une nouvelle commande",
+                "description": "Permet de créer une nouvelle commande avec ses articles.",
+                "operationId": "api.orders.store",
+                "requestBody": {
+                    "description": "Données de la commande à créer",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Commande créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StoreOrderResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Ressource non trouvée (client, adresse de livraison, centre de distribution, produit)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation ou stock insuffisant",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/payment-methods": {
             "get": {
                 "tags": [
@@ -2727,7 +2855,7 @@
         "/api/tracking/delivery/{orderId}/complete": {
             "patch": {
                 "tags": [
-                    "Suivi de Livraison"
+                    "Livraison"
                 ],
                 "summary": "Complete delivery tracking",
                 "description": "Marks a delivery as completed with optional final position and notes.",
@@ -2876,13 +3004,13 @@
         "/api/tracking/delivery": {
             "post": {
                 "tags": [
-                    "Suivi de Livraison"
+                    "Livraison"
                 ],
-                "summary": "Create a new delivery tracking record",
-                "description": "Initializes a new tracking record for a delivery.",
+                "summary": "Créer un nouveau enregistrement de suivi de livraison",
+                "description": "Initialise un nouvel enregistrement de suivi pour une livraison.",
                 "operationId": "api.tracking.delivery.create",
                 "requestBody": {
-                    "description": "Data for creating a new delivery tracking record",
+                    "description": "Données pour créer un nouvel enregistrement de suivi de livraison",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -2892,7 +3020,7 @@
                                 ],
                                 "properties": {
                                     "order_id": {
-                                        "description": "The ID of the order to be tracked",
+                                        "description": "L'ID de la commande à suivre",
                                         "type": "integer",
                                         "example": 1
                                     }
@@ -2904,7 +3032,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Delivery tracking created successfully",
+                        "description": "Suivi de livraison créé avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2930,7 +3058,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Non autorisé",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2940,7 +3068,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error",
+                        "description": "Erreur de validation",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2950,7 +3078,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Erreur serveur interne",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2970,16 +3098,16 @@
         "/api/tracking/delivery/{orderId}": {
             "get": {
                 "tags": [
-                    "Suivi de Livraison"
+                    "Livraison"
                 ],
-                "summary": "Get delivery tracking details",
-                "description": "Retrieves the tracking details for a specific delivery.",
+                "summary": "Obtenir les détails de suivi de livraison",
+                "description": "Récupère les détails de suivi pour une livraison spécifique.",
                 "operationId": "api.tracking.delivery.details",
                 "parameters": [
                     {
                         "name": "orderId",
                         "in": "path",
-                        "description": "The order ID of the delivery to track",
+                        "description": "L'ID de la commande de la livraison à suivre",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -2988,7 +3116,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Opération réussie",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3003,7 +3131,7 @@
                                                 },
                                                 "message": {
                                                     "type": "string",
-                                                    "example": "Delivery tracking details retrieved successfully."
+                                                    "example": "Détails de suivi de livraison récupérés avec succès."
                                                 }
                                             },
                                             "type": "object"
@@ -3014,7 +3142,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Non autorisé",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3024,7 +3152,7 @@
                         }
                     },
                     "404": {
-                        "description": "Delivery not found",
+                        "description": "Livraison introuvable",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3034,7 +3162,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Erreur serveur interne",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3054,16 +3182,16 @@
         "/api/tracking/delivery/{orderId}/start": {
             "post": {
                 "tags": [
-                    "Suivi de Livraison"
+                    "Livraison"
                 ],
-                "summary": "Start delivery tracking",
-                "description": "Marks a delivery as started.",
+                "summary": "Démarrer le suivi de livraison",
+                "description": "Marque une livraison comme démarrée.",
                 "operationId": "api.tracking.delivery.start",
                 "parameters": [
                     {
                         "name": "orderId",
                         "in": "path",
-                        "description": "The order ID of the delivery to start tracking",
+                        "description": "L'ID de la commande de la livraison pour démarrer le suivi",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -3071,7 +3199,7 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Initial GPS coordinates to start delivery tracking",
+                    "description": "Coordonnées GPS initiales pour démarrer le suivi de livraison",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -3082,7 +3210,7 @@
                                 ],
                                 "properties": {
                                     "driver_lat": {
-                                        "description": "Initial latitude of the delivery person",
+                                        "description": "Latitude initiale du livreur",
                                         "type": "number",
                                         "format": "float",
                                         "maximum": 90,
@@ -3090,7 +3218,7 @@
                                         "example": 3.848
                                     },
                                     "driver_lng": {
-                                        "description": "Initial longitude of the delivery person",
+                                        "description": "Longitude initiale du livreur",
                                         "type": "number",
                                         "format": "float",
                                         "maximum": 180,
@@ -3120,7 +3248,7 @@
                                                 },
                                                 "message": {
                                                     "type": "string",
-                                                    "example": "Delivery tracking started successfully."
+                                                    "example": "Suivi de livraison démarré avec succès."
                                                 }
                                             },
                                             "type": "object"
@@ -3171,16 +3299,16 @@
         "/api/tracking/delivery/{orderId}/position": {
             "patch": {
                 "tags": [
-                    "Suivi de Livraison"
+                    "Livraison"
                 ],
-                "summary": "Update delivery tracking position",
-                "description": "Updates the geographical position of a delivery.",
+                "summary": "Mettre à jour la position de suivi de livraison",
+                "description": "Met à jour la position géographique d'une livraison.",
                 "operationId": "api.tracking.delivery.position.update",
                 "parameters": [
                     {
                         "name": "orderId",
                         "in": "path",
-                        "description": "The order ID of the delivery to update position",
+                        "description": "L'ID de la commande de la livraison pour mettre à jour la position",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -3188,7 +3316,7 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Real-time position and tracking data",
+                    "description": "Données de position et de suivi en temps réel",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -3199,7 +3327,7 @@
                                 ],
                                 "properties": {
                                     "driver_lat": {
-                                        "description": "Current latitude of the delivery person",
+                                        "description": "Latitude actuelle du livreur",
                                         "type": "number",
                                         "format": "float",
                                         "maximum": 90,
@@ -3207,7 +3335,7 @@
                                         "example": 3.8495
                                     },
                                     "driver_lng": {
-                                        "description": "Current longitude of the delivery person",
+                                        "description": "Longitude actuelle du livreur",
                                         "type": "number",
                                         "format": "float",
                                         "maximum": 180,
@@ -3215,14 +3343,14 @@
                                         "example": 11.5035
                                     },
                                     "current_speed": {
-                                        "description": "Current speed in km/h (optional)",
+                                        "description": "Vitesse actuelle en km/h (optionnel)",
                                         "type": "number",
                                         "format": "float",
                                         "minimum": 0,
                                         "example": 35.5
                                     },
                                     "progress_percentage": {
-                                        "description": "Delivery progress percentage (optional)",
+                                        "description": "Pourcentage de progression de la livraison (optionnel)",
                                         "type": "number",
                                         "format": "float",
                                         "maximum": 100,
@@ -3230,14 +3358,14 @@
                                         "example": 75.2
                                     },
                                     "distance_remaining": {
-                                        "description": "Remaining distance in kilometers (optional)",
+                                        "description": "Distance restante en kilomètres (optionnel)",
                                         "type": "number",
                                         "format": "float",
                                         "minimum": 0,
                                         "example": 2.8
                                     },
                                     "estimated_duration": {
-                                        "description": "Estimated duration in minutes (optional)",
+                                        "description": "Durée estimée en minutes (optionnel)",
                                         "type": "integer",
                                         "minimum": 0,
                                         "example": 8
@@ -3250,7 +3378,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "Opération réussie",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3265,7 +3393,7 @@
                                                 },
                                                 "message": {
                                                     "type": "string",
-                                                    "example": "Delivery tracking position updated successfully."
+                                                    "example": "Position de suivi de livraison mise à jour avec succès."
                                                 }
                                             },
                                             "type": "object"
@@ -3276,7 +3404,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Non autorisé",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3286,7 +3414,7 @@
                         }
                     },
                     "404": {
-                        "description": "Delivery not found",
+                        "description": "Livraison introuvable",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3296,7 +3424,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error",
+                        "description": "Erreur de validation",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3342,7 +3470,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Erreur serveur interne",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3480,7 +3608,7 @@
         "/api/distribution-centers/{id}/products": {
             "get": {
                 "tags": [
-                    "Produits d'un centre de distribution"
+                    "Centres de Distribution"
                 ],
                 "summary": "Récupérer les produits d'un centre de distribution",
                 "description": "Récupère la liste de tous les produits disponibles dans un centre de distribution spécifique, avec leurs détails et quantités en stock.",
@@ -3607,6 +3735,56 @@
                     }
                 ]
             },
+            "CheckAuthData": {
+                "title": "CheckAuthData",
+                "description": "Authentication check response data",
+                "properties": {
+                    "authenticated": {
+                        "description": "Whether the user is authenticated",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "user_id": {
+                        "description": "Current authenticated user ID",
+                        "type": "integer",
+                        "example": 123,
+                        "nullable": true
+                    },
+                    "roles": {
+                        "description": "User roles",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        },
+                        "example": [
+                            {
+                                "id": 1,
+                                "name": "customer"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "CheckAuthResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/CheckAuthData"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "User is authenticated."
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "LoginRequest": {
                 "required": [
                     "login",
@@ -3643,26 +3821,44 @@
                 "type": "object"
             },
             "AuthData": {
-                "description": "Objet de transfert de données contenant le token et les informations de l'utilisateur authentifié",
+                "description": "Authentication response data with token and user information",
                 "properties": {
-                    "token": {
-                        "$ref": "#/components/schemas/TokenData"
+                    "access_token": {
+                        "description": "Bearer access token",
+                        "type": "string",
+                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+                    },
+                    "token_type": {
+                        "description": "Token type",
+                        "type": "string",
+                        "example": "bearer"
+                    },
+                    "expires_in": {
+                        "description": "Token expiration time in seconds",
+                        "type": "integer",
+                        "example": 3600
                     },
                     "user": {
-                        "$ref": "#/components/schemas/CustomerData"
+                        "description": "Authenticated user information (UserData for regular users, UserData for customers)",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/UserData"
+                            }
+                        ]
                     }
                 },
                 "type": "object"
             },
             "LoginResponse": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
+                "properties": {
+                    "_metadata": {
                         "properties": {
-                            "data": {
-                                "$ref": "#/components/schemas/AuthData"
+                            "success": {
+                                "type": "boolean",
+                                "example": true
                             },
                             "message": {
                                 "type": "string",
@@ -3670,8 +3866,12 @@
                             }
                         },
                         "type": "object"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/AuthData"
                     }
-                ]
+                },
+                "type": "object"
             },
             "UpdatePasswordRequest": {
                 "required": [
@@ -3681,19 +3881,19 @@
                 ],
                 "properties": {
                     "old_password": {
-                        "description": "User's current password",
+                        "description": "Mot de passe actuel de l'utilisateur",
                         "type": "string",
                         "format": "password",
                         "example": "password"
                     },
                     "new_password": {
-                        "description": "User's new password",
+                        "description": "Nouveau mot de passe de l'utilisateur",
                         "type": "string",
                         "format": "password",
                         "example": "new_strong_password"
                     },
                     "new_password_confirmation": {
-                        "description": "Confirmation of the new password",
+                        "description": "Confirmation du nouveau mot de passe",
                         "type": "string",
                         "format": "password",
                         "example": "new_strong_password"
@@ -3754,19 +3954,38 @@
                         "example": "123 Main St",
                         "nullable": true
                     },
+                    "language": {
+                        "description": "User's preferred language",
+                        "type": "string",
+                        "enum": [
+                            "fr",
+                            "en"
+                        ],
+                        "example": "fr"
+                    },
+                    "current_balance": {
+                        "description": "Customer current balance (only for customers)",
+                        "type": "number",
+                        "format": "float",
+                        "example": 1500,
+                        "nullable": true
+                    },
                     "email_verified_at": {
                         "type": "string",
                         "format": "date-time",
+                        "example": "2024-01-15T10:30:00.000000Z",
                         "nullable": true
                     },
                     "phone_verified_at": {
                         "type": "string",
                         "format": "date-time",
+                        "example": "2024-01-15T10:30:00.000000Z",
                         "nullable": true
                     },
                     "last_login_at": {
                         "type": "string",
                         "format": "date-time",
+                        "example": "2024-12-01T08:45:00.000000Z",
                         "nullable": true
                     },
                     "roles": {
@@ -3775,20 +3994,30 @@
                             "type": "string"
                         },
                         "example": [
-                            "admin"
+                            "customer"
                         ]
                     },
                     "customer_id": {
+                        "description": "Customer ID if user is a customer",
                         "type": "integer",
+                        "example": 123,
                         "nullable": true
                     },
                     "delivery_person_id": {
+                        "description": "Delivery person ID if user is a delivery person",
                         "type": "integer",
+                        "example": 456,
                         "nullable": true
                     },
                     "created_at": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-01T08:45:00.000000Z"
                     }
                 },
                 "type": "object"
@@ -3819,6 +4048,22 @@
                         "type": "string",
                         "example": "+237677123456",
                         "nullable": true
+                    },
+                    "address": {
+                        "description": "User's address",
+                        "type": "string",
+                        "example": "123 Main St",
+                        "nullable": true
+                    },
+                    "language": {
+                        "description": "User's preferred language (fr for French, en for English)",
+                        "type": "string",
+                        "enum": [
+                            "fr",
+                            "en"
+                        ],
+                        "example": "fr",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -3845,7 +4090,7 @@
             "BottleVerificationData": {
                 "properties": {
                     "authentic": {
-                        "description": "Indicates if the bottle is authentic and meets criteria.",
+                        "description": "Indique si la bouteille est authentique et respecte les critères.",
                         "type": "boolean",
                         "example": true
                     }
@@ -3864,7 +4109,7 @@
                             },
                             "message": {
                                 "type": "string",
-                                "example": "Bottle verification result"
+                                "example": "Résultat de vérification de la bouteille"
                             }
                         },
                         "type": "object"
@@ -3879,7 +4124,7 @@
                     {
                         "properties": {
                             "data": {
-                                "$ref": "#/components/schemas/CustomerData"
+                                "$ref": "#/components/schemas/UserData"
                             },
                             "message": {
                                 "type": "string",
@@ -3892,6 +4137,19 @@
             },
             "CustomerOrdersResponse": {
                 "properties": {
+                    "_metadata": {
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Liste des commandes du client récupérée avec succès"
+                            }
+                        },
+                        "type": "object"
+                    },
                     "data": {
                         "type": "array",
                         "items": {
@@ -3921,57 +4179,6 @@
                     }
                 },
                 "type": "object"
-            },
-            "CustomerData": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/UserData"
-                    },
-                    {
-                        "properties": {
-                            "customer_id": {
-                                "description": "Unique identifier for the customer record",
-                                "type": "integer",
-                                "example": 1
-                            },
-                            "deliveryAddresses": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/DeliveryAddress"
-                                }
-                            },
-                            "current_balance": {
-                                "type": "number",
-                                "format": "float",
-                                "example": 15000.5,
-                                "nullable": true
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
-            },
-            "CustomersResponse": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                        "properties": {
-                            "data": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/CustomerData"
-                                }
-                            },
-                            "message": {
-                                "type": "string",
-                                "example": "Liste des clients récupérée avec succès"
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
             },
             "StoreCustomerDeliveryAddressRequest": {
                 "required": [
@@ -4797,7 +5004,7 @@
                         "example": 1
                     },
                     "customer": {
-                        "$ref": "#/components/schemas/CustomerData"
+                        "$ref": "#/components/schemas/UserData"
                     },
                     "delivery_address_id": {
                         "type": "integer",
@@ -4883,16 +5090,16 @@
                 ]
             },
             "PaymentMethod": {
-                "title": "Payment Method",
-                "description": "Represents a single payment method",
+                "title": "Méthode de Paiement",
+                "description": "Représente une méthode de paiement",
                 "properties": {
                     "value": {
-                        "description": "The unique identifier for the payment method",
+                        "description": "L'identifiant unique de la méthode de paiement",
                         "type": "string",
                         "example": "credit_card"
                     },
                     "label": {
-                        "description": "The human-readable label for the payment method",
+                        "description": "Le libellé lisible de la méthode de paiement",
                         "type": "string",
                         "example": "Carte de Crédit"
                     }
@@ -4914,7 +5121,7 @@
                             },
                             "message": {
                                 "type": "string",
-                                "example": "Payment methods retrieved successfully."
+                                "example": "Méthodes de paiement récupérées avec succès."
                             }
                         },
                         "type": "object"
@@ -5035,16 +5242,30 @@
                 },
                 "type": "object"
             },
+            "Language": {
+                "description": "Supported languages",
+                "type": "string",
+                "enum": [
+                    "fr",
+                    "en"
+                ],
+                "example": "fr"
+            },
             "ApiResponse": {
                 "description": "Réponse standard de l'API",
                 "properties": {
-                    "success": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "message": {
-                        "type": "string",
-                        "example": "Opération réussie"
+                    "_metadata": {
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Opération réussie"
+                            }
+                        },
+                        "type": "object"
                     },
                     "data": {
                         "description": "Données retournées par l'API",
@@ -5055,11 +5276,8 @@
                 "type": "object"
             },
             "ErrorResponse": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
+                "properties": {
+                    "_metadata": {
                         "properties": {
                             "success": {
                                 "type": "boolean",
@@ -5071,22 +5289,25 @@
                             }
                         },
                         "type": "object"
+                    },
+                    "data": {
+                        "type": "object",
+                        "example": null,
+                        "nullable": true
                     }
-                ]
+                },
+                "type": "object"
             },
             "ValidationErrorDetail": {
                 "type": "array",
                 "items": {
                     "type": "string",
-                    "example": "Le champ driver_lat est requis."
+                    "example": "Ce champ est requis."
                 }
             },
             "ValidationErrorResponse": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
+                "properties": {
+                    "_metadata": {
                         "properties": {
                             "success": {
                                 "type": "boolean",
@@ -5095,20 +5316,21 @@
                             "message": {
                                 "type": "string",
                                 "example": "Erreur de validation."
-                            },
-                            "data": {
-                                "description": "Détail des erreurs de validation",
-                                "properties": {
-                                    "field_name": {
-                                        "$ref": "#/components/schemas/ValidationErrorDetail"
-                                    }
-                                },
-                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "data": {
+                        "description": "Détail des erreurs de validation",
+                        "properties": {
+                            "field_name": {
+                                "$ref": "#/components/schemas/ValidationErrorDetail"
                             }
                         },
                         "type": "object"
                     }
-                ]
+                },
+                "type": "object"
             },
             "UserData": {
                 "title": "UserData",
@@ -5126,6 +5348,10 @@
                         "type": "string",
                         "example": "Dupont"
                     },
+                    "full_name": {
+                        "type": "string",
+                        "example": "Jean Dupont"
+                    },
                     "email": {
                         "type": "string",
                         "format": "email",
@@ -5140,26 +5366,70 @@
                         "example": "123 Rue Principale, Douala",
                         "nullable": true
                     },
+                    "language": {
+                        "description": "User's preferred language",
+                        "type": "string",
+                        "enum": [
+                            "fr",
+                            "en"
+                        ],
+                        "example": "fr"
+                    },
                     "current_balance": {
+                        "description": "Customer current balance (only for customers)",
                         "type": "number",
                         "format": "float",
-                        "example": 1500
+                        "example": 1500,
+                        "nullable": true
                     },
                     "email_verified_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-01-01T12:00:00Z",
+                        "example": "2024-01-01T12:00:00.000000Z",
+                        "nullable": true
+                    },
+                    "phone_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T12:00:00.000000Z",
+                        "nullable": true
+                    },
+                    "last_login_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-01T08:45:00.000000Z",
+                        "nullable": true
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "customer"
+                        ]
+                    },
+                    "customer_id": {
+                        "description": "Customer ID if user is a customer",
+                        "type": "integer",
+                        "example": 123,
+                        "nullable": true
+                    },
+                    "delivery_person_id": {
+                        "description": "Delivery person ID if user is a delivery person",
+                        "type": "integer",
+                        "example": 456,
                         "nullable": true
                     },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-01-01T12:00:00Z"
+                        "example": "2024-01-01T12:00:00.000000Z"
                     },
                     "updated_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-01-01T12:00:00Z"
+                        "example": "2024-12-01T08:45:00.000000Z"
                     }
                 },
                 "type": "object"
@@ -5796,12 +6066,8 @@
             "description": "Authentification"
         },
         {
-            "name": "Authentication",
-            "description": "Authentication"
-        },
-        {
-            "name": "Bottles",
-            "description": "Bottles"
+            "name": "Bouteilles",
+            "description": "Bouteilles"
         },
         {
             "name": "Clients",
@@ -5812,32 +6078,20 @@
             "description": "Livraison"
         },
         {
-            "name": "Livreurs",
-            "description": "Livreurs"
+            "name": "Commandes",
+            "description": "Commandes"
         },
         {
             "name": "Géographie",
             "description": "Géographie"
         },
         {
-            "name": "Commandes",
-            "description": "Commandes"
-        },
-        {
             "name": "Paiement",
             "description": "Paiement"
         },
         {
-            "name": "Suivi de Livraison",
-            "description": "Suivi de Livraison"
-        },
-        {
             "name": "Centres de Distribution",
             "description": "Centres de Distribution"
-        },
-        {
-            "name": "Produits d'un centre de distribution",
-            "description": "Produits d'un centre de distribution"
         }
     ]
 }

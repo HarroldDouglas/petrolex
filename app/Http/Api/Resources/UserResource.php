@@ -17,11 +17,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $email
  * @property string $phone_number
  * @property string|null $address
+ * @property string $language
+ * @property float|null $current_balance
  * @property string|null $email_verified_at
  * @property string|null $phone_verified_at
  * @property string|null $last_login_at
  * @property string[] $roles
+ * @property int|null $customer_id
+ * @property int|null $delivery_person_id
  * @property string $created_at
+ * @property string $updated_at
  */
 class UserResource extends JsonResource
 {
@@ -43,6 +48,8 @@ class UserResource extends JsonResource
             'email' => $user->email,
             'phone_number' => $user->phone_number,
             'address' => $user->address,
+            'language' => $user->language,
+            'current_balance' => $this->when($user->isCustomer(), $user->customer->current_balance ?? 0.0),
             'email_verified_at' => $user->email_verified_at instanceof CarbonInterface ? $user->email_verified_at->toISOString() : null,
             'phone_verified_at' => $user->phone_verified_at instanceof CarbonInterface ? $user->phone_verified_at->toISOString() : null,
             'last_login_at' => $user->last_login_at instanceof CarbonInterface ? $user->last_login_at->toISOString() : null,
@@ -50,6 +57,7 @@ class UserResource extends JsonResource
             'customer_id' => $this->when($user->isCustomer(), $user->customer->id ?? null),
             'delivery_person_id' => $this->when($user->isDeliveryPerson(), $user->deliveryPerson->id ?? null),
             'created_at' => $user->created_at->toISOString(),
+            'updated_at' => $user->updated_at->toISOString(),
         ];
     }
 }

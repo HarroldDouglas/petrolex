@@ -16,14 +16,36 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=200,
- *         description="User profile",
+ *         description="Profil utilisateur récupéré avec succès",
  *
- *         @OA\JsonContent(ref="#/components/schemas/UserData")
+ *         @OA\JsonContent(
+ *
+ *             @OA\Property(
+ *                 property="_metadata",
+ *                 type="object",
+ *                 @OA\Property(property="success", type="boolean", example=true),
+ *                 @OA\Property(property="message", type="string", example="Profil récupéré avec succès.")
+ *             ),
+ *             @OA\Property(
+ *                 property="data",
+ *                 ref="#/components/schemas/UserData"
+ *             )
+ *         )
  *     ),
  *
  *     @OA\Response(
  *         response=401,
- *         description="Unauthenticated"
+ *         description="Non authentifié",
+ *
+ *         @OA\JsonContent(
+ *
+ *             @OA\Property(
+ *                 property="_metadata",
+ *                 type="object",
+ *                 @OA\Property(property="success", type="boolean", example=false),
+ *                 @OA\Property(property="message", type="string", example="Non authentifié.")
+ *             )
+ *         )
  *     )
  * )
  */

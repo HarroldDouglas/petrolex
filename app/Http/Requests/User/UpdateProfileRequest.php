@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\User;
 
+use App\Enums\Language;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
@@ -23,21 +24,22 @@ class UpdateProfileRequest extends FormRequest
         $userId = auth()->id();
 
         return [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['sometimes', 'string', 'max:255'],
+            'last_name' => ['sometimes', 'string', 'max:255'],
             'email' => [
-                'required',
+                'sometimes',
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->ignore($userId),
             ],
             'phone_number' => [
-                'required',
+                'sometimes',
                 'string',
                 'max:20',
                 Rule::unique('users', 'phone_number')->ignore($userId),
             ],
             'password' => ['nullable', 'string', 'min:8'],
+            'language' => ['nullable', Rule::in(Language::getValues())],
             'image' => [
                 'nullable',
                 function (string $attribute, mixed $value, Closure $fail): void {
@@ -70,6 +72,7 @@ class UpdateProfileRequest extends FormRequest
             'phone_number.required' => 'Le téléphone est obligatoire.',
             'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
             'phone_number.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
+            'language.in' => 'La langue sélectionnée n\'est pas valide.',
             'image.image' => 'L\'image doit être un fichier image valide.',
             'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
         ];

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_active')->default(true);
+            $table->string('language', 2)->nullable()->default('fr')->index();
             $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

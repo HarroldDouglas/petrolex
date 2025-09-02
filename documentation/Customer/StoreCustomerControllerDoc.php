@@ -29,6 +29,7 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(property="email", type="string", format="email", example="jean.dupont@example.com"),
  *             @OA\Property(property="phone_number", type="string", example="+237677123456"),
  *             @OA\Property(property="password", type="string", format="password", example="password123"),
+ *             @OA\Property(property="language", type="string", enum={"fr", "en"}, nullable=true, example="fr", description="User's preferred language (fr for French, en for English). Defaults to 'fr' if not provided."),
  *         )
  *     ),
  *

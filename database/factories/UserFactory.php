@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Language;
 use App\Enums\UserRole;
 use App\Models\Customer;
 use App\Models\CustomerDeliveryAddress;
@@ -35,6 +36,7 @@ class UserFactory extends Factory
             'address' => fake()->address(),
             'email_verified_at' => now(),
             'password' => Hash::make('password'), // Default password for test users
+            'language' => fake()->randomElement(Language::getValues()),
             'remember_token' => Str::random(10),
             'is_active' => true,
         ];

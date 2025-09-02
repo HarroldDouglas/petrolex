@@ -4,7 +4,7 @@ namespace App\Http\Api\Responses;
 
 class OtpResponse extends ApiResponse
 {
-    public static function otpSent(string $identifier, ?string $token = null): self
+    public static function otpSent(string $identifier, ?string $token = null, int $statusCode = 201): self
     {
         $data = [
             'identifier' => $identifier,
@@ -16,7 +16,9 @@ class OtpResponse extends ApiResponse
 
         return new self(
             $data,
-            'OTP sent successfully for verification.'
+            'OTP sent successfully for verification.',
+            true,
+            $statusCode
         );
     }
 

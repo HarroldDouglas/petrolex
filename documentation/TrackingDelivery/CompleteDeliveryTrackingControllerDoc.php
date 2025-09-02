@@ -8,7 +8,7 @@ use OpenApi\Annotations as OA;
  *     summary="Complete delivery tracking",
  *     description="Marks a delivery as completed with optional final position and notes.",
  *     operationId="api.tracking.delivery.complete",
- *     tags={"Suivi de Livraison"},
+ *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(

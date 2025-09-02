@@ -5,17 +5,17 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Get(
  *     path="/api/delivery-persons/{deliveryPersonId}/orders",
- *     summary="Get all orders for a specific delivery person",
- *     description="Retrieves a paginated list of orders for a given delivery person, with optional filtering by status, order number, and delivery type.",
+ *     summary="Obtenir toutes les commandes d'un livreur spécifique",
+ *     description="Récupère une liste paginée des commandes pour un livreur donné, avec filtrage optionnel par statut, numéro de commande et type de livraison.",
  *     operationId="api.delivery-persons.orders",
- *     tags={"Livreurs"},
+ *     tags={"Commandes"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
  *         name="deliveryPersonId",
  *         in="path",
  *         required=true,
- *         description="ID of the delivery person",
+ *         description="ID du livreur",
  *
  *         @OA\Schema(type="integer", format="int64")
  *     ),
@@ -24,7 +24,7 @@ use OpenApi\Annotations as OA;
  *         name="status",
  *         in="query",
  *         required=false,
- *         description="Filter orders by status",
+ *         description="Filtrer les commandes par statut",
  *
  *         @OA\Schema(type="string", enum={"confirmed", "in_progress", "delivered", "cancelled", "pending"})
  *     ),
@@ -33,7 +33,7 @@ use OpenApi\Annotations as OA;
  *         name="order_number",
  *         in="query",
  *         required=false,
- *         description="Filter orders by order number (partial match)",
+ *         description="Filtrer les commandes par numéro de commande (correspondance partielle)",
  *
  *         @OA\Schema(type="string")
  *     ),
@@ -42,7 +42,7 @@ use OpenApi\Annotations as OA;
  *         name="delivery_type",
  *         in="query",
  *         required=false,
- *         description="Filter orders by delivery type",
+ *         description="Filtrer les commandes par type de livraison",
  *
  *         @OA\Schema(type="string", enum={"normal", "fast"})
  *     ),
@@ -51,14 +51,14 @@ use OpenApi\Annotations as OA;
  *         name="per_page",
  *         in="query",
  *         required=false,
- *         description="Number of orders per page",
+ *         description="Nombre de commandes par page",
  *
  *         @OA\Schema(type="integer", format="int32", minimum=1, default=10)
  *     ),
  *
  *     @OA\Response(
  *         response=200,
- *         description="Successful operation",
+ *         description="Opération réussie",
  *
  *         @OA\JsonContent(
  *             allOf={
@@ -81,28 +81,28 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=401,
- *         description="Unauthorized",
+ *         description="Non autorisé",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=404,
- *         description="Delivery person not found",
+ *         description="Livreur introuvable",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=422,
- *         description="Validation error",
+ *         description="Erreur de validation",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=500,
- *         description="Internal server error",
+ *         description="Erreur serveur interne",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )

@@ -5,26 +5,26 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Post(
  *     path="/api/tracking/delivery",
- *     summary="Create a new delivery tracking record",
- *     description="Initializes a new tracking record for a delivery.",
+ *     summary="Créer un nouveau enregistrement de suivi de livraison",
+ *     description="Initialise un nouvel enregistrement de suivi pour une livraison.",
  *     operationId="api.tracking.delivery.create",
- *     tags={"Suivi de Livraison"},
+ *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\RequestBody(
  *         required=true,
- *         description="Data for creating a new delivery tracking record",
+ *         description="Données pour créer un nouvel enregistrement de suivi de livraison",
  *
  *         @OA\JsonContent(
  *             required={"order_id"},
  *
- *             @OA\Property(property="order_id", type="integer", description="The ID of the order to be tracked", example=1)
+ *             @OA\Property(property="order_id", type="integer", description="L'ID de la commande à suivre", example=1)
  *         )
  *     ),
  *
  *     @OA\Response(
  *         response=201,
- *         description="Delivery tracking created successfully",
+ *         description="Suivi de livraison créé avec succès",
  *
  *         @OA\JsonContent(
  *             allOf={
@@ -41,21 +41,21 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=401,
- *         description="Unauthorized",
+ *         description="Non autorisé",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=422,
- *         description="Validation error",
+ *         description="Erreur de validation",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=500,
- *         description="Internal server error",
+ *         description="Erreur serveur interne",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )

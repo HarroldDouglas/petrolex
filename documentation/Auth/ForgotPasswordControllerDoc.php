@@ -87,7 +87,39 @@ use OpenApi\Annotations as OA;
  *         response=422,
  *         description="Erreurs de validation",
  *
- *         @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
+ *         @OA\JsonContent(
+ *
+ *             @OA\Property(
+ *                 property="_metadata",
+ *                 type="object",
+ *                 @OA\Property(property="success", type="boolean", example=false),
+ *                 @OA\Property(property="message", type="string", example="Erreur de validation.")
+ *             ),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(
+ *                     property="token",
+ *                     type="array",
+ *
+ *                     @OA\Items(type="string", example="Le champ token est requis.")
+ *                 ),
+ *
+ *                 @OA\Property(
+ *                     property="password",
+ *                     type="array",
+ *
+ *                     @OA\Items(type="string", example="Le mot de passe doit contenir au moins 8 caractères.")
+ *                 ),
+ *
+ *                 @OA\Property(
+ *                     property="password_confirmation",
+ *                     type="array",
+ *
+ *                     @OA\Items(type="string", example="La confirmation du mot de passe ne correspond pas.")
+ *                 )
+ *             )
+ *         )
  *     ),
  *
  *     @OA\Response(

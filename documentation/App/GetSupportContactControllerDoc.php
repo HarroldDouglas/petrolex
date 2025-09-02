@@ -7,14 +7,14 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Get(
  *     path="/api/app/support/contact",
- *     summary="Get support team contact information",
- *     description="Returns the contact information (phone number and email) for the support team",
+ *     summary="Obtenir les informations de contact du support",
+ *     description="Retourne les informations de contact (numéro de téléphone et email) de l'équipe de support",
  *     operationId="getSupportContact",
  *     tags={"App"},
  *
  *     @OA\Response(
  *         response=200,
- *         description="Support contact information retrieved successfully",
+ *         description="Informations de contact du support récupérées avec succès",
  *
  *         @OA\JsonContent(
  *
@@ -35,7 +35,7 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=500,
- *         description="Internal server error",
+ *         description="Erreur serveur interne",
  *
  *         @OA\JsonContent(
  *

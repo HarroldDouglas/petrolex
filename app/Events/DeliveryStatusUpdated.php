@@ -14,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Event fired when a delivery status is updated.
- * 
+ *
  * This event broadcasts real-time updates about delivery status changes
  * to subscribed channels, providing comprehensive tracking information
  * including location data, timing details, and participant information.
@@ -30,18 +30,18 @@ final class DeliveryStatusUpdated implements ShouldBroadcast
     private const BROADCAST_EVENT_NAME = 'delivery-status-updated';
     private const EVENT_TYPE = 'status_update';
     private const COMPLETED_STATUS = 'completed';
-    
+
     private const REQUIRED_RELATIONS = [
         'order.customer',
         'order.deliveryPerson',
-        'order.deliveryAddress'
+        'order.deliveryAddress',
     ];
 
     /**
      * Create a new delivery status updated event instance.
      *
-     * @param DeliveryTracking $delivery The delivery tracking instance
-     * @param string|null $previousStatus The previous status before the update
+     * @param  DeliveryTracking  $delivery  The delivery tracking instance
+     * @param  string|null  $previousStatus  The previous status before the update
      */
     public function __construct(
         private readonly DeliveryTracking $delivery,
@@ -59,14 +59,12 @@ final class DeliveryStatusUpdated implements ShouldBroadcast
     {
         return [
             new Channel(self::CHANNEL_PREFIX_GENERAL),
-            new Channel(self::CHANNEL_PREFIX_SPECIFIC . $this->delivery->order->order_number),
+            new Channel(self::CHANNEL_PREFIX_SPECIFIC.$this->delivery->order->order_number),
         ];
     }
 
     /**
      * Get the broadcast event name.
-     *
-     * @return string
      */
     public function broadcastAs(): string
     {
@@ -145,7 +143,7 @@ final class DeliveryStatusUpdated implements ShouldBroadcast
             'current_longitude' => $driverPosition['lng'],
             'destination_latitude' => $destination['lat'],
             'destination_longitude' => $destination['lng'],
-            
+
             // Preferred format
             'driver_position' => $driverPosition,
             'destination' => $destination,
@@ -184,8 +182,8 @@ final class DeliveryStatusUpdated implements ShouldBroadcast
      */
     private function getDestinationAddress(): ?string
     {
-        return $this->delivery->order->deliveryAddress->full_address 
-            ?? $this->delivery->order->delivery_address 
+        return $this->delivery->order->deliveryAddress->full_address
+            ?? $this->delivery->order->delivery_address
             ?? null;
     }
 

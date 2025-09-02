@@ -11,7 +11,7 @@ use OpenApi\Annotations as OA;
  *
  *             @OA\Property(
  *                 property="data",
- *                 ref="#/components/schemas/CustomerData"
+ *                 ref="#/components/schemas/UserData"
  *             ),
  *             @OA\Property(
  *                 property="message",

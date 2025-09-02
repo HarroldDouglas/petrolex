@@ -30,7 +30,7 @@ use OpenApi\Annotations as OA;
  *     summary="Récupérer les produits d'un centre de distribution",
  *     description="Récupère la liste de tous les produits disponibles dans un centre de distribution spécifique, avec leurs détails et quantités en stock.",
  *     operationId="api.distribution-centers.products",
- *     tags={"Produits d'un centre de distribution"},
+ *     tags={"Centres de Distribution"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(

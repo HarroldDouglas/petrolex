@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Language;
 use App\Traits\HasMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,6 +23,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $email
  * @property string|null $phone_number
  * @property string|null $address
+ * @property string $language
  * @property string $password
  * @property string|null $remember_token
  * @property Carbon|null $email_verified_at
@@ -67,6 +69,7 @@ class User extends Authenticatable implements HasMedia
         'email',
         'phone_number',
         'address',
+        'language',
         'password',
         'is_active',
     ];
@@ -91,12 +94,23 @@ class User extends Authenticatable implements HasMedia
         'phone_verified_at' => 'datetime',
         'last_login_at' => 'datetime',
         'is_active' => 'boolean',
+        'language' => 'string',
         'password' => 'hashed',
     ];
 
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function getLanguageAttribute(): string
+    {
+        return $this->attributes['language'] ?? Language::default();
+    }
+
+    public function setLanguageAttribute($value): void
+    {
+        $this->attributes['language'] = $value;
     }
 
     public function getAvatar(): string

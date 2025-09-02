@@ -33,9 +33,13 @@ final class UpdateProfileController extends Controller
             last_name: $request->input('last_name'),
             email: $request->input('email'),
             phone_number: $request->input('phone_number'),
+            language: $request->input('language'),
+            password: $request->input('password'),
+            image: $request->file('image'),
+            address: $request->input('address'),
         );
 
-        $updatedUser = $this->userService->update($user, $dto->toArray());
+        $updatedUser = $this->userService->update($user, $dto->toArrayFiltered());
 
         return ProfileResponse::withUser($updatedUser);
     }
