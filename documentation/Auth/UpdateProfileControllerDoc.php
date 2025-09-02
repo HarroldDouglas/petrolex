@@ -14,8 +14,8 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="first_name", type="string", example="John"),
  *         @OA\Property(property="last_name", type="string", example="Doe"),
  *         @OA\Property(property="full_name", type="string", example="John Doe"),
- *         @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
- *         @OA\Property(property="phone_number", type="string", example="+237677123456"),
+ *         @OA\Property(property="email", type="string", format="email", example="test@example.com"),
+ *         @OA\Property(property="phone_number", type="string", example="677123456"),
  *         @OA\Property(property="address", type="string", nullable=true, example="123 Main St"),
  *         @OA\Property(property="language", type="string", enum={"fr", "en"}, example="fr", description="User's preferred language"),
  *         @OA\Property(property="current_balance", type="number", format="float", nullable=true, example=1500.00, description="Customer current balance (only for customers)"),
@@ -35,8 +35,8 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Property(property="first_name", type="string", nullable=true, example="John", description="User's first name"),
  *     @OA\Property(property="last_name", type="string", nullable=true, example="Doe", description="User's last name"),
- *     @OA\Property(property="email", type="string", format="email", nullable=true, example="john.doe@example.com", description="User's email address"),
- *     @OA\Property(property="phone_number", type="string", nullable=true, example="+237677123456", description="User's phone number"),
+ *     @OA\Property(property="email", type="string", format="email", nullable=true, example="test@example.com", description="User's email address"),
+ *     @OA\Property(property="phone_number", type="string", nullable=true, example="677123456", description="User's phone number"),
  *     @OA\Property(property="address", type="string", nullable=true, example="123 Main St", description="User's address"),
  *     @OA\Property(property="language", type="string", enum={"fr", "en"}, nullable=true, example="fr", description="User's preferred language (fr for French, en for English)"),
  * )

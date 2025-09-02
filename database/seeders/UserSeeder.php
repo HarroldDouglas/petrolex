@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
             'first_name' => config('super-admin.first_name', 'Super'),
             'last_name' => config('super-admin.last_name', 'Admin'),
             'email' => config('super-admin.email', 'admin@petrolex.com'),
-            'phone_number' => config('super-admin.phone', '+237670000001'),
+            'phone_number' => config('super-admin.phone', '670000001'),
             'country_id' => $cameroon?->id,
             'password' => Hash::make(config('super-admin.password', 'password')),
         ]);
@@ -50,7 +50,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Responsable',
             'last_name' => 'Gaz',
             'email' => 'responsablegaz@petrolex.com',
-            'phone_number' => '+237670000002',
+            'phone_number' => '670000002',
             'country_id' => $cameroon?->id,
             'password' => Hash::make('password'),
         ]);
@@ -69,7 +69,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Responsable',
             'last_name' => 'Centre',
             'email' => 'responsablecentre@petrolex.com',
-            'phone_number' => '+237670000003',
+            'phone_number' => '670000003',
             'country_id' => $cameroon?->id,
             'password' => Hash::make('password'),
         ]);

@@ -10,7 +10,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="login",
  *         type="string",
- *         description="Email ou téléphone de l'utilisateur (+237690000000)",
+ *         description="Email ou numéro de téléphone de l'utilisateur (sans code pays si country_id fourni)",
  *         example="admin@petrolex.com"
  *     ),
  *     @OA\Property(
@@ -19,6 +19,13 @@ use OpenApi\Annotations as OA;
  *         format="password",
  *         description="Mot de passe",
  *         example="password"
+ *     ),
+ *     @OA\Property(
+ *         property="country_id",
+ *         type="integer",
+ *         description="ID du pays (optionnel, requis pour login par téléphone avec nouveau format)",
+ *         example=1,
+ *         nullable=true
  *     )
  * )
  *

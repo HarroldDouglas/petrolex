@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api\Customer;
 
 use App\Enums\UserRole;
+use App\Models\Geography\Country;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -22,6 +23,13 @@ class CreateCustomerLanguageTest extends TestCase
         foreach (UserRole::cases() as $role) {
             Role::create(['name' => $role->value]);
         }
+
+        // Create country for tests
+        Country::factory()->create([
+            'name' => 'Cameroun',
+            'code' => 'CM',
+            'phone_code' => '+237',
+        ]);
     }
 
     public function test_can_create_customer_with_french_language()
@@ -30,7 +38,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Jean',
             'last_name' => 'Dupont',
             'email' => 'jean.dupont@example.com',
-            'phone_number' => '+237699123456',
+            'phone_number' => '699123456',
+            'country_id' => 1,
             'password' => 'password123',
             'language' => 'fr',
         ]);
@@ -52,7 +61,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Smith',
             'email' => 'john.smith@example.com',
-            'phone_number' => '+237699654321',
+            'phone_number' => '699654321',
+            'country_id' => 1,
             'password' => 'password123',
             'language' => 'en',
         ]);
@@ -70,7 +80,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Marie',
             'last_name' => 'Martin',
             'email' => 'marie.martin@example.com',
-            'phone_number' => '+237699787878',
+            'phone_number' => '699787878',
+            'country_id' => 1,
             'password' => 'password123',
         ]);
 
@@ -87,7 +98,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'test@example.com',
-            'phone_number' => '+237699111111',
+            'phone_number' => '699111111',
+            'country_id' => 1,
             'password' => 'password123',
             'language' => 'invalid',
         ]);
@@ -102,7 +114,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'Null',
             'email' => 'testnull@example.com',
-            'phone_number' => '+237699222222',
+            'phone_number' => '699222222',
+            'country_id' => 1,
             'password' => 'password123',
             'language' => null,
         ]);
@@ -120,7 +133,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Jean',
             'last_name' => 'Test',
             'email' => 'jean.test@example.com',
-            'phone_number' => '+237699333333',
+            'phone_number' => '699333333',
+            'country_id' => 1,
             'password' => 'password123',
             'language' => 'fr',
         ]);
@@ -136,7 +150,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Test',
             'email' => 'john.test@example.com',
-            'phone_number' => '+237699444444',
+            'phone_number' => '699444444',
+            'country_id' => 1,
             'password' => 'password123',
             'language' => 'en',
         ]);

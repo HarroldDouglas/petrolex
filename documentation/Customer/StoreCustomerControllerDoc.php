@@ -6,11 +6,11 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Post(
- *     path="/api/customers",
- *     summary="Créer un nouveau client",
+ *     path="/api/register/customer",
+ *     summary="Inscription client",
  *     description="Enregistre un nouvel utilisateur en tant que client et envoie un code OTP pour vérification.",
- *     operationId="api.customers.store",
- *     tags={"Clients"},
+ *     operationId="api.register.customer",
+ *     tags={"Authentification"},
  *
  *     @OA\RequestBody(
  *         required=true,
@@ -21,13 +21,15 @@ use OpenApi\Annotations as OA;
  *                 "last_name",
  *                 "email",
  *                 "phone_number",
- *                 "password"
+ *                 "password",
+ *                 "country_id"
  *             },
  *
  *             @OA\Property(property="first_name", type="string", example="Jean"),
  *             @OA\Property(property="last_name", type="string", example="Dupont"),
- *             @OA\Property(property="email", type="string", format="email", example="jean.dupont@example.com"),
- *             @OA\Property(property="phone_number", type="string", example="+237677123456"),
+ *             @OA\Property(property="email", type="string", format="email", example="test@example.com"),
+ *             @OA\Property(property="phone_number", type="string", example="677123456", description="Numéro de téléphone sans code pays"),
+ *             @OA\Property(property="country_id", type="integer", example=1, description="ID du pays"),
  *             @OA\Property(property="password", type="string", format="password", example="password123"),
  *             @OA\Property(property="language", type="string", enum={"fr", "en"}, nullable=true, example="fr", description="User's preferred language (fr for French, en for English). Defaults to 'fr' if not provided."),
  *         )
@@ -47,7 +49,7 @@ use OpenApi\Annotations as OA;
  *             ),
  *             @OA\Property(property="data", type="object",
  *                 properties={
- *                     @OA\Property(property="identifier", type="string", example="jean.dupont@example.com")
+ *                     @OA\Property(property="identifier", type="string", example="test@example.com")
  *                 }
  *             )
  *         )

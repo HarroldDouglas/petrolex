@@ -12,9 +12,10 @@ class CreateCustomerDTOTest extends TestCase
         $dto = new CreateCustomerDTO(
             first_name: 'Jean',
             last_name: 'Dupont',
-            email: 'jean.dupont@example.com',
-            phone_number: '+237699123456',
+            email: 'test@example.com',
+            phone_number: '677123456',
             password: 'password123',
+            country_id: 1,
             language: 'fr',
             address: '123 Rue Principale',
             current_balance: 100.50
@@ -22,8 +23,9 @@ class CreateCustomerDTOTest extends TestCase
 
         $this->assertEquals('Jean', $dto->first_name);
         $this->assertEquals('Dupont', $dto->last_name);
-        $this->assertEquals('jean.dupont@example.com', $dto->email);
-        $this->assertEquals('+237699123456', $dto->phone_number);
+        $this->assertEquals('test@example.com', $dto->email);
+        $this->assertEquals('677123456', $dto->phone_number);
+        $this->assertEquals(1, $dto->country_id);
         $this->assertEquals('password123', $dto->password);
         $this->assertEquals('fr', $dto->language);
         $this->assertEquals('123 Rue Principale', $dto->address);
@@ -35,15 +37,17 @@ class CreateCustomerDTOTest extends TestCase
         $dto = new CreateCustomerDTO(
             first_name: 'John',
             last_name: 'Smith',
-            email: 'john.smith@example.com',
-            phone_number: '+237699654321',
-            password: 'password123'
+            email: 'test@example.com',
+            phone_number: '677123456',
+            password: 'password123',
+            country_id: 1
         );
 
         $this->assertEquals('John', $dto->first_name);
         $this->assertEquals('Smith', $dto->last_name);
-        $this->assertEquals('john.smith@example.com', $dto->email);
-        $this->assertEquals('+237699654321', $dto->phone_number);
+        $this->assertEquals('test@example.com', $dto->email);
+        $this->assertEquals('677123456', $dto->phone_number);
+        $this->assertEquals(1, $dto->country_id);
         $this->assertEquals('password123', $dto->password);
         $this->assertNull($dto->language);
         $this->assertNull($dto->address);
@@ -55,9 +59,10 @@ class CreateCustomerDTOTest extends TestCase
         $dto = new CreateCustomerDTO(
             first_name: 'Alice',
             last_name: 'Johnson',
-            email: 'alice@example.com',
-            phone_number: '+237699999999',
+            email: 'test@example.com',
+            phone_number: '677123456',
             password: 'password123',
+            country_id: 1,
             language: 'en'
         );
 
@@ -69,9 +74,10 @@ class CreateCustomerDTOTest extends TestCase
         $dto = new CreateCustomerDTO(
             first_name: 'Bob',
             last_name: 'Wilson',
-            email: 'bob@example.com',
-            phone_number: '+237699888888',
+            email: 'test@example.com',
+            phone_number: '677123456',
             password: 'password123',
+            country_id: 1,
             language: null
         );
 

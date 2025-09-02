@@ -9,7 +9,7 @@ use OpenApi\Annotations as OA;
  *     description="Documentation API pour Petrolex",
  *
  *     @OA\Contact(
- *         email="contact@example.com"
+ *         email="test@example.com"
  *     )
  * )
  *

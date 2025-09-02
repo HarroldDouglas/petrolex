@@ -29,6 +29,11 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
     public function findByPhone(string $phone): ?User;
 
     /**
+     * Find a user by phone number and country
+     */
+    public function findByPhoneAndCountry(string $phone, int $countryId): ?User;
+
+    /**
      * Finds and returns a collection of users based on their assigned role.
      *
      * @param  UserRole  $userRole  The role to search for (e.g., UserRole::ADMIN, UserRole::EDITOR).
