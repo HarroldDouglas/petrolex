@@ -37,11 +37,9 @@ class CustomerResource extends UserResource
         /** @var Customer&\Illuminate\Database\Eloquent\Model $customer */
         $customer = $this->resource;
 
-        // Ensure country is loaded before creating UserResource
         $customer->user->loadMissing('country');
         $userData = (new UserResource($customer->user))->toArray($request);
 
-        // Merge user data with customer-specific data
         return array_merge(
             $userData,
             [
