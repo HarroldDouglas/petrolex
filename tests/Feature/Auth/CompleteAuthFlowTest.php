@@ -173,14 +173,14 @@ final class CompleteAuthFlowTest extends TestCase
         $user->is_active = true;
         $user->save();
 
-        // 3. CONNEXION avec PHONE uniquement (legacy support)
+        // 3. CONNEXION avec PHONE sans country_code (doit échouer maintenant)
         $phoneOnlyResponse = $this->postJson(route('api.login'), [
             'login' => '677654321',
             'password' => 'StrongPassword123!',
         ]);
 
-        $phoneOnlyResponse->assertStatus(200)
-            ->assertJsonPath('_metadata.success', true);
+        $phoneOnlyResponse->assertStatus(422)
+            ->assertJsonValidationErrors(['country_code']);
 
         // 4. CONNEXION avec PHONE + country_code
         $phoneWithCodeResponse = $this->postJson(route('api.login'), [

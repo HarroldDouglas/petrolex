@@ -27,10 +27,20 @@ class AuthenticationTest extends TestCase
     {
         parent::setUp();
 
+        // Créer d'abord un pays
+        $country = \App\Models\Geography\Country::firstOrCreate([
+            'code' => 'CM',
+        ], [
+            'name' => 'Cameroun',
+            'phone_code' => '+237',
+            'is_active' => true,
+        ]);
+
         $this->user = User::factory()->create([
             'email' => self::TEST_EMAIL,
             'phone_number' => self::TEST_PHONE,
             'password' => bcrypt(self::TEST_PASSWORD),
+            'country_id' => $country->id,
         ]);
     }
 
@@ -129,10 +139,17 @@ class AuthenticationTest extends TestCase
 
     private function attemptLogin(string $login, string $password): \Illuminate\Testing\TestResponse
     {
-        return $this->postJson(self::API_URL['login'], [
+        $data = [
             'login' => $login,
             'password' => $password,
-        ]);
+        ];
+        
+        // Ajouter country_code si c'est un numéro de téléphone
+        if (preg_match('/^[\d\s\+\-\(\)]+$/', $login)) {
+            $data['country_code'] = 'CM';
+        }
+        
+        return $this->postJson(self::API_URL['login'], $data);
     }
 
     private function authenticateUser(string $login = self::TEST_EMAIL): string

@@ -289,7 +289,7 @@
                                                 "email": {
                                                     "description": "Email de l'utilisateur dont le mot de passe a été réinitialisé",
                                                     "type": "string",
-                                                    "example": "user@example.com"
+                                                    "example": "test@example.com"
                                                 }
                                             },
                                             "type": "object"
@@ -632,7 +632,7 @@
                                         "description": "Email de l'utilisateur",
                                         "type": "string",
                                         "format": "email",
-                                        "example": "user@example.com"
+                                        "example": "test@example.com"
                                     }
                                 },
                                 "type": "object"
@@ -904,7 +904,7 @@
                                 "properties": {
                                     "identifier": {
                                         "type": "string",
-                                        "example": "jean.dupont@example.com"
+                                        "example": "test@example.com"
                                     },
                                     "otp": {
                                         "type": "string",
@@ -940,7 +940,7 @@
                                             "properties": {
                                                 "identifier": {
                                                     "type": "string",
-                                                    "example": "jean.dupont@example.com"
+                                                    "example": "test@example.com"
                                                 },
                                                 "reset_token": {
                                                     "type": "string",

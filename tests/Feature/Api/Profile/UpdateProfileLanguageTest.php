@@ -13,7 +13,10 @@ class UpdateProfileLanguageTest extends TestCase
 
     public function test_can_update_profile_language_to_english()
     {
-        $user = User::factory()->create(['language' => 'fr']);
+        $user = User::factory()->create([
+            'language' => 'fr',
+            'email' => 'test@example.com'
+        ]);
         Sanctum::actingAs($user);
 
         $response = $this->patchJson('/api/profile', [
@@ -43,7 +46,10 @@ class UpdateProfileLanguageTest extends TestCase
 
     public function test_can_update_profile_language_to_french()
     {
-        $user = User::factory()->create(['language' => 'en']);
+        $user = User::factory()->create([
+            'language' => 'en',
+            'email' => 'test2@example.com'
+        ]);
         Sanctum::actingAs($user);
 
         $response = $this->patchJson('/api/profile', [
@@ -62,7 +68,10 @@ class UpdateProfileLanguageTest extends TestCase
 
     public function test_profile_update_validates_language_enum()
     {
-        $user = User::factory()->create(['language' => 'fr']);
+        $user = User::factory()->create([
+            'language' => 'fr',
+            'email' => 'test3@example.com'
+        ]);
         Sanctum::actingAs($user);
 
         $response = $this->patchJson('/api/profile', [
@@ -79,7 +88,10 @@ class UpdateProfileLanguageTest extends TestCase
 
     public function test_profile_update_accepts_null_language()
     {
-        $user = User::factory()->create(['language' => 'en']);
+        $user = User::factory()->create([
+            'language' => 'en',
+            'email' => 'test4@example.com'
+        ]);
         Sanctum::actingAs($user);
 
         $response = $this->patchJson('/api/profile', [
@@ -99,7 +111,10 @@ class UpdateProfileLanguageTest extends TestCase
 
     public function test_profile_update_without_language_field_keeps_existing()
     {
-        $user = User::factory()->create(['language' => 'en']);
+        $user = User::factory()->create([
+            'language' => 'en',
+            'email' => 'test5@example.com'
+        ]);
         Sanctum::actingAs($user);
 
         $response = $this->patchJson('/api/profile', [
@@ -124,7 +139,10 @@ class UpdateProfileLanguageTest extends TestCase
 
     public function test_api_response_includes_language_in_user_data()
     {
-        $user = User::factory()->create(['language' => 'fr']);
+        $user = User::factory()->create([
+            'language' => 'fr',
+            'email' => 'test6@example.com'
+        ]);
         Sanctum::actingAs($user);
 
         $response = $this->patchJson('/api/profile', [

@@ -20,6 +20,16 @@ class AuthenticationServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        
+        // Créer un pays pour les tests
+        \App\Models\Geography\Country::firstOrCreate([
+            'code' => 'CM',
+        ], [
+            'name' => 'Cameroun',
+            'phone_code' => '+237',
+            'is_active' => true,
+        ]);
+        
         $this->authenticationService = $this->app->make(AuthenticationService::class);
     }
 
@@ -30,7 +40,12 @@ class AuthenticationServiceTest extends TestCase
     {
         // Arrange
         $password = 'password';
-        $user = User::factory()->create(['password' => Hash::make($password)]);
+        $country = \App\Models\Geography\Country::where('code', 'CM')->first();
+        $user = User::factory()->create([
+            'password' => Hash::make($password),
+            'country_id' => $country->id,
+            'email' => 'test@example.com'
+        ]);
         $credentials = new LoginCredentialsDTO(
             login: $user->email,
             password: $password
@@ -52,10 +67,15 @@ class AuthenticationServiceTest extends TestCase
     {
         // Arrange
         $password = 'password';
-        $user = User::factory()->create(['password' => Hash::make($password)]);
+        $country = \App\Models\Geography\Country::where('code', 'CM')->first();
+        $user = User::factory()->create([
+            'password' => Hash::make($password),
+            'country_id' => $country->id
+        ]);
         $credentials = new LoginCredentialsDTO(
             login: $user->phone_number,
-            password: $password
+            password: $password,
+            countryCode: 'CM'
         );
 
         // Act
@@ -73,7 +93,11 @@ class AuthenticationServiceTest extends TestCase
     public function test_it_throws_authentication_exception_for_invalid_credentials(): void
     {
         // Arrange
-        $user = User::factory()->create();
+        $country = \App\Models\Geography\Country::where('code', 'CM')->first();
+        $user = User::factory()->create([
+            'country_id' => $country->id,
+            'email' => 'test2@example.com'
+        ]);
         $credentials = new LoginCredentialsDTO(
             login: $user->email,
             password: 'wrong-password'
