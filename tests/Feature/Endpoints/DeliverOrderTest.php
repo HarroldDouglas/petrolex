@@ -40,12 +40,25 @@ final class DeliverOrderTest extends TestCase
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
 
-        $this->adminUser = User::factory()->create();
+        $country = \App\Models\Geography\Country::where('code', 'CM')->first();
+        if (! $country) {
+            $country = \App\Models\Geography\Country::create([
+                'name' => 'Cameroun',
+                'code' => 'CM',
+                'phone_code' => '+237',
+                'is_active' => true,
+            ]);
+        }
+
+        $this->adminUser = User::factory()->create([
+            'country_id' => $country->id,
+        ]);
         $this->adminUser->assignRole('admin');
 
         $response = $this->postJson(route('api.login'), [
-            'login' => $this->adminUser->email,
+            'login' => $this->adminUser->phone_number,
             'password' => 'password',
+            'country_code' => 'CM',
         ]);
         $this->authToken = $response->json('data.access_token');
 

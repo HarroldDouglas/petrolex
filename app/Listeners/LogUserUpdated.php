@@ -3,10 +3,14 @@
 namespace App\Listeners;
 
 use App\Events\UserUpdatedEvent;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class LogUserUpdated
+class LogUserUpdated implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Handle the event.
      */

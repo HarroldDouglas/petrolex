@@ -30,13 +30,20 @@ final class UpdatePasswordTest extends TestCase
     #[Test]
     public function it_can_update_authenticated_user_password(): void
     {
+        $country = \App\Models\Geography\Country::factory()->create([
+            'code' => 'CM',
+            'phone_code' => '+237',
+        ]);
+
         $this->user = User::factory()->create([
             'password' => Hash::make($this->oldPassword),
+            'country_id' => $country->id,
         ]);
 
         $response = $this->postJson(route('api.login'), [
-            'login' => $this->user->email,
+            'login' => $this->user->phone_number,
             'password' => 'password',
+            'country_code' => 'CM',
         ]);
         $this->authToken = $response->json('data.access_token');
 

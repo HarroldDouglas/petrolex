@@ -32,8 +32,16 @@ final class CancelOrderTest extends TestCase
         // Create center_manager role for testing
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
 
+        // Create country for authentication
+        $country = \App\Models\Geography\Country::factory()->create([
+            'code' => 'CM',
+            'phone_code' => '+237',
+        ]);
+
         // Create an admin user and authenticate to get a token
-        $this->adminUser = User::factory()->create();
+        $this->adminUser = User::factory()->create([
+            'country_id' => $country->id,
+        ]);
         $this->adminUser->assignRole('admin');
 
         // Ensure a Customer and DistributionCenter exist for OrderFactory
@@ -43,8 +51,9 @@ final class CancelOrderTest extends TestCase
         $this->order = Order::factory()->create();
 
         $response = $this->postJson(route('api.login'), [
-            'login' => $this->adminUser->email,
+            'login' => $this->adminUser->phone_number,
             'password' => 'password', // Default password from factory
+            'country_code' => 'CM',
         ]);
         $this->authToken = $response->json('data.access_token');
     }

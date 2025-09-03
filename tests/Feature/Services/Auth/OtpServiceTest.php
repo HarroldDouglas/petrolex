@@ -122,7 +122,7 @@ class OtpServiceTest extends TestCase
         $this->otpService->sendOtp('nonexistent@example.com');
     }
 
-    public function test_it_throws_exception_when_sms_delivery_fails(): void
+    public function test_it_returns_false_when_sms_delivery_fails(): void
     {
         $mockTwilioService = Mockery::mock(TwilioService::class);
         $mockTwilioService->shouldReceive('sendSms')
@@ -133,9 +133,9 @@ class OtpServiceTest extends TestCase
 
         $user = User::factory()->create(['phone_number' => '+1234567890']);
 
-        $this->expectException(OtpDeliveryException::class);
+        $result = $this->otpService->sendOtp($user->phone_number);
 
-        $this->otpService->sendOtp($user->phone_number);
+        $this->assertFalse($result);
     }
 
     public function test_it_can_determine_email_channel(): void

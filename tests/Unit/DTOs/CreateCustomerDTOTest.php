@@ -15,7 +15,7 @@ class CreateCustomerDTOTest extends TestCase
             email: 'test@example.com',
             phone_number: '677123456',
             password: 'password123',
-            country_id: 1,
+            country_code: 'CM',
             language: 'fr',
             address: '123 Rue Principale',
             current_balance: 100.50
@@ -25,7 +25,7 @@ class CreateCustomerDTOTest extends TestCase
         $this->assertEquals('Dupont', $dto->last_name);
         $this->assertEquals('test@example.com', $dto->email);
         $this->assertEquals('677123456', $dto->phone_number);
-        $this->assertEquals(1, $dto->country_id);
+        $this->assertEquals('CM', $dto->country_code);
         $this->assertEquals('password123', $dto->password);
         $this->assertEquals('fr', $dto->language);
         $this->assertEquals('123 Rue Principale', $dto->address);
@@ -40,14 +40,14 @@ class CreateCustomerDTOTest extends TestCase
             email: 'test@example.com',
             phone_number: '677123456',
             password: 'password123',
-            country_id: 1
+            country_code: 'CM'
         );
 
         $this->assertEquals('John', $dto->first_name);
         $this->assertEquals('Smith', $dto->last_name);
         $this->assertEquals('test@example.com', $dto->email);
         $this->assertEquals('677123456', $dto->phone_number);
-        $this->assertEquals(1, $dto->country_id);
+        $this->assertEquals('CM', $dto->country_code);
         $this->assertEquals('password123', $dto->password);
         $this->assertNull($dto->language);
         $this->assertNull($dto->address);
@@ -62,7 +62,7 @@ class CreateCustomerDTOTest extends TestCase
             email: 'test@example.com',
             phone_number: '677123456',
             password: 'password123',
-            country_id: 1,
+            country_code: 'CM',
             language: 'en'
         );
 
@@ -77,7 +77,7 @@ class CreateCustomerDTOTest extends TestCase
             email: 'test@example.com',
             phone_number: '677123456',
             password: 'password123',
-            country_id: 1,
+            country_code: 'CM',
             language: null
         );
 

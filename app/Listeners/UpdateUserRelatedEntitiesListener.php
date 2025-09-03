@@ -4,10 +4,14 @@ namespace App\Listeners;
 
 use App\Enums\UserRole;
 use App\Events\UserUpdatedEvent;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class UpdateUserRelatedEntitiesListener
+class UpdateUserRelatedEntitiesListener implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Handle the event.
      */

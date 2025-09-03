@@ -37,10 +37,13 @@ class AuthenticationService implements AuthenticationServiceInterface
         }
 
         if (! $user?->is_active) {
-
             $this->otpService->sendOtp($user->email ?? $user->phone_number);
-
             throw new AuthenticationException("Votre compte n'est pas encore activé, nous vous avons envoyé un code d'activation par mail.");
+        }
+
+        // Vérifier que l'email est vérifié si l'utilisateur se connecte avec son email
+        if (filter_var($credentials->login, FILTER_VALIDATE_EMAIL) && ! $user->email_verified_at) {
+            throw new AuthenticationException("Votre adresse email n'est pas encore vérifiée. Veuillez vérifier votre boîte mail.");
         }
 
         $plainTextToken = $this->tokenRepository->createToken($user, AuthConstants::API_TOKEN_NAME);
@@ -62,8 +65,11 @@ class AuthenticationService implements AuthenticationServiceInterface
             return $this->userRepository->findByEmail($credentials->login);
         }
 
-        if ($credentials->countryId) {
-            return $this->userRepository->findByPhoneAndCountry($credentials->login, $credentials->countryId);
+        if ($credentials->countryCode) {
+            $country = \App\Models\Geography\Country::where('code', strtoupper($credentials->countryCode))->first();
+            if ($country) {
+                return $this->userRepository->findByPhoneAndCountry($credentials->login, $country->id);
+            }
         }
 
         return $this->userRepository->findByPhone($credentials->login);

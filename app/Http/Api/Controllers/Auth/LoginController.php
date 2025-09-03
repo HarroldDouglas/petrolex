@@ -25,7 +25,7 @@ class LoginController extends Controller
         $credentials = new LoginCredentialsDTO(
             login: $request->input('login'),
             password: $request->input('password'),
-            countryId: $request->input('country_id')
+            countryCode: $request->input('country_code')
         );
 
         try {

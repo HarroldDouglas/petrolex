@@ -3,10 +3,14 @@
 namespace App\Listeners;
 
 use App\Events\CustomerCreatedEvent;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class LogCustomerCreatedListener
+class LogCustomerCreatedListener implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Create the event listener.
      */

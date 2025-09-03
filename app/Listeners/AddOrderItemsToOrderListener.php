@@ -4,9 +4,13 @@ namespace App\Listeners;
 
 use App\DTOs\Order\OrderItemDTO;
 use App\Events\OrderCreatedEvent;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
-class AddOrderItemsToOrderListener
+class AddOrderItemsToOrderListener implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Handle the event.
      */

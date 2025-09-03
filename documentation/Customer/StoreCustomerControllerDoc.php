@@ -22,14 +22,14 @@ use OpenApi\Annotations as OA;
  *                 "email",
  *                 "phone_number",
  *                 "password",
- *                 "country_id"
+ *                 "country_code"
  *             },
  *
  *             @OA\Property(property="first_name", type="string", example="Jean"),
  *             @OA\Property(property="last_name", type="string", example="Dupont"),
  *             @OA\Property(property="email", type="string", format="email", example="test@example.com"),
  *             @OA\Property(property="phone_number", type="string", example="677123456", description="Numéro de téléphone sans code pays"),
- *             @OA\Property(property="country_id", type="integer", example=1, description="ID du pays"),
+ *             @OA\Property(property="country_code", type="string", example="CM", description="Code ISO du pays (ex: CM pour Cameroun)"),
  *             @OA\Property(property="password", type="string", format="password", example="password123"),
  *             @OA\Property(property="language", type="string", enum={"fr", "en"}, nullable=true, example="fr", description="User's preferred language (fr for French, en for English). Defaults to 'fr' if not provided."),
  *         )

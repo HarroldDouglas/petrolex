@@ -4,10 +4,14 @@ namespace App\Listeners;
 
 use App\Events\PasswordUpdatedEvent;
 use App\Notifications\PasswordUpdatedNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Notification;
 
-final class SendPasswordUpdatedNotification
+final class SendPasswordUpdatedNotification implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     public function handle(PasswordUpdatedEvent $event): void
     {
         Notification::send($event->user, new PasswordUpdatedNotification($event->user));

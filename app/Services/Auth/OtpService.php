@@ -3,8 +3,6 @@
 namespace App\Services\Auth;
 
 use App\Enums\LoginChannel;
-use App\Exceptions\Auth\OtpDeliveryException;
-use App\Exceptions\SmsDeliveryException;
 use App\Exceptions\UserNotFoundException;
 use App\Mail\OtpMail;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -51,14 +49,19 @@ class OtpService implements OtpServiceInterface
                 $message = sprintf(self::SMS_MESSAGE_TEMPLATE, $otp);
 
                 if (! $twilioService->sendSms($identifier, $message)) {
-                    throw new SmsDeliveryException("Failed to deliver SMS to {$maskedIdentifier}");
+                    \Log::warning("Failed to deliver SMS to {$maskedIdentifier}");
+
+                    return false;
                 }
             }
 
             return true;
         } catch (\Exception $e) {
-            Cache::forget($cacheKey);
-            throw new OtpDeliveryException($e->getMessage());
+            // Log the error but don't block the registration process
+            \Log::warning('OTP delivery failed: '.$e->getMessage());
+
+            // Keep the OTP in cache so user can still verify manually if needed
+            return false;
         }
     }
 
