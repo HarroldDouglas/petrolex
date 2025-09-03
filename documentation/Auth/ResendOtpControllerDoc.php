@@ -23,7 +23,7 @@ use OpenApi\Annotations as OA;
  *                 property="email",
  *                 type="string",
  *                 format="email",
- *                 example="user@example.com",
+ *                 example="test@example.com",
  *                 description="Email de l'utilisateur"
  *             )
  *         )

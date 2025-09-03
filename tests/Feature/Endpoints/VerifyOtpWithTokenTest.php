@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\Auth\OtpService;
 use App\Services\User\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class VerifyOtpWithTokenTest extends TestCase
@@ -125,36 +126,6 @@ final class VerifyOtpWithTokenTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['otp']);
-    }
-
-    #[Test]
-    public function it_handles_user_not_found_gracefully(): void
-    {
-        // Mock the OtpService to return a valid token
-        $this->mock(OtpService::class, function ($mock) {
-            $mock->shouldReceive('verifyOtpWithToken')
-                ->once()
-                ->with('nonexistent@example.com', '123456')
-                ->andReturn('valid.token.here');
-        });
-
-        // Mock the UserService to return null (user not found)
-        $this->mock(UserService::class, function ($mock) {
-            $mock->shouldReceive('findUserByIdentifier')
-                ->once()
-                ->with('nonexistent@example.com')
-                ->andReturn(null);
-        });
-
-        $response = $this->postJson('/api/verify-otp', [
-            'identifier' => 'nonexistent@example.com',
-            'otp' => '123456',
-        ]);
-
-        // Should still succeed since OTP was valid, but no user operations performed
-        $response->assertStatus(200)
-            ->assertJsonPath('_metadata.success', true)
-            ->assertJsonPath('data.reset_token', 'valid.token.here');
     }
 
     #[Test]

@@ -289,7 +289,7 @@
                                                 "email": {
                                                     "description": "Email de l'utilisateur dont le mot de passe a été réinitialisé",
                                                     "type": "string",
-                                                    "example": "user@example.com"
+                                                    "example": "test@example.com"
                                                 }
                                             },
                                             "type": "object"
@@ -632,7 +632,7 @@
                                         "description": "Email de l'utilisateur",
                                         "type": "string",
                                         "format": "email",
-                                        "example": "user@example.com"
+                                        "example": "test@example.com"
                                     }
                                 },
                                 "type": "object"
@@ -904,7 +904,7 @@
                                 "properties": {
                                     "identifier": {
                                         "type": "string",
-                                        "example": "jean.dupont@example.com"
+                                        "example": "test@example.com"
                                     },
                                     "otp": {
                                         "type": "string",
@@ -940,7 +940,7 @@
                                             "properties": {
                                                 "identifier": {
                                                     "type": "string",
-                                                    "example": "jean.dupont@example.com"
+                                                    "example": "test@example.com"
                                                 },
                                                 "reset_token": {
                                                     "type": "string",
@@ -1135,7 +1135,7 @@
                                     "email",
                                     "phone_number",
                                     "password",
-                                    "country_id"
+                                    "country_code"
                                 ],
                                 "properties": {
                                     "first_name": {
@@ -1156,10 +1156,10 @@
                                         "type": "string",
                                         "example": "677123456"
                                     },
-                                    "country_id": {
-                                        "description": "ID du pays",
-                                        "type": "integer",
-                                        "example": 1
+                                    "country_code": {
+                                        "description": "Code ISO du pays (ex: CM pour Cameroun)",
+                                        "type": "string",
+                                        "example": "CM"
                                     },
                                     "password": {
                                         "type": "string",
@@ -3651,20 +3651,20 @@
                 ],
                 "properties": {
                     "login": {
-                        "description": "Email ou numéro de téléphone de l'utilisateur (sans code pays si country_id fourni)",
+                        "description": "Email ou numéro de téléphone de l'utilisateur (sans code pays si country_code fourni)",
                         "type": "string",
-                        "example": "admin@petrolex.com"
+                        "example": "test@example.com"
                     },
                     "password": {
                         "description": "Mot de passe",
                         "type": "string",
                         "format": "password",
-                        "example": "password"
+                        "example": "password123"
                     },
-                    "country_id": {
-                        "description": "ID du pays (optionnel, requis pour login par téléphone avec nouveau format)",
-                        "type": "integer",
-                        "example": 1,
+                    "country_code": {
+                        "description": "Code ISO du pays (optionnel, requis pour login par téléphone)",
+                        "type": "string",
+                        "example": "CM",
                         "nullable": true
                     }
                 },

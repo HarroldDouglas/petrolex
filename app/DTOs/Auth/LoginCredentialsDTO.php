@@ -7,7 +7,7 @@ class LoginCredentialsDTO
     public function __construct(
         public readonly string $login,
         public readonly string $password,
-        public readonly ?int $countryId = null
+        public readonly ?string $countryCode = null
     ) {}
 
     public static function fromArray(array $data): self
@@ -15,7 +15,7 @@ class LoginCredentialsDTO
         return new self(
             login: $data['login'] ?? '',
             password: $data['password'] ?? '',
-            countryId: $data['country_id'] ?? null
+            countryCode: $data['country_code'] ?? null
         );
     }
 }

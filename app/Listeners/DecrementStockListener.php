@@ -3,9 +3,13 @@
 namespace App\Listeners;
 
 use App\Events\OrderCreatedEvent;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
-class DecrementStockListener
+class DecrementStockListener implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Handle the event.
      */

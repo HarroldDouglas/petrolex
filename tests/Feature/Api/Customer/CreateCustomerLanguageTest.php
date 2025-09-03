@@ -38,8 +38,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Jean',
             'last_name' => 'Dupont',
             'email' => 'jean.dupont@example.com',
-            'phone_number' => '699123456',
-            'country_id' => 1,
+            'phone_number' => '677123456',
+            'country_code' => 'CM',
             'password' => 'password123',
             'language' => 'fr',
         ]);
@@ -61,8 +61,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Smith',
             'email' => 'john.smith@example.com',
-            'phone_number' => '699654321',
-            'country_id' => 1,
+            'phone_number' => '677654321',
+            'country_code' => 'CM',
             'password' => 'password123',
             'language' => 'en',
         ]);
@@ -80,8 +80,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Marie',
             'last_name' => 'Martin',
             'email' => 'marie.martin@example.com',
-            'phone_number' => '699787878',
-            'country_id' => 1,
+            'phone_number' => '677787878',
+            'country_code' => 'CM',
             'password' => 'password123',
         ]);
 
@@ -98,8 +98,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'User',
             'email' => 'test@example.com',
-            'phone_number' => '699111111',
-            'country_id' => 1,
+            'phone_number' => '677111111',
+            'country_code' => 'CM',
             'password' => 'password123',
             'language' => 'invalid',
         ]);
@@ -114,8 +114,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Test',
             'last_name' => 'Null',
             'email' => 'testnull@example.com',
-            'phone_number' => '699222222',
-            'country_id' => 1,
+            'phone_number' => '677222222',
+            'country_code' => 'CM',
             'password' => 'password123',
             'language' => null,
         ]);
@@ -133,8 +133,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'Jean',
             'last_name' => 'Test',
             'email' => 'jean.test@example.com',
-            'phone_number' => '699333333',
-            'country_id' => 1,
+            'phone_number' => '677333333',
+            'country_code' => 'CM',
             'password' => 'password123',
             'language' => 'fr',
         ]);
@@ -150,8 +150,8 @@ class CreateCustomerLanguageTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Test',
             'email' => 'john.test@example.com',
-            'phone_number' => '699444444',
-            'country_id' => 1,
+            'phone_number' => '677444444',
+            'country_code' => 'CM',
             'password' => 'password123',
             'language' => 'en',
         ]);

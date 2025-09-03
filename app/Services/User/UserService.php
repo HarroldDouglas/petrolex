@@ -37,6 +37,15 @@ class UserService extends BaseServiceWithMedia
     public function createWithMedia(array $attributes): User
     {
         try {
+            // Convert country_code to country_id if provided
+            if (isset($attributes['country_code'])) {
+                $country = \App\Models\Geography\Country::where('code', strtoupper($attributes['country_code']))->first();
+                if ($country) {
+                    $attributes['country_id'] = $country->id;
+                }
+                unset($attributes['country_code']);
+            }
+
             /** @var User $user */
             $user = parent::createWithMedia($attributes);
 

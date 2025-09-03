@@ -3,10 +3,14 @@
 namespace App\Listeners;
 
 use App\Events\DistributionCenterUpdatedEvent;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class LogDistributionCenterUpdated
+class LogDistributionCenterUpdated implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Handle the event.
      */

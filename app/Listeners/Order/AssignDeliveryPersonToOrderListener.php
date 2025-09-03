@@ -5,9 +5,13 @@ namespace App\Listeners\Order;
 use App\Events\OrderCreatedEvent;
 use App\Services\DeliveryPersonService;
 use App\Services\Order\OrderService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
-class AssignDeliveryPersonToOrderListener
+class AssignDeliveryPersonToOrderListener implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     public function __construct(
         private readonly DeliveryPersonService $deliveryPersonService,
         private readonly OrderService $orderService

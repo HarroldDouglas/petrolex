@@ -10,10 +10,14 @@ use App\Enums\BottleStatus;
 use App\Events\OrderDeliveredEvent;
 use App\Repositories\Contracts\BottleMovementRepositoryInterface;
 use App\Repositories\Contracts\BottleRepositoryInterface;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-final class UpdateBottleStatusAndMovementOnOrderDelivered
+final class UpdateBottleStatusAndMovementOnOrderDelivered implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     public function __construct(
         private readonly BottleRepositoryInterface $bottleRepository,
         private readonly BottleMovementRepositoryInterface $bottleMovementRepository

@@ -7,10 +7,11 @@ use App\Enums\BottleMovementType;
 use App\Enums\BottleStatus;
 use App\Events\BottleStatusUpdatedEvent;
 use App\Repositories\Eloquent\BottleMovementRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class CreateBottleMovementListener
+class CreateBottleMovementListener implements ShouldQueue
 {
     use InteractsWithQueue;
 
@@ -26,7 +27,7 @@ class CreateBottleMovementListener
     {
         try {
             $notes = null;
-            $movementType = BottleStatus::IN_STOCK();
+            $movementType = BottleMovementType::SUPPLIER_DELIVERY();
             if ($event->status === BottleStatus::IN_STOCK()) {
                 $movementType = BottleMovementType::SUPPLIER_DELIVERY();
             } elseif ($event->status === BottleStatus::LOST_STOLEN()) {

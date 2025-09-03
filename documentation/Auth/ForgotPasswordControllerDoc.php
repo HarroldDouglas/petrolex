@@ -60,7 +60,7 @@ use OpenApi\Annotations as OA;
  *                 @OA\Property(
  *                     property="email",
  *                     type="string",
- *                     example="user@example.com",
+ *                     example="test@example.com",
  *                     description="Email de l'utilisateur dont le mot de passe a été réinitialisé"
  *                 )
  *             )

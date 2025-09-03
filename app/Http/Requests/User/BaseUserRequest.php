@@ -4,6 +4,9 @@ namespace App\Http\Requests\User;
 
 use App\Enums\Language;
 use App\Enums\UserRole;
+use App\Rules\CountryPhoneRule;
+use App\Rules\UniquePhoneByCountryRule;
+use App\Rules\ValidISOCountryRule;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -12,6 +15,8 @@ abstract class BaseUserRequest extends FormRequest
 {
     public function rules(): array
     {
+        $countryCode = $this->input('country_code', '');
+
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -24,13 +29,10 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number' => [
                 'required',
                 'string',
-                'min:8',
-                'max:15',
-                Rule::unique('users', 'phone_number')->where(function ($query) {
-                    return $query->where('country_id', $this->input('country_id'));
-                }),
+                new CountryPhoneRule($countryCode),
+                new UniquePhoneByCountryRule($countryCode),
             ],
-            'country_id' => ['required', 'integer', 'exists:countries,id'],
+            'country_code' => ['required', 'string', 'size:2', 'regex:/^[A-Za-z]{2}$/', new ValidISOCountryRule],
             'password' => ['required', 'string', 'min:8'],
             'language' => ['nullable', Rule::in(Language::getValues())],
             'role' => ['required', Rule::in(UserRole::values())],
@@ -80,9 +82,10 @@ abstract class BaseUserRequest extends FormRequest
             'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
             'phone_number.unique' => 'Ce numéro de téléphone est déjà utilisé.',
             'phone_number.max' => 'Le téléphone ne doit pas dépasser 20 caractères.',
-            'country_id.required' => 'Le pays est obligatoire.',
-            'country_id.integer' => 'Le pays doit être un identifiant valide.',
-            'country_id.exists' => 'Le pays sélectionné n\'existe pas.',
+            'country_code.required' => 'Le code pays est obligatoire.',
+            'country_code.string' => 'Le code pays doit être une chaîne de caractères.',
+            'country_code.size' => 'Le code pays doit contenir exactement 2 caractères (ex: CM, FR).',
+            'country_code.regex' => 'Le code pays doit être au format ISO (2 lettres majuscules, ex: CM, FR, US).',
             'password.required' => 'Le mot de passe est obligatoire.',
             'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
