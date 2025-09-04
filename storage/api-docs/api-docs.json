@@ -5134,6 +5134,23 @@
                         "nullable": true,
                         "description": "User's country information including phone code and currency"
                     },
+                    "DeliveryAddress": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/DeliveryAddress"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Delivery Address informations"
+                    },
+                    "delivery_address": {
+                        "description": "User's delivery addresses (array of delivery address objects, only for customers)",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DeliveryAddress"
+                        },
+                        "nullable": true
+                    },
                     "current_balance": {
                         "description": "Customer current balance (only for customers)",
                         "type": "number",

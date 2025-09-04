@@ -5,7 +5,6 @@ namespace App\Documentation\Auth;
 use OpenApi\Annotations as OA;
 
 /**
- *
  * @OA\Schema(
  *     schema="UpdateProfileRequest",
  *
@@ -22,6 +21,7 @@ use OpenApi\Annotations as OA;
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
+ *
  *            @OA\Property(
  *                 property="data",
  *                 ref="#/components/schemas/UserData"

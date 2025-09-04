@@ -20,7 +20,7 @@ class AuthenticationServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Créer un pays pour les tests
         \App\Models\Geography\Country::firstOrCreate([
             'code' => 'CM',
@@ -29,7 +29,7 @@ class AuthenticationServiceTest extends TestCase
             'phone_code' => '+237',
             'is_active' => true,
         ]);
-        
+
         $this->authenticationService = $this->app->make(AuthenticationService::class);
     }
 
@@ -44,7 +44,7 @@ class AuthenticationServiceTest extends TestCase
         $user = User::factory()->create([
             'password' => Hash::make($password),
             'country_id' => $country->id,
-            'email' => 'test@example.com'
+            'email' => 'test@example.com',
         ]);
         $credentials = new LoginCredentialsDTO(
             login: $user->email,
@@ -70,7 +70,7 @@ class AuthenticationServiceTest extends TestCase
         $country = \App\Models\Geography\Country::where('code', 'CM')->first();
         $user = User::factory()->create([
             'password' => Hash::make($password),
-            'country_id' => $country->id
+            'country_id' => $country->id,
         ]);
         $credentials = new LoginCredentialsDTO(
             login: $user->phone_number,
@@ -96,7 +96,7 @@ class AuthenticationServiceTest extends TestCase
         $country = \App\Models\Geography\Country::where('code', 'CM')->first();
         $user = User::factory()->create([
             'country_id' => $country->id,
-            'email' => 'test2@example.com'
+            'email' => 'test2@example.com',
         ]);
         $credentials = new LoginCredentialsDTO(
             login: $user->email,

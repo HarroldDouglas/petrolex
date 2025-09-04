@@ -143,12 +143,12 @@ class AuthenticationTest extends TestCase
             'login' => $login,
             'password' => $password,
         ];
-        
+
         // Ajouter country_code si c'est un numéro de téléphone
         if (preg_match('/^[\d\s\+\-\(\)]+$/', $login)) {
             $data['country_code'] = 'CM';
         }
-        
+
         return $this->postJson(self::API_URL['login'], $data);
     }
 
