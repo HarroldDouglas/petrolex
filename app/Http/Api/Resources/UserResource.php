@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Resources;
 
+use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Models\User;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
@@ -39,7 +40,6 @@ class UserResource extends JsonResource
     {
         /** @var User&\Illuminate\Database\Eloquent\Model $user */
         $user = $this->resource;
-
         return [
             'id' => $user->id,
             'first_name' => $user->first_name,
@@ -65,6 +65,9 @@ class UserResource extends JsonResource
             'last_login_at' => $user->last_login_at instanceof CarbonInterface ? $user->last_login_at->toISOString() : null,
             'roles' => $user->getRoleNames(),
             'customer_id' => $this->when($user->isCustomer(), $user->customer->id ?? null),
+            'delivery_addresses' => $this->when($user->isCustomer(), function () use ($user) {
+                return CustomerDeliveryAddressResource::collection($user->customer?->deliveryAddresses);
+            }),
             'delivery_person_id' => $this->when($user->isDeliveryPerson(), $user->deliveryPerson->id ?? null),
             'created_at' => $user->created_at->toISOString(),
             'updated_at' => $user->updated_at->toISOString(),

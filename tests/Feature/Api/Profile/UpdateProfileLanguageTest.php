@@ -15,7 +15,7 @@ class UpdateProfileLanguageTest extends TestCase
     {
         $user = User::factory()->create([
             'language' => 'fr',
-            'email' => 'test@example.com'
+            'email' => 'test@example.com',
         ]);
         Sanctum::actingAs($user);
 
@@ -48,7 +48,7 @@ class UpdateProfileLanguageTest extends TestCase
     {
         $user = User::factory()->create([
             'language' => 'en',
-            'email' => 'test2@example.com'
+            'email' => 'test2@example.com',
         ]);
         Sanctum::actingAs($user);
 
@@ -70,7 +70,7 @@ class UpdateProfileLanguageTest extends TestCase
     {
         $user = User::factory()->create([
             'language' => 'fr',
-            'email' => 'test3@example.com'
+            'email' => 'test3@example.com',
         ]);
         Sanctum::actingAs($user);
 
@@ -90,7 +90,7 @@ class UpdateProfileLanguageTest extends TestCase
     {
         $user = User::factory()->create([
             'language' => 'en',
-            'email' => 'test4@example.com'
+            'email' => 'test4@example.com',
         ]);
         Sanctum::actingAs($user);
 
@@ -113,7 +113,7 @@ class UpdateProfileLanguageTest extends TestCase
     {
         $user = User::factory()->create([
             'language' => 'en',
-            'email' => 'test5@example.com'
+            'email' => 'test5@example.com',
         ]);
         Sanctum::actingAs($user);
 
@@ -141,7 +141,7 @@ class UpdateProfileLanguageTest extends TestCase
     {
         $user = User::factory()->create([
             'language' => 'fr',
-            'email' => 'test6@example.com'
+            'email' => 'test6@example.com',
         ]);
         Sanctum::actingAs($user);
 

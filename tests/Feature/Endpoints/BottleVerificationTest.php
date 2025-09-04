@@ -35,7 +35,7 @@ final class BottleVerificationTest extends TestCase
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
 
         $country = \App\Models\Geography\Country::where('code', 'CM')->first();
-        if (!$country) {
+        if (! $country) {
             $country = \App\Models\Geography\Country::create([
                 'name' => 'Cameroun',
                 'code' => 'CM',

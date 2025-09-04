@@ -45,7 +45,14 @@ class UserRepository extends BaseEloquentRepository implements UserRepositoryInt
      */
     public function findByPhone(string $phone): ?User
     {
-        return User::where('phone_number', $phone)->with(['customer', 'deliveryPerson', 'country'])->first();
+        return User::where('phone_number', $phone)
+            ->with([
+                'customer',
+                'customer.deliveryAddresses',
+                'deliveryPerson',
+                'country'
+            ])
+            ->first();
     }
 
     /**

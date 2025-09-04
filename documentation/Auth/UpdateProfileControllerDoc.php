@@ -6,31 +6,6 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
- *     schema="UserResource",
- *     type="object",
- *     properties={
- *
- *         @OA\Property(property="id", type="integer", example=1),
- *         @OA\Property(property="first_name", type="string", example="John"),
- *         @OA\Property(property="last_name", type="string", example="Doe"),
- *         @OA\Property(property="full_name", type="string", example="John Doe"),
- *         @OA\Property(property="email", type="string", format="email", example="test@example.com"),
- *         @OA\Property(property="phone_number", type="string", example="677123456"),
- *         @OA\Property(property="address", type="string", nullable=true, example="123 Main St"),
- *         @OA\Property(property="language", type="string", enum={"fr", "en"}, example="fr", description="User's preferred language"),
- *         @OA\Property(property="current_balance", type="number", format="float", nullable=true, example=1500.00, description="Customer current balance (only for customers)"),
- *         @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true, example="2024-01-15T10:30:00.000000Z"),
- *         @OA\Property(property="phone_verified_at", type="string", format="date-time", nullable=true, example="2024-01-15T10:30:00.000000Z"),
- *         @OA\Property(property="last_login_at", type="string", format="date-time", nullable=true, example="2024-12-01T08:45:00.000000Z"),
- *         @OA\Property(property="roles", type="array", @OA\Items(type="string"), example={"customer"}),
- *         @OA\Property(property="customer_id", type="integer", nullable=true, example=123, description="Customer ID if user is a customer"),
- *         @OA\Property(property="delivery_person_id", type="integer", nullable=true, example=456, description="Delivery person ID if user is a delivery person"),
- *         @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-15T10:30:00.000000Z"),
- *         @OA\Property(property="updated_at", type="string", format="date-time", example="2024-12-01T08:45:00.000000Z"),
- *     }
- * )
- *
- * @OA\Schema(
  *     schema="UpdateProfileRequest",
  *
  *     @OA\Property(property="first_name", type="string", nullable=true, example="John", description="User's first name"),
@@ -47,9 +22,9 @@ use OpenApi\Annotations as OA;
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
  *
- *             @OA\Property(
+ *            @OA\Property(
  *                 property="data",
- *                 ref="#/components/schemas/UserResource"
+ *                 ref="#/components/schemas/UserData"
  *             ),
  *             @OA\Property(
  *                 property="message",
