@@ -167,7 +167,10 @@ class OtpService implements OtpServiceInterface
             $user = $this->userRepository->findByEmailOrPhone($identifier);
 
             if ($user) {
-                $this->userRepository->update($user, ['is_active' => true]);
+                $this->userRepository->update($user, [
+                    'is_active' => true,
+                    'email_verified_at' => now(),
+                ]);
 
                 return $user;
             }

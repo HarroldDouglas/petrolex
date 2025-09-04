@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8001",
+            "url": "http://localhost:8000",
             "description": "API Server"
         }
     ],
@@ -3787,106 +3787,6 @@
                     }
                 ]
             },
-            "UserResource": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "first_name": {
-                        "type": "string",
-                        "example": "John"
-                    },
-                    "last_name": {
-                        "type": "string",
-                        "example": "Doe"
-                    },
-                    "full_name": {
-                        "type": "string",
-                        "example": "John Doe"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email",
-                        "example": "test@example.com"
-                    },
-                    "phone_number": {
-                        "type": "string",
-                        "example": "677123456"
-                    },
-                    "address": {
-                        "type": "string",
-                        "example": "123 Main St",
-                        "nullable": true
-                    },
-                    "language": {
-                        "description": "User's preferred language",
-                        "type": "string",
-                        "enum": [
-                            "fr",
-                            "en"
-                        ],
-                        "example": "fr"
-                    },
-                    "current_balance": {
-                        "description": "Customer current balance (only for customers)",
-                        "type": "number",
-                        "format": "float",
-                        "example": 1500,
-                        "nullable": true
-                    },
-                    "email_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2024-01-15T10:30:00.000000Z",
-                        "nullable": true
-                    },
-                    "phone_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2024-01-15T10:30:00.000000Z",
-                        "nullable": true
-                    },
-                    "last_login_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2024-12-01T08:45:00.000000Z",
-                        "nullable": true
-                    },
-                    "roles": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "example": [
-                            "customer"
-                        ]
-                    },
-                    "customer_id": {
-                        "description": "Customer ID if user is a customer",
-                        "type": "integer",
-                        "example": 123,
-                        "nullable": true
-                    },
-                    "delivery_person_id": {
-                        "description": "Delivery person ID if user is a delivery person",
-                        "type": "integer",
-                        "example": 456,
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2024-01-15T10:30:00.000000Z"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2024-12-01T08:45:00.000000Z"
-                    }
-                },
-                "type": "object"
-            },
             "UpdateProfileRequest": {
                 "properties": {
                     "first_name": {
@@ -3941,7 +3841,7 @@
                     {
                         "properties": {
                             "data": {
-                                "$ref": "#/components/schemas/UserResource"
+                                "$ref": "#/components/schemas/UserData"
                             },
                             "message": {
                                 "type": "string",
