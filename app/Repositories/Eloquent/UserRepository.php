@@ -50,7 +50,7 @@ class UserRepository extends BaseEloquentRepository implements UserRepositoryInt
                 'customer',
                 'customer.deliveryAddresses',
                 'deliveryPerson',
-                'country'
+                'country',
             ])
             ->first();
     }

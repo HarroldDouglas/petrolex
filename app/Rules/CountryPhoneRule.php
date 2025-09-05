@@ -29,7 +29,7 @@ class CountryPhoneRule implements ValidationRule
         // Validate phone format for the country
         if (! $this->phoneValidationService->validatePhoneForCountry($value, $this->countryCode)) {
             $message = $this->phoneValidationService->getValidationMessage($this->countryCode);
-            $fail("Le numéro de téléphone n'est pas valide pour le pays {$this->countryCode}. {$message}");
+            $fail('Le numéro de téléphone est incorrect');
         }
     }
 }

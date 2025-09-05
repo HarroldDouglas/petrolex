@@ -3829,6 +3829,12 @@
                         ],
                         "example": "fr",
                         "nullable": true
+                    },
+                    "country_code": {
+                        "description": "Code ISO du pays (optionnel, requis pour login par téléphone)",
+                        "type": "string",
+                        "example": "CM",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5134,16 +5140,7 @@
                         "nullable": true,
                         "description": "User's country information including phone code and currency"
                     },
-                    "DeliveryAddress": {
-                        "oneOf": [
-                            {
-                                "$ref": "#/components/schemas/DeliveryAddress"
-                            }
-                        ],
-                        "nullable": true,
-                        "description": "Delivery Address informations"
-                    },
-                    "delivery_address": {
+                    "delivery_addresses": {
                         "description": "User's delivery addresses (array of delivery address objects, only for customers)",
                         "type": "array",
                         "items": {

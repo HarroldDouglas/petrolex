@@ -14,6 +14,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="phone_number", type="string", nullable=true, example="677123456", description="User's phone number"),
  *     @OA\Property(property="address", type="string", nullable=true, example="123 Main St", description="User's address"),
  *     @OA\Property(property="language", type="string", enum={"fr", "en"}, nullable=true, example="fr", description="User's preferred language (fr for French, en for English)"),
+ *     @OA\Property(property="country_code", type="string", description="Code ISO du pays (optionnel, requis pour login par téléphone)", example="CM", nullable=true),
  * )
  *
  * @OA\Schema(
