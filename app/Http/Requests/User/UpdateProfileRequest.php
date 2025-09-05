@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Requests\User;
 
 use App\Enums\Language;
+use App\Rules\CountryPhoneRule;
+use App\Rules\UniquePhoneByCountryRule;
+use App\Rules\ValidISOCountryRule;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
@@ -23,6 +26,8 @@ class UpdateProfileRequest extends FormRequest
     {
         $userId = auth()->id();
 
+        $countryCode = $this->input('country_code', '');
+
         return [
             'first_name' => ['sometimes', 'string', 'max:255'],
             'last_name' => ['sometimes', 'string', 'max:255'],
@@ -36,8 +41,10 @@ class UpdateProfileRequest extends FormRequest
                 'sometimes',
                 'string',
                 'max:20',
-                Rule::unique('users', 'phone_number')->ignore($userId),
+                new CountryPhoneRule($countryCode),
+                new UniquePhoneByCountryRule($countryCode, $userId),
             ],
+            'country_code' => ['sometimes', 'string', 'size:2', 'regex:/^[A-Za-z]{2}$/', new ValidISOCountryRule],
             'password' => ['nullable', 'string', 'min:8'],
             'language' => ['nullable', Rule::in(Language::getValues())],
             'image' => [

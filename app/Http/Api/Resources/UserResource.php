@@ -40,6 +40,7 @@ class UserResource extends JsonResource
     {
         /** @var User&\Illuminate\Database\Eloquent\Model $user */
         $user = $this->resource;
+
         return [
             'id' => $user->id,
             'first_name' => $user->first_name,

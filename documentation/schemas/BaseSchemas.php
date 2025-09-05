@@ -76,12 +76,14 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="language", type="string", enum={"fr", "en"}, example="fr", description="User's preferred language"),
  *     @OA\Property(property="country", ref="#/components/schemas/Country", nullable=true, description="User's country information including phone code and currency"),
  *     @OA\Property(
- *           property="delivery_addresses", 
- *           type="array", 
+ *           property="delivery_addresses",
+ *           type="array",
+ *
  *           @OA\Items(ref="#/components/schemas/DeliveryAddress"),
- *           nullable=true, 
+ *           nullable=true,
  *           description="User's delivery addresses (array of delivery address objects, only for customers)"
- *       ),   
+ *       ),
+ *
  *     @OA\Property(property="current_balance", type="number", format="float", nullable=true, example=1500.00, description="Customer current balance (only for customers)"),
  *     @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true, example="2024-01-01T12:00:00.000000Z"),
  *     @OA\Property(property="phone_verified_at", type="string", format="date-time", nullable=true, example="2024-01-01T12:00:00.000000Z"),
