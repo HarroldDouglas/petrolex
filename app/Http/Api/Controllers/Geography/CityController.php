@@ -20,8 +20,27 @@ class CityController extends Controller
         $cities = $this->cityService->getCitiesByCountry($country);
 
         return ApiResponse::success(
-            data: $cities->map(fn (City $city) => ['id' => $city->id, 'name' => $city->name])->toArray(),
-            message: 'Cities retrieved successfully.'
+            data: $cities->map(function (City $city) {
+                $city->load(['neighborhoods.municipality']);
+                
+                return [
+                    'id' => $city->id,
+                    'name' => $city->name,
+                    'neighborhoods' => $city->neighborhoods->map(function ($neighborhood) {
+                        return [
+                            'id' => $neighborhood->id,
+                            'name' => $neighborhood->name,
+                            'municipality_id' => $neighborhood->municipality_id,
+                            'municipality' => [
+                                'id' => $neighborhood->municipality->id,
+                                'name' => $neighborhood->municipality->name,
+                            ],
+                            'is_active' => $neighborhood->is_active,
+                        ];
+                    })->toArray(),
+                ];
+            })->toArray(),
+            message: 'Cities with neighborhoods retrieved successfully.'
         );
     }
 

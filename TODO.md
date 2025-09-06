@@ -12,8 +12,6 @@ Je compte sur toi pr agir comme un senior, garde nos standards, code bien propre
 
 ## il faut t'assurer que pour les villes en bd, on les retourne avec leur quartier et tous les détails d'un quartier!
 
-## il faut un endpoint qui retourne la liste de tous les quartiers d'un pays, indépendement de la ville, tu poruras qd mm ajouter un chmaps pr preciser larray ville pr chaque quartier
-
 ## L'Endpoint de récupération d'un centre de distribution devrait renvoyé directement les produits de ce centre de distribution tout en conservant le Endpoint qui renvoi les produits pour un centre de distribution donnée car il sera utile aussi. donc tu vas juste mettre à jour le endpoint d'un centre de distribution
 
 ## le endpoint qui renvoie le closest centre de distribution devrait pouvoir recevoir aussi l'id d'un quartier, donc ça peut recevoir les coordonnées de géolocalisation ou l'id d'un quartier! ensuite on verifie s'il ya des centres de distribution qui snot dans la mm municipalité que ce quartier ou ses coordonnées, puis on cherche le plus proche tout simplement!

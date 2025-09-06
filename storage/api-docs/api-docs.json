@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000",
+            "url": "http://127.0.0.1:8001",
             "description": "API Server"
         }
     ],
@@ -4058,8 +4058,43 @@
                     }
                 ]
             },
+            "NeighborhoodWithMunicipalityData": {
+                "description": "Informations sur un quartier avec sa municipalité",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Akwa"
+                    },
+                    "municipality_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "municipality": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Douala 1er"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
             "CityData": {
-                "description": "Informations sur une ville",
+                "description": "Informations sur une ville avec ses quartiers",
                 "properties": {
                     "id": {
                         "type": "integer",
@@ -4069,23 +4104,11 @@
                         "type": "string",
                         "example": "Douala"
                     },
-                    "country_id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "country_name": {
-                        "type": "string",
-                        "example": "Cameroun"
-                    },
-                    "latitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 4.0511
-                    },
-                    "longitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 9.7679
+                    "neighborhoods": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/NeighborhoodWithMunicipalityData"
+                        }
                     }
                 },
                 "type": "object"
@@ -4100,7 +4123,7 @@
                             },
                             "message": {
                                 "type": "string",
-                                "example": "Liste des villes récupérée avec succès"
+                                "example": "Cities with neighborhoods retrieved successfully."
                             }
                         },
                         "type": "object"

@@ -12,8 +12,12 @@ class CityRepository extends BaseEloquentRepository implements CityRepositoryInt
         parent::__construct($model);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\Geography\City>
+     */
     public function findByCountry(string $country): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->model->where('country', $country)->get();
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Geography\City> */
+        return $this->model->where('country_id', $country)->where('is_active', true)->get();
     }
 }
