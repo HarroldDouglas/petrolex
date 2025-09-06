@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000",
+            "url": "http://127.0.0.1:8001",
             "description": "API Server"
         }
     ],
@@ -5806,6 +5806,11 @@
                         "description": "Description du produit",
                         "type": "string",
                         "example": "Une bouteille de gaz de 6 kilogrammes."
+                    },
+                    "category_name": {
+                        "description": "Nom de catégorie traduit pour mobile",
+                        "type": "string",
+                        "example": "Bouteilles à gaz domestiques"
                     },
                     "quantity": {
                         "description": "Quantité en stock",

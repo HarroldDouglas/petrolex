@@ -13,6 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $type
  * @property string $name
  * @property string|null $description
+ * @property string $category_name
  * @property int $quantity
  * @property float|null $price
  * @property float|null $capacity
@@ -39,6 +40,7 @@ class ProductResource extends JsonResource
             'type' => $productCategory->product_type->value,
             'name' => $productTypeInstance->name,
             'description' => $productTypeInstance->description,
+            'category_name' => $productCategory->product_type->labelForMobile(),
             'quantity' => $this->getQuantity(),
         ];
 

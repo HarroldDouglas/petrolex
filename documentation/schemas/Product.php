@@ -23,6 +23,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="type", type="string", enum={"bottle", "accessory"}, description="Type de produit", example="bottle"),
  *     @OA\Property(property="name", type="string", description="Nom du produit", example="Bouteille de 6Kg"),
  *     @OA\Property(property="description", type="string", description="Description du produit", example="Une bouteille de gaz de 6 kilogrammes."),
+ *     @OA\Property(property="category_name", type="string", description="Nom de catégorie traduit pour mobile", example="Bouteilles à gaz domestiques"),
  *     @OA\Property(property="quantity", type="integer", description="Quantité en stock", example=40)
  * )
  *
