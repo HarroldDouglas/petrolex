@@ -24,4 +24,10 @@ interface DistributionCenterRepositoryInterface extends BaseRepositoryInterface
      * Find the closest distribution center to a given point.
      */
     public function findClosest(float $latitude, float $longitude): ?DistributionCenter;
+
+    /**
+     * Find the closest distribution center to a given neighborhood.
+     * Prioritizes centers in the same municipality.
+     */
+    public function findClosestByNeighborhood(int $neighborhoodId): ?DistributionCenter;
 }

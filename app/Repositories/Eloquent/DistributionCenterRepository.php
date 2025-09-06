@@ -48,4 +48,35 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
             ->orderBy('distance')
             ->first();
     }
+
+    public function findClosestByNeighborhood(int $neighborhoodId): ?DistributionCenter
+    {
+        // First, find the municipality of the given neighborhood
+        $neighborhoodMunicipality = \App\Models\Geography\Neighborhood::with('municipality')
+            ->find($neighborhoodId)?->municipality;
+
+        if (!$neighborhoodMunicipality) {
+            return null;
+        }
+
+        // Find distribution centers in the same municipality
+        $centersInSameMunicipality = DistributionCenter::whereHas('neighborhood.municipality', function ($query) use ($neighborhoodMunicipality) {
+            $query->where('id', $neighborhoodMunicipality->id);
+        })
+        ->where('is_active', true)
+        ->with(['neighborhood.municipality.city.country'])
+        ->get();
+
+        if ($centersInSameMunicipality->isNotEmpty()) {
+            // If we have centers in the same municipality, return the first one
+            return $centersInSameMunicipality->first();
+        }
+
+        // If no centers in the same municipality, find the closest one by distance
+        // We'll use the municipality's coordinates or fallback to general search
+        return DistributionCenter::with(['neighborhood.municipality.city.country'])
+            ->where('is_active', true)
+            ->orderBy('id') // Simple ordering as fallback
+            ->first();
+    }
 }

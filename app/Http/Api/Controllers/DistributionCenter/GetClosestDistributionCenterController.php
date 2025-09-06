@@ -16,17 +16,25 @@ final class GetClosestDistributionCenterController extends Controller
     public function __construct(private readonly DistributionCenterService $distributionCenterService) {}
 
     /**
-     * Find the closest distribution center to a given latitude and longitude.
+     * Find the closest distribution center to a given latitude and longitude or neighborhood.
      *
      * Route: GET /distribution-centers/closest
      * Name: api.distribution-centers.closest
      */
     public function __invoke(GetClosestDistributionCenterRequest $request): DistributionCenterResponse
     {
-        $closestCenter = $this->distributionCenterService->findClosest(
-            (float) $request->input('latitude'),
-            (float) $request->input('longitude')
-        );
+        if ($request->has('neighborhood_id')) {
+            // Find by neighborhood ID
+            $closestCenter = $this->distributionCenterService->findClosestByNeighborhood(
+                (int) $request->input('neighborhood_id')
+            );
+        } else {
+            // Find by coordinates
+            $closestCenter = $this->distributionCenterService->findClosest(
+                (float) $request->input('latitude'),
+                (float) $request->input('longitude')
+            );
+        }
 
         if (! $closestCenter) {
             return DistributionCenterResponse::error('Aucun centre de distribution trouvé.', null, 404);

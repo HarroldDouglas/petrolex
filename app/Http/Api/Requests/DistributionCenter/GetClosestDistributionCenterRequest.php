@@ -16,20 +16,24 @@ class GetClosestDistributionCenterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'latitude' => ['required', 'numeric', 'between:-90,90'],
-            'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'latitude' => ['required_without:neighborhood_id', 'numeric', 'between:-90,90'],
+            'longitude' => ['required_without:neighborhood_id', 'numeric', 'between:-180,180'],
+            'neighborhood_id' => ['required_without:latitude,longitude', 'integer', 'exists:neighborhoods,id'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'latitude.required' => 'La latitude est requise.',
+            'latitude.required_without' => 'La latitude est requise si aucun ID de quartier n\'est fourni.',
             'latitude.numeric' => 'La latitude doit être un nombre.',
             'latitude.between' => 'La latitude doit être comprise entre -90 et 90.',
-            'longitude.required' => 'La longitude est requise.',
+            'longitude.required_without' => 'La longitude est requise si aucun ID de quartier n\'est fourni.',
             'longitude.numeric' => 'La longitude doit être un nombre.',
             'longitude.between' => 'La longitude doit être comprise entre -180 et 180.',
+            'neighborhood_id.required_without' => 'L\'ID du quartier est requis si les coordonnées ne sont pas fournies.',
+            'neighborhood_id.integer' => 'L\'ID du quartier doit être un nombre entier.',
+            'neighborhood_id.exists' => 'Le quartier spécifié n\'existe pas.',
         ];
     }
 }

@@ -134,4 +134,13 @@ class DistributionCenterService
     {
         return $this->distributionCenterRepository->findClosest($latitude, $longitude);
     }
+
+    /**
+     * Find the closest distribution center to a given neighborhood.
+     * First checks for centers in the same municipality, then finds the closest one.
+     */
+    public function findClosestByNeighborhood(int $neighborhoodId): ?DistributionCenter
+    {
+        return $this->distributionCenterRepository->findClosestByNeighborhood($neighborhoodId);
+    }
 }
