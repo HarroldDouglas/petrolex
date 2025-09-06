@@ -1,5 +1,5 @@
 Pour chaque tâche, tu dois absolument agir en tant que senior! et pour chaque tâche, tu créeras une branche nommée claude-nomdelafeature, puis tu checkout, dès que tu as fini, tu commit, puis tu reviens sur la dev avant de prendre la prochaine tâche, ainsi de suite! sauf si une tâche a besoin dune autre, c là où tu peux checkout à partir de la branche en question! poru chaque feature il faut mettre à jour les tests si necessaire. 
-Je compte sur toi pr agir comme un senior, garde nos standards, code bien propre stp, pas de commentaires en français uniquement en anglais si important, SOLID principles, logique simple et comprehensible, code lisible et optimisé, testable! 
+Je compte sur toi pr agir comme un senior, garde nos standards, code bien propre stp, pas de commentaires en français uniquement en anglais si important, SOLID principles, logique simple et comprehensible, code lisible et optimisé, testable! Pour chaque tâche, il faut executer phpstan
 
 
 ## Dans BottleProduct, changé bottle_with_content_price par full_price!
