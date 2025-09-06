@@ -14,7 +14,7 @@ class CreateBottleTypeDTO extends BaseDTO
         public readonly ?array $bottleTypeCityPrices,
         public readonly string $capacity,
         public readonly float $content_price,
-        public readonly float $bottle_with_content_price,
+        public readonly float $full_price,
         public readonly bool $is_active,
         public readonly ?string $description,
         public readonly ?float $weight,

@@ -71,7 +71,7 @@ class OrderServiceTest extends TestCase
     private function createBottleProductCategory(array $bottleOverrides = []): ProductCategory
     {
         $bottleType = BottleType::factory()->create(array_merge([
-            'bottle_with_content_price' => 25.00,
+            'full_price' => 25.00,
             'content_price' => 15.00,
             'is_active' => true,
         ], $bottleOverrides));
@@ -168,7 +168,7 @@ class OrderServiceTest extends TestCase
         ]);
 
         $bottleCategory = $this->createBottleProductCategory([
-            'bottle_with_content_price' => 30.00,
+            'full_price' => 30.00,
             'content_price' => 20.00,
         ]);
         $accessoryCategory = $this->createAccessoryProductCategory(['price' => 8.00]);
@@ -366,7 +366,7 @@ class OrderServiceTest extends TestCase
         Event::fake();
 
         $bottleCategory = $this->createBottleProductCategory([
-            'bottle_with_content_price' => 40.00,
+            'full_price' => 40.00,
             'content_price' => 25.00,
         ]);
 

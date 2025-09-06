@@ -15,7 +15,7 @@ class UpdateBottleTypeDTO extends BaseDTO
         public readonly ?array $bottleTypeCityPrices = null,
         public readonly ?string $capacity = null,
         public readonly ?float $content_price = null,
-        public readonly ?float $bottle_with_content_price = null,
+        public readonly ?float $full_price = null,
         public readonly ?bool $is_active = null,
         public readonly ?string $description = null,
         public readonly ?float $weight = null,
