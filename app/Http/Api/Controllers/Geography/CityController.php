@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Controllers\Geography;
 
+use App\Http\Api\Resources\CityResource;
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Geography\City;
@@ -19,27 +20,11 @@ class CityController extends Controller
     {
         $cities = $this->cityService->getCitiesByCountry($country);
 
-        return ApiResponse::success(
-            data: $cities->map(function (City $city) {
-                $city->load(['neighborhoods.municipality']);
+        // Load necessary relationships for the Resources
+        $cities->load(['neighborhoods.municipality']);
 
-                return [
-                    'id' => $city->id,
-                    'name' => $city->name,
-                    'neighborhoods' => $city->neighborhoods->map(function ($neighborhood) {
-                        return [
-                            'id' => $neighborhood->id,
-                            'name' => $neighborhood->name,
-                            'municipality_id' => $neighborhood->municipality_id,
-                            'municipality' => [
-                                'id' => $neighborhood->municipality->id,
-                                'name' => $neighborhood->municipality->name,
-                            ],
-                            'is_active' => $neighborhood->is_active,
-                        ];
-                    })->toArray(),
-                ];
-            })->toArray(),
+        return ApiResponse::success(
+            data: CityResource::collection($cities),
             message: 'Cities with neighborhoods retrieved successfully.'
         );
     }
@@ -54,8 +39,11 @@ class CityController extends Controller
          */
         $city = $this->cityService->find($cityId);
 
+        // Load country relationship for the Resource
+        $city->load(['country']);
+
         return ApiResponse::success(
-            data: ['id' => $city->id, 'name' => $city->name, 'country' => $city->country],
+            data: new CityResource($city),
             message: 'City retrieved successfully.'
         );
     }
