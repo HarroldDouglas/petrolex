@@ -46,10 +46,20 @@ class ProductCategoryDistributionCenterSeeder extends Seeder
         $linkCount = 0;
 
         foreach ($distributionCenters as $center) {
+            $isFirstBottle = true;
+
             foreach ($bottleCategories as $category) {
-                // Generate random stock values for bottles (empty and filled)
-                $stockEmpty = rand(5, 30);
-                $stockFilled = rand(10, 50);
+                // Ensure first bottle has 0 stock (out of stock)
+                if ($isFirstBottle) {
+                    $stockEmpty = 0;
+                    $stockFilled = 0;
+                    $isFirstBottle = false;
+                    $this->command->info("Setting bottle '{$category->name}' to 0 stock for center '{$center->name}'");
+                } else {
+                    // Generate random stock values for other bottles
+                    $stockEmpty = rand(5, 30);
+                    $stockFilled = rand(10, 50);
+                }
 
                 // Insert or update through the relationship to avoid duplicate records
                 $center->productCategories()->syncWithoutDetaching([
@@ -83,9 +93,18 @@ class ProductCategoryDistributionCenterSeeder extends Seeder
         $linkCount = 0;
 
         foreach ($distributionCenters as $center) {
+            $isFirstAccessory = true;
+
             foreach ($accessoryCategories as $category) {
-                // Generate random stock values for accessories
-                $stock = rand(20, 100);
+                // Ensure first accessory has 0 stock (out of stock)
+                if ($isFirstAccessory) {
+                    $stock = 0;
+                    $isFirstAccessory = false;
+                    $this->command->info("Setting accessory '{$category->name}' to 0 stock for center '{$center->name}'");
+                } else {
+                    // Generate random stock values for other accessories
+                    $stock = rand(20, 100);
+                }
 
                 // Insert or update through the relationship to avoid duplicate records
                 $center->productCategories()->syncWithoutDetaching([
