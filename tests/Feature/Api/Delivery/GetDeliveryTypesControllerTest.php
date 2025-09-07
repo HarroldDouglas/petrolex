@@ -90,7 +90,7 @@ class GetDeliveryTypesControllerTest extends TestCase
         $response->assertStatus(200);
 
         $data = $response->json('data');
-        
+
         foreach ($data as $deliveryType) {
             $enumCase = DeliveryType::from($deliveryType['value']);
             $this->assertEquals($enumCase->fee(), $deliveryType['fee']);

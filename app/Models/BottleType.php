@@ -23,7 +23,7 @@ use Spatie\MediaLibrary\HasMedia;
  * @property float $weight
  * @property float $radius
  * @property float $content_price
- * @property float $bottle_with_content_price
+ * @property float $full_price
  * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -59,7 +59,7 @@ class BottleType extends Model implements HasMedia
         'weight',
         'radius',
         'content_price',
-        'bottle_with_content_price',
+        'full_price',
         'is_active',
     ];
 
@@ -73,7 +73,7 @@ class BottleType extends Model implements HasMedia
         'weight' => 'decimal:2',
         'radius' => 'decimal:2',
         'content_price' => 'decimal:2',
-        'bottle_with_content_price' => 'decimal:2',
+        'full_price' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 

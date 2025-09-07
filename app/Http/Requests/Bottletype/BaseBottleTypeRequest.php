@@ -15,7 +15,7 @@ abstract class BaseBottleTypeRequest extends FormRequest
             'weight' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'numeric', 'min:0'],
             'content_price' => ['required', 'numeric', 'min:0'],
-            'bottle_with_content_price' => ['required', 'numeric', 'min:0', 'gt:content_price'],
+            'full_price' => ['required', 'numeric', 'min:0', 'gt:content_price'],
             'is_active' => ['required', 'boolean'],
 
             'product_images.*' => ['nullable', 'image', 'max:5120'], // 5MB max par image
@@ -61,10 +61,10 @@ abstract class BaseBottleTypeRequest extends FormRequest
             'content_price.numeric' => 'Le prix de la recharge doit être un nombre.',
             'content_price.min' => 'Le prix de la recharge doit être au moins 0.',
 
-            'bottle_with_content_price.required' => 'Le prix de la consigne avec recharge est requis.',
-            'bottle_with_content_price.numeric' => 'Le prix de la consigne avec recharge doit être un nombre.',
-            'bottle_with_content_price.min' => 'Le prix de la consigne avec recharge doit être au moins 0.',
-            'bottle_with_content_price.gt' => 'Le prix de la consigne avec recharge doit être supérieur au prix du contenu.',
+            'full_price.required' => 'Le prix de la consigne avec recharge est requis.',
+            'full_price.numeric' => 'Le prix de la consigne avec recharge doit être un nombre.',
+            'full_price.min' => 'Le prix de la consigne avec recharge doit être au moins 0.',
+            'full_price.gt' => 'Le prix de la consigne avec recharge doit être supérieur au prix du contenu.',
 
             'is_active.boolean' => 'Le statut doit être vrai ou faux.',
 
