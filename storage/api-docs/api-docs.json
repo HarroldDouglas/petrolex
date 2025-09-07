@@ -3398,28 +3398,42 @@
                 "tags": [
                     "Centres de Distribution"
                 ],
-                "summary": "Find the closest distribution center to a given latitude and longitude",
-                "description": "Retrieves the closest distribution center based on provided geographical coordinates.",
+                "summary": "Find the closest distribution center with its products",
+                "description": "Retrieves the closest distribution center based on provided geographical coordinates or neighborhood ID, along with all available products at that center. When neighborhood_id is provided, prioritizes centers in the same municipality.",
                 "operationId": "api.distribution-centers.closest",
                 "parameters": [
                     {
                         "name": "latitude",
                         "in": "query",
-                        "description": "Latitude of the location",
-                        "required": true,
+                        "description": "Latitude of the location (required if neighborhood_id not provided)",
+                        "required": false,
                         "schema": {
                             "type": "number",
-                            "format": "float"
+                            "format": "float",
+                            "maximum": 90,
+                            "minimum": -90
                         }
                     },
                     {
                         "name": "longitude",
                         "in": "query",
-                        "description": "Longitude of the location",
-                        "required": true,
+                        "description": "Longitude of the location (required if neighborhood_id not provided)",
+                        "required": false,
                         "schema": {
                             "type": "number",
-                            "format": "float"
+                            "format": "float",
+                            "maximum": 180,
+                            "minimum": -180
+                        }
+                    },
+                    {
+                        "name": "neighborhood_id",
+                        "in": "query",
+                        "description": "ID of the neighborhood (required if latitude and longitude not provided)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
@@ -3436,11 +3450,22 @@
                                         {
                                             "properties": {
                                                 "data": {
-                                                    "$ref": "#/components/schemas/DistributionCenterData"
+                                                    "properties": {
+                                                        "distribution_center": {
+                                                            "$ref": "#/components/schemas/DistributionCenterData"
+                                                        },
+                                                        "products": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Product"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 },
                                                 "message": {
                                                     "type": "string",
-                                                    "example": "Centre de distribution le plus proche trouvé."
+                                                    "example": "Centre de distribution le plus proche trouvé avec ses produits"
                                                 }
                                             },
                                             "type": "object"
