@@ -24,7 +24,14 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="name", type="string", description="Nom du produit (traduit selon la langue de l'utilisateur)", example="Bouteille de 6Kg"),
  *     @OA\Property(property="description", type="string", description="Description du produit (traduite selon la langue de l'utilisateur)", example="Une bouteille de gaz de 6 kilogrammes."),
  *     @OA\Property(property="category_name", type="string", description="Nom de catégorie traduit pour mobile selon la langue de l'utilisateur", example="Bouteilles à gaz domestiques"),
- *     @OA\Property(property="quantity", type="integer", description="Quantité en stock", example=40)
+ *     @OA\Property(property="quantity", type="integer", description="Quantité en stock", example=40),
+ *     @OA\Property(
+ *         property="specifications",
+ *         type="array",
+ *         description="Spécifications techniques du produit (traduites selon la langue de l'utilisateur)",
+ *
+ *         @OA\Items(ref="#/components/schemas/ProductSpecification")
+ *     )
  * )
  *
  * @OA\Schema(
@@ -44,19 +51,37 @@ use OpenApi\Annotations as OA;
  *     schema="BottleProduct",
  *     type="object",
  *
- *     @OA\Property(property="capacity", type="number", format="float", description="Capacité de la bouteille en litres", example=6),
- *     @OA\Property(property="height", type="number", format="float", description="Hauteur de la bouteille en cm", example=45.5),
- *     @OA\Property(property="weight", type="number", format="float", description="Poids de la bouteille vide en kg", example=5.2),
- *     @OA\Property(property="radius", type="number", format="float", description="Rayon de la bouteille en cm", example=15.2),
- *     @OA\Property(property="content_price", type="number", format="float", description="Prix du gaz seul", example=6500),
- *     @OA\Property(property="full_price", type="number", format="float", description="Prix de la consigne (bouteille + gaz)", example=18500)
+ *     @OA\Property(
+ *         property="options",
+ *         type="array",
+ *         description="Options d'achat disponibles pour la bouteille",
+ *
+ *         @OA\Items(ref="#/components/schemas/BottleOption")
+ *     )
  * )
  *
  * @OA\Schema(
  *     schema="AccessoryProduct",
+ *     type="object"
+ * )
+ * @OA\Schema(
+ *     schema="ProductSpecification",
  *     type="object",
+ *     description="Spécification technique d'un produit",
  *
- *     @OA\Property(property="price", type="number", format="float", description="Prix de l'accessoire", example=2500)
+ *     @OA\Property(property="name", type="string", description="Nom de la spécification (traduit selon la langue)", example="hauteur"),
+ *     @OA\Property(property="value", type="string", description="Valeur de la spécification", example="40.00"),
+ *     @OA\Property(property="unit", type="string", nullable=true, description="Unité de mesure", example="cm")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="BottleOption",
+ *     type="object",
+ *     description="Option d'achat pour une bouteille",
+ *
+ *     @OA\Property(property="value", type="string", enum={"bottle_with_content", "content"}, description="Type d'option", example="bottle_with_content"),
+ *     @OA\Property(property="label", type="string", description="Libellé de l'option (traduit selon la langue)", example="Bouteille avec recharge"),
+ *     @OA\Property(property="price", type="string", description="Prix de l'option", example="5000.00")
  * )
  */
 class ProductSchema {}

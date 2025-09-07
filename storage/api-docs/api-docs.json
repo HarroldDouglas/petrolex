@@ -6005,6 +6005,13 @@
                         "description": "Quantité en stock",
                         "type": "integer",
                         "example": 40
+                    },
+                    "specifications": {
+                        "description": "Spécifications techniques du produit (traduites selon la langue de l'utilisateur)",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductSpecification"
+                        }
                     }
                 },
                 "type": "object"
@@ -6029,52 +6036,62 @@
             },
             "BottleProduct": {
                 "properties": {
-                    "capacity": {
-                        "description": "Capacité de la bouteille en litres",
-                        "type": "number",
-                        "format": "float",
-                        "example": 6
-                    },
-                    "height": {
-                        "description": "Hauteur de la bouteille en cm",
-                        "type": "number",
-                        "format": "float",
-                        "example": 45.5
-                    },
-                    "weight": {
-                        "description": "Poids de la bouteille vide en kg",
-                        "type": "number",
-                        "format": "float",
-                        "example": 5.2
-                    },
-                    "radius": {
-                        "description": "Rayon de la bouteille en cm",
-                        "type": "number",
-                        "format": "float",
-                        "example": 15.2
-                    },
-                    "content_price": {
-                        "description": "Prix du gaz seul",
-                        "type": "number",
-                        "format": "float",
-                        "example": 6500
-                    },
-                    "full_price": {
-                        "description": "Prix de la consigne (bouteille + gaz)",
-                        "type": "number",
-                        "format": "float",
-                        "example": 18500
+                    "options": {
+                        "description": "Options d'achat disponibles pour la bouteille",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BottleOption"
+                        }
                     }
                 },
                 "type": "object"
             },
             "AccessoryProduct": {
+                "type": "object"
+            },
+            "ProductSpecification": {
+                "description": "Spécification technique d'un produit",
                 "properties": {
+                    "name": {
+                        "description": "Nom de la spécification (traduit selon la langue)",
+                        "type": "string",
+                        "example": "hauteur"
+                    },
+                    "value": {
+                        "description": "Valeur de la spécification",
+                        "type": "string",
+                        "example": "40.00"
+                    },
+                    "unit": {
+                        "description": "Unité de mesure",
+                        "type": "string",
+                        "example": "cm",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "BottleOption": {
+                "description": "Option d'achat pour une bouteille",
+                "properties": {
+                    "value": {
+                        "description": "Type d'option",
+                        "type": "string",
+                        "enum": [
+                            "bottle_with_content",
+                            "content"
+                        ],
+                        "example": "bottle_with_content"
+                    },
+                    "label": {
+                        "description": "Libellé de l'option (traduit selon la langue)",
+                        "type": "string",
+                        "example": "Bouteille avec recharge"
+                    },
                     "price": {
-                        "description": "Prix de l'accessoire",
-                        "type": "number",
-                        "format": "float",
-                        "example": 2500
+                        "description": "Prix de l'option",
+                        "type": "string",
+                        "example": "5000.00"
                     }
                 },
                 "type": "object"

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProductType;
 use App\Traits\HasMediaCollections;
+use App\Traits\HasSpecifications;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +39,7 @@ class AccessoryType extends Model implements HasMedia
 {
     use HasFactory;
     use HasMediaCollections;
+    use HasSpecifications;
     use SoftDeletes;
 
     /**
@@ -52,6 +54,7 @@ class AccessoryType extends Model implements HasMedia
         'description',
         'description_en',
         'is_active',
+        'specifications',
     ];
 
     /**
@@ -61,6 +64,7 @@ class AccessoryType extends Model implements HasMedia
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'specifications' => 'array',
     ];
 
     /**
@@ -155,5 +159,13 @@ class AccessoryType extends Model implements HasMedia
             'en' => $this->description_en ?: $this->description,
             default => $this->description,
         };
+    }
+
+    /**
+     * Get default specifications from existing fields.
+     */
+    protected function getDefaultSpecifications(): array
+    {
+        return [];
     }
 }

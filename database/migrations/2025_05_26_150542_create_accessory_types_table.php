@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->text('description_en')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->json('specifications')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
