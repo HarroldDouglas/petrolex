@@ -6,6 +6,8 @@ namespace Tests\Feature\Endpoints;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class UpdateProfileTest extends TestCase
@@ -13,22 +15,63 @@ final class UpdateProfileTest extends TestCase
     use RefreshDatabase;
 
     private User $adminUser;
-    private string $authToken;
+    private ?string $authToken = null;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        // Seed essential data
+        $this->artisan('db:seed', ['--class' => 'Database\\Seeders\\GeographicSeeder']);
+        $this->artisan('db:seed', ['--class' => 'Database\\Seeders\\RolePermissionSeeder']);
 
-        $this->adminUser = User::factory()->create();
+        // Create user with explicit password and ensure it's properly saved
+        $this->adminUser = User::factory()->create([
+            'email' => 'test.admin@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'is_active' => true,
+        ]);
+
+        // Assign admin role and refresh from database
         $this->adminUser->assignRole('admin');
+        $this->adminUser->refresh();
+
+        // Attempt authentication with retry for robustness
+        $this->authenticateUser();
+    }
+
+    private function authenticateUser(): void
+    {
+        // Ensure the database transaction is committed and user exists
+        $this->adminUser->refresh();
+
+        // Verify user exists and has correct attributes
+        $this->assertNotNull($this->adminUser->email);
+        $this->assertNotNull($this->adminUser->email_verified_at);
+        $this->assertTrue($this->adminUser->is_active);
 
         $response = $this->postJson(route('api.login'), [
             'login' => $this->adminUser->email,
             'password' => 'password',
         ]);
+
+        if ($response->getStatusCode() !== 200) {
+            $this->fail(
+                'Authentication failed. Status: '.$response->getStatusCode().
+                '. Response: '.$response->getContent().
+                '. User ID: '.$this->adminUser->id.
+                '. User email: '.$this->adminUser->email.
+                '. User active: '.($this->adminUser->is_active ? 'true' : 'false').
+                '. Email verified: '.($this->adminUser->email_verified_at ? 'true' : 'false')
+            );
+        }
+
         $this->authToken = $response->json('data.access_token');
+
+        if (! $this->authToken) {
+            $this->fail('Authentication succeeded but no token returned. Response: '.$response->getContent());
+        }
     }
 
     #[Test]
@@ -38,6 +81,8 @@ final class UpdateProfileTest extends TestCase
         $newLastName = 'UpdatedLastName';
         $newEmail = 'updated.email@example.com';
         $newPhoneNumber = '+237677112233';
+
+        $this->assertNotNull($this->authToken, 'Auth token should not be null');
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
@@ -64,6 +109,8 @@ final class UpdateProfileTest extends TestCase
     #[Test]
     public function it_cannot_update_profile_with_invalid_data(): void
     {
+        $this->assertNotNull($this->authToken, 'Auth token should not be null');
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
@@ -81,6 +128,8 @@ final class UpdateProfileTest extends TestCase
     {
         User::factory()->create(['email' => 'existing@example.com']);
 
+        $this->assertNotNull($this->authToken, 'Auth token should not be null');
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
@@ -95,13 +144,23 @@ final class UpdateProfileTest extends TestCase
     #[Test]
     public function it_cannot_update_profile_with_duplicate_phone_number(): void
     {
-        User::factory()->create(['phone_number' => '+237699000000']);
+        // Use the seeded country data
+        $country = \App\Models\Geography\Country::where('code', 'CM')->first();
+
+        // Create a user with specific phone number and country
+        User::factory()->create([
+            'phone_number' => '+237699000000',
+            'country_id' => $country->id,
+        ]);
+
+        $this->assertNotNull($this->authToken, 'Auth token should not be null');
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
         ])->patchJson(route('api.profile.update'), [
             'phone_number' => '+237699000000',
+            'country_code' => 'CM',
         ]);
 
         $response->assertStatus(422);
@@ -121,6 +180,8 @@ final class UpdateProfileTest extends TestCase
     #[Test]
     public function it_can_update_user_language_to_english(): void
     {
+        $this->assertNotNull($this->authToken, 'Auth token should not be null');
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
@@ -143,6 +204,8 @@ final class UpdateProfileTest extends TestCase
     {
         $this->adminUser->update(['language' => 'en']);
 
+        $this->assertNotNull($this->authToken, 'Auth token should not be null');
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
@@ -162,6 +225,8 @@ final class UpdateProfileTest extends TestCase
     #[Test]
     public function it_validates_language_enum_values(): void
     {
+        $this->assertNotNull($this->authToken, 'Auth token should not be null');
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
@@ -176,6 +241,8 @@ final class UpdateProfileTest extends TestCase
     #[Test]
     public function it_accepts_null_language_value(): void
     {
+        $this->assertNotNull($this->authToken, 'Auth token should not be null');
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',

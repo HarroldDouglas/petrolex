@@ -22,7 +22,7 @@ class CityController extends Controller
         return ApiResponse::success(
             data: $cities->map(function (City $city) {
                 $city->load(['neighborhoods.municipality']);
-                
+
                 return [
                     'id' => $city->id,
                     'name' => $city->name,

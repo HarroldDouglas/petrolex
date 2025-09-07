@@ -27,13 +27,13 @@ class CityControllerTest extends TestCase
             'country_id' => $country->id,
             'is_active' => true,
         ]);
-        
+
         $municipality = Municipality::create([
             'name' => 'Douala 1er',
             'city_id' => $city->id,
             'is_active' => true,
         ]);
-        
+
         $neighborhood = Neighborhood::create([
             'name' => 'Akwa',
             'municipality_id' => $municipality->id,

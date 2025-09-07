@@ -6,6 +6,7 @@ namespace Tests\Feature\Endpoints;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class SupportContactTest extends TestCase
