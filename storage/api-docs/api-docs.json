@@ -3398,8 +3398,8 @@
                 "tags": [
                     "Centres de Distribution"
                 ],
-                "summary": "Find the closest distribution center",
-                "description": "Retrieves the closest distribution center based on provided geographical coordinates or neighborhood ID. When neighborhood_id is provided, prioritizes centers in the same municipality.",
+                "summary": "Find the closest distribution center with its products",
+                "description": "Retrieves the closest distribution center based on provided geographical coordinates or neighborhood ID, along with all available products at that center. When neighborhood_id is provided, prioritizes centers in the same municipality.",
                 "operationId": "api.distribution-centers.closest",
                 "parameters": [
                     {
@@ -3450,11 +3450,22 @@
                                         {
                                             "properties": {
                                                 "data": {
-                                                    "$ref": "#/components/schemas/DistributionCenterData"
+                                                    "properties": {
+                                                        "distribution_center": {
+                                                            "$ref": "#/components/schemas/DistributionCenterData"
+                                                        },
+                                                        "products": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Product"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 },
                                                 "message": {
                                                     "type": "string",
-                                                    "example": "Centre de distribution le plus proche trouvé."
+                                                    "example": "Centre de distribution le plus proche trouvé avec ses produits"
                                                 }
                                             },
                                             "type": "object"

@@ -55,7 +55,7 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
         $neighborhoodMunicipality = \App\Models\Geography\Neighborhood::with('municipality')
             ->find($neighborhoodId)?->municipality;
 
-        if (!$neighborhoodMunicipality) {
+        if (! $neighborhoodMunicipality) {
             return null;
         }
 
@@ -63,9 +63,9 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
         $centersInSameMunicipality = DistributionCenter::whereHas('neighborhood.municipality', function ($query) use ($neighborhoodMunicipality) {
             $query->where('id', $neighborhoodMunicipality->id);
         })
-        ->where('is_active', true)
-        ->with(['neighborhood.municipality.city.country'])
-        ->get();
+            ->where('is_active', true)
+            ->with(['neighborhood.municipality.city.country'])
+            ->get();
 
         if ($centersInSameMunicipality->isNotEmpty()) {
             // If we have centers in the same municipality, return the first one

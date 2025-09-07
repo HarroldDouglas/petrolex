@@ -5,8 +5,8 @@ use OpenApi\Annotations as OA;
 /**
  * @OA\Get(
  *     path="/api/distribution-centers/closest",
- *     summary="Find the closest distribution center",
- *     description="Retrieves the closest distribution center based on provided geographical coordinates or neighborhood ID. When neighborhood_id is provided, prioritizes centers in the same municipality.",
+ *     summary="Find the closest distribution center with its products",
+ *     description="Retrieves the closest distribution center based on provided geographical coordinates or neighborhood ID, along with all available products at that center. When neighborhood_id is provided, prioritizes centers in the same municipality.",
  *     operationId="api.distribution-centers.closest",
  *     tags={"Centres de Distribution"},
  *     security={{"bearerAuth":{}}},
@@ -48,8 +48,19 @@ use OpenApi\Annotations as OA;
  *                 @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *                 @OA\Schema(
  *
- *                     @OA\Property(property="data", ref="#/components/schemas/DistributionCenterData"),
- *                     @OA\Property(property="message", type="string", example="Centre de distribution le plus proche trouvé.")
+ *                     @OA\Property(
+ *                         property="data",
+ *                         type="object",
+ *                         @OA\Property(property="distribution_center", ref="#/components/schemas/DistributionCenterData"),
+ *                         @OA\Property(
+ *                             property="products",
+ *                             type="array",
+ *
+ *                             @OA\Items(ref="#/components/schemas/Product")
+ *                         )
+ *                     ),
+ *
+ *                     @OA\Property(property="message", type="string", example="Centre de distribution le plus proche trouvé avec ses produits")
  *                 )
  *             }
  *         )

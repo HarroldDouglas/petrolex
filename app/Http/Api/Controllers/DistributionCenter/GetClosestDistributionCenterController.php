@@ -6,7 +6,8 @@ namespace App\Http\Api\Controllers\DistributionCenter;
 
 use App\Http\Api\Requests\DistributionCenter\GetClosestDistributionCenterRequest;
 use App\Http\Api\Resources\DistributionCenterResource;
-use App\Http\Api\Responses\Warehouse\DistributionCenterResponse;
+use App\Http\Api\Resources\ProductResource;
+use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Services\DistributionCenter\DistributionCenterService;
 
@@ -17,11 +18,12 @@ final class GetClosestDistributionCenterController extends Controller
 
     /**
      * Find the closest distribution center to a given latitude and longitude or neighborhood.
+     * Includes the center's available products.
      *
      * Route: GET /distribution-centers/closest
      * Name: api.distribution-centers.closest
      */
-    public function __invoke(GetClosestDistributionCenterRequest $request): DistributionCenterResponse
+    public function __invoke(GetClosestDistributionCenterRequest $request): ApiResponse
     {
         if ($request->has('neighborhood_id')) {
             // Find by neighborhood ID
@@ -37,9 +39,21 @@ final class GetClosestDistributionCenterController extends Controller
         }
 
         if (! $closestCenter) {
-            return DistributionCenterResponse::error('Aucun centre de distribution trouvé.', null, 404);
+            return ApiResponse::error(
+                message: 'Aucun centre de distribution trouvé.',
+                statusCode: 404
+            );
         }
 
-        return DistributionCenterResponse::success(new DistributionCenterResource($closestCenter), 'Centre de distribution le plus proche trouvé.');
+        // Get products for this distribution center
+        $products = $this->distributionCenterService->getProducts($closestCenter->id);
+
+        return ApiResponse::success(
+            data: [
+                'distribution_center' => new DistributionCenterResource($closestCenter),
+                'products' => ProductResource::collection($products),
+            ],
+            message: __('messages.closest_distribution_center_found')
+        );
     }
 }

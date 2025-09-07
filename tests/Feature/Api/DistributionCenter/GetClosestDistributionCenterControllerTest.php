@@ -58,19 +58,32 @@ class GetClosestDistributionCenterControllerTest extends TestCase
                     'message',
                 ],
                 'data' => [
-                    'id',
-                    'name',
-                    'address',
+                    'distribution_center' => [
+                        'id',
+                        'name',
+                        'address',
+                    ],
+                    'products' => [
+                        '*' => [
+                            'id',
+                            'type',
+                            'name',
+                            'description',
+                            'category_name',
+                            'quantity',
+                        ],
+                    ],
                 ],
             ])
             ->assertJson([
                 '_metadata' => [
                     'success' => true,
-                    'message' => 'Centre de distribution le plus proche trouvé.',
                 ],
                 'data' => [
-                    'id' => $distributionCenter->id,
-                    'name' => 'Centre Akwa',
+                    'distribution_center' => [
+                        'id' => $distributionCenter->id,
+                        'name' => 'Centre Akwa',
+                    ],
                 ],
             ]);
     }
@@ -109,14 +122,29 @@ class GetClosestDistributionCenterControllerTest extends TestCase
         $response = $this->getJson("/api/distribution-centers/closest?neighborhood_id={$neighborhood->id}");
 
         $response->assertStatus(200)
+            ->assertJsonStructure([
+                '_metadata' => [
+                    'success',
+                    'message',
+                ],
+                'data' => [
+                    'distribution_center' => [
+                        'id',
+                        'name',
+                        'address',
+                    ],
+                    'products',
+                ],
+            ])
             ->assertJson([
                 '_metadata' => [
                     'success' => true,
-                    'message' => 'Centre de distribution le plus proche trouvé.',
                 ],
                 'data' => [
-                    'id' => $distributionCenter->id,
-                    'name' => 'Centre Akwa',
+                    'distribution_center' => [
+                        'id' => $distributionCenter->id,
+                        'name' => 'Centre Akwa',
+                    ],
                 ],
             ]);
     }
