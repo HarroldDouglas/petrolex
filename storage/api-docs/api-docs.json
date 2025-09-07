@@ -4162,12 +4162,17 @@
                     "value": {
                         "description": "The unique identifier for the delivery type",
                         "type": "string",
-                        "example": "standard"
+                        "example": "normal"
                     },
                     "label": {
                         "description": "The human-readable label for the delivery type",
                         "type": "string",
                         "example": "Standard"
+                    },
+                    "fee": {
+                        "description": "The delivery fee in cents",
+                        "type": "integer",
+                        "example": 500
                     }
                 },
                 "type": "object"

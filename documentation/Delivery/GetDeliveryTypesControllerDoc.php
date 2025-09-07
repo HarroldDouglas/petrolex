@@ -8,8 +8,9 @@ use OpenApi\Annotations as OA;
  *     title="Delivery Type",
  *     description="Represents a single delivery type",
  *
- *     @OA\Property(property="value", type="string", description="The unique identifier for the delivery type", example="standard"),
- *     @OA\Property(property="label", type="string", description="The human-readable label for the delivery type", example="Standard")
+ *     @OA\Property(property="value", type="string", description="The unique identifier for the delivery type", example="normal"),
+ *     @OA\Property(property="label", type="string", description="The human-readable label for the delivery type", example="Standard"),
+ *     @OA\Property(property="fee", type="integer", description="The delivery fee in cents", example=500)
  * )
  *
  * @OA\Schema(

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Services\Auth;
 
 use App\Enums\LoginChannel;
-use App\Exceptions\Auth\OtpDeliveryException;
 use App\Exceptions\UserNotFoundException;
 use App\Mail\OtpMail;
 use App\Models\User;
@@ -279,7 +278,7 @@ class OtpServiceTest extends TestCase
 
         // The service should return false when delivery fails
         $result = $this->otpService->sendOtp($user->phone_number);
-        
+
         $this->assertFalse($result, 'Service should return false on delivery failure');
         // Cache should still contain the OTP as per the current implementation
         $this->assertTrue(Cache::has($cacheKey), 'OTP should remain in cache for manual verification');
