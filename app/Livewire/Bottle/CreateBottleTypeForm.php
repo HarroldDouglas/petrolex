@@ -41,7 +41,7 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
                 bottleTypeCityPrices: $bottleTypeCityPrices,
                 capacity: $validatedData['capacity'],
                 content_price: $validatedData['content_price'],
-                bottle_with_content_price: $validatedData['bottle_with_content_price'],
+                full_price: $validatedData['full_price'],
                 is_active: $validatedData['is_active'],
                 description: $validatedData['description'],
                 weight: $validatedData['weight'] ? (float) $validatedData['weight'] : null,

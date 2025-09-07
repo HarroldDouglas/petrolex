@@ -51,7 +51,7 @@ class BottleTypeDataTable extends BaseDataTable
             Column::make('Prix du contenu', 'content_price')
                 ->sortable(),
 
-            Column::make('Prix bouteille + contenu', 'bottle_with_content_price')
+            Column::make('Prix bouteille + contenu', 'full_price')
                 ->sortable(),
 
             Column::make('Actif', 'is_active')
@@ -147,7 +147,7 @@ class BottleTypeDataTable extends BaseDataTable
                 name: $bottleType->name,
                 capacity: $bottleType->capacity,
                 content_price: $bottleType->content_price,
-                bottle_with_content_price: $bottleType->bottle_with_content_price,
+                full_price: $bottleType->full_price,
                 weight: $bottleType->weight,
                 is_active: $isActive
             );

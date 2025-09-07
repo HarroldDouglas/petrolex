@@ -25,7 +25,7 @@ class BottleTypeSeeder extends Seeder
                 'weight' => 16.0,
                 'radius' => 15.5,
                 'content_price' => 3900,
-                'bottle_with_content_price' => 5000,
+                'full_price' => 5000,
                 'is_active' => true,
             ],
             [
@@ -36,7 +36,7 @@ class BottleTypeSeeder extends Seeder
                 'weight' => 16.0,
                 'radius' => 17.5,
                 'content_price' => 6000,
-                'bottle_with_content_price' => 6500,
+                'full_price' => 6500,
                 'is_active' => true,
             ],
             [
@@ -47,7 +47,7 @@ class BottleTypeSeeder extends Seeder
                 'weight' => 16.0,
                 'radius' => 20.5,
                 'content_price' => 7800,
-                'bottle_with_content_price' => 8500,
+                'full_price' => 8500,
                 'is_active' => true,
             ],
         ];
