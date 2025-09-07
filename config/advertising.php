@@ -14,9 +14,9 @@ return [
     'banners' => [
         [
             'id' => 1,
-            'title' => 'Promo spéciale gaz domestique',
-            'description' => 'Profitez de notre offre spéciale sur les bouteilles de gaz domestique',
-            'image_url' => 'https://example.com/banners/promo-gaz-domestique.jpg',
+            'title' => 'Bannière 1',
+            'description' => 'Description bannière 1',
+            'image_url' => 'assets/images/mobile/banners/banner_1.png',
             'action_url' => null,
             'is_active' => true,
             'priority' => 1,
@@ -25,9 +25,9 @@ return [
         ],
         [
             'id' => 2,
-            'title' => 'Accessoires de sécurité',
-            'description' => 'Découvrez notre gamme complète d\'accessoires de sécurité',
-            'image_url' => 'https://example.com/banners/accessoires-securite.jpg',
+            'title' => 'Bannière 2',
+            'description' => 'Description bannière 2',
+            'image_url' => 'assets/images/mobile/banners/banner_2.jpeg',
             'action_url' => null,
             'is_active' => true,
             'priority' => 2,

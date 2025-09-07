@@ -38,6 +38,14 @@ class GetAdvertisingBannersController extends Controller
 
                 return true;
             })
+            ->map(function ($banner) {
+                // Generate full URL for image
+                $banner['image_url'] = $banner['image_url']
+                    ? asset($banner['image_url'])
+                    : null;
+
+                return $banner;
+            })
             ->sortBy('priority')
             ->values()
             ->toArray();

@@ -72,8 +72,10 @@ use OpenApi\Annotations as OA;
  *         property="banners",
  *         type="array",
  *         description="Liste des bannières publicitaires actives",
+ *
  *         @OA\Items(ref="#/components/schemas/AdvertisingBanner")
  *     ),
+ *
  *     @OA\Property(
  *         property="total",
  *         type="integer",

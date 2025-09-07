@@ -47,8 +47,6 @@ final class UpdatePasswordTest extends TestCase
         ]);
         $this->authToken = $response->json('data.access_token');
 
-        $this->actingAs($this->user);
-
         $newPassword = 'new_strong_password';
 
         $response = $this->withHeaders([
