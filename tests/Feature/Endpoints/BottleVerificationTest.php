@@ -15,6 +15,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -23,7 +24,7 @@ final class BottleVerificationTest extends TestCase
     use RefreshDatabase;
 
     private User $adminUser;
-    private string $authToken;
+    private ?string $authToken = null;
     private DistributionCenter $distributionCenter;
     private BottleType $bottleType;
 
@@ -31,24 +32,27 @@ final class BottleVerificationTest extends TestCase
     {
         parent::setUp();
 
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
+        // Seed essential data to avoid conflicts
+        $this->artisan('db:seed', ['--class' => 'Database\\Seeders\\GeographicSeeder']);
+        $this->artisan('db:seed', ['--class' => 'Database\\Seeders\\RolePermissionSeeder']);
 
+        // Get the seeded Cameroon country
         $country = \App\Models\Geography\Country::where('code', 'CM')->first();
+
         if (! $country) {
-            $country = \App\Models\Geography\Country::create([
-                'name' => 'Cameroun',
-                'code' => 'CM',
-                'phone_code' => '+237',
-                'is_active' => true,
-            ]);
+            $this->fail('Cameroon country not found after seeding');
         }
 
+        // Create user with explicit setup to avoid authentication issues
         $this->adminUser = User::factory()->create([
-            'password' => \Illuminate\Support\Facades\Hash::make('password'), // Use Hash::make
+            'email' => 'bottle.admin@example.com',
+            'password' => Hash::make('password'),
             'country_id' => $country->id,
+            'email_verified_at' => now(),
+            'is_active' => true,
         ]);
         $this->adminUser->assignRole('admin');
+        $this->adminUser->refresh();
 
         \App\Models\Customer::factory()->create();
 
@@ -58,8 +62,15 @@ final class BottleVerificationTest extends TestCase
             'country_code' => 'CM',
         ]);
 
-        $response->assertStatus(200);
+        if ($response->getStatusCode() !== 200) {
+            $this->fail('Authentication failed: '.$response->getContent());
+        }
+
         $this->authToken = $response->json('data.access_token');
+
+        if (! $this->authToken) {
+            $this->fail('No authentication token returned');
+        }
 
         $this->distributionCenter = DistributionCenter::factory()->create();
         $this->bottleType = BottleType::factory()->create();

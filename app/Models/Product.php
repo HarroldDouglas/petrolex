@@ -122,7 +122,7 @@ class Product extends Model
         }
 
         $contentPrice = (int) $bottleType->content_price;
-        $bottleWithContentPrice = (int) $bottleType->bottle_with_content_price;
+        $bottleWithContentPrice = (int) $bottleType->full_price;
 
         return $contentPrice.'-'.$bottleWithContentPrice;
     }

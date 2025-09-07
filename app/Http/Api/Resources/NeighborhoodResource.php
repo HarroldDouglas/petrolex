@@ -13,6 +13,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $name
  * @property float|null $latitude
  * @property float|null $longitude
+ * @property int $municipality_id
+ * @property bool $is_active
  */
 class NeighborhoodResource extends JsonResource
 {
@@ -26,6 +28,9 @@ class NeighborhoodResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'municipality_id' => $this->municipality_id,
+            'municipality' => new MunicipalityResource($this->whenLoaded('municipality')),
+            'is_active' => $this->is_active,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'city' => new CityResource($this->whenLoaded('city')),

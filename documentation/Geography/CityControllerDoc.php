@@ -4,15 +4,26 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
+ *     schema="NeighborhoodWithMunicipalityData",
+ *     description="Informations sur un quartier avec sa municipalité",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Akwa"),
+ *     @OA\Property(property="municipality_id", type="integer", example=1),
+ *     @OA\Property(property="municipality", type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Douala 1er")
+ *     ),
+ *     @OA\Property(property="is_active", type="boolean", example=true)
+ * )
+ *
+ * @OA\Schema(
  *     schema="CityData",
- *     description="Informations sur une ville",
+ *     description="Informations sur une ville avec ses quartiers",
  *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Douala"),
- *     @OA\Property(property="country_id", type="integer", example=1),
- *     @OA\Property(property="country_name", type="string", example="Cameroun"),
- *     @OA\Property(property="latitude", type="number", format="float", example=4.0511),
- *     @OA\Property(property="longitude", type="number", format="float", example=9.7679)
+ *     @OA\Property(property="neighborhoods", type="array", @OA\Items(ref="#/components/schemas/NeighborhoodWithMunicipalityData"))
  * )
  *
  * @OA\Schema(
@@ -23,7 +34,7 @@ use OpenApi\Annotations as OA;
  *         property="_metadata",
  *         type="object",
  *         @OA\Property(property="success", type="boolean", example=true),
- *         @OA\Property(property="message", type="string", example="Liste des villes récupérée avec succès")
+ *         @OA\Property(property="message", type="string", example="Cities with neighborhoods retrieved successfully.")
  *     ),
  *     @OA\Property(
  *         property="data",

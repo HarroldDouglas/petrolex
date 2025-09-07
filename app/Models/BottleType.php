@@ -17,13 +17,15 @@ use Spatie\MediaLibrary\HasMedia;
 /**
  * @property int $id
  * @property string $name
+ * @property string|null $name_en
  * @property string $description
+ * @property string|null $description_en
  * @property float $capacity
  * @property float $height
  * @property float $weight
  * @property float $radius
  * @property float $content_price
- * @property float $bottle_with_content_price
+ * @property float $full_price
  * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -53,13 +55,15 @@ class BottleType extends Model implements HasMedia
      */
     protected $fillable = [
         'name',
+        'name_en',
         'description',
+        'description_en',
         'capacity',
         'height',
         'weight',
         'radius',
         'content_price',
-        'bottle_with_content_price',
+        'full_price',
         'is_active',
     ];
 
@@ -73,7 +77,7 @@ class BottleType extends Model implements HasMedia
         'weight' => 'decimal:2',
         'radius' => 'decimal:2',
         'content_price' => 'decimal:2',
-        'bottle_with_content_price' => 'decimal:2',
+        'full_price' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 
@@ -159,5 +163,31 @@ class BottleType extends Model implements HasMedia
     public function getImageIdentifier(): string
     {
         return "bottle-type-{$this->id}";
+    }
+
+    /**
+     * Get the localized name based on the current locale
+     */
+    public function getLocalizedName(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return match ($locale) {
+            'en' => $this->name_en ?: $this->name,
+            default => $this->name,
+        };
+    }
+
+    /**
+     * Get the localized description based on the current locale
+     */
+    public function getLocalizedDescription(?string $locale = null): ?string
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return match ($locale) {
+            'en' => $this->description_en ?: $this->description,
+            default => $this->description,
+        };
     }
 }

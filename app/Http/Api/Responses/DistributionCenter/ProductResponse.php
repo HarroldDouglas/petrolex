@@ -18,7 +18,7 @@ class ProductResponse extends ApiResponse
     ): self {
         return new self(
             ProductResource::collection($products),
-            $message ?? 'Produits récupérés avec succès',
+            $message ?? __('messages.products_retrieved_successfully'),
             true,
             $statusCode
         );

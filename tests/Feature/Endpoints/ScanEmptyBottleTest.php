@@ -17,6 +17,8 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class ScanEmptyBottleTest extends TestCase
@@ -24,7 +26,7 @@ final class ScanEmptyBottleTest extends TestCase
     use RefreshDatabase;
 
     private User $adminUser;
-    private string $authToken;
+    private ?string $authToken = null;
     private DistributionCenter $distributionCenter;
     private BottleType $bottleType;
     private ProductCategory $productCategory;
@@ -41,16 +43,30 @@ final class ScanEmptyBottleTest extends TestCase
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
 
+        // Create user with explicit password and proper setup
         $this->adminUser = User::factory()->create([
-            'password' => bcrypt('password'),
+            'email' => 'scan.admin@example.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'is_active' => true,
         ]);
         $this->adminUser->assignRole('admin');
+        $this->adminUser->refresh();
 
         $response = $this->postJson(route('api.login'), [
             'login' => $this->adminUser->email,
             'password' => 'password',
         ]);
+
+        if ($response->getStatusCode() !== 200) {
+            $this->fail('Authentication failed in setUp. Response: '.$response->getContent());
+        }
+
         $this->authToken = $response->json('data.access_token');
+
+        if (! $this->authToken) {
+            $this->fail('Authentication succeeded but no token returned.');
+        }
 
         $this->distributionCenter = DistributionCenter::factory()->create();
         $this->bottleType = BottleType::factory()->create();

@@ -19,7 +19,7 @@ class BottleTypeFactory extends Factory
             'weight' => $this->faker->randomFloat(2, 1, 20),
             'radius' => $this->faker->randomFloat(2, 5, 30),
             'content_price' => $this->faker->randomFloat(2, 100, 1000),
-            'bottle_with_content_price' => $this->faker->randomFloat(2, 100, 1000),
+            'full_price' => $this->faker->randomFloat(2, 100, 1000),
             'is_active' => $this->faker->boolean,
         ];
     }

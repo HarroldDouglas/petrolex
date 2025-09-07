@@ -2,17 +2,17 @@
 
 namespace App\Http\Api\Resources;
 
-use App\Models\Geography\City;
+use App\Models\Geography\Municipality;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin City
+ * @mixin Municipality
  *
  * @property int $id
  * @property string $name
  */
-class CityResource extends JsonResource
+class MunicipalityResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -24,8 +24,7 @@ class CityResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'neighborhoods' => NeighborhoodResource::collection($this->whenLoaded('neighborhoods')),
-            'country' => new CountryResource($this->whenLoaded('country')),
+            'city' => new CityResource($this->whenLoaded('city')),
         ];
     }
 }
