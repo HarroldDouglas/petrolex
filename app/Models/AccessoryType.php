@@ -166,8 +166,6 @@ class AccessoryType extends Model implements HasMedia
      */
     protected function getDefaultSpecifications(): array
     {
-        return [
-            ['name' => 'price', 'name_en' => 'price', 'value' => (string) $this->price, 'unit' => 'XOF'],
-        ];
+        return [];
     }
 }
