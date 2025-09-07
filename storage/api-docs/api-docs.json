@@ -6001,7 +6001,7 @@
                         "format": "float",
                         "example": 6500
                     },
-                    "bottle_with_content_price": {
+                    "full_price": {
                         "description": "Prix de la consigne (bouteille + gaz)",
                         "type": "number",
                         "format": "float",

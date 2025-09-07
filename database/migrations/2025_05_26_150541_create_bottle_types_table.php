@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('weight', 8, 2)->nullable();
             $table->decimal('radius', 8, 2)->nullable();
             $table->decimal('content_price', 10, 2);
-            $table->decimal('bottle_with_content_price', 10, 2);
+            $table->decimal('full_price', 10, 2);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
