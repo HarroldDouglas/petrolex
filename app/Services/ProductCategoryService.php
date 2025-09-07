@@ -45,7 +45,7 @@ class ProductCategoryService extends BaseServiceForEntity
 
         if ($productCategory->product_type->value === ProductType::BOTTLE()->value) {
             if ($option === BottleOrderType::FULL()->value) {
-                return $productInstance->bottle_with_content_price;
+                return $productInstance->full_price;
             } elseif ($option === BottleOrderType::RECHARGE()->value) {
                 return $productInstance->content_price;
             }

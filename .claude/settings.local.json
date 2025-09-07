@@ -9,7 +9,13 @@
       "Bash(grep:*)",
       "Bash(tree:*)",
       "Bash(sed:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git checkout:*)",
+      "Bash(./vendor/bin/phpstan analyse:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(./vendor/bin/pint:*)",
+      "Bash(./vendor/bin/phpstan analyse:*)"
     ],
     "deny": [],
     "ask": []

@@ -142,10 +142,10 @@ abstract class AbstractOrderForm extends Component
                         $this->showOptionField = true;
                         $this->selectedProductDetails['productTypeInstance'] = [
                             'content_price' => $productTypeInstance->content_price,
-                            'bottle_with_content_price' => $productTypeInstance->bottle_with_content_price,
+                            'full_price' => $productTypeInstance->full_price,
                         ];
                         $this->productOptions = [
-                            BottleOrderType::FULL()->value => BottleOrderType::FULL()->label.' ('.$productTypeInstance->bottle_with_content_price.' XAF)',
+                            BottleOrderType::FULL()->value => BottleOrderType::FULL()->label.' ('.$productTypeInstance->full_price.' XAF)',
                             BottleOrderType::RECHARGE()->value => BottleOrderType::RECHARGE()->label.' ('.$productTypeInstance->content_price.' XAF)',
                         ];
                     } elseif ($productCategory->product_type === ProductType::ACCESSORY()) {
@@ -205,7 +205,7 @@ abstract class AbstractOrderForm extends Component
 
             $bottleType = $selectedProductDetails['productTypeInstance'];
             if ($this->selectedOption === BottleOrderType::FULL()->value) {
-                $price = $bottleType['bottle_with_content_price'];
+                $price = $bottleType['full_price'];
                 $optionName = BottleOrderType::FULL()->label;
             } elseif ($this->selectedOption === BottleOrderType::RECHARGE()->value) {
                 $price = $bottleType['content_price'];

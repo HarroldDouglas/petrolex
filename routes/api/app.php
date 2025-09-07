@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Api\Controllers\App\GetAdvertisingBannersController;
 use App\Http\Api\Controllers\App\GetPrivacyPolicyController;
 use App\Http\Api\Controllers\App\GetSupportContactController;
 use App\Http\Api\Controllers\App\GetTermsAndConditionsController;
@@ -13,4 +14,5 @@ Route::prefix('app')->name('api.app.')->group(function () {
     Route::get('/privacy-policy', GetPrivacyPolicyController::class)->name('privacy-policy');
     Route::get('/privacy-policy/preview', PreviewPrivacyPolicyController::class)->name('privacy-policy.preview');
     Route::get('/support/contact', GetSupportContactController::class)->name('support.contact');
+    Route::get('/advertising/banners', GetAdvertisingBannersController::class)->name('advertising.banners');
 });

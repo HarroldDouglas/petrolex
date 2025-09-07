@@ -16,7 +16,9 @@ use Spatie\MediaLibrary\HasMedia;
 /**
  * @property int $id
  * @property string $name
+ * @property string|null $name_en
  * @property string|null $description
+ * @property string|null $description_en
  * @property float $price
  * @property bool $is_active
  * @property Carbon $created_at
@@ -45,8 +47,10 @@ class AccessoryType extends Model implements HasMedia
      */
     protected $fillable = [
         'name',
+        'name_en',
         'price',
         'description',
+        'description_en',
         'is_active',
     ];
 
@@ -125,5 +129,31 @@ class AccessoryType extends Model implements HasMedia
     public function getImageIdentifier(): string
     {
         return $this->name ?? 'Accessory Type #'.$this->id;
+    }
+
+    /**
+     * Get the localized name based on the current locale
+     */
+    public function getLocalizedName(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return match ($locale) {
+            'en' => $this->name_en ?: $this->name,
+            default => $this->name,
+        };
+    }
+
+    /**
+     * Get the localized description based on the current locale
+     */
+    public function getLocalizedDescription(?string $locale = null): ?string
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return match ($locale) {
+            'en' => $this->description_en ?: $this->description,
+            default => $this->description,
+        };
     }
 }

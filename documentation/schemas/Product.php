@@ -21,8 +21,9 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Property(property="id", type="integer", description="ID de la catégorie de produit", example=1),
  *     @OA\Property(property="type", type="string", enum={"bottle", "accessory"}, description="Type de produit", example="bottle"),
- *     @OA\Property(property="name", type="string", description="Nom du produit", example="Bouteille de 6Kg"),
- *     @OA\Property(property="description", type="string", description="Description du produit", example="Une bouteille de gaz de 6 kilogrammes."),
+ *     @OA\Property(property="name", type="string", description="Nom du produit (traduit selon la langue de l'utilisateur)", example="Bouteille de 6Kg"),
+ *     @OA\Property(property="description", type="string", description="Description du produit (traduite selon la langue de l'utilisateur)", example="Une bouteille de gaz de 6 kilogrammes."),
+ *     @OA\Property(property="category_name", type="string", description="Nom de catégorie traduit pour mobile selon la langue de l'utilisateur", example="Bouteilles à gaz domestiques"),
  *     @OA\Property(property="quantity", type="integer", description="Quantité en stock", example=40)
  * )
  *
@@ -48,7 +49,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="weight", type="number", format="float", description="Poids de la bouteille vide en kg", example=5.2),
  *     @OA\Property(property="radius", type="number", format="float", description="Rayon de la bouteille en cm", example=15.2),
  *     @OA\Property(property="content_price", type="number", format="float", description="Prix du gaz seul", example=6500),
- *     @OA\Property(property="bottle_with_content_price", type="number", format="float", description="Prix de la consigne (bouteille + gaz)", example=18500)
+ *     @OA\Property(property="full_price", type="number", format="float", description="Prix de la consigne (bouteille + gaz)", example=18500)
  * )
  *
  * @OA\Schema(

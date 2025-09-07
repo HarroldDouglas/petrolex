@@ -685,7 +685,7 @@ class OrderSeeder extends Seeder
     private function createBottleOrderItem(Order $order, ProductCategory $productCategory, int $quantity, BottleOrderType $bottleOrderType): void
     {
         $bottleType = $productCategory->typeInstance;
-        $bottleWithContentPrice = $bottleType->bottle_with_content_price ?? 5000;
+        $bottleWithContentPrice = $bottleType->full_price ?? 5000;
         $contentPrice = $bottleType->content_price ?? 3500;
 
         $unitPrice = match ($bottleOrderType) {
