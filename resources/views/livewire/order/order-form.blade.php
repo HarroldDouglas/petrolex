@@ -76,7 +76,7 @@
                                         if ($productCategory['product_type'] === \App\Enums\ProductType::ACCESSORY()->value) {
                                             $isDisabled = true;
                                             break;
-                                        } elseif ($productCategory['product_type'] === \App\Enums\ProductType::BOTTLE()->value && $item['option'] === 'bottle_with_content_price') {
+                                        } elseif ($productCategory['product_type'] === \App\Enums\ProductType::BOTTLE()->value && $item['option'] === 'full_price') {
                                             $isDisabled = true;
                                             break;
                                         }

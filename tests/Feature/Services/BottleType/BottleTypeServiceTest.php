@@ -56,7 +56,7 @@ class BottleTypeServiceTest extends TestCase
             'weight' => 5.0,
             'radius' => 10.0,
             'content_price' => 100.00,
-            'bottle_with_content_price' => 150.00,
+            'full_price' => 150.00,
             'is_active' => true,
             'bottleTypeCityPrices' => [$cityPriceDTO],
         ];

@@ -31,7 +31,7 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
         $this->name = $this->bottleType->name;
         $this->capacity = $this->bottleType->capacity;
         $this->content_price = $this->bottleType->content_price;
-        $this->bottle_with_content_price = $this->bottleType->bottle_with_content_price;
+        $this->full_price = $this->bottleType->full_price;
         $this->is_active = $this->bottleType->is_active;
         $this->description = $this->bottleType->description;
         $this->weight = $this->bottleType->weight;
@@ -107,7 +107,7 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
                 bottleTypeCityPrices: $bottleTypeCityPrices,
                 capacity: $validatedData['capacity'],
                 content_price: $validatedData['content_price'],
-                bottle_with_content_price: $validatedData['bottle_with_content_price'],
+                full_price: $validatedData['full_price'],
                 is_active: $validatedData['is_active'],
                 description: $validatedData['description'],
                 weight: $validatedData['weight'] ? (float) $validatedData['weight'] : null,

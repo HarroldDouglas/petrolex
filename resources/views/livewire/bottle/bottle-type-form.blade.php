@@ -40,11 +40,11 @@
         </div>
 
         <div class="col-md-6">
-            <label for="bottle_with_content_price" class="form-label required">Prix de la consigne + recharge</label>
-            <input type="number" class="form-control @error('bottle_with_content_price') is-invalid @enderror" 
-                id="bottle_with_content_price" placeholder="Ex: 25000"
-                wire:model.live.debounce.500ms="bottle_with_content_price">
-            @error('bottle_with_content_price')
+            <label for="full_price" class="form-label required">Prix de la consigne + recharge</label>
+            <input type="number" class="form-control @error('full_price') is-invalid @enderror" 
+                id="full_price" placeholder="Ex: 25000"
+                wire:model.live.debounce.500ms="full_price">
+            @error('full_price')
                 <div class="invalid-feedback">{{ __($message) }}</div>
             @enderror
         </div>

@@ -73,7 +73,7 @@ class ProductResource extends JsonResource
                 [
                     'value' => BottleOrderType::FULL()->value,
                     'label' => BottleOrderType::FULL()->label,
-                    'price' => $bottleType->bottle_with_content_price,
+                    'price' => $bottleType->full_price,
                 ],
                 [
                     'value' => BottleOrderType::RECHARGE()->value,

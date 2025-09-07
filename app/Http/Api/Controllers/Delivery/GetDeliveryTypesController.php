@@ -19,6 +19,7 @@ class GetDeliveryTypesController extends Controller
             ->map(fn ($case) => [
                 'value' => $case->value,
                 'label' => $case->label,
+                'fee' => $case->fee(),
             ])->toArray();
 
         return ApiResponse::success(

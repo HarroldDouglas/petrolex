@@ -49,7 +49,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="weight", type="number", format="float", description="Poids de la bouteille vide en kg", example=5.2),
  *     @OA\Property(property="radius", type="number", format="float", description="Rayon de la bouteille en cm", example=15.2),
  *     @OA\Property(property="content_price", type="number", format="float", description="Prix du gaz seul", example=6500),
- *     @OA\Property(property="bottle_with_content_price", type="number", format="float", description="Prix de la consigne (bouteille + gaz)", example=18500)
+ *     @OA\Property(property="full_price", type="number", format="float", description="Prix de la consigne (bouteille + gaz)", example=18500)
  * )
  *
  * @OA\Schema(
