@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('content_price', 10, 2);
             $table->decimal('full_price', 10, 2);
             $table->boolean('is_active')->default(true);
+            $table->json('specifications')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

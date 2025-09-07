@@ -52,6 +52,13 @@ class GetProductsControllerTest extends TestCase
                     'description',
                     'category_name',
                     'quantity',
+                    'specifications' => [
+                        '*' => [
+                            'name',
+                            'value',
+                            'unit',
+                        ],
+                    ],
                 ],
             ],
         ]);
@@ -64,10 +71,30 @@ class GetProductsControllerTest extends TestCase
 
             if ($bottleProducts->isNotEmpty()) {
                 $this->assertEquals('Bouteilles à gaz domestiques', $bottleProducts->first()['category_name']);
+
+                // Check specifications structure for bottles
+                $bottleProduct = $bottleProducts->first();
+                $this->assertIsArray($bottleProduct['specifications']);
+                if (! empty($bottleProduct['specifications'])) {
+                    $specification = $bottleProduct['specifications'][0];
+                    $this->assertArrayHasKey('name', $specification);
+                    $this->assertArrayHasKey('value', $specification);
+                    $this->assertArrayHasKey('unit', $specification);
+                }
             }
 
             if ($accessoryProducts->isNotEmpty()) {
                 $this->assertEquals('Accessoires de sécurité et distributions', $accessoryProducts->first()['category_name']);
+
+                // Check specifications structure for accessories
+                $accessoryProduct = $accessoryProducts->first();
+                $this->assertIsArray($accessoryProduct['specifications']);
+                if (! empty($accessoryProduct['specifications'])) {
+                    $specification = $accessoryProduct['specifications'][0];
+                    $this->assertArrayHasKey('name', $specification);
+                    $this->assertArrayHasKey('value', $specification);
+                    $this->assertArrayHasKey('unit', $specification);
+                }
             }
         }
 
@@ -96,10 +123,30 @@ class GetProductsControllerTest extends TestCase
 
             if ($bottleProducts->isNotEmpty()) {
                 $this->assertEquals('Domestic Gas Bottles', $bottleProducts->first()['category_name']);
+
+                // Check specifications structure for bottles in English
+                $bottleProduct = $bottleProducts->first();
+                $this->assertIsArray($bottleProduct['specifications']);
+                if (! empty($bottleProduct['specifications'])) {
+                    $specification = $bottleProduct['specifications'][0];
+                    $this->assertArrayHasKey('name', $specification);
+                    $this->assertArrayHasKey('value', $specification);
+                    $this->assertArrayHasKey('unit', $specification);
+                }
             }
 
             if ($accessoryProducts->isNotEmpty()) {
                 $this->assertEquals('Safety and Distribution Accessories', $accessoryProducts->first()['category_name']);
+
+                // Check specifications structure for accessories in English
+                $accessoryProduct = $accessoryProducts->first();
+                $this->assertIsArray($accessoryProduct['specifications']);
+                if (! empty($accessoryProduct['specifications'])) {
+                    $specification = $accessoryProduct['specifications'][0];
+                    $this->assertArrayHasKey('name', $specification);
+                    $this->assertArrayHasKey('value', $specification);
+                    $this->assertArrayHasKey('unit', $specification);
+                }
             }
         }
     }

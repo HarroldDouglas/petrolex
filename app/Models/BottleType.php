@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProductType;
 use App\Traits\HasMediaCollections;
+use App\Traits\HasSpecifications;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,6 +47,7 @@ class BottleType extends Model implements HasMedia
 {
     use HasFactory;
     use HasMediaCollections;
+    use HasSpecifications;
     use SoftDeletes;
 
     /**
@@ -65,6 +67,7 @@ class BottleType extends Model implements HasMedia
         'content_price',
         'full_price',
         'is_active',
+        'specifications',
     ];
 
     /**
@@ -79,6 +82,7 @@ class BottleType extends Model implements HasMedia
         'content_price' => 'decimal:2',
         'full_price' => 'decimal:2',
         'is_active' => 'boolean',
+        'specifications' => 'array',
     ];
 
     /**
@@ -189,5 +193,18 @@ class BottleType extends Model implements HasMedia
             'en' => $this->description_en ?: $this->description,
             default => $this->description,
         };
+    }
+
+    /**
+     * Get default specifications from existing fields.
+     */
+    protected function getDefaultSpecifications(): array
+    {
+        return [
+            ['name' => 'capacity', 'name_en' => 'capacity', 'value' => (string) $this->capacity, 'unit' => 'L'],
+            ['name' => 'height', 'name_en' => 'height', 'value' => (string) $this->height, 'unit' => 'cm'],
+            ['name' => 'weight', 'name_en' => 'weight', 'value' => (string) $this->weight, 'unit' => 'kg'],
+            ['name' => 'radius', 'name_en' => 'radius', 'value' => (string) $this->radius, 'unit' => 'cm'],
+        ];
     }
 }

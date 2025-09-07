@@ -28,6 +28,10 @@ class StoreAccessoryTypeRequest extends FormRequest
             'is_active' => 'boolean',
             'images' => 'nullable|array',
             'images.*' => 'image|max:2048',
+            'specifications' => 'nullable|array',
+            'specifications.*.name' => 'required_with:specifications|string|max:255',
+            'specifications.*.value' => 'required_with:specifications|string|max:255',
+            'specifications.*.unit' => 'nullable|string|max:50',
         ];
     }
 

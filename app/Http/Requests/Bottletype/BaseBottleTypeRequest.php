@@ -26,6 +26,11 @@ abstract class BaseBottleTypeRequest extends FormRequest
             'cityPrices.*.content_price' => ['required_with:cityPrices', 'numeric', 'min:0'],
             'cityPrices.*.content_with_bottle_price' => ['required_with:cityPrices', 'numeric',
                 'min:0', 'gte:cityPrices.*.content_price'],
+
+            'specifications' => ['nullable', 'array'],
+            'specifications.*.name' => ['required_with:specifications', 'string', 'max:255'],
+            'specifications.*.value' => ['required_with:specifications', 'string', 'max:255'],
+            'specifications.*.unit' => ['nullable', 'string', 'max:50'],
         ];
     }
 

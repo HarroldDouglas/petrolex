@@ -15,11 +15,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string|null $description
  * @property string $category_name
  * @property int $quantity
- * @property float|null $price
- * @property float|null $capacity
- * @property float|null $height
- * @property float|null $weight
- * @property float|null $radius
+ * @property array $specifications
  * @property array<array{value: string, label: string, price: float}>|null $options
  */
 class ProductResource extends JsonResource
@@ -42,6 +38,7 @@ class ProductResource extends JsonResource
             'description' => $productTypeInstance->getLocalizedDescription(),
             'category_name' => $productCategory->product_type->labelForMobile(),
             'quantity' => $this->getQuantity(),
+            'specifications' => $productTypeInstance->specifications ?? [],
         ];
 
         $specificData = match ($productCategory->product_type) {
@@ -55,9 +52,7 @@ class ProductResource extends JsonResource
 
     private function getAccessoryDetails(): array
     {
-        return [
-            'price' => $this->resource->productTypeInstance->price,
-        ];
+        return [];
     }
 
     private function getBottleDetails(): array
@@ -65,10 +60,6 @@ class ProductResource extends JsonResource
         $bottleType = $this->resource->productTypeInstance;
 
         return [
-            'capacity' => $bottleType->capacity,
-            'height' => $bottleType->height,
-            'weight' => $bottleType->weight,
-            'radius' => $bottleType->radius,
             'options' => [
                 [
                     'value' => BottleOrderType::FULL()->value,
