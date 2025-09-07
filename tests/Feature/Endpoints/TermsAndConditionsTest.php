@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Endpoints;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 final class TermsAndConditionsTest extends TestCase

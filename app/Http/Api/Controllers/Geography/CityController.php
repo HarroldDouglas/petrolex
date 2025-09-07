@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Controllers\Geography;
 
+use App\Http\Api\Resources\CityResource;
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Geography\City;
@@ -19,9 +20,12 @@ class CityController extends Controller
     {
         $cities = $this->cityService->getCitiesByCountry($country);
 
+        // Load necessary relationships for the Resources
+        $cities->load(['neighborhoods.municipality']);
+
         return ApiResponse::success(
-            data: $cities->map(fn (City $city) => ['id' => $city->id, 'name' => $city->name])->toArray(),
-            message: 'Cities retrieved successfully.'
+            data: CityResource::collection($cities),
+            message: 'Cities with neighborhoods retrieved successfully.'
         );
     }
 
@@ -35,8 +39,11 @@ class CityController extends Controller
          */
         $city = $this->cityService->find($cityId);
 
+        // Load country relationship for the Resource
+        $city->load(['country']);
+
         return ApiResponse::success(
-            data: ['id' => $city->id, 'name' => $city->name, 'country' => $city->country],
+            data: new CityResource($city),
             message: 'City retrieved successfully.'
         );
     }
