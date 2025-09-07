@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('bottle_types', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
+            $table->string('name_en', 255)->nullable();
             $table->text('description')->nullable();
+            $table->text('description_en')->nullable();
             $table->string('capacity', 50);
             $table->decimal('height', 8, 2)->nullable();
             $table->decimal('weight', 8, 2)->nullable();

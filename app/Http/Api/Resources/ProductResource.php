@@ -13,6 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $type
  * @property string $name
  * @property string|null $description
+ * @property string $category_name
  * @property int $quantity
  * @property float|null $price
  * @property float|null $capacity
@@ -37,8 +38,9 @@ class ProductResource extends JsonResource
         $commonData = [
             'id' => $productCategory->id,
             'type' => $productCategory->product_type->value,
-            'name' => $productTypeInstance->name,
-            'description' => $productTypeInstance->description,
+            'name' => $productTypeInstance->getLocalizedName(),
+            'description' => $productTypeInstance->getLocalizedDescription(),
+            'category_name' => $productCategory->product_type->labelForMobile(),
             'quantity' => $this->getQuantity(),
         ];
 
@@ -70,12 +72,12 @@ class ProductResource extends JsonResource
             'options' => [
                 [
                     'value' => BottleOrderType::FULL()->value,
-                    'label' => BottleOrderType::FULL()->label,
+                    'label' => BottleOrderType::FULL()->getLocalizedLabel(),
                     'price' => $bottleType->full_price,
                 ],
                 [
                     'value' => BottleOrderType::RECHARGE()->value,
-                    'label' => BottleOrderType::RECHARGE()->label,
+                    'label' => BottleOrderType::RECHARGE()->getLocalizedLabel(),
                     'price' => $bottleType->content_price,
                 ],
             ],

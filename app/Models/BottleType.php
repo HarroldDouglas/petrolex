@@ -17,7 +17,9 @@ use Spatie\MediaLibrary\HasMedia;
 /**
  * @property int $id
  * @property string $name
+ * @property string|null $name_en
  * @property string $description
+ * @property string|null $description_en
  * @property float $capacity
  * @property float $height
  * @property float $weight
@@ -53,7 +55,9 @@ class BottleType extends Model implements HasMedia
      */
     protected $fillable = [
         'name',
+        'name_en',
         'description',
+        'description_en',
         'capacity',
         'height',
         'weight',
@@ -159,5 +163,31 @@ class BottleType extends Model implements HasMedia
     public function getImageIdentifier(): string
     {
         return "bottle-type-{$this->id}";
+    }
+
+    /**
+     * Get the localized name based on the current locale
+     */
+    public function getLocalizedName(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return match ($locale) {
+            'en' => $this->name_en ?: $this->name,
+            default => $this->name,
+        };
+    }
+
+    /**
+     * Get the localized description based on the current locale
+     */
+    public function getLocalizedDescription(?string $locale = null): ?string
+    {
+        $locale = $locale ?: app()->getLocale();
+
+        return match ($locale) {
+            'en' => $this->description_en ?: $this->description,
+            default => $this->description,
+        };
     }
 }
