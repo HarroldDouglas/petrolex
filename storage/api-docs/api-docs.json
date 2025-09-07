@@ -15,6 +15,53 @@
         }
     ],
     "paths": {
+        "/api/app/advertising/banners": {
+            "get": {
+                "tags": [
+                    "App"
+                ],
+                "summary": "Récupérer les bannières publicitaires",
+                "description": "Retourne la liste des bannières publicitaires actives triées par priorité",
+                "operationId": "api.app.advertising.banners",
+                "responses": {
+                    "200": {
+                        "description": "Bannières publicitaires récupérées avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdvertisingBannersResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Erreur lors de la récupération des bannières publicitaires"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/app/privacy-policy": {
             "get": {
                 "tags": [
@@ -3536,6 +3583,95 @@
     },
     "components": {
         "schemas": {
+            "AdvertisingBanner": {
+                "properties": {
+                    "id": {
+                        "description": "Identifiant unique de la bannière",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "Titre de la bannière",
+                        "type": "string",
+                        "example": "Promo spéciale gaz domestique"
+                    },
+                    "description": {
+                        "description": "Description de la bannière",
+                        "type": "string",
+                        "example": "Profitez de notre offre spéciale sur les bouteilles de gaz domestique"
+                    },
+                    "image_url": {
+                        "description": "URL de l'image de la bannière",
+                        "type": "string",
+                        "example": "https://example.com/banners/promo-gaz-domestique.jpg"
+                    },
+                    "action_url": {
+                        "description": "URL d'action optionnelle lors du clic sur la bannière",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "description": "Statut d'activation de la bannière",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "priority": {
+                        "description": "Priorité d'affichage de la bannière (ordre croissant)",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "start_date": {
+                        "description": "Date de début d'affichage",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-01-01"
+                    },
+                    "end_date": {
+                        "description": "Date de fin d'affichage",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-12-31"
+                    }
+                },
+                "type": "object"
+            },
+            "AdvertisingBannersData": {
+                "properties": {
+                    "banners": {
+                        "description": "Liste des bannières publicitaires actives",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AdvertisingBanner"
+                        }
+                    },
+                    "total": {
+                        "description": "Nombre total de bannières actives",
+                        "type": "integer",
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            },
+            "AdvertisingBannersResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/AdvertisingBannersData"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Bannières publicitaires récupérées avec succès."
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "PrivacyPolicyData": {
                 "properties": {
                     "html_content": {
