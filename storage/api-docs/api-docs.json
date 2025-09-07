@@ -3517,7 +3517,7 @@
                     "Centres de Distribution"
                 ],
                 "summary": "Récupérer les produits d'un centre de distribution",
-                "description": "Récupère la liste de tous les produits disponibles dans un centre de distribution spécifique, avec leurs détails et quantités en stock.",
+                "description": "Récupère la liste de tous les produits disponibles dans un centre de distribution spécifique, avec leurs détails et quantités en stock. Les noms et descriptions des produits sont automatiquement traduits selon la langue de l'utilisateur authentifié (français par défaut, anglais disponible).",
                 "operationId": "api.distribution-centers.products",
                 "parameters": [
                     {
@@ -5939,17 +5939,17 @@
                         "example": "bottle"
                     },
                     "name": {
-                        "description": "Nom du produit",
+                        "description": "Nom du produit (traduit selon la langue de l'utilisateur)",
                         "type": "string",
                         "example": "Bouteille de 6Kg"
                     },
                     "description": {
-                        "description": "Description du produit",
+                        "description": "Description du produit (traduite selon la langue de l'utilisateur)",
                         "type": "string",
                         "example": "Une bouteille de gaz de 6 kilogrammes."
                     },
                     "category_name": {
-                        "description": "Nom de catégorie traduit pour mobile",
+                        "description": "Nom de catégorie traduit pour mobile selon la langue de l'utilisateur",
                         "type": "string",
                         "example": "Bouteilles à gaz domestiques"
                     },

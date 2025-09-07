@@ -19,7 +19,9 @@ class BottleTypeSeeder extends Seeder
         $bottleTypes = [
             [
                 'name' => 'Bouteille de 6Kg',
+                'name_en' => '6Kg Gas Bottle',
                 'description' => 'Bouteille standard de 6kg pour usage domestique',
+                'description_en' => 'Standard 6kg bottle for domestic use',
                 'capacity' => '6',
                 'height' => 40.0,
                 'weight' => 16.0,
@@ -30,7 +32,9 @@ class BottleTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Bouteille de 9Kg',
+                'name_en' => '9Kg Gas Bottle',
                 'description' => 'Bouteille moyenne de 9kg pour usage régulier',
+                'description_en' => 'Medium 9kg bottle for regular use',
                 'capacity' => '9',
                 'height' => 45.0,
                 'weight' => 16.0,
@@ -41,7 +45,9 @@ class BottleTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Bouteille de 12Kg',
+                'name_en' => '12Kg Gas Bottle',
                 'description' => 'Bouteille moyenne de 12kg pour usage régulier',
+                'description_en' => 'Medium 12kg bottle for regular use',
                 'capacity' => '12',
                 'height' => 50.0,
                 'weight' => 16.0,

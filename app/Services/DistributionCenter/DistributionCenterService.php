@@ -127,6 +127,10 @@ class DistributionCenterService
     {
         $distributionCenter = $this->find($distributionCenterId);
 
+        if (! $distributionCenter) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Distribution center not found');
+        }
+
         return $distributionCenter->productCategories;
     }
 

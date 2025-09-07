@@ -59,11 +59,11 @@ class ProductType extends Enum
         $locale = $locale ?: app()->getLocale();
         $labels = static::mobileLabels();
         $upperValue = strtoupper($this->value);
-        
-        if (!isset($labels[$upperValue])) {
+
+        if (! isset($labels[$upperValue])) {
             return $this->label;
         }
-        
+
         return $labels[$upperValue][$locale] ?? $labels[$upperValue]['fr'];
     }
 }
