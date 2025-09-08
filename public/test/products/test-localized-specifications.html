@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Spécifications Localisées</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">Test des Spécifications Localisées</h1>
+                <p class="lead">Ce test démontre comment les spécifications des produits sont localisées selon la langue de l'utilisateur.</p>
+                
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-info-circle me-2"></i>Instructions</h5>
+                    <ol>
+                        <li>Connectez-vous d'abord avec un utilisateur</li>
+                        <li>Sélectionnez un centre de distribution</li>
+                        <li>Les spécifications des produits s'afficheront dans la langue de l'utilisateur</li>
+                    </ol>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Test en Français</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Les spécifications devraient apparaître comme :</p>
+                                <ul>
+                                    <li><strong>Capacité</strong> : 6.00 L</li>
+                                    <li><strong>Hauteur</strong> : 40.00 cm</li>
+                                    <li><strong>Poids</strong> : 12.50 kg</li>
+                                    <li><strong>Rayon</strong> : 15.00 cm</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Test en Anglais</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Les spécifications devraient apparaître comme :</p>
+                                <ul>
+                                    <li><strong>Capacity</strong> : 6.00 L</li>
+                                    <li><strong>Height</strong> : 40.00 cm</li>
+                                    <li><strong>Weight</strong> : 12.50 kg</li>
+                                    <li><strong>Radius</strong> : 15.00 cm</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h4>Test API Direct</h4>
+                    <div class="mb-3">
+                        <label for="distributionCenterId" class="form-label">ID du Centre de Distribution</label>
+                        <input type="number" class="form-control" id="distributionCenterId" placeholder="Entrez l'ID du centre de distribution" value="1">
+                    </div>
+                    <button class="btn btn-primary" onclick="testLocalizedSpecifications()">
+                        <i class="bi bi-play-circle me-2"></i>Tester les Spécifications Localisées
+                    </button>
+                </div>
+
+                <div id="results" class="mt-4" style="display: none;">
+                    <h4>Résultats</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <pre id="apiResponse" class="bg-light p-3 rounded"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="order.html" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Retour au Formulaire de Commande
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script>
+        function testLocalizedSpecifications() {
+            const distributionCenterId = document.getElementById('distributionCenterId').value;
+            
+            if (!distributionCenterId) {
+                alert('Veuillez entrer un ID de centre de distribution');
+                return;
+            }
+
+            const apiToken = localStorage.getItem('api_token');
+            if (!apiToken) {
+                alert('Veuillez vous connecter d\'abord');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Test with French locale
+            testWithLocale(distributionCenterId, 'fr');
+        }
+
+        function testWithLocale(distributionCenterId, locale) {
+            $.ajax({
+                url: `/api/distribution-centers/${distributionCenterId}/products`,
+                type: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('api_token')}`,
+                    'Accept': 'application/json',
+                    'Accept-Language': locale
+                },
+                success: function(response) {
+                    displayResults(response, locale);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Erreur API:', error);
+                    alert('Erreur lors de la récupération des produits: ' + error);
+                }
+            });
+        }
+
+        function displayResults(response, locale) {
+            const resultsDiv = document.getElementById('results');
+            const apiResponsePre = document.getElementById('apiResponse');
+            
+            // Find bottle products and their specifications
+            const bottleProducts = response.data.filter(product => product.type === 'bottle');
+            
+            let output = `=== RÉSULTATS POUR LA LANGUE: ${locale.toUpperCase()} ===\n\n`;
+            
+            if (bottleProducts.length > 0) {
+                const product = bottleProducts[0];
+                output += `Produit: ${product.name}\n`;
+                output += `Type: ${product.type}\n`;
+                output += `Description: ${product.description}\n\n`;
+                output += `Spécifications:\n`;
+                
+                product.specifications.forEach(spec => {
+                    output += `  - ${spec.name}: ${spec.value} ${spec.unit || ''}\n`;
+                });
+                
+                output += `\n=== RÉPONSE API COMPLÈTE ===\n`;
+                output += JSON.stringify(response, null, 2);
+            } else {
+                output += 'Aucun produit de type bouteille trouvé.\n\n';
+                output += `=== RÉPONSE API COMPLÈTE ===\n`;
+                output += JSON.stringify(response, null, 2);
+            }
+            
+            apiResponsePre.textContent = output;
+            resultsDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

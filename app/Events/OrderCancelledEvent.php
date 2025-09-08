@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Events;
 
 use App\Models\Order;
@@ -7,7 +9,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OrderStatusChanged
+final class OrderCancelledEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -15,11 +17,6 @@ class OrderStatusChanged
      * Create a new event instance.
      */
     public function __construct(
-        public Order $order,
-        public ?string $oldStatus = null,
-        public ?string $newStatus = null
-    ) {
-        
-        $this->newStatus = $this->newStatus ?? $order->status;
-    }
+        public readonly Order $order
+    ) {}
 }
