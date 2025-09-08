@@ -67,9 +67,9 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="ProductSpecification",
  *     type="object",
- *     description="Spécification technique d'un produit",
+ *     description="Spécification technique d'un produit (localisée selon la langue de l'utilisateur)",
  *
- *     @OA\Property(property="name", type="string", description="Nom de la spécification (traduit selon la langue)", example="hauteur"),
+ *     @OA\Property(property="name", type="string", description="Nom de la spécification traduit selon la langue de l'utilisateur (ex: 'Hauteur' en français, 'Height' en anglais)", example="Hauteur"),
  *     @OA\Property(property="value", type="string", description="Valeur de la spécification", example="40.00"),
  *     @OA\Property(property="unit", type="string", nullable=true, description="Unité de mesure", example="cm")
  * )

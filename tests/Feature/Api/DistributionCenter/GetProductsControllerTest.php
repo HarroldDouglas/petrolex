@@ -80,6 +80,14 @@ class GetProductsControllerTest extends TestCase
                     $this->assertArrayHasKey('name', $specification);
                     $this->assertArrayHasKey('value', $specification);
                     $this->assertArrayHasKey('unit', $specification);
+
+                    // Check that specification names are in French
+                    $specificationNames = collect($bottleProduct['specifications'])->pluck('name')->toArray();
+                    $expectedFrenchNames = ['Capacité', 'Hauteur', 'Poids', 'Rayon'];
+                    $this->assertTrue(
+                        ! empty(array_intersect($specificationNames, $expectedFrenchNames)),
+                        'Expected French specification names not found. Found: '.implode(', ', $specificationNames)
+                    );
                 }
             }
 
@@ -132,6 +140,14 @@ class GetProductsControllerTest extends TestCase
                     $this->assertArrayHasKey('name', $specification);
                     $this->assertArrayHasKey('value', $specification);
                     $this->assertArrayHasKey('unit', $specification);
+
+                    // Check that specification names are in English
+                    $specificationNames = collect($bottleProduct['specifications'])->pluck('name')->toArray();
+                    $expectedEnglishNames = ['Capacity', 'Height', 'Weight', 'Radius'];
+                    $this->assertTrue(
+                        ! empty(array_intersect($specificationNames, $expectedEnglishNames)),
+                        'Expected English specification names not found. Found: '.implode(', ', $specificationNames)
+                    );
                 }
             }
 

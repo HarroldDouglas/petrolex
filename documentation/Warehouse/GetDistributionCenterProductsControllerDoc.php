@@ -28,7 +28,7 @@ use OpenApi\Annotations as OA;
  * @OA\Get(
  *     path="/api/distribution-centers/{id}/products",
  *     summary="Récupérer les produits d'un centre de distribution",
- *     description="Récupère la liste de tous les produits disponibles dans un centre de distribution spécifique, avec leurs détails et quantités en stock. Les noms et descriptions des produits sont automatiquement traduits selon la langue de l'utilisateur authentifié (français par défaut, anglais disponible).",
+ *     description="Récupère la liste de tous les produits disponibles dans un centre de distribution spécifique, avec leurs détails et quantités en stock. Les noms, descriptions et spécifications techniques des produits sont automatiquement traduits selon la langue de l'utilisateur authentifié (français par défaut, anglais disponible). Les spécifications incluent des propriétés comme 'Capacité', 'Hauteur', 'Poids', etc. en français ou 'Capacity', 'Height', 'Weight', etc. en anglais.",
  *     operationId="api.distribution-centers.products",
  *     tags={"Centres de Distribution"},
  *     security={{"bearerAuth":{}}},

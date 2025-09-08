@@ -201,10 +201,10 @@ class BottleType extends Model implements HasMedia
     protected function getDefaultSpecifications(): array
     {
         return [
-            ['name' => 'capacity', 'name_en' => 'capacity', 'value' => (string) $this->capacity, 'unit' => 'L'],
-            ['name' => 'height', 'name_en' => 'height', 'value' => (string) $this->height, 'unit' => 'cm'],
-            ['name' => 'weight', 'name_en' => 'weight', 'value' => (string) $this->weight, 'unit' => 'kg'],
-            ['name' => 'radius', 'name_en' => 'radius', 'value' => (string) $this->radius, 'unit' => 'cm'],
+            ['name' => __('capacity'), 'name_en' => 'capacity', 'value' => (string) $this->capacity, 'unit' => 'L'],
+            ['name' => __('height'), 'name_en' => 'height', 'value' => (string) $this->height, 'unit' => 'cm'],
+            ['name' => __('weight'), 'name_en' => 'weight', 'value' => (string) $this->weight, 'unit' => 'kg'],
+            ['name' => __('radius'), 'name_en' => 'radius', 'value' => (string) $this->radius, 'unit' => 'cm'],
         ];
     }
 }
