@@ -24,7 +24,7 @@ return [
     'order_status_message' => 'Your order **#:order_number** status is: **:status**',
     'default_user_name' => 'User',
     'unknown_customer' => 'Unknown Customer',
-    
+
     'order_details' => 'Order Details',
     'order_number' => 'Order Number',
     'order_status' => 'Status',

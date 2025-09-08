@@ -19,7 +19,6 @@ use App\Listeners\LogOrderDelivered;
 use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
 use App\Listeners\Order\AssignDeliveryPersonToOrderListener;
-use App\Listeners\SendOrderStatusChangedNotification;
 use App\Listeners\SendPasswordUpdatedNotification;
 use App\Listeners\UpdateBottleStatusAndMovementOnOrderDelivered;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;

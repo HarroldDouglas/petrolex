@@ -7,7 +7,6 @@ use Spatie\Enum\Laravel\Enum;
 /**
  * @method static self NORMAL()
  * @method static self FAST()
- * @method label(): string
  */
 class DeliveryType extends Enum
 {
@@ -42,14 +41,6 @@ class DeliveryType extends Enum
             'normal' => 500,
             'fast' => 1000,
         ];
-    }
-
-    /**
-     * Get the label for this delivery type instance.
-     */
-    public function label(): string
-    {
-        return static::labels()[$this->value];
     }
 
     /**

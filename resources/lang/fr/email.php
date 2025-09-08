@@ -21,10 +21,10 @@ return [
     // Order notification emails - Simple unified approach
     'order_notification_subject' => 'Commande #:order_number',
     'order_greeting' => 'Bonjour :user_name,',
-    'order_status_message' => 'Votre commande **#:order_number** a le statut : **:status**',
+    'order_status_message' => 'Votre commande **#:order_number** a désormais le statut : **:status**',
     'default_user_name' => 'Utilisateur',
     'unknown_customer' => 'Client inconnu',
-    
+
     'order_details' => 'Détails de la commande',
     'order_number' => 'Numéro de commande',
     'order_status' => 'Statut',

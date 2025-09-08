@@ -35,7 +35,8 @@ class NotificationServiceTest extends TestCase
         $this->notificationService = $this->app->make(NotificationService::class);
         $this->user = User::factory()->create();
 
-        // Create order with required dependencies
+        // Create order with required dependencies (disable observers to avoid event firing)
+        \App\Models\Order::unsetEventDispatcher();
         $customer = Customer::factory()->create();
         $distributionCenter = DistributionCenter::factory()->create();
         $this->order = Order::factory()->create([
@@ -132,6 +133,7 @@ class NotificationServiceTest extends TestCase
     {
         Notification::fake();
 
+        \App\Models\Order::unsetEventDispatcher();
         $distributionCenter = DistributionCenter::factory()->create();
         $customer = Customer::factory()->create();
         $order = Order::factory()->create([

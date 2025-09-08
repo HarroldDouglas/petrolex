@@ -19,7 +19,7 @@ class OrderStatusChanged
         public ?string $oldStatus = null,
         public ?string $newStatus = null
     ) {
-        
+
         $this->newStatus = $this->newStatus ?? $order->status;
     }
 }

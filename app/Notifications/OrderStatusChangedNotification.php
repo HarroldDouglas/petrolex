@@ -46,14 +46,14 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
             'message' => __('email.order_status_changed_message', [
                 'order_number' => $this->order->order_number,
                 'old_status' => $this->getStatusLabel($this->oldStatus),
-                'new_status' => $this->getStatusLabel($this->newStatus)
+                'new_status' => $this->getStatusLabel($this->newStatus),
             ]),
         ];
     }
 
     private function getStatusLabel(?string $status): string
     {
-        if (!$status) {
+        if (! $status) {
             return '';
         }
 

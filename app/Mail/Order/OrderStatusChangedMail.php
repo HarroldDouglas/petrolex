@@ -24,7 +24,7 @@ class OrderStatusChangedMail extends Mailable
     public function envelope(): Envelope
     {
         $orderNumber = $this->order->order_number;
-        
+
         return new Envelope(
             to: [$this->user->email],
             subject: __('email.order_notification_subject', ['order_number' => $orderNumber]),
