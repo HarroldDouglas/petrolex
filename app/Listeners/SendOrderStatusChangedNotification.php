@@ -5,7 +5,6 @@ namespace App\Listeners;
 use App\Enums\OrderStatus;
 use App\Events\OrderStatusChanged;
 use App\Notifications\OrderStatusChangedNotification;
-use Doctrine\Common\Annotations\Annotation\Enum;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -74,7 +73,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
     private function addDistributionCenterManagerToRecipients($recipients, $order): void
     {
         $manager = $order->distributionCenter?->manager;
-       
+
         if ($manager?->email) {
             $recipients->push($manager);
             Log::info('Added distribution center manager to recipients', [
@@ -100,7 +99,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
     private function addDeliveryPersonToRecipientsIfNeeded($recipients, $order): void
     {
         // Only add delivery person if order is In Progress and has one assigned and has a valid email
-        if($order->status === OrderStatus::InProgress()->value) {
+        if ($order->status === OrderStatus::PROCESSING()->value) {
             $deliveryPerson = $order->deliveryPerson?->user;
             if ($deliveryPerson?->email) {
                 $recipients->push($deliveryPerson);
@@ -113,7 +112,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
                     'order_id' => $order->id,
                     'has_delivery_person' => (bool) $order->deliveryPerson,
                     'has_user' => $order->deliveryPerson ? (bool) $order->deliveryPerson->user : false,
-                        'has_email' => $order->deliveryPerson && $order->deliveryPerson->user ? (bool) $order->deliveryPerson->user->email : false,
+                    'has_email' => $order->deliveryPerson && $order->deliveryPerson->user ? (bool) $order->deliveryPerson->user->email : false,
                 ]);
             }
 

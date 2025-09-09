@@ -22,14 +22,14 @@ class OrderStatusChangedMail extends Mailable
     ) {
         if ($this->user->language) {
             app()->setLocale($this->user->language);
-        }   
+        }
     }
-   
+
     public function envelope(): Envelope
     {
         $orderNumber = $this->order->order_number;
 
-        if (!$this->user->email) {
+        if (! $this->user->email) {
             throw new \InvalidArgumentException("User {$this->user->id} does not have a valid email address");
         }
 
