@@ -2,6 +2,7 @@
 
 namespace App\Mail\Order;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -17,8 +18,8 @@ class OrderStatusChangedMail extends Mailable
     public function __construct(
         public Order $order,
         public User $user,
-        public ?string $oldStatus = null,
-        public ?string $newStatus = null
+        public ?OrderStatus $oldStatus = null,
+        public ?OrderStatus $newStatus = null
     ) {
         if ($this->user->language) {
             app()->setLocale($this->user->language);

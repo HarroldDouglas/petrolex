@@ -17,9 +17,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
     public function handle(OrderStatusChanged $event): void
     {
         $order = $event->order;
-
         $recipients = $this->getRecipients($order);
-
         $validRecipients = $this->filterValidRecipients($recipients);
 
         Log::info('Recipients found', ['count' => $validRecipients->count(),

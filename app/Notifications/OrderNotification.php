@@ -27,7 +27,7 @@ class OrderNotification extends Notification
             'customer_name' => $this->order->customer->name,
             'total_amount' => $this->order->total_amount,
             'message' => $this->generateMessage(),
-            'url' => url('/orders/'.$this->order->id),
+            'url' => route('orders.details', $this->order->id),
         ];
     }
 
