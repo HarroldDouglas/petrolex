@@ -14,7 +14,7 @@
 
     <p>{{ __('email.order_status_message', [
         'order_number' => $order->order_number,
-        'status' => \App\Enums\OrderStatus::labels()[strtoupper($order->status)] ?? ucfirst($order->status)
+        'status' => $order->status->label ?? ucfirst($order->status)
     ]) }}</p>
 
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">

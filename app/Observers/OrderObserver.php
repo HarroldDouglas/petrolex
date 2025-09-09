@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\OrderStatus;
 use App\Events\OrderStatusChanged;
 use App\Models\Order;
 
@@ -19,7 +20,10 @@ class OrderObserver
             $oldStatus = $order->getOriginal('status');
             $newStatus = $order->status;
 
-            event(new OrderStatusChanged($order, $oldStatus, $newStatus));
+            // The original status is a string, convert to enum
+            $oldStatusEnum = $oldStatus ? OrderStatus::from($oldStatus) : null;
+
+            event(new OrderStatusChanged($order, $oldStatusEnum, $newStatus));
         }
     }
 }

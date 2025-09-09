@@ -46,8 +46,8 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
             'total_amount' => $this->order->total_amount,
             'message' => __('email.order_status_changed_message', [
                 'order_number' => $this->order->order_number,
-                'old_status' => OrderStatus::from($this->oldStatus)->label,
-                'new_status' => OrderStatus::from($this->newStatus)->label,
+                'old_status' => $this->oldStatus ? $this->oldStatus->label : 'Unknown',
+                'new_status' => $this->newStatus ? $this->newStatus->label : 'Unknown',
             ]),
         ];
     }
