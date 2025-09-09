@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    <p>{{ __('email.order_greeting', ['user_name' => $user->fullname ?? __('email.default_user_name')]) }}</p>
+    <p>{{ __('email.order_greeting', ['user_name' => $user->fullname ]) }}</p>
 
     <p>{{ __('email.order_status_message', [
         'order_number' => $order->order_number,

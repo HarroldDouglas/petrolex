@@ -12,6 +12,7 @@ use App\Enums\ProductType;
 use App\Events\EmptyBottleReturnedEvent;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
+use Illuminate\Support\Facades\Event;
 use App\Models\AccessoryType;
 use App\Models\Bottle;
 use App\Models\BottleType;
@@ -25,7 +26,6 @@ use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Event;
 
 class OrderService extends BaseServiceForEntity
 {
@@ -169,9 +169,18 @@ class OrderService extends BaseServiceForEntity
             return null;
         }
 
-        /** @var \App\Models\Order $updatedOrder */
-        $updatedOrder = parent::update($order, ['status' => OrderStatus::DELIVERED()->value]);
+        $oldStatus = $order->status;
 
+        /** @var \App\Models\Order $updatedOrder */
+        // Update without triggering observer events to avoid duplicate notifications
+        $updatedOrder = $order->withoutEvents(function () use ($order) {
+            return parent::update($order, ['status' => OrderStatus::DELIVERED()->value]);
+        });
+
+        // Manually dispatch the status changed event for notifications
+        Event::dispatch(new \App\Events\OrderStatusChanged($updatedOrder, $oldStatus, $updatedOrder->status));
+        
+        // Dispatch the delivered event for other business logic (bottle movements, etc.)
         Event::dispatch(new OrderDeliveredEvent($updatedOrder));
 
         return $updatedOrder;
