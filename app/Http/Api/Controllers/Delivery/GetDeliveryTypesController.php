@@ -15,13 +15,11 @@ class GetDeliveryTypesController extends Controller
      */
     public function __invoke(): ApiResponse
     {
-        $labels = DeliveryType::labels();
-
         $deliveryTypes = collect(DeliveryType::cases())
-            ->map(function ($case) use ($labels) {
+            ->map(function ($case) {
                 return [
                     'value' => $case->value,
-                    'label' => $labels[$case->value] ?? $case->value,
+                    'label' => $case->label,
                     'fee' => $case->fee(),
                 ];
             })->toArray();

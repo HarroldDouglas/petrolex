@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -16,8 +17,8 @@ class OrderStatusChanged
      */
     public function __construct(
         public Order $order,
-        public ?string $oldStatus = null,
-        public ?string $newStatus = null
+        public ?OrderStatus $oldStatus = null,
+        public ?OrderStatus $newStatus = null
     ) {
 
         $this->newStatus = $this->newStatus ?? $order->status;

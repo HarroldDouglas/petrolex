@@ -16,8 +16,8 @@ class DeliveryType extends Enum
     public static function labels(): array
     {
         return [
-            'normal' => 'Standard',
-            'fast' => 'Express',
+            'NORMAL' => 'Standard',
+            'FAST' => 'Express',
         ];
     }
 

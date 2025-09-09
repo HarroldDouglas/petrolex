@@ -1,11 +1,3 @@
-@php
-    // Set locale based on user language
-    $currentLocale = app()->getLocale();
-    if (isset($user) && $user->language) {
-        app()->setLocale($user->language);
-    }
-@endphp
-
 @extends('emails.layout')
 
 @section('title', __('email.order_notification_subject', ['order_number' => $order->order_number]))
@@ -18,8 +10,8 @@
 @endsection
 
 @section('content')
-    <p>{{ __('email.order_greeting', ['user_name' => $user->name ?? __('email.default_user_name')]) }}</p>
-    
+    <p>{{ __('email.order_greeting', ['user_name' => $user->fullname ?? __('email.default_user_name')]) }}</p>
+
     <p>{{ __('email.order_status_message', [
         'order_number' => $order->order_number,
         'status' => \App\Enums\OrderStatus::labels()[strtoupper($order->status)] ?? ucfirst($order->status)
@@ -38,17 +30,5 @@
         @endif
     </div>
 
-    <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ url('/orders/' . $order->id . '/details') }}" 
-           style="background-color: #227093; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-            {{ __('email.view_order_button') }}
-        </a>
-    </div>
-
     <p>{{ __('email.order_footer_message') }}</p>
 @endsection
-
-@php
-    // Restore original locale
-    app()->setLocale($currentLocale);
-@endphp

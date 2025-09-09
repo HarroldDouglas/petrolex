@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\OrderStatus;
 use App\Mail\Order\OrderStatusChangedMail;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
@@ -14,13 +15,13 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
 
     public function __construct(
         public Order $order,
-        public ?string $oldStatus = null,
-        public ?string $newStatus = null
+        public ?OrderStatus $oldStatus = null,
+        public ?OrderStatus $newStatus = null
     ) {}
 
     public function via($notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail($notifiable)
@@ -45,18 +46,9 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
             'total_amount' => $this->order->total_amount,
             'message' => __('email.order_status_changed_message', [
                 'order_number' => $this->order->order_number,
-                'old_status' => $this->getStatusLabel($this->oldStatus),
-                'new_status' => $this->getStatusLabel($this->newStatus),
+                'old_status' => OrderStatus::from($this->oldStatus)->label,
+                'new_status' => OrderStatus::from($this->newStatus)->label,
             ]),
         ];
-    }
-
-    private function getStatusLabel(?string $status): string
-    {
-        if (! $status) {
-            return '';
-        }
-
-        return \App\Enums\OrderStatus::labels()[strtoupper($status)] ?? ucfirst($status);
     }
 }

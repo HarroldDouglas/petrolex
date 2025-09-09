@@ -27,7 +27,7 @@ class CancelOrderController extends Controller
         $data = [
             'cancelled_reason' => $request->validated()['cancelled_reason'],
             'cancelled_by' => (int) $request->validated()['cancelled_by'],
-            'status' => OrderStatus::CANCELLED()->value,
+            'status' => OrderStatus::CANCELLED(),
             'cancelled_at' => now(),
         ];
 
