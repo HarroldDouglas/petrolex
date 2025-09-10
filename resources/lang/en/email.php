@@ -35,7 +35,96 @@ return [
     'view_order_button' => 'View Order',
     'order_footer_message' => 'Thank you for choosing our services.',
 
-    // Order notification emails
+    // Specific Order Status Email Translations
+
+    // Order Created
+    'order_created_subject' => 'New Order #:order_number Created',
+    'order_created_message' => 'Your order **#:order_number** has been successfully created!',
+    'order_created_footer_message' => 'We will process your order as soon as possible.',
+    'order_created_note' => 'You will receive a notification as soon as your order is confirmed.',
+
+    // Order Confirmed
+    'order_confirmed_subject' => 'Order #:order_number Confirmed',
+    'order_confirmed_message' => 'Great news! Your order **#:order_number** has been confirmed.',
+    'order_confirmed_footer_message' => 'Your order is now being prepared.',
+    'order_confirmed_next_steps' => 'Your order will soon be assigned to a delivery person.',
+    'order_confirmed_at' => 'Confirmed on',
+
+    // Order Processing
+    'order_processing_subject' => 'Order #:order_number Out for Delivery',
+    'order_processing_message' => 'Your order **#:order_number** is now out for delivery!',
+    'order_processing_footer_message' => 'Your delivery person will contact you soon.',
+    'order_processing_delivery_info' => 'Estimated delivery within 2-4 hours depending on delivery type.',
+    'order_processing_at' => 'Out for delivery on',
+    'delivery_person' => 'Delivery Person',
+    'delivery_person_phone' => 'Delivery Person Phone',
+    'estimated_delivery' => 'Estimated Delivery',
+
+    // Order Delivered
+    'order_delivered_subject' => 'Order #:order_number Delivered!',
+    'order_delivered_celebration' => 'Delivery Successful!',
+    'order_delivered_message' => 'We are happy to confirm that your order **#:order_number** has been successfully delivered!',
+    'order_delivered_footer_message' => 'Thank you for choosing our services!',
+    'order_delivered_feedback_message' => 'We value your feedback! Rate your experience in the app.',
+    'delivery_details' => 'Delivery Details',
+    'delivered_by' => 'Delivered by',
+    'feedback_request' => '⭐ Leave Feedback',
+    'thank_you_for_business' => 'Thank you for your business!',
+
+    // Order Cancelled
+    'order_cancelled_subject' => 'Order #:order_number Cancelled',
+    'order_cancelled_message' => 'We regret to inform you that your order **#:order_number** has been cancelled.',
+    'order_cancelled_footer_message' => 'We apologize for any inconvenience caused.',
+    'order_cancelled_refund_message' => 'If payment was made, refund will be processed within 3-5 business days.',
+    'cancellation_details' => 'Cancellation Details',
+    'order_cancelled_at' => 'Cancelled on',
+    'cancellation_reason' => 'Cancellation Reason',
+    'refund_info' => 'Refund Information',
+    'contact_support_message' => 'Our support team is available to assist you.',
+
+    // Order Pending Payment
+    'order_pending_subject' => 'Payment Pending - Order #:order_number',
+    'order_pending_message' => 'Your order **#:order_number** is pending payment.',
+    'order_pending_footer_message' => 'Complete your payment so we can process your order.',
+    'order_pending_payment_warning' => 'Your order will be automatically cancelled if payment is not completed within 24 hours.',
+    'order_pending_timeout_warning' => 'This order will automatically expire in 24 hours without payment.',
+    'payment_details' => 'Payment Details',
+    'complete_payment_now' => 'Complete Payment Now',
+    'urgent' => 'Urgent',
+
+    // Order Paid
+    'order_paid_subject' => 'Payment Confirmed - Order #:order_number',
+    'payment_confirmed' => 'Payment Confirmed',
+    'order_paid_message' => 'Perfect! Payment for your order **#:order_number** has been confirmed.',
+    'order_paid_footer_message' => 'Your order will now be processed quickly.',
+    'order_paid_next_steps' => 'Your order will be confirmed and assigned to a delivery person shortly.',
+    'payment_confirmation_details' => 'Payment Confirmation Details',
+    'amount_paid' => 'Amount Paid',
+    'payment_date' => 'Payment Date',
+    'payment_receipt' => '🧾 Payment Receipt',
+    'keep_receipt_message' => 'Keep this email as receipt of your payment.',
+
+    // Order Payment Failed
+    'order_payment_failed_subject' => 'Payment Failed - Order #:order_number',
+    'order_payment_failed_message' => 'Payment for your order **#:order_number** has failed.',
+    'order_payment_failed_footer_message' => 'Please retry payment to continue with your order.',
+    'payment_failure_details' => 'Payment Failure Details',
+    'failure_date' => 'Failure Date',
+    'possible_reasons' => 'Possible Reasons',
+    'insufficient_funds' => 'Insufficient funds',
+    'expired_card' => 'Expired card',
+    'network_issue' => 'Network issue',
+    'bank_decline' => 'Bank decline',
+    'retry_payment_now' => 'Retry Payment Now',
+    'payment_support_message' => 'Our team can help you with payment issues.',
+
+    // Common elements
+    'order_date' => 'Order Date',
+    'next_steps' => 'Next Steps',
+    'need_help' => 'Need Help?',
+    'note' => 'Note',
+
+    // Legacy Order notification emails
     'order_created_customer_subject' => 'Order Confirmation #:order_number',
     'order_created_customer_greeting' => 'Hello :customer_name,',
     'order_created_customer_message' => 'Your order #:order_number has been successfully created and is being processed.',

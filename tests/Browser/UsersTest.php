@@ -193,7 +193,7 @@ class UsersTest extends DuskTestCase
             $browser->visit('/users/'.$user->id.'/details')
                 ->pause(2000)
                 ->screenshot('user_details')
-                ->assertSee($user->name)
+                ->assertSee($user->fullname)
                 ->assertSee($user->email);
 
             echo "✅ Détails utilisateur affichés avec succès\n";

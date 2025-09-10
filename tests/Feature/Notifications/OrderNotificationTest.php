@@ -32,27 +32,6 @@ class OrderNotificationTest extends TestCase
         }
     }
 
-    public function test_order_status_changed_event_is_dispatched_when_order_is_created()
-    {
-        Event::fake([OrderStatusChanged::class]);
-
-        // Create necessary related models first
-        $customerUser = User::factory()->create();
-        $customer = Customer::factory()->create(['user_id' => $customerUser->id]);
-        $distributionCenter = DistributionCenter::factory()->create();
-
-        $order = Order::factory()->create([
-            'customer_id' => $customer->id,
-            'distribution_center_id' => $distributionCenter->id,
-        ]);
-
-        Event::assertDispatched(OrderStatusChanged::class, function ($event) use ($order) {
-            return $event->order->id === $order->id &&
-                   $event->oldStatus === null &&
-                   $event->newStatus->value === OrderStatus::CONFIRMED()->value; // Default status from factory
-        });
-    }
-
     public function test_order_status_changed_event_is_dispatched_when_order_status_changes()
     {
         // Create necessary related models first
@@ -70,8 +49,9 @@ class OrderNotificationTest extends TestCase
         // Now fake events after creation
         Event::fake([OrderStatusChanged::class]);
 
-        // Update the order status - this should trigger the observer
-        $order->update(['status' => OrderStatus::DELIVERED()]);
+        // Use OrderService to update the order status - this should trigger the event
+        $orderService = app(\App\Services\Order\OrderService::class);
+        $orderService->update($order, ['status' => OrderStatus::DELIVERED()->value]);
 
         Event::assertDispatched(OrderStatusChanged::class, function ($event) use ($order) {
             return $event->order->id === $order->id &&
@@ -119,7 +99,7 @@ class OrderNotificationTest extends TestCase
         $order->saveQuietly(); // Save without firing events
 
         // Now manually trigger the listener
-        $listener = new \App\Listeners\SendOrderStatusChangedNotification;
+        $listener = new \App\Listeners\Order\SendOrderStatusChangedNotification;
         $listener->handle(new OrderStatusChanged($order, OrderStatus::PENDING(), OrderStatus::DELIVERED()));
 
         Notification::assertSentTo($customerUser, OrderStatusChangedNotification::class);

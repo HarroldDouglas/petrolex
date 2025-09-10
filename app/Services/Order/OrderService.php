@@ -12,7 +12,7 @@ use App\Enums\ProductType;
 use App\Events\EmptyBottleReturnedEvent;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
-use Illuminate\Support\Facades\Event;
+use App\Events\OrderStatusChanged;
 use App\Models\AccessoryType;
 use App\Models\Bottle;
 use App\Models\BottleType;
@@ -26,6 +26,7 @@ use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 
 class OrderService extends BaseServiceForEntity
 {
@@ -169,21 +170,11 @@ class OrderService extends BaseServiceForEntity
             return null;
         }
 
-        $oldStatus = $order->status;
-
-        /** @var \App\Models\Order $updatedOrder */
-        // Update without triggering observer events to avoid duplicate notifications
-        $updatedOrder = $order->withoutEvents(function () use ($order) {
-            return parent::update($order, ['status' => OrderStatus::DELIVERED()->value]);
-        });
-
-        // Manually dispatch the status changed event for notifications
-        Event::dispatch(new \App\Events\OrderStatusChanged($updatedOrder, $oldStatus, $updatedOrder->status));
+        $updatedOrder = $this->update($order, ['status' => OrderStatus::DELIVERED()->value]);
         
-        // Dispatch the delivered event for other business logic (bottle movements, etc.)
         Event::dispatch(new OrderDeliveredEvent($updatedOrder));
 
-        return $updatedOrder;
+        return $updatedOrder instanceof Order ? $updatedOrder : null;
     }
 
     public function getOrderWithGroupedItems(int $orderId): ?OrderDetailsDTO
@@ -301,7 +292,9 @@ class OrderService extends BaseServiceForEntity
             throw new \Exception('Cette commande ne peut pas être annulée');
         }
 
-        return $order->update(['status' => OrderStatus::CANCELLED()->value]);
+        $result = $this->update($order, ['status' => OrderStatus::CANCELLED()->value]);
+
+        return (bool) $result;
     }
 
     /**
@@ -323,6 +316,22 @@ class OrderService extends BaseServiceForEntity
      */
     public function updateOrderStatus(Order $order, OrderStatus $status): void
     {
-        $this->orderRepository->update($order, ['status' => $status->value]);
+        $this->update($order, ['status' => $status->value]);
+    }
+
+    /**
+     * Override the update method to manually dispatch OrderStatusChanged events
+     */
+    public function update(\Illuminate\Database\Eloquent\Model $model, array $data): \Illuminate\Database\Eloquent\Model
+    {
+        $oldStatus = $model->status ?? null;
+
+        $result = parent::update($model, $data);
+        if (isset($data['status']) && $result) {
+            $newStatus = OrderStatus::from($data['status']);
+            Event::dispatch(new OrderStatusChanged($result, $oldStatus, $newStatus));
+        }
+
+        return $result;
     }
 }

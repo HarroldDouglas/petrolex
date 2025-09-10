@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Order;
 
 use App\Enums\OrderStatus;
 use App\Events\OrderStatusChanged;
@@ -20,7 +20,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
         $recipients = $this->getRecipients($order);
         $validRecipients = $this->filterValidRecipients($recipients);
 
-        Log::info('Recipients found', ['count' => $validRecipients->count(),
+        Log::info('Order Recipients found', ['count' => $validRecipients->count(),
             'recipients' => $validRecipients->pluck('email')->toArray(),
         ]);
 

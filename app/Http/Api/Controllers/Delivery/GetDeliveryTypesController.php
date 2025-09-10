@@ -17,11 +17,11 @@ class GetDeliveryTypesController extends Controller
     {
         $deliveryTypes = collect(DeliveryType::cases())
             ->map(function (DeliveryType $case): array {
-            return [
-                'value' => $case->value,
-                'label' => $case->label,
-                'fee' => $case->fee(),
-            ];
+                return [
+                    'value' => $case->value,
+                    'label' => $case->label,
+                    'fee' => $case->fee(),
+                ];
             })->toArray();
 
         return ApiResponse::success(
