@@ -6,10 +6,14 @@ use App\Enums\UserRole;
 use App\Events\OrderCreatedEvent;
 use App\Models\UserDistributionCenter;
 use App\Notifications\OrderCreatedNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Notification;
 
-class SendOrderCreatedNotification
+class SendOrderCreatedNotification implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Handle the event.
      */

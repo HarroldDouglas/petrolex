@@ -4,9 +4,11 @@ namespace App\Listeners\Order;
 
 use App\Enums\OrderStatus;
 use App\Events\OrderStatusChanged;
+use App\Models\Order;
 use App\Notifications\OrderStatusChangedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
@@ -130,7 +132,16 @@ class SendOrderStatusChangedNotification implements ShouldQueue
     /**
      * Send the notification to all valid recipients.
      */
-    private function sendNotification($recipients, $order, $oldStatus, $newStatus): void
+    /**
+     * Send the notification to all valid recipients.
+     *
+     * @param Collection $recipients
+     * @param Order $order
+     * @param OrderStatus|null $oldStatus
+     * @param OrderStatus|null $newStatus
+     * @return void
+     */
+    private function sendNotification(Collection $recipients, Order $order, ?OrderStatus $oldStatus, ?OrderStatus $newStatus): void
     {
         Notification::send(
             $recipients,
