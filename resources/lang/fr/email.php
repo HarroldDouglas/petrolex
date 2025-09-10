@@ -68,7 +68,7 @@ return [
     'order_delivered_feedback_message' => 'Votre avis nous intéresse ! Notez votre expérience dans l\'application.',
     'delivery_details' => 'Détails de la livraison',
     'delivered_by' => 'Livré par',
-    'feedback_request' => '⭐ Donnez votre avis',
+    'feedback_request' => '⭐ Cliquez sur la commande dans l\'application et donnez votre avis',
     'thank_you_for_business' => 'Merci de votre confiance !',
 
     // Order Cancelled

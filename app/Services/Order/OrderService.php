@@ -24,6 +24,7 @@ use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -322,7 +323,7 @@ class OrderService extends BaseServiceForEntity
     /**
      * Override the update method to manually dispatch OrderStatusChanged events
      */
-    public function update(\Illuminate\Database\Eloquent\Model $model, array $data): \Illuminate\Database\Eloquent\Model
+    public function update(Model $model, array $data): Model
     {
         $oldStatus = $model->status ?? null;
 

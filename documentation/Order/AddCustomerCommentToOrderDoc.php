@@ -8,7 +8,10 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/api/orders/{order}/customer-feedback",
  *     summary="Add customer comment and rating to an order",
+ *     description="Allows a customer to add comments and a rating to their order after delivery.",
+ *     operationId="api.orders.addCustomerComment",
  *     tags={"Commandes"},
+ *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
  *         name="order",

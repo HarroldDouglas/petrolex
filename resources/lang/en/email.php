@@ -68,7 +68,7 @@ return [
     'order_delivered_feedback_message' => 'We value your feedback! Rate your experience in the app.',
     'delivery_details' => 'Delivery Details',
     'delivered_by' => 'Delivered by',
-    'feedback_request' => '⭐ Leave Feedback',
+    'feedback_request' => '⭐ Click on the order in the app and give your feedback',
     'thank_you_for_business' => 'Thank you for your business!',
 
     // Order Cancelled
