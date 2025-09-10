@@ -74,7 +74,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="phone_number", type="string", nullable=true, example="677123456", description="Numéro de téléphone sans code pays"),
  *     @OA\Property(property="address", type="string", nullable=true, example="123 Rue Principale, Douala"),
  *     @OA\Property(property="language", type="string", enum={"fr", "en"}, example="fr", description="User's preferred language"),
- *     @OA\Property(property="country", ref="#/components/schemas/Country", nullable=true, description="User's country information including phone code and currency"),
+ *     @OA\Property(property="country", ref="#/components/schemas/Country", nullable=true, description="User's country information including phone code, currency, and decimal places for formatting"),
  *     @OA\Property(
  *           property="delivery_addresses",
  *           type="array",
@@ -129,7 +129,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="code", type="string", example="CM"),
  *     @OA\Property(property="phone_code", type="string", nullable=true, example="+237"),
  *     @OA\Property(property="currency", type="string", nullable=true, example="XAF"),
- *     @OA\Property(property="is_active", type="boolean", example=true)
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="decimal_places", type="integer", example=2, description="Number of decimal places for currency formatting")
  * )
  */
 class BaseSchemas {}

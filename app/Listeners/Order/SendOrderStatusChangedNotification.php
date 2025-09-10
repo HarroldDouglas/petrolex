@@ -134,12 +134,6 @@ class SendOrderStatusChangedNotification implements ShouldQueue
      */
     /**
      * Send the notification to all valid recipients.
-     *
-     * @param Collection $recipients
-     * @param Order $order
-     * @param OrderStatus|null $oldStatus
-     * @param OrderStatus|null $newStatus
-     * @return void
      */
     private function sendNotification(Collection $recipients, Order $order, ?OrderStatus $oldStatus, ?OrderStatus $newStatus): void
     {

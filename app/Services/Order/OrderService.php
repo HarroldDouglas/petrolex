@@ -172,7 +172,7 @@ class OrderService extends BaseServiceForEntity
         }
 
         $updatedOrder = $this->update($order, ['status' => OrderStatus::DELIVERED()->value]);
-        
+
         Event::dispatch(new OrderDeliveredEvent($updatedOrder));
 
         return $updatedOrder instanceof Order ? $updatedOrder : null;

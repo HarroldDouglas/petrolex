@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  *
  * // Accessors
  * @property-read int $total_stock
+ * @property-read int $available_stock
  *
  * // Query Scopes
  */

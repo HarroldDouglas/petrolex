@@ -56,6 +56,7 @@ class UserResource extends JsonResource
                     'code' => $user->country->code,
                     'phone_code' => $user->country->phone_code,
                     'currency' => $user->country->currency,
+                    'decimal_places' => config('countries.default_decimal_places'),
                     'is_active' => $user->country->is_active,
                 ];
             }),

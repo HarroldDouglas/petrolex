@@ -79,7 +79,6 @@ class GetProductsControllerTest extends TestCase
                     $specification = $bottleProduct['specifications'][0];
                     $this->assertArrayHasKey('name', $specification);
                     $this->assertArrayHasKey('value', $specification);
-                    $this->assertArrayHasKey('unit', $specification);
 
                     // Check that specification names are in French
                     $specificationNames = collect($bottleProduct['specifications'])->pluck('name')->toArray();
@@ -101,7 +100,6 @@ class GetProductsControllerTest extends TestCase
                     $specification = $accessoryProduct['specifications'][0];
                     $this->assertArrayHasKey('name', $specification);
                     $this->assertArrayHasKey('value', $specification);
-                    $this->assertArrayHasKey('unit', $specification);
                 }
             }
         }
@@ -139,7 +137,6 @@ class GetProductsControllerTest extends TestCase
                     $specification = $bottleProduct['specifications'][0];
                     $this->assertArrayHasKey('name', $specification);
                     $this->assertArrayHasKey('value', $specification);
-                    $this->assertArrayHasKey('unit', $specification);
 
                     // Check that specification names are in English
                     $specificationNames = collect($bottleProduct['specifications'])->pluck('name')->toArray();
@@ -161,7 +158,6 @@ class GetProductsControllerTest extends TestCase
                     $specification = $accessoryProduct['specifications'][0];
                     $this->assertArrayHasKey('name', $specification);
                     $this->assertArrayHasKey('value', $specification);
-                    $this->assertArrayHasKey('unit', $specification);
                 }
             }
         }

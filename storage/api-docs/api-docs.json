@@ -3820,13 +3820,13 @@
                     "login": {
                         "description": "Email ou numéro de téléphone de l'utilisateur (sans code pays si country_code fourni)",
                         "type": "string",
-                        "example": "test@example.com"
+                        "example": "customer1@test.com"
                     },
                     "password": {
                         "description": "Mot de passe",
                         "type": "string",
                         "format": "password",
-                        "example": "password123"
+                        "example": "password"
                     },
                     "country_code": {
                         "description": "Code ISO du pays (optionnel, requis pour login par téléphone)",
@@ -5333,7 +5333,7 @@
                             }
                         ],
                         "nullable": true,
-                        "description": "User's country information including phone code and currency"
+                        "description": "User's country information including phone code, currency, and decimal places for formatting"
                     },
                     "delivery_addresses": {
                         "description": "User's delivery addresses (array of delivery address objects, only for customers)",
@@ -5522,6 +5522,11 @@
                     "is_active": {
                         "type": "boolean",
                         "example": true
+                    },
+                    "decimal_places": {
+                        "description": "Number of decimal places for currency formatting",
+                        "type": "integer",
+                        "example": 2
                     }
                 },
                 "type": "object"
@@ -6064,15 +6069,9 @@
                         "example": "Hauteur"
                     },
                     "value": {
-                        "description": "Valeur de la spécification",
+                        "description": "Valeur de la spécification avec unité combinée",
                         "type": "string",
-                        "example": "40.00"
-                    },
-                    "unit": {
-                        "description": "Unité de mesure",
-                        "type": "string",
-                        "example": "cm",
-                        "nullable": true
+                        "example": "40.00 cm"
                     }
                 },
                 "type": "object"
