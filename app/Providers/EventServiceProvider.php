@@ -19,6 +19,7 @@ use App\Listeners\LogOrderDelivered;
 use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
 use App\Listeners\Order\AssignDeliveryPersonToOrderListener;
+use App\Listeners\Order\SendOrderCreatedNotification;
 use App\Listeners\SendPasswordUpdatedNotification;
 use App\Listeners\UpdateBottleStatusAndMovementOnOrderDelivered;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -50,15 +51,11 @@ class EventServiceProvider extends ServiceProvider
         DistributionCenterUpdatedEvent::class => [
             LogDistributionCenterUpdated::class,
         ],
-        \App\Events\OrderStatusChanged::class => [
-            \App\Listeners\Order\SendOrderStatusChangedNotificationToCustomer::class,
-            \App\Listeners\Order\SendOrderStatusChangedNotificationToDeliveryPerson::class,
-            \App\Listeners\Order\SendOrderStatusChangedNotificationToManager::class,
-        ],
         OrderCreatedEvent::class => [
             AddOrderItemsToOrderListener::class,
             LogOrderCreatedListener::class,
             AssignDeliveryPersonToOrderListener::class,
+            SendOrderCreatedNotification::class,
         ],
         CustomerCreatedEvent::class => [
             LogCustomerCreatedListener::class,

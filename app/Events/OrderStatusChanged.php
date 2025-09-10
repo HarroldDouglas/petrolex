@@ -17,6 +17,10 @@ class OrderStatusChanged
      */
     public function __construct(
         public Order $order,
-        public OrderStatus $oldStatus
-    ) {}
+        public ?OrderStatus $oldStatus = null,
+        public ?OrderStatus $newStatus = null
+    ) {
+
+        $this->newStatus = $this->newStatus ?? $order->status;
+    }
 }

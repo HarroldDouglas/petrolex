@@ -2287,7 +2287,8 @@
                     "Commandes"
                 ],
                 "summary": "Add customer comment and rating to an order",
-                "operationId": "fedbc61d1edd81c4908599f282988dec",
+                "description": "Allows a customer to add comments and a rating to their order after delivery.",
+                "operationId": "api.orders.addCustomerComment",
                 "parameters": [
                     {
                         "name": "order",
@@ -2362,7 +2363,12 @@
                     "422": {
                         "description": "Validation error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/orders/{order}/deliver": {

@@ -23,6 +23,7 @@ class CancelOrderController extends Controller
      */
     public function __invoke(CancelOrderRequest $request, Order $order): CancelOrderResponse
     {
+        // Update the order with cancellation details
         $data = [
             'cancelled_reason' => $request->input('cancelled_reason'),
             'cancelled_by' => (int) $request->input('cancelled_by'),
@@ -30,8 +31,8 @@ class CancelOrderController extends Controller
             'cancelled_at' => now(),
         ];
 
-        $order = $this->orderService->update($order, $data);
+        $updatedOrder = $this->orderService->update($order, $data);
 
-        return CancelOrderResponse::withOrder($order);
+        return CancelOrderResponse::withOrder($updatedOrder);
     }
 }

@@ -33,7 +33,7 @@ class UserFactory extends Factory
         return [
             'first_name' => $firstName,
             'last_name' => $lastName,
-            'email' => strtolower($firstName.'.'.$lastName.'@example.com'),
+            'email' => strtolower(str_replace(' ', '', $firstName).'.'.str_replace(' ', '', $lastName).'@example.com'),
             'phone_number' => '6'.fake()->numerify('#########'),
             'address' => fake()->address(),
             'country_id' => $cameroon?->id,
