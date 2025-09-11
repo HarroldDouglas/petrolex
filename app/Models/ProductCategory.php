@@ -130,4 +130,80 @@ class ProductCategory extends Model
     {
         return $query->where('product_type', ProductType::ACCESSORY());
     }
+
+    // ===== ADDITIONAL METHODS =====
+
+    /**
+     * Get the images for the product from the product type instance
+     *
+     * @return array<array{url: string, thumb: string, medium: string, large: string, is_default: bool}>
+     */
+    public function getImages(): array
+    {
+        $productTypeInstance = $this->productTypeInstance;
+
+        if (!$productTypeInstance) {
+            return [];
+        }
+
+        // Get all images from the 'images' collection
+        $media = $productTypeInstance->getMedia('images');
+        
+        if ($media->isEmpty()) {
+            return [];
+        }
+
+        $images = [];
+        foreach ($media as $index => $mediaItem) {
+            $images[] = [
+                'url' => $mediaItem->getUrl(),
+                'thumb' => $mediaItem->getUrl('thumb'),
+                'medium' => $mediaItem->getUrl('medium'),
+                'large' => $mediaItem->getUrl('large'),
+                'is_default' => $index === 0, // First image is default
+            ];
+        }
+
+        return $images;
+    }
+
+    /**
+     * Get the default price for the product category
+     */
+    public function getDefaultPrice(): string
+    {
+        return match ($this->product_type) {
+            ProductType::BOTTLE() => $this->getDefaultBottlePrice(),
+            ProductType::ACCESSORY() => $this->getDefaultAccessoryPrice(),
+            default => '0',
+        };
+    }
+
+    /**
+     * Helper method to get default bottle price (full price)
+     */
+    private function getDefaultBottlePrice(): string
+    {
+        $bottleType = $this->productTypeInstance;
+
+        if (!$bottleType) {
+            return '0';
+        }
+
+        return number_format((float) $bottleType->full_price, config('countries.default_decimal_places'), '.', '');
+    }
+
+    /**
+     * Helper method to get default accessory price
+     */
+    private function getDefaultAccessoryPrice(): string
+    {
+        $accessoryType = $this->productTypeInstance;
+
+        if (!$accessoryType) {
+            return '0';
+        }
+
+        return number_format((float) $accessoryType->price, config('countries.default_decimal_places'), '.', '');
+    }
 }

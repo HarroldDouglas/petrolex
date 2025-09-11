@@ -16,7 +16,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $category_name
  * @property int $quantity
  * @property array $specifications
- * @property array<array{value: string, label: string, price: string}>|null $options
+ * @property array<array{value: string, label: string, price: string, is_default: bool}>|null $options
+ * @property array<array{url: string, thumb: string, medium: string, large: string, is_default: bool}> $images
+ * @property string $price
  */
 class ProductResource extends JsonResource
 {
@@ -38,7 +40,9 @@ class ProductResource extends JsonResource
             'description' => $productTypeInstance->getLocalizedDescription(),
             'category_name' => $productCategory->product_type->labelForMobile(),
             'quantity' => $this->getQuantity(),
+            'price' => $productCategory->getDefaultPrice(),
             'specifications' => $productTypeInstance->specifications ?? [],
+            'images' => $productCategory->getImages(),
         ];
 
         $specificData = match ($productCategory->product_type) {
@@ -60,6 +64,7 @@ class ProductResource extends JsonResource
                     'value' => 'default',
                     'label' => 'default',
                     'price' => number_format((float) $accessoryType->price, config('countries.default_decimal_places'), '.', ''),
+                    'is_default' => true,
                 ],
             ],
         ];
@@ -75,11 +80,13 @@ class ProductResource extends JsonResource
                     'value' => BottleOrderType::FULL()->value,
                     'label' => BottleOrderType::FULL()->getLocalizedLabel(),
                     'price' => number_format((float) $bottleType->full_price, config('countries.default_decimal_places'), '.', ''),
+                    'is_default' => true,
                 ],
                 [
                     'value' => BottleOrderType::RECHARGE()->value,
                     'label' => BottleOrderType::RECHARGE()->getLocalizedLabel(),
                     'price' => number_format((float) $bottleType->content_price, config('countries.default_decimal_places'), '.', ''),
+                    'is_default' => false,
                 ],
             ],
         ];

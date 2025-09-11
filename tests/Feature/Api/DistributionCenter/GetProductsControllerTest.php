@@ -59,6 +59,23 @@ class GetProductsControllerTest extends TestCase
                             'unit',
                         ],
                     ],
+                    'images' => [
+                        '*' => [
+                            'url',
+                            'thumb',
+                            'medium',
+                            'large',
+                            'is_default',
+                        ],
+                    ],
+                    'options' => [
+                        '*' => [
+                            'value',
+                            'label',
+                            'price',
+                            'is_default',
+                        ],
+                    ],
                 ],
             ],
         ]);
@@ -180,5 +197,63 @@ class GetProductsControllerTest extends TestCase
 
         // Assert
         $response->assertNotFound();
+    }
+
+    public function test_products_include_images_array(): void
+    {
+        // Act
+        $response = $this->actingAs($this->customer, 'sanctum')
+            ->getJson("/api/distribution-centers/{$this->distributionCenter->id}/products");
+
+        // Assert
+        $response->assertSuccessful();
+        
+        $products = $response->json('data');
+        if (!empty($products)) {
+            // Check that every product has an images array
+            foreach ($products as $product) {
+                $this->assertArrayHasKey('images', $product);
+                $this->assertIsArray($product['images']);
+                
+                // If there are images, check their structure
+                foreach ($product['images'] as $image) {
+                    $this->assertArrayHasKey('url', $image);
+                    $this->assertArrayHasKey('thumb', $image);
+                    $this->assertArrayHasKey('medium', $image);
+                    $this->assertArrayHasKey('large', $image);
+                    $this->assertArrayHasKey('is_default', $image);
+                    $this->assertIsBool($image['is_default']);
+                }
+            }
+        }
+    }
+
+    public function test_products_include_options_array(): void
+    {
+        // Act
+        $response = $this->actingAs($this->customer, 'sanctum')
+            ->getJson("/api/distribution-centers/{$this->distributionCenter->id}/products");
+
+        // Assert
+        $response->assertSuccessful();
+        
+        $products = $response->json('data');
+        if (!empty($products)) {
+            // Check that every product has an options array
+            foreach ($products as $product) {
+                $this->assertArrayHasKey('options', $product);
+                $this->assertIsArray($product['options']);
+                
+                // If there are options, check their structure
+                foreach ($product['options'] as $option) {
+                    $this->assertArrayHasKey('value', $option);
+                    $this->assertArrayHasKey('label', $option);
+                    $this->assertArrayHasKey('price', $option);
+                    $this->assertArrayHasKey('is_default', $option);
+                    $this->assertIsBool($option['is_default']);
+                    $this->assertIsString($option['price']);
+                }
+            }
+        }
     }
 }

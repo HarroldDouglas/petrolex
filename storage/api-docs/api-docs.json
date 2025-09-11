@@ -5958,6 +5958,38 @@
                 },
                 "type": "object"
             },
+            "ProductImage": {
+                "title": "Product Image",
+                "description": "Image data for a product with different sizes",
+                "properties": {
+                    "url": {
+                        "description": "URL de l'image originale",
+                        "type": "string",
+                        "example": "https://example.com/storage/images/product1.jpg"
+                    },
+                    "thumb": {
+                        "description": "URL de la miniature (150x150)",
+                        "type": "string",
+                        "example": "https://example.com/storage/images/product1-thumb.jpg"
+                    },
+                    "medium": {
+                        "description": "URL de l'image moyenne (500x500)",
+                        "type": "string",
+                        "example": "https://example.com/storage/images/product1-medium.jpg"
+                    },
+                    "large": {
+                        "description": "URL de la grande image (1200x1200)",
+                        "type": "string",
+                        "example": "https://example.com/storage/images/product1-large.jpg"
+                    },
+                    "is_default": {
+                        "description": "Indique si c'est l'image par défaut",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
             "ProductCategoryData": {
                 "title": "Product Category Data",
                 "description": "Data of a product category",
@@ -6017,11 +6049,23 @@
                         "type": "integer",
                         "example": 40
                     },
+                    "price": {
+                        "description": "Prix par défaut du produit",
+                        "type": "string",
+                        "example": "5000.00"
+                    },
                     "specifications": {
                         "description": "Spécifications techniques du produit (traduites selon la langue de l'utilisateur)",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/ProductSpecification"
+                        }
+                    },
+                    "images": {
+                        "description": "Images du produit avec différentes tailles",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductImage"
                         }
                     }
                 },
@@ -6058,6 +6102,41 @@
                 "type": "object"
             },
             "AccessoryProduct": {
+                "properties": {
+                    "options": {
+                        "description": "Options d'achat disponibles pour l'accessoire",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AccessoryOption"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "AccessoryOption": {
+                "description": "Option d'achat pour un accessoire",
+                "properties": {
+                    "value": {
+                        "description": "Type d'option",
+                        "type": "string",
+                        "example": "default"
+                    },
+                    "label": {
+                        "description": "Libellé de l'option",
+                        "type": "string",
+                        "example": "default"
+                    },
+                    "price": {
+                        "description": "Prix de l'option",
+                        "type": "string",
+                        "example": "500.00"
+                    },
+                    "is_default": {
+                        "description": "Indique si c'est l'option par défaut",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
                 "type": "object"
             },
             "ProductSpecification": {
@@ -6097,6 +6176,11 @@
                         "description": "Prix de l'option",
                         "type": "string",
                         "example": "5000.00"
+                    },
+                    "is_default": {
+                        "description": "Indique si c'est l'option par défaut",
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"
