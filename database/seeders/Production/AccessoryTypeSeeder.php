@@ -58,7 +58,6 @@ class AccessoryTypeSeeder extends Seeder
                 $accessoryType
             );
 
-            // Add images to accessory types
             $this->addAccessoryImages($accessory);
         }
 
