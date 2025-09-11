@@ -21,7 +21,7 @@ class AssignDeliveryPersonToOrderListener implements ShouldQueue
     {
         $order = $event->order;
         if ($order->delivery_person_id === null) {
-            $deliveryPerson = $this->deliveryPersonService->findLeastBusyDeliveryPerson();
+            $deliveryPerson = $this->deliveryPersonService->findLeastBusyDeliveryPerson($order->distribution_center_id);
 
             if ($deliveryPerson) {
                 $this->orderService->assignDeliveryPerson($order, $deliveryPerson->id);
