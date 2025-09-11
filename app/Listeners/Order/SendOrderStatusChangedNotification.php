@@ -18,6 +18,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
 
     public function handle(OrderStatusChanged $event): void
     {
+        /** @var Order $order */
         $order = $event->order;
         $recipients = $this->getRecipients($order);
         $validRecipients = $this->filterValidRecipients($recipients);
@@ -34,7 +35,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
         }
     }
 
-    private function getRecipients($order)
+    private function getRecipients(Order $order)
     {
         $recipients = collect();
 
@@ -129,9 +130,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
         });
     }
 
-    /**
-     * Send the notification to all valid recipients.
-     */
+
     /**
      * Send the notification to all valid recipients.
      */
