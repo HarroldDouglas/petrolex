@@ -6049,11 +6049,6 @@
                         "type": "integer",
                         "example": 40
                     },
-                    "price": {
-                        "description": "Prix par défaut du produit",
-                        "type": "string",
-                        "example": "5000.00"
-                    },
                     "specifications": {
                         "description": "Spécifications techniques du produit (traduites selon la langue de l'utilisateur)",
                         "type": "array",

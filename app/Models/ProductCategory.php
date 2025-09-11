@@ -142,13 +142,13 @@ class ProductCategory extends Model
     {
         $productTypeInstance = $this->productTypeInstance;
 
-        if (!$productTypeInstance) {
+        if (! $productTypeInstance) {
             return [];
         }
 
         // Get all images from the 'images' collection
         $media = $productTypeInstance->getMedia('images');
-        
+
         if ($media->isEmpty()) {
             return [];
         }
@@ -186,7 +186,7 @@ class ProductCategory extends Model
     {
         $bottleType = $this->productTypeInstance;
 
-        if (!$bottleType) {
+        if (! $bottleType) {
             return '0';
         }
 
@@ -200,7 +200,7 @@ class ProductCategory extends Model
     {
         $accessoryType = $this->productTypeInstance;
 
-        if (!$accessoryType) {
+        if (! $accessoryType) {
             return '0';
         }
 

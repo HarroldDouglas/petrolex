@@ -6,6 +6,7 @@ namespace Database\Seeders\Production;
 
 use App\Models\BottleType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 
 class BottleTypeSeeder extends Seeder
 {
@@ -59,12 +60,80 @@ class BottleTypeSeeder extends Seeder
         ];
 
         foreach ($bottleTypes as $bottleType) {
-            BottleType::firstOrCreate(
+            $bottle = BottleType::firstOrCreate(
                 ['name' => $bottleType['name']],
                 $bottleType
             );
+
+            // Add images to bottle types
+            $this->addBottleImages($bottle);
         }
 
         $this->command->info('Bottle types created successfully!');
+    }
+
+    /**
+     * Add images to bottle types
+     */
+    private function addBottleImages(BottleType $bottle): void
+    {
+        $imagesPath = public_path('assets/images/mobile/products/bottles');
+
+        // Check if images directory exists
+        if (! File::exists($imagesPath)) {
+            $this->command->warn("Images directory not found: {$imagesPath}");
+            $this->command->info("Skipping image addition for {$bottle->name}");
+
+            return;
+        }
+
+        // Map bottle types to their corresponding images
+        $imageMapping = [
+            'Bouteille de 6Kg' => [
+                'bouteille_gaz_6kg_1.jpeg',
+                'bouteille_gaz_6kg_2.jpeg',
+            ],
+            'Bouteille de 12Kg' => [
+                'bouteille_gaz_12kg_1.jpeg',
+                'bouteille_gaz_12kg_2.jpeg',
+            ],
+            // For 9Kg bottles, we now have a specific 9kg image
+            'Bouteille de 9Kg' => [
+                'bouteille_gaz_9kg_1.jpeg',
+            ],
+        ];
+
+        if (isset($imageMapping[$bottle->name])) {
+            $images = $imageMapping[$bottle->name];
+            $addedCount = 0;
+
+            foreach ($images as $imageName) {
+                $imagePath = $imagesPath.'/'.$imageName;
+
+                if (File::exists($imagePath)) {
+                    // Check if image is already attached to avoid duplicates
+                    $existingMedia = $bottle->getMedia('images')->where('name', $imageName)->first();
+
+                    if (! $existingMedia) {
+                        // Copy the file to preserve the original
+                        $bottle->addMedia($imagePath)
+                            ->preservingOriginal()
+                            ->usingName($imageName)
+                            ->toMediaCollection('images');
+
+                        $addedCount++;
+                        $this->command->info("Added image {$imageName} to {$bottle->name}");
+                    }
+                } else {
+                    $this->command->warn("Image not found: {$imagePath}");
+                }
+            }
+
+            if ($addedCount === 0) {
+                $this->command->info("No new images added to {$bottle->name} (images may already exist or files not found)");
+            }
+        } else {
+            $this->command->info("No image mapping defined for {$bottle->name}");
+        }
     }
 }

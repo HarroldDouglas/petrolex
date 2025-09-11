@@ -37,7 +37,6 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="description", type="string", description="Description du produit (traduite selon la langue de l'utilisateur)", example="Une bouteille de gaz de 6 kilogrammes."),
  *     @OA\Property(property="category_name", type="string", description="Nom de catégorie traduit pour mobile selon la langue de l'utilisateur", example="Bouteilles à gaz domestiques"),
  *     @OA\Property(property="quantity", type="integer", description="Quantité en stock", example=40),
- *     @OA\Property(property="price", type="string", description="Prix par défaut du produit", example="5000.00"),
  *     @OA\Property(
  *         property="specifications",
  *         type="array",
@@ -45,6 +44,7 @@ use OpenApi\Annotations as OA;
  *
  *         @OA\Items(ref="#/components/schemas/ProductSpecification")
  *     ),
+ *
  *     @OA\Property(
  *         property="images",
  *         type="array",
@@ -92,6 +92,7 @@ use OpenApi\Annotations as OA;
  *         @OA\Items(ref="#/components/schemas/AccessoryOption")
  *     )
  * )
+ *
  * @OA\Schema(
  *     schema="AccessoryOption",
  *     type="object",
@@ -102,6 +103,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="price", type="string", description="Prix de l'option", example="500.00"),
  *     @OA\Property(property="is_default", type="boolean", description="Indique si c'est l'option par défaut", example=true)
  * )
+ *
  * @OA\Schema(
  *     schema="ProductSpecification",
  *     type="object",

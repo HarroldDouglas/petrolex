@@ -18,7 +18,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property array $specifications
  * @property array<array{value: string, label: string, price: string, is_default: bool}>|null $options
  * @property array<array{url: string, thumb: string, medium: string, large: string, is_default: bool}> $images
- * @property string $price
  */
 class ProductResource extends JsonResource
 {
@@ -40,7 +39,6 @@ class ProductResource extends JsonResource
             'description' => $productTypeInstance->getLocalizedDescription(),
             'category_name' => $productCategory->product_type->labelForMobile(),
             'quantity' => $this->getQuantity(),
-            'price' => $productCategory->getDefaultPrice(),
             'specifications' => $productTypeInstance->specifications ?? [],
             'images' => $productCategory->getImages(),
         ];

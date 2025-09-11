@@ -6,6 +6,7 @@ namespace Database\Seeders\Production;
 
 use App\Models\AccessoryType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 
 class AccessoryTypeSeeder extends Seeder
 {
@@ -52,12 +53,82 @@ class AccessoryTypeSeeder extends Seeder
         ];
 
         foreach ($accessoryTypes as $accessoryType) {
-            AccessoryType::firstOrCreate(
+            $accessory = AccessoryType::firstOrCreate(
                 ['name' => $accessoryType['name']],
                 $accessoryType
             );
+
+            // Add images to accessory types
+            $this->addAccessoryImages($accessory);
         }
 
         $this->command->info('Accessory types created successfully!');
+    }
+
+    /**
+     * Add images to accessory types
+     */
+    private function addAccessoryImages(AccessoryType $accessory): void
+    {
+        $imagesPath = public_path('assets/images/mobile/products/accessories');
+
+        // Check if images directory exists
+        if (! File::exists($imagesPath)) {
+            $this->command->warn("Images directory not found: {$imagesPath}");
+            $this->command->info("Skipping image addition for {$accessory->name}");
+
+            return;
+        }
+
+        // Map accessory types to their corresponding images
+        $imageMapping = [
+            'Tuyau de gaz standard 5m' => [
+                'tuyau_gaz_standard_1.jpeg',
+            ],
+            // For other accessories, we'll use the gas hose image as a placeholder
+            // until specific images are available
+            'Détendeur universel' => [
+                'detendeur_universel_1.jpeg',
+            ],
+            'Protection anti-chute' => [
+                'protection_anti_chute_1.jpeg',
+            ],
+            'Adaptateur pour réchaud' => [
+                'adaptateur_pour_rechaud_1.jpeg',
+            ],
+        ];
+
+        if (isset($imageMapping[$accessory->name])) {
+            $images = $imageMapping[$accessory->name];
+            $addedCount = 0;
+
+            foreach ($images as $imageName) {
+                $imagePath = $imagesPath.'/'.$imageName;
+
+                if (File::exists($imagePath)) {
+                    // Check if image is already attached to avoid duplicates
+                    $existingMedia = $accessory->getMedia('images')->where('name', $imageName)->first();
+
+                    if (! $existingMedia) {
+                        // Copy the file to preserve the original
+                        $accessory->addMedia($imagePath)
+                            ->preservingOriginal()
+                            ->usingName($imageName)
+                            ->toMediaCollection('images');
+
+                        $addedCount++;
+                        $this->command->info("Added image {$imageName} to {$accessory->name}");
+                    }
+                } else {
+                    $this->command->warn("Image not found: {$imagePath}");
+                }
+            }
+
+            if ($addedCount === 0) {
+                $this->command->info("No new images added to {$accessory->name} (images may already exist or files not found)");
+            }
+        } else {
+            $this->command->info("No image mapping defined for {$accessory->name}");
+        }
     }
 }

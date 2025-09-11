@@ -130,7 +130,6 @@ class SendOrderStatusChangedNotification implements ShouldQueue
         });
     }
 
-
     /**
      * Send the notification to all valid recipients.
      */

@@ -207,14 +207,14 @@ class GetProductsControllerTest extends TestCase
 
         // Assert
         $response->assertSuccessful();
-        
+
         $products = $response->json('data');
-        if (!empty($products)) {
+        if (! empty($products)) {
             // Check that every product has an images array
             foreach ($products as $product) {
                 $this->assertArrayHasKey('images', $product);
                 $this->assertIsArray($product['images']);
-                
+
                 // If there are images, check their structure
                 foreach ($product['images'] as $image) {
                     $this->assertArrayHasKey('url', $image);
@@ -236,14 +236,14 @@ class GetProductsControllerTest extends TestCase
 
         // Assert
         $response->assertSuccessful();
-        
+
         $products = $response->json('data');
-        if (!empty($products)) {
+        if (! empty($products)) {
             // Check that every product has an options array
             foreach ($products as $product) {
                 $this->assertArrayHasKey('options', $product);
                 $this->assertIsArray($product['options']);
-                
+
                 // If there are options, check their structure
                 foreach ($product['options'] as $option) {
                     $this->assertArrayHasKey('value', $option);
