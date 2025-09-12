@@ -55,8 +55,6 @@ class ProductCategory extends Model
         'deleted_at' => 'datetime',
     ];
 
-    // ===== RELATIONS =====
-
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
@@ -76,8 +74,6 @@ class ProductCategory extends Model
     {
         return $this->hasMany(ProductCategoryCityPrice::class, 'product_category_id', 'id');
     }
-
-    // ===== ACCESSORS =====
 
     public function getProductTypeInstanceAttribute(): BottleType|AccessoryType|null
     {
@@ -107,8 +103,6 @@ class ProductCategory extends Model
         return $this->productTypeInstance?->price;
     }
 
-    // ===== QUERY SCOPES =====
-
     public function scopeOfType(Builder $query, ProductType $type): Builder
     {
         return $query->where('product_type', $type);
@@ -131,8 +125,6 @@ class ProductCategory extends Model
         return $query->where('product_type', ProductType::ACCESSORY());
     }
 
-    // ===== ADDITIONAL METHODS =====
-
     /**
      * Get the images for the product from the product type instance
      *
@@ -146,7 +138,6 @@ class ProductCategory extends Model
             return [];
         }
 
-        // Get all images from the 'images' collection
         $media = $productTypeInstance->getMedia('images');
 
         if ($media->isEmpty()) {
@@ -160,7 +151,7 @@ class ProductCategory extends Model
                 'thumb' => $mediaItem->getUrl('thumb'),
                 'medium' => $mediaItem->getUrl('medium'),
                 'large' => $mediaItem->getUrl('large'),
-                'is_default' => $index === 0, // First image is default
+                'is_default' => $index === 0,
             ];
         }
 

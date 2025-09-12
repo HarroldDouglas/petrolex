@@ -99,7 +99,6 @@ class SendOrderStatusChangedNotification implements ShouldQueue
      */
     private function addDeliveryPersonToRecipientsIfNeeded($recipients, $order): void
     {
-        // Only add delivery person if order is In Progress and has one assigned and has a valid email
         if ($order->status === OrderStatus::PROCESSING()->value) {
             $deliveryPerson = $order->deliveryPerson?->user;
             if ($deliveryPerson?->email) {
