@@ -25,10 +25,11 @@ class DeliveryPersonService extends BaseServiceForEntity
 
     /**
      * Find the delivery person with the minimum number of pending orders.
+     * If distributionCenterId is provided, only consider delivery persons assigned to that center.
      */
-    public function findLeastBusyDeliveryPerson(): ?DeliveryPerson
+    public function findLeastBusyDeliveryPerson(?int $distributionCenterId = null): ?DeliveryPerson
     {
-        return $this->deliveryPersonRepository->findLeastBusyDeliveryPerson();
+        return $this->deliveryPersonRepository->findLeastBusyDeliveryPerson($distributionCenterId);
     }
 
     public function getOrders(DeliveryPerson $deliveryPerson, GetOrdersFilterDTO $filters, int $perPage): LengthAwarePaginator

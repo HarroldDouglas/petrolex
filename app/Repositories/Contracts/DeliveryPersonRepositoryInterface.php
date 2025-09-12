@@ -10,7 +10,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface DeliveryPersonRepositoryInterface extends BaseRepositoryInterface
 {
-    public function findLeastBusyDeliveryPerson(): ?DeliveryPerson;
+    public function findLeastBusyDeliveryPerson(?int $distributionCenterId = null): ?DeliveryPerson;
 
     public function getOrdersForDeliveryPerson(DeliveryPerson $deliveryPerson, GetOrdersFilterDTO $filters, int $perPage): LengthAwarePaginator;
 }

@@ -9,6 +9,7 @@ use App\Enums\OrderStatus;
 use App\Models\DeliveryPerson;
 use App\Repositories\Contracts\DeliveryPersonRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 
 class DeliveryPersonRepository extends BaseEloquentRepository implements DeliveryPersonRepositoryInterface
 {
@@ -17,21 +18,38 @@ class DeliveryPersonRepository extends BaseEloquentRepository implements Deliver
         parent::__construct($model);
     }
 
-    public function findLeastBusyDeliveryPerson(): ?DeliveryPerson
+    public function findLeastBusyDeliveryPerson(?int $distributionCenterId = null): ?DeliveryPerson
     {
-        /** @var \App\Models\DeliveryPerson|null $deliveryPerson */
-        $deliveryPerson = $this->model::withCount([
+        $query = $this->model::withCount([
             'orders' => function ($query) {
                 $query->whereIn('status', [
                     OrderStatus::CONFIRMED(),
                     OrderStatus::PROCESSING(),
                 ]);
             },
-        ])
+        ]);
+
+        // If distribution center ID is provided, filter delivery persons by that center
+        if ($distributionCenterId !== null) {
+            $query = $this->filterByDistributionCenter($query, $distributionCenterId);
+        }
+
+        /** @var \App\Models\DeliveryPerson|null $deliveryPerson */
+        $deliveryPerson = $query
             ->orderBy('orders_count', 'asc')
             ->first();
 
         return $deliveryPerson;
+    }
+
+    /**
+     * Filter delivery persons by distribution center
+     */
+    private function filterByDistributionCenter(Builder $query, int $distributionCenterId): Builder
+    {
+        return $query->whereHas('activeDistributionCenters', function ($q) use ($distributionCenterId) {
+            $q->where('distribution_centers.id', $distributionCenterId);
+        });
     }
 
     public function getOrdersForDeliveryPerson(DeliveryPerson $deliveryPerson, GetOrdersFilterDTO $filters, int $perPage): LengthAwarePaginator
