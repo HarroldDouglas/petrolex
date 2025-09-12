@@ -65,7 +65,6 @@ class BottleTypeSeeder extends Seeder
                 $bottleType
             );
 
-            // Add images to bottle types
             $this->addBottleImages($bottle);
         }
 
@@ -79,7 +78,6 @@ class BottleTypeSeeder extends Seeder
     {
         $imagesPath = public_path('assets/images/mobile/products/bottles');
 
-        // Check if images directory exists
         if (! File::exists($imagesPath)) {
             $this->command->warn("Images directory not found: {$imagesPath}");
             $this->command->info("Skipping image addition for {$bottle->name}");
@@ -87,7 +85,6 @@ class BottleTypeSeeder extends Seeder
             return;
         }
 
-        // Map bottle types to their corresponding images
         $imageMapping = [
             'Bouteille de 6Kg' => [
                 'bouteille_gaz_6kg_1.jpeg',
@@ -97,7 +94,6 @@ class BottleTypeSeeder extends Seeder
                 'bouteille_gaz_12kg_1.jpeg',
                 'bouteille_gaz_12kg_2.jpeg',
             ],
-            // For 9Kg bottles, we now have a specific 9kg image
             'Bouteille de 9Kg' => [
                 'bouteille_gaz_9kg_1.jpeg',
             ],
@@ -111,11 +107,9 @@ class BottleTypeSeeder extends Seeder
                 $imagePath = $imagesPath.'/'.$imageName;
 
                 if (File::exists($imagePath)) {
-                    // Check if image is already attached to avoid duplicates
                     $existingMedia = $bottle->getMedia('images')->where('name', $imageName)->first();
 
                     if (! $existingMedia) {
-                        // Copy the file to preserve the original
                         $bottle->addMedia($imagePath)
                             ->preservingOriginal()
                             ->usingName($imageName)

@@ -71,7 +71,6 @@ class AccessoryTypeSeeder extends Seeder
     {
         $imagesPath = public_path('assets/images/mobile/products/accessories');
 
-        // Check if images directory exists
         if (! File::exists($imagesPath)) {
             $this->command->warn("Images directory not found: {$imagesPath}");
             $this->command->info("Skipping image addition for {$accessory->name}");
@@ -79,13 +78,10 @@ class AccessoryTypeSeeder extends Seeder
             return;
         }
 
-        // Map accessory types to their corresponding images
         $imageMapping = [
             'Tuyau de gaz standard 5m' => [
                 'tuyau_gaz_standard_1.jpeg',
             ],
-            // For other accessories, we'll use the gas hose image as a placeholder
-            // until specific images are available
             'Détendeur universel' => [
                 'detendeur_universel_1.jpeg',
             ],
@@ -105,11 +101,9 @@ class AccessoryTypeSeeder extends Seeder
                 $imagePath = $imagesPath.'/'.$imageName;
 
                 if (File::exists($imagePath)) {
-                    // Check if image is already attached to avoid duplicates
                     $existingMedia = $accessory->getMedia('images')->where('name', $imageName)->first();
 
                     if (! $existingMedia) {
-                        // Copy the file to preserve the original
                         $accessory->addMedia($imagePath)
                             ->preservingOriginal()
                             ->usingName($imageName)
