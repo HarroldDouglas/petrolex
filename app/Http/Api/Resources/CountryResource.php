@@ -12,6 +12,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property int $id
  * @property string $name
  * @property string $code
+ * @property string $phone_code
+ * @property string $currency
+ * @property bool $is_active
  */
 class CountryResource extends JsonResource
 {
@@ -26,6 +29,10 @@ class CountryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
+            'phone_code' => $this->phone_code,
+            'currency' => $this->currency,
+            'decimal_places' => config('countries.default_decimal_places'),
+            'is_active' => $this->is_active,
         ];
     }
 }

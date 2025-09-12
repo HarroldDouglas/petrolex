@@ -55,8 +55,6 @@ class ProductCategory extends Model
         'deleted_at' => 'datetime',
     ];
 
-    // ===== RELATIONS =====
-
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
@@ -76,8 +74,6 @@ class ProductCategory extends Model
     {
         return $this->hasMany(ProductCategoryCityPrice::class, 'product_category_id', 'id');
     }
-
-    // ===== ACCESSORS =====
 
     public function getProductTypeInstanceAttribute(): BottleType|AccessoryType|null
     {
@@ -107,8 +103,6 @@ class ProductCategory extends Model
         return $this->productTypeInstance?->price;
     }
 
-    // ===== QUERY SCOPES =====
-
     public function scopeOfType(Builder $query, ProductType $type): Builder
     {
         return $query->where('product_type', $type);
@@ -129,5 +123,78 @@ class ProductCategory extends Model
     public function scopeAccessories(Builder $query): Builder
     {
         return $query->where('product_type', ProductType::ACCESSORY());
+    }
+
+    /**
+     * Get the images for the product from the product type instance
+     *
+     * @return array<array{url: string, thumb: string, medium: string, large: string, is_default: bool}>
+     */
+    public function getImages(): array
+    {
+        $productTypeInstance = $this->productTypeInstance;
+
+        if (! $productTypeInstance) {
+            return [];
+        }
+
+        $media = $productTypeInstance->getMedia('images');
+
+        if ($media->isEmpty()) {
+            return [];
+        }
+
+        $images = [];
+        foreach ($media as $index => $mediaItem) {
+            $images[] = [
+                'url' => $mediaItem->getUrl(),
+                'thumb' => $mediaItem->getUrl('thumb'),
+                'medium' => $mediaItem->getUrl('medium'),
+                'large' => $mediaItem->getUrl('large'),
+                'is_default' => $index === 0,
+            ];
+        }
+
+        return $images;
+    }
+
+    /**
+     * Get the default price for the product category
+     */
+    public function getDefaultPrice(): string
+    {
+        return match ($this->product_type) {
+            ProductType::BOTTLE() => $this->getDefaultBottlePrice(),
+            ProductType::ACCESSORY() => $this->getDefaultAccessoryPrice(),
+            default => '0',
+        };
+    }
+
+    /**
+     * Helper method to get default bottle price (full price)
+     */
+    private function getDefaultBottlePrice(): string
+    {
+        $bottleType = $this->productTypeInstance;
+
+        if (! $bottleType) {
+            return '0';
+        }
+
+        return number_format((float) $bottleType->full_price, config('countries.default_decimal_places'), '.', '');
+    }
+
+    /**
+     * Helper method to get default accessory price
+     */
+    private function getDefaultAccessoryPrice(): string
+    {
+        $accessoryType = $this->productTypeInstance;
+
+        if (! $accessoryType) {
+            return '0';
+        }
+
+        return number_format((float) $accessoryType->price, config('countries.default_decimal_places'), '.', '');
     }
 }

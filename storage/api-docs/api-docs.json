@@ -3820,13 +3820,13 @@
                     "login": {
                         "description": "Email ou numéro de téléphone de l'utilisateur (sans code pays si country_code fourni)",
                         "type": "string",
-                        "example": "test@example.com"
+                        "example": "customer1@test.com"
                     },
                     "password": {
                         "description": "Mot de passe",
                         "type": "string",
                         "format": "password",
-                        "example": "password123"
+                        "example": "password"
                     },
                     "country_code": {
                         "description": "Code ISO du pays (optionnel, requis pour login par téléphone)",
@@ -5333,7 +5333,7 @@
                             }
                         ],
                         "nullable": true,
-                        "description": "User's country information including phone code and currency"
+                        "description": "User's country information including phone code, currency, and decimal places for formatting"
                     },
                     "delivery_addresses": {
                         "description": "User's delivery addresses (array of delivery address objects, only for customers)",
@@ -5522,6 +5522,11 @@
                     "is_active": {
                         "type": "boolean",
                         "example": true
+                    },
+                    "decimal_places": {
+                        "description": "Number of decimal places for currency formatting",
+                        "type": "integer",
+                        "example": 2
                     }
                 },
                 "type": "object"
@@ -5953,6 +5958,38 @@
                 },
                 "type": "object"
             },
+            "ProductImage": {
+                "title": "Product Image",
+                "description": "Image data for a product with different sizes",
+                "properties": {
+                    "url": {
+                        "description": "URL de l'image originale",
+                        "type": "string",
+                        "example": "https://example.com/storage/images/product1.jpg"
+                    },
+                    "thumb": {
+                        "description": "URL de la miniature (150x150)",
+                        "type": "string",
+                        "example": "https://example.com/storage/images/product1-thumb.jpg"
+                    },
+                    "medium": {
+                        "description": "URL de l'image moyenne (500x500)",
+                        "type": "string",
+                        "example": "https://example.com/storage/images/product1-medium.jpg"
+                    },
+                    "large": {
+                        "description": "URL de la grande image (1200x1200)",
+                        "type": "string",
+                        "example": "https://example.com/storage/images/product1-large.jpg"
+                    },
+                    "is_default": {
+                        "description": "Indique si c'est l'image par défaut",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
             "ProductCategoryData": {
                 "title": "Product Category Data",
                 "description": "Data of a product category",
@@ -6018,6 +6055,13 @@
                         "items": {
                             "$ref": "#/components/schemas/ProductSpecification"
                         }
+                    },
+                    "images": {
+                        "description": "Images du produit avec différentes tailles",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductImage"
+                        }
                     }
                 },
                 "type": "object"
@@ -6053,6 +6097,41 @@
                 "type": "object"
             },
             "AccessoryProduct": {
+                "properties": {
+                    "options": {
+                        "description": "Options d'achat disponibles pour l'accessoire",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AccessoryOption"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "AccessoryOption": {
+                "description": "Option d'achat pour un accessoire",
+                "properties": {
+                    "value": {
+                        "description": "Type d'option",
+                        "type": "string",
+                        "example": "default"
+                    },
+                    "label": {
+                        "description": "Libellé de l'option",
+                        "type": "string",
+                        "example": "default"
+                    },
+                    "price": {
+                        "description": "Prix de l'option",
+                        "type": "string",
+                        "example": "500.00"
+                    },
+                    "is_default": {
+                        "description": "Indique si c'est l'option par défaut",
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
                 "type": "object"
             },
             "ProductSpecification": {
@@ -6064,15 +6143,9 @@
                         "example": "Hauteur"
                     },
                     "value": {
-                        "description": "Valeur de la spécification",
+                        "description": "Valeur de la spécification avec unité combinée",
                         "type": "string",
-                        "example": "40.00"
-                    },
-                    "unit": {
-                        "description": "Unité de mesure",
-                        "type": "string",
-                        "example": "cm",
-                        "nullable": true
+                        "example": "40.00 cm"
                     }
                 },
                 "type": "object"
@@ -6098,6 +6171,11 @@
                         "description": "Prix de l'option",
                         "type": "string",
                         "example": "5000.00"
+                    },
+                    "is_default": {
+                        "description": "Indique si c'est l'option par défaut",
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"

@@ -11,14 +11,14 @@ use OpenApi\Annotations as OA;
  *         property="login",
  *         type="string",
  *         description="Email ou numéro de téléphone de l'utilisateur (sans code pays si country_code fourni)",
- *         example="test@example.com"
+ *         example="customer1@test.com"
  *     ),
  *     @OA\Property(
  *         property="password",
  *         type="string",
  *         format="password",
  *         description="Mot de passe",
- *         example="password123"
+ *         example="password"
  *     ),
  *     @OA\Property(
  *         property="country_code",

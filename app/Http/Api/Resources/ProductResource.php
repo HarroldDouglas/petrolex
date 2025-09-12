@@ -16,7 +16,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $category_name
  * @property int $quantity
  * @property array $specifications
- * @property array<array{value: string, label: string, price: float}>|null $options
+ * @property array<array{value: string, label: string, price: string, is_default: bool}>|null $options
+ * @property array<array{url: string, thumb: string, medium: string, large: string, is_default: bool}> $images
  */
 class ProductResource extends JsonResource
 {
@@ -39,6 +40,7 @@ class ProductResource extends JsonResource
             'category_name' => $productCategory->product_type->labelForMobile(),
             'quantity' => $this->getQuantity(),
             'specifications' => $productTypeInstance->specifications ?? [],
+            'images' => $productCategory->getImages(),
         ];
 
         $specificData = match ($productCategory->product_type) {
@@ -52,7 +54,18 @@ class ProductResource extends JsonResource
 
     private function getAccessoryDetails(): array
     {
-        return [];
+        $accessoryType = $this->resource->productTypeInstance;
+
+        return [
+            'options' => [
+                [
+                    'value' => 'default',
+                    'label' => 'default',
+                    'price' => number_format((float) $accessoryType->price, config('countries.default_decimal_places'), '.', ''),
+                    'is_default' => true,
+                ],
+            ],
+        ];
     }
 
     private function getBottleDetails(): array
@@ -64,12 +77,14 @@ class ProductResource extends JsonResource
                 [
                     'value' => BottleOrderType::FULL()->value,
                     'label' => BottleOrderType::FULL()->getLocalizedLabel(),
-                    'price' => $bottleType->full_price,
+                    'price' => number_format((float) $bottleType->full_price, config('countries.default_decimal_places'), '.', ''),
+                    'is_default' => true,
                 ],
                 [
                     'value' => BottleOrderType::RECHARGE()->value,
                     'label' => BottleOrderType::RECHARGE()->getLocalizedLabel(),
-                    'price' => $bottleType->content_price,
+                    'price' => number_format((float) $bottleType->content_price, config('countries.default_decimal_places'), '.', ''),
+                    'is_default' => false,
                 ],
             ],
         ];

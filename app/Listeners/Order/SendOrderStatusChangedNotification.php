@@ -18,6 +18,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
 
     public function handle(OrderStatusChanged $event): void
     {
+        /** @var Order $order */
         $order = $event->order;
         $recipients = $this->getRecipients($order);
         $validRecipients = $this->filterValidRecipients($recipients);
@@ -34,7 +35,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
         }
     }
 
-    private function getRecipients($order)
+    private function getRecipients(Order $order)
     {
         $recipients = collect();
 
@@ -98,7 +99,6 @@ class SendOrderStatusChangedNotification implements ShouldQueue
      */
     private function addDeliveryPersonToRecipientsIfNeeded($recipients, $order): void
     {
-        // Only add delivery person if order is In Progress and has one assigned and has a valid email
         if ($order->status === OrderStatus::PROCESSING()->value) {
             $deliveryPerson = $order->deliveryPerson?->user;
             if ($deliveryPerson?->email) {
@@ -131,15 +131,6 @@ class SendOrderStatusChangedNotification implements ShouldQueue
 
     /**
      * Send the notification to all valid recipients.
-     */
-    /**
-     * Send the notification to all valid recipients.
-     *
-     * @param Collection $recipients
-     * @param Order $order
-     * @param OrderStatus|null $oldStatus
-     * @param OrderStatus|null $newStatus
-     * @return void
      */
     private function sendNotification(Collection $recipients, Order $order, ?OrderStatus $oldStatus, ?OrderStatus $newStatus): void
     {

@@ -34,10 +34,15 @@ trait HasSpecifications
                 $translatedName = $spec['name_en'];
             }
 
+            // Combine value and unit into a single field with space
+            $combinedValue = $spec['value'];
+            if (isset($spec['unit']) && ! empty($spec['unit'])) {
+                $combinedValue .= ' '.$spec['unit'];
+            }
+
             return [
                 'name' => $translatedName,
-                'value' => $spec['value'],
-                'unit' => $spec['unit'] ?? null,
+                'value' => $combinedValue,
             ];
         }, $specifications);
     }
