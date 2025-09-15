@@ -26,6 +26,11 @@ class MunicipalityRepository extends BaseEloquentRepository implements Municipal
         Neighborhood::whereIn('id', $neighborhoodIds)->update(['municipality_id' => $municipality->id]);
     }
 
+    public function all(array $columns = ['*']): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->model->orderBy('name', 'asc')->get($columns);
+    }
+
     public function syncNeighborhoods(Municipality $municipality, array $neighborhoodIds): void
     {
         // 1. Unset municipality_id for neighborhoods that are no longer associated

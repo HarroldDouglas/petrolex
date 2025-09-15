@@ -14,6 +14,8 @@ class NeighborhoodRepository extends BaseEloquentRepository implements Neighborh
 
     public function findByCity(int $cityId): \Illuminate\Database\Eloquent\Collection
     {
-        return $this->model->where('city_id', $cityId)->get();
+        return $this->model->whereHas('municipality', function ($query) use ($cityId) {
+            $query->where('city_id', $cityId);
+        })->orderBy('name', 'asc')->get();
     }
 }

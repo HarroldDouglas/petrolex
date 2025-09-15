@@ -8,11 +8,8 @@ use OpenApi\Annotations as OA;
  *     description="Informations sur une municipalité",
  *
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="name", type="string", example="Douala 1er"),
- *     @OA\Property(property="city_id", type="integer", example=1),
- *     @OA\Property(property="city_name", type="string", example="Douala"),
- *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-08-22T12:00:00Z"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-08-22T12:00:00Z")
+ *     @OA\Property(property="name", type="string", example="Yaoundé I"),
+ *     @OA\Property(property="city_id", type="integer", example=1)
  * )
  *
  * @OA\Schema(
@@ -23,7 +20,7 @@ use OpenApi\Annotations as OA;
  *         property="_metadata",
  *         type="object",
  *         @OA\Property(property="success", type="boolean", example=true),
- *         @OA\Property(property="message", type="string", example="Liste des municipalités récupérée avec succès")
+ *         @OA\Property(property="message", type="string", example="Municipalities retrieved successfully.")
  *     ),
  *     @OA\Property(
  *         property="data",
@@ -59,7 +56,7 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=200,
- *         description="Liste des municipalités récupérée avec succès",
+ *         description="Municipalities retrieved successfully.",
  *
  *         @OA\JsonContent(ref="#/components/schemas/MunicipalitiesResponse")
  *     ),
@@ -114,7 +111,7 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/api/geography/municipalities",
  *     summary="Créer une municipalité",
- *     description="Crée une nouvelle municipalité.",
+ *     description="Crée une nouvelle municipalité. Le nom de la municipalité doit être unique au sein d'une même ville.",
  *     operationId="api.geography.municipalities.store",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},
@@ -155,7 +152,7 @@ use OpenApi\Annotations as OA;
  * @OA\Put(
  *     path="/api/geography/municipalities/{municipality}",
  *     summary="Mettre à jour une municipalité",
- *     description="Met à jour les informations d'une municipalité.",
+ *     description="Met à jour les informations d'une municipalité. Le nom de la municipalité doit être unique au sein d'une même ville.",
  *     operationId="api.geography.municipalities.update",
  *     tags={"Géographie"},
  *     security={{"bearerAuth":{}}},

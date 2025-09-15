@@ -31,7 +31,12 @@ class MunicipalityController extends Controller
     public function store(Request $request): ApiResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:municipalities,name,NULL,id,city_id,'.$request->input('city_id'),
+            ],
             'city_id' => 'required|exists:cities,id',
             'neighborhood_ids' => 'array',
             'neighborhood_ids.*' => 'exists:neighborhoods,id',
@@ -69,8 +74,16 @@ class MunicipalityController extends Controller
     {
         $municipality = $this->municipalityService->find($municipalityId);
 
+        $cityId = $request->input('city_id', $municipality->city_id);
+
         $request->validate([
-            'name' => 'sometimes|required|string|max:255',
+            'name' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                'unique:municipalities,name,'.$municipalityId.',id,city_id,'.$cityId,
+            ],
             'city_id' => 'sometimes|required|exists:cities,id',
             'neighborhood_ids' => 'array',
             'neighborhood_ids.*' => 'exists:neighborhoods,id',

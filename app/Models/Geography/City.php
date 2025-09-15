@@ -34,11 +34,12 @@ class City extends Model
 
     public function municipalities(): HasMany
     {
-        return $this->hasMany(Municipality::class);
+        return $this->hasMany(Municipality::class)->orderBy('name', 'asc');
     }
 
     public function neighborhoods(): HasManyThrough
     {
-        return $this->hasManyThrough(Neighborhood::class, Municipality::class);
+        return $this->hasManyThrough(Neighborhood::class, Municipality::class)
+            ->orderBy('neighborhoods.name', 'asc');
     }
 }

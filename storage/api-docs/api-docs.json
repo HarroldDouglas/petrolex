@@ -1753,7 +1753,7 @@
                 "operationId": "api.geography.municipalities.index",
                 "responses": {
                     "200": {
-                        "description": "Liste des municipalités récupérée avec succès",
+                        "description": "Municipalities retrieved successfully.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1784,7 +1784,7 @@
                     "Géographie"
                 ],
                 "summary": "Créer une municipalité",
-                "description": "Crée une nouvelle municipalité.",
+                "description": "Crée une nouvelle municipalité. Le nom de la municipalité doit être unique au sein d'une même ville.",
                 "operationId": "api.geography.municipalities.store",
                 "requestBody": {
                     "required": true,
@@ -1912,7 +1912,7 @@
                     "Géographie"
                 ],
                 "summary": "Mettre à jour une municipalité",
-                "description": "Met à jour les informations d'une municipalité.",
+                "description": "Met à jour les informations d'une municipalité. Le nom de la municipalité doit être unique au sein d'une même ville.",
                 "operationId": "api.geography.municipalities.update",
                 "parameters": [
                     {
@@ -4203,7 +4203,7 @@
                     "fee": {
                         "description": "The delivery fee in cents",
                         "type": "integer",
-                        "example": 500
+                        "example": "500"
                     },
                     "description": {
                         "description": "The delivery description",
@@ -4345,25 +4345,11 @@
                     },
                     "name": {
                         "type": "string",
-                        "example": "Douala 1er"
+                        "example": "Yaoundé I"
                     },
                     "city_id": {
                         "type": "integer",
                         "example": 1
-                    },
-                    "city_name": {
-                        "type": "string",
-                        "example": "Douala"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-08-22T12:00:00Z"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-08-22T12:00:00Z"
                     }
                 },
                 "type": "object"
@@ -4378,7 +4364,7 @@
                             },
                             "message": {
                                 "type": "string",
-                                "example": "Liste des municipalités récupérée avec succès"
+                                "example": "Municipalities retrieved successfully."
                             }
                         },
                         "type": "object"
