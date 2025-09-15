@@ -54,17 +54,17 @@ class DeliveryPersonDistributionCenterFilterTest extends TestCase
         ]);
 
         // Give deliveryPerson3 no orders (making them least busy globally, but in different center)
-        
+
         // When finding least busy for distribution center 1
         $leastBusyForCenter1 = $this->deliveryPersonService->findLeastBusyDeliveryPerson($distributionCenter1->id);
-        
+
         // Should return deliveryPerson2 (least busy in center 1), not deliveryPerson3 (different center)
         $this->assertNotNull($leastBusyForCenter1);
         $this->assertEquals($deliveryPerson2->id, $leastBusyForCenter1->id);
 
         // When finding least busy for distribution center 2
         $leastBusyForCenter2 = $this->deliveryPersonService->findLeastBusyDeliveryPerson($distributionCenter2->id);
-        
+
         // Should return deliveryPerson3
         $this->assertNotNull($leastBusyForCenter2);
         $this->assertEquals($deliveryPerson3->id, $leastBusyForCenter2->id);
@@ -73,14 +73,14 @@ class DeliveryPersonDistributionCenterFilterTest extends TestCase
     public function test_returns_null_when_no_delivery_person_available_for_distribution_center(): void
     {
         $distributionCenter = DistributionCenter::factory()->create();
-        
+
         // Create a delivery person for a different distribution center
         $otherDistributionCenter = DistributionCenter::factory()->create();
         $this->createDeliveryPersonForDistributionCenter($otherDistributionCenter);
 
         // Should return null when no delivery person is assigned to the requested center
         $result = $this->deliveryPersonService->findLeastBusyDeliveryPerson($distributionCenter->id);
-        
+
         $this->assertNull($result);
     }
 

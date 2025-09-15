@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Currency;
 use App\Models\Geography\City;
 use App\Models\Geography\Country;
 use App\Models\Geography\Municipality;
@@ -21,7 +22,7 @@ class GeographicSeeder extends Seeder
             [
                 'name' => 'Cameroun',
                 'phone_code' => '+237',
-                'currency' => 'XAF',
+                'currency' => Currency::XAF(),
                 'is_active' => true,
             ]
         );

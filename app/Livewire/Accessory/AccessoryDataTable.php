@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Accessory;
 
+use App\Enums\Currency;
 use App\Enums\EntityStatus;
 use App\Models\AccessoryType;
 use App\Models\DistributionCenter;
@@ -31,7 +32,7 @@ class AccessoryDataTable extends BaseDataTable
                 ->searchable(),
             Column::make('Prix', 'price')
                 ->format(
-                    fn ($value, $row) => number_format($value, 0, ',', ' ').' FCFA'
+                    fn ($value, $row) => Currency::from(config('countries.default_currency', 'XAF'))->format($value)
                 )
                 ->sortable(),
             Column::make("Date d'enregistrement", 'created_at')
@@ -117,7 +118,7 @@ class AccessoryDataTable extends BaseDataTable
                     return $builder->where('is_active', $isActive);
                 }),
 
-            NumberFilter::make('Prix Min (FCFA)')
+            NumberFilter::make('Prix Min ('.Currency::from(config('countries.default_currency', 'XAF'))->symbol().')')
                 ->config([
                     'placeholder' => 'Prix minimum',
                 ])
@@ -125,7 +126,7 @@ class AccessoryDataTable extends BaseDataTable
                     return $builder->where('price', '>=', $value);
                 }),
 
-            NumberFilter::make('Prix Max (FCFA)')
+            NumberFilter::make('Prix Max ('.Currency::from(config('countries.default_currency', 'XAF'))->symbol().')')
                 ->config([
                     'placeholder' => 'Prix maximum',
                 ])

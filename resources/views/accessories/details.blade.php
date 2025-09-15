@@ -98,15 +98,15 @@
                                 <tbody>
                                     <tr>
                                         <td>Bouteille vide</td>
-                                        <td>7,500 FCFA</td>
+                                        <td>{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format(7500) }}</td>
                                     </tr>
                                     <tr>
                                         <td>Bouteille avec gaz</td>
-                                        <td>15,000 FCFA</td>
+                                        <td>{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format(15000) }}</td>
                                     </tr>
                                     <tr>
                                         <td>Recharge seule</td>
-                                        <td>8,000 FCFA</td>
+                                        <td>{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format(8000) }}</td>
                                     </tr>
                                 </tbody>
                             </table>

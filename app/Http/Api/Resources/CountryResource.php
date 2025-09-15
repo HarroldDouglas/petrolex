@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Resources;
 
+use App\Enums\Currency;
 use App\Models\Geography\Country;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -13,7 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $name
  * @property string $code
  * @property string $phone_code
- * @property string $currency
+ * @property Currency $currency
  * @property bool $is_active
  */
 class CountryResource extends JsonResource
@@ -30,8 +31,8 @@ class CountryResource extends JsonResource
             'name' => $this->name,
             'code' => $this->code,
             'phone_code' => $this->phone_code,
-            'currency' => $this->currency,
-            'decimal_places' => config('countries.default_decimal_places'),
+            'currency' => $this->currency?->label,
+            'decimal_places' => $this->currency?->decimalPlaces() ?? config('countries.default_decimal_places'),
             'is_active' => $this->is_active,
         ];
     }

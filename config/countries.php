@@ -3,6 +3,18 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Default Currency
+    |--------------------------------------------------------------------------
+    |
+    | The default currency code to use throughout the application.
+    | This should match one of the Currency enum values.
+    |
+    */
+
+    'default_currency' => env('DEFAULT_CURRENCY', 'XAF'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Currency Decimal Places
     |--------------------------------------------------------------------------
     |

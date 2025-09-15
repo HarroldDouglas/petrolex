@@ -2,6 +2,7 @@
 
 namespace App\Livewire\User;
 
+use App\Enums\Currency;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\User;
@@ -64,9 +65,9 @@ class DeliveryPersonOrderDataTable extends BaseDataTable
                     );
                 }),
 
-            Column::make('Total (CFA)', 'total_amount')
+            Column::make('Total', 'total_amount')
                 ->sortable()
-                ->format(fn ($value) => number_format($value, 0, ',', ' ').' CFA'),
+                ->format(fn ($value) => Currency::from(config('countries.default_currency', 'XAF'))->format($value)),
 
             Column::make('Date', 'order_date')
                 ->sortable()

@@ -2,11 +2,21 @@
 
 namespace App\Http\Resources\Geography;
 
+use App\Enums\Currency;
 use App\Models\Geography\Country;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Country */
+/**
+ * @mixin Country
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $code
+ * @property string $phone_code
+ * @property Currency|null $currency
+ * @property bool $is_active
+ */
 class CountryResource extends JsonResource
 {
     /**
@@ -21,8 +31,8 @@ class CountryResource extends JsonResource
             'name' => $this->name,
             'code' => $this->code,
             'phone_code' => $this->phone_code,
-            'currency' => $this->currency,
-            'decimal_places' => config('countries.default_decimal_places'),
+            'currency' => $this->currency?->label,
+            'decimal_places' => $this->currency?->decimalPlaces() ?? 2,
             'is_active' => $this->is_active,
         ];
     }

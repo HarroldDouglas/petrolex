@@ -3,6 +3,7 @@
 namespace App\Livewire\Order;
 
 use App\Enums\BottleOrderType;
+use App\Enums\Currency;
 use App\Enums\PaymentMethod;
 use App\Enums\ProductType;
 use App\Services\DistributionCenter\DistributionCenterService;
@@ -145,8 +146,8 @@ abstract class AbstractOrderForm extends Component
                             'full_price' => $productTypeInstance->full_price,
                         ];
                         $this->productOptions = [
-                            BottleOrderType::FULL()->value => BottleOrderType::FULL()->label.' ('.$productTypeInstance->full_price.' XAF)',
-                            BottleOrderType::RECHARGE()->value => BottleOrderType::RECHARGE()->label.' ('.$productTypeInstance->content_price.' XAF)',
+                            BottleOrderType::FULL()->value => BottleOrderType::FULL()->label.' ('.Currency::from(config('countries.default_currency', 'XAF'))->format($productTypeInstance->full_price).')',
+                            BottleOrderType::RECHARGE()->value => BottleOrderType::RECHARGE()->label.' ('.Currency::from(config('countries.default_currency', 'XAF'))->format($productTypeInstance->content_price).')',
                         ];
                     } elseif ($productCategory->product_type === ProductType::ACCESSORY()) {
                         $this->selectedProductDetails['productTypeInstance'] = [

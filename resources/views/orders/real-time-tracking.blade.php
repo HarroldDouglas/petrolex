@@ -240,7 +240,7 @@
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Montant</span>
-                    <span class="stat-value">{{ number_format($order->total_amount, 0, ',', ' ') }} FCFA</span>
+                    <span class="stat-value">{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($order->total_amount) }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Statut</span>

@@ -112,7 +112,7 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value, index, values) {
-                                    return value.toLocaleString('fr-FR') + ' CFA';
+                                    return value.toLocaleString('fr-FR') + ' {{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->symbol() }}';
                                 }
                             }
                         }
@@ -132,7 +132,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value, index, values) {
-                                return value.toLocaleString('fr-FR') + ' CFA';
+                                return value.toLocaleString('fr-FR') + ' {{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->symbol() }}';
                             }
                         }
                     }

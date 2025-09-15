@@ -189,8 +189,8 @@
                 <tr>
                     <td>{{ $groupedItem->displayName }}</td>
                     <td>{{ $groupedItem->groupedQuantity }}</td>
-                    <td>{{ number_format($groupedItem->getUnitPrice(), 0, ',', ' ') }} FCFA</td>
-                    <td>{{ number_format($groupedItem->groupedTotalPrice, 0, ',', ' ') }} FCFA</td>
+                    <td>{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($groupedItem->getUnitPrice()) }}</td>
+                    <td>{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($groupedItem->groupedTotalPrice) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -200,21 +200,21 @@
         <div class="total-right">
             <div class="total-row">
                 <span class="total-label">Sous-total:</span>
-                <span class="total-value">{{ number_format($order->items_total_price ?? $order->subtotal ?? 0, 0, ',', ' ') }} FCFA</span>
+                <span class="total-value">{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($order->items_total_price ?? $order->subtotal ?? 0) }}</span>
             </div>
             <div class="total-row">
                 <span class="total-label">Frais de livraison:</span>
-                <span class="total-value">{{ $order->delivery_fee }} FCFA</span>
+                <span class="total-value">{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($order->delivery_fee) }}</span>
             </div>
             @if(($order->discount ?? 0) > 0)
             <div class="total-row">
                 <span class="total-label">Réduction:</span>
-                <span class="total-value">{{ number_format($order->discount ?? 0, 0, ',', ' ') }} FCFA</span>
+                <span class="total-value">{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($order->discount ?? 0) }}</span>
             </div>
             @endif
             <div class="total-row grand-total">
                 <span class="total-label">TOTAL:</span>
-                <span class="total-value">{{ number_format($order->total_price ?? $order->total_amount ?? 0, 0, ',', ' ') }} FCFA</span>
+                <span class="total-value">{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($order->total_price ?? $order->total_amount ?? 0) }}</span>
             </div>
         </div>
     </div>

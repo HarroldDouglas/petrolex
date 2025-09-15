@@ -30,7 +30,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="badge bg-dark">{{ number_format($refund->amount, 0, ',', ' ') }} CFA</span></td>
+                            <td><span class="badge bg-dark">{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($refund->amount) }}</span></td>
                             <td><span class="badge bg-success">{{ $refund->refund_method->label }}</span></td>
                             <td><span class="badge bg-dark">{{ $refund->completed_at->format('d/m/Y H:i') }}</span></td>
                             <td><span class="badge bg-success">{{ $refund->refund_identifier }}</span></td>

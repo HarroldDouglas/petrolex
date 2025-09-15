@@ -5515,8 +5515,9 @@
                         "nullable": true
                     },
                     "currency": {
+                        "description": "Currency symbol/label from Currency enum (FCFA, $, €)",
                         "type": "string",
-                        "example": "XAF",
+                        "example": "FCFA",
                         "nullable": true
                     },
                     "is_active": {
@@ -5524,9 +5525,9 @@
                         "example": true
                     },
                     "decimal_places": {
-                        "description": "Number of decimal places for currency formatting",
+                        "description": "Number of decimal places for currency formatting (0 for FCFA, 2 for $/€)",
                         "type": "integer",
-                        "example": 2
+                        "example": 0
                     }
                 },
                 "type": "object"
