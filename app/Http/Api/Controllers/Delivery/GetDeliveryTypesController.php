@@ -15,12 +15,15 @@ class GetDeliveryTypesController extends Controller
      */
     public function __invoke(): ApiResponse
     {
+        $locale = app()->getLocale();
+
         $deliveryTypes = collect(DeliveryType::cases())
-            ->map(function (DeliveryType $case): array {
+            ->map(function (DeliveryType $case) use ($locale): array {
                 return [
                     'value' => $case->value,
                     'label' => $case->label,
                     'fee' => $case->fee(),
+                    'description' => $case->description($locale),
                 ];
             })->toArray();
 

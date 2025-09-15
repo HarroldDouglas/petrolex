@@ -4204,6 +4204,11 @@
                         "description": "The delivery fee in cents",
                         "type": "integer",
                         "example": 500
+                    },
+                    "description": {
+                        "description": "The delivery description",
+                        "type": "string",
+                        "example": "Within 24 hours"
                     }
                 },
                 "type": "object"
