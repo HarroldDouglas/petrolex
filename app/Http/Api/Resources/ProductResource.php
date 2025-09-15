@@ -55,13 +55,14 @@ class ProductResource extends JsonResource
     private function getAccessoryDetails(): array
     {
         $accessoryType = $this->resource->productTypeInstance;
+        $decimalPlaces = $this->getUserCountryDecimalPlaces();
 
         return [
             'options' => [
                 [
                     'value' => 'default',
                     'label' => 'default',
-                    'price' => number_format((float) $accessoryType->price, config('countries.default_decimal_places'), '.', ''),
+                    'price' => number_format((float) $accessoryType->price, $decimalPlaces, '.', ''),
                     'is_default' => true,
                 ],
             ],
@@ -71,19 +72,20 @@ class ProductResource extends JsonResource
     private function getBottleDetails(): array
     {
         $bottleType = $this->resource->productTypeInstance;
+        $decimalPlaces = $this->getUserCountryDecimalPlaces();
 
         return [
             'options' => [
                 [
                     'value' => BottleOrderType::FULL()->value,
                     'label' => BottleOrderType::FULL()->getLocalizedLabel(),
-                    'price' => number_format((float) $bottleType->full_price, config('countries.default_decimal_places'), '.', ''),
+                    'price' => number_format((float) $bottleType->full_price, $decimalPlaces, '.', ''),
                     'is_default' => true,
                 ],
                 [
                     'value' => BottleOrderType::RECHARGE()->value,
                     'label' => BottleOrderType::RECHARGE()->getLocalizedLabel(),
-                    'price' => number_format((float) $bottleType->content_price, config('countries.default_decimal_places'), '.', ''),
+                    'price' => number_format((float) $bottleType->content_price, $decimalPlaces, '.', ''),
                     'is_default' => false,
                 ],
             ],
@@ -100,5 +102,19 @@ class ProductResource extends JsonResource
         }
 
         return $productCategory->pivot->stock ?? 0;
+    }
+
+    /**
+     * Get the decimal places for the current user's country currency
+     */
+    private function getUserCountryDecimalPlaces(): int
+    {
+        $user = request()->user();
+
+        if ($user && $user->country && $user->country->currency) {
+            return $user->country->currency->decimalPlaces();
+        }
+
+        return config('countries.default_decimal_places');
     }
 }
