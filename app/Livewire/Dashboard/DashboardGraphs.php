@@ -108,7 +108,7 @@ class DashboardGraphs extends Component
         $this->revenueGraphData = [
             'labels' => $revenueStats->labels,
             'datasets' => [[
-                'label' => 'Chiffre d\'affaires ('.Currency::from(config('countries.default_currency', 'XAF'))->symbol().')',
+                'label' => 'Chiffre d\'affaires ('.Currency::from(config('countries.default_currency', 'XAF'))->label.')',
                 'data' => $revenueStats->data,
                 'borderColor' => '#4e73df',
                 'tension' => 0.4,

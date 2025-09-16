@@ -118,7 +118,7 @@ class AccessoryDataTable extends BaseDataTable
                     return $builder->where('is_active', $isActive);
                 }),
 
-            NumberFilter::make('Prix Min ('.Currency::from(config('countries.default_currency', 'XAF'))->symbol().')')
+            NumberFilter::make('Prix Min ('.Currency::from(config('countries.default_currency', 'XAF'))->label.')')
                 ->config([
                     'placeholder' => 'Prix minimum',
                 ])
@@ -126,7 +126,7 @@ class AccessoryDataTable extends BaseDataTable
                     return $builder->where('price', '>=', $value);
                 }),
 
-            NumberFilter::make('Prix Max ('.Currency::from(config('countries.default_currency', 'XAF'))->symbol().')')
+            NumberFilter::make('Prix Max ('.Currency::from(config('countries.default_currency', 'XAF'))->label.')')
                 ->config([
                     'placeholder' => 'Prix maximum',
                 ])

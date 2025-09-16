@@ -5,7 +5,7 @@
             text-color="primary"
             icon="currency-circle-dollar"
             title="Chiffre d'affaires"
-            subtitle="(en {{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->symbol() }})"
+            subtitle="(en {{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->label }})"
             :value="$revenue"
             :url="$this->revenueUrl"
         />

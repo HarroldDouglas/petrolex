@@ -47,14 +47,6 @@ class Currency extends Enum
     }
 
     /**
-     * Get the symbol for this currency
-     */
-    public function symbol(): string
-    {
-        return static::labels()[$this->value];
-    }
-
-    /**
      * Format an amount with this currency
      */
     public function format(float $amount, bool $showSymbol = true): string
@@ -62,7 +54,7 @@ class Currency extends Enum
         $formatted = number_format($amount, $this->decimalPlaces(), ',', ' ');
 
         if ($showSymbol) {
-            $formatted .= ' '.$this->symbol();
+            $formatted .= ' '.$this->label;
         }
 
         return $formatted;

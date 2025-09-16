@@ -1135,7 +1135,7 @@ class OrderSeeder extends Seeder
         $order->cancelled_reason = rand(0, 1) ? 'Customer request' : 'Technical problem at the center';
         $order->save();
 
-        Log::info("Refund created for order #{$order->order_number} in the amount of {$refundAmount} ".Currency::from(config('countries.default_currency', 'XAF'))->symbol());
+        Log::info("Refund created for order #{$order->order_number} in the amount of {$refundAmount} ".Currency::from(config('countries.default_currency', 'XAF'))->label);
     }
 
     /**
