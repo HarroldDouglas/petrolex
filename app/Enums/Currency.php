@@ -7,7 +7,6 @@ use Spatie\Enum\Laravel\Enum;
 /**
  * @method static self XAF()
  * @method static self USD()
- * @method static self EUR()
  */
 class Currency extends Enum
 {
@@ -16,7 +15,6 @@ class Currency extends Enum
         return [
             'XAF' => 'FCFA',
             'USD' => '$',
-            'EUR' => '€',
         ];
     }
 
@@ -25,7 +23,6 @@ class Currency extends Enum
         return [
             'XAF' => 'XAF',
             'USD' => 'USD',
-            'EUR' => 'EUR',
         ];
     }
 
@@ -34,7 +31,6 @@ class Currency extends Enum
         return [
             'XAF' => 0,
             'USD' => 2,
-            'EUR' => 2,
         ];
     }
 
