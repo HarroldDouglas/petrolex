@@ -32,7 +32,7 @@ class CountryResource extends JsonResource
             'code' => $this->code,
             'phone_code' => $this->phone_code,
             'currency' => $this->currency?->label,
-            'decimal_places' => $this->currency?->decimalPlaces() ?? 2,
+            'decimal_places' => $this->currency?->decimalPlaces() ?? config('countries.default_decimal_places'),
             'is_active' => $this->is_active,
         ];
     }
