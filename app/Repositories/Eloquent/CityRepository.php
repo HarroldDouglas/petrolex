@@ -18,6 +18,9 @@ class CityRepository extends BaseEloquentRepository implements CityRepositoryInt
     public function findByCountry(string $country): \Illuminate\Database\Eloquent\Collection
     {
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Geography\City> */
-        return $this->model->where('country_id', $country)->where('is_active', true)->get();
+        return $this->model->where('country_id', $country)
+            ->where('is_active', true)
+            ->orderBy('name', 'asc')
+            ->get();
     }
 }

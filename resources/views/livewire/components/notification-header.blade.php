@@ -67,7 +67,7 @@
                                 @if(isset($notification->data['total_amount']))
                                     |
                                     <span class="d-inline-block f-w-500 ms-1">
-                                        Total: <span class="text-primary">{{ number_format($notification->data['total_amount']) }} FCFA</span>
+                                        Total: <span class="text-primary">{{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($notification->data['total_amount']) }}</span>
                                     </span>
                                 @endif
                             </div>

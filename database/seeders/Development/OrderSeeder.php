@@ -7,6 +7,7 @@ namespace Database\Seeders\Development;
 use App\Enums\BottleMovementType;
 use App\Enums\BottleOrderType;
 use App\Enums\BottleStatus;
+use App\Enums\Currency;
 use App\Enums\NotificationType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
@@ -1134,7 +1135,7 @@ class OrderSeeder extends Seeder
         $order->cancelled_reason = rand(0, 1) ? 'Customer request' : 'Technical problem at the center';
         $order->save();
 
-        Log::info("Refund created for order #{$order->order_number} in the amount of {$refundAmount} CFA");
+        Log::info("Refund created for order #{$order->order_number} in the amount of {$refundAmount} ".Currency::make(config('countries.default_currency', 'XAF'))->label);
     }
 
     /**

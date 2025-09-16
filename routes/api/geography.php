@@ -2,7 +2,7 @@
 
 use App\Http\Api\Controllers\Geography\CityController;
 use App\Http\Api\Controllers\Geography\CountryController;
-use App\Http\Api\Controllers\Geography\MunicipalityController;
+
 use App\Http\Api\Controllers\Geography\NeighborhoodController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,8 +17,4 @@ Route::middleware('auth:sanctum')->prefix('geography')->name('api.geography.')->
     // Neighborhoods
     Route::get('/cities/{cityId}/neighborhoods', [NeighborhoodController::class, 'index'])->name('neighborhoods.index');
     Route::get('/neighborhoods/{neighborhoodId}', [NeighborhoodController::class, 'show'])->name('neighborhoods.show');
-
-    // Municipalities
-    Route::apiResource('/municipalities', MunicipalityController::class);
-    Route::post('/municipalities/{municipality}/neighborhoods', [MunicipalityController::class, 'syncNeighborhoods'])->name('municipalities.syncNeighborhoods');
 });

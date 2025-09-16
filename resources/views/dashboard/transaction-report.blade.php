@@ -103,7 +103,7 @@
                         <div class="card ticket-card bg-light-primary">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des transactions<br>(en CFA)</p>
+                                    <p class="f-s-16 mb-0">Total des transactions<br>(en {{ \App\Enums\Currency::make(config('countries.default_currency', 'XAF'))->label }})</p>
                                     <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
                                         <i class="ph-bold ph-arrows-left-right f-s-25 text-primary"></i>
                                     </div>
@@ -116,7 +116,7 @@
                         <div class="card ticket-card bg-light-warning">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des achats<br>(en CFA)</p>
+                                    <p class="f-s-16 mb-0">Total des achats<br>(en {{ \App\Enums\Currency::make(config('countries.default_currency', 'XAF'))->label }})</p>
                                     <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
                                         <i class="ph-bold ph-arrow-circle-up f-s-25 text-warning"></i>
                                     </div>
@@ -130,7 +130,7 @@
                         <div class="card ticket-card bg-light-success">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Total des ventes<br>(en CFA)</p>
+                                    <p class="f-s-16 mb-0">Total des ventes<br>(en {{ \App\Enums\Currency::make(config('countries.default_currency', 'XAF'))->label }})</p>
                                     <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
                                         <i class="ph-bold ph-currency-circle-dollar f-s-25 text-success"></i>
                                     </div>
@@ -144,7 +144,7 @@
                         <div class="card ticket-card bg-light-danger">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <p class="f-s-16 mb-0">Autres dépenses<br>(en CFA)</p>
+                                    <p class="f-s-16 mb-0">Autres dépenses<br>(en {{ \App\Enums\Currency::make(config('countries.default_currency', 'XAF'))->label }})</p>
                                     <div class="h-40 w-40 d-flex-center b-r-8 bg-white">
                                         <i class="ph-bold ph-bank f-s-25 text-danger"></i>
                                     </div>
@@ -171,7 +171,7 @@
                                         <th class="w-10">N° Transaction</th>
                                         <th class="w-10">Initiateur</th>
                                         <th class="w-10">Destinataire</th>
-                                        <th class="w-10">Montant (CFA)</th>
+                                        <th class="w-10">Montant ({{ \App\Enums\Currency::make(config('countries.default_currency', 'XAF'))->label }})</th>
                                         <th class="w-20">Type de transaction</th>
                                         <th class="w-10">Méthode</th>
                                         <th class="w-10">Date</th>

@@ -44,10 +44,41 @@ class DeliveryType extends Enum
     }
 
     /**
+     * Get the delivery descriptions for each type.
+     */
+    public static function descriptions(?string $locale = null): array
+    {
+        $originalLocale = null;
+        if ($locale && $locale !== app()->getLocale()) {
+            $originalLocale = app()->getLocale();
+            app()->setLocale($locale);
+        }
+
+        $descriptions = [
+            'normal' => __('delivery.descriptions.normal'),
+            'fast' => __('delivery.descriptions.fast'),
+        ];
+
+        if ($originalLocale) {
+            app()->setLocale($originalLocale);
+        }
+
+        return $descriptions;
+    }
+
+    /**
      * Get the fee for this delivery type instance.
      */
     public function fee(): int
     {
         return static::fees()[$this->value];
+    }
+
+    /**
+     * Get the description for this delivery type instance.
+     */
+    public function description(?string $locale = null): string
+    {
+        return static::descriptions($locale)[$this->value];
     }
 }

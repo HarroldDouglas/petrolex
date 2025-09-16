@@ -128,9 +128,9 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="name", type="string", example="Cameroun"),
  *     @OA\Property(property="code", type="string", example="CM"),
  *     @OA\Property(property="phone_code", type="string", nullable=true, example="+237"),
- *     @OA\Property(property="currency", type="string", nullable=true, example="XAF"),
+ *     @OA\Property(property="currency", type="string", nullable=true, example="FCFA", description="Currency symbol/label from Currency enum (FCFA, $, €)"),
  *     @OA\Property(property="is_active", type="boolean", example=true),
- *     @OA\Property(property="decimal_places", type="integer", example=2, description="Number of decimal places for currency formatting")
+ *     @OA\Property(property="decimal_places", type="integer", example=0, description="Number of decimal places for currency formatting (0 for FCFA, 2 for $/€)")
  * )
  */
 class BaseSchemas {}

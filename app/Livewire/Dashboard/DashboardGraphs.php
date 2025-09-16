@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Enums\Currency;
 use App\Enums\PeriodFilterStats;
 use App\Models\User;
 use App\Services\Dashboard\DashboardGraphService;
@@ -30,7 +31,7 @@ class DashboardGraphs extends Component
         'labels' => [],
         'datasets' => [
             [
-                'label' => 'Chiffre d\'affaire (CFA)',
+                'label' => 'Chiffre d\'affaire',
                 'data' => [],
                 'backgroundColor' => '#25F4EE',
                 'borderColor' => '#25F4EE',
@@ -107,7 +108,7 @@ class DashboardGraphs extends Component
         $this->revenueGraphData = [
             'labels' => $revenueStats->labels,
             'datasets' => [[
-                'label' => 'Chiffre d\'affaires',
+                'label' => 'Chiffre d\'affaires ('.Currency::make(config('countries.default_currency', 'XAF'))->label.')',
                 'data' => $revenueStats->data,
                 'borderColor' => '#4e73df',
                 'tension' => 0.4,

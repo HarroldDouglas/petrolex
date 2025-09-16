@@ -19,7 +19,7 @@
     <div style="background-color: #cce5ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #007bff;">
         <h3 style="margin-top: 0; color: #004085;">{{ __('email.order_details') }}</h3>
         <p><strong>{{ __('email.order_number') }}:</strong> {{ $order->order_number }}</p>
-        <p><strong>{{ __('email.order_total') }}:</strong> {{ number_format($order->total_amount, 2) }} {{ $order->currency ?? 'FCFA' }}</p>
+        <p><strong>{{ __('email.order_total') }}:</strong> {{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($order->total_amount) }}</p>
         <p><strong>{{ __('email.order_customer') }}:</strong> {{ $order->customer->user->name ?? __('email.unknown_customer') }}</p>
         @if($order->processing_at)
             <p><strong>{{ __('email.order_processing_at') }}:</strong> {{ $order->processing_at->format('d/m/Y H:i') }}</p>

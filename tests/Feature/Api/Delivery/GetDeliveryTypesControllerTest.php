@@ -30,6 +30,7 @@ class GetDeliveryTypesControllerTest extends TestCase
                         'value',
                         'label',
                         'fee',
+                        'description',
                     ],
                 ],
             ])
@@ -52,9 +53,11 @@ class GetDeliveryTypesControllerTest extends TestCase
 
         $this->assertEquals('Standard', $normalType['label']);
         $this->assertEquals(500, $normalType['fee']);
+        $this->assertNotEmpty($normalType['description']);
 
         $this->assertEquals('Express', $fastType['label']);
         $this->assertEquals(1000, $fastType['fee']);
+        $this->assertNotEmpty($fastType['description']);
     }
 
     public function test_requires_authentication()
@@ -95,5 +98,62 @@ class GetDeliveryTypesControllerTest extends TestCase
             $enumCase = DeliveryType::from($deliveryType['value']);
             $this->assertEquals($enumCase->fee(), $deliveryType['fee']);
         }
+    }
+
+    public function test_descriptions_are_in_french_by_default()
+    {
+        $user = User::factory()->create(['language' => 'fr']);
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/delivery-types');
+
+        $response->assertStatus(200);
+
+        $data = $response->json('data');
+
+        $normalType = collect($data)->firstWhere('value', 'normal');
+        $fastType = collect($data)->firstWhere('value', 'fast');
+
+        $this->assertEquals('En moins de 48h', $normalType['description']);
+        $this->assertEquals('En moins de 24h', $fastType['description']);
+    }
+
+    public function test_descriptions_are_in_english_when_locale_is_english()
+    {
+        $user = User::factory()->create(['language' => 'en']);
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/delivery-types');
+
+        $response->assertStatus(200);
+
+        $data = $response->json('data');
+
+        $normalType = collect($data)->firstWhere('value', 'normal');
+        $fastType = collect($data)->firstWhere('value', 'fast');
+
+        $this->assertEquals('Within 48 hours', $normalType['description']);
+        $this->assertEquals('Within 24 hours', $fastType['description']);
+    }
+
+    public function test_descriptions_fallback_to_french_for_unsupported_locale()
+    {
+        $user = User::factory()->create(['language' => null]);
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/delivery-types', [
+            'Accept-Language' => 'es-ES,es;q=0.9', // Spanish - unsupported language
+        ]);
+
+        $response->assertStatus(200);
+
+        $data = $response->json('data');
+
+        $normalType = collect($data)->firstWhere('value', 'normal');
+        $fastType = collect($data)->firstWhere('value', 'fast');
+
+        // Should fallback to French (default language)
+        $this->assertEquals('En moins de 48h', $normalType['description']);
+        $this->assertEquals('En moins de 24h', $fastType['description']);
     }
 }
