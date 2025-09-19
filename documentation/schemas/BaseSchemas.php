@@ -105,35 +105,27 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté"),
  *     @OA\Property(
  *         property="neighborhood",
- *         type="object",
+ *         ref="#/components/schemas/Neighborhood",
  *         nullable=true,
- *         @OA\Property(property="id", type="integer", example=123),
- *         @OA\Property(property="name", type="string", example="Bali"),
- *         @OA\Property(property="municipality_id", type="integer", example=456)
+ *         description="Full neighborhood resource object"
  *     ),
  *     @OA\Property(
  *         property="municipality",
- *         type="object",
+ *         ref="#/components/schemas/Municipality",
  *         nullable=true,
- *         @OA\Property(property="id", type="integer", example=456),
- *         @OA\Property(property="name", type="string", example="Yaoundé I"),
- *         @OA\Property(property="city_id", type="integer", example=789)
+ *         description="Full municipality resource object"
  *     ),
  *     @OA\Property(
  *         property="city",
- *         type="object",
+ *         ref="#/components/schemas/City",
  *         nullable=true,
- *         @OA\Property(property="id", type="integer", example=789),
- *         @OA\Property(property="name", type="string", example="Yaoundé"),
- *         @OA\Property(property="country_id", type="integer", example=237)
+ *         description="Full city resource object"
  *     ),
  *     @OA\Property(
  *         property="country",
- *         type="object",
+ *         ref="#/components/schemas/Country",
  *         nullable=true,
- *         @OA\Property(property="id", type="integer", example=237),
- *         @OA\Property(property="name", type="string", example="Cameroun"),
- *         @OA\Property(property="code", type="string", example="CM")
+ *         description="Full country resource object"
  *     ),
  *     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=3.848),
  *     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=11.502),
@@ -161,6 +153,42 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="currency", type="string", nullable=true, example="FCFA", description="Currency symbol/label from Currency enum (FCFA, $, €)"),
  *     @OA\Property(property="is_active", type="boolean", example=true),
  *     @OA\Property(property="decimal_places", type="integer", example=0, description="Number of decimal places for currency formatting (0 for FCFA, 2 for $/€)")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="City",
+ *     title="City",
+ *     description="City data",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Yaoundé"),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="country", ref="#/components/schemas/Country", nullable=true)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="Municipality",
+ *     title="Municipality",
+ *     description="Municipality data",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Yaoundé I"),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="city", ref="#/components/schemas/City", nullable=true)
+ * )
+ *
+ * @OA\Schema(
+ *     schema="Neighborhood",
+ *     title="Neighborhood",
+ *     description="Neighborhood data",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Bali"),
+ *     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=3.848),
+ *     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=11.502),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="municipality", ref="#/components/schemas/Municipality", nullable=true),
+ *     @OA\Property(property="city", ref="#/components/schemas/City", nullable=true)
  * )
  */
 class BaseSchemas {}

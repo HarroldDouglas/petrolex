@@ -73,27 +73,39 @@ class StoreCustomerDeliveryAddressTest extends TestCase
                     'message' => 'Adresse de livraison créée avec succès',
                 ],
                 'data' => [
+                    'id' => 1,
                     'label' => 'Maison principale',
                     'address' => '123 Avenue de la Liberté',
                     'neighborhood' => [
                         'id' => $this->neighborhood->id,
                         'name' => 'Bali',
                         'municipality_id' => $this->municipality->id,
+                        'municipality' => [
+                            'id' => $this->municipality->id,
+                            'name' => 'Yaoundé I',
+                            'city' => [
+                                'id' => $this->city->id,
+                                'name' => 'Yaoundé',
+                                'country' => [
+                                    'id' => $this->country->id,
+                                    'name' => 'Cameroun',
+                                    'code' => 'CM',
+                                ],
+                            ],
+                        ],
                     ],
                     'municipality' => [
                         'id' => $this->municipality->id,
                         'name' => 'Yaoundé I',
-                        'city_id' => $this->city->id,
-                    ],
-                    'city' => [
-                        'id' => $this->city->id,
-                        'name' => 'Yaoundé',
-                        'country_id' => $this->country->id,
-                    ],
-                    'country' => [
-                        'id' => $this->country->id,
-                        'name' => 'Cameroun',
-                        'code' => 'CM',
+                        'city' => [
+                            'id' => $this->city->id,
+                            'name' => 'Yaoundé',
+                            'country' => [
+                                'id' => $this->country->id,
+                                'name' => 'Cameroun',
+                                'code' => 'CM',
+                            ],
+                        ],
                     ],
                     'is_default' => false,
                 ],
@@ -266,10 +278,23 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonStructure([
                 'data' => [
-                    'neighborhood' => ['id', 'name', 'municipality_id'],
-                    'municipality' => ['id', 'name', 'city_id'],
-                    'city' => ['id', 'name', 'country_id'],
-                    'country' => ['id', 'name', 'code'],
+                    'neighborhood' => [
+                        'id', 'name', 'municipality_id',
+                        'municipality' => [
+                            'id', 'name',
+                            'city' => [
+                                'id', 'name',
+                                'country' => ['id', 'name', 'code'],
+                            ],
+                        ],
+                    ],
+                    'municipality' => [
+                        'id', 'name',
+                        'city' => [
+                            'id', 'name',
+                            'country' => ['id', 'name', 'code'],
+                        ],
+                    ],
                 ],
             ]);
 
@@ -277,7 +302,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         $responseData = $response->json('data');
         $this->assertEquals($this->neighborhood->id, $responseData['neighborhood']['id']);
         $this->assertEquals($this->municipality->id, $responseData['municipality']['id']);
-        $this->assertEquals($this->city->id, $responseData['city']['id']);
-        $this->assertEquals($this->country->id, $responseData['country']['id']);
+        $this->assertEquals($this->city->id, $responseData['municipality']['city']['id']);
+        $this->assertEquals($this->country->id, $responseData['municipality']['city']['country']['id']);
     }
 }

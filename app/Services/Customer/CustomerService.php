@@ -2,10 +2,12 @@
 
 namespace App\Services\Customer;
 
+use App\DTOs\Customer\CustomerDeliveryAddressDTO;
 use App\DTOs\Order\GetOrdersFilterDTO;
 use App\Enums\UserRole;
 use App\Events\CustomerCreatedEvent;
 use App\Models\Customer;
+use App\Models\CustomerDeliveryAddress;
 use App\Models\User;
 use App\Repositories\Contracts\BaseRepositoryInterface;
 use App\Repositories\Contracts\CustomerRepositoryInterface;
@@ -71,5 +73,12 @@ class CustomerService extends BaseServiceWithMedia
     public function getOrders(Customer $customer, GetOrdersFilterDTO $filters, int $perPage = 10): LengthAwarePaginator
     {
         return $this->repository->getOrdersForCustomer($customer, $filters, $perPage);
+    }
+
+    public function createDeliveryAddress(Customer $customer, CustomerDeliveryAddressDTO $dto): CustomerDeliveryAddress
+    {
+        return $this->repository->createDeliveryAddress(array_merge($dto->toArray(), [
+            'customer_id' => $customer->id,
+        ]));
     }
 }

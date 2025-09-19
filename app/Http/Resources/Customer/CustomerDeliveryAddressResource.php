@@ -2,6 +2,10 @@
 
 namespace App\Http\Resources\Customer;
 
+use App\Http\Api\Resources\CityResource;
+use App\Http\Api\Resources\CountryResource;
+use App\Http\Api\Resources\MunicipalityResource;
+use App\Http\Api\Resources\NeighborhoodResource;
 use App\Models\CustomerDeliveryAddress;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,34 +24,12 @@ class CustomerDeliveryAddressResource extends JsonResource
             'id' => $this->id,
             'label' => $this->label,
             'address' => $this->address,
-            'neighborhood' => $this->whenLoaded('neighborhood', function () {
-                return [
-                    'id' => $this->neighborhood->id,
-                    'name' => $this->neighborhood->name,
-                    'municipality_id' => $this->neighborhood->municipality_id,
-                ];
+            'neighborhood' => NeighborhoodResource::make($this->whenLoaded('neighborhood')),
+            'municipality' => $this->when($this->neighborhood?->relationLoaded('municipality'), function () {
+                return MunicipalityResource::make($this->neighborhood->municipality);
             }),
-            'municipality' => $this->when($this->neighborhood && $this->neighborhood->municipality, function () {
-                return [
-                    'id' => $this->neighborhood->municipality->id,
-                    'name' => $this->neighborhood->municipality->name,
-                    'city_id' => $this->neighborhood->municipality->city_id,
-                ];
-            }),
-            'city' => $this->when($this->city !== null, function () {
-                return [
-                    'id' => $this->city->id,
-                    'name' => $this->city->name,
-                    'country_id' => $this->city->country_id,
-                ];
-            }),
-            'country' => $this->when($this->country !== null, function () {
-                return [
-                    'id' => $this->country->id,
-                    'name' => $this->country->name,
-                    'code' => $this->country->code,
-                ];
-            }),
+            'city' => CityResource::make($this->whenLoaded('city')),
+            'country' => CountryResource::make($this->whenLoaded('country')),
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'phone' => $this->phone,

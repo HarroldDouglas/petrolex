@@ -7,9 +7,14 @@ use App\Http\Api\Responses\Customer\StoreCustomerDeliveryAddressResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\StoreCustomerDeliveryAddressRequest;
 use App\Models\Customer;
+use App\Services\Customer\CustomerService;
 
 class StoreCustomerDeliveryAddressController extends Controller
 {
+    public function __construct(
+        protected CustomerService $customerService
+    ) {}
+
     /**
      * Store new customer delivery address.
      *
@@ -19,17 +24,7 @@ class StoreCustomerDeliveryAddressController extends Controller
     public function __invoke(StoreCustomerDeliveryAddressRequest $request, Customer $customer): StoreCustomerDeliveryAddressResponse
     {
         $dto = CustomerDeliveryAddressDTO::from($request->validated());
-        $deliveryAddress = $customer->deliveryAddresses()->create($dto->toArray());
-
-        // TODO: move this into a repository or service
-        if ($deliveryAddress->is_default) {
-            $customer->deliveryAddresses()
-                ->where('id', '!=', $deliveryAddress->id)
-                ->update(['is_default' => false]);
-        }
-
-        // Load relationships for the response
-        $deliveryAddress->load(['neighborhood.municipality.city.country']);
+        $deliveryAddress = $this->customerService->createDeliveryAddress($customer, $dto);
 
         return StoreCustomerDeliveryAddressResponse::withAddress($deliveryAddress);
     }

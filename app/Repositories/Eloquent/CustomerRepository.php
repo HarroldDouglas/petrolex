@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\DTOs\Order\GetOrdersFilterDTO;
 use App\Models\Customer;
+use App\Models\CustomerDeliveryAddress;
 use App\Repositories\Contracts\CustomerRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -34,5 +35,18 @@ class CustomerRepository extends BaseEloquentRepository implements CustomerRepos
                 fn ($q) => $q->whereHas('payment', fn ($q) => $q->where('payment_method', $filters->payment_method))
             )
             ->paginate($perPage);
+    }
+
+    public function createDeliveryAddress(array $attributes): CustomerDeliveryAddress
+    {
+        $address = CustomerDeliveryAddress::create($attributes);
+
+        if ($address->is_default) {
+            CustomerDeliveryAddress::where('customer_id', $address->customer_id)
+                ->where('id', '!=', $address->id)
+                ->update(['is_default' => false]);
+        }
+
+        return $address->load(['neighborhood.municipality.city.country']);
     }
 }
