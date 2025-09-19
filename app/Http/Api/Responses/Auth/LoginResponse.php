@@ -16,8 +16,11 @@ class LoginResponse extends ApiResponse
         /** @var User $user */
         $user = $authDTO->user;
 
-        $user->loadMissing('country');
-
+        $user->load([
+            'country',
+            'customer.deliveryAddresses.neighborhood.municipality.city.country',
+        ]);
+       
         $userResource = match (true) {
             $user->hasRole(UserRole::CUSTOMER()->value) => new CustomerResource($user->customer),
             default => new UserResource($user),

@@ -181,12 +181,23 @@ class DemoDataSeeder extends Seeder
 
     private function createDemoCustomerData(): void
     {
-        $customerRecord = Customer::whereHas('user', function ($query) {
+        $customerRecord = Customer::whereHas('user', function (
+            $query
+        ) {
             $query->where('email', 'demo.customer@example.com');
         })->first();
 
         if (! $customerRecord) {
             $this->command->error('Demo customer not found. Create it first.');
+
+            return;
+        }
+
+        // Get the first available neighborhood
+        $neighborhood = \App\Models\Geography\Neighborhood::first();
+
+        if (! $neighborhood) {
+            $this->command->error('No neighborhoods found. Please seed geographic data first.');
 
             return;
         }
@@ -203,6 +214,7 @@ class DemoDataSeeder extends Seeder
                 'phone' => $customerRecord->user->phone_number,
                 'contact_name' => $customerRecord->user->first_name.' '.$customerRecord->user->last_name,
                 'is_default' => true,
+                'neighborhood_id' => $neighborhood->id,
             ]
         );
 

@@ -10,7 +10,10 @@ class ProfileResponse extends ApiResponse
 {
     public static function withUser(User $user): self
     {
-        $user->loadMissing('country');
+        $user->loadMissing([
+            'country',
+            'customer.deliveryAddresses.neighborhood.municipality.city.country',
+        ]);
 
         return new self(
             new UserResource($user),
