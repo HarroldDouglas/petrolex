@@ -12,7 +12,9 @@ class StoreCustomerDeliveryAddressResponse extends ApiResponse
     {
         return new self(
             new CustomerDeliveryAddressResource($address),
-            'Adresse de livraison créée avec succès'
+            'Adresse de livraison créée avec succès',
+            true,
+            201
         );
     }
 }

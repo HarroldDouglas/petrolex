@@ -3656,7 +3656,8 @@
             "StoreCustomerDeliveryAddressRequest": {
                 "required": [
                     "label",
-                    "address"
+                    "address",
+                    "neighborhood_id"
                 ],
                 "properties": {
                     "label": {
@@ -3669,23 +3670,10 @@
                         "type": "string",
                         "example": "456 Avenue de la Liberté"
                     },
-                    "neighborhood": {
-                        "description": "Neighborhood or district",
-                        "type": "string",
-                        "example": "Bali",
-                        "nullable": true
-                    },
-                    "city": {
-                        "description": "City",
-                        "type": "string",
-                        "example": "Yaoundé",
-                        "nullable": true
-                    },
-                    "country": {
-                        "description": "Country",
-                        "type": "string",
-                        "example": "Cameroun",
-                        "nullable": true
+                    "neighborhood_id": {
+                        "description": "ID of the neighborhood",
+                        "type": "integer",
+                        "example": 123
                     },
                     "latitude": {
                         "description": "Latitude coordinate",
@@ -4926,19 +4914,62 @@
                         "type": "string",
                         "example": "456 Avenue de la Liberté"
                     },
+                    "neighborhood_id": {
+                        "type": "integer",
+                        "example": 123
+                    },
                     "neighborhood": {
-                        "type": "string",
-                        "example": "Bali",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 123
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Bali"
+                            },
+                            "municipality_id": {
+                                "type": "integer",
+                                "example": 456
+                            }
+                        },
+                        "type": "object",
                         "nullable": true
                     },
                     "city": {
-                        "type": "string",
-                        "example": "Yaoundé",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 789
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Yaoundé"
+                            },
+                            "country_id": {
+                                "type": "integer",
+                                "example": 237
+                            }
+                        },
+                        "type": "object",
                         "nullable": true
                     },
                     "country": {
-                        "type": "string",
-                        "example": "Cameroun",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 237
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Cameroun"
+                            },
+                            "code": {
+                                "type": "string",
+                                "example": "CM"
+                            }
+                        },
+                        "type": "object",
                         "nullable": true
                     },
                     "latitude": {
@@ -4973,6 +5004,10 @@
                         "example": "Curie",
                         "nullable": true
                     },
+                    "contact_full_name": {
+                        "type": "string",
+                        "example": "Marie Curie"
+                    },
                     "email": {
                         "type": "string",
                         "format": "email",
@@ -4987,6 +5022,14 @@
                     "is_default": {
                         "type": "boolean",
                         "example": false
+                    },
+                    "full_address": {
+                        "type": "string",
+                        "example": "Maison, 456 Avenue de la Liberté, Bâtiment C, 3ème étage, Bali, Yaoundé, Cameroun, GPS: 3.848, 11.502"
+                    },
+                    "short_address": {
+                        "type": "string",
+                        "example": "Maison - 456 Avenue de la Liberté"
                     },
                     "created_at": {
                         "type": "string",

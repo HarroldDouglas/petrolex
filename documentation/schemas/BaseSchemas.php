@@ -103,15 +103,45 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="label", type="string", example="Maison"),
  *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté"),
- *     @OA\Property(property="neighborhood", type="string", nullable=true, example="Bali"),
- *     @OA\Property(property="city", type="string", nullable=true, example="Yaoundé"),
- *     @OA\Property(property="country", type="string", nullable=true, example="Cameroun"),
+ *     @OA\Property(
+ *         property="neighborhood",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer", example=123),
+ *         @OA\Property(property="name", type="string", example="Bali"),
+ *         @OA\Property(property="municipality_id", type="integer", example=456)
+ *     ),
+ *     @OA\Property(
+ *         property="municipality",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer", example=456),
+ *         @OA\Property(property="name", type="string", example="Yaoundé I"),
+ *         @OA\Property(property="city_id", type="integer", example=789)
+ *     ),
+ *     @OA\Property(
+ *         property="city",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer", example=789),
+ *         @OA\Property(property="name", type="string", example="Yaoundé"),
+ *         @OA\Property(property="country_id", type="integer", example=237)
+ *     ),
+ *     @OA\Property(
+ *         property="country",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer", example=237),
+ *         @OA\Property(property="name", type="string", example="Cameroun"),
+ *         @OA\Property(property="code", type="string", example="CM")
+ *     ),
  *     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=3.848),
  *     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=11.502),
  *     @OA\Property(property="phone", type="string", nullable=true, example="699887766"),
  *     @OA\Property(property="phone_country_code", type="string", nullable=true, example="+237"),
  *     @OA\Property(property="contact_firstname", type="string", nullable=true, example="Marie"),
  *     @OA\Property(property="contact_lastname", type="string", nullable=true, example="Curie"),
+ *     @OA\Property(property="contact_full_name", type="string", example="Marie Curie"),
  *     @OA\Property(property="email", type="string", format="email", nullable=true, example="test@example.com"),
  *     @OA\Property(property="address_precision", type="string", nullable=true, example="Bâtiment C, 3ème étage"),
  *     @OA\Property(property="is_default", type="boolean", example=false),

@@ -28,6 +28,9 @@ class StoreCustomerDeliveryAddressController extends Controller
                 ->update(['is_default' => false]);
         }
 
+        // Load relationships for the response
+        $deliveryAddress->load(['neighborhood.municipality.city.country']);
+
         return StoreCustomerDeliveryAddressResponse::withAddress($deliveryAddress);
     }
 }

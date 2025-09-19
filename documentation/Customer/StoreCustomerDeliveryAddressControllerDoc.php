@@ -7,14 +7,13 @@ use OpenApi\Annotations as OA;
  *     schema="StoreCustomerDeliveryAddressRequest",
  *     required={
  *         "label",
- *         "address"
+ *         "address",
+ *         "neighborhood_id"
  *     },
  *
  *     @OA\Property(property="label", type="string", example="Maison secondaire", description="Label for the delivery address"),
  *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté", description="Full street address"),
- *     @OA\Property(property="neighborhood", type="string", example="Bali", nullable=true, description="Neighborhood or district"),
- *     @OA\Property(property="city", type="string", example="Yaoundé", nullable=true, description="City"),
- *     @OA\Property(property="country", type="string", example="Cameroun", nullable=true, description="Country"),
+ *     @OA\Property(property="neighborhood_id", type="integer", example=123, description="ID of the neighborhood"),
  *     @OA\Property(property="latitude", type="number", format="float", example=3.848, nullable=true, description="Latitude coordinate"),
  *     @OA\Property(property="longitude", type="number", format="float", example=11.502, nullable=true, description="Longitude coordinate"),
  *     @OA\Property(property="phone", type="string", example="699887766", nullable=true, description="Contact phone number without country code"),

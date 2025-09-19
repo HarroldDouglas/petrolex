@@ -9,9 +9,7 @@ class CustomerDeliveryAddressDTO extends BaseDTO
     public function __construct(
         public string $label,
         public string $address,
-        public ?string $neighborhood,
-        public ?string $city,
-        public ?string $country,
+        public int $neighborhood_id,
         public ?float $latitude,
         public ?float $longitude,
         public ?string $phone,
@@ -20,6 +18,6 @@ class CustomerDeliveryAddressDTO extends BaseDTO
         public ?string $contact_lastname,
         public ?string $email,
         public ?string $address_precision,
-        public ?bool $is_default,
+        public bool $is_default = false,
     ) {}
 }
