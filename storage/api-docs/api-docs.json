@@ -1377,6 +1377,106 @@
                 ]
             }
         },
+        "/api/customers/{customer}/delivery-addresses/{deliveryAddress}": {
+            "put": {
+                "tags": [
+                    "Livraison"
+                ],
+                "summary": "Mettre à jour une adresse de livraison d'un client",
+                "description": "Permet de mettre à jour une adresse de livraison existante associée à un client spécifique.",
+                "operationId": "api.customers.delivery-addresses.update",
+                "parameters": [
+                    {
+                        "name": "customer",
+                        "in": "path",
+                        "description": "ID du client",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "deliveryAddress",
+                        "in": "path",
+                        "description": "ID de l'adresse de livraison",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Données de l'adresse de livraison à mettre à jour",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCustomerDeliveryAddressRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Adresse de livraison mise à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateCustomerDeliveryAddressResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Client ou adresse de livraison non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/delivery-types": {
             "get": {
                 "tags": [
@@ -3673,7 +3773,7 @@
                     "neighborhood_id": {
                         "description": "ID of the neighborhood",
                         "type": "integer",
-                        "example": 123
+                        "example": 1
                     },
                     "latitude": {
                         "description": "Latitude coordinate",
@@ -3748,6 +3848,107 @@
                             "message": {
                                 "type": "string",
                                 "example": "Adresse de livraison créée avec succès"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "UpdateCustomerDeliveryAddressRequest": {
+                "required": [
+                    "label",
+                    "address",
+                    "neighborhood_id"
+                ],
+                "properties": {
+                    "label": {
+                        "description": "Label for the delivery address",
+                        "type": "string",
+                        "example": "Maison secondaire"
+                    },
+                    "address": {
+                        "description": "Full street address",
+                        "type": "string",
+                        "example": "456 Avenue de la Liberté"
+                    },
+                    "neighborhood_id": {
+                        "description": "ID of the neighborhood",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "latitude": {
+                        "description": "Latitude coordinate",
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.848,
+                        "nullable": true
+                    },
+                    "longitude": {
+                        "description": "Longitude coordinate",
+                        "type": "number",
+                        "format": "float",
+                        "example": 11.502,
+                        "nullable": true
+                    },
+                    "phone": {
+                        "description": "Contact phone number without country code",
+                        "type": "string",
+                        "example": "699887766",
+                        "nullable": true
+                    },
+                    "phone_country_code": {
+                        "description": "Country code for the phone number",
+                        "type": "string",
+                        "example": "+237",
+                        "nullable": true
+                    },
+                    "contact_firstname": {
+                        "description": "Contact person's first name",
+                        "type": "string",
+                        "example": "Marie",
+                        "nullable": true
+                    },
+                    "contact_lastname": {
+                        "description": "Contact person's last name",
+                        "type": "string",
+                        "example": "Curie",
+                        "nullable": true
+                    },
+                    "email": {
+                        "description": "Contact person's email address",
+                        "type": "string",
+                        "format": "email",
+                        "example": "test@example.com",
+                        "nullable": true
+                    },
+                    "address_precision": {
+                        "description": "Additional details for address precision",
+                        "type": "string",
+                        "example": "Bâtiment C, 3ème étage",
+                        "nullable": true
+                    },
+                    "is_default": {
+                        "description": "Whether this is the default delivery address for the customer",
+                        "type": "boolean",
+                        "example": false,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateCustomerDeliveryAddressResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "$ref": "#/components/schemas/DeliveryAddress"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Adresse de livraison mise à jour avec succès"
                             }
                         },
                         "type": "object"
@@ -4914,15 +5115,12 @@
                         "type": "string",
                         "example": "456 Avenue de la Liberté"
                     },
-                    "neighborhood_id": {
-                        "type": "integer",
-                        "example": 123
-                    },
                     "neighborhood": {
+                        "description": "Neighborhood data without nested relationships",
                         "properties": {
                             "id": {
                                 "type": "integer",
-                                "example": 123
+                                "example": 1
                             },
                             "name": {
                                 "type": "string",
@@ -4930,17 +5128,49 @@
                             },
                             "municipality_id": {
                                 "type": "integer",
-                                "example": 456
+                                "example": 1
+                            },
+                            "is_active": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "latitude": {
+                                "type": "string",
+                                "example": "3.85600000"
+                            },
+                            "longitude": {
+                                "type": "string",
+                                "example": "11.49500000"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "municipality": {
+                        "description": "Municipality data without nested relationships",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Yaoundé I"
+                            },
+                            "city_id": {
+                                "type": "integer",
+                                "example": 1
                             }
                         },
                         "type": "object",
                         "nullable": true
                     },
                     "city": {
+                        "description": "City data without nested relationships",
                         "properties": {
                             "id": {
                                 "type": "integer",
-                                "example": 789
+                                "example": 1
                             },
                             "name": {
                                 "type": "string",
@@ -4948,17 +5178,18 @@
                             },
                             "country_id": {
                                 "type": "integer",
-                                "example": 237
+                                "example": 1
                             }
                         },
                         "type": "object",
                         "nullable": true
                     },
                     "country": {
+                        "description": "Complete country data",
                         "properties": {
                             "id": {
                                 "type": "integer",
-                                "example": 237
+                                "example": 1
                             },
                             "name": {
                                 "type": "string",
@@ -4967,6 +5198,22 @@
                             "code": {
                                 "type": "string",
                                 "example": "CM"
+                            },
+                            "phone_code": {
+                                "type": "string",
+                                "example": "+237"
+                            },
+                            "currency": {
+                                "type": "string",
+                                "example": "FCFA"
+                            },
+                            "decimal_places": {
+                                "type": "integer",
+                                "example": 0
+                            },
+                            "is_active": {
+                                "type": "boolean",
+                                "example": true
                             }
                         },
                         "type": "object",
@@ -5023,14 +5270,6 @@
                         "type": "boolean",
                         "example": false
                     },
-                    "full_address": {
-                        "type": "string",
-                        "example": "Maison, 456 Avenue de la Liberté, Bâtiment C, 3ème étage, Bali, Yaoundé, Cameroun, GPS: 3.848, 11.502"
-                    },
-                    "short_address": {
-                        "type": "string",
-                        "example": "Maison - 456 Avenue de la Liberté"
-                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
@@ -5079,6 +5318,107 @@
                         "description": "Number of decimal places for currency formatting (0 for FCFA, 2 for $/€)",
                         "type": "integer",
                         "example": 0
+                    }
+                },
+                "type": "object"
+            },
+            "City": {
+                "title": "City",
+                "description": "City data",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Yaoundé"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "country": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Country"
+                            }
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Municipality": {
+                "title": "Municipality",
+                "description": "Municipality data",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Yaoundé I"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "city": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/City"
+                            }
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Neighborhood": {
+                "title": "Neighborhood",
+                "description": "Neighborhood data",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Bali"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.848,
+                        "nullable": true
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 11.502,
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "municipality": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Municipality"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "city": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/City"
+                            }
+                        ],
+                        "nullable": true
                     }
                 },
                 "type": "object"

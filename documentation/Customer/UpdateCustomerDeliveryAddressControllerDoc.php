@@ -4,7 +4,7 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Schema(
- *     schema="StoreCustomerDeliveryAddressRequest",
+ *     schema="UpdateCustomerDeliveryAddressRequest",
  *     required={
  *         "label",
  *         "address",
@@ -26,7 +26,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Schema(
- *     schema="StoreCustomerDeliveryAddressResponse",
+ *     schema="UpdateCustomerDeliveryAddressResponse",
  *     allOf={
  *         @OA\Schema(ref="#/components/schemas/ApiResponse"),
  *         @OA\Schema(
@@ -38,17 +38,17 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(
  *                 property="message",
  *                 type="string",
- *                 example="Adresse de livraison créée avec succès"
+ *                 example="Adresse de livraison mise à jour avec succès"
  *             )
  *         )
  *     }
  * )
  *
- * @OA\Post(
- *     path="/api/customers/{customer}/delivery-addresses",
- *     summary="Créer une nouvelle adresse de livraison pour un client",
- *     description="Permet de créer une nouvelle adresse de livraison associée à un client spécifique.",
- *     operationId="api.customers.delivery-addresses.store",
+ * @OA\Put(
+ *     path="/api/customers/{customer}/delivery-addresses/{deliveryAddress}",
+ *     summary="Mettre à jour une adresse de livraison d'un client",
+ *     description="Permet de mettre à jour une adresse de livraison existante associée à un client spécifique.",
+ *     operationId="api.customers.delivery-addresses.update",
  *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
  *
@@ -61,18 +61,27 @@ use OpenApi\Annotations as OA;
  *         @OA\Schema(type="integer", example=1)
  *     ),
  *
+ *     @OA\Parameter(
+ *         name="deliveryAddress",
+ *         in="path",
+ *         required=true,
+ *         description="ID de l'adresse de livraison",
+ *
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *
  *     @OA\RequestBody(
  *         required=true,
- *         description="Données de l'adresse de livraison à créer",
+ *         description="Données de l'adresse de livraison à mettre à jour",
  *
- *         @OA\JsonContent(ref="#/components/schemas/StoreCustomerDeliveryAddressRequest")
+ *         @OA\JsonContent(ref="#/components/schemas/UpdateCustomerDeliveryAddressRequest")
  *     ),
  *
  *     @OA\Response(
- *         response=201,
- *         description="Adresse de livraison créée avec succès",
+ *         response=200,
+ *         description="Adresse de livraison mise à jour avec succès",
  *
- *         @OA\JsonContent(ref="#/components/schemas/StoreCustomerDeliveryAddressResponse")
+ *         @OA\JsonContent(ref="#/components/schemas/UpdateCustomerDeliveryAddressResponse")
  *     ),
  *
  *     @OA\Response(
@@ -84,7 +93,7 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Response(
  *         response=404,
- *         description="Client non trouvé",
+ *         description="Client ou adresse de livraison non trouvé",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
@@ -104,4 +113,4 @@ use OpenApi\Annotations as OA;
  *     )
  * )
  */
-class StoreCustomerDeliveryAddressControllerDoc {}
+class UpdateCustomerDeliveryAddressControllerDoc {}
