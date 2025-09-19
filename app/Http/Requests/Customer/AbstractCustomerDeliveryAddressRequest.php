@@ -24,9 +24,7 @@ class AbstractCustomerDeliveryAddressRequest extends FormRequest
         return [
             'label' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
-            'neighborhood' => ['nullable', 'string', 'max:255'],
-            'city' => ['nullable', 'string', 'max:255'],
-            'country' => ['nullable', 'string', 'max:255'],
+            'neighborhood_id' => ['required', 'integer', 'exists:neighborhoods,id'],
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'phone' => ['nullable', 'string', 'max:255'],

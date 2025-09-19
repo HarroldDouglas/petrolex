@@ -3,6 +3,7 @@
 namespace App\Http\Api\Resources\Order;
 
 use App\Http\Api\Resources\CustomerResource;
+use App\Http\Api\Resources\DistributionCenterResource;
 use App\Http\Resources\Customer\CustomerDeliveryAddressResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -55,14 +56,7 @@ class OrderResource extends JsonResource
             'payment' => OrderPaymentResource::make($this->whenLoaded('payment')),
             'delivery_address' => CustomerDeliveryAddressResource::make($this->deliveryAddress),
             'customer' => CustomerResource::make($this->customer),
-            'distribution_center' => $this->whenLoaded('distributionCenter', function () {
-                return [
-                    'id' => $this->distributionCenter->id,
-                    'name' => $this->distributionCenter->name,
-                    'latitude' => $this->distributionCenter->latitude,
-                    'longitude' => $this->distributionCenter->longitude,
-                ];
-            }),
+            'distribution_center' => DistributionCenterResource::make($this->whenLoaded('distributionCenter')),
         ];
     }
 }

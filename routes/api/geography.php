@@ -2,7 +2,6 @@
 
 use App\Http\Api\Controllers\Geography\CityController;
 use App\Http\Api\Controllers\Geography\CountryController;
-
 use App\Http\Api\Controllers\Geography\NeighborhoodController;
 use Illuminate\Support\Facades\Route;
 
