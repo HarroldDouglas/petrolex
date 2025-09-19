@@ -200,12 +200,20 @@ class UserSeeder extends Seeder
 
         $customer = $customerUser->customer;
 
+        $neighborhood = \App\Models\Geography\Neighborhood::first();
+
+        if (! $neighborhood) {
+            $this->command->error('No neighborhoods found. Please seed geographic data first.');
+            return;
+        }
+
         $customer->deliveryAddresses()->create([
             'label' => 'Nkoabang',
             'address' => 'Nkoabang',
             'latitude' => 3.8617882,
             'longitude' => 11.5835694,
             'is_default' => true,
+            'neighborhood_id' => $neighborhood->id,
         ]);
 
         $customer->deliveryAddresses()->create([
@@ -213,6 +221,7 @@ class UserSeeder extends Seeder
             'address' => 'Poste Centrale',
             'latitude' => 3.8741355,
             'longitude' => 11.5173166,
+            'neighborhood_id' => $neighborhood->id,
         ]);
 
         $customer->deliveryAddresses()->create([
@@ -220,6 +229,7 @@ class UserSeeder extends Seeder
             'address' => 'Essos',
             'latitude' => 3.868779,
             'longitude' => 11.542277,
+            'neighborhood_id' => $neighborhood->id,
         ]);
     }
 

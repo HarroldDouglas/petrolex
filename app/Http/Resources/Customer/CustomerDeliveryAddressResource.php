@@ -16,46 +16,53 @@ class CustomerDeliveryAddressResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'label' => $this->label,
-            'address' => $this->address,
-            'neighborhood' => $this->whenLoaded('neighborhood', function () {
-                return [
-                    'id' => $this->neighborhood->id,
-                    'name' => $this->neighborhood->name,
-                    'municipality_id' => $this->neighborhood->municipality_id,
-                    'is_active' => $this->neighborhood->is_active,
-                    'latitude' => $this->neighborhood->latitude,
-                    'longitude' => $this->neighborhood->longitude,
-                ];
-            }),
-            'municipality' => $this->when($this->neighborhood?->relationLoaded('municipality'), function () {
-                return [
-                    'id' => $this->neighborhood->municipality->id,
-                    'name' => $this->neighborhood->municipality->name,
-                    'city_id' => $this->neighborhood->municipality->city_id,
-                ];
-            }),
-            'city' => $this->when($this->neighborhood?->municipality?->relationLoaded('city'), function () {
-                return [
+        $neighborhood = $this->whenLoaded('neighborhood', function () {
+            return [
+                'id' => $this->neighborhood->id,
+                'name' => $this->neighborhood->name,
+                'municipality_id' => $this->neighborhood->municipality_id,
+                'is_active' => $this->neighborhood->is_active,
+                'latitude' => $this->neighborhood->latitude,
+                'longitude' => $this->neighborhood->longitude,
+            ];
+        });
+        $municipality = null;
+        $city = null;
+        $country = null;
+        if ($this->neighborhood && $this->neighborhood->relationLoaded('municipality')) {
+            $municipality = [
+                'id' => $this->neighborhood->municipality->id,
+                'name' => $this->neighborhood->municipality->name,
+                'city_id' => $this->neighborhood->municipality->city_id,
+            ];
+            if ($this->neighborhood->municipality->relationLoaded('city')) {
+                $city = [
                     'id' => $this->neighborhood->municipality->city->id,
                     'name' => $this->neighborhood->municipality->city->name,
                     'country_id' => $this->neighborhood->municipality->city->country_id,
                 ];
-            }),
-            'country' => $this->when($this->neighborhood?->municipality?->city?->relationLoaded('country'), function () {
-                $country = $this->neighborhood->municipality->city->country;
-                return [
-                    'id' => $country->id,
-                    'name' => $country->name,
-                    'code' => $country->code,
-                    'phone_code' => $country->phone_code,
-                    'currency' => $country->currency?->label,
-                    'decimal_places' => $country->currency?->decimalPlaces(),
-                    'is_active' => $country->is_active,
-                ];
-            }),
+                if ($this->neighborhood->municipality->city->relationLoaded('country')) {
+                    $countryObj = $this->neighborhood->municipality->city->country;
+                    $country = [
+                        'id' => $countryObj->id,
+                        'name' => $countryObj->name,
+                        'code' => $countryObj->code,
+                        'phone_code' => $countryObj->phone_code,
+                        'currency' => $countryObj->currency?->label,
+                        'decimal_places' => $countryObj->currency?->decimalPlaces(),
+                        'is_active' => $countryObj->is_active,
+                    ];
+                }
+            }
+        }
+        return [
+            'id' => $this->id,
+            'label' => $this->label,
+            'address' => $this->address,
+            'neighborhood' => $neighborhood ?? null,
+            'municipality' => $municipality,
+            'city' => $city,
+            'country' => $country,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'phone' => $this->phone,
