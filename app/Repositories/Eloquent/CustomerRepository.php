@@ -18,7 +18,12 @@ class CustomerRepository extends BaseEloquentRepository implements CustomerRepos
     public function getOrdersForCustomer(Customer $customer, GetOrdersFilterDTO $filters, int $perPage = 10): LengthAwarePaginator
     {
         return $customer->orders()
-            ->with(['items.productCategory', 'deliveryAddress', 'payment'])
+            ->with([
+                'items.productCategory',
+                'deliveryAddress.neighborhood.municipality.city.country',
+                'payment',
+                'customer.deliveryAddresses.neighborhood.municipality.city.country',
+            ])
             ->when(
                 $filters->order_number !== null && $filters->order_number !== '',
                 fn ($q) => $q->where('order_number', $filters->order_number)

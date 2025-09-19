@@ -55,6 +55,7 @@ class CustomerDeliveryAddressResource extends JsonResource
                 }
             }
         }
+
         return [
             'id' => $this->id,
             'label' => $this->label,

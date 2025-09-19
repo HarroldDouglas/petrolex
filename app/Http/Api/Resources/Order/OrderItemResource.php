@@ -35,6 +35,7 @@ class OrderItemResource extends JsonResource
             'unit_price' => $this->unit_price,
             'total_price' => $this->total_price,
             'option' => $this->bottle_type,
+            'option_label' => $this->bottle_type ? (BottleOrderType::from($this->bottle_type)->label ?? $this->bottle_type) : null,
             'created_at' => $this->created_at,
         ];
     }

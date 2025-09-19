@@ -35,6 +35,7 @@ class ProductResource extends JsonResource
         $commonData = [
             'id' => $productCategory->id,
             'type' => $productCategory->product_type->value,
+            'type_label' => $productCategory->product_type->label ?? $productCategory->product_type->value,
             'name' => $productTypeInstance->getLocalizedName(),
             'description' => $productTypeInstance->getLocalizedDescription(),
             'category_name' => $productCategory->product_type->labelForMobile(),

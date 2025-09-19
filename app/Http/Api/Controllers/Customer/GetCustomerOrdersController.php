@@ -19,11 +19,13 @@ class GetCustomerOrdersController extends Controller
     /**
      * Get customer orders.
      *
-     * Route: GET /customers/{customer}/orders
-     * Name: api.customers.orders.index
+     * Route: GET /my/orders
+     * Name: api.my.orders.index
      */
-    public function __invoke(GetCustomerOrdersRequest $request, Customer $customer): CustomerOrdersResponse
+    public function __invoke(GetCustomerOrdersRequest $request): CustomerOrdersResponse
     {
+        $user = $request->user();
+        $customer = $user->customer;
         $validated = $request->validated();
         $filters = GetOrdersFilterDTO::from(Arr::except($validated, ['per_page']));
         $perPage = $validated['per_page'] ?? 10;

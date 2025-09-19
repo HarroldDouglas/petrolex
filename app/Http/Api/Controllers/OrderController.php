@@ -52,6 +52,7 @@ class OrderController extends Controller
                     'payment_reference' => $payment->payment_reference,
                     'payment_url' => $payment->payment_url,
                     'status' => $payment->payment_status->value,
+                    'status_label' => $payment->payment_status->label,
                 ],
                 message: 'Commande créée et paiement initié avec succès.',
                 statusCode: 201

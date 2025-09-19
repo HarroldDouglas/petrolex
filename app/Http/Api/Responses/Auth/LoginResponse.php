@@ -20,7 +20,7 @@ class LoginResponse extends ApiResponse
             'country',
             'customer.deliveryAddresses.neighborhood.municipality.city.country',
         ]);
-       
+
         $userResource = match (true) {
             $user->hasRole(UserRole::CUSTOMER()->value) => new CustomerResource($user->customer),
             default => new UserResource($user),

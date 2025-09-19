@@ -82,6 +82,9 @@ class OrderSeeder extends Seeder
         $this->command->info('===== FINAL STOCK STATE AFTER ALL ORDERS =====');
         $this->displayAllCenterStats($centers, $productCategories);
 
+        // Create specific test orders for customer1
+        $this->createTestOrdersForCustomer1();
+
         // Global summary
         $this->displayOrderSummary();
         $this->createNotificationsForOrders();
@@ -520,9 +523,11 @@ class OrderSeeder extends Seeder
             $orderData['processing_at'] = $confirmedAt->copy()->addHours(rand(1, 5));
         }
 
-        // For delivered orders, set the delivered_at timestamp
+        // For delivered orders, set the delivered_at timestamp and delivery_date
         if ($status->equals(OrderStatus::DELIVERED())) {
-            $orderData['delivered_at'] = $orderData['processing_at']->copy()->addHours(rand(1, 8));
+            $deliveredAt = $orderData['processing_at']->copy()->addHours(rand(1, 8));
+            $orderData['delivered_at'] = $deliveredAt;
+            $orderData['delivery_date'] = $deliveredAt;
         }
 
         if ($addRatings) {
@@ -1253,5 +1258,248 @@ class OrderSeeder extends Seeder
         }
 
         $this->command->info($recentOrders->count().' notifications created successfully');
+    }
+
+    /**
+     * Create specific test orders for customer1@test.com with varied data
+     */
+    private function createTestOrdersForCustomer1(): void
+    {
+        $this->command->info('Creating test orders for customer1...');
+
+        // Find customer1
+        $customer1User = User::where('email', 'customer1@test.com')->first();
+        if (! $customer1User || ! $customer1User->customer) {
+            $this->command->error('Customer1 not found. Run UserSeeder first.');
+
+            return;
+        }
+
+        // Clean existing test orders for customer1
+        $customer1 = $customer1User->customer;
+        $existingTestOrders = Order::where('customer_id', $customer1->id)
+            ->where('order_number', 'LIKE', 'TEST-C'.$customer1->id.'-%')
+            ->get();
+
+        foreach ($existingTestOrders as $order) {
+            // Delete related records first
+            $order->items()->delete();
+            $order->payment()->delete();
+            \App\Models\Refund::where('order_id', $order->id)->delete();
+            $order->delete();
+        }
+
+        $this->command->info('Cleaned '.count($existingTestOrders).' existing test orders for customer1.');
+
+        $centers = DistributionCenter::all();
+        $deliveryPersons = DeliveryPerson::where('is_active', true)->get();
+
+        if ($centers->isEmpty()) {
+            $this->command->error('No distribution centers found.');
+
+            return;
+        }
+
+        // Define order scenarios with varied data
+        $orderScenarios = [
+            // Pending orders (3)
+            ['status' => OrderStatus::PENDING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PENDING(), 'days_ago' => 1],
+            ['status' => OrderStatus::PENDING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PENDING(), 'days_ago' => 2],
+            ['status' => OrderStatus::PENDING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::FAILED(), 'days_ago' => 3],
+
+            // Confirmed orders (4)
+            ['status' => OrderStatus::CONFIRMED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 4],
+            ['status' => OrderStatus::CONFIRMED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 5],
+            ['status' => OrderStatus::CONFIRMED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 6],
+            ['status' => OrderStatus::CONFIRMED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 7],
+
+            // Processing orders (4)
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 8, 'needs_delivery_person' => true],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 9, 'needs_delivery_person' => true],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 10, 'needs_delivery_person' => true],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 11, 'needs_delivery_person' => true],
+
+            // Delivered orders (4)
+            ['status' => OrderStatus::DELIVERED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 15, 'needs_delivery_person' => true, 'delivered' => true, 'rating' => 4.5, 'comment' => 'Excellent service!'],
+            ['status' => OrderStatus::DELIVERED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 20, 'needs_delivery_person' => true, 'delivered' => true, 'rating' => 5.0, 'comment' => 'Perfect delivery'],
+            ['status' => OrderStatus::DELIVERED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 25, 'needs_delivery_person' => true, 'delivered' => true, 'rating' => 3.5],
+            ['status' => OrderStatus::DELIVERED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 30, 'needs_delivery_person' => true, 'delivered' => true, 'rating' => 4.0, 'comment' => 'Good service, on time'],
+
+            // Cancelled orders (2)
+            ['status' => OrderStatus::CANCELLED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 12, 'cancelled' => true],
+            ['status' => OrderStatus::CANCELLED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 18, 'cancelled' => true],
+        ];
+
+        $createdOrders = [];
+        foreach ($orderScenarios as $index => $scenario) {
+            $order = $this->createCustomer1Order($customer1, $centers, $deliveryPersons, $scenario, $index + 1);
+            if ($order) {
+                $createdOrders[] = $order;
+            }
+        }
+
+        $this->command->info(count($createdOrders).' test orders created for customer1.');
+    }
+
+    /**
+     * Create a specific order for customer1
+     */
+    private function createCustomer1Order(Customer $customer, Collection $centers, Collection $deliveryPersons, array $scenario, int $orderNumber): ?Order
+    {
+        $center = $centers->random();
+        $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
+
+        if (! $deliveryAddress) {
+            $this->command->error('No delivery addresses found for customer1.');
+
+            return null;
+        }
+
+        $orderDate = now()->subDays($scenario['days_ago']);
+        $confirmedAt = $orderDate->copy()->addMinutes(rand(5, 60));
+
+        $orderData = [
+            'customer_id' => $customer->id,
+            'distribution_center_id' => $center->id,
+            'delivery_address_id' => $deliveryAddress->id,
+            'order_number' => 'TEST-C'.$customer->id.'-'.str_pad($orderNumber, 3, '0', STR_PAD_LEFT),
+            'order_date' => $orderDate,
+            'delivery_type' => $scenario['delivery_type'],
+            'status' => $scenario['status'],
+            'subtotal' => 0, // Will be updated after adding items
+            'delivery_fee' => $scenario['delivery_type']->fee(),
+            'total_amount' => $scenario['delivery_type']->fee(),
+        ];
+
+        // Set delivery person for orders that need one
+        if (isset($scenario['needs_delivery_person']) && $deliveryPersons->isNotEmpty()) {
+            $orderData['delivery_person_id'] = $deliveryPersons->random()->id;
+        }
+
+        // Set timestamps based on status
+        if ($scenario['status']->equals(OrderStatus::CONFIRMED()) ||
+            $scenario['status']->equals(OrderStatus::PROCESSING()) ||
+            $scenario['status']->equals(OrderStatus::DELIVERED())) {
+            $orderData['confirmed_at'] = $confirmedAt;
+        }
+
+        if ($scenario['status']->equals(OrderStatus::PROCESSING()) ||
+            $scenario['status']->equals(OrderStatus::DELIVERED())) {
+            $orderData['processing_at'] = $confirmedAt->copy()->addHours(rand(1, 5));
+        }
+
+        if (isset($scenario['delivered']) && $scenario['delivered']) {
+            $orderData['delivered_at'] = $orderData['processing_at']->copy()->addHours(rand(1, 8));
+            $orderData['delivery_date'] = $orderData['delivered_at'];
+        }
+
+        if (isset($scenario['cancelled']) && $scenario['cancelled']) {
+            $orderData['cancelled_at'] = $confirmedAt->copy()->addHours(rand(1, 24));
+            $orderData['cancelled_reason'] = 'Customer request for cancellation';
+        }
+
+        // Add ratings and comments
+        if (isset($scenario['rating'])) {
+            $orderData['rating'] = $scenario['rating'];
+        }
+        if (isset($scenario['comment'])) {
+            $orderData['comments'] = $scenario['comment'];
+        }
+
+        $order = Order::create($orderData);
+
+        // Create order items
+        $this->addItemsToCustomer1Order($order);
+
+        // Calculate totals
+        $this->updateOrderTotals($order);
+
+        // Create payment with specific method and status
+        $this->createCustomer1Payment($order, $scenario);
+
+        return $order;
+    }
+
+    /**
+     * Add items to customer1's order
+     */
+    private function addItemsToCustomer1Order(Order $order): void
+    {
+        // Get available product categories for bottles
+        $bottleCategories = ProductCategory::bottles()
+            ->whereHas('distributionCenters', function ($query) use ($order) {
+                $query->where('distribution_center_id', $order->distribution_center_id)
+                    ->where('stock_filled', '>', 0);
+            })
+            ->get();
+
+        if ($bottleCategories->isEmpty()) {
+            // If no bottles available, just create a basic item
+            $basicCategory = ProductCategory::bottles()->first();
+            if ($basicCategory) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_category_id' => $basicCategory->id,
+                    'quantity' => rand(1, 3),
+                    'bottle_type' => \App\Enums\BottleOrderType::FULL()->value,
+                    'unit_price' => 5000,
+                    'total_price' => 5000 * rand(1, 3),
+                ]);
+            }
+
+            return;
+        }
+
+        // Add 1-2 different bottle types
+        $selectedCategories = $bottleCategories->take(rand(1, 2));
+
+        foreach ($selectedCategories as $category) {
+            $quantity = rand(1, 3);
+            $bottleType = rand(0, 1) ? \App\Enums\BottleOrderType::FULL() : \App\Enums\BottleOrderType::RECHARGE();
+            $unitPrice = $bottleType->equals(\App\Enums\BottleOrderType::FULL()) ? 5000 : 3500;
+
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_category_id' => $category->id,
+                'quantity' => $quantity,
+                'bottle_type' => $bottleType->value,
+                'unit_price' => $unitPrice,
+                'total_price' => $unitPrice * $quantity,
+            ]);
+        }
+    }
+
+    /**
+     * Create payment for customer1's order with specific method and status
+     */
+    private function createCustomer1Payment(Order $order, array $scenario): void
+    {
+        $paymentMethod = $scenario['payment_method'];
+        $paymentStatus = $scenario['payment_status'];
+        $totalAmount = $order->total_amount;
+
+        $paymentDate = $paymentStatus->equals(PaymentStatus::PAID()) ? $order->order_date : null;
+        $amountPaid = $paymentStatus->equals(PaymentStatus::PAID()) ? $totalAmount : 0;
+        $amountDue = $paymentStatus->equals(PaymentStatus::PAID()) ? 0 : $totalAmount;
+
+        OrderPayment::create([
+            'order_id' => $order->id,
+            'payment_method' => $paymentMethod,
+            'payment_status' => $paymentStatus,
+            'amount_paid' => $amountPaid,
+            'amount_due' => $amountDue,
+            'payment_reference' => $this->generatePaymentReference($paymentMethod, $order->order_date),
+            'payment_date' => $paymentDate,
+            'payment_notes' => 'Test payment for customer1',
+        ]);
+
+        // Create refund for cancelled paid orders
+        if ($order->status->equals(OrderStatus::CANCELLED()) && $paymentStatus->equals(PaymentStatus::PAID())) {
+            // Check if refund already exists
+            $existingRefund = \App\Models\Refund::where('order_id', $order->id)->first();
+            if (! $existingRefund) {
+                $this->createRefundForCancelledOrder($order, $totalAmount);
+            }
+        }
     }
 }

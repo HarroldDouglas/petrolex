@@ -2130,6 +2130,93 @@
                 ]
             }
         },
+        "/api/orders/{order}": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Récupérer les détails complets d'une commande",
+                "description": "Retourne tous les détails d'une commande spécifique: informations de base, client, adresse de livraison, livreur, articles, paiement, suivi, etc.",
+                "operationId": "getOrderDetails",
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "description": "ID de la commande",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de la commande récupérés avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Détails de la commande récupérés avec succès"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderDetailsData"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Non autorisé à voir cette commande",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commande non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/orders/checkout": {
             "post": {
                 "tags": [
@@ -5423,6 +5510,273 @@
                 },
                 "type": "object"
             },
+            "OrderDetailsData": {
+                "title": "OrderDetailsData",
+                "description": "Détails complets d'une commande",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order_number": {
+                        "type": "string",
+                        "example": "CMD-202412-0001"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "confirmed"
+                    },
+                    "status_label": {
+                        "type": "string",
+                        "example": "Confirmée"
+                    },
+                    "delivery_type": {
+                        "type": "string",
+                        "example": "home_delivery"
+                    },
+                    "delivery_type_label": {
+                        "type": "string",
+                        "example": "Livraison à domicile"
+                    },
+                    "subtotal": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1500
+                    },
+                    "delivery_fee": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 500
+                    },
+                    "total_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 2000
+                    },
+                    "total_refunded_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "order_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-01T10:00:00.000000Z"
+                    },
+                    "delivery_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "confirmed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "processing_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "delivered_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "cancelled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "comments": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "center_comments": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "maximum": 5,
+                        "minimum": 1,
+                        "nullable": true
+                    },
+                    "cancelled_by": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "cancelled_reason": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "customer": {
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "user_id": {
+                                "type": "integer"
+                            },
+                            "first_name": {
+                                "type": "string"
+                            },
+                            "last_name": {
+                                "type": "string"
+                            },
+                            "full_name": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "phone_number": {
+                                "type": "string"
+                            },
+                            "current_balance": {
+                                "type": "number",
+                                "format": "float"
+                            },
+                            "country": {
+                                "$ref": "#/components/schemas/Country"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "delivery_address": {
+                        "$ref": "#/components/schemas/DeliveryAddress"
+                    },
+                    "delivery_person": {
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "user_id": {
+                                "type": "integer"
+                            },
+                            "first_name": {
+                                "type": "string"
+                            },
+                            "last_name": {
+                                "type": "string"
+                            },
+                            "full_name": {
+                                "type": "string"
+                            },
+                            "phone_number": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "payment": {
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "payment_method": {
+                                "type": "string"
+                            },
+                            "payment_method_label": {
+                                "type": "string"
+                            },
+                            "payment_status": {
+                                "type": "string"
+                            },
+                            "payment_status_label": {
+                                "type": "string"
+                            },
+                            "amount": {
+                                "type": "number",
+                                "format": "float"
+                            },
+                            "payment_reference": {
+                                "type": "string"
+                            },
+                            "paid_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "integer"
+                                },
+                                "unit_price": {
+                                    "type": "number",
+                                    "format": "float"
+                                },
+                                "total_price": {
+                                    "type": "number",
+                                    "format": "float"
+                                },
+                                "product": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "sku": {
+                                            "type": "string"
+                                        },
+                                        "barcode": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "permissions": {
+                        "properties": {
+                            "can_be_rated": {
+                                "type": "boolean"
+                            },
+                            "can_be_cancelled": {
+                                "type": "boolean"
+                            },
+                            "can_be_delivered": {
+                                "type": "boolean"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "DeliveryPersonOrderData": {
                 "title": "Delivery Person Order Data",
                 "description": "Detailed order information for a delivery person",
@@ -5750,6 +6104,10 @@
                         "example": "bottle_with_content",
                         "nullable": true
                     },
+                    "option_label": {
+                        "type": "string",
+                        "example": "Nouvelle bouteille"
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
@@ -5778,6 +6136,10 @@
                         ],
                         "example": "normal"
                     },
+                    "delivery_type_label": {
+                        "type": "string",
+                        "example": "Livraison normale"
+                    },
                     "payment_method": {
                         "type": "string",
                         "enum": [
@@ -5786,6 +6148,10 @@
                             "orange_money"
                         ],
                         "example": "mobile_money"
+                    },
+                    "payment_method_label": {
+                        "type": "string",
+                        "example": "Mobile Money"
                     },
                     "total_amount": {
                         "type": "number",
@@ -5802,6 +6168,10 @@
                             "pending"
                         ],
                         "example": "in_progress"
+                    },
+                    "status_label": {
+                        "type": "string",
+                        "example": "En cours"
                     },
                     "items": {
                         "type": "array",
@@ -5901,6 +6271,10 @@
                             "accessory"
                         ],
                         "example": "bottle"
+                    },
+                    "product_type_label": {
+                        "type": "string",
+                        "example": "Bouteille"
                     }
                 },
                 "type": "object"

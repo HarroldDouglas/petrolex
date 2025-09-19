@@ -46,7 +46,7 @@ class AddressConsistencyTest extends TestCase
         // 2. Appeler api/user avec le token
         $token = $loginData['access_token'];
         $profileResponse = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->getJson('/api/user');
 
         $profileResponse->assertSuccessful();
@@ -81,9 +81,9 @@ class AddressConsistencyTest extends TestCase
         }
 
         // 5. Vérifier que la structure des adresses est complète
-        if (!empty($loginAddresses)) {
+        if (! empty($loginAddresses)) {
             $firstAddress = $loginAddresses[0];
-            
+
             // Champs obligatoires
             $this->assertArrayHasKey('id', $firstAddress);
             $this->assertArrayHasKey('label', $firstAddress);
@@ -91,7 +91,7 @@ class AddressConsistencyTest extends TestCase
             $this->assertArrayHasKey('latitude', $firstAddress);
             $this->assertArrayHasKey('longitude', $firstAddress);
             $this->assertArrayHasKey('is_default', $firstAddress);
-            
+
             // Données géographiques
             $this->assertArrayHasKey('neighborhood', $firstAddress);
             $this->assertArrayHasKey('municipality', $firstAddress);
@@ -126,7 +126,7 @@ class AddressConsistencyTest extends TestCase
                 $address->neighborhood_id,
                 "L'adresse ID {$address->id} doit avoir un neighborhood_id"
             );
-            
+
             $this->assertNotNull(
                 $address->neighborhood,
                 "L'adresse ID {$address->id} doit avoir une relation neighborhood chargée"
@@ -149,7 +149,7 @@ class AddressConsistencyTest extends TestCase
 
         // Créer une nouvelle adresse
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->postJson("/api/customers/{$user->customer->id}/delivery-addresses", [
             'label' => 'Test Address',
             'address' => '123 Test Street',
@@ -163,7 +163,7 @@ class AddressConsistencyTest extends TestCase
 
         // Maintenant récupérer le profil et vérifier que la nouvelle adresse est là
         $profileResponse = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ])->getJson('/api/user');
 
         $profileResponse->assertSuccessful();

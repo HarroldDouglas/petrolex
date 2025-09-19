@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Resources\Order;
 
+use App\Enums\PaymentMethod;
 use App\Models\OrderPayment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,7 +16,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $payment_status
  * @property string $payment_date
  * @property string $payment_reference
- * @property string $payment_method
+ * @property PaymentMethod $payment_method
  */
 class OrderPaymentResource extends JsonResource
 {
@@ -31,7 +32,8 @@ class OrderPaymentResource extends JsonResource
             'status' => $this->payment_status,
             'date' => $this->payment_date,
             'reference' => $this->payment_reference,
-            'method' => $this->payment_method,
+            'method' => $this->payment_method ? $this->payment_method->value : null,
+            'method_label' => $this->payment_method ? ($this->payment_method->label ?? $this->payment_method->value) : null,
         ];
     }
 }
