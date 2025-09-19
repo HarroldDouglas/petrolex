@@ -49,4 +49,18 @@ class CustomerRepository extends BaseEloquentRepository implements CustomerRepos
 
         return $address->load(['neighborhood.municipality.city.country']);
     }
+
+    public function updateDeliveryAddress(CustomerDeliveryAddress $address, array $attributes): CustomerDeliveryAddress
+    {
+        $address->update($attributes);
+
+        // Handle default address logic
+        if ($address->is_default) {
+            CustomerDeliveryAddress::where('customer_id', $address->customer_id)
+                ->where('id', '!=', $address->id)
+                ->update(['is_default' => false]);
+        }
+
+        return $address->load(['neighborhood.municipality.city.country']);
+    }
 }

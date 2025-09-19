@@ -105,27 +105,46 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté"),
  *     @OA\Property(
  *         property="neighborhood",
- *         ref="#/components/schemas/Neighborhood",
+ *         type="object",
  *         nullable=true,
- *         description="Full neighborhood resource object"
+ *         description="Neighborhood data without nested relationships",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Bali"),
+ *         @OA\Property(property="municipality_id", type="integer", example=1),
+ *         @OA\Property(property="is_active", type="boolean", example=true),
+ *         @OA\Property(property="latitude", type="string", example="3.85600000"),
+ *         @OA\Property(property="longitude", type="string", example="11.49500000")
  *     ),
  *     @OA\Property(
  *         property="municipality",
- *         ref="#/components/schemas/Municipality",
+ *         type="object",
  *         nullable=true,
- *         description="Full municipality resource object"
+ *         description="Municipality data without nested relationships",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Yaoundé I"),
+ *         @OA\Property(property="city_id", type="integer", example=1)
  *     ),
  *     @OA\Property(
  *         property="city",
- *         ref="#/components/schemas/City",
+ *         type="object",
  *         nullable=true,
- *         description="Full city resource object"
+ *         description="City data without nested relationships",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Yaoundé"),
+ *         @OA\Property(property="country_id", type="integer", example=1)
  *     ),
  *     @OA\Property(
  *         property="country",
- *         ref="#/components/schemas/Country",
+ *         type="object",
  *         nullable=true,
- *         description="Full country resource object"
+ *         description="Complete country data",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Cameroun"),
+ *         @OA\Property(property="code", type="string", example="CM"),
+ *         @OA\Property(property="phone_code", type="string", example="+237"),
+ *         @OA\Property(property="currency", type="string", example="FCFA"),
+ *         @OA\Property(property="decimal_places", type="integer", example=0),
+ *         @OA\Property(property="is_active", type="boolean", example=true)
  *     ),
  *     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=3.848),
  *     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=11.502),

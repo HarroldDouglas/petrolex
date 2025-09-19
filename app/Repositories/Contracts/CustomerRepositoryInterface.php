@@ -12,4 +12,6 @@ interface CustomerRepositoryInterface extends BaseRepositoryInterface
     public function getOrdersForCustomer(Customer $customer, GetOrdersFilterDTO $filters, int $perPage = 10): LengthAwarePaginator;
 
     public function createDeliveryAddress(array $attributes): CustomerDeliveryAddress;
+
+    public function updateDeliveryAddress(CustomerDeliveryAddress $address, array $attributes): CustomerDeliveryAddress;
 }

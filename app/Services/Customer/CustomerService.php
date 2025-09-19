@@ -81,4 +81,9 @@ class CustomerService extends BaseServiceWithMedia
             'customer_id' => $customer->id,
         ]));
     }
+
+    public function updateDeliveryAddress(CustomerDeliveryAddress $address, CustomerDeliveryAddressDTO $dto): CustomerDeliveryAddress
+    {
+        return $this->repository->updateDeliveryAddress($address, $dto->toArray());
+    }
 }

@@ -2,10 +2,6 @@
 
 namespace App\Http\Resources\Customer;
 
-use App\Http\Api\Resources\CityResource;
-use App\Http\Api\Resources\CountryResource;
-use App\Http\Api\Resources\MunicipalityResource;
-use App\Http\Api\Resources\NeighborhoodResource;
 use App\Models\CustomerDeliveryAddress;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -24,12 +20,42 @@ class CustomerDeliveryAddressResource extends JsonResource
             'id' => $this->id,
             'label' => $this->label,
             'address' => $this->address,
-            'neighborhood' => NeighborhoodResource::make($this->whenLoaded('neighborhood')),
-            'municipality' => $this->when($this->neighborhood?->relationLoaded('municipality'), function () {
-                return MunicipalityResource::make($this->neighborhood->municipality);
+            'neighborhood' => $this->whenLoaded('neighborhood', function () {
+                return [
+                    'id' => $this->neighborhood->id,
+                    'name' => $this->neighborhood->name,
+                    'municipality_id' => $this->neighborhood->municipality_id,
+                    'is_active' => $this->neighborhood->is_active,
+                    'latitude' => $this->neighborhood->latitude,
+                    'longitude' => $this->neighborhood->longitude,
+                ];
             }),
-            'city' => CityResource::make($this->whenLoaded('city')),
-            'country' => CountryResource::make($this->whenLoaded('country')),
+            'municipality' => $this->when($this->neighborhood?->relationLoaded('municipality'), function () {
+                return [
+                    'id' => $this->neighborhood->municipality->id,
+                    'name' => $this->neighborhood->municipality->name,
+                    'city_id' => $this->neighborhood->municipality->city_id,
+                ];
+            }),
+            'city' => $this->when($this->neighborhood?->municipality?->relationLoaded('city'), function () {
+                return [
+                    'id' => $this->neighborhood->municipality->city->id,
+                    'name' => $this->neighborhood->municipality->city->name,
+                    'country_id' => $this->neighborhood->municipality->city->country_id,
+                ];
+            }),
+            'country' => $this->when($this->neighborhood?->municipality?->city?->relationLoaded('country'), function () {
+                $country = $this->neighborhood->municipality->city->country;
+                return [
+                    'id' => $country->id,
+                    'name' => $country->name,
+                    'code' => $country->code,
+                    'phone_code' => $country->phone_code,
+                    'currency' => $country->currency?->label,
+                    'decimal_places' => $country->currency?->decimalPlaces(),
+                    'is_active' => $country->is_active,
+                ];
+            }),
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'phone' => $this->phone,

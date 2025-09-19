@@ -5,6 +5,7 @@ use App\Http\Api\Controllers\Customer\GetCustomerOrdersController;
 use App\Http\Api\Controllers\Customer\GetCustomersController;
 use App\Http\Api\Controllers\Customer\StoreCustomerController;
 use App\Http\Api\Controllers\Customer\StoreCustomerDeliveryAddressController;
+use App\Http\Api\Controllers\Customer\UpdateCustomerDeliveryAddressController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('customers')->name('api.')->group(function () {
@@ -16,5 +17,6 @@ Route::prefix('customers')->name('api.')->group(function () {
         Route::get('/{customerId}', GetCustomerController::class)->name('customers.show');
         Route::get('/{customer}/orders', GetCustomerOrdersController::class)->name('customers.orders.index');
         Route::post('/{customer}/delivery-addresses', StoreCustomerDeliveryAddressController::class)->name('customers.delivery-addresses.store');
+        Route::put('/{customer}/delivery-addresses/{deliveryAddress}', UpdateCustomerDeliveryAddressController::class)->name('customers.delivery-addresses.update');
     });
 });
