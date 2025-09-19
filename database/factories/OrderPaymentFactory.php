@@ -22,7 +22,7 @@ class OrderPaymentFactory extends Factory
      */
     public function definition(): array
     {
-        $paymentMethod = $this->faker->randomElement(PaymentMethod::toArray());
+        $paymentMethod = $this->faker->randomElement(PaymentMethod::values());
         $amount = $this->faker->randomFloat(2, 1000, 10000);
 
         return [
@@ -30,14 +30,8 @@ class OrderPaymentFactory extends Factory
             'payment_method' => $paymentMethod,
             'amount_paid' => $amount,
             'amount_due' => $amount,
-            'payment_status' => $this->faker->randomElement(PaymentStatus::toArray()),
+            'payment_status' => $this->faker->randomElement(PaymentStatus::values()),
             'payment_reference' => 'PAY-'.$this->faker->unique()->numberBetween(100000, 999999),
-            'transaction_reference' => $this->faker->optional()->regexify('[A-Z0-9]{12}'),
-            'payment_url' => $this->faker->optional()->url(),
-            'gateway_response' => $this->faker->optional()->randomElement([
-                ['status' => 'success', 'transaction_id' => $this->faker->uuid()],
-                ['status' => 'pending', 'message' => 'Payment processing'],
-            ]),
             'payment_date' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
             'payment_notes' => $this->faker->optional()->sentence(),
         ];
@@ -51,7 +45,6 @@ class OrderPaymentFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'payment_status' => PaymentStatus::PAID(),
             'payment_date' => $this->faker->dateTimeBetween('-1 week', 'now'),
-            'gateway_response' => ['status' => 'success', 'transaction_id' => $this->faker->uuid()],
         ]);
     }
 
@@ -63,7 +56,6 @@ class OrderPaymentFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'payment_status' => PaymentStatus::PENDING(),
             'payment_date' => null,
-            'gateway_response' => ['status' => 'pending', 'message' => 'Payment processing'],
         ]);
     }
 
@@ -75,7 +67,6 @@ class OrderPaymentFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'payment_status' => PaymentStatus::FAILED(),
             'payment_date' => null,
-            'gateway_response' => ['status' => 'failed', 'error' => 'Insufficient funds'],
         ]);
     }
 }

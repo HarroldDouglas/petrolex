@@ -19,6 +19,7 @@ class GetOrderDetailsController extends Controller
     {
         $order->load([
             'customer.user.country',
+            'customer.deliveryAddresses.neighborhood.municipality.city.country',
             'deliveryAddress.neighborhood.municipality.city.country',
             'deliveryPerson.user',
             'distributionCenter',
