@@ -44,7 +44,7 @@ class CustomerResource extends UserResource
             $userData,
             [
                 'customer_id' => $customer->id,
-                'deliveryAddresses' => CustomerDeliveryAddressResource::collection($customer->deliveryAddresses) ?? [],
+                'delivery_addresses' => CustomerDeliveryAddressResource::collection($customer->deliveryAddresses) ?? [],
                 'current_balance' => $customer->current_balance ?? null,
             ]
         );
