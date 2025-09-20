@@ -306,6 +306,41 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="can_be_rated", type="boolean"),
  *         @OA\Property(property="can_be_cancelled", type="boolean"),
  *         @OA\Property(property="can_be_delivered", type="boolean")
+ *     ),
+ *     @OA\Property(property="invoice_url", type="string", nullable=true, format="uri", example="https://app.petrolex.cm/api/orders/1/download/invoice", description="URL de téléchargement de la facture PDF (null si la facture n'existe pas encore)")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="CustomerOrdersResponse",
+ *     type="object",
+ *
+ *     @OA\Property(
+ *         property="_metadata",
+ *         type="object",
+ *         @OA\Property(property="success", type="boolean", example=true),
+ *         @OA\Property(property="message", type="string", example="Commandes client récupérées avec succès.")
+ *     ),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *
+ *         @OA\Items(ref="#/components/schemas/OrderData")
+ *     ),
+ *
+ *     @OA\Property(
+ *         property="meta",
+ *         type="object",
+ *         @OA\Property(
+ *             property="pagination",
+ *             type="object",
+ *             @OA\Property(property="total", type="integer", example=25),
+ *             @OA\Property(property="current_page_total", type="integer", example=10),
+ *             @OA\Property(property="per_page", type="integer", example=10),
+ *             @OA\Property(property="current_page", type="integer", example=1),
+ *             @OA\Property(property="total_pages", type="integer", example=3),
+ *             @OA\Property(property="next_page_url", type="string", nullable=true, example="https://app.petrolex.cm/api/my/orders?page=2"),
+ *             @OA\Property(property="prev_page_url", type="string", nullable=true, example=null)
+ *         )
  *     )
  * )
  */

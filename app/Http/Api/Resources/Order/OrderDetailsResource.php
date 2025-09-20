@@ -207,6 +207,9 @@ class OrderDetailsResource extends JsonResource
                 'all_bottles_scanned' => $order->areAllBottlesScanned(),
                 'bottle_scan_progress' => $order->bottle_scan_progress,
             ],
+
+            // Lien de téléchargement de la facture PDF
+            'invoice_url' => url("/api/orders/{$order->id}/download/invoice"),
         ];
     }
 }

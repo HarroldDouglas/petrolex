@@ -44,7 +44,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="distribution_center", type="object",
  *         @OA\Property(property="latitude", type="number", format="float", example=3.8480),
  *         @OA\Property(property="longitude", type="number", format="float", example=11.5021)
- *     )
+ *     ),
+ *     @OA\Property(property="invoice_url", type="string", nullable=true, format="uri", example="https://app.petrolex.cm/api/orders/127/download/invoice", description="URL de téléchargement de la facture PDF (null si la facture n'existe pas encore)")
  * )
  */
 class OrderSchema {}

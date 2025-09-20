@@ -4,20 +4,15 @@ namespace App\Http\Controllers\Order;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\PrintOrderRequest;
-use App\Services\Invoice\InvoiceService;
 use App\Services\Order\OrderService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PrintOrderController extends Controller
 {
     public function __construct(
         private OrderService $orderService,
-        private InvoiceService $invoiceService,
     ) {}
 
     /**
@@ -44,27 +39,21 @@ class PrintOrderController extends Controller
         ]);
     }
 
-    /**
-     * Download the order invoice as PDF.
-     *
-     * Route: GET /orders/{order}/download/invoice
-     * Name: orders.download.invoice
-     */
-    public function downloadPdf(int $orderId): BinaryFileResponse
+    public function downloadPdf(int $orderId): Response
     {
-        $invoicePath = $this->invoiceService->getInvoicePath($orderId);
+        $orderDetails = $this->orderService->getOrderWithGroupedItems($orderId);
 
-        if (! $invoicePath) {
-            Log::critical("Invoice PDF missing for order {$orderId}", [
-                'order_id' => $orderId,
-                'user_id' => auth()->id(),
-            ]);
-            abort(SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR, 'Invoice PDF not found - system error');
+        if (! $orderDetails) {
+            abort(Response::HTTP_NOT_FOUND, 'Commande introuvable');
         }
 
-        $order = \App\Models\Order::findOrFail($orderId);
-        $filename = 'facture-'.($order->order_number ?? $order->id).'.pdf';
+        $pdf = Pdf::loadView('orders.print.pdf-invoice', [
+            'order' => $orderDetails->order,
+            'groupedItems' => $orderDetails->groupedItems,
+        ]);
 
-        return response()->download($invoicePath, $filename);
+        $filename = 'facture-'.($orderDetails->order->order_number ?? $orderDetails->order->id).'.pdf';
+
+        return $pdf->download($filename);
     }
 }

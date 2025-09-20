@@ -16,7 +16,8 @@
       "Bash(git commit:*)",
       "Bash(./vendor/bin/pint:*)",
       "Bash(./vendor/bin/phpstan analyse:*)",
-      "Bash(jq:*)"
+      "Bash(jq:*)",
+      "Bash(php:*)"
     ],
     "deny": [],
     "ask": []

@@ -19,6 +19,7 @@ class CreateOrderDTO extends BaseDTO
         #[WithCast(SpatieEnumCast::class, PaymentMethod::class)]
         public PaymentMethod $payment_method,
         /** @var OrderItemDTO[] */
-        public array $items
+        public array $items,
+        public ?string $comments = null
     ) {}
 }

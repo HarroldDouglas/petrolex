@@ -29,15 +29,15 @@ class PaymentService
         return $payment;
     }
 
-    public function handleCallback(string $paymentReference, array $callbackData): void
+    public function handleCallback(string $orderId, array $callbackData): void
     {
-        DB::transaction(function () use ($paymentReference, $callbackData) {
-            $payment = $this->findPaymentByReference($paymentReference);
+        DB::transaction(function () use ($orderId, $callbackData) {
+            $payment = $this->findPaymentByOrderId($orderId);
             $gateway = $this->gatewayFactory->create($payment->payment_method->value);
             $callbackDto = new PaymentCallbackData(
-                transactionReference: $callbackData['transactionReference'] ?? $paymentReference,
-                status: $callbackData['status'],
-                amount: $callbackData['amount'],
+                transactionReference: $callbackData['transaction_ref'],
+                status: $this->mapTransactionStatusToPaymentStatus($callbackData['transaction_status']),
+                amount: $callbackData['transaction_amount'],
                 rawData: $callbackData
             );
             $response = $gateway->handleCallback($callbackDto);
@@ -61,44 +61,52 @@ class PaymentService
     {
         $payment->update([
             'payment_status' => $response->status,
-            'transaction_reference' => $response->transactionReference ?? $payment->getAttribute('transaction_reference'),
-            'payment_url' => $response->paymentUrl ?? $payment->getAttribute('payment_url'),
-            'gateway_response' => $response->gatewayResponse ?? $payment->getAttribute('gateway_response'),
             'payment_date' => ($response->status === PaymentStatus::PAID()->value) ? now() : null,
             'amount_paid' => ($response->status === PaymentStatus::PAID()->value) ? $payment->amount_due : $payment->amount_paid,
             'amount_due' => ($response->status === PaymentStatus::PAID()->value) ? 0 : $payment->amount_due,
+            'payment_notes' => $response->notes ?? null,
         ]);
     }
 
-    private function findPaymentByReference(string $reference): OrderPayment
+    private function findPaymentByOrderId(string $orderId): OrderPayment
     {
-        $payment = OrderPayment::where('payment_reference', $reference)->first();
+        $payment = OrderPayment::where('order_id', $orderId)->first();
 
         if (! $payment) {
-            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(OrderPayment::class, [$reference]);
+            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(OrderPayment::class, [$orderId]);
         }
 
         return $payment;
+    }
+
+    private function mapTransactionStatusToPaymentStatus(string $transactionStatus): string
+    {
+        return match ($transactionStatus) {
+            'SUCCESS' => PaymentStatus::PAID()->value,
+            'CANCELED', 'CANCELLED' => PaymentStatus::FAILED()->value,
+            'FAILED' => PaymentStatus::FAILED()->value,
+            default => PaymentStatus::PENDING()->value,
+        };
     }
 
     private function processPaymentResponse(OrderPayment $payment, PaymentResponse $response): void
     {
         $payment->update([
             'payment_status' => $response->status,
-            'transaction_reference' => $response->transactionReference ?? $payment->getAttribute('transaction_reference'),
-            'gateway_response' => $response->gatewayResponse ?? $payment->getAttribute('gateway_response'),
             'payment_date' => ($response->status === PaymentStatus::PAID()->value) ? now() : null,
             'amount_paid' => ($response->status === PaymentStatus::PAID()->value) ? $payment->amount_due : $payment->amount_paid,
             'amount_due' => ($response->status === PaymentStatus::PAID()->value) ? 0 : $payment->amount_due,
+            'payment_notes' => $response->notes ?? null,
         ]);
 
         if ($response->success && $response->status === PaymentStatus::PAID()->value) {
             $payment->order->update([
-                'status' => OrderStatus::PAID()->value, // Assuming OrderStatus enum exists
+                'status' => OrderStatus::CONFIRMED()->value,
+                'confirmed_at' => now(),
             ]);
         } elseif ($response->status === PaymentStatus::FAILED()->value) {
             $payment->order->update([
-                'status' => OrderStatus::FAILED()->value, // Assuming OrderStatus enum exists
+                'status' => OrderStatus::FAILED()->value,
             ]);
         }
     }

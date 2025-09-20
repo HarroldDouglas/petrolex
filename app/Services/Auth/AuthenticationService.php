@@ -41,10 +41,12 @@ class AuthenticationService implements AuthenticationServiceInterface
             throw new AuthenticationException("Votre compte n'est pas encore activé, nous vous avons envoyé un code d'activation par mail.");
         }
 
-        // Vérifier que l'email est vérifié si l'utilisateur se connecte avec son email
         if (filter_var($credentials->login, FILTER_VALIDATE_EMAIL) && ! $user->email_verified_at) {
             throw new AuthenticationException("Votre adresse email n'est pas encore vérifiée. Veuillez vérifier votre boîte mail.");
         }
+
+        $user->last_login_at = now();
+        $user->save();
 
         $plainTextToken = $this->tokenRepository->createToken($user, AuthConstants::API_TOKEN_NAME);
 
