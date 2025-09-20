@@ -9,7 +9,62 @@ use App\Models\Order;
 use App\Services\Order\OrderService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Get(
+ *     path="/api/orders/{order}/download/invoice",
+ *     summary="Télécharger la facture PDF d'une commande",
+ *     description="Génère et télécharge la facture PDF d'une commande spécifique. Le PDF est généré à la demande avec tous les détails de la commande.",
+ *     operationId="api.orders.download.invoice",
+ *     tags={"Commandes"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\Parameter(
+ *         name="order",
+ *         in="path",
+ *         required=true,
+ *         description="ID de la commande",
+ *
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Facture PDF générée et téléchargée avec succès",
+ *
+ *         @OA\MediaType(
+ *             mediaType="application/pdf",
+ *
+ *             @OA\Schema(type="string", format="binary")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=401,
+ *         description="Non authentifié",
+ *
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=403,
+ *         description="Non autorisé à télécharger cette facture",
+ *
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Commande non trouvée",
+ *
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     )
+ * )
+ *
+ * TODO: Déplacer cette documentation vers documentation/Order/DownloadInvoiceControllerDoc.php
+ * une fois que le système de scan de documentation sera corrigé
+ */
 class DownloadInvoiceController extends Controller
 {
     public function __construct(

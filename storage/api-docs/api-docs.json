@@ -15,6 +15,276 @@
         }
     ],
     "paths": {
+        "/api/my/orders": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Récupérer les commandes du client connecté",
+                "description": "Retourne la liste des commandes du client connecté avec possibilité de filtrage et pagination.",
+                "operationId": "api.my.orders.index",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Nombre d'éléments par page (défaut: 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "order_number",
+                        "in": "query",
+                        "description": "Filtrer par numéro de commande (recherche partielle)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "CMD-202412-0001"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrer par statut de commande",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "confirmed",
+                                "in_progress",
+                                "delivered",
+                                "cancelled",
+                                "paid",
+                                "failed"
+                            ],
+                            "example": "confirmed"
+                        }
+                    },
+                    {
+                        "name": "delivery_type",
+                        "in": "query",
+                        "description": "Filtrer par type de livraison",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "normal",
+                                "fast"
+                            ],
+                            "example": "normal"
+                        }
+                    },
+                    {
+                        "name": "payment_method",
+                        "in": "query",
+                        "description": "Filtrer par méthode de paiement",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "orange_money",
+                                "mtn_money",
+                                "credit_card"
+                            ],
+                            "example": "orange_money"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des commandes récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Commandes récupérées avec succès"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/OrderData"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "last": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès refusé - rôle client requis",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/orders/{order}/download/invoice": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Télécharger la facture PDF d'une commande",
+                "description": "Génère et télécharge la facture PDF d'une commande spécifique. Le PDF est généré à la demande avec tous les détails de la commande.",
+                "operationId": "api.orders.download.invoice",
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "description": "ID de la commande",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Facture PDF générée et téléchargée avec succès",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Non autorisé à télécharger cette facture",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commande non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/app/advertising/banners": {
             "get": {
                 "tags": [
@@ -6383,6 +6653,10 @@
     },
     "tags": [
         {
+            "name": "Commandes",
+            "description": "Commandes"
+        },
+        {
             "name": "App",
             "description": "App"
         },
@@ -6401,10 +6675,6 @@
         {
             "name": "Livraison",
             "description": "Livraison"
-        },
-        {
-            "name": "Commandes",
-            "description": "Commandes"
         },
         {
             "name": "Géographie",

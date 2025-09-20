@@ -9,7 +9,10 @@ use App\Enums\OrderStatus;
 use App\Models\Customer;
 use App\Models\CustomerDeliveryAddress;
 use App\Models\DistributionCenter;
+use App\Models\Geography\City;
 use App\Models\Geography\Country;
+use App\Models\Geography\Municipality;
+use App\Models\Geography\Neighborhood;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,6 +26,10 @@ final class GetCustomerOrdersTest extends TestCase
     private User $customerUser;
     private Customer $customer;
     private string $authToken;
+    private Country $country;
+    private City $city;
+    private Municipality $municipality;
+    private Neighborhood $neighborhood;
 
     protected function setUp(): void
     {
@@ -34,15 +41,27 @@ final class GetCustomerOrdersTest extends TestCase
         // Create roles
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
 
-        // Create country
-        $country = Country::factory()->create([
+        // Create geographical hierarchy
+        $this->country = Country::factory()->create([
             'code' => 'CM',
             'phone_code' => '+237',
         ]);
 
+        $this->city = City::factory()->create([
+            'country_id' => $this->country->id,
+        ]);
+
+        $this->municipality = Municipality::factory()->create([
+            'city_id' => $this->city->id,
+        ]);
+
+        $this->neighborhood = Neighborhood::factory()->create([
+            'municipality_id' => $this->municipality->id,
+        ]);
+
         // Create customer user
         $this->customerUser = User::factory()->create([
-            'country_id' => $country->id,
+            'country_id' => $this->country->id,
         ]);
         $this->customerUser->assignRole('customer');
 
@@ -67,6 +86,7 @@ final class GetCustomerOrdersTest extends TestCase
         $distributionCenter = DistributionCenter::factory()->create();
         $deliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
+            'neighborhood_id' => $this->neighborhood->id,
         ]);
 
         // Create orders with different statuses and delivery types
@@ -129,6 +149,7 @@ final class GetCustomerOrdersTest extends TestCase
         $distributionCenter = DistributionCenter::factory()->create();
         $deliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
+            'neighborhood_id' => $this->neighborhood->id,
         ]);
 
         // Create orders with different statuses
@@ -166,6 +187,7 @@ final class GetCustomerOrdersTest extends TestCase
         $distributionCenter = DistributionCenter::factory()->create();
         $deliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
+            'neighborhood_id' => $this->neighborhood->id,
         ]);
 
         // Create orders with different delivery types
@@ -203,6 +225,7 @@ final class GetCustomerOrdersTest extends TestCase
         $distributionCenter = DistributionCenter::factory()->create();
         $deliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
+            'neighborhood_id' => $this->neighborhood->id,
         ]);
 
         // Create orders (we'll skip payment_method filtering for now due to missing factory)
@@ -231,6 +254,7 @@ final class GetCustomerOrdersTest extends TestCase
         $distributionCenter = DistributionCenter::factory()->create();
         $deliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
+            'neighborhood_id' => $this->neighborhood->id,
         ]);
 
         $order = Order::factory()->create([
@@ -265,6 +289,7 @@ final class GetCustomerOrdersTest extends TestCase
         $distributionCenter = DistributionCenter::factory()->create();
         $deliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
+            'neighborhood_id' => $this->neighborhood->id,
         ]);
 
         // Create 5 orders
