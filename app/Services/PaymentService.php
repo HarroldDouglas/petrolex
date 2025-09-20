@@ -99,6 +99,11 @@ class PaymentService
             'payment_notes' => $response->notes ?? null,
         ]);
 
+        // Only process order status updates if the order is in pending status
+        if ($payment->order->status->value !== OrderStatus::PENDING()->value) {
+            return;
+        }
+
         if ($response->success && $response->status === PaymentStatus::PAID()->value) {
             $payment->order->update([
                 'status' => OrderStatus::CONFIRMED()->value,

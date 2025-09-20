@@ -366,4 +366,57 @@ final class PaymentCallbackTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('_metadata.success', true);
     }
+
+    #[Test]
+    public function it_does_not_update_non_pending_orders(): void
+    {
+        $customer = \App\Models\Customer::factory()->create();
+        $distributionCenter = \App\Models\DistributionCenter::factory()->create();
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $customer->id,
+        ]);
+
+        $confirmedAt = now()->subHour(); // Confirmed 1 hour ago
+        $order = Order::factory()->create([
+            'customer_id' => $customer->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_address_id' => $deliveryAddress->id,
+            'status' => \App\Enums\OrderStatus::CONFIRMED()->value, // Already confirmed
+            'confirmed_at' => $confirmedAt,
+        ]);
+        $payment = OrderPayment::factory()->create([
+            'order_id' => $order->id,
+            'payment_status' => PaymentStatus::PENDING()->value,
+        ]);
+
+        $callbackData = [
+            'application' => 'PETROLEX',
+            'app_transaction_ref' => (string) $order->id,
+            'operator_transaction_ref' => 'OM_CONFIRMED_ORDER',
+            'transaction_ref' => 'TXN_CONFIRMED_ORDER',
+            'transaction_type' => 'PAYIN',
+            'transaction_amount' => 50000.0,
+            'transaction_fees' => 100.0,
+            'transaction_currency' => 'XAF',
+            'transaction_operator' => 'CM_OM',
+            'transaction_status' => 'SUCCESS',
+            'transaction_reason' => 'Payment completed',
+            'transaction_message' => 'Transaction successful',
+            'customer_phone_number' => '677123456',
+            'signature' => 'test_signature',
+        ];
+
+        $response = $this->postJson(route('api.payments.callback'), $callbackData);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('_metadata.success', true);
+
+        // Verify payment status is updated but order status remains unchanged
+        $payment->refresh();
+        $order->refresh();
+
+        $this->assertEquals(PaymentStatus::PAID()->value, $payment->payment_status);
+        $this->assertEquals(\App\Enums\OrderStatus::CONFIRMED()->value, $order->status->value);
+        $this->assertEquals($confirmedAt->timestamp, $order->confirmed_at->timestamp); // Should not be updated
+    }
 }

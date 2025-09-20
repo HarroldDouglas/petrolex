@@ -10,6 +10,14 @@ use Illuminate\Validation\Rule;
 final class PaymentCallbackRequest extends FormRequest
 {
     /**
+     * TODO: Optimiser cette classe PaymentCallbackRequest
+     * - Créer les enums pour TransactionType, TransactionStatus, TransactionOperator, Currency
+     * - Refactoriser les règles de validation pour utiliser les enums
+     * - Simplifier les messages de validation en utilisant les enums
+     * - Réduire la duplication de code dans les messages FR/EN
+     * - Considérer l'extraction des constantes hardcodées
+     */
+    /**
      * @return array<string, mixed>
      */
     public function rules(): array

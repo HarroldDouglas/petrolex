@@ -25,7 +25,7 @@ class OrderDetailsResource extends JsonResource
         $order = $this->resource;
 
         return [
-            // Informations de base de la commande
+            // Basic order information
             'id' => $order->id,
             'order_number' => $order->order_number,
             'status' => $order->status->value,
@@ -33,13 +33,13 @@ class OrderDetailsResource extends JsonResource
             'delivery_type' => $order->delivery_type->value,
             'delivery_type_label' => $order->delivery_type->label ?? $order->delivery_type->value,
 
-            // Montants et prix
+            // Amounts and pricing
             'subtotal' => $order->subtotal,
             'delivery_fee' => $order->delivery_fee,
             'total_amount' => $order->total_amount,
             'total_refunded_amount' => $order->getTotalRefundedAmount(),
 
-            // Dates importantes
+            // Important dates
             'order_date' => $order->order_date?->toISOString(),
             'delivery_date' => $order->delivery_date?->toISOString(),
             'confirmed_at' => $order->confirmed_at?->toISOString(),
@@ -49,24 +49,24 @@ class OrderDetailsResource extends JsonResource
             'created_at' => $order->created_at->toISOString(),
             'updated_at' => $order->updated_at->toISOString(),
 
-            // Commentaires et notes
+            // Comments and notes
             'comments' => $order->comments,
             'center_comments' => $order->center_comments,
             'rating' => $order->rating,
             'cancelled_by' => $order->cancelled_by,
             'cancelled_reason' => $order->cancelled_reason,
 
-            // Informations du client
+            // Customer information
             'customer' => $this->whenLoaded('customer', function () use ($order) {
                 return new CustomerResource($order->customer);
             }),
 
-            // Adresse de livraison complète
+            // Complete delivery address
             'delivery_address' => $this->whenLoaded('deliveryAddress', function () use ($order) {
                 return new CustomerDeliveryAddressResource($order->deliveryAddress);
             }),
 
-            // Informations du livreur
+            // Delivery person information
             'delivery_person' => $this->whenLoaded('deliveryPerson', function () use ($order) {
                 if (! $order->deliveryPerson) {
                     return null;
@@ -86,7 +86,7 @@ class OrderDetailsResource extends JsonResource
                 ];
             }),
 
-            // Centre de distribution
+            // Distribution center
             'distribution_center' => $this->whenLoaded('distributionCenter', function () use ($order) {
                 if (! $order->distributionCenter) {
                     return null;
@@ -104,7 +104,7 @@ class OrderDetailsResource extends JsonResource
                 ];
             }),
 
-            // Informations de paiement
+            // Payment information
             'payment' => $this->whenLoaded('payment', function () use ($order) {
                 if (! $order->payment) {
                     return null;
@@ -130,7 +130,7 @@ class OrderDetailsResource extends JsonResource
                 ];
             }),
 
-            // Articles de la commande avec tous les détails
+            // Order items with complete details
             'items' => $this->whenLoaded('items', function () use ($order): array {
                 return $order->items->map(function ($item): array {
                     $category = $item->productCategory;
@@ -152,9 +152,9 @@ class OrderDetailsResource extends JsonResource
                 })->toArray();
             }),
 
-            // Mouvements de bouteilles (consignes) - Supprimé car non pertinent pour mobile
+            // Bottle movements (deposits) - Removed as not relevant for mobile
 
-            // Remboursements
+            // Refunds
             'refunds' => $this->whenLoaded('refunds', function () use ($order): array {
                 return $order->refunds->map(function ($refund): array {
                     return [
@@ -169,7 +169,7 @@ class OrderDetailsResource extends JsonResource
                 })->toArray();
             }),
 
-            // Suivi de livraison
+            // Delivery tracking
             'delivery_tracking' => $this->whenLoaded('deliveryTracking', function () use ($order) {
                 if (! $order->deliveryTracking) {
                     return null;
@@ -192,15 +192,15 @@ class OrderDetailsResource extends JsonResource
                 ];
             }),
 
-            // Coordonnées de destination
+            // Destination coordinates
             'destination_coordinates' => [
                 'latitude' => $order->destination_lat,
                 'longitude' => $order->destination_lng,
             ],
 
-            // États et permissions - Supprimé car non nécessaire pour mobile
+            // States and permissions - Removed as not necessary for mobile
 
-            // Informations sur les bouteilles
+            // Bottle information
             'bottle_info' => [
                 'has_bottle_items' => $order->hasBottleItems(),
                 'has_refunds' => $order->hasRefunds(),
@@ -208,7 +208,7 @@ class OrderDetailsResource extends JsonResource
                 'bottle_scan_progress' => $order->bottle_scan_progress,
             ],
 
-            // Lien de téléchargement de la facture PDF
+            // PDF invoice download link
             'invoice_url' => url("/api/orders/{$order->id}/download/invoice"),
         ];
     }

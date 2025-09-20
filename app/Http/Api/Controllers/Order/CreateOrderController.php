@@ -19,12 +19,6 @@ final class CreateOrderController extends Controller
         private PaymentService $paymentService
     ) {}
 
-    /**
-     * Create a new order with payment initiation.
-     *
-     * Route: POST /api/orders
-     * Name: api.orders.store
-     */
     public function __invoke(CreateOrderRequest $request): CreateOrderResponse
     {
         $data = $request->validated();
@@ -33,16 +27,13 @@ final class CreateOrderController extends Controller
         $orderDTO = CreateOrderDTO::from($data);
 
         return DB::transaction(function () use ($orderDTO) {
-            // Create the order using existing service
             $order = $this->orderService->create($orderDTO->toArray());
 
-            // Initiate payment process
             $payment = $this->paymentService->initiatePayment(
                 $order,
                 $orderDTO->payment_method
             );
 
-            // Load necessary relations for response
             $order->load([
                 'items.productCategory',
                 'deliveryAddress.neighborhood.municipality.city.country',
