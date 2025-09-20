@@ -208,6 +208,9 @@ class UserSeeder extends Seeder
             return;
         }
 
+        // Check if customer already has a default address
+        $hasDefaultAddress = $customer->deliveryAddresses()->where('is_default', true)->exists();
+
         $customer->deliveryAddresses()->create([
             'label' => 'Nkoabang',
             'address' => 'Nkoabang',
@@ -219,7 +222,7 @@ class UserSeeder extends Seeder
             'contact_lastname' => 'Dupont',
             'email' => 'marie.dupont@example.com',
             'address_precision' => 'Près du marché central',
-            'is_default' => true,
+            'is_default' => ! $hasDefaultAddress, // Only set as default if no default exists
             'neighborhood_id' => $neighborhood->id,
         ]);
 

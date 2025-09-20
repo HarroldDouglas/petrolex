@@ -21,12 +21,21 @@ use OpenApi\Annotations as OA;
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
+ *         name="page",
+ *         in="query",
+ *         required=false,
+ *         description="Numéro de la page (défaut: 1)",
+ *
+ *         @OA\Schema(type="integer", minimum=1)
+ *     ),
+ *
+ *     @OA\Parameter(
  *         name="per_page",
  *         in="query",
  *         required=false,
  *         description="Nombre d'éléments par page (défaut: 10)",
  *
- *         @OA\Schema(type="integer", example=10, minimum=1, maximum=100)
+ *         @OA\Schema(type="integer", minimum=1, maximum=100)
  *     ),
  *
  *     @OA\Parameter(
@@ -35,7 +44,7 @@ use OpenApi\Annotations as OA;
  *         required=false,
  *         description="Filtrer par numéro de commande (recherche partielle)",
  *
- *         @OA\Schema(type="string", example="CMD-202412-0001")
+ *         @OA\Schema(type="string")
  *     ),
  *
  *     @OA\Parameter(
@@ -44,7 +53,7 @@ use OpenApi\Annotations as OA;
  *         required=false,
  *         description="Filtrer par statut de commande",
  *
- *         @OA\Schema(type="string", enum={"pending", "confirmed", "in_progress", "delivered", "cancelled", "paid", "failed"}, example="confirmed")
+ *         @OA\Schema(type="string", enum={"pending", "confirmed", "in_progress", "delivered", "cancelled", "paid", "failed"})
  *     ),
  *
  *     @OA\Parameter(
@@ -53,7 +62,7 @@ use OpenApi\Annotations as OA;
  *         required=false,
  *         description="Filtrer par type de livraison",
  *
- *         @OA\Schema(type="string", enum={"normal", "fast"}, example="normal")
+ *         @OA\Schema(type="string", enum={"normal", "fast"})
  *     ),
  *
  *     @OA\Parameter(
@@ -62,7 +71,7 @@ use OpenApi\Annotations as OA;
  *         required=false,
  *         description="Filtrer par méthode de paiement",
  *
- *         @OA\Schema(type="string", enum={"orange_money", "mtn_money", "credit_card"}, example="orange_money")
+ *         @OA\Schema(type="string", enum={"orange_money", "mtn_money", "credit_card"})
  *     ),
  *
  *     @OA\Response(

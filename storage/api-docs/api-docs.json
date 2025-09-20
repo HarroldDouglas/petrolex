@@ -25,6 +25,16 @@
                 "operationId": "api.my.orders.index",
                 "parameters": [
                     {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Numéro de la page (défaut: 1)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
                         "name": "per_page",
                         "in": "query",
                         "description": "Nombre d'éléments par page (défaut: 10)",
@@ -32,8 +42,7 @@
                         "schema": {
                             "type": "integer",
                             "maximum": 100,
-                            "minimum": 1,
-                            "example": 10
+                            "minimum": 1
                         }
                     },
                     {
@@ -42,8 +51,7 @@
                         "description": "Filtrer par numéro de commande (recherche partielle)",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "CMD-202412-0001"
+                            "type": "string"
                         }
                     },
                     {
@@ -61,8 +69,7 @@
                                 "cancelled",
                                 "paid",
                                 "failed"
-                            ],
-                            "example": "confirmed"
+                            ]
                         }
                     },
                     {
@@ -75,8 +82,7 @@
                             "enum": [
                                 "normal",
                                 "fast"
-                            ],
-                            "example": "normal"
+                            ]
                         }
                     },
                     {
@@ -90,8 +96,7 @@
                                 "orange_money",
                                 "mtn_money",
                                 "credit_card"
-                            ],
-                            "example": "orange_money"
+                            ]
                         }
                     }
                 ],
@@ -2236,21 +2241,23 @@
                 "tags": [
                     "Commandes"
                 ],
-                "summary": "Add customer comment and rating to an order",
-                "description": "Allows a customer to add comments and a rating to their order after delivery.",
+                "summary": "Ajouter un commentaire et une note à une commande",
+                "description": "Permet au client d'ajouter un commentaire et une note (de 1 à 5) à une commande après livraison.",
                 "operationId": "api.orders.addCustomerComment",
                 "parameters": [
                     {
                         "name": "order",
                         "in": "path",
-                        "description": "ID of the order",
+                        "description": "ID de la commande",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "requestBody": {
+                    "description": "Données du commentaire et de la note",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -2261,12 +2268,17 @@
                                 ],
                                 "properties": {
                                     "comments": {
+                                        "description": "Commentaire du client (minimum 10 caractères)",
                                         "type": "string",
-                                        "example": "The delivery was very fast and the service was excellent!"
+                                        "minLength": 10,
+                                        "example": "Service excellent, livraison rapide et produit de qualité !"
                                     },
                                     "rating": {
+                                        "description": "Note de 1 à 5",
                                         "type": "number",
                                         "format": "float",
+                                        "maximum": 5,
+                                        "minimum": 1,
                                         "example": 4.5
                                     }
                                 },
@@ -2277,7 +2289,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Comment and rating added successfully",
+                        "description": "Commentaire et note ajoutés avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2290,16 +2302,65 @@
                                                 },
                                                 "message": {
                                                     "type": "string",
-                                                    "example": "Commentaire ajouté à la commande avec succès"
+                                                    "example": "Commentaire ajouté avec succès"
                                                 }
                                             },
                                             "type": "object"
                                         },
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
+                                            "properties": {
+                                                "order_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "comments": {
+                                                    "type": "string",
+                                                    "example": "Service excellent, livraison rapide et produit de qualité !"
+                                                },
+                                                "rating": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 4.5
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-09-20T16:30:00.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès refusé - La commande n'appartient pas au client",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cette commande ne vous appartient pas."
                                         }
                                     },
                                     "type": "object"
@@ -2308,10 +2369,55 @@
                         }
                     },
                     "404": {
-                        "description": "Order not found"
+                        "description": "Commande non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Commande non trouvée."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Erreurs de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "comments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Le commentaire doit contenir au moins 10 caractères."
+                                                    }
+                                                },
+                                                "rating": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "La note doit être comprise entre 1 et 5."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
