@@ -8,7 +8,6 @@ use App\Services\Order\OrderService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PrintOrderController extends Controller
 {
@@ -40,26 +39,18 @@ class PrintOrderController extends Controller
         ]);
     }
 
-    /**
-     * Download the order invoice as PDF.
-     *
-     * Route: GET /orders/{order}/download/invoice
-     * Name: orders.download.invoice
-     */
-    public function downloadPdf(int $orderId)
+    public function downloadPdf(int $orderId): Response
     {
         $orderDetails = $this->orderService->getOrderWithGroupedItems($orderId);
 
         if (! $orderDetails) {
-            abort(SymfonyResponse::HTTP_NOT_FOUND, 'Commande introuvable');
+            abort(Response::HTTP_NOT_FOUND, 'Commande introuvable');
         }
 
-        $data = [
+        $pdf = Pdf::loadView('orders.print.pdf-invoice', [
             'order' => $orderDetails->order,
             'groupedItems' => $orderDetails->groupedItems,
-        ];
-
-        $pdf = PDF::loadView('orders.print.pdf-invoice', $data);
+        ]);
 
         $filename = 'facture-'.($orderDetails->order->order_number ?? $orderDetails->order->id).'.pdf';
 

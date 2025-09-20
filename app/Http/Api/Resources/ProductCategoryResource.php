@@ -25,7 +25,8 @@ class ProductCategoryResource extends JsonResource
         $data = [
             'id' => $this->id,
             'name' => $this->name,
-            'product_type' => $this->product_type,
+            'product_type' => $this->product_type->value,
+            'product_type_label' => $this->product_type->label ?? $this->product_type->value,
             'specifications' => $this->productTypeInstance->specifications ?? [],
         ];
 

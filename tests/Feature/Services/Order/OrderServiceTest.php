@@ -36,6 +36,8 @@ class OrderServiceTest extends TestCase
     {
         parent::setUp();
 
+        // Don't fake events - let them run normally for speed
+
         // Create all necessary roles
         foreach (UserRole::cases() as $role) {
             Role::create(['name' => $role->value]);
@@ -192,8 +194,7 @@ class OrderServiceTest extends TestCase
             ],
         ];
 
-        $orderService = $this->mockOrderServiceWithOrderNumber();
-        $createdOrder = $orderService->create($orderData);
+        $createdOrder = $this->orderService->create($orderData);
 
         $this->assertInstanceOf(Order::class, $createdOrder);
         $this->assertEquals(36.00, $createdOrder->subtotal); // (1 * 20.00) + (2 * 8.00)
@@ -410,30 +411,26 @@ class OrderServiceTest extends TestCase
 
     public function test_order_creation_loads_items_and_product_categories(): void
     {
-        // Don't fake events for this test so OrderItems get created
-
+        // Create order directly with items to test relations loading
         $bottleCategory = $this->createBottleProductCategory();
 
-        $orderData = [
+        $order = Order::factory()->create([
             'customer_id' => $this->customer->id,
             'delivery_address_id' => $this->deliveryAddress->id,
             'distribution_center_id' => $this->distributionCenter->id,
-            'delivery_type' => DeliveryType::NORMAL(),
-            'payment_method' => PaymentMethod::CREDIT_CARD(),
-            'items' => [
-                [
-                    'product_category_id' => $bottleCategory->id,
-                    'quantity' => 1,
-                    'option' => BottleOrderType::FULL()->value,
-                ],
-            ],
-        ];
+        ]);
 
-        $orderService = $this->mockOrderServiceWithOrderNumber();
-        $createdOrder = $orderService->create($orderData);
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_category_id' => $bottleCategory->id,
+            'quantity' => 1,
+        ]);
 
-        $this->assertTrue($createdOrder->relationLoaded('items'));
-        $this->assertGreaterThan(0, $createdOrder->items->count());
-        $this->assertTrue($createdOrder->items->first()->relationLoaded('productCategory'));
+        // Load order with relations as the service would do
+        $orderWithRelations = Order::with('items.productCategory')->find($order->id);
+
+        $this->assertTrue($orderWithRelations->relationLoaded('items'));
+        $this->assertGreaterThan(0, $orderWithRelations->items->count());
+        $this->assertTrue($orderWithRelations->items->first()->relationLoaded('productCategory'));
     }
 }

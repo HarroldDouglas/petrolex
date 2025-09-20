@@ -209,5 +209,139 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="municipality", ref="#/components/schemas/Municipality", nullable=true),
  *     @OA\Property(property="city", ref="#/components/schemas/City", nullable=true)
  * )
+ *
+ * @OA\Schema(
+ *     schema="OrderDetailsData",
+ *     title="OrderDetailsData",
+ *     description="Détails complets d'une commande",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="order_number", type="string", example="CMD-202412-0001"),
+ *     @OA\Property(property="status", type="string", example="confirmed"),
+ *     @OA\Property(property="status_label", type="string", example="Confirmée"),
+ *     @OA\Property(property="delivery_type", type="string", example="home_delivery"),
+ *     @OA\Property(property="delivery_type_label", type="string", example="Livraison à domicile"),
+ *     @OA\Property(property="subtotal", type="number", format="float", example=1500.00),
+ *     @OA\Property(property="delivery_fee", type="number", format="float", example=500.00),
+ *     @OA\Property(property="total_amount", type="number", format="float", example=2000.00),
+ *     @OA\Property(property="total_refunded_amount", type="number", format="float", example=0.00),
+ *     @OA\Property(property="order_date", type="string", format="date-time", example="2024-12-01T10:00:00.000000Z"),
+ *     @OA\Property(property="delivery_date", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="confirmed_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="processing_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="delivered_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="cancelled_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time"),
+ *     @OA\Property(property="comments", type="string", nullable=true),
+ *     @OA\Property(property="center_comments", type="string", nullable=true),
+ *     @OA\Property(property="rating", type="integer", nullable=true, minimum=1, maximum=5),
+ *     @OA\Property(property="cancelled_by", type="string", nullable=true),
+ *     @OA\Property(property="cancelled_reason", type="string", nullable=true),
+ *     @OA\Property(
+ *         property="customer",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer"),
+ *         @OA\Property(property="user_id", type="integer"),
+ *         @OA\Property(property="first_name", type="string"),
+ *         @OA\Property(property="last_name", type="string"),
+ *         @OA\Property(property="full_name", type="string"),
+ *         @OA\Property(property="email", type="string"),
+ *         @OA\Property(property="phone_number", type="string"),
+ *         @OA\Property(property="current_balance", type="number", format="float"),
+ *         @OA\Property(property="country", ref="#/components/schemas/Country")
+ *     ),
+ *     @OA\Property(property="delivery_address", ref="#/components/schemas/DeliveryAddress"),
+ *     @OA\Property(
+ *         property="delivery_person",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer"),
+ *         @OA\Property(property="user_id", type="integer"),
+ *         @OA\Property(property="first_name", type="string"),
+ *         @OA\Property(property="last_name", type="string"),
+ *         @OA\Property(property="full_name", type="string"),
+ *         @OA\Property(property="phone_number", type="string"),
+ *         @OA\Property(property="email", type="string")
+ *     ),
+ *     @OA\Property(
+ *         property="payment",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer"),
+ *         @OA\Property(property="payment_method", type="string"),
+ *         @OA\Property(property="payment_method_label", type="string"),
+ *         @OA\Property(property="payment_status", type="string"),
+ *         @OA\Property(property="payment_status_label", type="string"),
+ *         @OA\Property(property="amount", type="number", format="float"),
+ *         @OA\Property(property="payment_reference", type="string"),
+ *         @OA\Property(property="paid_at", type="string", format="date-time", nullable=true),
+ *         @OA\Property(property="created_at", type="string", format="date-time")
+ *     ),
+ *     @OA\Property(
+ *         property="items",
+ *         type="array",
+ *
+ *         @OA\Items(
+ *             type="object",
+ *
+ *             @OA\Property(property="id", type="integer"),
+ *             @OA\Property(property="quantity", type="integer"),
+ *             @OA\Property(property="unit_price", type="number", format="float"),
+ *             @OA\Property(property="total_price", type="number", format="float"),
+ *             @OA\Property(
+ *                 property="product",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer"),
+ *                 @OA\Property(property="name", type="string"),
+ *                 @OA\Property(property="description", type="string"),
+ *                 @OA\Property(property="sku", type="string"),
+ *                 @OA\Property(property="barcode", type="string")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Property(
+ *         property="permissions",
+ *         type="object",
+ *         @OA\Property(property="can_be_rated", type="boolean"),
+ *         @OA\Property(property="can_be_cancelled", type="boolean"),
+ *         @OA\Property(property="can_be_delivered", type="boolean")
+ *     ),
+ *     @OA\Property(property="invoice_url", type="string", nullable=true, format="uri", example="https://app.petrolex.cm/api/orders/1/download/invoice", description="URL de téléchargement de la facture PDF (null si la facture n'existe pas encore)")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="CustomerOrdersResponse",
+ *     type="object",
+ *
+ *     @OA\Property(
+ *         property="_metadata",
+ *         type="object",
+ *         @OA\Property(property="success", type="boolean", example=true),
+ *         @OA\Property(property="message", type="string", example="Commandes client récupérées avec succès.")
+ *     ),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *
+ *         @OA\Items(ref="#/components/schemas/OrderData")
+ *     ),
+ *
+ *     @OA\Property(
+ *         property="meta",
+ *         type="object",
+ *         @OA\Property(
+ *             property="pagination",
+ *             type="object",
+ *             @OA\Property(property="total", type="integer", example=25),
+ *             @OA\Property(property="current_page_total", type="integer", example=10),
+ *             @OA\Property(property="per_page", type="integer", example=10),
+ *             @OA\Property(property="current_page", type="integer", example=1),
+ *             @OA\Property(property="total_pages", type="integer", example=3),
+ *             @OA\Property(property="next_page_url", type="string", nullable=true, example="https://app.petrolex.cm/api/my/orders?page=2"),
+ *             @OA\Property(property="prev_page_url", type="string", nullable=true, example=null)
+ *         )
+ *     )
+ * )
  */
 class BaseSchemas {}

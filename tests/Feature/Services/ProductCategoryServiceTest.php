@@ -135,7 +135,7 @@ class ProductCategoryServiceTest extends TestCase
 
         $price = $this->productCategoryService->getProductPrice(
             $productCategory->id,
-            BottleOrderType::FULL()->value
+            BottleOrderType::FULL()
         );
 
         $this->assertEquals(30.00, $price);
@@ -150,7 +150,7 @@ class ProductCategoryServiceTest extends TestCase
 
         $price = $this->productCategoryService->getProductPrice(
             $productCategory->id,
-            BottleOrderType::RECHARGE()->value
+            BottleOrderType::RECHARGE()
         );
 
         $this->assertEquals(20.00, $price);
@@ -195,7 +195,8 @@ class ProductCategoryServiceTest extends TestCase
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('Price not found for product type.');
 
-        $this->productCategoryService->getProductPrice($productCategory->id, 'invalid_option');
+        // Pass null for bottle type should trigger the exception since we need an option for bottles
+        $this->productCategoryService->getProductPrice($productCategory->id, null);
     }
 
     public function test_it_can_get_product_quantity(): void

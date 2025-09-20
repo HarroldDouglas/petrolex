@@ -25,7 +25,7 @@ class ProductCategoryService extends BaseServiceForEntity
 
     public function getProductPrice(
         int $productCategoryId,
-        ?string $option = null
+        ?BottleOrderType $option = null
     ): float {
         /** @var ProductCategory $productCategory */
         $productCategory = $this->repository->find($productCategoryId);
@@ -44,9 +44,9 @@ class ProductCategoryService extends BaseServiceForEntity
         }
 
         if ($productCategory->product_type->value === ProductType::BOTTLE()->value) {
-            if ($option === BottleOrderType::FULL()->value) {
+            if ($option?->value === BottleOrderType::FULL()->value) {
                 return $productInstance->full_price;
-            } elseif ($option === BottleOrderType::RECHARGE()->value) {
+            } elseif ($option?->value === BottleOrderType::RECHARGE()->value) {
                 return $productInstance->content_price;
             }
         } elseif ($productCategory->product_type->value === ProductType::ACCESSORY()->value) {

@@ -21,8 +21,8 @@ class OrderFactory extends Factory
 
     public function definition(): array
     {
-        $customer = Customer::inRandomOrder()->first();
-        $distributionCenter = DistributionCenter::inRandomOrder()->first();
+        $customer = Customer::inRandomOrder()->first() ?? Customer::factory()->create();
+        $distributionCenter = DistributionCenter::inRandomOrder()->first() ?? DistributionCenter::factory()->create();
         $deliveryAddress = CustomerDeliveryAddress::where('customer_id', $customer->id)
             ->inRandomOrder()->first() ?? CustomerDeliveryAddress::factory()->create(['customer_id' => $customer->id]);
 
@@ -86,7 +86,7 @@ class OrderFactory extends Factory
     public function processing(): static
     {
         return $this->state(function () {
-            $deliveryPerson = DeliveryPerson::inRandomOrder()->first();
+            $deliveryPerson = DeliveryPerson::inRandomOrder()->first() ?? DeliveryPerson::factory()->create();
             $deliveryType = $this->faker->randomElement([DeliveryType::NORMAL(), DeliveryType::FAST()]);
 
             $orderDate = $this->faker->dateTimeBetween('-7 days', '-1 hours');
@@ -122,7 +122,7 @@ class OrderFactory extends Factory
     public function delivered(): static
     {
         return $this->state(function () {
-            $deliveryPerson = DeliveryPerson::inRandomOrder()->first();
+            $deliveryPerson = DeliveryPerson::inRandomOrder()->first() ?? DeliveryPerson::factory()->create();
             $deliveryType = $this->faker->randomElement([DeliveryType::NORMAL(), DeliveryType::FAST()]);
 
             $orderDate = $this->faker->dateTimeBetween('-30 days', '-2 hours');
@@ -202,7 +202,7 @@ class OrderFactory extends Factory
     public function cancelledFromProcessing(): static
     {
         return $this->state(function () {
-            $deliveryPerson = DeliveryPerson::inRandomOrder()->first();
+            $deliveryPerson = DeliveryPerson::inRandomOrder()->first() ?? DeliveryPerson::factory()->create();
             $deliveryType = $this->faker->randomElement([DeliveryType::NORMAL(), DeliveryType::FAST()]);
 
             $orderDate = $this->faker->dateTimeBetween('-30 days', '-2 hours');

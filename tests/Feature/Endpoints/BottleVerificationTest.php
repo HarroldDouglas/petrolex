@@ -32,16 +32,18 @@ final class BottleVerificationTest extends TestCase
     {
         parent::setUp();
 
-        // Seed essential data to avoid conflicts
-        $this->artisan('db:seed', ['--class' => 'Database\\Seeders\\GeographicSeeder']);
+        // Create essential data to avoid conflicts in parallel execution
         $this->artisan('db:seed', ['--class' => 'Database\\Seeders\\RolePermissionSeeder']);
 
-        // Get the seeded Cameroon country
-        $country = \App\Models\Geography\Country::where('code', 'CM')->first();
-
-        if (! $country) {
-            $this->fail('Cameroon country not found after seeding');
-        }
+        // Create Cameroon country with firstOrCreate to avoid UNIQUE constraint violations
+        $country = \App\Models\Geography\Country::firstOrCreate(
+            ['code' => 'CM'],
+            [
+                'name' => 'Cameroun',
+                'phone_code' => '+237',
+                'is_active' => true,
+            ]
+        );
 
         // Create user with explicit setup to avoid authentication issues
         $this->adminUser = User::factory()->create([

@@ -70,10 +70,33 @@ final class OrderCustomerFeedbackTest extends TestCase
                     'success',
                     'message',
                 ],
-                'data' => [],
+                'data' => [
+                    'id',
+                    'order_number',
+                    'status',
+                    'status_label',
+                    'delivery_type',
+                    'delivery_type_label',
+                    'subtotal',
+                    'delivery_fee',
+                    'total_amount',
+                    'comments',
+                    'rating',
+                    'created_at',
+                    'updated_at',
+                    'customer',
+                    'delivery_address',
+                    'items',
+                    'payment',
+                ],
             ])
             ->assertJsonPath('_metadata.success', true)
-            ->assertJsonPath('_metadata.message', 'Commentaire ajouté à la commande avec succès');
+            ->assertJsonPath('_metadata.message', 'Commentaire ajouté à la commande avec succès')
+            ->assertJsonPath('data.id', $order->id)
+            ->assertJsonPath('data.comments', $payload['comments'])
+            ->assertJsonPath('data.rating', $payload['rating'])
+            ->assertJsonPath('data.status', $order->status->value)
+            ->assertJsonPath('data.delivery_type', $order->delivery_type->value);
 
         // Assert that the order in the database has been updated
         $this->assertDatabaseHas('orders', [

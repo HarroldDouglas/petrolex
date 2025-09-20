@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Customer;
+use App\Models\Geography\Neighborhood;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,6 +28,7 @@ class CustomerDeliveryAddressFactory extends Factory
             'contact_lastname' => fake()->lastName(),
             'email' => fake()->safeEmail(),
             'address_precision' => fake()->sentence(),
+            'neighborhood_id' => Neighborhood::inRandomOrder()->first()?->id,
             'is_default' => false,
         ];
     }

@@ -10,11 +10,281 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000",
+            "url": "http://127.0.0.1:8001",
             "description": "API Server"
         }
     ],
     "paths": {
+        "/api/my/orders": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Récupérer les commandes du client connecté",
+                "description": "Retourne la liste des commandes du client connecté avec possibilité de filtrage et pagination.",
+                "operationId": "api.my.orders.index",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Nombre d'éléments par page (défaut: 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "order_number",
+                        "in": "query",
+                        "description": "Filtrer par numéro de commande (recherche partielle)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "CMD-202412-0001"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrer par statut de commande",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "confirmed",
+                                "in_progress",
+                                "delivered",
+                                "cancelled",
+                                "paid",
+                                "failed"
+                            ],
+                            "example": "confirmed"
+                        }
+                    },
+                    {
+                        "name": "delivery_type",
+                        "in": "query",
+                        "description": "Filtrer par type de livraison",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "normal",
+                                "fast"
+                            ],
+                            "example": "normal"
+                        }
+                    },
+                    {
+                        "name": "payment_method",
+                        "in": "query",
+                        "description": "Filtrer par méthode de paiement",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "orange_money",
+                                "mtn_money",
+                                "credit_card"
+                            ],
+                            "example": "orange_money"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des commandes récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Commandes récupérées avec succès"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/OrderData"
+                                            }
+                                        },
+                                        "links": {
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "last": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès refusé - rôle client requis",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/orders/{order}/download/invoice": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Télécharger la facture PDF d'une commande",
+                "description": "Génère et télécharge la facture PDF d'une commande spécifique. Le PDF est généré à la demande avec tous les détails de la commande.",
+                "operationId": "api.orders.download.invoice",
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "description": "ID de la commande",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Facture PDF générée et téléchargée avec succès",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Non autorisé à télécharger cette facture",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commande non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/app/advertising/banners": {
             "get": {
                 "tags": [
@@ -2130,31 +2400,51 @@
                 ]
             }
         },
-        "/api/orders/checkout": {
-            "post": {
+        "/api/orders/{order}": {
+            "get": {
                 "tags": [
                     "Commandes"
                 ],
-                "summary": "Passer une commande (checkout)",
-                "description": "Crée une nouvelle commande et initie le paiement.",
-                "operationId": "api.orders.checkout",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/OrderCheckoutRequest"
-                            }
+                "summary": "Récupérer les détails complets d'une commande",
+                "description": "Retourne tous les détails d'une commande spécifique: informations de base, client, adresse de livraison, livreur, articles, paiement, suivi, etc.",
+                "operationId": "getOrderDetails",
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "description": "ID de la commande",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
                         }
                     }
-                },
+                ],
                 "responses": {
-                    "201": {
-                        "description": "Commande créée avec succès",
+                    "200": {
+                        "description": "Détails de la commande récupérés avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/OrderCheckoutResponse"
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Détails de la commande récupérés avec succès"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/OrderDetailsData"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -2169,8 +2459,18 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Erreur de validation",
+                    "403": {
+                        "description": "Non autorisé à voir cette commande",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commande non trouvée",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2185,48 +2485,6 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/orders/payment-callback": {
-            "post": {
-                "tags": [
-                    "Commandes"
-                ],
-                "summary": "Callback de paiement d'une commande",
-                "description": "Traite le callback de paiement envoyé par le prestataire de paiement.",
-                "operationId": "api.orders.paymentCallback",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/OrderPaymentCallbackRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Callback traité avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OrderPaymentCallbackResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreur de validation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/api/orders/{order}/scan-empty-bottle": {
@@ -2325,15 +2583,14 @@
                     "Commandes"
                 ],
                 "summary": "Créer une nouvelle commande",
-                "description": "Permet de créer une nouvelle commande avec ses articles.",
+                "description": "Crée une nouvelle commande avec initiation du paiement. ENDPOINT PRINCIPAL pour passer des commandes.",
                 "operationId": "api.orders.store",
                 "requestBody": {
-                    "description": "Données de la commande à créer",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/StoreOrderRequest"
+                                "$ref": "#/components/schemas/CreateOrderRequest"
                             }
                         }
                     }
@@ -2344,13 +2601,13 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/StoreOrderResponse"
+                                    "$ref": "#/components/schemas/CreateOrderResponse"
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Non autorisé",
+                        "description": "Non authentifié",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2359,8 +2616,8 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Ressource non trouvée (client, adresse de livraison, centre de distribution, produit)",
+                    "403": {
+                        "description": "Accès refusé - rôle client requis",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2370,21 +2627,11 @@
                         }
                     },
                     "422": {
-                        "description": "Erreur de validation ou stock insuffisant",
+                        "description": "Erreur de validation",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur interne du serveur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
                                 }
                             }
                         }
@@ -2442,6 +2689,58 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/api/payments/callback": {
+            "post": {
+                "tags": [
+                    "Paiement"
+                ],
+                "summary": "Callback de paiement",
+                "description": "Endpoint pour recevoir les callbacks de paiement des passerelles de paiement externes. Aucune authentification requise car appelé par des services externes.",
+                "operationId": "api.payments.callback",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PaymentCallbackRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Callback traité avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentCallbackSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erreur lors du traitement du callback",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentCallbackErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation des données du callback",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/tracking/delivery/{orderId}/complete": {
@@ -4218,184 +4517,6 @@
                     }
                 ]
             },
-            "OrderCheckoutItem": {
-                "required": [
-                    "product_id",
-                    "quantity",
-                    "option",
-                    "unit_price"
-                ],
-                "properties": {
-                    "product_id": {
-                        "description": "ID du produit",
-                        "type": "integer",
-                        "example": 5
-                    },
-                    "quantity": {
-                        "description": "Quantité commandée",
-                        "type": "integer",
-                        "example": 2
-                    },
-                    "option": {
-                        "description": "Option du produit",
-                        "type": "string",
-                        "example": "bottle_with_content"
-                    },
-                    "unit_price": {
-                        "description": "Prix unitaire",
-                        "type": "number",
-                        "format": "float",
-                        "example": 8500
-                    }
-                },
-                "type": "object"
-            },
-            "OrderCheckoutRequest": {
-                "required": [
-                    "customer_id",
-                    "distribution_center_id",
-                    "items",
-                    "payment_method"
-                ],
-                "properties": {
-                    "customer_id": {
-                        "description": "ID du client",
-                        "type": "integer",
-                        "example": 12
-                    },
-                    "distribution_center_id": {
-                        "description": "ID du centre de distribution",
-                        "type": "integer",
-                        "example": 3
-                    },
-                    "items": {
-                        "description": "Liste des articles de la commande",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/OrderCheckoutItem"
-                        }
-                    },
-                    "payment_method": {
-                        "description": "Méthode de paiement",
-                        "type": "string",
-                        "example": "mobile_money"
-                    },
-                    "delivery_address_id": {
-                        "description": "ID de l'adresse de livraison",
-                        "type": "integer",
-                        "example": 7
-                    },
-                    "comments": {
-                        "description": "Commentaires optionnels",
-                        "type": "string",
-                        "example": "Livrer rapidement"
-                    }
-                },
-                "type": "object"
-            },
-            "OrderCheckoutResponse": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                        "properties": {
-                            "data": {
-                                "properties": {
-                                    "order_id": {
-                                        "type": "integer",
-                                        "example": 123
-                                    },
-                                    "order_number": {
-                                        "type": "string",
-                                        "example": "ORD-20250822-001"
-                                    },
-                                    "payment_url": {
-                                        "type": "string",
-                                        "example": "https://payment-gateway.com/pay/abc123"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        },
-                        "type": "object"
-                    }
-                ]
-            },
-            "OrderPaymentCallbackRequest": {
-                "required": [
-                    "order_id",
-                    "status",
-                    "transaction_reference"
-                ],
-                "properties": {
-                    "order_id": {
-                        "description": "ID de la commande",
-                        "type": "integer",
-                        "example": 123
-                    },
-                    "status": {
-                        "description": "Statut du paiement (paid, failed, pending, etc.)",
-                        "type": "string",
-                        "example": "paid"
-                    },
-                    "transaction_reference": {
-                        "description": "Référence de la transaction",
-                        "type": "string",
-                        "example": "TXN-123456789"
-                    },
-                    "payment_method": {
-                        "description": "Méthode de paiement",
-                        "type": "string",
-                        "example": "mobile_money"
-                    },
-                    "amount": {
-                        "description": "Montant payé",
-                        "type": "number",
-                        "format": "float",
-                        "example": 23000
-                    },
-                    "meta": {
-                        "description": "Données additionnelles du callback",
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "type": "object"
-            },
-            "OrderPaymentCallbackResponse": {
-                "properties": {
-                    "_metadata": {
-                        "properties": {
-                            "success": {
-                                "type": "boolean",
-                                "example": true
-                            },
-                            "message": {
-                                "type": "string",
-                                "example": "Callback de paiement traité avec succès"
-                            }
-                        },
-                        "type": "object"
-                    },
-                    "data": {
-                        "properties": {
-                            "order_id": {
-                                "type": "integer",
-                                "example": 123
-                            },
-                            "status": {
-                                "type": "string",
-                                "example": "paid"
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
             "ScanEmptyBottleRequest": {
                 "required": [
                     "barcode",
@@ -4436,7 +4557,7 @@
                     }
                 ]
             },
-            "OrderItemRequest": {
+            "CreateOrderItem": {
                 "required": [
                     "product_category_id",
                     "quantity"
@@ -4445,18 +4566,20 @@
                     "product_category_id": {
                         "description": "ID de la catégorie de produit",
                         "type": "integer",
-                        "example": 1
+                        "example": 5
                     },
                     "quantity": {
-                        "description": "Quantité de l'article",
+                        "description": "Quantité commandée (1-100)",
                         "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1,
                         "example": 2
                     },
                     "option": {
-                        "description": "Option pour les bouteilles (e.g., content_only, bottle_with_content)",
+                        "description": "Option du produit: content (recharge seulement), bottle_with_content (bouteille pleine), ou null (accessoires)",
                         "type": "string",
                         "enum": [
-                            "content_only",
+                            "content",
                             "bottle_with_content"
                         ],
                         "example": "bottle_with_content",
@@ -4465,9 +4588,8 @@
                 },
                 "type": "object"
             },
-            "StoreOrderRequest": {
+            "CreateOrderRequest": {
                 "required": [
-                    "customer_id",
                     "delivery_address_id",
                     "distribution_center_id",
                     "delivery_type",
@@ -4475,198 +4597,18 @@
                     "items"
                 ],
                 "properties": {
-                    "customer_id": {
-                        "description": "ID du client",
-                        "type": "integer",
-                        "example": 1
-                    },
                     "delivery_address_id": {
-                        "description": "ID de l'adresse de livraison",
+                        "description": "ID de l'adresse de livraison du client",
                         "type": "integer",
-                        "example": 1
+                        "example": 7
                     },
                     "distribution_center_id": {
                         "description": "ID du centre de distribution",
                         "type": "integer",
-                        "example": 1
+                        "example": 3
                     },
                     "delivery_type": {
                         "description": "Type de livraison",
-                        "type": "string",
-                        "enum": [
-                            "delivery",
-                            "pickup"
-                        ],
-                        "example": "delivery"
-                    },
-                    "payment_method": {
-                        "description": "Méthode de paiement",
-                        "type": "string",
-                        "enum": [
-                            "mobile_money",
-                            "credit_card"
-                        ],
-                        "example": "mobile_money"
-                    },
-                    "items": {
-                        "description": "Liste des articles de la commande",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/OrderItemRequest"
-                        }
-                    }
-                },
-                "type": "object"
-            },
-            "OrderItemResource": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "order_id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "product_category_id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "quantity": {
-                        "type": "integer",
-                        "example": 2
-                    },
-                    "unit_price": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 5000
-                    },
-                    "total_price": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 10000
-                    },
-                    "option": {
-                        "type": "string",
-                        "enum": [
-                            "content_only",
-                            "bottle_with_content"
-                        ],
-                        "example": "bottle_with_content",
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object"
-            },
-            "DistributionCenterResource": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "type": "string",
-                        "example": "Centre Principal"
-                    },
-                    "country": {
-                        "type": "string",
-                        "example": "Cameroun"
-                    },
-                    "city": {
-                        "type": "string",
-                        "example": "Douala"
-                    },
-                    "neighborhood": {
-                        "type": "string",
-                        "example": "Bonanjo"
-                    },
-                    "address": {
-                        "type": "string",
-                        "example": "123 Rue Principale, Douala"
-                    },
-                    "description": {
-                        "type": "string",
-                        "example": "Centre de distribution principal avec toutes les commodités"
-                    },
-                    "latitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 4.0511
-                    },
-                    "longitude": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 9.7679
-                    },
-                    "phone": {
-                        "type": "string",
-                        "example": "677123456"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email",
-                        "example": "centre.principal@petrolex.cm"
-                    },
-                    "is_active": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "storage_capacity": {
-                        "type": "integer",
-                        "example": 1000,
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object"
-            },
-            "OrderResource": {
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "order_number": {
-                        "type": "string",
-                        "example": "ORDER-123456789"
-                    },
-                    "customer_id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "customer": {
-                        "$ref": "#/components/schemas/UserData"
-                    },
-                    "delivery_address_id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "delivery_address": {
-                        "$ref": "#/components/schemas/DeliveryAddress"
-                    },
-                    "distribution_center_id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "distribution_center": {
-                        "$ref": "#/components/schemas/DistributionCenterResource"
-                    },
-                    "delivery_type": {
                         "type": "string",
                         "enum": [
                             "normal",
@@ -4675,48 +4617,34 @@
                         "example": "normal"
                     },
                     "payment_method": {
+                        "description": "Méthode de paiement",
                         "type": "string",
                         "enum": [
-                            "credit_card",
-                            "mobile_money",
-                            "orange_money"
+                            "orange_money",
+                            "mtn_money",
+                            "credit_card"
                         ],
-                        "example": "mobile_money"
-                    },
-                    "total_amount": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 23500
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "pending",
-                            "confirmed",
-                            "in_progress",
-                            "delivered",
-                            "cancelled"
-                        ],
-                        "example": "pending"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time"
+                        "example": "orange_money"
                     },
                     "items": {
+                        "description": "Liste des articles de la commande (1 bouteille recharge, 1 bouteille pleine, 1 accessoire)",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/OrderItemResource"
-                        }
+                            "$ref": "#/components/schemas/CreateOrderItem"
+                        },
+                        "minItems": 1
+                    },
+                    "comments": {
+                        "description": "Commentaires optionnels (max 500 caractères)",
+                        "type": "string",
+                        "maxLength": 500,
+                        "example": "Livrer avant 18h",
+                        "nullable": true
                     }
                 },
                 "type": "object"
             },
-            "StoreOrderResponse": {
+            "CreateOrderResponse": {
                 "allOf": [
                     {
                         "$ref": "#/components/schemas/ApiResponse"
@@ -4724,11 +4652,115 @@
                     {
                         "properties": {
                             "data": {
-                                "$ref": "#/components/schemas/OrderResource"
-                            },
-                            "message": {
-                                "type": "string",
-                                "example": "Commande créée avec succès"
+                                "properties": {
+                                    "order": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 123
+                                            },
+                                            "order_number": {
+                                                "type": "string",
+                                                "example": "ORD-2025-001234"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "pending"
+                                            },
+                                            "status_label": {
+                                                "type": "string",
+                                                "example": "En attente"
+                                            },
+                                            "delivery_type": {
+                                                "type": "string",
+                                                "example": "normal"
+                                            },
+                                            "delivery_type_label": {
+                                                "type": "string",
+                                                "example": "Livraison normale"
+                                            },
+                                            "subtotal": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 15000
+                                            },
+                                            "delivery_fee": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 2000
+                                            },
+                                            "total_amount": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 17000
+                                            },
+                                            "comments": {
+                                                "type": "string",
+                                                "example": "Livrer avant 18h",
+                                                "nullable": true
+                                            },
+                                            "customer": {
+                                                "description": "Informations du client",
+                                                "type": "object"
+                                            },
+                                            "delivery_address": {
+                                                "description": "Adresse de livraison",
+                                                "type": "object"
+                                            },
+                                            "items": {
+                                                "description": "Articles de la commande",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "invoice_url": {
+                                                "description": "URL de téléchargement de la facture PDF (générée automatiquement après création)",
+                                                "type": "string",
+                                                "format": "uri",
+                                                "example": "https://app.petrolex.cm/api/orders/123/download/invoice",
+                                                "nullable": true
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "payment": {
+                                        "properties": {
+                                            "payment_reference": {
+                                                "type": "string",
+                                                "example": "PAY_2025_001234"
+                                            },
+                                            "payment_status": {
+                                                "type": "string",
+                                                "example": "pending"
+                                            },
+                                            "payment_status_label": {
+                                                "type": "string",
+                                                "example": "En attente"
+                                            },
+                                            "payment_method": {
+                                                "type": "string",
+                                                "example": "orange_money"
+                                            },
+                                            "payment_method_label": {
+                                                "type": "string",
+                                                "example": "Orange Money"
+                                            },
+                                            "amount_due": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 17000
+                                            },
+                                            "amount_paid": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 0
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
                             }
                         },
                         "type": "object"
@@ -4768,6 +4800,179 @@
                             "message": {
                                 "type": "string",
                                 "example": "Méthodes de paiement récupérées avec succès."
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "PaymentCallbackRequest": {
+                "required": [
+                    "application",
+                    "app_transaction_ref",
+                    "operator_transaction_ref",
+                    "transaction_ref",
+                    "transaction_type",
+                    "transaction_amount",
+                    "transaction_fees",
+                    "transaction_currency",
+                    "transaction_operator",
+                    "transaction_status",
+                    "transaction_reason",
+                    "transaction_message",
+                    "customer_phone_number",
+                    "signature"
+                ],
+                "properties": {
+                    "application": {
+                        "description": "Nom de l'application",
+                        "type": "string",
+                        "example": "PETROLEX"
+                    },
+                    "app_transaction_ref": {
+                        "description": "Référence de transaction de l'application (Order ID)",
+                        "type": "string",
+                        "example": "107"
+                    },
+                    "operator_transaction_ref": {
+                        "description": "Référence de transaction de l'opérateur",
+                        "type": "string",
+                        "example": "OM_230920250211_107"
+                    },
+                    "transaction_ref": {
+                        "description": "Référence de transaction unique",
+                        "type": "string",
+                        "example": "TXN_PETROLEX_107_20250920021148"
+                    },
+                    "transaction_type": {
+                        "description": "Type de transaction",
+                        "type": "string",
+                        "enum": [
+                            "PAYIN",
+                            "PAYOUT"
+                        ],
+                        "example": "PAYIN"
+                    },
+                    "transaction_amount": {
+                        "description": "Montant de la transaction",
+                        "type": "number",
+                        "format": "float",
+                        "example": 22300
+                    },
+                    "transaction_fees": {
+                        "description": "Frais de transaction",
+                        "type": "number",
+                        "format": "float",
+                        "example": 100
+                    },
+                    "transaction_currency": {
+                        "description": "Devise de la transaction",
+                        "type": "string",
+                        "enum": [
+                            "XAF",
+                            "EUR"
+                        ],
+                        "example": "XAF"
+                    },
+                    "transaction_operator": {
+                        "description": "Opérateur de paiement",
+                        "type": "string",
+                        "enum": [
+                            "MCP",
+                            "CM_MOMO",
+                            "CM_OM",
+                            "CARD"
+                        ],
+                        "example": "CM_OM"
+                    },
+                    "transaction_status": {
+                        "description": "Statut de la transaction",
+                        "type": "string",
+                        "enum": [
+                            "SUCCESS",
+                            "CANCELED",
+                            "CANCELLED",
+                            "FAILED"
+                        ],
+                        "example": "SUCCESS"
+                    },
+                    "transaction_reason": {
+                        "description": "Raison de la transaction",
+                        "type": "string",
+                        "example": "Payment completed successfully"
+                    },
+                    "transaction_message": {
+                        "description": "Message de la transaction",
+                        "type": "string",
+                        "example": "Transaction processed successfully by Orange Money"
+                    },
+                    "customer_phone_number": {
+                        "description": "Numéro de téléphone du client",
+                        "type": "string",
+                        "example": "677123456"
+                    },
+                    "signature": {
+                        "description": "Signature de sécurité HMAC",
+                        "type": "string",
+                        "example": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+                    }
+                },
+                "type": "object"
+            },
+            "PaymentCallbackSuccessResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "properties": {
+                                    "order_id": {
+                                        "type": "string",
+                                        "example": "107"
+                                    },
+                                    "transaction_status": {
+                                        "type": "string",
+                                        "example": "SUCCESS"
+                                    },
+                                    "processed_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-01-20T14:30:00Z"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "PaymentCallbackErrorResponse": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "properties": {
+                                    "order_id": {
+                                        "type": "string",
+                                        "example": "107"
+                                    },
+                                    "error": {
+                                        "type": "string",
+                                        "example": "Order not found"
+                                    },
+                                    "processed_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-01-20T14:30:00Z"
+                                    }
+                                },
+                                "type": "object"
                             }
                         },
                         "type": "object"
@@ -5423,6 +5628,344 @@
                 },
                 "type": "object"
             },
+            "OrderDetailsData": {
+                "title": "OrderDetailsData",
+                "description": "Détails complets d'une commande",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order_number": {
+                        "type": "string",
+                        "example": "CMD-202412-0001"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "confirmed"
+                    },
+                    "status_label": {
+                        "type": "string",
+                        "example": "Confirmée"
+                    },
+                    "delivery_type": {
+                        "type": "string",
+                        "example": "home_delivery"
+                    },
+                    "delivery_type_label": {
+                        "type": "string",
+                        "example": "Livraison à domicile"
+                    },
+                    "subtotal": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1500
+                    },
+                    "delivery_fee": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 500
+                    },
+                    "total_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 2000
+                    },
+                    "total_refunded_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "order_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-01T10:00:00.000000Z"
+                    },
+                    "delivery_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "confirmed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "processing_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "delivered_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "cancelled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "comments": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "center_comments": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "maximum": 5,
+                        "minimum": 1,
+                        "nullable": true
+                    },
+                    "cancelled_by": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "cancelled_reason": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "customer": {
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "user_id": {
+                                "type": "integer"
+                            },
+                            "first_name": {
+                                "type": "string"
+                            },
+                            "last_name": {
+                                "type": "string"
+                            },
+                            "full_name": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "phone_number": {
+                                "type": "string"
+                            },
+                            "current_balance": {
+                                "type": "number",
+                                "format": "float"
+                            },
+                            "country": {
+                                "$ref": "#/components/schemas/Country"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "delivery_address": {
+                        "$ref": "#/components/schemas/DeliveryAddress"
+                    },
+                    "delivery_person": {
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "user_id": {
+                                "type": "integer"
+                            },
+                            "first_name": {
+                                "type": "string"
+                            },
+                            "last_name": {
+                                "type": "string"
+                            },
+                            "full_name": {
+                                "type": "string"
+                            },
+                            "phone_number": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "payment": {
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "payment_method": {
+                                "type": "string"
+                            },
+                            "payment_method_label": {
+                                "type": "string"
+                            },
+                            "payment_status": {
+                                "type": "string"
+                            },
+                            "payment_status_label": {
+                                "type": "string"
+                            },
+                            "amount": {
+                                "type": "number",
+                                "format": "float"
+                            },
+                            "payment_reference": {
+                                "type": "string"
+                            },
+                            "paid_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            },
+                            "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "quantity": {
+                                    "type": "integer"
+                                },
+                                "unit_price": {
+                                    "type": "number",
+                                    "format": "float"
+                                },
+                                "total_price": {
+                                    "type": "number",
+                                    "format": "float"
+                                },
+                                "product": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "sku": {
+                                            "type": "string"
+                                        },
+                                        "barcode": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "permissions": {
+                        "properties": {
+                            "can_be_rated": {
+                                "type": "boolean"
+                            },
+                            "can_be_cancelled": {
+                                "type": "boolean"
+                            },
+                            "can_be_delivered": {
+                                "type": "boolean"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "invoice_url": {
+                        "description": "URL de téléchargement de la facture PDF (null si la facture n'existe pas encore)",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://app.petrolex.cm/api/orders/1/download/invoice",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerOrdersResponse": {
+                "properties": {
+                    "_metadata": {
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Commandes client récupérées avec succès."
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderData"
+                        }
+                    },
+                    "meta": {
+                        "properties": {
+                            "pagination": {
+                                "properties": {
+                                    "total": {
+                                        "type": "integer",
+                                        "example": 25
+                                    },
+                                    "current_page_total": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "per_page": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "current_page": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "total_pages": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "next_page_url": {
+                                        "type": "string",
+                                        "example": "https://app.petrolex.cm/api/my/orders?page=2",
+                                        "nullable": true
+                                    },
+                                    "prev_page_url": {
+                                        "type": "string",
+                                        "example": null,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "DeliveryPersonOrderData": {
                 "title": "Delivery Person Order Data",
                 "description": "Detailed order information for a delivery person",
@@ -5750,6 +6293,10 @@
                         "example": "bottle_with_content",
                         "nullable": true
                     },
+                    "option_label": {
+                        "type": "string",
+                        "example": "Nouvelle bouteille"
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
@@ -5778,6 +6325,10 @@
                         ],
                         "example": "normal"
                     },
+                    "delivery_type_label": {
+                        "type": "string",
+                        "example": "Livraison normale"
+                    },
                     "payment_method": {
                         "type": "string",
                         "enum": [
@@ -5786,6 +6337,10 @@
                             "orange_money"
                         ],
                         "example": "mobile_money"
+                    },
+                    "payment_method_label": {
+                        "type": "string",
+                        "example": "Mobile Money"
                     },
                     "total_amount": {
                         "type": "number",
@@ -5802,6 +6357,10 @@
                             "pending"
                         ],
                         "example": "in_progress"
+                    },
+                    "status_label": {
+                        "type": "string",
+                        "example": "En cours"
                     },
                     "items": {
                         "type": "array",
@@ -5846,6 +6405,13 @@
                             }
                         },
                         "type": "object"
+                    },
+                    "invoice_url": {
+                        "description": "URL de téléchargement de la facture PDF (null si la facture n'existe pas encore)",
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://app.petrolex.cm/api/orders/127/download/invoice",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -5901,6 +6467,10 @@
                             "accessory"
                         ],
                         "example": "bottle"
+                    },
+                    "product_type_label": {
+                        "type": "string",
+                        "example": "Bouteille"
                     }
                 },
                 "type": "object"
@@ -6083,6 +6653,10 @@
     },
     "tags": [
         {
+            "name": "Commandes",
+            "description": "Commandes"
+        },
+        {
             "name": "App",
             "description": "App"
         },
@@ -6101,10 +6675,6 @@
         {
             "name": "Livraison",
             "description": "Livraison"
-        },
-        {
-            "name": "Commandes",
-            "description": "Commandes"
         },
         {
             "name": "Géographie",

@@ -1,0 +1,34 @@
+<?php
+
+return [
+    'messages' => [
+        'delivery_address_id.required' => 'L\'adresse de livraison est obligatoire',
+        'delivery_address_id.exists' => 'L\'adresse de livraison sélectionnée n\'existe pas',
+        'distribution_center_id.required' => 'Le centre de distribution est obligatoire',
+        'distribution_center_id.exists' => 'Le centre de distribution sélectionné n\'existe pas',
+        'delivery_type.in' => 'Le type de livraison doit être l\'un des suivants : :values',
+        'payment_method.in' => 'La méthode de paiement doit être l\'une des suivantes : :values',
+        'items.required' => 'Au moins un article est requis',
+        'items.min' => 'Au moins un article est requis',
+        'items.max' => 'Vous ne pouvez pas commander plus de 50 articles différents',
+        'items.*.product_category_id.required' => 'L\'ID de la catégorie de produit est obligatoire',
+        'items.*.product_category_id.exists' => 'La catégorie de produit sélectionnée n\'existe pas',
+        'items.*.quantity.required' => 'La quantité est obligatoire',
+        'items.*.quantity.min' => 'La quantité doit être au minimum de 1',
+        'items.*.quantity.max' => 'La quantité ne peut pas dépasser 100',
+        'items.*.option.in' => 'L\'option doit être l\'une des valeurs suivantes : :values',
+        'comments.max' => 'Les commentaires ne peuvent pas dépasser 500 caractères',
+    ],
+
+    'attributes' => [
+        'delivery_address_id' => 'adresse de livraison',
+        'distribution_center_id' => 'centre de distribution',
+        'delivery_type' => 'type de livraison',
+        'payment_method' => 'méthode de paiement',
+        'items' => 'articles',
+        'items.*.product_category_id' => 'catégorie de produit',
+        'items.*.quantity' => 'quantité',
+        'items.*.option' => 'option',
+        'comments' => 'commentaires',
+    ],
+];

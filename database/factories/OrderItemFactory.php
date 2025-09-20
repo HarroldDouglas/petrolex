@@ -21,7 +21,7 @@ class OrderItemFactory extends Factory
             'total_price' => function (array $attributes) {
                 return $attributes['quantity'] * $attributes['unit_price'];
             },
-            'option' => null,
+            'bottle_type' => null,
         ];
     }
 }

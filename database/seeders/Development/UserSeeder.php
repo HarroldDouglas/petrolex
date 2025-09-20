@@ -204,6 +204,7 @@ class UserSeeder extends Seeder
 
         if (! $neighborhood) {
             $this->command->error('No neighborhoods found. Please seed geographic data first.');
+
             return;
         }
 
@@ -212,6 +213,12 @@ class UserSeeder extends Seeder
             'address' => 'Nkoabang',
             'latitude' => 3.8617882,
             'longitude' => 11.5835694,
+            'phone' => '+237677889900',
+            'phone_country_code' => '+237',
+            'contact_firstname' => 'Marie',
+            'contact_lastname' => 'Dupont',
+            'email' => 'marie.dupont@example.com',
+            'address_precision' => 'Près du marché central',
             'is_default' => true,
             'neighborhood_id' => $neighborhood->id,
         ]);
@@ -221,6 +228,12 @@ class UserSeeder extends Seeder
             'address' => 'Poste Centrale',
             'latitude' => 3.8741355,
             'longitude' => 11.5173166,
+            'phone' => '+237688776655',
+            'phone_country_code' => '+237',
+            'contact_firstname' => 'Jean',
+            'contact_lastname' => 'Martin',
+            'email' => 'jean.martin@example.com',
+            'address_precision' => 'Face à la poste principale',
             'neighborhood_id' => $neighborhood->id,
         ]);
 
@@ -229,6 +242,12 @@ class UserSeeder extends Seeder
             'address' => 'Essos',
             'latitude' => 3.868779,
             'longitude' => 11.542277,
+            'phone' => '+237699554433',
+            'phone_country_code' => '+237',
+            'contact_firstname' => 'Paul',
+            'contact_lastname' => 'Nguema',
+            'email' => 'paul.nguema@example.com',
+            'address_precision' => 'Quartier Essos, près de l\'école',
             'neighborhood_id' => $neighborhood->id,
         ]);
     }
