@@ -74,8 +74,14 @@ class DownloadInvoiceController extends Controller
     public function __invoke(Order $order): Response
     {
         $user = auth()->user();
-        if ($user->customer && $user->customer->id !== $order->customer_id) {
-            abort(Response::HTTP_FORBIDDEN, 'You are not authorized to download this invoice');
+
+        // Security check: Only order owner (customer), admins, and delivery persons can download invoice
+        $isOrderOwner = $user->customer && $user->customer->id === $order->customer_id;
+        $isAdmin = $user->hasAnyRole(['admin', 'manager', 'center_manager']);
+        $isDeliveryPerson = $user->hasRole('delivery_person');
+
+        if (! $isOrderOwner && ! $isAdmin && ! $isDeliveryPerson) {
+            abort(Response::HTTP_FORBIDDEN, 'Cette facture ne vous appartient pas.');
         }
 
         $orderDetails = $this->orderService->getOrderWithGroupedItems($order->id);

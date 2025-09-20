@@ -339,7 +339,7 @@ class OrderSeeder extends Seeder
         // Create 8 confirmed orders
         $confirmedOrders = [];
         for ($i = 0; $i < 8; $i++) {
-            $confirmedOrders[] = $this->createRandomOrder($customers, $centers, OrderStatus::CONFIRMED());
+            $confirmedOrders[] = $this->createRandomOrder($customers, $centers, OrderStatus::PAID());
         }
 
         $this->addOrderItems($confirmedOrders);
@@ -702,7 +702,7 @@ class OrderSeeder extends Seeder
         // Determine bottle status based on order status
         $targetBottleStatus = match (true) {
             $order->status->equals(OrderStatus::PROCESSING()) => BottleStatus::WITH_DELIVERY_PERSON(),
-            $order->status->equals(OrderStatus::CONFIRMED()) => BottleStatus::IN_STOCK(), // Remains in stock until delivery person takes it
+            $order->status->equals(OrderStatus::PAID()) => BottleStatus::IN_STOCK(), // Remains in stock until delivery person takes it
             $order->status->equals(OrderStatus::DELIVERED()) => BottleStatus::WITH_CLIENT(),
             $order->status->equals(OrderStatus::CANCELLED()) => BottleStatus::IN_STOCK(),
             default => BottleStatus::IN_STOCK(),
@@ -767,7 +767,7 @@ class OrderSeeder extends Seeder
         $this->updatePivotStockCountsAfterStatusChange($bottle);
 
         // Associate bottle with OrderItem only for orders beyond confirmed status
-        if (! $order->status->equals(OrderStatus::CONFIRMED())) {
+        if (! $order->status->equals(OrderStatus::PAID())) {
             OrderBottleScans::create([
                 'order_item_id' => $orderItem->id,
                 'bottle_id' => $bottle->id,
@@ -1308,10 +1308,10 @@ class OrderSeeder extends Seeder
             ['status' => OrderStatus::PENDING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::FAILED(), 'days_ago' => 3],
 
             // Confirmed orders (4)
-            ['status' => OrderStatus::CONFIRMED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 4],
-            ['status' => OrderStatus::CONFIRMED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 5],
-            ['status' => OrderStatus::CONFIRMED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 6],
-            ['status' => OrderStatus::CONFIRMED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 7],
+            ['status' => OrderStatus::PAID(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 4],
+            ['status' => OrderStatus::PAID(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 5],
+            ['status' => OrderStatus::PAID(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 6],
+            ['status' => OrderStatus::PAID(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 7],
 
             // Processing orders (4)
             ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 8, 'needs_delivery_person' => true],
@@ -1377,7 +1377,7 @@ class OrderSeeder extends Seeder
         }
 
         // Set timestamps based on status
-        if ($scenario['status']->equals(OrderStatus::CONFIRMED()) ||
+        if ($scenario['status']->equals(OrderStatus::PAID()) ||
             $scenario['status']->equals(OrderStatus::PROCESSING()) ||
             $scenario['status']->equals(OrderStatus::DELIVERED())) {
             $orderData['confirmed_at'] = $confirmedAt;

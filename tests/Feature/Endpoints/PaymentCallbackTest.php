@@ -72,10 +72,10 @@ final class PaymentCallbackTest extends TestCase
             'payment_status' => PaymentStatus::PAID()->value,
         ]);
 
-        // Verify order was confirmed
+        // Verify order was confirmed (paid)
         $this->assertDatabaseHas('orders', [
             'id' => $order->id,
-            'status' => 'confirmed',
+            'status' => 'paid',
         ]);
 
         $order->refresh();
@@ -381,7 +381,7 @@ final class PaymentCallbackTest extends TestCase
             'customer_id' => $customer->id,
             'distribution_center_id' => $distributionCenter->id,
             'delivery_address_id' => $deliveryAddress->id,
-            'status' => \App\Enums\OrderStatus::CONFIRMED()->value, // Already confirmed
+            'status' => \App\Enums\OrderStatus::PAID()->value, // Already confirmed
             'confirmed_at' => $confirmedAt,
         ]);
         $payment = OrderPayment::factory()->create([
@@ -416,7 +416,56 @@ final class PaymentCallbackTest extends TestCase
         $order->refresh();
 
         $this->assertEquals(PaymentStatus::PAID()->value, $payment->payment_status);
-        $this->assertEquals(\App\Enums\OrderStatus::CONFIRMED()->value, $order->status->value);
+        $this->assertEquals(\App\Enums\OrderStatus::PAID()->value, $order->status->value);
         $this->assertEquals($confirmedAt->timestamp, $order->confirmed_at->timestamp); // Should not be updated
+    }
+
+
+    #[Test]
+    public function it_denies_customer_access_to_other_customers_orders_for_feedback(): void
+    {
+        // Create two customers
+        $customer1 = \App\Models\Customer::factory()->create();
+        $customer2 = \App\Models\Customer::factory()->create();
+        
+        $distributionCenter = \App\Models\DistributionCenter::factory()->create();
+        $deliveryAddress1 = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $customer1->id,
+        ]);
+        $deliveryAddress2 = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $customer2->id,
+        ]);
+
+        // Create orders for both customers
+        $order1 = Order::factory()->create([
+            'customer_id' => $customer1->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_address_id' => $deliveryAddress1->id,
+        ]);
+        $order2 = Order::factory()->create([
+            'customer_id' => $customer2->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_address_id' => $deliveryAddress2->id,
+        ]);
+
+        // Login customer 1
+        $response = $this->postJson(route('api.login'), [
+            'login' => $customer1->user->phone_number,
+            'password' => 'password',
+            'country_code' => 'CM',
+        ]);
+        $customer1Token = $response->json('data.access_token');
+
+        // Customer 1 should NOT be able to add feedback to customer 2's order
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$customer1Token,
+            'Accept' => 'application/json',
+        ])->postJson(route('api.orders.customer-feedback', ['order' => $order2->id]), [
+            'comments' => 'Trying to access other customer order',
+            'rating' => 3.0,
+        ]);
+
+        $response->assertStatus(403)
+            ->assertJsonPath('message', 'Cette commande ne vous appartient pas.');
     }
 }

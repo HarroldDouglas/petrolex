@@ -92,7 +92,7 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
     {
         $query = $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
             ->whereIn('status', [
-                OrderStatus::CONFIRMED()->value,
+                OrderStatus::PAID()->value,
                 OrderStatus::PROCESSING()->value,
                 OrderStatus::PENDING()->value,
             ]);

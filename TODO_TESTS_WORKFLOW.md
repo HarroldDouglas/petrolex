@@ -24,7 +24,7 @@ Ce document détaille tous les tests de workflow métier (end-to-end) à implém
 - **Actions :**
   1. Client crée une commande avec 2 bouteilles + 1 accessoire
   2. Vérifier statut PENDING
-  3. Manager confirme la commande → statut CONFIRMED
+  3. Manager confirme la commande → statut PAID
   4. Système assigne automatiquement un livreur → statut PROCESSING
   5. Livreur démarre le tracking → DeliveryTracking créé
   6. Livreur met à jour position plusieurs fois
@@ -40,7 +40,7 @@ Ce document détaille tous les tests de workflow métier (end-to-end) à implém
 #### Test 2 : `test_order_cancellation_workflow`
 - **Actions :**
   1. Créer commande → PENDING
-  2. Manager confirme → CONFIRMED  
+  2. Manager confirme → PAID  
   3. Annuler avant assignation livreur → CANCELLED
 - **Vérifications :**
   - cancelled_at timestamp défini
@@ -125,7 +125,7 @@ Ce document détaille tous les tests de workflow métier (end-to-end) à implém
 - **Actions :**
   1. Commande créée avec paiement CREDIT_CARD
   2. Simulation paiement réussi
-  3. Vérifier commande passe en CONFIRMED automatiquement
+  3. Vérifier commande passe en PAID automatiquement
   4. Livreur assigné automatiquement
   5. Processus livraison démarre
 - **Vérifications :**

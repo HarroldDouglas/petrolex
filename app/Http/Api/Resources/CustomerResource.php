@@ -37,8 +37,12 @@ class CustomerResource extends UserResource
         /** @var Customer&\Illuminate\Database\Eloquent\Model $customer */
         $customer = $this->resource;
 
-        $customer->user->loadMissing('country');
-        $userData = (new UserResource($customer->user))->toArray($request);
+        if ($customer->user) {
+            $customer->user->loadMissing('country');
+            $userData = (new UserResource($customer->user))->toArray($request);
+        } else {
+            $userData = [];
+        }
 
         return array_merge(
             $userData,

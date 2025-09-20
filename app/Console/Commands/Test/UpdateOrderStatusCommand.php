@@ -24,7 +24,7 @@ class UpdateOrderStatusCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Updates the status and payment method of a given order to confirmed/processing and paid, optionally assigning a delivery person.';
+    protected $description = 'Updates the status and payment method of a given order to PAID/processing and paid, optionally assigning a delivery person.';
 
     /**
      * Execute the console command.
@@ -56,8 +56,8 @@ class UpdateOrderStatusCommand extends Command
             $order->assignToDeliveryPerson($deliveryPersonId);
             $this->info("  - Delivery Person assigned: {$deliveryPerson->user->email}");
         }
-        // Ensure order status is CONFIRMED after any operation
-        $order->status = OrderStatus::CONFIRMED();
+        // Ensure order status is PAID after any operation
+        $order->status = OrderStatus::PAID();
         $order->save();
 
         // Update or create OrderPayment

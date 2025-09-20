@@ -280,4 +280,76 @@ final class GetOrderDetailsTest extends TestCase
         $this->assertNotNull($data['items'][0]['product_category']);
         $this->assertNotNull($data['customer']['delivery_addresses']);
     }
+
+    #[Test]
+    public function it_denies_access_to_orders_belonging_to_other_customers(): void
+    {
+        // Create another customer
+        $otherCustomerUser = User::factory()->create();
+        $otherCustomerUser->assignRole('customer');
+        $otherCustomer = Customer::factory()->create([
+            'user_id' => $otherCustomerUser->id,
+        ]);
+
+        $distributionCenter = \App\Models\DistributionCenter::factory()->create();
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $otherCustomer->id,
+        ]);
+
+        // Create order belonging to other customer
+        $otherOrder = Order::factory()->create([
+            'customer_id' => $otherCustomer->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_address_id' => $deliveryAddress->id,
+        ]);
+
+        // Try to access other customer's order
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->authToken,
+            'Accept' => 'application/json',
+        ])->getJson(route('api.orders.show', ['order' => $otherOrder->id]));
+
+        $response->assertStatus(403)
+            ->assertJsonPath('message', 'Cette commande ne vous appartient pas.');
+    }
+
+
+    #[Test]
+    public function it_allows_delivery_persons_to_access_any_order(): void
+    {
+        // Create delivery person role and user
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'delivery_person', 'guard_name' => 'web']);
+        $deliveryUser = User::factory()->create();
+        $deliveryUser->assignRole('delivery_person');
+
+        // Login delivery person
+        $response = $this->postJson(route('api.login'), [
+            'login' => $deliveryUser->phone_number,
+            'password' => 'password',
+            'country_code' => 'CM',
+        ]);
+        $deliveryToken = $response->json('data.access_token');
+
+        // Create order belonging to our customer
+        $distributionCenter = \App\Models\DistributionCenter::factory()->create();
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $this->customer->id,
+        ]);
+
+        $order = Order::factory()->create([
+            'customer_id' => $this->customer->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_address_id' => $deliveryAddress->id,
+        ]);
+
+        // Delivery person should be able to access any order
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$deliveryToken,
+            'Accept' => 'application/json',
+        ])->getJson(route('api.orders.show', ['order' => $order->id]));
+
+        $response->assertStatus(200)
+            ->assertJsonPath('_metadata.success', true)
+            ->assertJsonPath('data.id', $order->id);
+    }
 }

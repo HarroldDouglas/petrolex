@@ -22,7 +22,7 @@ class ResetOrderTrackingCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Réinitialise le tracking d\'une commande (remet le statut à CONFIRMED et supprime le tracking)';
+    protected $description = 'Réinitialise le tracking d\'une commande (remet le statut à PAID et supprime le tracking)';
 
     /**
      * Execute the console command.
@@ -72,9 +72,9 @@ class ResetOrderTrackingCommand extends Command
                 $this->info('ℹ️  Aucun tracking à supprimer');
             }
 
-            // 2. Remettre le statut à CONFIRMED
+            // 2. Remettre le statut à PAID
             $oldStatus = $order->status->value;
-            $order->status = OrderStatus::CONFIRMED();
+            $order->status = OrderStatus::PAID();
             $order->save();
 
             $this->info("✅ Statut mis à jour : {$oldStatus} → {$order->status->value}");

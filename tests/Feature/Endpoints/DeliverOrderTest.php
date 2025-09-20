@@ -25,7 +25,8 @@ final class DeliverOrderTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $adminUser;
+    private User $deliveryUser;
+    private \App\Models\DeliveryPerson $deliveryPerson;
     private string $authToken;
     private DistributionCenter $distributionCenter;
     private BottleType $bottleType;
@@ -37,7 +38,7 @@ final class DeliverOrderTest extends TestCase
     {
         parent::setUp();
 
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'delivery_person', 'guard_name' => 'web']);
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
 
         $country = \App\Models\Geography\Country::where('code', 'CM')->first();
@@ -50,13 +51,17 @@ final class DeliverOrderTest extends TestCase
             ]);
         }
 
-        $this->adminUser = User::factory()->create([
+        $this->deliveryUser = User::factory()->create([
             'country_id' => $country->id,
         ]);
-        $this->adminUser->assignRole('admin');
+        $this->deliveryUser->assignRole('delivery_person');
+
+        $this->deliveryPerson = \App\Models\DeliveryPerson::factory()->create([
+            'user_id' => $this->deliveryUser->id,
+        ]);
 
         $response = $this->postJson(route('api.login'), [
-            'login' => $this->adminUser->phone_number,
+            'login' => $this->deliveryUser->phone_number,
             'password' => 'password',
             'country_code' => 'CM',
         ]);
@@ -81,6 +86,7 @@ final class DeliverOrderTest extends TestCase
             'status' => OrderStatus::PROCESSING(),
             'customer_id' => $this->customer->id,
             'distribution_center_id' => $this->distributionCenter->id,
+            'delivery_person_id' => $this->deliveryPerson->id,
         ]);
 
         $bottle = Bottle::factory()->create([
@@ -147,6 +153,7 @@ final class DeliverOrderTest extends TestCase
             'status' => OrderStatus::CANCELLED(),
             'customer_id' => $this->customer->id,
             'distribution_center_id' => $this->distributionCenter->id,
+            'delivery_person_id' => $this->deliveryPerson->id,
         ]);
 
         $response = $this->withHeaders([

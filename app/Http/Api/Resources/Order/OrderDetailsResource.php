@@ -52,7 +52,7 @@ class OrderDetailsResource extends JsonResource
             // Comments and notes
             'comments' => $order->comments,
             'center_comments' => $order->center_comments,
-            'rating' => $order->rating,
+            'rating' => $order->rating ? (float) $order->rating : null,
             'cancelled_by' => $order->cancelled_by,
             'cancelled_reason' => $order->cancelled_reason,
 

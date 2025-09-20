@@ -37,9 +37,9 @@ class Status extends Component
 
         // Step 1: Order Confirmed (always present)
         $steps[] = [
-            'key' => OrderStatus::CONFIRMED()->value,
+            'key' => OrderStatus::PAID()->value,
             'icon' => 'ti-shopping-cart',
-            'title' => 'Commande '.OrderStatus::CONFIRMED()->label,
+            'title' => 'Commande '.OrderStatus::PAID()->label,
             'description' => 'Votre commande a été confirmée et est en cours de traitement.',
             'color' => 'primary',
             'date' => $this->order->confirmed_at,
@@ -94,7 +94,7 @@ class Status extends Component
     private function getCurrentStepIndex(): int
     {
         return match ($this->order->status) {
-            OrderStatus::CONFIRMED() => 0,
+            OrderStatus::PAID() => 0,
             OrderStatus::PROCESSING() => $this->hasProcessingStep() ? 1 : 0,
             OrderStatus::DELIVERED(), OrderStatus::CANCELLED() => count($this->steps) - 1,
             default => 0,

@@ -223,14 +223,14 @@ class OrderServiceTest extends TestCase
             'distribution_center_id' => $this->distributionCenter->id,
             'order_number' => 'TEST-002',
         ]);
-        $updateData = ['status' => OrderStatus::CONFIRMED()->value];
+        $updateData = ['status' => OrderStatus::PAID()->value];
 
         $updatedOrder = $this->orderService->update($order, $updateData);
 
-        $this->assertEquals(OrderStatus::CONFIRMED()->value, $updatedOrder->status);
+        $this->assertEquals(OrderStatus::PAID()->value, $updatedOrder->status);
         $this->assertDatabaseHas('orders', [
             'id' => $order->id,
-            'status' => OrderStatus::CONFIRMED()->value,
+            'status' => OrderStatus::PAID()->value,
         ]);
     }
 

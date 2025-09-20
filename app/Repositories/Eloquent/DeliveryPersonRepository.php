@@ -23,7 +23,7 @@ class DeliveryPersonRepository extends BaseEloquentRepository implements Deliver
         $query = $this->model::withCount([
             'orders' => function ($query) {
                 $query->whereIn('status', [
-                    OrderStatus::CONFIRMED(),
+                    OrderStatus::PAID(),
                     OrderStatus::PROCESSING(),
                 ]);
             },

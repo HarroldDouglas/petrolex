@@ -25,6 +25,16 @@ final class ScanEmptyBottleController extends Controller
      */
     public function __invoke(ScanEmptyBottleRequest $request, Order $order): ScanEmptyBottleResponse
     {
+        $user = auth()->user();
+
+        // Security check: Only order owner (customer) and delivery persons can scan bottles
+        $isOrderOwner = $user->customer && $user->customer->id === $order->customer_id;
+        $isDeliveryPerson = $user->hasRole('delivery_person');
+
+        if (! $isOrderOwner && ! $isDeliveryPerson) {
+            abort(403, 'Vous n\'êtes pas autorisé à scanner des bouteilles pour cette commande.');
+        }
+
         $dto = new ScanEmptyBottleDTO(
             barcode: $request->validated('barcode'),
             orderItemId: (int) $request->validated('order_item_id'),

@@ -22,7 +22,7 @@ return new class extends Migration
             
             $table->string('order_number', 255)->unique();
             $table->enum('delivery_type', ['normal', 'fast'])->default('normal');
-            $table->enum('status', OrderStatus::values())->default(OrderStatus::CONFIRMED());
+            $table->enum('status', OrderStatus::values())->default(OrderStatus::PAID());
             
             $table->decimal('subtotal', 10, 2);
             $table->decimal('delivery_fee', 10, 2)->default(0);

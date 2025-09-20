@@ -36,7 +36,7 @@ class OrderFactory extends Factory
             'delivery_person_id' => null,
             'order_number' => 'ORD-'.$this->faker->unique()->bothify('######'),
             'delivery_type' => $deliveryType,
-            'status' => OrderStatus::CONFIRMED(),
+            'status' => OrderStatus::PAID(),
             'subtotal' => $this->faker->randomFloat(2, 1000, 10000),
             'delivery_fee' => $deliveryType->fee(),
             'total_amount' => 0,
@@ -67,7 +67,7 @@ class OrderFactory extends Factory
 
             return [
                 'delivery_type' => $deliveryType,
-                'status' => OrderStatus::CONFIRMED(),
+                'status' => OrderStatus::PAID(),
                 'order_date' => $orderDate,
                 'delivery_date' => null,
                 'delivery_person_id' => null,

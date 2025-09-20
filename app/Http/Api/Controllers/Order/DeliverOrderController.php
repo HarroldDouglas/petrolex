@@ -23,6 +23,15 @@ final class DeliverOrderController extends Controller
      */
     public function __invoke(Order $order): OrderDeliveredResponse
     {
+        $user = auth()->user();
+
+        // Security check: Only the delivery person assigned to this order can mark it as delivered
+        $isAssignedDeliveryPerson = $user->deliveryPerson && $order->delivery_person_id === $user->deliveryPerson->id;
+
+        if (! $isAssignedDeliveryPerson) {
+            abort(403, 'Vous n\'êtes pas autorisé à marquer cette commande comme livrée.');
+        }
+
         $updatedOrder = $this->orderService->deliverOrder($order);
         $message = empty($updatedOrder) ? 'This order cannot be marked as delivered.'
            : 'Order marked as delivered successfully.';

@@ -42,7 +42,7 @@ class DeliveryPersonDistributionCenterFilterTest extends TestCase
             'delivery_person_id' => $deliveryPerson1->id,
             'customer_id' => $customer->id,
             'distribution_center_id' => $distributionCenter1->id,
-            'status' => 'confirmed',
+            'status' => 'paid',
         ]);
 
         // Give deliveryPerson2 fewer orders (making them less busy)
@@ -50,7 +50,7 @@ class DeliveryPersonDistributionCenterFilterTest extends TestCase
             'delivery_person_id' => $deliveryPerson2->id,
             'customer_id' => $customer->id,
             'distribution_center_id' => $distributionCenter1->id,
-            'status' => 'confirmed',
+            'status' => 'paid',
         ]);
 
         // Give deliveryPerson3 no orders (making them least busy globally, but in different center)

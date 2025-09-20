@@ -106,7 +106,7 @@ class PaymentService
 
         if ($response->success && $response->status === PaymentStatus::PAID()->value) {
             $payment->order->update([
-                'status' => OrderStatus::CONFIRMED()->value,
+                'status' => OrderStatus::PAID()->value,
                 'confirmed_at' => now(),
             ]);
         } elseif ($response->status === PaymentStatus::FAILED()->value) {

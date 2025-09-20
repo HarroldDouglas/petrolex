@@ -39,7 +39,7 @@ class OrderEmailTemplatesTest extends TestCase
         $this->order = Order::factory()->create([
             'customer_id' => $this->customer->id,
             'distribution_center_id' => $this->distributionCenter->id,
-            'status' => OrderStatus::CONFIRMED(),
+            'status' => OrderStatus::PAID(),
         ]);
     }
 
@@ -58,17 +58,17 @@ class OrderEmailTemplatesTest extends TestCase
 
     public function test_order_confirmed_email_template()
     {
-        $mail = new OrderStatusChangedMail($this->order, $this->user, null, OrderStatus::CONFIRMED());
+        $mail = new OrderStatusChangedMail($this->order, $this->user, null, OrderStatus::PAID());
 
         $content = $mail->content();
 
-        $this->assertEquals('emails.orders.order-confirmed', $content->view);
+        $this->assertEquals('emails.orders.order-paid', $content->view);
     }
 
     public function test_order_processing_email_template()
     {
         $this->order->update(['status' => OrderStatus::PROCESSING()]);
-        $mail = new OrderStatusChangedMail($this->order, $this->user, OrderStatus::CONFIRMED(), OrderStatus::PROCESSING());
+        $mail = new OrderStatusChangedMail($this->order, $this->user, OrderStatus::PAID(), OrderStatus::PROCESSING());
 
         $content = $mail->content();
 
@@ -88,7 +88,7 @@ class OrderEmailTemplatesTest extends TestCase
     public function test_order_cancelled_email_template()
     {
         $this->order->update(['status' => OrderStatus::CANCELLED()]);
-        $mail = new OrderStatusChangedMail($this->order, $this->user, OrderStatus::CONFIRMED(), OrderStatus::CANCELLED());
+        $mail = new OrderStatusChangedMail($this->order, $this->user, OrderStatus::PAID(), OrderStatus::CANCELLED());
 
         $content = $mail->content();
 
@@ -133,6 +133,6 @@ class OrderEmailTemplatesTest extends TestCase
         $content = $mail->content();
 
         // Should use the default template for confirmed status
-        $this->assertEquals('emails.orders.order-confirmed', $content->view);
+        $this->assertEquals('emails.orders.order-paid', $content->view);
     }
 }

@@ -101,6 +101,7 @@ class Order extends Model
         'delivery_date' => 'datetime',
         'status' => OrderStatus::class,
         'delivery_type' => DeliveryType::class,
+        'rating' => 'float',
         'confirmed_at' => 'datetime',
         'processing_at' => 'datetime',
         'cancelled_at' => 'datetime',
@@ -243,7 +244,7 @@ class Order extends Model
     public function canBeCancelled(): bool
     {
         return in_array($this->status->value, [
-            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PAID()->value,
             OrderStatus::PROCESSING()->value,
         ]);
     }
@@ -254,7 +255,7 @@ class Order extends Model
     public function canBeDelivered(): bool
     {
         return in_array($this->status->value, [
-            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PAID()->value,
             OrderStatus::PROCESSING()->value,
         ]);
     }
@@ -265,7 +266,7 @@ class Order extends Model
     public function canChangeDeliveryPerson(): bool
     {
         return in_array($this->status->value, [
-            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PAID()->value,
             OrderStatus::PROCESSING()->value,
         ]);
     }
@@ -275,7 +276,7 @@ class Order extends Model
      */
     public function canScanBottles(): bool
     {
-        return $this->status === OrderStatus::CONFIRMED() && $this->hasBottleItems();
+        return $this->status === OrderStatus::PAID() && $this->hasBottleItems();
     }
 
     /**
@@ -352,7 +353,7 @@ class Order extends Model
     public function canBeTracked(): bool
     {
         return in_array($this->status->value, [
-            OrderStatus::CONFIRMED()->value,
+            OrderStatus::PAID()->value,
             OrderStatus::PROCESSING()->value,
         ]);
     }

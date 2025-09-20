@@ -16,30 +16,33 @@ final class OrderCustomerFeedbackTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $adminUser;
+    private User $customerUser;
+    private Customer $customer;
     private string $authToken;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Create admin role for testing
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        // Create center_manager role for testing
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
+        // Create customer role for testing
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
 
-        // Ensure a Customer and DistributionCenter exist for OrderFactory
-        Customer::factory()->create();
+        // Ensure a DistributionCenter exists for OrderFactory
         DistributionCenter::factory()->create();
 
-        // Create an admin user and authenticate to get a token
-        $this->adminUser = User::factory()->create([
-            'email' => 'admin@test.com',
+        // Create a customer user and authenticate to get a token
+        $this->customerUser = User::factory()->create([
+            'email' => 'customer@test.com',
         ]);
-        $this->adminUser->assignRole('admin');
+        $this->customerUser->assignRole('customer');
+
+        // Create customer
+        $this->customer = Customer::factory()->create([
+            'user_id' => $this->customerUser->id,
+        ]);
 
         $response = $this->postJson(route('api.login'), [
-            'login' => $this->adminUser->email,
+            'login' => $this->customerUser->email,
             'password' => 'password',
         ]);
 
@@ -53,7 +56,16 @@ final class OrderCustomerFeedbackTest extends TestCase
     #[Test]
     public function it_can_add_customer_feedback_to_order(): void
     {
-        $order = Order::factory()->create();
+        $distributionCenter = DistributionCenter::factory()->create();
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $this->customer->id,
+        ]);
+
+        $order = Order::factory()->create([
+            'customer_id' => $this->customer->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_address_id' => $deliveryAddress->id,
+        ]);
         $payload = [
             'comments' => 'This is a test comment for the order.',
             'rating' => 4.5,
@@ -109,7 +121,16 @@ final class OrderCustomerFeedbackTest extends TestCase
     #[Test]
     public function it_returns_422_if_validation_fails(): void
     {
-        $order = Order::factory()->create();
+        $distributionCenter = DistributionCenter::factory()->create();
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $this->customer->id,
+        ]);
+
+        $order = Order::factory()->create([
+            'customer_id' => $this->customer->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_address_id' => $deliveryAddress->id,
+        ]);
 
         $payload = [
             'comments' => 'Too short',

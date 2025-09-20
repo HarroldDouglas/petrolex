@@ -25,7 +25,7 @@ class SimpleOrderFactory extends Factory
             'delivery_person_id' => null,
             'order_number' => 'ORD-'.$this->faker->unique()->bothify('######'),
             'delivery_type' => 'normal',
-            'status' => OrderStatus::CONFIRMED(),
+            'status' => OrderStatus::PAID(),
             'subtotal' => $subtotal,
             'delivery_fee' => $deliveryFee,
             'total_amount' => $subtotal + $deliveryFee,
@@ -38,7 +38,7 @@ class SimpleOrderFactory extends Factory
     public function confirmed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => OrderStatus::CONFIRMED(),
+            'status' => OrderStatus::PAID(),
         ]);
     }
 
