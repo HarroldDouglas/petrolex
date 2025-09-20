@@ -108,7 +108,7 @@ final class GetCustomerOrdersTest extends TestCase
                         'order_date',
                         'delivery_date',
                         'status',
-                        'ticket_url',
+                        'invoice_url',
                         'items',
                         'comments',
                         'rating',
