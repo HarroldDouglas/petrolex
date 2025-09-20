@@ -19,16 +19,9 @@ class PaymentService
 
     public function initiatePayment(Order $order, PaymentMethod $method): OrderPayment
     {
-        // 1. Créer OrderPayment
         $payment = $this->createOrderPayment($order, $method);
-
-        // 2. Obtenir le gateway approprié
         $gateway = $this->gatewayFactory->create($method->value);
-
-        // 3. Initier le paiement
         $response = $gateway->initiatePayment($payment);
-
-        // 4. Mettre à jour avec la réponse
         $this->updatePaymentFromResponse($payment, $response);
 
         $payment->refresh();
@@ -39,13 +32,8 @@ class PaymentService
     public function handleCallback(string $paymentReference, array $callbackData): void
     {
         DB::transaction(function () use ($paymentReference, $callbackData) {
-            // 1. Trouver le paiement
             $payment = $this->findPaymentByReference($paymentReference);
-
-            // 2. Obtenir le gateway approprié
             $gateway = $this->gatewayFactory->create($payment->payment_method->value);
-
-            // 3. Traiter le callback
             $callbackDto = new PaymentCallbackData(
                 transactionReference: $callbackData['transactionReference'] ?? $paymentReference,
                 status: $callbackData['status'],
@@ -53,8 +41,6 @@ class PaymentService
                 rawData: $callbackData
             );
             $response = $gateway->handleCallback($callbackDto);
-
-            // 4. Mettre à jour le paiement et la commande
             $this->processPaymentResponse($payment, $response);
         });
     }

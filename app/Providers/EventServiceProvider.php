@@ -7,6 +7,7 @@ use App\Events\DistributionCenterUpdatedEvent;
 use App\Events\EmptyBottleReturnedEvent;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
+use App\Events\OrderStatusChanged;
 use App\Events\PasswordUpdatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
@@ -19,6 +20,7 @@ use App\Listeners\LogOrderDelivered;
 use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
 use App\Listeners\Order\AssignDeliveryPersonToOrderListener;
+use App\Listeners\Order\GenerateInvoicePdfListener;
 use App\Listeners\Order\SendOrderCreatedNotification;
 use App\Listeners\SendPasswordUpdatedNotification;
 use App\Listeners\UpdateBottleStatusAndMovementOnOrderDelivered;
@@ -56,9 +58,13 @@ class EventServiceProvider extends ServiceProvider
             LogOrderCreatedListener::class,
             AssignDeliveryPersonToOrderListener::class,
             SendOrderCreatedNotification::class,
+            GenerateInvoicePdfListener::class,
         ],
         CustomerCreatedEvent::class => [
             LogCustomerCreatedListener::class,
+        ],
+        OrderStatusChanged::class => [
+            GenerateInvoicePdfListener::class,
         ],
     ];
 
