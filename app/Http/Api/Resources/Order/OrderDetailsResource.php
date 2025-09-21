@@ -42,7 +42,7 @@ class OrderDetailsResource extends JsonResource
             // Important dates
             'order_date' => $order->order_date?->toISOString(),
             'delivery_date' => $order->delivery_date?->toISOString(),
-            'confirmed_at' => $order->confirmed_at?->toISOString(),
+            'paid_at' => $order->paid_at?->toISOString(),
             'processing_at' => $order->processing_at?->toISOString(),
             'delivered_at' => $order->delivered_at?->toISOString(),
             'cancelled_at' => $order->cancelled_at?->toISOString(),

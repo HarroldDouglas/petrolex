@@ -79,7 +79,7 @@ final class PaymentCallbackTest extends TestCase
         ]);
 
         $order->refresh();
-        $this->assertNotNull($order->confirmed_at);
+        $this->assertNotNull($order->paid_at);
     }
 
     #[Test]
@@ -382,7 +382,7 @@ final class PaymentCallbackTest extends TestCase
             'distribution_center_id' => $distributionCenter->id,
             'delivery_address_id' => $deliveryAddress->id,
             'status' => \App\Enums\OrderStatus::PAID()->value, // Already confirmed
-            'confirmed_at' => $confirmedAt,
+            'paid_at' => $confirmedAt,
         ]);
         $payment = OrderPayment::factory()->create([
             'order_id' => $order->id,
@@ -417,9 +417,8 @@ final class PaymentCallbackTest extends TestCase
 
         $this->assertEquals(PaymentStatus::PAID()->value, $payment->payment_status);
         $this->assertEquals(\App\Enums\OrderStatus::PAID()->value, $order->status->value);
-        $this->assertEquals($confirmedAt->timestamp, $order->confirmed_at->timestamp); // Should not be updated
+        $this->assertEquals($confirmedAt->timestamp, $order->paid_at->timestamp); // Should not be updated
     }
-
 
     #[Test]
     public function it_denies_customer_access_to_other_customers_orders_for_feedback(): void
@@ -427,7 +426,7 @@ final class PaymentCallbackTest extends TestCase
         // Create two customers
         $customer1 = \App\Models\Customer::factory()->create();
         $customer2 = \App\Models\Customer::factory()->create();
-        
+
         $distributionCenter = \App\Models\DistributionCenter::factory()->create();
         $deliveryAddress1 = \App\Models\CustomerDeliveryAddress::factory()->create([
             'customer_id' => $customer1->id,

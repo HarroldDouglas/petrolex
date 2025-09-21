@@ -48,7 +48,7 @@ return [
     'order_confirmed_message' => 'Great news! Your order **#:order_number** has been confirmed.',
     'order_confirmed_footer_message' => 'Your order is now being prepared.',
     'order_confirmed_next_steps' => 'Your order will soon be assigned to a delivery person.',
-    'order_confirmed_at' => 'Confirmed on',
+    'order_paid_at' => 'Paid on',
 
     // Order Processing
     'order_processing_subject' => 'Order #:order_number Out for Delivery',

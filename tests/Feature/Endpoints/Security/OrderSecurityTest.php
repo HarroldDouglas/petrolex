@@ -184,7 +184,6 @@ final class OrderSecurityTest extends TestCase
             ->assertJsonPath('message', 'Vous n\'êtes pas autorisé à marquer cette commande comme livrée.');
     }
 
-
     #[Test]
     public function customer_cannot_scan_bottles_for_other_customers_order(): void
     {

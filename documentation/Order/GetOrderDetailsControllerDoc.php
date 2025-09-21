@@ -83,7 +83,7 @@ class GetOrderDetailsControllerDoc {}
  *     @OA\Property(property="total_refunded_amount", type="number", format="float", example=0.00),
  *     @OA\Property(property="order_date", type="string", format="date-time", example="2024-12-01T10:00:00.000000Z"),
  *     @OA\Property(property="delivery_date", type="string", format="date-time", nullable=true, example="2024-12-01T15:00:00.000000Z"),
- *     @OA\Property(property="confirmed_at", type="string", format="date-time", nullable=true, example="2024-12-01T10:05:00.000000Z"),
+ *     @OA\Property(property="paid_at", type="string", format="date-time", nullable=true, example="2024-12-01T10:05:00.000000Z"),
  *     @OA\Property(property="processing_at", type="string", format="date-time", nullable=true),
  *     @OA\Property(property="delivered_at", type="string", format="date-time", nullable=true),
  *     @OA\Property(property="cancelled_at", type="string", format="date-time", nullable=true),

@@ -313,7 +313,6 @@ final class GetOrderDetailsTest extends TestCase
             ->assertJsonPath('message', 'Cette commande ne vous appartient pas.');
     }
 
-
     #[Test]
     public function it_allows_delivery_persons_to_access_any_order(): void
     {

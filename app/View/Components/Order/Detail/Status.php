@@ -42,7 +42,7 @@ class Status extends Component
             'title' => 'Commande '.OrderStatus::PAID()->label,
             'description' => 'Votre commande a été confirmée et est en cours de traitement.',
             'color' => 'primary',
-            'date' => $this->order->confirmed_at,
+            'date' => $this->order->paid_at,
             'completed' => true,
         ];
 

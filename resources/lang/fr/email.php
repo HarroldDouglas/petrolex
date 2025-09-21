@@ -48,7 +48,7 @@ return [
     'order_confirmed_message' => 'Excellente nouvelle ! Votre commande **#:order_number** a été confirmée.',
     'order_confirmed_footer_message' => 'Votre commande est maintenant en cours de préparation.',
     'order_confirmed_next_steps' => 'Votre commande va bientôt être assignée à un livreur.',
-    'order_confirmed_at' => 'Confirmée le',
+    'order_paid_at' => 'Payée le',
 
     // Order Processing
     'order_processing_subject' => 'Commande #:order_number en cours de livraison',

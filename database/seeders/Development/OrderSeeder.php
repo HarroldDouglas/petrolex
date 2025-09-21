@@ -515,7 +515,7 @@ class OrderSeeder extends Seeder
             'delivery_person_id' => $deliveryPerson?->id,
             'order_number' => 'ORD-'.rand(100000, 999999),
             'order_date' => $orderDate,
-            'confirmed_at' => $confirmedAt,
+            'paid_at' => $confirmedAt,
         ];
 
         // For orders that are processing or delivered, set the processing_at timestamp
@@ -1380,7 +1380,7 @@ class OrderSeeder extends Seeder
         if ($scenario['status']->equals(OrderStatus::PAID()) ||
             $scenario['status']->equals(OrderStatus::PROCESSING()) ||
             $scenario['status']->equals(OrderStatus::DELIVERED())) {
-            $orderData['confirmed_at'] = $confirmedAt;
+            $orderData['paid_at'] = $confirmedAt;
         }
 
         if ($scenario['status']->equals(OrderStatus::PROCESSING()) ||

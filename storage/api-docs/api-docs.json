@@ -5792,7 +5792,7 @@
                         "format": "date-time",
                         "nullable": true
                     },
-                    "confirmed_at": {
+                    "paid_at": {
                         "type": "string",
                         "format": "date-time",
                         "nullable": true

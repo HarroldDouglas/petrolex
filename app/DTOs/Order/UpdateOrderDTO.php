@@ -26,7 +26,7 @@ class UpdateOrderDTO extends BaseDTO
         public ?string $comments = null,
         public ?string $center_comments = null,
         public ?int $rating = null,
-        public ?Carbon $confirmed_at = null,
+        public ?Carbon $paid_at = null,
         public ?Carbon $processing_at = null,
         public ?Carbon $cancelled_at = null,
         public ?int $cancelled_by = null,

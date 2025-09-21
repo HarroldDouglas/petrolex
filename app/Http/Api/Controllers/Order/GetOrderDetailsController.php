@@ -21,8 +21,8 @@ class GetOrderDetailsController extends Controller
         $authenticatedUser = $request->user();
         $isOrderOwner = $authenticatedUser->customer && $authenticatedUser->customer->id === $order->customer_id;
         $isDeliveryPerson = $authenticatedUser->hasRole('delivery_person');
-        
-        if (!$isOrderOwner && !$isDeliveryPerson) {
+
+        if (! $isOrderOwner && ! $isDeliveryPerson) {
             abort(403, 'Cette commande ne vous appartient pas.');
         }
 
