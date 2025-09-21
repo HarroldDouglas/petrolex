@@ -53,7 +53,7 @@ use OpenApi\Annotations as OA;
  *         required=false,
  *         description="Filtrer par statut de commande",
  *
- *         @OA\Schema(type="string", enum={"pending", "confirmed", "in_progress", "delivered", "cancelled", "paid", "failed"})
+ *         @OA\Schema(type="string", enum={"pending", "processing", "delivered", "cancelled", "paid", "failed"})
  *     ),
  *
  *     @OA\Parameter(
@@ -90,7 +90,7 @@ use OpenApi\Annotations as OA;
  *                 property="data",
  *                 type="array",
  *
- *                 @OA\Items(ref="#/components/schemas/OrderData")
+ *                 @OA\Items(ref="#/components/schemas/OrderDetailsData")
  *             ),
  *
  *             @OA\Property(

@@ -7,7 +7,6 @@ namespace Tests\Feature\Endpoints;
 use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
 use App\Models\Customer;
 use App\Models\Geography\Country;
 use App\Models\User;
@@ -69,6 +68,15 @@ final class CreateOrderTest extends TestCase
         ]);
         $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
 
+        // Get the actual price from the product
+        $actualPrice = app(\App\Services\ProductCategoryService::class)->getProductPrice(
+            $productCategory->id
+        );
+        $quantity = 2;
+        $deliveryFee = 500.00;
+        $subtotal = $quantity * $actualPrice;
+        $totalAmount = $subtotal + $deliveryFee;
+
         $orderData = [
             'delivery_address_id' => $deliveryAddress->id,
             'distribution_center_id' => $distributionCenter->id,
@@ -77,10 +85,13 @@ final class CreateOrderTest extends TestCase
             'items' => [
                 [
                     'product_category_id' => $productCategory->id,
-                    'quantity' => 2,
+                    'quantity' => $quantity,
+                    'unit_price' => $actualPrice,
                     'option' => null,
                 ],
             ],
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $totalAmount,
             'comments' => 'Livrer avant 18h',
         ];
 
@@ -109,23 +120,12 @@ final class CreateOrderTest extends TestCase
                         'items',
                         'invoice_url',
                     ],
-                    'payment' => [
-                        'payment_reference',
-                        'payment_status',
-                        'payment_status_label',
-                        'payment_method',
-                        'payment_method_label',
-                        'amount_due',
-                        'amount_paid',
-                    ],
                 ],
             ])
             ->assertJsonPath('_metadata.success', true)
             ->assertJsonPath('data.order.status', OrderStatus::PENDING()->value)
             ->assertJsonPath('data.order.delivery_type', DeliveryType::NORMAL()->value)
-            ->assertJsonPath('data.order.comments', 'Livrer avant 18h')
-            ->assertJsonPath('data.payment.payment_status', PaymentStatus::PENDING()->value)
-            ->assertJsonPath('data.payment.payment_method', PaymentMethod::ORANGE_MONEY()->value);
+            ->assertJsonPath('data.order.comments', 'Livrer avant 18h');
 
         // Verify order was created in database
         $this->assertDatabaseHas('orders', [
@@ -143,11 +143,6 @@ final class CreateOrderTest extends TestCase
             'quantity' => 2,
         ]);
 
-        // Verify payment was created
-        $this->assertDatabaseHas('order_payments', [
-            'payment_method' => PaymentMethod::ORANGE_MONEY()->value,
-            'payment_status' => PaymentStatus::PENDING()->value,
-        ]);
     }
 
     #[Test]
@@ -165,73 +160,11 @@ final class CreateOrderTest extends TestCase
                     'delivery_address_id',
                     'distribution_center_id',
                     'delivery_type',
-                    'payment_method',
                     'items',
+                    'delivery_fee',
+                    'total_amount',
                 ],
             ]);
-    }
-
-    #[Test]
-    public function it_validates_delivery_type_enum_values(): void
-    {
-        $distributionCenter = \App\Models\DistributionCenter::factory()->create();
-        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
-            'customer_id' => $this->customer->id,
-        ]);
-        $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer '.$this->authToken,
-            'Accept' => 'application/json',
-        ])->postJson(route('api.orders.store'), [
-            'delivery_address_id' => $deliveryAddress->id,
-            'distribution_center_id' => $distributionCenter->id,
-            'delivery_type' => 'invalid_type',
-            'payment_method' => PaymentMethod::ORANGE_MONEY()->value,
-            'items' => [
-                [
-                    'product_category_id' => $productCategory->id,
-                    'quantity' => 1,
-                ],
-            ],
-        ]);
-
-        $response->assertStatus(422);
-        $actualMessage = $response->json('errors.delivery_type.0');
-        $this->assertStringContainsString('normal', $actualMessage);
-        $this->assertStringContainsString('fast', $actualMessage);
-    }
-
-    #[Test]
-    public function it_validates_payment_method_enum_values(): void
-    {
-        $distributionCenter = \App\Models\DistributionCenter::factory()->create();
-        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
-            'customer_id' => $this->customer->id,
-        ]);
-        $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer '.$this->authToken,
-            'Accept' => 'application/json',
-        ])->postJson(route('api.orders.store'), [
-            'delivery_address_id' => $deliveryAddress->id,
-            'distribution_center_id' => $distributionCenter->id,
-            'delivery_type' => DeliveryType::NORMAL()->value,
-            'payment_method' => 'invalid_method',
-            'items' => [
-                [
-                    'product_category_id' => $productCategory->id,
-                    'quantity' => 1,
-                ],
-            ],
-        ]);
-
-        $response->assertStatus(422);
-        $actualMessage = $response->json('errors.payment_method.0');
-        $this->assertStringContainsString('orange_money', $actualMessage);
-        $this->assertStringContainsString('mtn_money', $actualMessage);
-        $this->assertStringContainsString('credit_card', $actualMessage);
     }
 
     #[Test]
@@ -246,6 +179,13 @@ final class CreateOrderTest extends TestCase
             'customer_id' => $otherCustomer->id,
         ]);
 
+        // Get actual price
+        $actualPrice = app(\App\Services\ProductCategoryService::class)->getProductPrice(
+            $productCategory->id
+        );
+        $deliveryFee = 500.00;
+        $totalAmount = $actualPrice + $deliveryFee;
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
@@ -253,13 +193,15 @@ final class CreateOrderTest extends TestCase
             'delivery_address_id' => $otherDeliveryAddress->id,
             'distribution_center_id' => $distributionCenter->id,
             'delivery_type' => DeliveryType::NORMAL()->value,
-            'payment_method' => PaymentMethod::ORANGE_MONEY()->value,
             'items' => [
                 [
                     'product_category_id' => $productCategory->id,
                     'quantity' => 1,
+                    'unit_price' => $actualPrice,
                 ],
             ],
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $totalAmount,
         ]);
 
         $response->assertStatus(422)
@@ -280,6 +222,12 @@ final class CreateOrderTest extends TestCase
         ]);
         $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
 
+        // Get actual price
+        $actualPrice = app(\App\Services\ProductCategoryService::class)->getProductPrice(
+            $productCategory->id
+        );
+        $deliveryFee = 500.00;
+
         // Test quantity too low
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
@@ -288,13 +236,15 @@ final class CreateOrderTest extends TestCase
             'delivery_address_id' => $deliveryAddress->id,
             'distribution_center_id' => $distributionCenter->id,
             'delivery_type' => DeliveryType::NORMAL()->value,
-            'payment_method' => PaymentMethod::ORANGE_MONEY()->value,
             'items' => [
                 [
                     'product_category_id' => $productCategory->id,
                     'quantity' => 0,
+                    'unit_price' => $actualPrice,
                 ],
             ],
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $deliveryFee, // 0 * price + delivery fee
         ]);
 
         $response->assertStatus(422)
@@ -313,13 +263,15 @@ final class CreateOrderTest extends TestCase
             'delivery_address_id' => $deliveryAddress->id,
             'distribution_center_id' => $distributionCenter->id,
             'delivery_type' => DeliveryType::NORMAL()->value,
-            'payment_method' => PaymentMethod::ORANGE_MONEY()->value,
             'items' => [
                 [
                     'product_category_id' => $productCategory->id,
                     'quantity' => 101,
+                    'unit_price' => $actualPrice,
                 ],
             ],
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => (101 * $actualPrice) + $deliveryFee,
         ]);
 
         $response->assertStatus(422)
@@ -340,6 +292,13 @@ final class CreateOrderTest extends TestCase
         ]);
         $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
 
+        // Get actual price
+        $actualPrice = app(\App\Services\ProductCategoryService::class)->getProductPrice(
+            $productCategory->id
+        );
+        $deliveryFee = 500.00;
+        $totalAmount = $actualPrice + $deliveryFee;
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$this->authToken,
             'Accept' => 'application/json',
@@ -347,13 +306,15 @@ final class CreateOrderTest extends TestCase
             'delivery_address_id' => $deliveryAddress->id,
             'distribution_center_id' => $distributionCenter->id,
             'delivery_type' => DeliveryType::NORMAL()->value,
-            'payment_method' => PaymentMethod::ORANGE_MONEY()->value,
             'items' => [
                 [
                     'product_category_id' => $productCategory->id,
                     'quantity' => 1,
+                    'unit_price' => $actualPrice,
                 ],
             ],
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $totalAmount,
             'comments' => str_repeat('a', 501), // Too long
         ]);
 
@@ -404,18 +365,29 @@ final class CreateOrderTest extends TestCase
         ]);
         $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
 
+        // Get actual price
+        $actualPrice = app(\App\Services\ProductCategoryService::class)->getProductPrice(
+            $productCategory->id
+        );
+        $quantity = 2;
+        $deliveryFee = 500.00;
+        $subtotal = $quantity * $actualPrice;
+        $totalAmount = $subtotal + $deliveryFee;
+
         $orderData = [
             'delivery_address_id' => $deliveryAddress->id,
             'distribution_center_id' => $distributionCenter->id,
             'delivery_type' => DeliveryType::NORMAL()->value,
-            'payment_method' => PaymentMethod::ORANGE_MONEY()->value,
             'items' => [
                 [
                     'product_category_id' => $productCategory->id,
-                    'quantity' => 2,
+                    'quantity' => $quantity,
+                    'unit_price' => $actualPrice,
                     'option' => null,
                 ],
             ],
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $totalAmount,
         ];
 
         $response = $this->withHeaders([

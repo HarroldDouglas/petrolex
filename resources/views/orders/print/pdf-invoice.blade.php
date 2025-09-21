@@ -140,10 +140,10 @@
                 @if($order->delivery_address_id && $order->deliveryAddress)
                     {{ $order->deliveryAddress->address }}<br>
                     @if($order->deliveryAddress->neighborhood)
-                        {{ $order->deliveryAddress->neighborhood }},
+                        {{ $order->deliveryAddress->neighborhood->name }},
                     @endif
-                    {{ $order->deliveryAddress->city ?? 'Yaoundé' }}<br>
-                    {{ $order->deliveryAddress->country ?? 'Cameroun' }}<br>
+                    {{ $order->deliveryAddress->city->name ?? 'Yaoundé' }}<br>
+                    {{ $order->deliveryAddress->country->name ?? 'Cameroun' }}<br>
                     <strong>Tél:</strong> {{ $order->deliveryAddress->phone ?? ($order->customer?->phone ?? 'Non disponible') }}
                     @if($order->deliveryAddress->contact_name)
                         <br><strong>Contact:</strong> {{ $order->deliveryAddress->contact_name }}

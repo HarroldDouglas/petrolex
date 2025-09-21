@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer une Commande - Test API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/test/products/assets/css/style.css" rel="stylesheet">
+    <style>
+        .navbar-custom {
+            background-color: #007bff;
+        }
+        .json-response {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .cart-item {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+        .product-card {
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .product-card.selected {
+            border-color: #007bff;
+            background-color: #e7f1ff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/test/products/list.html">
+                <i class="fas fa-arrow-left"></i> Retour aux commandes
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Connecté en tant que: <span id="user-name"></span></span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <h2 class="mb-4"><i class="fas fa-plus-circle"></i> Créer une nouvelle commande</h2>
+        
+        <!-- Top Row: Form + Cart + API Response -->
+        <div class="row mb-4">
+            <!-- Order Form - 60% -->
+            <div class="col-lg-7">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5><i class="fas fa-shopping-cart"></i> Détails de la commande</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="order-form">
+                            <div class="row">
+                                <!-- Left column -->
+                                <div class="col-md-6">
+                                    <!-- Delivery Address -->
+                                    <div class="mb-3">
+                                        <label for="delivery-address" class="form-label">Adresse de livraison</label>
+                                        <select class="form-select" id="delivery-address" required>
+                                            <option value="">Sélectionnez une adresse...</option>
+                                        </select>
+                                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="loadDeliveryAddresses()">
+                                            <i class="fas fa-refresh"></i> Charger mes adresses
+                                        </button>
+                                    </div>
+
+                                    <!-- Distribution Center -->
+                                    <div class="mb-3">
+                                        <label for="distribution-center" class="form-label">Centre de distribution</label>
+                                        <select class="form-select" id="distribution-center" required onchange="onDistributionCenterChange()">
+                                            <option value="">Sélectionnez un centre...</option>
+                                        </select>
+                                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="loadDistributionCenters()">
+                                            <i class="fas fa-refresh"></i> Charger les centres
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right column -->
+                                <div class="col-md-6">
+                                    <!-- Delivery Type -->
+                                    <div class="mb-3">
+                                        <label for="delivery-type" class="form-label">Type de livraison</label>
+                                        <select class="form-select" id="delivery-type" required onchange="calculateDeliveryFee()">
+                                            <option value="">Sélectionnez un type...</option>
+                                            <option value="normal" data-fee="500">Normal (500 FCFA)</option>
+                                            <option value="fast" data-fee="1000">Rapide (1000 FCFA)</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Comments -->
+                                    <div class="mb-3">
+                                        <label for="comments" class="form-label">Commentaires (optionnel)</label>
+                                        <textarea class="form-control" id="comments" rows="3" placeholder="Instructions spéciales..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-check"></i> Créer la commande
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Summary - 25% -->
+            <div class="col-lg-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h6><i class="fas fa-shopping-cart"></i> Panier (<span id="cart-count">0</span>)</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="cart-items" style="max-height: 300px; overflow-y: auto;">
+                            <p class="text-muted text-center">Votre panier est vide</p>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <strong>Total: <span id="cart-total">0 FCFA</span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Response - 15% -->
+            <div class="col-lg-2">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h6><i class="fas fa-code"></i> API</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        <div id="api-response" class="json-response" style="font-size: 10px; max-height: 300px; overflow-y: auto;">
+                            Aucune réponse
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Products Selection -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-box"></i> Sélection des produits</h5>
+                        <button class="btn btn-primary" onclick="loadProducts()">
+                            <i class="fas fa-refresh"></i> Charger les produits
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="products-loading" class="text-center d-none">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p>Chargement des produits...</p>
+                        </div>
+                        <div id="products-container" class="row">
+                            <!-- Products will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let cart = [];
+        let products = [];
+        let deliveryAddresses = [];
+        let distributionCenters = [];
+        let deliveryFee = 0;
+
+        $(document).ready(function() {
+            // Check authentication
+            const token = localStorage.getItem('api_token');
+            const userFullName = localStorage.getItem('user_full_name');
+            
+            if (!token) {
+                window.location.href = '/test/products/index.html';
+                return;
+            }
+
+            $('#user-name').text(userFullName || 'Utilisateur');
+
+            // Load initial data
+            loadDeliveryAddresses();
+            loadDistributionCenters();
+
+            // Form submission
+            $('#order-form').on('submit', function(e) {
+                e.preventDefault();
+                createOrder();
+            });
+        });
+
+        function loadProducts() {
+            const distributionCenterId = $('#distribution-center').val();
+            if (!distributionCenterId) {
+                alert('Veuillez d\'abord sélectionner un centre de distribution');
+                return;
+            }
+            
+            const token = localStorage.getItem('api_token');
+            $('#products-loading').removeClass('d-none');
+            
+            $.ajax({
+                url: `/api/distribution-centers/${distributionCenterId}/products`,
+                type: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    $('#products-loading').addClass('d-none');
+                    products = response.data || response;
+                    displayProducts(products);
+                    updateApiResponse('Products loaded', response);
+                },
+                error: function(jqXHR) {
+                    $('#products-loading').addClass('d-none');
+                    console.error('Products API Error:', jqXHR.responseText);
+                    updateApiResponse('Products Error', jqXHR.responseJSON);
+                }
+            });
+        }
+
+        function loadDeliveryAddresses() {
+            const token = localStorage.getItem('api_token');
+            const customerId = localStorage.getItem('customer_id');
+            
+            if (!customerId) {
+                alert('ID client non trouvé. Veuillez vous reconnecter.');
+                return;
+            }
+            
+            $.ajax({
+                url: `/api/customers/${customerId}`,
+                type: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    const customer = response.data || response;
+                    deliveryAddresses = customer.delivery_addresses || [];
+                    const select = $('#delivery-address');
+                    select.empty().append('<option value="">Sélectionnez une adresse...</option>');
+                    
+                    if (deliveryAddresses.length > 0) {
+                        deliveryAddresses.forEach(address => {
+                            select.append(`<option value="${address.id}">${address.label} - ${address.address}</option>`);
+                        });
+                    } else {
+                        select.append('<option value="" disabled>Aucune adresse trouvée</option>');
+                    }
+                    
+                    updateApiResponse('Customer data with addresses loaded', response);
+                },
+                error: function(jqXHR) {
+                    console.error('Customer API Error:', jqXHR.responseText);
+                    updateApiResponse('Customer Error', jqXHR.responseJSON);
+                    
+                    // Fallback: try the general customers endpoint
+                    $.ajax({
+                        url: '/api/customers',
+                        type: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json'
+                        },
+                        success: function(response) {
+                            const customers = response.data || response;
+                            const currentCustomer = customers.find(c => c.id == customerId);
+                            
+                            if (currentCustomer && currentCustomer.delivery_addresses) {
+                                deliveryAddresses = currentCustomer.delivery_addresses;
+                                const select = $('#delivery-address');
+                                select.empty().append('<option value="">Sélectionnez une adresse...</option>');
+                                
+                                deliveryAddresses.forEach(address => {
+                                    select.append(`<option value="${address.id}">${address.label} - ${address.address}</option>`);
+                                });
+                                
+                                updateApiResponse('Addresses loaded from customers list', response);
+                            }
+                        },
+                        error: function(jqXHR) {
+                            console.error('Customers list API Error:', jqXHR.responseText);
+                            updateApiResponse('Customers list Error', jqXHR.responseJSON);
+                        }
+                    });
+                }
+            });
+        }
+
+        function loadDistributionCenters() {
+            const token = localStorage.getItem('api_token');
+            
+            $.ajax({
+                url: '/api/distribution-centers',
+                type: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    distributionCenters = response.data || response;
+                    const select = $('#distribution-center');
+                    select.empty().append('<option value="">Sélectionnez un centre...</option>');
+                    
+                    distributionCenters.forEach(center => {
+                        select.append(`<option value="${center.id}">${center.name} - ${center.address}</option>`);
+                    });
+                    
+                    updateApiResponse('Distribution Centers loaded', response);
+                },
+                error: function(jqXHR) {
+                    console.error('Distribution Centers API Error:', jqXHR.responseText);
+                    updateApiResponse('Distribution Centers Error', jqXHR.responseJSON);
+                }
+            });
+        }
+
+        function displayProducts(products) {
+            let html = '';
+            
+            products.forEach(product => {
+                const defaultImage = product.images?.find(img => img.is_default)?.medium || product.images?.[0]?.medium || '';
+                const stock = product.quantity || 0;
+                const stockClass = stock > 0 ? 'text-success' : 'text-danger';
+                
+                html += `
+                    <div class="col-lg-6 col-xl-4 mb-3">
+                        <div class="card product-card h-100">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-4">
+                                        ${defaultImage ? `<img src="${defaultImage}" alt="${product.name}" class="img-fluid rounded" style="height: 80px; object-fit: cover;">` : '<div class="bg-light p-2 text-center" style="height: 80px; display: flex; align-items: center; justify-content: center;"><small>Pas d\'image</small></div>'}
+                                    </div>
+                                    <div class="col-8">
+                                        <h6 class="card-title mb-1" style="font-size: 14px;">${product.name}</h6>
+                                        <p class="card-text mb-1" style="font-size: 12px;">${product.description ? product.description.substring(0, 50) + '...' : ''}</p>
+                                        <p class="card-text mb-2"><small class="${stockClass}">Stock: ${stock}</small></p>
+                                    </div>
+                                </div>
+                                
+                                ${product.options && product.options.length > 0 ? `
+                                    <div class="mt-2">
+                                        <div class="mb-2">
+                                            <label style="font-size: 11px;">Option:</label>
+                                            <select class="form-select form-select-sm" id="option-${product.id}" style="font-size: 11px;">
+                                                <option value="">Choisir une option...</option>
+                                                ${product.options.map(option => `
+                                                    <option value="${option.value}" data-price="${option.price}">
+                                                        ${option.label} - ${option.price} FCFA
+                                                    </option>
+                                                `).join('')}
+                                            </select>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div>
+                                                <label style="font-size: 11px;">Qté:</label>
+                                                <input type="number" class="form-control form-control-sm" 
+                                                       style="width: 60px; font-size: 11px;" value="1" min="1" max="${stock}" 
+                                                       id="qty-${product.id}">
+                                            </div>
+                                            <button class="btn btn-sm btn-success" onclick="addProductToCart(${product.id})" style="font-size: 11px;">
+                                                <i class="fas fa-plus"></i> Ajouter
+                                            </button>
+                                        </div>
+                                    </div>
+                                ` : '<p class="text-muted" style="font-size: 12px;">Aucune option disponible</p>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            $('#products-container').html(html);
+        }
+
+        function onDistributionCenterChange() {
+            // Clear products when distribution center changes
+            $('#products-container').empty();
+            cart = [];
+            updateCartDisplay();
+            
+            // Auto-load products for the selected center
+            loadProducts();
+        }
+
+        function calculateDeliveryFee() {
+            const selectedOption = $('#delivery-type option:selected');
+            deliveryFee = parseFloat(selectedOption.data('fee')) || 0;
+            updateCartDisplay();
+        }
+
+        function addProductToCart(productId) {
+            const optionSelect = $(`#option-${productId}`);
+            const quantityInput = $(`#qty-${productId}`);
+            
+            const selectedOption = optionSelect.val();
+            const quantity = parseInt(quantityInput.val()) || 1;
+            
+            if (!selectedOption) {
+                alert('Veuillez sélectionner une option');
+                return;
+            }
+            
+            const selectedOptionElement = optionSelect.find('option:selected');
+            const price = parseFloat(selectedOptionElement.data('price'));
+            
+            if (quantity <= 0) {
+                alert('La quantité doit être supérieure à 0');
+                return;
+            }
+            
+            addToCart(productId, selectedOption, quantity, price);
+            
+            // Reset form
+            optionSelect.val('');
+            quantityInput.val(1);
+        }
+
+        function addToCart(productId, option, quantity, price) {
+            const product = products.find(p => p.id === productId);
+            const optionData = product.options.find(opt => opt.value === option);
+            
+            const itemKey = `${productId}-${option}`;
+            const existingItemIndex = cart.findIndex(item => item.key === itemKey);
+            
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity = quantity;
+            } else {
+                cart.push({
+                    key: itemKey,
+                    product_category_id: productId,
+                    quantity: quantity,
+                    unit_price: parseFloat(price),
+                    option: option,
+                    name: product.name,
+                    option_label: optionData.label
+                });
+            }
+            
+            updateCartDisplay();
+        }
+
+        function removeFromCart(productId, option) {
+            const itemKey = `${productId}-${option}`;
+            cart = cart.filter(item => item.key !== itemKey);
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            const cartContainer = $('#cart-items');
+            const cartCount = $('#cart-count');
+            const cartTotal = $('#cart-total');
+            
+            if (cart.length === 0) {
+                cartContainer.html('<p class="text-muted text-center">Votre panier est vide</p>');
+                cartCount.text('0');
+                cartTotal.text('0 FCFA');
+                return;
+            }
+            
+            let html = '';
+            let subtotal = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.unit_price * item.quantity;
+                subtotal += itemTotal;
+                
+                html += `
+                    <div class="cart-item">
+                        <h6>${item.name}</h6>
+                        <small class="text-muted">${item.option_label}</small>
+                        <div class="d-flex justify-content-between">
+                            <span>${item.quantity} x ${item.unit_price} FCFA</span>
+                            <strong>${itemTotal} FCFA</strong>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${item.product_category_id}, '${item.option}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            const total = subtotal + deliveryFee;
+            
+            html += `
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <span>Sous-total:</span>
+                    <span>${subtotal} FCFA</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Frais de livraison:</span>
+                    <span>${deliveryFee} FCFA</span>
+                </div>
+            `;
+            
+            cartContainer.html(html);
+            cartCount.text(cart.length);
+            cartTotal.text(`${total} FCFA`);
+        }
+
+        function createOrder() {
+            if (cart.length === 0) {
+                alert('Veuillez sélectionner au moins un produit');
+                return;
+            }
+            
+            const deliveryAddressId = $('#delivery-address').val();
+            const distributionCenterId = $('#distribution-center').val();
+            const deliveryType = $('#delivery-type').val();
+            
+            if (!deliveryAddressId || !distributionCenterId || !deliveryType) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+            
+            // Calculate totals
+            const subtotal = cart.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
+            const totalAmount = subtotal + deliveryFee;
+            
+            const token = localStorage.getItem('api_token');
+            const orderData = {
+                delivery_address_id: parseInt(deliveryAddressId),
+                distribution_center_id: parseInt(distributionCenterId),
+                delivery_type: deliveryType,
+                delivery_fee: deliveryFee,
+                total_amount: totalAmount,
+                comments: $('#comments').val() || null,
+                items: cart.map(item => ({
+                    product_category_id: item.product_category_id,
+                    quantity: item.quantity,
+                    unit_price: item.unit_price,
+                    option: item.option
+                }))
+            };
+            
+            updateApiResponse('Creating order...', orderData);
+            
+            $.ajax({
+                url: '/api/orders',
+                type: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(orderData),
+                success: function(response) {
+                    updateApiResponse('Order created successfully!', response);
+                    alert('Commande créée avec succès!');
+                    
+                    // Redirect to order detail or list
+                    if (response.data && response.data.id) {
+                        window.location.href = `/test/products/detail.html?id=${response.data.id}`;
+                    } else {
+                        window.location.href = '/test/products/list.html';
+                    }
+                },
+                error: function(jqXHR) {
+                    console.error('Create Order Error:', jqXHR.responseText);
+                    updateApiResponse('Order creation failed', jqXHR.responseJSON);
+                    
+                    // Show detailed validation errors
+                    let errorMessage = 'Erreur lors de la création de la commande:\n';
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
+                        Object.entries(jqXHR.responseJSON.errors).forEach(([field, messages]) => {
+                            errorMessage += `${field}: ${messages.join(', ')}\n`;
+                        });
+                    } else if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                        errorMessage += jqXHR.responseJSON.message;
+                    }
+                    
+                    alert(errorMessage);
+                }
+            });
+        }
+
+        function updateApiResponse(title, data) {
+            const responseHtml = `<strong>${title}</strong>\n${JSON.stringify(data, null, 2)}`;
+            $('#api-response').text(responseHtml);
+        }
+
+        function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                localStorage.clear();
+                window.location.href = '/test/products/index.html';
+            }
+        }
+
+        // Allow adding to cart with Enter key
+        $(document).on('keypress', '[id^="qty-"]', function(e) {
+            if (e.which === 13) { // Enter key
+                const productId = parseInt(this.id.replace('qty-', ''));
+                addProductToCart(productId);
+            }
+        });
+    </script>
+</body>
+</html>

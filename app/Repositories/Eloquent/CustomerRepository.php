@@ -23,6 +23,10 @@ class CustomerRepository extends BaseEloquentRepository implements CustomerRepos
                 'deliveryAddress.neighborhood.municipality.city.country',
                 'payment',
                 'customer.deliveryAddresses.neighborhood.municipality.city.country',
+                'deliveryPerson.user',
+                'distributionCenter',
+                'refunds',
+                'deliveryTracking',
             ])
             ->when(
                 $filters->order_number !== null && $filters->order_number !== '',
@@ -39,6 +43,7 @@ class CustomerRepository extends BaseEloquentRepository implements CustomerRepos
                 $filters->payment_method !== null,
                 fn ($q) => $q->whereHas('payment', fn ($q) => $q->where('payment_method', $filters->payment_method))
             )
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
 

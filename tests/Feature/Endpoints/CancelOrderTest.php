@@ -17,19 +17,16 @@ final class CancelOrderTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $adminUser;
-
-    private string $authToken;
-
+    private User $customerUser;
+    private Customer $customer;
     private Order $order;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Create admin role for testing
+        // Create required roles for the system
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        // Create center_manager role for testing
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'center_manager', 'guard_name' => 'web']);
 
         // Create country for authentication
@@ -38,36 +35,33 @@ final class CancelOrderTest extends TestCase
             'phone_code' => '+237',
         ]);
 
-        // Create an admin user and authenticate to get a token
-        $this->adminUser = User::factory()->create([
+        // Create a customer user who will own the order
+        $this->customerUser = User::factory()->create([
             'country_id' => $country->id,
         ]);
-        $this->adminUser->assignRole('admin');
 
-        // Ensure a Customer and DistributionCenter exist for OrderFactory
-        Customer::factory()->create();
+        $this->customer = Customer::factory()->create([
+            'user_id' => $this->customerUser->id,
+        ]);
+
+        // Ensure a DistributionCenter exists for OrderFactory
         DistributionCenter::factory()->create();
 
-        $this->order = Order::factory()->create();
-
-        $response = $this->postJson(route('api.login'), [
-            'login' => $this->adminUser->phone_number,
-            'password' => 'password', // Default password from factory
-            'country_code' => 'CM',
+        // Create an order that belongs to this customer
+        $this->order = Order::factory()->create([
+            'customer_id' => $this->customer->id,
+            'status' => 'pending', // Ensure order can be cancelled
         ]);
-        $this->authToken = $response->json('data.access_token');
     }
 
     #[Test]
     public function it_can_cancel_an_order(): void
     {
-
         $cancellationData = [
             'cancelled_reason' => 'Customer requested cancellation.',
-            'cancelled_by' => $this->adminUser->id,
         ];
 
-        $response = $this->actingAs($this->adminUser, 'sanctum')
+        $response = $this->actingAs($this->customerUser, 'sanctum')
             ->patchJson(route('api.orders.cancel', ['order' => $this->order->id]), $cancellationData);
 
         $response->assertStatus(200)
@@ -82,7 +76,7 @@ final class CancelOrderTest extends TestCase
             'id' => $this->order->id,
             'status' => OrderStatus::CANCELLED(),
             'cancelled_reason' => $cancellationData['cancelled_reason'],
-            'cancelled_by' => $this->adminUser->id,
+            'cancelled_by' => $this->customerUser->id,
         ]);
 
         $updatedOrder = Order::find($this->order->id);
@@ -90,12 +84,30 @@ final class CancelOrderTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_an_error_if_cancellation_reason_is_missing(): void
+    public function it_can_cancel_an_order_without_reason(): void
     {
-        $response = $this->actingAs($this->adminUser, 'sanctum')
-            ->patchJson(route('api.orders.cancel', ['order' => $this->order->id]), []);
+        // Create a new order for this test
+        $secondOrder = Order::factory()->create([
+            'customer_id' => $this->customer->id,
+            'status' => 'pending',
+        ]);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['cancelled_reason']);
+        // Since cancelled_reason is nullable, this should work and use the default reason
+        $response = $this->actingAs($this->customerUser, 'sanctum')
+            ->patchJson(route('api.orders.cancel', ['order' => $secondOrder->id]), []);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                '_metadata' => ['success', 'message'],
+                'data' => [],
+            ]);
+
+        // Check that the default reason was used
+        $this->assertDatabaseHas('orders', [
+            'id' => $secondOrder->id,
+            'status' => OrderStatus::CANCELLED(),
+            'cancelled_reason' => 'Annulée par le client', // Default reason from controller
+            'cancelled_by' => $this->customerUser->id,
+        ]);
     }
 }

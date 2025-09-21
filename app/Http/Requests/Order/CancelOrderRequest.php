@@ -22,16 +22,14 @@ class CancelOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cancelled_reason' => 'required|string|max:255',
-            'cancelled_by' => 'required|integer|exists:users,id',
+            'cancelled_reason' => 'nullable|string|max:255',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'cancelled_reason.required' => 'La raison de l\'annulation est requise.',
-            'cancelled_by.required' => 'L\'ID de l\'utilisateur ayant annulé la commande est requis.',
+            'cancelled_reason.max' => 'La raison de l\'annulation ne peut pas dépasser 255 caractères.',
         ];
     }
 }

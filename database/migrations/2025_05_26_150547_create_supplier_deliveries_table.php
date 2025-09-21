@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('supplier_name', 255)->nullable();
             $table->text('description')->nullable();
             $table->datetime('supply_date');
-            $table->enum('status', SupplierDeliveryStatus::values())->default('in_progress');
+            $table->enum('status', SupplierDeliveryStatus::values())->default('processing');
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -16,7 +16,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="total_amount", type="string", example="30000.00"),
  *     @OA\Property(property="order_date", type="string", format="date-time", example="2025-07-24T16:21:54.000000Z"),
  *     @OA\Property(property="delivery_date", type="string", format="date-time", nullable=true, example=null),
- *     @OA\Property(property="status", type="string", enum={"pending", "confirmed", "in_progress", "delivered", "cancelled"}, example="in_progress"),
+ *     @OA\Property(property="status", type="string", enum={"pending", "confirmed", "processing", "delivered", "cancelled"}, example="processing"),
  *     @OA\Property(
  *         property="payment",
  *         type="object",

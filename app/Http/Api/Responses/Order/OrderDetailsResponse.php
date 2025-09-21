@@ -2,17 +2,17 @@
 
 namespace App\Http\Api\Responses\Order;
 
-use App\Http\Api\Resources\Order\OrderDetailsResource;
+use App\Http\Api\Resources\Order\OrderDetailResource;
 use App\Http\Api\Responses\ApiResponse;
 use App\Models\Order;
 
 class OrderDetailsResponse extends ApiResponse
 {
-    public static function withOrder(Order $order): self
+    public static function withOrder(Order $order, ?string $message = null): self
     {
         return new self(
-            new OrderDetailsResource($order),
-            'Détails de la commande récupérés avec succès'
+            new OrderDetailResource($order),
+            $message ?? 'Détails de la commande récupérés avec succès'
         );
     }
 }

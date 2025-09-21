@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->prefix('orders')->name('api.')->group(functio
     Route::patch('/{order}/deliver', DeliverOrderController::class)->name('orders.deliver');
     Route::post('/{order}/scan-empty-bottle', ScanEmptyBottleController::class)->name('orders.scan-empty-bottle');
     Route::patch('/{order}/cancel', CancelOrderController::class)->name('orders.cancel');
+    Route::post('/{order}/payment', \App\Http\Api\Controllers\Payment\InitiatePaymentController::class)->name('orders.initiate-payment');
 });
 
 Route::middleware('auth:sanctum')->group(function () {

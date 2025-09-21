@@ -26,7 +26,7 @@ use OpenApi\Annotations as OA;
  *         required=false,
  *         description="Filtrer les commandes par statut",
  *
- *         @OA\Schema(type="string", enum={"confirmed", "in_progress", "delivered", "cancelled", "pending"})
+ *         @OA\Schema(type="string", enum={"confirmed", "processing", "delivered", "cancelled", "pending"})
  *     ),
  *
  *     @OA\Parameter(

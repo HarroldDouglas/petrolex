@@ -29,7 +29,7 @@ class DeliveryStatus extends Enum
     public static function values(): array
     {
         return [
-            'IN_PROGRESS' => 'in_progress',
+            'IN_PROGRESS' => 'processing',
             'COMPLETED' => 'completed',
             'CANCELLED' => 'cancelled',
         ];

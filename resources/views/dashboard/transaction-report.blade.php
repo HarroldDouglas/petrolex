@@ -68,7 +68,7 @@
                                     <label for="warehouse_filter" class="form-label"> Type de transactions : </label>
                                     <select id="warehouse_filter" name="warehouse" class="form-select">
                                         <option value="" selected>Tous</option>
-                                        <option value="in_progress">Vente</option>
+                                        <option value="processing">Vente</option>
                                         <option value="delivered">Achat</option>
                                         <option value="delivered">Dépenses</option>
                                     </select>

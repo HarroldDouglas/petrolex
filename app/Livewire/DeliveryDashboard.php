@@ -21,9 +21,9 @@ class DeliveryDashboard extends Component
 
     public function loadDeliveries()
     {
-        // Chercher seulement les livraisons avec position GPS (started, in_progress)
+        // Chercher seulement les livraisons avec position GPS (started, processing)
         // ou filtrer celles qui ont driver_lat et driver_lng non null
-        $this->deliveries = DeliveryTracking::whereIn('status', ['started', 'in_progress'])
+        $this->deliveries = DeliveryTracking::whereIn('status', ['started', 'processing'])
             ->whereNotNull('driver_lat')
             ->whereNotNull('driver_lng')
             ->where('driver_lat', '!=', '')

@@ -12,6 +12,25 @@ use Illuminate\Foundation\Http\FormRequest;
 final class GetCustomerOrdersRequest extends FormRequest
 {
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        // Convert enum values to lowercase for case-insensitive validation
+        if ($this->has('status')) {
+            $this->merge(['status' => strtolower($this->input('status'))]);
+        }
+
+        if ($this->has('delivery_type')) {
+            $this->merge(['delivery_type' => strtolower($this->input('delivery_type'))]);
+        }
+
+        if ($this->has('payment_method')) {
+            $this->merge(['payment_method' => strtolower($this->input('payment_method'))]);
+        }
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function rules(): array

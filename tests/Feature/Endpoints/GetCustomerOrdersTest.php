@@ -335,7 +335,7 @@ final class GetCustomerOrdersTest extends TestCase
                 'errors' => ['status'],
             ]);
 
-        $this->assertStringContainsString('in_progress, delivered, cancelled, pending, paid, failed',
+        $this->assertStringContainsString('processing, delivered, cancelled, pending, paid, failed',
             $response->json('errors.status.0'));
     }
 

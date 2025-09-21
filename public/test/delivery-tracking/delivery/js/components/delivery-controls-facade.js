@@ -51,7 +51,7 @@ class DeliveryControlsFacade {
             case DELIVERY_CONFIG.ORDER_STATUS.CONFIRMED:
                 return 'confirmed';
             case DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS:
-                return 'in_progress';
+                return 'processing';
             default:
                 console.warn(`Statut non géré: ${order.status}`);
                 return 'confirmed'; // fallback

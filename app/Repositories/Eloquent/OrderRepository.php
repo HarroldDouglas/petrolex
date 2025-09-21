@@ -27,7 +27,7 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
     {
         $order = $this->model::with([
             'customer',
-            'deliveryAddress',
+            'deliveryAddress.neighborhood.municipality.city.country',
             'distributionCenter',
             'deliveryPerson',
             'items.productCategory',

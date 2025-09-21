@@ -18,7 +18,14 @@
       "Bash(./vendor/bin/phpstan analyse:*)",
       "Bash(jq:*)",
       "Bash(php:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(chmod:*)",
+      "Bash(./test_price_validation.sh:*)",
+      "Bash(./run_all_tests.sh)",
+      "Bash(cd:*)",
+      "Bash(echo:*)",
+      "Bash(./tests/E2E/order/test_complete_flow.sh:*)",
+      "Bash(./tests/E2E/order/run_all_tests.sh:*)"
     ],
     "deny": [],
     "ask": []

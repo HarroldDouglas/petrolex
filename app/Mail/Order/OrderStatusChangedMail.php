@@ -65,7 +65,7 @@ class OrderStatusChangedMail extends Mailable
 
         return match ($status->value) {
             'confirmed' => 'emails.orders.order-confirmed',
-            'in_progress' => 'emails.orders.order-processing',
+            'processing' => 'emails.orders.order-processing',
             'delivered' => 'emails.orders.order-delivered',
             'cancelled' => 'emails.orders.order-cancelled',
             'pending' => 'emails.orders.order-pending',
@@ -84,7 +84,7 @@ class OrderStatusChangedMail extends Mailable
 
         return match ($status->value) {
             'confirmed' => 'email.order_confirmed_subject',
-            'in_progress' => 'email.order_processing_subject',
+            'processing' => 'email.order_processing_subject',
             'delivered' => 'email.order_delivered_subject',
             'cancelled' => 'email.order_cancelled_subject',
             'pending' => 'email.order_pending_subject',

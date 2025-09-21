@@ -14,8 +14,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="status",
  *         type="string",
- *         enum={"pending", "started", "in_progress", "delivered", "cancelled"},
- *         example="in_progress",
+ *         enum={"pending", "started", "processing", "delivered", "cancelled"},
+ *         example="processing",
  *         description="The current status of the delivery"
  *     ),
  *     @OA\Property(property="driver_lat", type="number", format="float", example=3.8480, description="Current latitude of the delivery person"),
@@ -35,7 +35,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-01-09T14:47:35Z", description="The date and time the record was last updated"),
  *     @OA\Property(
  *         property="order",
- *         ref="#/components/schemas/OrderData",
+ *         ref="#/components/schemas/OrderDetailsData",
  *         description="The order being tracked"
  *     ),
  *     @OA\Property(

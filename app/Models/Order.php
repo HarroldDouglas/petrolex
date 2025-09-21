@@ -149,6 +149,26 @@ class Order extends Model
     }
 
     /**
+     * Get all payments for the order.
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
+
+    /**
+     * Check if the order can accept a new payment.
+     */
+    public function canAcceptPayment(): bool
+    {
+        return $this->status === OrderStatus::PENDING() &&
+               ! $this->payments()->whereIn('payment_status', [
+                   PaymentStatus::PAID()->value,
+                   PaymentStatus::PENDING()->value,
+               ])->exists();
+    }
+
+    /**
      * Get the items for the order.
      */
     public function items(): HasMany
@@ -424,5 +444,22 @@ class Order extends Model
         }
 
         return (int) round(($totalScannedBottles / $totalExpectedBottles) * 100);
+    }
+
+    /**
+     * Load all necessary relations for detailed API responses
+     */
+    public function loadDetailRelations(): self
+    {
+        return $this->load([
+            'items.productCategory',
+            'deliveryAddress.neighborhood.municipality.city.country',
+            'payment',
+            'customer.user',
+            'deliveryPerson.user',
+            'distributionCenter.neighborhood.municipality.city.country',
+            'refunds',
+            'deliveryTracking',
+        ]);
     }
 }

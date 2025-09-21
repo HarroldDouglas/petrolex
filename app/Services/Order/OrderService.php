@@ -3,6 +3,7 @@
 namespace App\Services\Order;
 
 use App\DTOs\Order\CreateOrderDTO;
+use App\DTOs\Order\CreateOrderWithoutPaymentDTO;
 use App\DTOs\Order\GroupedOrderItemDTO;
 use App\DTOs\Order\OrderDetailsDTO;
 use App\DTOs\Order\OrderItemDTO;
@@ -99,6 +100,42 @@ class OrderService extends BaseServiceForEntity
             Event::dispatch(new EmptyBottleReturnedEvent($bottle, $order, $dto->orderItemId));
 
             return true;
+        });
+    }
+
+    /**
+     * Create a new order without payment processing.
+     */
+    public function createWithoutPayment(CreateOrderWithoutPaymentDTO $orderDTO): Order
+    {
+        return $this->executeInTransaction(function () use ($orderDTO) {
+            $orderItemsData = array_map(function (OrderItemDTO $itemDTO): OrderItemDTO {
+                // Calculate total_price for each item even though prices are already validated
+                $itemDTO->total_price = $itemDTO->unit_price * $itemDTO->quantity;
+                $itemDTO->option = $itemDTO->option ?? null;
+
+                return $itemDTO;
+            }, $orderDTO->items);
+
+            $orderData = $orderDTO->toArray();
+            if (isset($orderData['items'])) {
+                unset($orderData['items']);
+            }
+
+            // Calculate subtotal from validated items
+            $subtotal = collect($orderDTO->items)->sum(fn ($item) => $item->unit_price * $item->quantity);
+
+            $orderData['subtotal'] = $subtotal;
+            $orderData['status'] = OrderStatus::PENDING()->value;
+
+            /** @var Order $order */
+            $order = $this->repository->create($orderData);
+
+            Event::dispatch(new OrderCreatedEvent($order, $orderItemsData));
+
+            $order->load('items.productCategory');
+
+            return $order;
         });
     }
 

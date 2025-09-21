@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - Test API</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="/test/products/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -17,7 +17,7 @@
                         <div id="login_form">
                             <div class="mb-3">
                                 <label for="login" class="form-label">Login (Email ou nom d'utilisateur):</label>
-                                <input type="text" class="form-control" id="login" value="admin@petrolex.com">
+                                <input type="text" class="form-control" id="login" value="customer1@test.com">
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Mot de passe:</label>
@@ -35,14 +35,14 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/test-products/assets/js/auth.js"></script>
+    <script src="/test/products/assets/js/auth.js"></script>
     <script>
         // Vérifier si une session est active et rediriger
         const sessionToken = localStorage.getItem('test-products-sessionToken');
         const sessionExpiry = localStorage.getItem('test-products-sessionExpiry');
 
         if (sessionToken && sessionExpiry && new Date().getTime() < parseInt(sessionExpiry)) {
-            window.location.href = '/test-products/order.html';
+            window.location.href = '/test/products/order.html';
         }
     </script>
 </body>

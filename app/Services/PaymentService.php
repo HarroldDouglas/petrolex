@@ -17,16 +17,17 @@ class PaymentService
         private PaymentGatewayFactory $gatewayFactory
     ) {}
 
-    public function initiatePayment(Order $order, PaymentMethod $method): OrderPayment
+    public function initiatePayment(Order $order, PaymentMethod $method, array $paymentDetails = []): OrderPayment
     {
         $payment = $this->createOrderPayment($order, $method);
         $gateway = $this->gatewayFactory->create($method->value);
         $response = $gateway->initiatePayment($payment);
         $this->updatePaymentFromResponse($payment, $response);
 
-        $payment->refresh();
+        // TODO: Remove this simulation when real payment callbacks are implemented
+        $this->schedulePaymentCallback($payment);
 
-        return $payment;
+        return $payment->refresh();
     }
 
     public function handleCallback(string $orderId, array $callbackData): void
@@ -114,5 +115,10 @@ class PaymentService
                 'status' => OrderStatus::FAILED()->value,
             ]);
         }
+    }
+
+    private function schedulePaymentCallback(OrderPayment $payment): void
+    {
+        dispatch(new \App\Jobs\UpdatePaymentStatusJob($payment->id))->delay(now()->addMinute());
     }
 }

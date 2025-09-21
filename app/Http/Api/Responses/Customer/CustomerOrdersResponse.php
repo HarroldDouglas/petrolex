@@ -2,7 +2,7 @@
 
 namespace App\Http\Api\Responses\Customer;
 
-use App\Http\Api\Resources\Order\OrderResource;
+use App\Http\Api\Resources\Order\OrderDetailResource;
 use App\Http\Api\Responses\ApiResponse;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -14,7 +14,7 @@ class CustomerOrdersResponse extends ApiResponse
     public static function paginatedCollection(LengthAwarePaginator $paginator, ?string $message = null, int $statusCode = 200): self
     {
         $response = new self(
-            OrderResource::collection($paginator->items()),
+            OrderDetailResource::collection($paginator->items()),
             $message ?? 'Commandes client récupérées avec succès.',
             true,
             $statusCode

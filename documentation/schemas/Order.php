@@ -19,33 +19,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="option_label", type="string", example="Nouvelle bouteille"),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-18T10:00:00Z")
  * )
- *
- * @OA\Schema(
- *     schema="OrderData",
- *     title="Order Data",
- *     description="Data of a single order",
- *
- *     @OA\Property(property="id", type="integer", example=127),
- *     @OA\Property(property="order_number", type="string", example="ORD-127-20250109"),
- *     @OA\Property(property="delivery_type", type="string", enum={"normal", "fast"}, example="normal"),
- *     @OA\Property(property="delivery_type_label", type="string", example="Livraison normale"),
- *     @OA\Property(property="payment_method", type="string", enum={"credit_card", "mobile_money", "orange_money"}, example="mobile_money"),
- *     @OA\Property(property="payment_method_label", type="string", example="Mobile Money"),
- *     @OA\Property(property="total_amount", type="number", format="float", example=6000.00),
- *     @OA\Property(property="status", type="string", enum={"confirmed", "in_progress", "delivered", "cancelled", "pending"}, example="in_progress"),
- *     @OA\Property(property="status_label", type="string", example="En cours"),
- *     @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/OrderItemData")),
- *     @OA\Property(property="delivery_address", type="object",
- *         @OA\Property(property="id", type="integer", example=42),
- *         @OA\Property(property="name", type="string", example="Maison familiale, Quartier Mvog-Ada, Yaoundé, Cameroun")
- *     ),
- *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-01-09T10:15:00Z"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-01-09T14:25:12Z"),
- *     @OA\Property(property="distribution_center", type="object",
- *         @OA\Property(property="latitude", type="number", format="float", example=3.8480),
- *         @OA\Property(property="longitude", type="number", format="float", example=11.5021)
- *     ),
- *     @OA\Property(property="invoice_url", type="string", nullable=true, format="uri", example="https://app.petrolex.cm/api/orders/127/download/invoice", description="URL de téléchargement de la facture PDF (null si la facture n'existe pas encore)")
- * )
+ * All Order endpoints now use the unified OrderDetailsData schema for consistency.
+ * @see OrderDetailsData in GetOrderDetailsControllerDoc.php
  */
 class OrderSchema {}

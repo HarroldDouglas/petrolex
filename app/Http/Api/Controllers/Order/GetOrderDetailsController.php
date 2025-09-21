@@ -6,7 +6,62 @@ use App\Http\Api\Responses\Order\OrderDetailsResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Get(
+ *     path="/api/orders/{order}",
+ *     summary="Obtenir les détails d'une commande",
+ *     description="Récupère les détails complets d'une commande spécifique. Seul le propriétaire de la commande (client) ou les livreurs peuvent accéder aux détails.",
+ *     operationId="api.orders.show",
+ *     tags={"Commandes"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\Parameter(
+ *         name="order",
+ *         in="path",
+ *         required=true,
+ *         description="ID de la commande",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Détails de la commande récupérés avec succès",
+ *         @OA\JsonContent(
+ *             @OA\Property(
+ *                 property="_metadata",
+ *                 type="object",
+ *                 @OA\Property(property="success", type="boolean", example=true),
+ *                 @OA\Property(property="message", type="string", example="Détails de la commande récupérés avec succès")
+ *             ),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="order", ref="#/components/schemas/OrderDetailsData")
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=401,
+ *         description="Non authentifié",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=403,
+ *         description="Cette commande ne vous appartient pas",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Commande non trouvée",
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     )
+ * )
+ */
 class GetOrderDetailsController extends Controller
 {
     /**
@@ -26,17 +81,7 @@ class GetOrderDetailsController extends Controller
             abort(403, 'Cette commande ne vous appartient pas.');
         }
 
-        $order->load([
-            'customer.user.country',
-            'customer.deliveryAddresses.neighborhood.municipality.city.country',
-            'deliveryAddress.neighborhood.municipality.city.country',
-            'deliveryPerson.user',
-            'distributionCenter',
-            'payment',
-            'items.productCategory',
-            'refunds',
-            'deliveryTracking',
-        ]);
+        $order->loadDetailRelations();
 
         return OrderDetailsResponse::withOrder($order);
     }

@@ -32,7 +32,7 @@ const DELIVERY_CONFIG = {
         // Statuts principaux
         PENDING: "pending",
         CONFIRMED: "confirmed",
-        IN_PROGRESS: "in_progress",
+        IN_PROGRESS: "processing",
         DELIVERED: "delivered",
         CANCELLED: "cancelled",
 
@@ -53,14 +53,14 @@ const DELIVERY_CONFIG = {
         TRANSLATIONS: {
             pending: "En attente",
             confirmed: "Confirmée",
-            in_progress: "En cours de livraison",
+            processing: "En cours de livraison",
             delivered: "Livrée",
             cancelled: "Annulée",
         },
         COLORS: {
             pending: "warning",
             confirmed: "dark",
-            in_progress: "primary",
+            processing: "primary",
             delivered: "success",
             cancelled: "danger",
         },

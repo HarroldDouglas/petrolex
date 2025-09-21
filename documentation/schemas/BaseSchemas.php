@@ -209,11 +209,11 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="municipality", ref="#/components/schemas/Municipality", nullable=true),
  *     @OA\Property(property="city", ref="#/components/schemas/City", nullable=true)
  * )
- *
+/**
  * @OA\Schema(
  *     schema="OrderDetailsData",
  *     title="OrderDetailsData",
- *     description="Détails complets d'une commande",
+ *     description="Détails complets d'une commande - Structure uniforme pour tous les endpoints Order",
  *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="order_number", type="string", example="CMD-202412-0001"),
@@ -226,14 +226,14 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="total_amount", type="number", format="float", example=2000.00),
  *     @OA\Property(property="total_refunded_amount", type="number", format="float", example=0.00),
  *     @OA\Property(property="order_date", type="string", format="date-time", example="2024-12-01T10:00:00.000000Z"),
- *     @OA\Property(property="delivery_date", type="string", format="date-time", nullable=true),
- *     @OA\Property(property="paid_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="delivery_date", type="string", format="date-time", nullable=true, example="2024-12-01T15:00:00.000000Z"),
+ *     @OA\Property(property="paid_at", type="string", format="date-time", nullable=true, example="2024-12-01T10:05:00.000000Z"),
  *     @OA\Property(property="processing_at", type="string", format="date-time", nullable=true),
  *     @OA\Property(property="delivered_at", type="string", format="date-time", nullable=true),
  *     @OA\Property(property="cancelled_at", type="string", format="date-time", nullable=true),
- *     @OA\Property(property="created_at", type="string", format="date-time"),
- *     @OA\Property(property="updated_at", type="string", format="date-time"),
- *     @OA\Property(property="comments", type="string", nullable=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-12-01T10:00:00.000000Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-12-01T10:05:00.000000Z"),
+ *     @OA\Property(property="comments", type="string", nullable=true, example="Livrer avant 18h"),
  *     @OA\Property(property="center_comments", type="string", nullable=true),
  *     @OA\Property(property="rating", type="integer", nullable=true, minimum=1, maximum=5),
  *     @OA\Property(property="cancelled_by", type="string", nullable=true),
@@ -241,107 +241,156 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="customer",
  *         type="object",
- *         @OA\Property(property="id", type="integer"),
- *         @OA\Property(property="user_id", type="integer"),
- *         @OA\Property(property="first_name", type="string"),
- *         @OA\Property(property="last_name", type="string"),
- *         @OA\Property(property="full_name", type="string"),
- *         @OA\Property(property="email", type="string"),
- *         @OA\Property(property="phone_number", type="string"),
- *         @OA\Property(property="current_balance", type="number", format="float"),
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="user_id", type="integer", example=1),
+ *         @OA\Property(property="first_name", type="string", example="Jean"),
+ *         @OA\Property(property="last_name", type="string", example="Dupont"),
+ *         @OA\Property(property="full_name", type="string", example="Jean Dupont"),
+ *         @OA\Property(property="email", type="string", example="jean.dupont@example.com"),
+ *         @OA\Property(property="phone_number", type="string", example="677123456"),
+ *         @OA\Property(property="current_balance", type="number", format="float", example=1500.00),
  *         @OA\Property(property="country", ref="#/components/schemas/Country")
  *     ),
- *     @OA\Property(property="delivery_address", ref="#/components/schemas/DeliveryAddress"),
+ *     @OA\Property(property="delivery_address", ref="#/components/schemas/DeliveryAddress", nullable=true),
  *     @OA\Property(
  *         property="delivery_person",
  *         type="object",
  *         nullable=true,
- *         @OA\Property(property="id", type="integer"),
- *         @OA\Property(property="user_id", type="integer"),
- *         @OA\Property(property="first_name", type="string"),
- *         @OA\Property(property="last_name", type="string"),
- *         @OA\Property(property="full_name", type="string"),
- *         @OA\Property(property="phone_number", type="string"),
- *         @OA\Property(property="email", type="string")
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="user_id", type="integer", example=5),
+ *         @OA\Property(property="first_name", type="string", example="Paul"),
+ *         @OA\Property(property="last_name", type="string", example="Martin"),
+ *         @OA\Property(property="full_name", type="string", example="Paul Martin"),
+ *         @OA\Property(property="phone_number", type="string", example="677987654"),
+ *         @OA\Property(property="email", type="string", example="paul.martin@example.com")
+ *     ),
+ *     @OA\Property(
+ *         property="distribution_center",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Centre Yaoundé"),
+ *         @OA\Property(property="address", type="string", example="123 Rue de la Paix"),
+ *         @OA\Property(property="phone", type="string", example="677111222"),
+ *         @OA\Property(property="latitude", type="number", format="float", example=3.848),
+ *         @OA\Property(property="longitude", type="number", format="float", example=11.502)
  *     ),
  *     @OA\Property(
  *         property="payment",
  *         type="object",
  *         nullable=true,
- *         @OA\Property(property="id", type="integer"),
- *         @OA\Property(property="payment_method", type="string"),
- *         @OA\Property(property="payment_method_label", type="string"),
- *         @OA\Property(property="payment_status", type="string"),
- *         @OA\Property(property="payment_status_label", type="string"),
- *         @OA\Property(property="amount", type="number", format="float"),
- *         @OA\Property(property="payment_reference", type="string"),
- *         @OA\Property(property="paid_at", type="string", format="date-time", nullable=true),
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="payment_method", type="string", example="orange_money"),
+ *         @OA\Property(property="payment_method_label", type="string", example="Orange Money"),
+ *         @OA\Property(property="payment_status", type="string", example="paid"),
+ *         @OA\Property(property="payment_status_label", type="string", example="Payé"),
+ *         @OA\Property(property="amount_paid", type="number", format="float", example=2000.00),
+ *         @OA\Property(property="amount_due", type="number", format="float", example=0.00),
+ *         @OA\Property(property="payment_reference", type="string", example="PAY_123456"),
+ *         @OA\Property(property="transaction_reference", type="string", nullable=true, example="TXN_987654"),
+ *         @OA\Property(property="payment_url", type="string", nullable=true),
+ *         @OA\Property(property="gateway_response", type="object", nullable=true),
+ *         @OA\Property(property="payment_date", type="string", format="date-time", nullable=true, example="2024-12-01T10:05:00.000000Z"),
+ *         @OA\Property(property="payment_notes", type="string", nullable=true),
  *         @OA\Property(property="created_at", type="string", format="date-time")
  *     ),
  *     @OA\Property(
  *         property="items",
  *         type="array",
  *
- *         @OA\Items(
- *             type="object",
+ *         @OA\Items(ref="#/components/schemas/OrderItemDetails")
+ *     ),
  *
- *             @OA\Property(property="id", type="integer"),
- *             @OA\Property(property="quantity", type="integer"),
- *             @OA\Property(property="unit_price", type="number", format="float"),
- *             @OA\Property(property="total_price", type="number", format="float"),
- *             @OA\Property(
- *                 property="product",
- *                 type="object",
- *                 @OA\Property(property="id", type="integer"),
- *                 @OA\Property(property="name", type="string"),
- *                 @OA\Property(property="description", type="string"),
- *                 @OA\Property(property="sku", type="string"),
- *                 @OA\Property(property="barcode", type="string")
- *             )
- *         )
+ *     @OA\Property(
+ *         property="refunds",
+ *         type="array",
+ *
+ *         @OA\Items(ref="#/components/schemas/RefundDetails")
+ *     ),
+ *
+ *     @OA\Property(property="delivery_tracking", ref="#/components/schemas/DeliveryTracking", nullable=true),
+ *     @OA\Property(
+ *         property="destination_coordinates",
+ *         type="object",
+ *         @OA\Property(property="latitude", type="number", format="float", example=3.848),
+ *         @OA\Property(property="longitude", type="number", format="float", example=11.502)
  *     ),
  *     @OA\Property(
- *         property="permissions",
+ *         property="bottle_info",
  *         type="object",
- *         @OA\Property(property="can_be_rated", type="boolean"),
- *         @OA\Property(property="can_be_cancelled", type="boolean"),
- *         @OA\Property(property="can_be_delivered", type="boolean")
+ *         @OA\Property(property="has_bottle_items", type="boolean", example=true),
+ *         @OA\Property(property="has_refunds", type="boolean", example=false),
+ *         @OA\Property(property="all_bottles_scanned", type="boolean", example=false),
+ *         @OA\Property(property="bottle_scan_progress", type="integer", example=75, description="Pourcentage de bouteilles scannées")
  *     ),
- *     @OA\Property(property="invoice_url", type="string", nullable=true, format="uri", example="https://app.petrolex.cm/api/orders/1/download/invoice", description="URL de téléchargement de la facture PDF (null si la facture n'existe pas encore)")
+ *     @OA\Property(property="invoice_url", type="string", format="uri", example="http://127.0.0.1:8001/api/orders/1/download/invoice", description="URL de téléchargement de la facture PDF")
  * )
  *
  * @OA\Schema(
- *     schema="CustomerOrdersResponse",
- *     type="object",
+ *     schema="OrderItemDetails",
+ *     title="OrderItemDetails",
+ *     description="Détails d'un article dans une commande",
  *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="quantity", type="integer", example=2),
+ *     @OA\Property(property="unit_price", type="number", format="float", example=750.00),
+ *     @OA\Property(property="total_price", type="number", format="float", example=1500.00),
+ *     @OA\Property(property="bottle_type", type="string", nullable=true, example="bottle_with_content"),
+ *     @OA\Property(property="bottle_type_label", type="string", nullable=true, example="Nouvelle bouteille"),
  *     @OA\Property(
- *         property="_metadata",
+ *         property="product_category",
  *         type="object",
- *         @OA\Property(property="success", type="boolean", example=true),
- *         @OA\Property(property="message", type="string", example="Commandes client récupérées avec succès.")
- *     ),
- *     @OA\Property(
- *         property="data",
- *         type="array",
- *
- *         @OA\Items(ref="#/components/schemas/OrderData")
- *     ),
- *
- *     @OA\Property(
- *         property="meta",
- *         type="object",
- *         @OA\Property(
- *             property="pagination",
- *             type="object",
- *             @OA\Property(property="total", type="integer", example=25),
- *             @OA\Property(property="current_page_total", type="integer", example=10),
- *             @OA\Property(property="per_page", type="integer", example=10),
- *             @OA\Property(property="current_page", type="integer", example=1),
- *             @OA\Property(property="total_pages", type="integer", example=3),
- *             @OA\Property(property="next_page_url", type="string", nullable=true, example="https://app.petrolex.cm/api/my/orders?page=2"),
- *             @OA\Property(property="prev_page_url", type="string", nullable=true, example=null)
- *         )
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Bouteilles 19L"),
+ *         @OA\Property(property="product_type", type="string", example="bottle"),
+ *         @OA\Property(property="product_type_label", type="string", example="Bouteille")
  *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="RefundDetails",
+ *     title="RefundDetails",
+ *     description="Détails d'un remboursement",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="amount", type="number", format="float", example=500.00),
+ *     @OA\Property(property="reason", type="string", example="Produit défectueux"),
+ *     @OA\Property(property="status", type="string", example="processed"),
+ *     @OA\Property(property="status_label", type="string", example="Traité"),
+ *     @OA\Property(property="processed_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="DeliveryTracking",
+ *     title="DeliveryTracking",
+ *     description="Suivi de livraison en temps réel",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="status", type="string", example="processing"),
+ *     @OA\Property(property="status_label", type="string", example="En cours"),
+ *     @OA\Property(property="current_latitude", type="number", format="float", nullable=true, example=3.850),
+ *     @OA\Property(property="current_longitude", type="number", format="float", nullable=true, example=11.500),
+ *     @OA\Property(property="estimated_arrival", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="started_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="completed_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="OrderPaymentData",
+ *     title="OrderPaymentData",
+ *     description="Données d'un paiement de commande",
+ *
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="status", type="string", example="pending", description="Statut du paiement"),
+ *     @OA\Property(property="date", type="string", format="date-time", nullable=true, description="Date du paiement"),
+ *     @OA\Property(property="reference", type="string", example="PAY_2025_001234", description="Référence du paiement"),
+ *     @OA\Property(property="method", type="string", example="orange_money", description="Méthode de paiement"),
+ *     @OA\Property(property="method_label", type="string", example="Orange Money", description="Libellé de la méthode de paiement")
  * )
  */
 class BaseSchemas {}

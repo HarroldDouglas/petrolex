@@ -29,7 +29,7 @@ class SupplierDeliveryStatus extends Enum
     public static function values(): array
     {
         return [
-            'IN_PROGRESS' => 'in_progress',
+            'IN_PROGRESS' => 'processing',
             'COMPLETED' => 'completed',
             'CANCELLED' => 'cancelled',
         ];
@@ -41,7 +41,7 @@ class SupplierDeliveryStatus extends Enum
     public function badge(): string
     {
         return match ($this->value) {
-            'in_progress' => 'text-outline-warning',
+            'processing' => 'text-outline-warning',
             'completed' => 'text-outline-success',
             'cancelled' => 'text-outline-danger',
             default => 'text-outline-secondary',

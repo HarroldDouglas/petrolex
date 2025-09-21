@@ -113,7 +113,7 @@ class StatsOverview extends Component
         return '/orders?'.http_build_query([
             'table-filters' => [
                 'centre_de_distribution' => $this->currentDistributionCenterId ?? '',
-                'statut' => ['confirmed', 'in_progress'],
+                'statut' => ['confirmed', 'processing'],
                 'période_de_date_de_commande' => [
                     'minDate' => $this->currentStartDate,
                     'maxDate' => $this->currentEndDate,

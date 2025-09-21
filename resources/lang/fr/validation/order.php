@@ -18,6 +18,18 @@ return [
         'items.*.quantity.max' => 'La quantité ne peut pas dépasser 100',
         'items.*.option.in' => 'L\'option doit être l\'une des valeurs suivantes : :values',
         'comments.max' => 'Les commentaires ne peuvent pas dépasser 500 caractères',
+
+        // New validation messages
+        'price_mismatch' => 'Prix incorrect: attendu :expected, fourni :provided',
+        'insufficient_stock' => 'Stock insuffisant: demandé :requested, disponible :available',
+        'delivery_fee_mismatch' => 'Frais de livraison incorrect: attendu :expected, fourni :provided',
+        'total_amount_mismatch' => 'Montant total incorrect: attendu :expected, fourni :provided',
+        'unit_price_required' => 'Le prix unitaire est requis',
+        'unit_price_numeric' => 'Le prix unitaire doit être un nombre',
+        'delivery_fee_required' => 'Les frais de livraison sont requis',
+        'delivery_fee_numeric' => 'Les frais de livraison doivent être un nombre',
+        'total_amount_required' => 'Le montant total est requis',
+        'total_amount_numeric' => 'Le montant total doit être un nombre',
     ],
 
     'attributes' => [

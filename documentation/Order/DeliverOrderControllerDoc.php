@@ -13,7 +13,7 @@ use OpenApi\Annotations as OA;
  *
  *             @OA\Property(
  *                 property="data",
- *                 ref="#/components/schemas/OrderData"
+ *                 ref="#/components/schemas/OrderDetailsData"
  *             ),
  *             @OA\Property(
  *                 property="message",

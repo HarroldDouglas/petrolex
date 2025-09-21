@@ -20,12 +20,12 @@ class OrderStatus extends Enum
     public static function labels(): array
     {
         return [
-            'PROCESSING' => 'En cours de livraison',
+            'PROCESSING' => 'En cours',
             'DELIVERED' => 'Livrée',
             'CANCELLED' => 'Annulée',
-            'PENDING' => 'En attente de paiement',
+            'PENDING' => 'En attente',
             'PAID' => 'Payée',
-            'FAILED' => 'Paiement échoué',
+            'FAILED' => 'Echoué',
         ];
     }
 
@@ -35,7 +35,7 @@ class OrderStatus extends Enum
     public static function values(): array
     {
         return [
-            'PROCESSING' => 'in_progress',
+            'PROCESSING' => 'processing',
             'DELIVERED' => 'delivered',
             'CANCELLED' => 'cancelled',
             'PENDING' => 'pending',

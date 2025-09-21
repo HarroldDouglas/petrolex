@@ -244,7 +244,7 @@
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Statut</span>
-                    <span class="badge status-badge bg-{{ $order->status === 'in_progress' ? 'warning' : 'primary' }}">
+                    <span class="badge status-badge bg-{{ $order->status === 'processing' ? 'warning' : 'primary' }}">
                         {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                     </span>
                 </div>

@@ -94,7 +94,7 @@ class SendOrderStatusChangedNotification implements ShouldQueue
     }
 
     /**
-     * Add the delivery person to the recipients list if the order status is changing to in_progress
+     * Add the delivery person to the recipients list if the order status is changing to processing
      * and they have a valid email.
      */
     private function addDeliveryPersonToRecipientsIfNeeded($recipients, $order): void

@@ -32,17 +32,17 @@ $(document).ready(function() {
                     if (user && user.roles) {
                         if (user.roles.includes('delivery_person') && user.delivery_person_id) {
                             localStorage.setItem('delivery_person_id', user.delivery_person_id);
-                            window.location.href = '/test-products/delivery-person-orders.html';
+                            window.location.href = '/test/products/delivery-person-orders.html';
                         } else if (user.roles.includes('customer') && user.customer_id) {
                             localStorage.setItem('customer_id', user.customer_id);
-                            window.location.href = '/test-products/order.html';
+                            window.location.href = '/test/products/list.html';
                         } else {
                             // Default redirection if no specific role or ID is found
-                            window.location.href = '/test-products/order.html';
+                            window.location.href = '/test/products/list.html';
                         }
                     } else {
                         // Fallback if roles are not present
-                        window.location.href = '/test-products/order.html';
+                        window.location.href = '/test/products/list.html';
                     }
                     loginStatus.text("Connexion réussie! Redirection...").removeClass("alert-warning").addClass("alert-success");
                 } else {

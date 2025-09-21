@@ -79,28 +79,9 @@ use OpenApi\Annotations as OA;
  *             ),
  *             @OA\Property(
  *                 property="data",
- *                 type="object",
- *                 @OA\Property(
- *                     property="orders",
- *                     type="array",
+ *                 type="array",
  *
- *                     @OA\Items(
- *                         type="object",
- *
- *                         @OA\Property(property="id", type="integer", example=1),
- *                         @OA\Property(property="order_number", type="string", example="ORD-20241201-001"),
- *                         @OA\Property(property="status", type="string", example="confirmed"),
- *                         @OA\Property(property="delivery_type", type="string", example="delivery"),
- *                         @OA\Property(property="total_amount", type="number", format="float", example=25.50)
- *                     )
- *                 ),
- *                 @OA\Property(
- *                     property="pagination",
- *                     type="object",
- *                     @OA\Property(property="current_page", type="integer", example=1),
- *                     @OA\Property(property="per_page", type="integer", example=10),
- *                     @OA\Property(property="total", type="integer", example=42)
- *                 )
+ *                 @OA\Items(ref="#/components/schemas/OrderDetailsData")
  *             )
  *         )
  *     ),

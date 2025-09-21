@@ -55,7 +55,16 @@ class DeliveryPersonRepository extends BaseEloquentRepository implements Deliver
     public function getOrdersForDeliveryPerson(DeliveryPerson $deliveryPerson, GetOrdersFilterDTO $filters, int $perPage): LengthAwarePaginator
     {
         return $deliveryPerson->orders()
-            ->with(['customer', 'deliveryAddress', 'distributionCenter', 'payment'])
+            ->with([
+                'items.productCategory',
+                'deliveryAddress.neighborhood.municipality.city.country',
+                'payment',
+                'customer.user.country',
+                'deliveryPerson.user',
+                'distributionCenter',
+                'refunds',
+                'deliveryTracking',
+            ])
             ->when(
                 $filters->order_number !== null && $filters->order_number !== '',
                 fn ($q) => $q->where('order_number', 'like', '%'.$filters->order_number.'%')

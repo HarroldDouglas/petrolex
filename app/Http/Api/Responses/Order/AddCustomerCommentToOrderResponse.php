@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Responses\Order;
 
-use App\Http\Api\Resources\Order\OrderDetailsResource;
+use App\Http\Api\Resources\Order\OrderDetailResource;
 use App\Http\Api\Responses\ApiResponse;
 use App\Models\Order;
 
@@ -13,7 +13,7 @@ class AddCustomerCommentToOrderResponse extends ApiResponse
     public static function withOrder(Order $order): self
     {
         return new self(
-            new OrderDetailsResource($order->load([
+            new OrderDetailResource($order->load([
                 'customer',
                 'deliveryAddress',
                 'distributionCenter',
