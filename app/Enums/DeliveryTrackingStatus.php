@@ -37,7 +37,7 @@ final class DeliveryTrackingStatus extends Enum
         return [
             'PENDING' => 'pending',
             'STARTED' => 'started',
-            'IN_PROGRESS' => 'processing',
+            'IN_PROGRESS' => 'in_progress',
             'DELIVERED' => 'delivered',
             'CANCELLED' => 'cancelled',
         ];

@@ -24,13 +24,11 @@ class AddCustomerCommentToOrderController extends Controller
      */
     public function __invoke(AddCustomerCommentToOrderRequest $request, Order $order): OrderDetailsResponse
     {
-        // Security check: Ensure the order belongs to the authenticated customer
         $authenticatedUser = $request->user();
         if (! $authenticatedUser->customer || $order->customer_id !== $authenticatedUser->customer->id) {
             abort(403, __('api.order_not_belongs_to_you'));
         }
 
-        // Business rule: Only delivered or cancelled orders can receive feedback
         $allowedStatuses = [\App\Enums\OrderStatus::DELIVERED()->value, \App\Enums\OrderStatus::CANCELLED()->value];
         if (! in_array($order->status, $allowedStatuses)) {
             abort(422, __('api.order_cannot_receive_feedback'));

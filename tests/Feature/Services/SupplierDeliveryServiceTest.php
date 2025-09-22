@@ -52,6 +52,7 @@ class SupplierDeliveryServiceTest extends TestCase
             'title' => 'Test Delivery',
             'supplier_name' => 'Test Supplier',
             'supply_date' => now(),
+            'status' => \App\Enums\SupplierDeliveryStatus::IN_PROGRESS(),
         ];
 
         // Act

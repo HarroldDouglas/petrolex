@@ -495,169 +495,6 @@
                 ]
             }
         },
-        "/api/orders/{order}/payment": {
-            "post": {
-                "tags": [
-                    "Commandes"
-                ],
-                "summary": "Initier le paiement d'une commande",
-                "description": "Lance le processus de paiement pour une commande spécifique avec la méthode de paiement choisie. Supporte Orange Money, MTN Money et cartes de crédit.",
-                "operationId": "api.orders.initiate-payment",
-                "parameters": [
-                    {
-                        "name": "order",
-                        "in": "path",
-                        "description": "ID de la commande à payer",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "payment_method"
-                                ],
-                                "properties": {
-                                    "payment_method": {
-                                        "description": "Méthode de paiement",
-                                        "type": "string",
-                                        "enum": [
-                                            "orange_money",
-                                            "mtn_money",
-                                            "credit_card"
-                                        ],
-                                        "example": "orange_money"
-                                    },
-                                    "payment_details": {
-                                        "description": "Détails spécifiques à la méthode de paiement (phone+name pour mobile money, card_number+cvv+expiry_date+cardholder_name pour carte)",
-                                        "properties": {
-                                            "phone": {
-                                                "description": "Numéro de téléphone (mobile money)",
-                                                "type": "string",
-                                                "example": "677123456"
-                                            },
-                                            "name": {
-                                                "description": "Nom du titulaire (mobile money)",
-                                                "type": "string",
-                                                "example": "Jean Dupont"
-                                            },
-                                            "card_number": {
-                                                "description": "Numéro de carte (carte de crédit)",
-                                                "type": "string",
-                                                "example": "4111111111111111"
-                                            },
-                                            "cvv": {
-                                                "description": "Code CVV (carte de crédit)",
-                                                "type": "string",
-                                                "example": "123"
-                                            },
-                                            "expiry_date": {
-                                                "description": "Date d'expiration (carte de crédit)",
-                                                "type": "string",
-                                                "example": "12/25"
-                                            },
-                                            "cardholder_name": {
-                                                "description": "Nom du titulaire (carte de crédit)",
-                                                "type": "string",
-                                                "example": "Jean Dupont"
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Paiement initié avec succès - Retourne l'objet commande complet avec toutes ses relations",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Paiement initié avec succès."
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "order": {
-                                                    "$ref": "#/components/schemas/OrderDetailsData"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Erreur - Commande ne peut pas accepter de paiement",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Commande non trouvée",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreur de validation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/app/advertising/banners": {
             "get": {
                 "tags": [
@@ -3066,6 +2903,169 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/orders/{order}/payment": {
+            "post": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Initier le paiement d'une commande",
+                "description": "Lance le processus de paiement pour une commande spécifique avec la méthode de paiement choisie. Supporte Orange Money, MTN Money et cartes de crédit.",
+                "operationId": "api.orders.initiate-payment",
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "description": "ID de la commande à payer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "payment_method"
+                                ],
+                                "properties": {
+                                    "payment_method": {
+                                        "description": "Méthode de paiement",
+                                        "type": "string",
+                                        "enum": [
+                                            "orange_money",
+                                            "mtn_money",
+                                            "credit_card"
+                                        ],
+                                        "example": "orange_money"
+                                    },
+                                    "payment_details": {
+                                        "description": "Détails spécifiques à la méthode de paiement (phone+name pour mobile money, card_number+cvv+expiry_date+cardholder_name pour carte)",
+                                        "properties": {
+                                            "phone": {
+                                                "description": "Numéro de téléphone (mobile money)",
+                                                "type": "string",
+                                                "example": "677123456"
+                                            },
+                                            "name": {
+                                                "description": "Nom du titulaire (mobile money)",
+                                                "type": "string",
+                                                "example": "Jean Dupont"
+                                            },
+                                            "card_number": {
+                                                "description": "Numéro de carte (carte de crédit)",
+                                                "type": "string",
+                                                "example": "4111111111111111"
+                                            },
+                                            "cvv": {
+                                                "description": "Code CVV (carte de crédit)",
+                                                "type": "string",
+                                                "example": "123"
+                                            },
+                                            "expiry_date": {
+                                                "description": "Date d'expiration (carte de crédit)",
+                                                "type": "string",
+                                                "example": "12/25"
+                                            },
+                                            "cardholder_name": {
+                                                "description": "Nom du titulaire (carte de crédit)",
+                                                "type": "string",
+                                                "example": "Jean Dupont"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Paiement initié avec succès - Retourne l'objet commande complet avec toutes ses relations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Paiement initié avec succès."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "order": {
+                                                    "$ref": "#/components/schemas/OrderDetailsData"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erreur - Commande ne peut pas accepter de paiement",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commande non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
                                 }
                             }
                         }

@@ -13,7 +13,7 @@ class CountryFactory extends Factory
     {
         return [
             'name' => $this->faker->unique()->country,
-            'code' => $this->faker->unique()->countryCode,
+            'code' => strtoupper($this->faker->unique()->lexify('??')),
             'is_active' => true,
         ];
     }

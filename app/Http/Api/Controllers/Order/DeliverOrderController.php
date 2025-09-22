@@ -25,7 +25,6 @@ final class DeliverOrderController extends Controller
     {
         $user = auth()->user();
 
-        // Security check: Either the assigned delivery person OR the customer who owns the order can mark it as delivered
         $isAssignedDeliveryPerson = $user->deliveryPerson && $order->delivery_person_id === $user->deliveryPerson->id;
         $isOrderCustomer = $user->customer && $order->customer_id === $user->customer->id;
 

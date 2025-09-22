@@ -29,7 +29,7 @@ class SupplierDeliveryStatus extends Enum
     public static function values(): array
     {
         return [
-            'IN_PROGRESS' => 'processing',
+            'IN_PROGRESS' => 'in_progress',
             'COMPLETED' => 'completed',
             'CANCELLED' => 'cancelled',
         ];

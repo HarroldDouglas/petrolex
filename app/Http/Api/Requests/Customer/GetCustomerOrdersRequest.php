@@ -16,7 +16,6 @@ final class GetCustomerOrdersRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // Convert enum values to lowercase for case-insensitive validation
         if ($this->has('status')) {
             $this->merge(['status' => strtolower($this->input('status'))]);
         }

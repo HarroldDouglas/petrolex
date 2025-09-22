@@ -27,7 +27,6 @@ final class ScanEmptyBottleController extends Controller
     {
         $user = auth()->user();
 
-        // Security check: Only order owner (customer) and delivery persons can scan bottles
         $isOrderOwner = $user->customer && $user->customer->id === $order->customer_id;
         $isDeliveryPerson = $user->hasRole('delivery_person');
 

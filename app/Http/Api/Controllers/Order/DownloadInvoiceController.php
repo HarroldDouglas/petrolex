@@ -81,7 +81,6 @@ class DownloadInvoiceController extends Controller
     {
         $user = auth()->user();
 
-        // Security check: Only order owner (customer), admins, and delivery persons can download invoice
         $isOrderOwner = $user->customer && $user->customer->id === $order->customer_id;
         $isAdmin = $user->hasAnyRole(['admin', 'manager', 'center_manager']);
         $isDeliveryPerson = $user->hasRole('delivery_person');

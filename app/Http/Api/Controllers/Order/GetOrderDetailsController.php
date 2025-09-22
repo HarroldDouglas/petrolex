@@ -78,7 +78,6 @@ class GetOrderDetailsController extends Controller
      */
     public function __invoke(Request $request, Order $order): OrderDetailsResponse
     {
-        // Security check: Only order owner (customer) and delivery persons can view order details
         $authenticatedUser = $request->user();
         $isOrderOwner = $authenticatedUser->customer && $authenticatedUser->customer->id === $order->customer_id;
         $isDeliveryPerson = $authenticatedUser->hasRole('delivery_person');

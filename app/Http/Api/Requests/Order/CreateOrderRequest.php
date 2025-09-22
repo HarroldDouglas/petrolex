@@ -96,7 +96,6 @@ final class CreateOrderRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // Convert enum values to lowercase for case-insensitive validation
         if ($this->has('delivery_type')) {
             $this->merge(['delivery_type' => strtolower($this->input('delivery_type'))]);
         }
@@ -144,27 +143,6 @@ final class CreateOrderRequest extends FormRequest
         }
     }
 
-    private function validateStock($validator): void
-    {
-        $distributionCenterId = $this->input('distribution_center_id');
-
-        foreach ($this->input('items', []) as $index => $item) {
-            $availableStock = app(\App\Services\ProductCategoryService::class)->getProductQuantity(
-                $item['product_category_id'],
-                $distributionCenterId
-            );
-
-            if ($item['quantity'] > $availableStock) {
-                $validator->errors()->add("items.{$index}.quantity",
-                    __('validation.order.insufficient_stock', [
-                        'requested' => $item['quantity'],
-                        'available' => $availableStock,
-                    ])
-                );
-            }
-        }
-    }
-
     private function validateDeliveryFee($validator): void
     {
         $deliveryTypeValue = $this->input('delivery_type');
@@ -194,7 +172,6 @@ final class CreateOrderRequest extends FormRequest
         $deliveryFee = $this->input('delivery_fee');
         $providedTotal = $this->input('total_amount');
 
-        // Skip validation if required fields are missing (will be caught by basic validation)
         if (! is_array($items) || ! is_numeric($deliveryFee) || ! is_numeric($providedTotal)) {
             return;
         }

@@ -102,19 +102,16 @@ class CancelOrderController extends Controller
      */
     public function __invoke(CancelOrderRequest $request, Order $order): CancelOrderResponse
     {
-        // Security check: Ensure the order belongs to the authenticated customer
         $authenticatedUser = $request->user();
         if (! $authenticatedUser->customer || $order->customer_id !== $authenticatedUser->customer->id) {
             abort(403, __('api.order_not_belongs_to_you'));
         }
 
-        // Business rule: Only pending or paid orders can be cancelled
         $allowedStatuses = [OrderStatus::PENDING()->value, OrderStatus::PAID()->value];
         if (! in_array($order->status, $allowedStatuses)) {
             abort(422, __('api.order_cannot_be_cancelled'));
         }
 
-        // Update the order with cancellation details
         $data = [
             'cancelled_reason' => $request->input('cancelled_reason', 'Annulée par le client'),
             'cancelled_by' => $authenticatedUser->id,

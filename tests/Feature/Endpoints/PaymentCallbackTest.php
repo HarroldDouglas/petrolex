@@ -476,6 +476,6 @@ final class PaymentCallbackTest extends TestCase
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'This order does not belong to you');
+            ->assertJsonPath('message', 'Cette commande ne vous appartient pas');
     }
 }
