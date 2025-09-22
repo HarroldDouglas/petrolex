@@ -2955,17 +2955,12 @@
                                         "example": "orange_money"
                                     },
                                     "payment_details": {
-                                        "description": "Détails spécifiques à la méthode de paiement (phone+name pour mobile money, card_number+cvv+expiry_date+cardholder_name pour carte)",
+                                        "description": "Détails spécifiques à la méthode de paiement (phone pour mobile money, card_number+cvv+expiry_date+cardholder_name pour carte)",
                                         "properties": {
                                             "phone": {
                                                 "description": "Numéro de téléphone (mobile money)",
                                                 "type": "string",
                                                 "example": "677123456"
-                                            },
-                                            "name": {
-                                                "description": "Nom du titulaire (mobile money)",
-                                                "type": "string",
-                                                "example": "Jean Dupont"
                                             },
                                             "card_number": {
                                                 "description": "Numéro de carte (carte de crédit)",

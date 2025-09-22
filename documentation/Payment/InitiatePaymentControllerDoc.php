@@ -37,9 +37,8 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(
  *                 property="payment_details",
  *                 type="object",
- *                 description="Détails spécifiques à la méthode de paiement (phone+name pour mobile money, card_number+cvv+expiry_date+cardholder_name pour carte)",
+ *                 description="Détails spécifiques à la méthode de paiement (phone pour mobile money, card_number+cvv+expiry_date+cardholder_name pour carte)",
  *                 @OA\Property(property="phone", type="string", example="677123456", description="Numéro de téléphone (mobile money)"),
- *                 @OA\Property(property="name", type="string", example="Jean Dupont", description="Nom du titulaire (mobile money)"),
  *                 @OA\Property(property="card_number", type="string", example="4111111111111111", description="Numéro de carte (carte de crédit)"),
  *                 @OA\Property(property="cvv", type="string", example="123", description="Code CVV (carte de crédit)"),
  *                 @OA\Property(property="expiry_date", type="string", example="12/25", description="Date d'expiration (carte de crédit)"),
