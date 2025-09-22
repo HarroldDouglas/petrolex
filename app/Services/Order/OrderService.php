@@ -127,6 +127,7 @@ class OrderService extends BaseServiceForEntity
 
             $orderData['subtotal'] = $subtotal;
             $orderData['status'] = OrderStatus::PENDING()->value;
+            $orderData['order_date'] = now();
 
             /** @var Order $order */
             $order = $this->repository->create($orderData);

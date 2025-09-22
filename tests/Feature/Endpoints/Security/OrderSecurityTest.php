@@ -81,7 +81,7 @@ final class OrderSecurityTest extends TestCase
         ])->getJson(route('api.orders.download.invoice', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Cette facture ne vous appartient pas');
+            ->assertJsonPath('message', 'This invoice does not belong to you');
     }
 
     #[Test]
@@ -217,7 +217,7 @@ final class OrderSecurityTest extends TestCase
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'You are not authorized to scan bottles for this order');
+            ->assertJsonPath('message', 'Vous n\'êtes pas autorisé à scanner des bouteilles pour cette commande');
     }
 
     #[Test]
