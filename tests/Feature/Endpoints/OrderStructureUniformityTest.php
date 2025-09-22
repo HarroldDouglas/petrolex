@@ -137,6 +137,23 @@ final class OrderStructureUniformityTest extends TestCase
         ];
     }
 
+    /**
+     * Define the expected uniform structure for order item object.
+     */
+    private function getExpectedOrderItemStructure(): array
+    {
+        return [
+            'id',
+            'quantity',
+            'unit_price',
+            'total_price',
+            'bottle_type',
+            'bottle_type_label',
+            'image',
+            'product_category',
+        ];
+    }
+
     #[Test]
     public function order_details_endpoint_returns_uniform_structure(): void
     {
@@ -153,6 +170,15 @@ final class OrderStructureUniformityTest extends TestCase
         // Verify all expected fields are present
         foreach ($this->getExpectedOrderStructure() as $field) {
             $this->assertArrayHasKey($field, $orderData, "Missing field: {$field} in order details response");
+        }
+
+        // If items are present, verify their structure
+        if (! empty($orderData['items'])) {
+            foreach ($orderData['items'] as $item) {
+                foreach ($this->getExpectedOrderItemStructure() as $field) {
+                    $this->assertArrayHasKey($field, $item, "Missing field: {$field} in order item");
+                }
+            }
         }
 
         // If delivery_address is present, verify its structure

@@ -28,15 +28,23 @@ class OrderItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $category = $this->whenLoaded('productCategory');
+        $image = null;
+        if ($category && method_exists($category, 'getImages')) {
+            $images = $category->getImages();
+            $image = $images[0] ?? null;
+        }
+
         return [
             'id' => $this->id,
-            'product_category' => ProductCategoryResource::make($this->whenLoaded('productCategory')),
+            'product_category' => ProductCategoryResource::make($category),
             'quantity' => $this->quantity,
             'unit_price' => $this->unit_price,
             'total_price' => $this->total_price,
             'option' => $this->bottle_type,
             'option_label' => $this->bottle_type ? (BottleOrderType::from($this->bottle_type)->label ?? $this->bottle_type) : null,
             'created_at' => $this->created_at,
+            'image' => $image,
         ];
     }
 }

@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8001",
+            "url": "http://localhost:8000",
             "description": "API Server"
         }
     ],
@@ -2955,17 +2955,12 @@
                                         "example": "orange_money"
                                     },
                                     "payment_details": {
-                                        "description": "Détails spécifiques à la méthode de paiement (phone+name pour mobile money, card_number+cvv+expiry_date+cardholder_name pour carte)",
+                                        "description": "Détails spécifiques à la méthode de paiement (phone pour mobile money, card_number+cvv+expiry_date+cardholder_name pour carte)",
                                         "properties": {
                                             "phone": {
                                                 "description": "Numéro de téléphone (mobile money)",
                                                 "type": "string",
                                                 "example": "677123456"
-                                            },
-                                            "name": {
-                                                "description": "Nom du titulaire (mobile money)",
-                                                "type": "string",
-                                                "example": "Jean Dupont"
                                             },
                                             "card_number": {
                                                 "description": "Numéro de carte (carte de crédit)",
@@ -6352,6 +6347,33 @@
                             "product_type_label": {
                                 "type": "string",
                                 "example": "Bouteille"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "image": {
+                        "description": "Image principale du produit (ou null)",
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "example": "https://example.com/image.jpg"
+                            },
+                            "thumb": {
+                                "type": "string",
+                                "example": "https://example.com/image-thumb.jpg"
+                            },
+                            "medium": {
+                                "type": "string",
+                                "example": "https://example.com/image-medium.jpg"
+                            },
+                            "large": {
+                                "type": "string",
+                                "example": "https://example.com/image-large.jpg"
+                            },
+                            "is_default": {
+                                "type": "boolean",
+                                "example": true
                             }
                         },
                         "type": "object",

@@ -181,7 +181,7 @@ final class OrderSecurityTest extends TestCase
         ])->patchJson(route('api.orders.deliver', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'You are not authorized to mark this order as delivered');
+            ->assertJsonPath('message', "Vous n'êtes pas autorisé à marquer cette commande comme livrée");
     }
 
     #[Test]
