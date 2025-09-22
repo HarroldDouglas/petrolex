@@ -19,7 +19,7 @@ final class CreateOrderResponse extends ApiResponse
 
         return new self(
             $data,
-            'Commande créée avec succès. Procédez au paiement.',
+            __('api.order_created_success'),
             true,
             201
         );
@@ -42,7 +42,7 @@ final class CreateOrderResponse extends ApiResponse
 
         return new self(
             $data,
-            'Commande créée avec succès. Procédez au paiement.',
+            __('api.order_created_success'),
             true,
             201
         );

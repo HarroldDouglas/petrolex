@@ -131,7 +131,7 @@ class UserFactory extends Factory
                 $randomCenter = DistributionCenter::inRandomOrder()->first();
                 if ($randomCenter) {
                     $deliveryPerson->distributionCenters()->sync([
-                        $centerId => [
+                        $randomCenter->id => [
                             'is_active' => $isActive,
                             'created_at' => now(),
                             'updated_at' => now(),

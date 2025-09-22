@@ -13,15 +13,7 @@ class AddCustomerCommentToOrderResponse extends ApiResponse
     public static function withOrder(Order $order): self
     {
         return new self(
-            new OrderDetailResource($order->load([
-                'customer',
-                'deliveryAddress',
-                'distributionCenter',
-                'items.productCategory',
-                'payment',
-                'refunds',
-                'deliveryTracking',
-            ])),
+            new OrderDetailResource($order->loadDetailRelations()),
             'Commentaire ajouté à la commande avec succès'
         );
     }

@@ -71,6 +71,12 @@ class DownloadInvoiceController extends Controller
         private readonly OrderService $orderService
     ) {}
 
+    /**
+     * Download order invoice.
+     *
+     * Route: GET /api/orders/{order}/download/invoice
+     * Name: api.orders.download.invoice
+     */
     public function __invoke(Order $order): Response
     {
         $user = auth()->user();
@@ -81,7 +87,7 @@ class DownloadInvoiceController extends Controller
         $isDeliveryPerson = $user->hasRole('delivery_person');
 
         if (! $isOrderOwner && ! $isAdmin && ! $isDeliveryPerson) {
-            abort(Response::HTTP_FORBIDDEN, 'Cette facture ne vous appartient pas.');
+            abort(Response::HTTP_FORBIDDEN, __('api.order_invoice_not_belongs_to_you'));
         }
 
         $orderDetails = $this->orderService->getOrderWithGroupedItems($order->id);

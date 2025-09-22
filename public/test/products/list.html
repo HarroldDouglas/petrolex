@@ -77,6 +77,86 @@
             </div>
         </div>
 
+        <!-- Filters Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter"></i> Filtres
+                    <button class="btn btn-sm btn-outline-secondary float-end" type="button" onclick="toggleFilters()">
+                        <i class="fas fa-chevron-down" id="filter-toggle-icon"></i>
+                    </button>
+                </h5>
+            </div>
+            <div class="card-body" id="filters-body" style="display: none;">
+                <form id="filters-form">
+                    <div class="row">
+                        <!-- Order Number Filter -->
+                        <div class="col-md-3 mb-3">
+                            <label for="filter-order-number" class="form-label">Numéro de commande</label>
+                            <input type="text" class="form-control" id="filter-order-number" placeholder="Rechercher...">
+                        </div>
+                        
+                        <!-- Status Filter -->
+                        <div class="col-md-3 mb-3">
+                            <label for="filter-status" class="form-label">Statut</label>
+                            <select class="form-select" id="filter-status">
+                                <option value="">Tous les statuts</option>
+                                <option value="pending">En attente</option>
+                                <option value="paid">Payée</option>
+                                <option value="processing">En traitement</option>
+                                <option value="delivered">Livrée</option>
+                                <option value="cancelled">Annulée</option>
+                                <option value="failed">Échouée</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Delivery Type Filter -->
+                        <div class="col-md-3 mb-3">
+                            <label for="filter-delivery-type" class="form-label">Type de livraison</label>
+                            <select class="form-select" id="filter-delivery-type">
+                                <option value="">Tous les types</option>
+                                <option value="normal">Normal</option>
+                                <option value="fast">Rapide</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Payment Method Filter -->
+                        <div class="col-md-3 mb-3">
+                            <label for="filter-payment-method" class="form-label">Méthode de paiement</label>
+                            <select class="form-select" id="filter-payment-method">
+                                <option value="">Toutes les méthodes</option>
+                                <option value="orange_money">Orange Money</option>
+                                <option value="mtn_money">MTN Money</option>
+                                <option value="credit_card">Carte de crédit</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Per Page Filter -->
+                        <div class="col-md-3 mb-3">
+                            <label for="filter-per-page" class="form-label">Éléments par page</label>
+                            <select class="form-select" id="filter-per-page">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-9 mb-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary me-2" onclick="applyFilters()">
+                                <i class="fas fa-search"></i> Appliquer les filtres
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                                <i class="fas fa-times"></i> Effacer
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Loading -->
         <div id="loading" class="loading d-none">
             <div class="spinner-border text-primary" role="status">
@@ -123,6 +203,7 @@
     <script>
         let currentPage = 1;
         let totalPages = 1;
+        let currentFilters = {};
 
         $(document).ready(function() {
             // Check if user is logged in
@@ -141,6 +222,64 @@
             loadOrders();
         });
 
+        function toggleFilters() {
+            const filtersBody = $('#filters-body');
+            const icon = $('#filter-toggle-icon');
+            
+            if (filtersBody.is(':visible')) {
+                filtersBody.slideUp();
+                icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            } else {
+                filtersBody.slideDown();
+                icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+            }
+        }
+
+        function buildQueryParams(page = 1) {
+            const params = new URLSearchParams();
+            params.append('page', page);
+            
+            // Add filters to params
+            Object.keys(currentFilters).forEach(key => {
+                if (currentFilters[key] && currentFilters[key] !== '') {
+                    params.append(key, currentFilters[key]);
+                }
+            });
+            
+            return params.toString();
+        }
+
+        function applyFilters() {
+            // Collect all filter values
+            currentFilters = {
+                order_number: $('#filter-order-number').val(),
+                status: $('#filter-status').val(),
+                delivery_type: $('#filter-delivery-type').val(),
+                payment_method: $('#filter-payment-method').val(),
+                per_page: $('#filter-per-page').val()
+            };
+            
+            // Reset to page 1 when applying filters
+            currentPage = 1;
+            loadOrders(1);
+        }
+
+        function clearFilters() {
+            // Clear all filter inputs
+            $('#filter-order-number').val('');
+            $('#filter-status').val('');
+            $('#filter-delivery-type').val('');
+            $('#filter-payment-method').val('');
+            $('#filter-per-page').val('10');
+            
+            // Clear current filters
+            currentFilters = {};
+            
+            // Reload orders without filters
+            currentPage = 1;
+            loadOrders(1);
+        }
+
         function loadOrders(page = 1) {
             const token = localStorage.getItem('api_token');
             
@@ -148,8 +287,10 @@
             $('#error-message').addClass('d-none');
             $('#orders-container').empty();
 
+            const queryParams = buildQueryParams(page);
+
             $.ajax({
-                url: `/api/my/orders?page=${page}`,
+                url: `/api/my/orders?${queryParams}`,
                 type: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,

@@ -14,7 +14,7 @@ class CancelOrderResponse extends ApiResponse
     {
         return new self(
             new OrderDetailResource($order),
-            'Commande annulée avec succès.'
+            __('api.order_cancelled_success')
         );
     }
 }

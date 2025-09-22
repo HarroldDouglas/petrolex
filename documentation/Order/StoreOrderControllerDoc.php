@@ -21,7 +21,7 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Property(property="delivery_address_id", type="integer", example=1, description="ID de l'adresse de livraison du client"),
  *     @OA\Property(property="distribution_center_id", type="integer", example=1, description="ID du centre de distribution"),
- *     @OA\Property(property="delivery_type", type="string", enum={"normal", "fast"}, example="normal", description="Type de livraison"),
+ *     @OA\Property(property="delivery_type", type="string", enum={"normal", "fast"}, example="normal", description="Type de livraison: normal (standard) ou fast (express)"),
  *     @OA\Property(
  *         property="items",
  *         type="array",

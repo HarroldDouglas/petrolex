@@ -105,13 +105,13 @@ class CancelOrderController extends Controller
         // Security check: Ensure the order belongs to the authenticated customer
         $authenticatedUser = $request->user();
         if (! $authenticatedUser->customer || $order->customer_id !== $authenticatedUser->customer->id) {
-            abort(403, 'Cette commande ne vous appartient pas.');
+            abort(403, __('api.order_not_belongs_to_you'));
         }
 
         // Business rule: Only pending or paid orders can be cancelled
         $allowedStatuses = [OrderStatus::PENDING()->value, OrderStatus::PAID()->value];
         if (! in_array($order->status, $allowedStatuses)) {
-            abort(422, 'Cette commande ne peut plus être annulée. Seules les commandes en attente ou payées peuvent être annulées.');
+            abort(422, __('api.order_cannot_be_cancelled'));
         }
 
         // Update the order with cancellation details
@@ -122,6 +122,7 @@ class CancelOrderController extends Controller
             'cancelled_at' => now(),
         ];
 
+        /** @var Order $updatedOrder */
         $updatedOrder = $this->orderService->update($order, $data);
 
         return CancelOrderResponse::withOrder($updatedOrder->loadDetailRelations());

@@ -70,7 +70,7 @@ final class CancelOrderTest extends TestCase
                 'data' => [],
             ])
             ->assertJsonPath('_metadata.success', true)
-            ->assertJsonPath('_metadata.message', 'Order cancelled successfully.');
+            ->assertJsonPath('_metadata.message', __('api.order_cancelled_success'));
 
         $this->assertDatabaseHas('orders', [
             'id' => $this->order->id,

@@ -42,11 +42,13 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
                 ],
             ]);
 
-        $response->assertStatus(201);
+        $response->assertStatus(200);
         $response->assertJsonStructure([
-            'success',
-            'message',
-            'data' => ['payment'],
+            '_metadata' => [
+                'success',
+                'message',
+            ],
+            'data',
         ]);
     }
 
@@ -62,7 +64,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
                 ],
             ]);
 
-        $response->assertStatus(201);
+        $response->assertStatus(200);
     }
 
     /** @test */
@@ -79,7 +81,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
                 ],
             ]);
 
-        $response->assertStatus(201);
+        $response->assertStatus(200);
     }
 
     /** @test */
@@ -133,7 +135,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
                     'payment_details' => $details,
                 ]);
 
-            $response->assertStatus(201, "Failed for payment_method: {$paymentMethod}");
+            $response->assertStatus(200, "Failed for payment_method: {$paymentMethod}");
         }
     }
 

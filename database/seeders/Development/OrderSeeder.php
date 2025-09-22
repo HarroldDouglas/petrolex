@@ -538,9 +538,21 @@ class OrderSeeder extends Seeder
             ]);
         }
 
-        return Order::factory()
-            ->state(['status' => $status]) // Explicitly set the status
-            ->create($orderData);
+        // Use appropriate factory method based on status to ensure proper field initialization
+        if ($status->equals(OrderStatus::PROCESSING())) {
+            return Order::factory()->processing()->create($orderData);
+        } elseif ($status->equals(OrderStatus::DELIVERED())) {
+            return Order::factory()->delivered()->create($orderData);
+        } elseif ($status->equals(OrderStatus::PAID())) {
+            return Order::factory()->confirmed()->create($orderData);
+        } elseif ($status->equals(OrderStatus::CANCELLED())) {
+            return Order::factory()->cancelled()->create($orderData);
+        } else {
+            // For PENDING status or any other, use base factory with explicit status
+            return Order::factory()
+                ->state(['status' => $status])
+                ->create($orderData);
+        }
     }
 
     /**

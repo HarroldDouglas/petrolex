@@ -38,6 +38,30 @@ return [
     'address_deleted_success' => 'Delivery address deleted successfully',
     'address_not_found' => 'Address not found',
 
+    // Order messages
+    'order_created_success' => 'Order created successfully. Proceed to payment.',
+    'order_details_retrieved' => 'Order details retrieved successfully',
+    'order_cancelled_success' => 'Order cancelled successfully',
+    'order_delivered_success' => 'Order marked as delivered successfully',
+    'order_comment_added_success' => 'Comment added to order successfully',
+    'order_not_belongs_to_you' => 'This order does not belong to you',
+    'order_cannot_be_cancelled' => 'This order can no longer be cancelled. Only pending or paid orders can be cancelled.',
+    'order_cannot_be_delivered' => 'This order cannot be marked as delivered',
+    'order_cannot_accept_payment' => 'This order cannot accept payment',
+    'order_cannot_receive_feedback' => 'You can only leave feedback on delivered or cancelled orders',
+    'order_invoice_not_belongs_to_you' => 'This invoice does not belong to you',
+    'order_not_authorized_to_deliver' => 'You are not authorized to mark this order as delivered',
+    'order_not_authorized_to_scan_bottles' => 'You are not authorized to scan bottles for this order',
+    'customer_orders_retrieved_success' => 'Customer orders retrieved successfully',
+
+    // Payment messages
+    'payment_initiated_success' => 'Payment initiated successfully',
+    'payment_not_belongs_to_you' => 'This payment does not belong to you',
+
+    // Bottle scanning messages
+    'empty_bottle_scanned_success' => 'Empty bottle scanned successfully',
+    'empty_bottle_scan_failed' => 'Failed to scan empty bottle',
+
     // Generic messages
     'operation_success' => 'Operation successful',
     'operation_failed' => 'Operation failed',

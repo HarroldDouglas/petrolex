@@ -121,11 +121,11 @@ final class InitiatePaymentController extends Controller
     {
         // Simplified authorization check for testing
         if ($order->customer_id !== $request->user()->customer->id) {
-            throw new BadRequestHttpException(__('This order does not belong to you'));
+            throw new BadRequestHttpException(__('api.order_not_belongs_to_you'));
         }
 
         if (! $order->canAcceptPayment()) {
-            throw new BadRequestHttpException(__('order.cannot_accept_payment'));
+            throw new BadRequestHttpException(__('api.order_cannot_accept_payment'));
         }
 
         $data = $request->validated();
@@ -136,19 +136,8 @@ final class InitiatePaymentController extends Controller
             $data['payment_details']
         );
 
-        // Reload order with all relations like GetOrderDetailsController
-        $order->load([
-            'customer.user.country',
-            'customer.deliveryAddresses.neighborhood.municipality.city.country',
-            'deliveryAddress.neighborhood.municipality.city.country',
-            'deliveryPerson.user',
-            'distributionCenter',
-            'payment',
-            'items.productCategory',
-            'refunds',
-            'deliveryTracking',
-        ]);
+        $order->loadDetailRelations();
 
-        return OrderDetailsResponse::withOrder($order, 'Paiement initié avec succès');
+        return OrderDetailsResponse::withOrder($order, __('api.payment_initiated_success'));
     }
 }

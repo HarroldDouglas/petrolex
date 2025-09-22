@@ -161,9 +161,8 @@ final class DeliverOrderTest extends TestCase
             'Accept' => 'application/json',
         ])->patch(route('api.orders.deliver', ['order' => $order->id]));
 
-        $response->assertStatus(200)
-            ->assertJsonPath('_metadata.success', false)
-            ->assertJsonPath('_metadata.message', 'This order cannot be marked as delivered.');
+        $response->assertStatus(422)
+            ->assertJsonPath('message', __('api.order_cannot_be_delivered'));
 
         $this->assertDatabaseHas('orders', [
             'id' => $order->id,

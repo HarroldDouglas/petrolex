@@ -423,9 +423,17 @@ final class PaymentCallbackTest extends TestCase
     #[Test]
     public function it_denies_customer_access_to_other_customers_orders_for_feedback(): void
     {
+
+        // Create customer role
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+
         // Create two customers
         $customer1 = \App\Models\Customer::factory()->create();
         $customer2 = \App\Models\Customer::factory()->create();
+
+        // Assign customer role to both users
+        $customer1->user->assignRole('customer');
+        $customer2->user->assignRole('customer');
 
         $distributionCenter = \App\Models\DistributionCenter::factory()->create();
         $deliveryAddress1 = \App\Models\CustomerDeliveryAddress::factory()->create([
@@ -453,18 +461,21 @@ final class PaymentCallbackTest extends TestCase
             'password' => 'password',
             'country_code' => 'CM',
         ]);
+        $response->assertStatus(200);
         $customer1Token = $response->json('data.access_token');
+        $this->assertNotNull($customer1Token);
 
         // Customer 1 should NOT be able to add feedback to customer 2's order
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$customer1Token,
             'Accept' => 'application/json',
+            'Accept-Language' => 'fr',
         ])->postJson(route('api.orders.customer-feedback', ['order' => $order2->id]), [
             'comments' => 'Trying to access other customer order',
             'rating' => 3.0,
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Cette commande ne vous appartient pas.');
+            ->assertJsonPath('message', 'This order does not belong to you');
     }
 }

@@ -310,7 +310,7 @@ final class GetOrderDetailsTest extends TestCase
         ])->getJson(route('api.orders.show', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Cette commande ne vous appartient pas.');
+            ->assertJsonPath('message', __('api.order_not_belongs_to_you'));
     }
 
     #[Test]

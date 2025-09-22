@@ -12,7 +12,7 @@ class OrderDetailsResponse extends ApiResponse
     {
         return new self(
             new OrderDetailResource($order),
-            $message ?? 'Détails de la commande récupérés avec succès'
+            $message ?? __('api.order_details_retrieved')
         );
     }
 }

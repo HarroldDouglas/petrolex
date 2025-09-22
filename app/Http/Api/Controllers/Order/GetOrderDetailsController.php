@@ -22,13 +22,16 @@ use OpenApi\Annotations as OA;
  *         in="path",
  *         required=true,
  *         description="ID de la commande",
+ *
  *         @OA\Schema(type="integer", example=1)
  *     ),
  *
  *     @OA\Response(
  *         response=200,
  *         description="Détails de la commande récupérés avec succès",
+ *
  *         @OA\JsonContent(
+ *
  *             @OA\Property(
  *                 property="_metadata",
  *                 type="object",
@@ -46,18 +49,21 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=401,
  *         description="Non authentifié",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=403,
  *         description="Cette commande ne vous appartient pas",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
  *
  *     @OA\Response(
  *         response=404,
  *         description="Commande non trouvée",
+ *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     )
  * )
@@ -78,7 +84,7 @@ class GetOrderDetailsController extends Controller
         $isDeliveryPerson = $authenticatedUser->hasRole('delivery_person');
 
         if (! $isOrderOwner && ! $isDeliveryPerson) {
-            abort(403, 'Cette commande ne vous appartient pas.');
+            abort(403, __('api.order_not_belongs_to_you'));
         }
 
         $order->loadDetailRelations();

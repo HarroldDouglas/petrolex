@@ -15,7 +15,7 @@ class CustomerOrdersResponse extends ApiResponse
     {
         $response = new self(
             OrderDetailResource::collection($paginator->items()),
-            $message ?? 'Commandes client récupérées avec succès.',
+            $message ?? __('api.customer_orders_retrieved_success'),
             true,
             $statusCode
         );

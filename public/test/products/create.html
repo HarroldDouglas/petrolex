@@ -78,7 +78,7 @@
                                     <!-- Delivery Address -->
                                     <div class="mb-3">
                                         <label for="delivery-address" class="form-label">Adresse de livraison</label>
-                                        <select class="form-select" id="delivery-address" required>
+                                        <select class="form-select" id="delivery-address" required onchange="onDeliveryAddressChange()">
                                             <option value="">Sélectionnez une adresse...</option>
                                         </select>
                                         <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="loadDeliveryAddresses()">
@@ -272,7 +272,13 @@
                     
                     if (deliveryAddresses.length > 0) {
                         deliveryAddresses.forEach(address => {
-                            select.append(`<option value="${address.id}">${address.label} - ${address.address}</option>`);
+                            console.log('Adding address:', address);
+                            select.append(`<option value="${address.id}" 
+                                data-latitude="${address.latitude || ''}" 
+                                data-longitude="${address.longitude || ''}" 
+                                data-neighborhood-id="${address.neighborhood_id || ''}">
+                                ${address.label} - ${address.address}
+                            </option>`);
                         });
                     } else {
                         select.append('<option value="" disabled>Aucune adresse trouvée</option>');
@@ -302,7 +308,13 @@
                                 select.empty().append('<option value="">Sélectionnez une adresse...</option>');
                                 
                                 deliveryAddresses.forEach(address => {
-                                    select.append(`<option value="${address.id}">${address.label} - ${address.address}</option>`);
+                                    console.log('Adding address (from customers list):', address);
+                                    select.append(`<option value="${address.id}" 
+                                        data-latitude="${address.latitude || ''}" 
+                                        data-longitude="${address.longitude || ''}" 
+                                        data-neighborhood-id="${address.neighborhood_id || ''}">
+                                        ${address.label} - ${address.address}
+                                    </option>`);
                                 });
                                 
                                 updateApiResponse('Addresses loaded from customers list', response);
@@ -401,6 +413,80 @@
             });
             
             $('#products-container').html(html);
+        }
+
+        function onDeliveryAddressChange() {
+            const selectedOption = $('#delivery-address option:selected');
+            
+            if (!selectedOption.val()) {
+                return; // No address selected
+            }
+            
+            // Get address coordinates
+            const neighborhoodId = selectedOption.data('neighborhood-id');
+            const latitude = selectedOption.data('latitude');
+            const longitude = selectedOption.data('longitude');
+            
+            console.log('Address data:', {
+                neighborhoodId: neighborhoodId,
+                latitude: latitude,
+                longitude: longitude
+            });
+            
+            // Find closest distribution center
+            findClosestDistributionCenter(neighborhoodId, latitude, longitude);
+        }
+
+        function findClosestDistributionCenter(neighborhoodId, latitude, longitude) {
+            const token = localStorage.getItem('api_token');
+            
+            // Use neighborhood_id if available, otherwise use coordinates
+            let params = '';
+            if (neighborhoodId && neighborhoodId !== 'undefined' && neighborhoodId !== undefined) {
+                params = `neighborhood_id=${neighborhoodId}`;
+            } else if (latitude && longitude && latitude !== 'undefined' && longitude !== 'undefined' && latitude !== undefined && longitude !== undefined) {
+                params = `latitude=${latitude}&longitude=${longitude}`;
+            } else {
+                console.error('No valid neighborhood ID or coordinates available', {
+                    neighborhoodId: neighborhoodId,
+                    latitude: latitude,
+                    longitude: longitude
+                });
+                alert('Impossible de trouver le centre de distribution le plus proche. Coordonnées manquantes.');
+                return;
+            }
+            
+            $.ajax({
+                url: `/api/distribution-centers/closest?${params}`,
+                type: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    console.log('Closest distribution center response:', response);
+                    
+                    if (response.data && response.data.distribution_center) {
+                        const center = response.data.distribution_center;
+                        
+                        // Select the closest distribution center
+                        $('#distribution-center').val(center.id);
+                        
+                        // Update products for this center
+                        if (response.data.products) {
+                            products = response.data.products;
+                            displayProducts(products);
+                        }
+                        
+                        updateApiResponse('Closest distribution center found', response);
+                    }
+                },
+                error: function(jqXHR) {
+                    console.error('Closest distribution center API Error:', jqXHR.responseText);
+                    updateApiResponse('Closest distribution center Error', jqXHR.responseJSON);
+                    alert('Erreur lors de la recherche du centre de distribution le plus proche');
+                }
+            });
         }
 
         function onDistributionCenterChange() {
@@ -556,12 +642,20 @@
                 delivery_fee: deliveryFee,
                 total_amount: totalAmount,
                 comments: $('#comments').val() || null,
-                items: cart.map(item => ({
-                    product_category_id: item.product_category_id,
-                    quantity: item.quantity,
-                    unit_price: item.unit_price,
-                    option: item.option
-                }))
+                items: cart.map(item => {
+                    const orderItem = {
+                        product_category_id: item.product_category_id,
+                        quantity: item.quantity,
+                        unit_price: item.unit_price
+                    };
+                    
+                    // Only add option if it's not "default" (for accessories)
+                    if (item.option && item.option !== 'default') {
+                        orderItem.option = item.option;
+                    }
+                    
+                    return orderItem;
+                })
             };
             
             updateApiResponse('Creating order...', orderData);

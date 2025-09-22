@@ -403,6 +403,98 @@
                 ]
             }
         },
+        "/api/orders/{order}": {
+            "get": {
+                "tags": [
+                    "Commandes"
+                ],
+                "summary": "Obtenir les détails d'une commande",
+                "description": "Récupère les détails complets d'une commande spécifique. Seul le propriétaire de la commande (client) ou les livreurs peuvent accéder aux détails.",
+                "operationId": "api.orders.show",
+                "parameters": [
+                    {
+                        "name": "order",
+                        "in": "path",
+                        "description": "ID de la commande",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de la commande récupérés avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Détails de la commande récupérés avec succès"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "order": {
+                                                    "$ref": "#/components/schemas/OrderDetailsData"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Cette commande ne vous appartient pas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commande non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/orders/{order}/payment": {
             "post": {
                 "tags": [
@@ -2782,93 +2874,6 @@
                 ]
             }
         },
-        "/api/orders/{order}": {
-            "get": {
-                "tags": [
-                    "Commandes"
-                ],
-                "summary": "Récupérer les détails complets d'une commande",
-                "description": "Retourne tous les détails d'une commande spécifique: informations de base, client, adresse de livraison, livreur, articles, paiement, suivi, etc.",
-                "operationId": "getOrderDetails",
-                "parameters": [
-                    {
-                        "name": "order",
-                        "in": "path",
-                        "description": "ID de la commande",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Détails de la commande récupérés avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "_metadata": {
-                                            "properties": {
-                                                "success": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Détails de la commande récupérés avec succès"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/OrderDetailsData"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Non autorisé à voir cette commande",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Commande non trouvée",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/orders/{order}/scan-empty-bottle": {
             "post": {
                 "tags": [
@@ -4998,7 +5003,7 @@
                         "example": 1
                     },
                     "delivery_type": {
-                        "description": "Type de livraison",
+                        "description": "Type de livraison: normal (standard) ou fast (express)",
                         "type": "string",
                         "enum": [
                             "normal",

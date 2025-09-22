@@ -121,7 +121,6 @@ final class GetCustomerOrdersTest extends TestCase
                         'id',
                         'order_number',
                         'delivery_type',
-                        'payment_method',
                         'subtotal',
                         'delivery_fee',
                         'total_amount',

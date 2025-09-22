@@ -24,8 +24,9 @@ final class OrderCustomerFeedbackTest extends TestCase
     {
         parent::setUp();
 
-        // Create customer role for testing
+        // Create roles for testing
         \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'delivery_person', 'guard_name' => 'web']);
 
         // Ensure a DistributionCenter exists for OrderFactory
         DistributionCenter::factory()->create();
@@ -56,12 +57,13 @@ final class OrderCustomerFeedbackTest extends TestCase
     #[Test]
     public function it_can_add_customer_feedback_to_order(): void
     {
+
         $distributionCenter = DistributionCenter::factory()->create();
         $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
         ]);
 
-        $order = Order::factory()->create([
+        $order = Order::factory()->delivered()->create([
             'customer_id' => $this->customer->id,
             'distribution_center_id' => $distributionCenter->id,
             'delivery_address_id' => $deliveryAddress->id,
@@ -126,7 +128,7 @@ final class OrderCustomerFeedbackTest extends TestCase
             'customer_id' => $this->customer->id,
         ]);
 
-        $order = Order::factory()->create([
+        $order = Order::factory()->delivered()->create([
             'customer_id' => $this->customer->id,
             'distribution_center_id' => $distributionCenter->id,
             'delivery_address_id' => $deliveryAddress->id,

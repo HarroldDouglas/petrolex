@@ -52,7 +52,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->getJson('/api/my/orders?status=In_Progress');
+            ->getJson('/api/my/orders?status=PROCESSING');
 
         $response->assertStatus(200);
     }
@@ -99,7 +99,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
     {
         $validStatuses = [
             'pending', 'PENDING', 'Pending',
-            'processing', 'IN_PROGRESS', 'In_Progress',
+            'processing', 'PROCESSING', 'Processing',
             'delivered', 'DELIVERED', 'Delivered',
             'cancelled', 'CANCELLED', 'Cancelled',
             'paid', 'PAID', 'Paid',
@@ -117,7 +117,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
     /** @test */
     public function it_rejects_confirmed_status_which_does_not_exist_in_enum()
     {
-        $invalidStatuses = ['confirmed', 'CONFIRMED', 'Confirmed', 'processing', 'PROCESSING'];
+        $invalidStatuses = ['confirmed', 'CONFIRMED', 'Confirmed'];
 
         foreach ($invalidStatuses as $status) {
             $response = $this->actingAs($this->user)

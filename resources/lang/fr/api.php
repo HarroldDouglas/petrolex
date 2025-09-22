@@ -38,6 +38,30 @@ return [
     'address_deleted_success' => 'Adresse de livraison supprimée avec succès',
     'address_not_found' => 'Adresse non trouvée',
 
+    // Order messages
+    'order_created_success' => 'Commande créée avec succès. Procédez au paiement.',
+    'order_details_retrieved' => 'Détails de la commande récupérés avec succès',
+    'order_cancelled_success' => 'Commande annulée avec succès',
+    'order_delivered_success' => 'Commande marquée comme livrée avec succès',
+    'order_comment_added_success' => 'Commentaire ajouté à la commande avec succès',
+    'order_not_belongs_to_you' => 'Cette commande ne vous appartient pas',
+    'order_cannot_be_cancelled' => 'Cette commande ne peut plus être annulée. Seules les commandes en attente ou payées peuvent être annulées.',
+    'order_cannot_be_delivered' => 'Cette commande ne peut pas être marquée comme livrée',
+    'order_cannot_accept_payment' => 'Cette commande ne peut pas accepter de paiement',
+    'order_cannot_receive_feedback' => 'Vous ne pouvez laisser un avis que sur des commandes livrées ou annulées',
+    'order_invoice_not_belongs_to_you' => 'Cette facture ne vous appartient pas',
+    'order_not_authorized_to_deliver' => 'Vous n\'êtes pas autorisé à marquer cette commande comme livrée',
+    'order_not_authorized_to_scan_bottles' => 'Vous n\'êtes pas autorisé à scanner des bouteilles pour cette commande',
+    'customer_orders_retrieved_success' => 'Commandes client récupérées avec succès',
+
+    // Payment messages
+    'payment_initiated_success' => 'Paiement initié avec succès',
+    'payment_not_belongs_to_you' => 'Ce paiement ne vous appartient pas',
+
+    // Bottle scanning messages
+    'empty_bottle_scanned_success' => 'Bouteille vide scannée avec succès',
+    'empty_bottle_scan_failed' => 'Échec du scan de la bouteille vide',
+
     // Generic messages
     'operation_success' => 'Opération réussie',
     'operation_failed' => 'Échec de l\'opération',

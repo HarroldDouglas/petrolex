@@ -81,7 +81,7 @@ final class OrderSecurityTest extends TestCase
         ])->getJson(route('api.orders.download.invoice', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Cette facture ne vous appartient pas.');
+            ->assertJsonPath('message', 'Cette facture ne vous appartient pas');
     }
 
     #[Test]
@@ -181,7 +181,7 @@ final class OrderSecurityTest extends TestCase
         ])->patchJson(route('api.orders.deliver', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Vous n\'êtes pas autorisé à marquer cette commande comme livrée.');
+            ->assertJsonPath('message', 'Vous n\'\u00eates pas autoris\u00e9 \u00e0 marquer cette commande comme livr\u00e9e');
     }
 
     #[Test]
@@ -217,7 +217,7 @@ final class OrderSecurityTest extends TestCase
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Vous n\'êtes pas autorisé à scanner des bouteilles pour cette commande.');
+            ->assertJsonPath('message', 'Vous n\'\u00eates pas autoris\u00e9 \u00e0 scanner des bouteilles pour cette commande');
     }
 
     #[Test]
