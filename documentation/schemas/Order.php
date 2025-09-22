@@ -20,6 +20,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-18T10:00:00Z")
  * )
  * All Order endpoints now use the unified OrderDetailsData schema for consistency.
+ *
  * @see OrderDetailsData in GetOrderDetailsControllerDoc.php
  */
 class OrderSchema {}

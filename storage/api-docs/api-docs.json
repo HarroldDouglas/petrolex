@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8001",
+            "url": "http://localhost:8000",
             "description": "API Server"
         }
     ],
@@ -6352,6 +6352,33 @@
                             "product_type_label": {
                                 "type": "string",
                                 "example": "Bouteille"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "image": {
+                        "description": "Image principale du produit (ou null)",
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "example": "https://example.com/image.jpg"
+                            },
+                            "thumb": {
+                                "type": "string",
+                                "example": "https://example.com/image-thumb.jpg"
+                            },
+                            "medium": {
+                                "type": "string",
+                                "example": "https://example.com/image-medium.jpg"
+                            },
+                            "large": {
+                                "type": "string",
+                                "example": "https://example.com/image-large.jpg"
+                            },
+                            "is_default": {
+                                "type": "boolean",
+                                "example": true
                             }
                         },
                         "type": "object",

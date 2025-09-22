@@ -346,7 +346,14 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="name", type="string", example="Bouteilles 19L"),
  *         @OA\Property(property="product_type", type="string", example="bottle"),
  *         @OA\Property(property="product_type_label", type="string", example="Bouteille")
- *     )
+ *     ),
+ *     @OA\Property(property="image", type="object", nullable=true, description="Image principale du produit (ou null)",
+ *         @OA\Property(property="url", type="string", example="https://example.com/image.jpg"),
+ *         @OA\Property(property="thumb", type="string", example="https://example.com/image-thumb.jpg"),
+ *         @OA\Property(property="medium", type="string", example="https://example.com/image-medium.jpg"),
+ *         @OA\Property(property="large", type="string", example="https://example.com/image-large.jpg"),
+ *         @OA\Property(property="is_default", type="boolean", example=true)
+ *     ),
  * )
  *
  * @OA\Schema(

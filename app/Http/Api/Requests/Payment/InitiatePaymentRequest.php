@@ -31,7 +31,6 @@ final class InitiatePaymentRequest extends FormRequest
 
         if ($paymentMethod === PaymentMethod::ORANGE_MONEY()->value || $paymentMethod === PaymentMethod::MTN_MONEY()->value) {
             $rules['payment_details.phone'] = ['required', 'string', 'regex:/^[0-9]{8,15}$/'];
-            $rules['payment_details.name'] = ['required', 'string', 'max:255'];
         } elseif ($paymentMethod === PaymentMethod::CREDIT_CARD()->value) {
             $rules['payment_details.card_number'] = ['required', 'string', 'regex:/^[0-9]{13,19}$/'];
             $rules['payment_details.cvv'] = ['required', 'string', 'regex:/^[0-9]{3,4}$/'];
@@ -63,7 +62,6 @@ final class InitiatePaymentRequest extends FormRequest
             'payment_method.in' => __('validation.payment.payment_method_invalid'),
             'payment_details.phone.required' => __('validation.payment.phone_required'),
             'payment_details.phone.regex' => __('validation.payment.phone_format'),
-            'payment_details.name.required' => __('validation.payment.name_required'),
             'payment_details.card_number.required' => __('validation.payment.card_number_required'),
             'payment_details.card_number.regex' => __('validation.payment.card_number_format'),
             'payment_details.cvv.required' => __('validation.payment.cvv_required'),

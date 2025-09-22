@@ -22,12 +22,15 @@ class ProductCategoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $images = $this->getImages();
+        $image = $images[0] ?? null;
         $data = [
             'id' => $this->id,
             'name' => $this->name,
             'product_type' => $this->product_type->value,
             'product_type_label' => $this->product_type->label ?? $this->product_type->value,
             'specifications' => $this->productTypeInstance->specifications ?? [],
+            'image' => $image,
         ];
 
         return $data;
