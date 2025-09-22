@@ -177,6 +177,19 @@ class CustomerApiService {
         return this.request(endpoint);
     }
 
+    async getMyOrders(filters = {}, page = 1) {
+        let endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.MY_ORDERS;
+
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: CUSTOMER_CONFIG.UI.DEFAULT_PAGINATION.toString(),
+            ...filters,
+        });
+
+        endpoint += `?${params.toString()}`;
+        return this.request(endpoint);
+    }
+
     async getCustomerOrders(customerId, filters = {}, page = 1) {
         let endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.CUSTOMER_ORDERS.replace(
             "{id}",

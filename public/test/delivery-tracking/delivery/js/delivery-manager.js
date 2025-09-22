@@ -147,21 +147,42 @@ class DeliveryManager {
             console.log('🗺️ Calcul de nouvelle route...');
             let currentPosition = await this.mapService.getCurrentGPSPosition();
             
+            console.log('📍 Position actuelle:', currentPosition);
+            console.log('🏠 Destination:', selectedOrder.delivery_address);
+            
+            // Afficher les marqueurs
+            this.mapService.updateDriverPosition(
+                currentPosition.lat, 
+                currentPosition.lng, 
+                { name: 'Ma position' }
+            );
+            
+            this.mapService.setDestination(
+                parseFloat(selectedOrder.delivery_address.latitude),
+                parseFloat(selectedOrder.delivery_address.longitude),
+                { 
+                    name: selectedOrder.customer?.full_name || 'Client',
+                    address: selectedOrder.delivery_address.address 
+                }
+            );
+            
+            // Tracer la route avec les paramètres corrects
             const routeInfo = await this.mapService.drawRoute(
-                currentPosition,
-                {
-                    lat: selectedOrder.delivery_address.latitude,
-                    lng: selectedOrder.delivery_address.longitude
-                },
-                'driving'
+                currentPosition.lat,
+                currentPosition.lng,
+                parseFloat(selectedOrder.delivery_address.latitude),
+                parseFloat(selectedOrder.delivery_address.longitude)
             );
             
             if (routeInfo) {
                 const currentSpeed = this.ui.getTravelSpeed();
                 
                 // 🔧 CORRECTION: Calcul simple et direct
-                const distanceKm = parseFloat(routeInfo.distance);
+                const distanceKm = parseFloat(routeInfo.distance) / 1000; // Convertir mètres en km
                 const speedKmh = parseFloat(currentSpeed);
+                
+                console.log('📏 Distance calculée:', distanceKm, 'km');
+                console.log('🚗 Vitesse:', speedKmh, 'km/h');
                 
                 let adjustedDuration;
                 if (speedKmh && speedKmh > 0) {

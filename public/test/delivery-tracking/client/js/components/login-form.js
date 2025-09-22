@@ -11,7 +11,7 @@ class LoginForm {
             this.authService = window.customerApp.authService;
         } else {
             // Fallback: créer une nouvelle instance
-            this.authService = new AuthService();
+            this.authService = new CustomerAuthService();
             console.warn("🔐 LoginForm: Using fallback AuthService instance");
         }
 

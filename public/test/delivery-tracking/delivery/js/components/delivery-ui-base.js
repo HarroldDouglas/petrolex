@@ -310,7 +310,7 @@ class DeliveryControlsManager {
     constructor(elements) {
         this.elements = elements;
         this.strategies = {
-            'confirmed': new ConfirmedOrderStrategy(),
+            'paid': new ConfirmedOrderStrategy(),
             'processing': new InProgressOrderStrategy(),
             'tracking_active': new ActiveTrackingStrategy(),
             'tracking_paused': new PausedTrackingStrategy()

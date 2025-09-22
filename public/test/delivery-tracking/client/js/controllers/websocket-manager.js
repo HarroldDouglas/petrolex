@@ -27,9 +27,9 @@ class WebSocketManager {
             forceTLS: CUSTOMER_CONFIG.WEBSOCKET.FORCE_TLS,
             enabledTransports: CUSTOMER_CONFIG.WEBSOCKET.ENABLED_TRANSPORTS,
             cluster: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_APP_CLUSTER || "mt1",
-            // Ajout d'un timeout pour la connexion
-            activityTimeout: 10000, 
-            pongTimeout: 5000,
+            // Configuration pour Laravel Reverb local
+            activityTimeout: 30000, 
+            pongTimeout: 10000
         };
 
         console.log("[WebSocket] Configuration Pusher :", {
@@ -51,7 +51,8 @@ class WebSocketManager {
             });
 
             this.pusher.connection.bind("connected", () => {
-                console.log("[WebSocket] Connexion établie avec succès !");
+                console.log("✅ [WebSocket] Connexion établie avec succès !");
+                console.log("📊 [WebSocket] État de la connexion:", this.pusher.connection.state);
                 this.wsConnected = true;
                 this.ui.updateWebSocketStatus(true);
                 this.ui.showSuccess("Connexion temps réel établie", 2000);
@@ -66,7 +67,8 @@ class WebSocketManager {
             });
 
             this.pusher.connection.bind("error", (error) => {
-                console.error("[WebSocket] Erreur de connexion :", error);
+                console.error("❌ [WebSocket] Erreur de connexion :", error);
+                console.error("🔍 [WebSocket] Détails de l'erreur:", error.error);
                 this.wsConnected = false;
                 this.ui.updateWebSocketStatus(false);
                 this.ui.showError(`Erreur WebSocket: ${error.error?.data?.message || 'Vérifiez la console'}`);

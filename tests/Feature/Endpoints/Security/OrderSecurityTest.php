@@ -81,7 +81,7 @@ final class OrderSecurityTest extends TestCase
         ])->getJson(route('api.orders.download.invoice', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'This invoice does not belong to you');
+            ->assertJsonPath('message', __('api.order_invoice_not_belongs_to_you'));
     }
 
     #[Test]
@@ -181,7 +181,7 @@ final class OrderSecurityTest extends TestCase
         ])->patchJson(route('api.orders.deliver', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'You are not authorized to mark this order as delivered');
+            ->assertJsonPath('message', __('api.order_not_authorized_to_deliver'));
     }
 
     #[Test]
@@ -217,7 +217,7 @@ final class OrderSecurityTest extends TestCase
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Vous n\'êtes pas autorisé à scanner des bouteilles pour cette commande');
+            ->assertJsonPath('message', __('api.order_not_authorized_to_scan_bottles'));
     }
 
     #[Test]

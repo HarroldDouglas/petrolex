@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class InitiatePaymentCaseInsensitiveTest extends TestCase
@@ -30,7 +31,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_payment_method_in_uppercase_orange_money()
     {
         $response = $this->actingAs($this->user)
@@ -52,7 +53,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_payment_method_in_mixed_case_mtn_money()
     {
         $response = $this->actingAs($this->user)
@@ -67,7 +68,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_payment_method_in_lowercase_credit_card()
     {
         $response = $this->actingAs($this->user)
@@ -84,7 +85,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_all_valid_payment_methods_in_different_cases()
     {
         $validPaymentMethods = [
@@ -139,7 +140,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_invalid_payment_methods()
     {
         $invalidPaymentMethods = ['paypal', 'PAYPAL', 'bank_transfer', 'cash'];
@@ -159,7 +160,7 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_required_fields_based_on_normalized_payment_method()
     {
         // Test that when we send 'ORANGE_MONEY', it still validates the correct fields

@@ -13,7 +13,7 @@ class DeliveryPersonApp {
     initServices() {
         this.services = {
             api: new DeliveryPersonApiService(),
-            map: new DeliveryPersonMapService(),
+            map: new DeliveryGoogleMapService(), // Utiliser Google Maps au lieu de Mapbox
             tracking: null
         };
         this.ui = new DeliveryPersonUIComponents();
@@ -23,19 +23,33 @@ class DeliveryPersonApp {
         this.sessionManager = new SessionManager(this.services.api, this.ui);
         this.orderManager = new OrderManager(this.services.api, this.ui, this.sessionManager);
         
-        this.services.map.initialize('map');
-        this.services.tracking = new DeliveryTrackingService(this.services.api, this.services.map, this.ui, this.orderManager);
+        // Initialiser deliveryManager à null temporairement
+        this.deliveryManager = null;
         
-        this.deliveryManager = new DeliveryManager(
-            this.services.map, 
-            this.services.tracking, 
-            this.ui, 
-            this.orderManager
-        );
-        
-        // Injecter les dépendances entre orderManager, trackingService et deliveryManager
-        this.orderManager.setTrackingService(this.services.tracking);
-        this.orderManager.setDeliveryManager(this.deliveryManager);
+        // Attendre que Google Maps soit chargé
+        this.waitForGoogleMaps().then(() => {
+            this.services.map.initialize('map');
+            this.services.tracking = new DeliveryTrackingService(this.services.api, this.services.map, this.ui, this.orderManager);
+            
+            this.deliveryManager = new DeliveryManager(
+                this.services.map, 
+                this.services.tracking, 
+                this.ui, 
+                this.orderManager
+            );
+            
+            // Maintenant qu'on a deliveryManager, configurer les dépendances
+            this.orderManager.setTrackingService(this.services.tracking);
+            this.orderManager.setDeliveryManager(this.deliveryManager);
+            
+            // Configurer les event handlers du deliveryManager
+            this.deliveryManager.setupEventHandlers();
+            
+            // Injecter la facade dans le DeliveryManager pour les transitions d'état
+            if (this.controlsFacade) {
+                this.deliveryManager.setControlsFacade(this.controlsFacade);
+            }
+        });
         
         // AJOUT: Connecter orderManager à l'UI de tracking pour l'accès aux données de commande
         this.ui.trackingUI.setOrderManager(this.orderManager);
@@ -48,18 +62,20 @@ class DeliveryPersonApp {
         });
         
         this.ui.elements.logoutBtn.addEventListener('click', () => {
-            if (this.deliveryManager.getTrackingState().isTracking) {
+            if (this.deliveryManager && this.deliveryManager.getTrackingState().isTracking) {
                 this.deliveryManager.stopDelivery();
             }
             this.sessionManager.logout();
         });
 
         this.ui.elements.completeDeliveryBtn.addEventListener('click', () => {
-            this.deliveryManager.completeDelivery();
+            if (this.deliveryManager) {
+                this.deliveryManager.completeDelivery();
+            }
         });
 
         this.orderManager.setupEventHandlers();
-        this.deliveryManager.setupEventHandlers();
+        // deliveryManager.setupEventHandlers() sera appelé dans initManagers() après l'initialisation
         
         window.deliveryPersonApp = this;
     }
@@ -122,6 +138,34 @@ class DeliveryPersonApp {
 
     getSelectedOrder() {
         return this.orderManager.getSelectedOrder();
+    }
+    
+    // Attendre que Google Maps soit chargé
+    waitForGoogleMaps() {
+        return new Promise((resolve) => {
+            if (window.google && window.google.maps) {
+                resolve();
+            } else if (window.googleMapsLoaded) {
+                resolve();
+            } else {
+                const checkGoogleMaps = () => {
+                    if (window.google && window.google.maps) {
+                        resolve();
+                    } else {
+                        setTimeout(checkGoogleMaps, 100);
+                    }
+                };
+                checkGoogleMaps();
+            }
+        });
+    }
+    
+    // Callback pour quand Google Maps est prêt
+    onGoogleMapsReady() {
+        console.log("🗺️ Google Maps prêt pour l'interface delivery");
+        if (this.services && this.services.map && !this.services.map.initialized) {
+            this.services.map.initialize('map');
+        }
     }
 }
 

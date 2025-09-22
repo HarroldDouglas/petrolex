@@ -48,13 +48,15 @@ class DeliveryControlsFacade {
     
     getStateNameForOrder(order) {
         switch (order.status) {
-            case DELIVERY_CONFIG.ORDER_STATUS.CONFIRMED:
-                return 'confirmed';
+            case DELIVERY_CONFIG.ORDER_STATUS.PAID:
+                return 'paid';
+            case DELIVERY_CONFIG.ORDER_STATUS.PROCESSING:
+                return 'processing';
             case DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS:
                 return 'processing';
             default:
                 console.warn(`Statut non géré: ${order.status}`);
-                return 'confirmed'; // fallback
+                return 'paid'; // fallback
         }
     }
     

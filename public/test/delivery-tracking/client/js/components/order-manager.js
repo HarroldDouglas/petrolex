@@ -2,7 +2,8 @@
 // Affichage, filtrage, pagination des commandes
 
 class CustomerOrderManager {
-    constructor(uiManager) {
+    constructor(orderController, uiManager) {
+        this.orderController = orderController;
         this.uiManager = uiManager;
         this.initOrderElements();
     }
@@ -77,17 +78,25 @@ class CustomerOrderManager {
 
     getTrackingActionButton(order) {
         switch (order.status) {
-            case CUSTOMER_CONFIG.ORDER_STATUS.IN_PROGRESS:  // 🔧 CORRECTION: IN_PROGRESS au lieu de PROCESSING
+            case CUSTOMER_CONFIG.ORDER_STATUS.PROCESSING:  // En cours de livraison
                 return `<button class="btn btn-sm btn-success w-100" onclick="window.customerApp.startTracking('${order.order_number}')">
                     <i class="fas fa-map-marker-alt"></i> Suivre
                 </button>`;
-            case CUSTOMER_CONFIG.ORDER_STATUS.CONFIRMED:
+            case CUSTOMER_CONFIG.ORDER_STATUS.PAID:  // Payée, en attente de traitement
+                return `<button class="btn btn-sm btn-info w-100" disabled>
+                    <i class="fas fa-credit-card"></i> Payée
+                </button>`;
+            case CUSTOMER_CONFIG.ORDER_STATUS.PENDING:  // En attente de paiement
                 return `<button class="btn btn-sm btn-warning w-100" disabled>
                     <i class="fas fa-clock"></i> En attente
                 </button>`;
             case CUSTOMER_CONFIG.ORDER_STATUS.DELIVERED:
                 return `<button class="btn btn-sm btn-outline-success w-100" disabled>
                     <i class="fas fa-check"></i> Livrée
+                </button>`;
+            case CUSTOMER_CONFIG.ORDER_STATUS.CANCELLED:
+                return `<button class="btn btn-sm btn-outline-danger w-100" disabled>
+                    <i class="fas fa-times"></i> Annulée
                 </button>`;
             default:
                 const statusLabel =
@@ -199,5 +208,50 @@ class CustomerOrderManager {
             this.elements.ordersPagination.innerHTML = "";
         }
         this.clearFilters();
+    }
+
+    // === CHARGEMENT DES COMMANDES ===
+
+    async loadOrders(customerId, page = 1) {
+        try {
+            console.log(`📦 Chargement des commandes pour client ${customerId}, page ${page}`);
+            
+            // Afficher un loader
+            this.elements.ordersList.innerHTML = '<div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>';
+            
+            // Obtenir les filtres
+            const filters = this.getFilters();
+            
+            // Appeler l'API via le controller
+            const response = await this.orderController.loadCustomerOrders(customerId, filters, page);
+            
+            if (response && response.data) {
+                // Rendre les commandes
+                this.renderOrders(response.data.data || response.data, response.data.current_page || page, response.data.last_page || 1);
+                
+                // Mettre à jour la pagination
+                this.updatePagination(response.data.current_page || page, response.data.last_page || 1);
+                
+                console.log(`✅ ${response.data.data?.length || response.data.length || 0} commandes chargées`);
+            } else {
+                this.elements.ordersList.innerHTML = '<div class="text-center text-muted py-3">Aucune commande trouvée</div>';
+            }
+            
+        } catch (error) {
+            console.error('❌ Erreur lors du chargement des commandes:', error);
+            this.elements.ordersList.innerHTML = '<div class="text-center text-danger py-3"><i class="fas fa-exclamation-triangle"></i> Erreur de chargement</div>';
+            
+            // Afficher une notification d'erreur
+            if (window.customerApp && window.customerApp.notificationService) {
+                window.customerApp.notificationService.error('Erreur lors du chargement des commandes');
+            }
+        }
+    }
+
+    // Méthode de rechargement rapide
+    async refreshOrders() {
+        if (window.customerApp && window.customerApp.currentUser) {
+            await this.loadOrders(window.customerApp.currentUser.id);
+        }
     }
 }

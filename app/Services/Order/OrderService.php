@@ -242,8 +242,8 @@ class OrderService extends BaseServiceForEntity
             $productCategory = $item->productCategory;
 
             return match ($productCategory->product_type) {
-                ProductType::BOTTLE()->value => $this->getBottleGroupingKey($item),
-                ProductType::ACCESSORY()->value => $this->getAccessoryGroupingKey($item),
+                ProductType::BOTTLE() => $this->getBottleGroupingKey($item),
+                ProductType::ACCESSORY() => $this->getAccessoryGroupingKey($item),
                 default => 'unknown-'.$item->id,
             };
         })->map(function (Collection $group, string $groupKey): GroupedOrderItemDTO {
@@ -266,8 +266,8 @@ class OrderService extends BaseServiceForEntity
         $productCategory = $item->productCategory;
 
         return match ($productCategory->product_type) {
-            ProductType::BOTTLE()->value => $this->getBottleDisplayName($item),
-            ProductType::ACCESSORY()->value => $this->getAccessoryDisplayName($item),
+            ProductType::BOTTLE() => $this->getBottleDisplayName($item),
+            ProductType::ACCESSORY() => $this->getAccessoryDisplayName($item),
             default => 'Produit inconnu',
         };
     }

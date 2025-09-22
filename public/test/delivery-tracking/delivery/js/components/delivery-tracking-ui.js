@@ -82,8 +82,9 @@ class DeliveryTrackingUI {
 
     // Notifications
     showError(message, title = "Erreur") {
-        console.error(title + ":", message);
-        this.showNotification("error", title, message, 5000);
+        const safeMessage = message || "Une erreur s'est produite";
+        console.error(title + ":", safeMessage);
+        this.showNotification("error", title, safeMessage, 5000);
     }
 
     showSuccess(message, title = "Succès") {
@@ -210,13 +211,16 @@ class DeliveryTrackingUI {
     }
 
     showNotification(type, title, message, duration = 4000) {
+        const safeTitle = title || "Notification";
+        const safeMessage = message || "Aucun message";
+        
         const notification = document.createElement("div");
         notification.className = `notification ${type} fade-in`;
         notification.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <strong style="display: block; margin-bottom: 5px;">${title}</strong>
-                    <div style="font-size: 0.9em;">${message}</div>
+                    <strong style="display: block; margin-bottom: 5px;">${safeTitle}</strong>
+                    <div style="font-size: 0.9em;">${safeMessage}</div>
                 </div>
                 <button onclick="this.parentElement.parentElement.remove()" 
                         style="background: none; border: none; color: inherit; font-size: 1.2em; cursor: pointer; margin-left: 10px;">&times;</button>

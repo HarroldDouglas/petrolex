@@ -53,7 +53,9 @@ class OrderManager {
                 throw new Error(response._metadata?.message || 'Impossible de charger les commandes');
             }
         } catch (error) {
-            this.ui.showError(error.message || 'Erreur lors du chargement des commandes');
+            console.error('Erreur chargement commandes:', error);
+            const errorMessage = error?.message || error?.toString() || 'Erreur lors du chargement des commandes';
+            this.ui.showError(errorMessage);
         } finally {
             this.ui.setLoadingState('refreshOrdersBtn', false);
         }
@@ -144,6 +146,19 @@ class OrderManager {
                 this.currentPage = 1;
                 this.loadOrders();
             }, 500);
+        });
+        
+        // Event delegation pour les boutons de sélection de commande
+        this.ui.elements.ordersList.addEventListener('click', (e) => {
+            const button = e.target.closest('.select-order-btn');
+            if (button) {
+                const orderNumber = button.dataset.orderNumber;
+                if (orderNumber && window.deliveryPersonApp) {
+                    window.deliveryPersonApp.selectOrder(orderNumber);
+                } else {
+                    console.error('Order number missing or app not ready:', orderNumber);
+                }
+            }
         });
     }
 
