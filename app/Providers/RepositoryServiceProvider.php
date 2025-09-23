@@ -11,6 +11,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
      * @var array<class-string, class-string>
      */
     public array $bindings = [
+        \App\Repositories\Contracts\CountryRepositoryInterface::class => \App\Repositories\Eloquent\CountryRepository::class,
         \App\Repositories\Contracts\BaseRepositoryInterface::class => \App\Repositories\Eloquent\BaseEloquentRepository::class,
         \App\Repositories\Contracts\CustomerRepositoryInterface::class => \App\Repositories\Eloquent\CustomerRepository::class,
         \App\Repositories\Contracts\ProductCategoryRepositoryInterface::class => \App\Repositories\Eloquent\ProductCategoryRepository::class,

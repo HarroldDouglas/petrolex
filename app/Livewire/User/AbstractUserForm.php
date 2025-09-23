@@ -12,6 +12,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
+use App\Services\Geography\CountryService;
 
 abstract class AbstractUserForm extends Component
 {
@@ -59,20 +60,21 @@ abstract class AbstractUserForm extends Component
             ->toArray();
 
         $this->countries = $this->countryService->getCodeNameList();
+        // Set default country code from config if not already set
+        $this->country_code = $this->country_code ?: config('countries.default_country_code');
 
-        // Load language options from Language enum
-        $this->languages = [
-            'fr' => 'Français',
-            'en' => 'English',
-        ];
-        $this->language = $this->language ?: 'fr';
+        // Load language options from Language enum using Spatie methods
+        $this->languages = collect(\App\Enums\Language::cases())
+            ->mapWithKeys(fn($case) => [$case->value => $case->label])
+            ->toArray();
+        $this->language = $this->language ?: config('countries.default_language', 'fr');
     }
 
     public function boot(
         UserService $userService,
         DistributionCenterService $distributionCenterService,
         MediaServiceInterface $mediaService,
-        \App\Services\Geography\CountryService $countryService
+        CountryService $countryService
     ) {
         $this->userService = $userService;
         $this->distributionCenterService = $distributionCenterService;
