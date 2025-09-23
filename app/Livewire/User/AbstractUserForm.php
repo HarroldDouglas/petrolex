@@ -16,6 +16,7 @@ use Livewire\Features\SupportFileUploads\WithFileUploads;
 abstract class AbstractUserForm extends Component
 {
     use WithFileUploads;
+
     public string $first_name = '';
     public string $last_name = '';
     public string $email = '';
@@ -28,11 +29,18 @@ abstract class AbstractUserForm extends Component
     public bool $showDistributionCenters = false;
     public bool $showPassword = false;
 
+    public string $country_code = '';
+    public array $countries = [];
+
+    public string $language = '';
+    public array $languages = [];
+
     public $allowedRoles = [];
     public array $availableDistributionCenters = [];
 
     protected $userService;
     protected $distributionCenterService;
+    protected $countryService;
 
     /** @var MediaServiceInterface */
     protected $mediaService;
@@ -46,18 +54,30 @@ abstract class AbstractUserForm extends Component
     public function initialize()
     {
         $this->allowedRoles = array_diff(UserRole::toArray(), [UserRole::CUSTOMER()->value]);
-
         $this->availableDistributionCenters = $this->distributionCenterService->getAll()
             ->pluck('name', 'id')
             ->toArray();
+
+        $this->countries = $this->countryService->getCodeNameList();
+
+        // Load language options from Language enum
+        $this->languages = [
+            'fr' => 'Français',
+            'en' => 'English',
+        ];
+        $this->language = $this->language ?: 'fr';
     }
 
     public function boot(
-        UserService $userService, DistributionCenterService $distributionCenterService, MediaServiceInterface $mediaService)
-    {
+        UserService $userService,
+        DistributionCenterService $distributionCenterService,
+        MediaServiceInterface $mediaService,
+        \App\Services\Geography\CountryService $countryService
+    ) {
         $this->userService = $userService;
         $this->distributionCenterService = $distributionCenterService;
         $this->mediaService = $mediaService;
+        $this->countryService = $countryService;
     }
 
     public function rules()

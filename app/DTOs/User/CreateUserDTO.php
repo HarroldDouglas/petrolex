@@ -8,6 +8,7 @@ use Illuminate\Http\UploadedFile;
 
 class CreateUserDTO extends BaseDTO
 {
+
     public function __construct(
         public string $first_name,
         public string $last_name,
@@ -20,6 +21,8 @@ class CreateUserDTO extends BaseDTO
         /** @var array<int> $distribution_center_ids */
         public ?array $distribution_center_ids = [],
         public readonly ?UploadedFile $image = null,
+        public string $country_code = '',
+        public string $language = '',
     ) {}
 
     public function toArray(): array
@@ -28,6 +31,8 @@ class CreateUserDTO extends BaseDTO
             parent::toArray(),
             [
                 'image' => $this->image ? $this->image->getClientOriginalName() : null,
+                'country_code' => $this->country_code,
+                'language' => $this->language,
             ]
         );
     }
