@@ -60,10 +60,8 @@ abstract class AbstractUserForm extends Component
             ->toArray();
 
         $this->countries = $this->countryService->getCodeNameList();
-        // Set default country code from config if not already set
         $this->country_code = $this->country_code ?: config('countries.default_country_code');
 
-        // Load language options from Language enum using Spatie methods
         $this->languages = collect(\App\Enums\Language::cases())
             ->mapWithKeys(fn($case) => [$case->value => $case->label])
             ->toArray();
