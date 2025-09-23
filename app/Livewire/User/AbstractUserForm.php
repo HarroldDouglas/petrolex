@@ -12,10 +12,12 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
+use App\Services\Geography\CountryService;
 
 abstract class AbstractUserForm extends Component
 {
     use WithFileUploads;
+
     public string $first_name = '';
     public string $last_name = '';
     public string $email = '';
@@ -28,11 +30,18 @@ abstract class AbstractUserForm extends Component
     public bool $showDistributionCenters = false;
     public bool $showPassword = false;
 
+    public string $country_code = '';
+    public array $countries = [];
+
+    public string $language = '';
+    public array $languages = [];
+
     public $allowedRoles = [];
     public array $availableDistributionCenters = [];
 
     protected $userService;
     protected $distributionCenterService;
+    protected $countryService;
 
     /** @var MediaServiceInterface */
     protected $mediaService;
@@ -46,18 +55,29 @@ abstract class AbstractUserForm extends Component
     public function initialize()
     {
         $this->allowedRoles = array_diff(UserRole::toArray(), [UserRole::CUSTOMER()->value]);
-
         $this->availableDistributionCenters = $this->distributionCenterService->getAll()
             ->pluck('name', 'id')
             ->toArray();
+
+        $this->countries = $this->countryService->getCodeNameList();
+        $this->country_code = $this->country_code ?: config('countries.default_country_code');
+
+        $this->languages = collect(\App\Enums\Language::cases())
+            ->mapWithKeys(fn($case) => [$case->value => $case->label])
+            ->toArray();
+        $this->language = $this->language ?: config('countries.default_language', 'fr');
     }
 
     public function boot(
-        UserService $userService, DistributionCenterService $distributionCenterService, MediaServiceInterface $mediaService)
-    {
+        UserService $userService,
+        DistributionCenterService $distributionCenterService,
+        MediaServiceInterface $mediaService,
+        CountryService $countryService
+    ) {
         $this->userService = $userService;
         $this->distributionCenterService = $distributionCenterService;
         $this->mediaService = $mediaService;
+        $this->countryService = $countryService;
     }
 
     public function rules()
