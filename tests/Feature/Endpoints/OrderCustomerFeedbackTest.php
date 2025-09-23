@@ -105,7 +105,7 @@ final class OrderCustomerFeedbackTest extends TestCase
                 ],
             ])
             ->assertJsonPath('_metadata.success', true)
-            ->assertJsonPath('_metadata.message', 'Commentaire ajouté à la commande avec succès')
+            ->assertJsonPath('_metadata.message', 'Comment added to order successfully')
             ->assertJsonPath('data.id', $order->id)
             ->assertJsonPath('data.comments', $payload['comments'])
             ->assertJsonPath('data.rating', $payload['rating'])

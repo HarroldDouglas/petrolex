@@ -29,8 +29,6 @@ class CreateUserForm extends AbstractUserForm
 
         try {
 
-
-
             $dto = new CreateUserDTO(
                 first_name: $validatedData['first_name'],
                 last_name: $validatedData['last_name'],

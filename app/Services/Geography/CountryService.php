@@ -15,8 +15,6 @@ class CountryService extends BaseServiceForEntity
 
     /**
      * Get all active countries as [code => name]
-     *
-     * @return array
      */
     public function getCodeNameList(): array
     {
