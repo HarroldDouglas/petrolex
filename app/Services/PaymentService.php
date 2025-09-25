@@ -119,6 +119,6 @@ class PaymentService
 
     private function schedulePaymentCallback(OrderPayment $payment): void
     {
-        dispatch(new \App\Jobs\UpdatePaymentStatusJob($payment->id))->delay(now()->addMinute());
+        dispatch(new \App\Jobs\UpdatePaymentStatusJob($payment->id))->delay(now()->addSeconds(30));
     }
 }
