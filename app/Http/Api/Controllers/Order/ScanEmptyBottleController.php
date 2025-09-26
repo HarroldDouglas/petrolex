@@ -41,9 +41,10 @@ final class ScanEmptyBottleController extends Controller
 
         $success = $this->orderService->handleEmptyBottleReturn($dto, $order);
 
-        if ($success) {
+        //TODO uncomment this after mobile test
+       /* if ($success) { */
             return ScanEmptyBottleResponse::success(null, __('api.empty_bottle_scanned_success'));
-        }
+       /* } */
 
         return ScanEmptyBottleResponse::error(__('api.empty_bottle_scan_failed'));
     }
