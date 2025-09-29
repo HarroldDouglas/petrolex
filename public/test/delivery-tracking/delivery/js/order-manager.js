@@ -85,14 +85,14 @@ class OrderManager {
             this.selectedOrderData = orderData;
             this.selectedOrder = orderData;
             
-            if (orderData.status === DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS) {
+            if (orderData.status === DELIVERY_CONFIG.ORDER_STATUS.PROCESSING || orderData.status === 'processing') {
                 try {
                     const trackingResponse = await this.apiService.getOrderTracking(orderId);
                     if (trackingResponse && trackingResponse.data) {
                         orderData.trackingData = trackingResponse.data;
                         
                         const trackingData = trackingResponse.data;
-                        if (trackingData.status === DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS || trackingData.status === 'started') {
+                        if (trackingData.status === DELIVERY_CONFIG.ORDER_STATUS.PROCESSING || trackingData.status === 'started' || trackingData.status === 'processing') {
                             // Initialiser l'affichage des estimations avec les données existantes
                             if (trackingData.progress_percentage !== undefined && 
                                 trackingData.distance_remaining !== undefined && 
@@ -111,7 +111,7 @@ class OrderManager {
                     console.warn('Tracking data not available for in-progress order:', trackingError.message);
                 }
             } else {
-                // Pour les commandes confirmées, pas de tracking à récupérer
+                // Pour les commandes non-processing, pas de tracking à récupérer
                 console.log(`📦 Commande ${orderData.order_number} sélectionnée (statut: ${orderData.status}) - pas de tracking requis`);
             }
             

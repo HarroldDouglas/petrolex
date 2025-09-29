@@ -14,6 +14,14 @@ if (typeof SHARED_CONFIG !== 'undefined') {
             DEFAULT_CREDENTIALS: {
                 email: 'delivery1@test.com',
                 password: 'password'
+            },
+            
+            // Configuration de simulation
+            SIMULATION: {
+                POSITION_UPDATE_INTERVAL: 2000, // 2 secondes
+                DEFAULT_SPEED_KMH: 40,
+                MIN_SPEED_KMH: 10,
+                MAX_SPEED_KMH: 80
             }
         };
     } else {
@@ -23,6 +31,12 @@ if (typeof SHARED_CONFIG !== 'undefined') {
             DEFAULT_CREDENTIALS: {
                 email: 'delivery1@test.com',
                 password: 'password'
+            },
+            SIMULATION: {
+                POSITION_UPDATE_INTERVAL: 2000, // 2 secondes
+                DEFAULT_SPEED_KMH: 40,
+                MIN_SPEED_KMH: 10,
+                MAX_SPEED_KMH: 80
             }
         });
     }

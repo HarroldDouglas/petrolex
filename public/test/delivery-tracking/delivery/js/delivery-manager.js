@@ -193,11 +193,90 @@ class DeliveryManager {
                     adjustedDuration = routeInfo.duration;
                 }
                 
-                this.ui.updateRouteEstimates(adjustedDuration, routeInfo.distance);
-                this.currentEstimatedDuration = adjustedDuration;
-                this.ui.updateCurrentPosition(null, currentSpeed);
-                
                 console.log(`✅ Route calculée: ${distanceKm}km en ${adjustedDuration}min à ${speedKmh}km/h`);
+                
+                // 🔧 CORRECTION CRITIQUE: Vérifier d'abord s'il y a des données existantes
+                // Debug : vérifier les données de tracking
+                console.log('🔍 [DeliveryManager] Vérification trackingData:', {
+                    hasTrackingData: !!selectedOrder.trackingData,
+                    trackingData: selectedOrder.trackingData,
+                    progressPercentage: selectedOrder.trackingData?.progress_percentage
+                });
+                
+                // Vérifier s'il y a des données de tracking existantes
+                const hasExistingTracking = selectedOrder.trackingData && 
+                    selectedOrder.trackingData.progress_percentage !== null && 
+                    selectedOrder.trackingData.progress_percentage !== undefined &&
+                    parseFloat(selectedOrder.trackingData.progress_percentage) > 0;
+                
+                // 🔧 VÉRIFICATION DANS LA BASE DE DONNÉES pour éviter les races conditions
+                const existingTrackingFromDB = await this.checkExistingTrackingInDB(selectedOrder.id);
+                
+                if (!hasExistingTracking && !existingTrackingFromDB) {
+                    // Pas de tracking existant - utiliser nouvelles données calculées
+                    console.log('📡 Pas de tracking existant - initialisation avec nouvelles données');
+                    this.ui.updateRouteEstimates(adjustedDuration, distanceKm);
+                    this.currentEstimatedDuration = adjustedDuration;
+                    this.ui.updateCurrentPosition(null, currentSpeed);
+                    
+                    await this.updateTrackingData(selectedOrder.id, {
+                        distance_remaining: parseFloat(distanceKm.toFixed(2)),
+                        estimated_duration: adjustedDuration,
+                        progress_percentage: 0 // Nouveau calcul, donc 0%
+                    });
+                } else {
+                    // Tracking existant - utiliser données existantes
+                    const existingProgress = parseFloat(selectedOrder.trackingData.progress_percentage);
+                    const existingDistance = parseFloat(selectedOrder.trackingData.distance_remaining);
+                    const existingDuration = parseInt(selectedOrder.trackingData.estimated_duration);
+                    
+                    console.log('✅ Tracking existant détecté - conservation des données:', {
+                        fromSelectedOrder: hasExistingTracking,
+                        fromDatabase: existingTrackingFromDB,
+                        progress: existingProgress,
+                        remaining: existingDistance,
+                        duration: existingDuration
+                    });
+                    
+                    // 🔧 UTILISER LES DONNÉES EXISTANTES dans l'UI
+                    this.ui.updateRouteEstimates(existingDuration, existingDistance);
+                    this.ui.updateProgress(existingProgress); // 🎯 AJOUT: Afficher la progression existante!
+                    this.currentEstimatedDuration = existingDuration;
+                    this.ui.updateCurrentPosition(null, currentSpeed);
+                    
+                    // 🔧 METTRE À JOUR LA POSITION DU LIVREUR sur la carte avec les données existantes
+                    if (selectedOrder.trackingData.driver_lat && selectedOrder.trackingData.driver_lng) {
+                        const currentDriverPosition = {
+                            lat: parseFloat(selectedOrder.trackingData.driver_lat),
+                            lng: parseFloat(selectedOrder.trackingData.driver_lng)
+                        };
+                        
+                        console.log(`🗺️ Mise à jour position livreur existante: ${currentDriverPosition.lat}, ${currentDriverPosition.lng}`);
+                        
+                        this.mapService.updateDriverPosition(
+                            currentDriverPosition.lat,
+                            currentDriverPosition.lng,
+                            `Position actuelle - ${selectedOrder.order_number}`
+                        );
+                        
+                        // 🔧 RECALCULER L'ITINÉRAIRE depuis la position actuelle du livreur
+                        const destination = selectedOrder.destination_coordinates || selectedOrder.delivery_address;
+                        if (destination) {
+                            console.log(`🗺️ Recalcul itinéraire depuis position actuelle vers destination`);
+                            
+                            const routeInfo = await this.mapService.drawRoute(
+                                currentDriverPosition.lat,
+                                currentDriverPosition.lng,
+                                destination.latitude,
+                                destination.longitude
+                            );
+                            
+                            if (routeInfo) {
+                                console.log(`✅ Itinéraire recalculé depuis position actuelle: ${existingDistance}km restants`);
+                            }
+                        }
+                    }
+                }
             } else {
                 this.ui.updateRouteEstimates(null, null);
             }
@@ -398,5 +477,96 @@ class DeliveryManager {
 
     getTrackingState() {
         return this.trackingService.getTrackingState();
+    }
+
+    /**
+     * Vérifier s'il existe des données de tracking dans la base de données
+     */
+    async checkExistingTrackingInDB(orderId) {
+        try {
+            const token = localStorage.getItem('delivery_person_token');
+            if (!token) {
+                return false;
+            }
+
+            const response = await fetch(`${SHARED_CONFIG.API.BASE_URL}/tracking/delivery/${orderId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                const progressPercentage = parseFloat(result.data?.progress_percentage || 0);
+                console.log('🔍 [DeliveryManager] Vérification DB tracking:', {
+                    orderId,
+                    progress: progressPercentage + '%',
+                    hasProgress: progressPercentage > 0
+                });
+                return progressPercentage > 0;
+            }
+            return false;
+        } catch (error) {
+            console.error('❌ Erreur vérification tracking DB:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Met à jour les données de tracking dans le backend (distance, durée, etc.)
+     */
+    async updateTrackingData(orderId, trackingData) {
+        try {
+            console.log(`📡 Envoi des données de tracking au backend:`, trackingData);
+            
+            // Récupérer le token d'authentification
+            const token = localStorage.getItem('delivery_person_token');
+            if (!token) {
+                console.error('❌ Pas de token d\'authentification');
+                return;
+            }
+
+            // Ajouter la position actuelle si disponible
+            const currentPosition = await this.getCurrentPosition();
+            if (currentPosition) {
+                trackingData.driver_lat = currentPosition.lat;
+                trackingData.driver_lng = currentPosition.lng;
+            }
+
+            // Appel API pour mettre à jour le tracking
+            const response = await fetch(`${SHARED_CONFIG.API.BASE_URL}/tracking/delivery/${orderId}/position`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(trackingData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log(`✅ Données de tracking mises à jour:`, result);
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la mise à jour du tracking:', error);
+        }
+    }
+
+    /**
+     * Récupère la position actuelle du livreur
+     */
+    async getCurrentPosition() {
+        try {
+            return await this.mapService.getCurrentPosition();
+        } catch (error) {
+            console.warn('⚠️ Impossible de récupérer la position actuelle:', error);
+            return null;
+        }
     }
 }

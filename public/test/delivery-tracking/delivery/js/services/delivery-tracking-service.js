@@ -110,6 +110,15 @@ class DeliveryTrackingService {
                 this.state.isTracking = true;
                 this.state.isPaused = false;
                 
+                // 🔧 CORRECTION CRITIQUE: Initialiser currentIndex basé sur la progression existante
+                const existingProgress = parseFloat(trackingData.progress_percentage || 0);
+                console.log('🔄 [TrackingService] Progression existante détectée:', existingProgress + '%');
+                
+                if (existingProgress > 0) {
+                    // On initialisera currentIndex après avoir récupéré les coordonnées de route
+                    this.state.existingProgress = existingProgress;
+                }
+                
                 const orderDetails = {
                     id: this.state.currentOrder.order_id,
                     order_number: this.state.currentOrder.order_number,
@@ -205,10 +214,21 @@ class DeliveryTrackingService {
             phone: orderDetails.customer?.phone_number,
         });
 
-        const routeData = await this.mapService.drawRoute(currentPosition, destination, this.getTransportMode());
+        const routeData = await this.mapService.drawRoute(currentPosition.lat, currentPosition.lng, destination.lat, destination.lng);
 
         if (routeData?.geometry?.coordinates) {
             this.state.routeCoordinates = routeData.geometry.coordinates;
+            
+            // 🔧 CORRECTION CRITIQUE: Initialiser currentIndex basé sur la progression existante
+            if (this.state.existingProgress && this.state.existingProgress > 0) {
+                const totalSteps = this.state.routeCoordinates.length;
+                this.state.currentIndex = Math.floor((this.state.existingProgress / 100) * totalSteps);
+                console.log(`🎯 [TrackingService] Index initialisé à ${this.state.currentIndex}/${totalSteps} basé sur ${this.state.existingProgress}%`);
+                
+                // Nettoyer la variable temporaire
+                delete this.state.existingProgress;
+            }
+            
             this.startSimulation(speed, estimatedDurationMinutes);
         } else {
             throw new Error("Impossible de calculer la route");
@@ -247,7 +267,9 @@ class DeliveryTrackingService {
         }
 
         if (this.state.currentIndex >= this.state.routeCoordinates.length) {
-            this.completeTracking();
+            // 🚫 NE PAS AUTO-COMPLÉTER ! Seulement arrêter la simulation
+            console.log("🏁 Fin de parcours atteinte - simulation terminée (pas de livraison automatique)");
+            this.stopTracking();
             return;
         }
 
@@ -274,9 +296,16 @@ class DeliveryTrackingService {
     }
 
     startPositionUpdates() {
-        this.intervals.positionUpdate = setInterval(async () => {
+        // 🔧 ATTENDRE AVANT LE PREMIER ENVOI pour éviter d'écraser les données existantes
+        setTimeout(async () => {
+            // Premier envoi après délai
             await this.sendPositionUpdate();
-        }, DELIVERY_CONFIG.SIMULATION.POSITION_UPDATE_INTERVAL);
+            
+            // Puis intervalle régulier
+            this.intervals.positionUpdate = setInterval(async () => {
+                await this.sendPositionUpdate();
+            }, DELIVERY_CONFIG.SIMULATION.POSITION_UPDATE_INTERVAL);
+        }, 5000); // Attendre 5 secondes au démarrage
     }
 
     async sendPositionUpdate() {
@@ -304,6 +333,12 @@ class DeliveryTrackingService {
                 
                 if (response && response._metadata?.success && response.data) {
                     const serverData = response.data;
+                    
+                    // 🔧 MISE À JOUR CRITIQUE: Mettre à jour currentOrder avec les nouvelles données
+                    this.state.currentOrder.progress_percentage = serverData.progress_percentage || progressData.progressPercentage;
+                    this.state.currentOrder.distance_remaining = serverData.distance_remaining || progressData.distanceRemaining;
+                    this.state.currentOrder.estimated_duration = serverData.estimated_duration || progressData.estimatedDuration;
+                    
                     this.emit("progressUpdate", {
                         progress: serverData.progress_percentage || progressData.progressPercentage,
                         position: position,
@@ -320,6 +355,47 @@ class DeliveryTrackingService {
     
     // 🔧 NOUVELLE MÉTHODE : Calculer la progression basée sur la position actuelle
     calculateProgress(currentPosition) {
+        // 🔧 PENDANT LA SIMULATION ACTIVE : Calculer la progression basée sur currentIndex
+        if (this.state.routeCoordinates && this.state.routeCoordinates.length > 0) {
+            // Calculer la progression basée sur l'index actuel dans la route
+            const totalSteps = this.state.routeCoordinates.length;
+            const completedSteps = this.state.currentIndex || 0;
+            const progressPercentage = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
+            
+            // Calculer la distance restante approximative
+            const remainingSteps = totalSteps - completedSteps;
+            const totalRouteDistance = this.estimateRouteDistance();
+            const distanceRemaining = (remainingSteps / totalSteps) * totalRouteDistance;
+            
+            // Calculer le temps estimé restant
+            const currentSpeed = this.ui?.getTravelSpeed() || 40;
+            const estimatedDuration = distanceRemaining > 0 ? Math.round((distanceRemaining / currentSpeed) * 60) : 0;
+            
+            console.log(`📊 Progression simulée: ${progressPercentage}% - ${distanceRemaining.toFixed(2)}km restants - ${estimatedDuration}min (index: ${completedSteps}/${totalSteps})`);
+            
+            return {
+                progressPercentage,
+                distanceRemaining: parseFloat(distanceRemaining.toFixed(2)),
+                estimatedDuration
+            };
+        }
+        
+        // 🔧 FALLBACK : Utiliser données existantes si pas de simulation active
+        if (this.state.currentOrder && this.state.currentOrder.progress_percentage !== null && this.state.currentOrder.progress_percentage !== undefined) {
+            const existingProgress = parseFloat(this.state.currentOrder.progress_percentage);
+            const existingDistance = parseFloat(this.state.currentOrder.distance_remaining || 0);
+            const existingDuration = parseInt(this.state.currentOrder.estimated_duration || 0);
+            
+            console.log(`📊 Utilisation données existantes (pas de simulation): ${existingProgress}% - ${existingDistance}km restants - ${existingDuration}min`);
+            
+            return {
+                progressPercentage: existingProgress,
+                distanceRemaining: existingDistance,
+                estimatedDuration: existingDuration
+            };
+        }
+        
+        // 🔧 FALLBACK FINAL : valeurs par défaut
         if (!this.state.routeCoordinates || this.state.routeCoordinates.length === 0) {
             return {
                 progressPercentage: 0,
@@ -327,28 +403,6 @@ class DeliveryTrackingService {
                 estimatedDuration: null
             };
         }
-        
-        // Calculer la progression basée sur l'index actuel dans la route
-        const totalSteps = this.state.routeCoordinates.length;
-        const completedSteps = this.state.currentIndex;
-        const progressPercentage = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
-        
-        // Calculer la distance restante approximative
-        const remainingSteps = totalSteps - completedSteps;
-        const totalRouteDistance = this.estimateRouteDistance();
-        const distanceRemaining = (remainingSteps / totalSteps) * totalRouteDistance;
-        
-        // Calculer le temps estimé restant
-        const currentSpeed = this.ui?.getTravelSpeed() || 40;
-        const estimatedDuration = distanceRemaining > 0 ? Math.round((distanceRemaining / currentSpeed) * 60) : 0;
-        
-        console.log(`📊 Progression calculée: ${progressPercentage}% - ${distanceRemaining.toFixed(2)}km restants - ${estimatedDuration}min`);
-        
-        return {
-            progressPercentage,
-            distanceRemaining: parseFloat(distanceRemaining.toFixed(2)),
-            estimatedDuration
-        };
     }
     
     // 🔧 NOUVELLE MÉTHODE : Estimer la distance totale de la route

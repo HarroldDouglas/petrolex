@@ -73,12 +73,12 @@ class WebSocketManager {
                 this.ui.updateWebSocketStatus(false);
                 this.ui.showError(`Erreur WebSocket: ${error.error?.data?.message || 'Vérifiez la console'}`);
             });
-            
-            this.pusher.connection.bind('failed', () => {
-                console.error('[WebSocket] La connexion a échoué (failed event).');
+
+            this.pusher.connection.bind("failed", () => {
+                console.error("❌ [WebSocket] Connexion échouée définitivement");
                 this.wsConnected = false;
                 this.ui.updateWebSocketStatus(false);
-                this.ui.showError("La connexion WebSocket a échoué.");
+                this.ui.showError("Connexion WebSocket échouée - Basculement en mode API");
             });
 
             // === SOUSCRIPTION AUX CANAUX ===

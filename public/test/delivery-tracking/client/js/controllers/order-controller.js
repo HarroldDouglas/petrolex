@@ -44,6 +44,8 @@ class OrderController {
 
         try {
             console.log("🔍 Chargement des commandes pour l'utilisateur:", user);
+            console.log("🔍 [OrderController] Filtres:", filters);
+            console.log("🔍 [OrderController] Page:", page);
             const response = await this.apiService.getMyOrders(filters, page);
 
             // Retourner la réponse pour que CustomerOrderManager la traite
@@ -56,6 +58,7 @@ class OrderController {
                 window.customerApp.notificationService.error("Impossible de charger vos commandes");
             }
         } finally {
+            // Toujours remettre le bouton à l'état normal
             this.ui.setLoadingState("refreshOrdersBtn", false);
         }
     }

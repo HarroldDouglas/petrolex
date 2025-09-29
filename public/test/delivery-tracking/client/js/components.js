@@ -6,7 +6,7 @@
 class CustomerUIComponents {
     constructor() {
         this.uiManager = new UIManager();
-        this.orderManager = new CustomerOrderManager(this.uiManager);
+        this.orderManager = null; // Sera initialisé plus tard avec le controller
         this.trackingManager = new TrackingManager(this.uiManager);
         this.loginForm = null;
 
@@ -16,6 +16,14 @@ class CustomerUIComponents {
     init() {
         this.uiManager.initElements();
         this.bindGlobalEvents();
+    }
+    
+    // Méthode pour initialiser l'orderManager avec le controller
+    initOrderManager(orderController) {
+        if (!this.orderManager && orderController) {
+            this.orderManager = new CustomerOrderManager(orderController, this.uiManager);
+            console.log('📦 [Components] OrderManager initialisé');
+        }
     }
 
     bindGlobalEvents() {
@@ -43,21 +51,45 @@ class CustomerUIComponents {
         }
     }
 
-    showClientPanel() {
+    async showClientPanel() {
         this.uiManager.showClientPanel();
         if (this.loginForm) {
             this.loginForm.hide();
         }
+        
+        // Charger directement les commandes ici aussi
+        console.log('🎯 [Components] showClientPanel - Chargement des commandes...');
+        if (window.customerApp && window.customerApp.loadMyOrders) {
+            console.log('📞 [Components] Appel direct de loadMyOrders()...');
+            try {
+                await window.customerApp.loadMyOrders();
+            } catch (error) {
+                console.error('❌ [Components] Erreur lors du chargement des commandes:', error);
+            }
+        } else {
+            console.error('❌ [Components] customerApp non disponible dans showClientPanel');
+        }
     }
 
-    onLoginSuccess(authData) {
+    async onLoginSuccess(authData) {
         console.log("🔐 [Components] Connexion réussie:", authData.user);
         this.uiManager.updateClientInfo(authData.user);
-        this.showClientPanel();
+        await this.showClientPanel();
 
         // Charger les commandes initiales
+        console.log('🎯 [Components] Tentative de chargement des commandes...');
+        console.log('🎯 [Components] window.customerApp:', window.customerApp);
+        console.log('🎯 [Components] loadMyOrders method:', window.customerApp?.loadMyOrders);
+        
         if (window.customerApp && window.customerApp.loadMyOrders) {
-            window.customerApp.loadMyOrders();
+            console.log('📞 [Components] Appel de loadMyOrders()...');
+            try {
+                await window.customerApp.loadMyOrders();
+            } catch (error) {
+                console.error('❌ [Components] Erreur lors du chargement des commandes:', error);
+            }
+        } else {
+            console.error('❌ [Components] customerApp ou loadMyOrders non disponible');
         }
     }
 
@@ -113,19 +145,27 @@ class CustomerUIComponents {
     }
 
     updateTrackingStats(data) {
-        return this.trackingManager.updateStats(data);
+        return this.trackingManager.updateTrackingDisplay(data);
     }
 
     updateTrackingProgress(percent) {
-        return this.trackingManager.updateProgress(percent);
+        // La progression est gérée directement via les éléments DOM
+        if (this.trackingManager.elements.trackingProgress) {
+            this.trackingManager.elements.trackingProgress.textContent = `${Math.round(percent)}%`;
+        }
+        if (this.trackingManager.elements.trackingProgressBar) {
+            this.trackingManager.elements.trackingProgressBar.style.width = `${percent}%`;
+        }
     }
 
     addTrackingHistoryItem(message, type) {
-        return this.trackingManager.addHistoryItem(message, type);
+        return this.trackingManager.addToHistory(message, type);
     }
 
     clearTrackingHistory() {
-        return this.trackingManager.clearHistory();
+        if (this.trackingManager.elements.trackingHistory) {
+            this.trackingManager.elements.trackingHistory.innerHTML = '';
+        }
     }
 
     // Gestion UI générale

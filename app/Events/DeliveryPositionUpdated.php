@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Helpers\DeliveryProgressHelper;
 use App\Models\DeliveryTracking;
 use Exception;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +19,7 @@ use Illuminate\Support\Facades\Log;
  * This event broadcasts real-time position updates for delivery tracking,
  * providing comprehensive delivery information to connected clients.
  */
-class DeliveryPositionUpdated implements ShouldBroadcast
+class DeliveryPositionUpdated implements ShouldBroadcastNow
 {
     use Dispatchable;
     use InteractsWithSockets;
@@ -43,6 +42,13 @@ class DeliveryPositionUpdated implements ShouldBroadcast
             'order.customer',
             'order.deliveryPerson',
             'order.deliveryAddress',
+        ]);
+
+        // 🔧 DEBUG : Log pour vérifier que l'événement est déclenché
+        Log::info('DeliveryPositionUpdated event triggered', [
+            'delivery_id' => $this->delivery->id,
+            'order_id' => $this->delivery->order_id,
+            'status' => $this->delivery->status->value,
         ]);
     }
 
@@ -131,15 +137,10 @@ class DeliveryPositionUpdated implements ShouldBroadcast
      */
     private function calculateRouteProgress(): array
     {
-        $totalDistance = $this->calculateRouteDistance($this->delivery->route_geometry);
-        $progressPercentage = DeliveryProgressHelper::calculateProgressPercentage(
-            $totalDistance,
-            $this->delivery->distance_remaining
-        );
-
+        // 🔧 UTILISER DIRECTEMENT LES DONNÉES DU LIVREUR - PAS DE CALCUL !
         return [
-            'total_distance' => $totalDistance,
-            'progress_percentage' => $progressPercentage,
+            'total_distance' => null,
+            'progress_percentage' => $this->delivery->progress_percentage,
         ];
     }
 

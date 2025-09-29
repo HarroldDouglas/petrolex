@@ -7,6 +7,7 @@ class TrackingManager {
         this.websocketManager = null; // Manager WebSocket
         this.currentOrderId = null;
         this.lastTrackingData = null; // Dernières données reçues du WebSocket
+        this.pollingInterval = null; // Pour le polling API
         this.initTrackingElements();
     }
     
@@ -56,27 +57,90 @@ class TrackingManager {
         
         this.currentOrderId = orderId;
         
-        // Vérifier que WebSocket est connecté
-        if (!this.websocketManager || !this.websocketManager.isConnected()) {
-            console.error("❌ WebSocket non connecté - impossible de recevoir les données de tracking");
-            this.uiManager.showError("WebSocket déconnecté. Reconnexion en cours...");
-            return false;
+        // Utiliser WebSocket OU API polling (pas les deux)
+        if (this.websocketManager && this.websocketManager.isConnected()) {
+            // Mode WebSocket: souscrire aux mises à jour en temps réel
+            this.websocketManager.subscribeToDeliveryTracking(orderId);
+            console.log(`✅ Suivi activé pour la commande ${orderId} via WebSocket`);
+        } else {
+            // Mode API: récupérer les données de tracking via polling
+            console.warn("⚠️ WebSocket non connecté - utilisation de l'API pour le tracking");
+            this.uiManager.showInfo("Mode tracking via API (WebSocket indisponible)");
+            this.startApiPolling(orderId);
+            console.log(`✅ Suivi activé pour la commande ${orderId} via API polling`);
         }
-
-        // Souscrire aux mises à jour de tracking via WebSocket
-        this.websocketManager.subscribeToDeliveryTracking(orderId);
         
         // Initialiser l'affichage
         this.showTracking();
         this.setupConnectionStatus();
         
-        console.log(`✅ Suivi activé pour la commande ${orderId} via WebSocket`);
         return true;
+    }
+
+    // Polling API pour le tracking quand WebSocket n'est pas disponible
+    startApiPolling(orderId) {
+        // Arrêter tout polling existant
+        if (this.pollingInterval) {
+            clearInterval(this.pollingInterval);
+        }
+        
+        // Récupérer les données initiales
+        this.fetchTrackingData(orderId);
+        
+        // Polling toutes les 10 secondes
+        this.pollingInterval = setInterval(() => {
+            this.fetchTrackingData(orderId);
+        }, 10000);
+    }
+    
+    async fetchTrackingData(orderId) {
+        try {
+            console.log(`📡 Récupération des vraies données de tracking pour commande ${orderId}`);
+            
+            // Appel API réel pour récupérer les données de tracking
+            const response = await fetch(`${SHARED_CONFIG.API.BASE_URL}/tracking/delivery/${orderId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('api_token')}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data && data.data) {
+                console.log("📊 Données reçues de l'API:", data.data);
+                console.log("📈 Progression:", data.data.progress_percentage + "%");
+                console.log("📍 Distance restante:", data.data.distance_remaining);
+                console.log("⏱️ ETA:", data.data.estimated_arrival);
+                this.handleRealTimeUpdate(data.data);
+                console.log("✅ Vraies données de tracking récupérées via API:", data.data);
+            } else {
+                console.warn("⚠️ Aucune donnée de tracking disponible");
+            }
+            
+        } catch (error) {
+            console.error("❌ Erreur lors de la récupération des données de tracking:", error);
+            // En cas d'erreur, afficher un message informatif
+            this.uiManager.showError("Impossible de récupérer les données de tracking");
+        }
     }
 
     stopTracking() {
         console.log("🛑 Arrêt du suivi");
         
+        // Arrêter le polling API
+        if (this.pollingInterval) {
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
+        }
+        
+        // Arrêter WebSocket si connecté
         if (this.currentOrderId && this.websocketManager) {
             this.websocketManager.unsubscribeFromDeliveryTracking(this.currentOrderId);
         }
@@ -89,29 +153,48 @@ class TrackingManager {
     handleRealTimeUpdate(trackingData) {
         console.log("📡 Mise à jour reçue via WebSocket:", trackingData);
         
+        // Si on reçoit des données WebSocket, arrêter le polling
+        if (this.pollingInterval) {
+            console.log("🛑 Arrêt du polling - WebSocket fonctionnel");
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
+        }
+        
         this.lastTrackingData = trackingData;
 
         // Mettre à jour la carte avec la position du livreur
-        if (this.mapService && trackingData.driver_position) {
+        // 🔧 SUPPORT DES DEUX FORMATS : API Resource ET WebSocket Event
+        const driverLat = trackingData.driver_position?.lat || trackingData.driver_lat;
+        const driverLng = trackingData.driver_position?.lng || trackingData.driver_lng;
+        const destLat = trackingData.destination?.lat || trackingData.destination_lat;
+        const destLng = trackingData.destination?.lng || trackingData.destination_lng;
+        
+        if (this.mapService && driverLat && driverLng) {
+            console.log(`🗺️ Mise à jour position livreur: ${driverLat}, ${driverLng}`);
             this.mapService.updateDriverPosition(
-                trackingData.driver_position.lat,
-                trackingData.driver_position.lng,
-                trackingData.driver_info || { name: 'Livreur' }
+                parseFloat(driverLat),
+                parseFloat(driverLng),
+                { name: trackingData.driver_name || 'Livreur' }
             );
 
             // Afficher aussi la destination si disponible
-            if (trackingData.customer_position) {
+            if (destLat && destLng) {
+                console.log(`🎯 Mise à jour destination: ${destLat}, ${destLng}`);
                 this.mapService.setDestination(
-                    trackingData.customer_position.lat,
-                    trackingData.customer_position.lng,
-                    trackingData.customer_info || { name: 'Destination' }
+                    parseFloat(destLat),
+                    parseFloat(destLng),
+                    { name: trackingData.customer_name || 'Destination' }
                 );
             }
+        } else {
+            console.warn("⚠️ Données de position manquantes pour la carte:", {
+                driverLat, driverLng, destLat, destLng
+            });
+        }
 
-            // Tracer l'itinéraire si disponible
-            if (trackingData.route_points && trackingData.route_points.length > 0) {
-                this.mapService.drawRouteFromPoints(trackingData.route_points);
-            }
+        // Tracer l'itinéraire si disponible
+        if (trackingData.route_points && trackingData.route_points.length > 0) {
+            this.mapService.drawRouteFromPoints(trackingData.route_points);
         }
 
         // Mettre à jour l'interface utilisateur
@@ -124,29 +207,85 @@ class TrackingManager {
     }
 
     updateTrackingDisplay(trackingData) {
+        console.log('🎨 [TrackingManager] updateTrackingDisplay avec:', trackingData);
+        
         // Nom du livreur
-        if (this.elements.trackingDriverName && trackingData.driver_info) {
-            this.elements.trackingDriverName.textContent = 
-                trackingData.driver_info.name || `${trackingData.driver_info.first_name} ${trackingData.driver_info.last_name}`;
+        if (this.elements.trackingDriverName) {
+            let driverName = '-';
+            if (trackingData.driver_info) {
+                driverName = trackingData.driver_info.name || `${trackingData.driver_info.first_name} ${trackingData.driver_info.last_name}`;
+            } else if (trackingData.driver_name) {
+                driverName = trackingData.driver_name;
+            }
+            this.elements.trackingDriverName.textContent = driverName;
         }
 
-        // ETA
-        if (this.elements.trackingETA && trackingData.estimated_arrival) {
-            this.elements.trackingETA.textContent = trackingData.estimated_arrival;
+        // ETA - essayer plusieurs propriétés possibles
+        if (this.elements.trackingETA) {
+            let eta = trackingData.estimated_arrival || trackingData.estimated_duration || trackingData.eta;
+            if (eta) {
+                // Si c'est un nombre, ajouter "min"
+                if (typeof eta === 'number') {
+                    eta = `${eta} min`;
+                }
+                this.elements.trackingETA.textContent = eta;
+            }
+        }
+
+        // Distance restante - essayer plusieurs propriétés
+        if (this.elements.trackingDistance) {
+            let distance = trackingData.distance_remaining || trackingData.distance;
+            if (distance) {
+                // Si c'est un nombre, ajouter "km"
+                if (typeof distance === 'number') {
+                    distance = `${distance} km`;
+                } else if (typeof distance === 'string' && !distance.includes('km')) {
+                    distance = `${distance} km`;
+                }
+                this.elements.trackingDistance.textContent = distance;
+            }
         }
 
         // Progression
-        if (this.elements.trackingProgress && trackingData.progress_percentage !== undefined) {
-            this.elements.trackingProgress.textContent = `${Math.round(trackingData.progress_percentage)}%`;
+        if (trackingData.progress_percentage !== undefined) {
+            const progress = parseFloat(trackingData.progress_percentage);
+            
+            if (this.elements.trackingProgress) {
+                this.elements.trackingProgress.textContent = `${Math.round(progress)}%`;
+            }
+            
+            if (this.elements.trackingProgressBar) {
+                this.elements.trackingProgressBar.style.width = `${progress}%`;
+            }
         }
 
-        if (this.elements.trackingProgressBar && trackingData.progress_percentage !== undefined) {
-            this.elements.trackingProgressBar.style.width = `${trackingData.progress_percentage}%`;
+        // Statut de la commande
+        if (this.elements.trackingOrderStatus && trackingData.status) {
+            let statusText = trackingData.status;
+            let statusClass = 'badge bg-secondary';
+            
+            // Mapper les statuts
+            if (statusText === 'in_progress') {
+                statusText = 'En cours de livraison';
+                statusClass = 'badge bg-warning';
+            } else if (statusText === 'delivered') {
+                statusText = 'Livrée';
+                statusClass = 'badge bg-success';
+            }
+            
+            this.elements.trackingOrderStatus.textContent = statusText;
+            this.elements.trackingOrderStatus.className = statusClass;
         }
 
-        // Distance restante
-        if (this.elements.trackingDistance && trackingData.distance_remaining) {
-            this.elements.trackingDistance.textContent = trackingData.distance_remaining;
+        // Adresse de livraison
+        if (this.elements.trackingDeliveryAddress) {
+            let address = 'Adresse non disponible';
+            if (trackingData.delivery_address) {
+                address = trackingData.delivery_address.name || trackingData.delivery_address.address || trackingData.delivery_address;
+            } else if (trackingData.destination_address) {
+                address = trackingData.destination_address;
+            }
+            this.elements.trackingDeliveryAddress.textContent = address;
         }
     }
 

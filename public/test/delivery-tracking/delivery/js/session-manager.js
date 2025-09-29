@@ -17,13 +17,14 @@ class SessionManager {
             currentTime: new Date()
         });
         
-        if (sessionExpiry && Date.now() > parseInt(sessionExpiry)) {
-            console.log('⏰ Session expirée');
-            this.clearSession();
-            this.ui.showLoginPanel();
-            this.ui.showInfo('Session expirée. Veuillez vous reconnecter.');
-            return null;
-        }
+        // Désactiver la vérification d'expiration - tokens à validité infinie
+        // if (sessionExpiry && Date.now() > parseInt(sessionExpiry)) {
+        //     console.log('⏰ Session expirée');
+        //     this.clearSession();
+        //     this.ui.showLoginPanel();
+        //     this.ui.showInfo('Session expirée. Veuillez vous reconnecter.');
+        //     return null;
+        // }
         
         if (token && deliveryPersonData) {
             try {

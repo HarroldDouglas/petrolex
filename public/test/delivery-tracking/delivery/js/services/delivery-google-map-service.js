@@ -163,8 +163,11 @@ class DeliveryGoogleMapService {
             };
 
             return new Promise((resolve, reject) => {
+                console.log('🗺️ Appel Google Maps Directions API...');
                 this.directionsService.route(request, (result, status) => {
+                    console.log('📋 Statut API Google Maps:', status);
                     if (status === 'OK') {
+                        console.log('✅ Directions API réussie - utilisation route réelle');
                         // Afficher la route
                         this.routeRenderer.setDirections(result);
 
@@ -181,20 +184,35 @@ class DeliveryGoogleMapService {
                             top: 50, bottom: 50, left: 50, right: 50
                         });
 
+                        console.log('📏 Distance réelle (Google):', leg.distance.value, 'mètres =', (leg.distance.value/1000).toFixed(3), 'km');
+                        
+                        // Extraire les coordonnées de la route pour la simulation
+                        const routeCoordinates = [];
+                        route.overview_path.forEach(point => {
+                            routeCoordinates.push([point.lng(), point.lat()]); // Format [lng, lat] comme Mapbox
+                        });
+                        
                         resolve({
                             duration: leg.duration.value, // en secondes
                             distance: leg.distance.value, // en mètres
                             durationText: leg.duration.text,
-                            distanceText: leg.distance.text
+                            distanceText: leg.distance.text,
+                            // Ajouter compatibilité avec format Mapbox pour le tracking
+                            geometry: {
+                                coordinates: routeCoordinates
+                            }
                         });
                     } else {
-                        console.error('Erreur lors du calcul de la route:', status);
+                        console.error('❌ ÉCHEC Directions API - Statut:', status);
+                        console.error('🔍 Détails de l\'erreur:', result);
+                        console.log('🔄 Basculement vers calcul géodésique direct...');
+                        
                         // Fallback: tracer une ligne droite
-                        console.log('🔄 Utilisation du mode fallback avec ligne droite...');
                         this.drawStraightLine(startLat, startLng, endLat, endLng);
                         
                         // Calculer une estimation basique
                         const distance = this.calculateDistance(startLat, startLng, endLat, endLng);
+                        console.log('📏 Distance géodésique (fallback):', distance.toFixed(3), 'km');
                         const estimatedDuration = Math.round(distance / 30 * 60); // 30 km/h en ville
                         
                         resolve({

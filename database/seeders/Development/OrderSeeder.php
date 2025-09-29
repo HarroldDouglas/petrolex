@@ -1370,7 +1370,8 @@ class OrderSeeder extends Seeder
         }
 
         // Choose distribution center based on delivery address location for geographic proximity
-        $center = $this->getOptimalDistributionCenter($centers, $deliveryAddress);
+        // For test orders, prioritize Yaoundé centers to ensure same city
+        $center = $this->getOptimalDistributionCenter($centers, $deliveryAddress, true);
 
         if (! $deliveryAddress) {
             $this->command->error('No delivery addresses found for customer1.');
@@ -1394,9 +1395,19 @@ class OrderSeeder extends Seeder
             'total_amount' => $scenario['delivery_type']->fee(),
         ];
 
-        // Set delivery person for orders that need one
+        // Set delivery person for orders that need one - Use delivery1@test.com for processing orders
         if (isset($scenario['needs_delivery_person']) && $deliveryPersons->isNotEmpty()) {
-            $orderData['delivery_person_id'] = $deliveryPersons->random()->id;
+            if ($scenario['status']->equals(OrderStatus::PROCESSING())) {
+                // Find delivery1@test.com specifically for processing orders
+                $delivery1User = User::where('email', 'delivery1@test.com')->first();
+                if ($delivery1User && $delivery1User->deliveryPerson) {
+                    $orderData['delivery_person_id'] = $delivery1User->deliveryPerson->id;
+                } else {
+                    $orderData['delivery_person_id'] = $deliveryPersons->random()->id;
+                }
+            } else {
+                $orderData['delivery_person_id'] = $deliveryPersons->random()->id;
+            }
         }
 
         // Set timestamps based on status
@@ -1529,8 +1540,20 @@ class OrderSeeder extends Seeder
     /**
      * Get the optimal distribution center based on geographic proximity to delivery address
      */
-    private function getOptimalDistributionCenter(Collection $centers, $deliveryAddress): ?DistributionCenter
+    private function getOptimalDistributionCenter(Collection $centers, $deliveryAddress, bool $prioritizeYaounde = false): ?DistributionCenter
     {
+        // If prioritizing Yaoundé for test orders, filter to Yaoundé centers first
+        if ($prioritizeYaounde) {
+            $yaoundeCenters = $centers->filter(function ($center) {
+                return str_contains(strtolower($center->name), 'yaoundé') || str_contains(strtolower($center->name), 'yaounde');
+            });
+
+            if ($yaoundeCenters->isNotEmpty()) {
+                $centers = $yaoundeCenters;
+                $this->command->info('Using Yaoundé center for test order');
+            }
+        }
+
         if (! $deliveryAddress || ! $deliveryAddress->latitude || ! $deliveryAddress->longitude) {
             return $centers->random();
         }

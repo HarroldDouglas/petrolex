@@ -27,7 +27,9 @@
       "Bash(./tests/E2E/order/test_complete_flow.sh:*)",
       "Bash(./tests/E2E/order/run_all_tests.sh:*)",
       "Bash(netstat:*)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "WebSearch",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []

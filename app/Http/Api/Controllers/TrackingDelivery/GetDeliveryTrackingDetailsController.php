@@ -29,7 +29,7 @@ final class GetDeliveryTrackingDetailsController extends Controller
         if (! $deliveryTracking) {
             Log::warning('Delivery tracking not found for order ID: '.$orderId);
 
-            return DeliveryTrackingResponse::error('Delivery tracking not found.', Response::HTTP_NOT_FOUND);
+            return DeliveryTrackingResponse::error('Delivery tracking not found.', null, Response::HTTP_NOT_FOUND);
         }
 
         $deliveryTracking->load([

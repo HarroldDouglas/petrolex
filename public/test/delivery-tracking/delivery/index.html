@@ -73,6 +73,7 @@
                                 </div>
                             </div>
 
+
                             <!-- Mes commandes -->
                             <div class="mb-3">
                                 <div class="section-header d-flex justify-content-between align-items-center">
@@ -195,6 +196,45 @@
                     </div>
                     <div class="card-body p-0">
                         <div id="map"></div>
+                    </div>
+                </div>
+                
+                <!-- Statut des connexions -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6><i class="fas fa-network-wired"></i> Statut des Connexions</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 col-md-3">
+                                <div class="connection-info">
+                                    <i class="fas fa-wifi text-primary"></i>
+                                    <small class="d-block">WebSocket</small>
+                                    <span id="websocketStatus" class="badge bg-success">Connecté</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="connection-info">
+                                    <i class="fas fa-server text-success"></i>
+                                    <small class="d-block">API</small>
+                                    <span id="apiStatus" class="badge bg-success">Connecté</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="connection-info">
+                                    <i class="fas fa-map text-info"></i>
+                                    <small class="d-block">Google Maps</small>
+                                    <span id="mapStatus" class="badge bg-danger">Erreur</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="connection-info">
+                                    <i class="fas fa-clock text-warning"></i>
+                                    <small class="d-block">Dernière MAJ</small>
+                                    <span id="lastUpdateTime">-</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

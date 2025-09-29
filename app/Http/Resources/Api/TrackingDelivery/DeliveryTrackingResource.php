@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Api\TrackingDelivery;
 
-use App\Helpers\DeliveryProgressHelper;
 use App\Models\DeliveryTracking;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -46,10 +45,8 @@ final class DeliveryTrackingResource extends JsonResource
             'delivered_at' => $this->delivered_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'progress_percentage' => DeliveryProgressHelper::calculateProgressPercentageWithLogging(
-                $this->total_distance,
-                $this->distance_remaining
-            ),
+            // 🔧 CORRECTION: Utiliser directement les données calculées par le livreur
+            'progress_percentage' => $this->progress_percentage,
         ];
     }
 }

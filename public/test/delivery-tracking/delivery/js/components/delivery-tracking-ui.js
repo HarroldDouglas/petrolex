@@ -30,8 +30,23 @@ class DeliveryTrackingUI {
     // Contrôles de livraison
     updateProgress(percent) {
         const roundedPercent = Math.round(percent);
-        this.ui.elements.progressPercent.textContent = `${roundedPercent}%`;
-        this.ui.elements.progressBar.style.width = `${percent}%`;
+        console.log(`🎯 [TrackingUI] updateProgress appelé avec ${percent}%`);
+        console.log(`🎯 [TrackingUI] progressPercent element:`, this.ui.elements.progressPercent);
+        console.log(`🎯 [TrackingUI] progressBar element:`, this.ui.elements.progressBar);
+        
+        if (this.ui.elements.progressPercent) {
+            this.ui.elements.progressPercent.textContent = `${roundedPercent}%`;
+            console.log(`✅ [TrackingUI] Texte progression mis à jour: ${roundedPercent}%`);
+        } else {
+            console.error(`❌ [TrackingUI] Element progressPercent non trouvé!`);
+        }
+        
+        if (this.ui.elements.progressBar) {
+            this.ui.elements.progressBar.style.width = `${percent}%`;
+            console.log(`✅ [TrackingUI] Barre progression mise à jour: ${percent}%`);
+        } else {
+            console.error(`❌ [TrackingUI] Element progressBar non trouvé!`);
+        }
     }
 
     setDeliveryControlsState(isTracking, isPaused) {
@@ -116,10 +131,16 @@ class DeliveryTrackingUI {
         const trackingData = selectedOrder.trackingData;
         if (trackingData.progress_percentage !== undefined && trackingData.progress_percentage !== null) {
             const serverProgress = parseFloat(trackingData.progress_percentage);
+            console.log(`🔍 [TrackingUI] trackingData.progress_percentage:`, trackingData.progress_percentage);
+            console.log(`🔍 [TrackingUI] serverProgress parsé:`, serverProgress);
             if (!isNaN(serverProgress)) {
                 this.updateProgress(serverProgress);
                 console.log(`📊 [TrackingUI] Progression du serveur utilisée: ${serverProgress}%`);
+            } else {
+                console.error(`❌ [TrackingUI] serverProgress est NaN!`);
             }
+        } else {
+            console.warn(`⚠️ [TrackingUI] Pas de progress_percentage dans trackingData:`, trackingData);
         }
         
         // Modifier le bouton principal

@@ -4,7 +4,7 @@ class CustomerApp {
         this.authService = new CustomerAuthService();
         this.apiService = new CustomerApiService();
         this.ui = new CustomerUIComponents();
-        this.mapService = new CustomerMapService();
+        this.mapService = new CustomerGoogleMapService();
         this.errorHandler = new CustomerErrorHandlingService();
 
         // Délégation des responsabilités
@@ -28,6 +28,13 @@ class CustomerApp {
         this.currentUser = null;
 
         this.apiService.setAuthService(this.authService);
+        
+        // Initialiser l'orderManager avec le controller
+        this.ui.initOrderManager(this.orderController);
+        
+        // Exposer globalement pour accès depuis les components
+        window.components = this.ui;
+        window.customerApp = this;
     }
 
     async init() {
@@ -116,7 +123,40 @@ class CustomerApp {
     }
 
     async loadMyOrders(page = 1) {
-        return this.orderController.loadCustomerOrders(this.currentUser, page);
+        console.log('📦 [CustomerApp] Chargement des commandes...');
+        try {
+            const response = await this.orderController.loadCustomerOrders(this.currentUser, {}, page);
+            console.log('✅ [CustomerApp] Commandes reçues:', response);
+            
+            if (response && response.data) {
+                console.log('📊 [CustomerApp] Données à afficher:', response.data.data || response.data);
+                console.log('📊 [CustomerApp] orderManager:', window.components?.orderManager);
+                
+                // Utiliser directement l'OrderManager pour afficher les commandes
+                if (window.components && window.components.orderManager) {
+                    const ordersData = response.data.data || response.data;
+                    const currentPage = response.data.current_page || page;
+                    const totalPages = response.data.last_page || 1;
+                    
+                    console.log('🎨 [CustomerApp] Appel renderOrders avec:', {
+                        ordersCount: ordersData.length,
+                        currentPage,
+                        totalPages
+                    });
+                    
+                    window.components.orderManager.renderOrders(ordersData, currentPage, totalPages);
+                } else {
+                    console.error('❌ [CustomerApp] orderManager non disponible');
+                }
+            } else {
+                console.error('❌ [CustomerApp] Aucune donnée dans la réponse');
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('❌ [CustomerApp] Erreur chargement commandes:', error);
+            throw error;
+        }
     }
 
     bindMainEvents() {

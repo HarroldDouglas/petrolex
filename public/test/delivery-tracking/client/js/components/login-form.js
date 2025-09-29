@@ -50,7 +50,7 @@ class LoginForm {
                                         id="email" 
                                         name="email"
                                         required
-                                        placeholder="votre.email@exemple.com"
+                                        value="customer1@test.com"
                                     >
                                 </div>
                                 <div class="mb-3">
@@ -64,7 +64,7 @@ class LoginForm {
                                         id="password" 
                                         name="password"
                                         required
-                                        placeholder="Votre mot de passe"
+                                        value="password"
                                     >
                                 </div>
                                 <div class="d-grid">

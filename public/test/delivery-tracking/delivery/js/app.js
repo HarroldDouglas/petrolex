@@ -28,7 +28,15 @@ class DeliveryPersonApp {
         
         // Attendre que Google Maps soit chargé
         this.waitForGoogleMaps().then(() => {
-            this.services.map.initialize('map');
+            try {
+                this.services.map.initialize('map');
+                // Update map status to success
+                this.ui.updateMapStatus(true);
+                console.log('✅ Google Maps initialisé avec succès');
+            } catch (error) {
+                console.error('❌ Erreur lors de l\'initialisation Google Maps:', error);
+                this.ui.updateMapStatus(false);
+            }
             this.services.tracking = new DeliveryTrackingService(this.services.api, this.services.map, this.ui, this.orderManager);
             
             this.deliveryManager = new DeliveryManager(
@@ -93,8 +101,10 @@ class DeliveryPersonApp {
             this.deliveryManager
         );
         
-        // Injecter la facade dans le DeliveryManager pour les transitions d'état
-        this.deliveryManager.setControlsFacade(this.controlsFacade);
+        // Injecter la facade dans le DeliveryManager SEULEMENT s'il existe
+        if (this.deliveryManager) {
+            this.deliveryManager.setControlsFacade(this.controlsFacade);
+        }
     }
 
     async handleLogin() {
@@ -164,7 +174,14 @@ class DeliveryPersonApp {
     onGoogleMapsReady() {
         console.log("🗺️ Google Maps prêt pour l'interface delivery");
         if (this.services && this.services.map && !this.services.map.initialized) {
-            this.services.map.initialize('map');
+            try {
+                this.services.map.initialize('map');
+                this.ui.updateMapStatus(true);
+                console.log('✅ Google Maps initialisé via callback');
+            } catch (error) {
+                console.error('❌ Erreur lors de l\'initialisation Google Maps via callback:', error);
+                this.ui.updateMapStatus(false);
+            }
         }
     }
 }

@@ -101,17 +101,17 @@ const SHARED_CONFIG = {
 
     // Configuration WebSocket pour Laravel Reverb
     WEBSOCKET: {
-        ENABLED: false, // Temporairement désactivé en attendant config Laravel Reverb
-        APP_KEY: 'local-key',
-        APP_SECRET: 'local-secret',
-        HOST: '127.0.0.1',
+        ENABLED: true, // Réactivé avec config Laravel Reverb
+        APP_KEY: 'petro-key-12345',
+        APP_SECRET: 'petro-secret-67890',
+        HOST: '127.0.0.1',  // 🔧 CORRECTION: utiliser 127.0.0.1 comme dans Reverb
         PORT: 8080,
         FORCE_TLS: false,
         ENABLED_TRANSPORTS: ['websocket', 'polling'],
-        // Configuration spécifique pour Laravel Reverb (valeurs simples pour test)
-        PUSHER_APP_ID: '12345',
-        PUSHER_APP_KEY: 'test-key',
-        PUSHER_APP_SECRET: 'test-secret',
+        // Configuration spécifique pour Laravel Reverb
+        PUSHER_APP_ID: 'petro-app',
+        PUSHER_APP_KEY: 'petro-key-12345',
+        PUSHER_APP_SECRET: 'petro-secret-67890',
         PUSHER_APP_CLUSTER: 'mt1'
     },
 
