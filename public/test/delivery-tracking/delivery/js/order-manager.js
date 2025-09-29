@@ -124,7 +124,8 @@ class OrderManager {
                     console.log('Loading existing tracking data for map display');
                     await this.deliveryManager.loadExistingTrackingData(orderData);
                 } else {
-                    // For new orders, calculate route
+                    // For new orders (paid) or orders without tracking, calculate route
+                    console.log(`📍 Calcul de route pour commande ${orderData.status}: ${orderData.order_number}`);
                     await this.deliveryManager.calculateRouteForSelectedOrder();
                 }
             }

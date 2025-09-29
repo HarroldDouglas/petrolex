@@ -57,39 +57,22 @@ class CustomerUIComponents {
             this.loginForm.hide();
         }
         
-        // Charger directement les commandes ici aussi
-        console.log('🎯 [Components] showClientPanel - Chargement des commandes...');
-        if (window.customerApp && window.customerApp.loadMyOrders) {
-            console.log('📞 [Components] Appel direct de loadMyOrders()...');
-            try {
-                await window.customerApp.loadMyOrders();
-            } catch (error) {
-                console.error('❌ [Components] Erreur lors du chargement des commandes:', error);
-            }
-        } else {
-            console.error('❌ [Components] customerApp non disponible dans showClientPanel');
-        }
+        // NE PAS charger les commandes ici - ça sera fait par initMainApp()
+        console.log('🎯 [Components] showClientPanel - Panel affiché, chargement des commandes délégué à initMainApp()');
     }
 
     async onLoginSuccess(authData) {
         console.log("🔐 [Components] Connexion réussie:", authData.user);
-        this.uiManager.updateClientInfo(authData.user);
-        await this.showClientPanel();
-
-        // Charger les commandes initiales
-        console.log('🎯 [Components] Tentative de chargement des commandes...');
-        console.log('🎯 [Components] window.customerApp:', window.customerApp);
-        console.log('🎯 [Components] loadMyOrders method:', window.customerApp?.loadMyOrders);
         
-        if (window.customerApp && window.customerApp.loadMyOrders) {
-            console.log('📞 [Components] Appel de loadMyOrders()...');
-            try {
-                await window.customerApp.loadMyOrders();
-            } catch (error) {
-                console.error('❌ [Components] Erreur lors du chargement des commandes:', error);
-            }
+        // IMPORTANT : Appeler handleLoginSuccess() de CustomerApp pour initialiser l'app complète
+        if (window.customerApp && window.customerApp.handleLoginSuccess) {
+            console.log('🎯 [Components] Appel de handleLoginSuccess() pour initialiser l\'app complète');
+            await window.customerApp.handleLoginSuccess(authData);
         } else {
-            console.error('❌ [Components] customerApp ou loadMyOrders non disponible');
+            console.error('❌ [Components] customerApp.handleLoginSuccess non disponible');
+            // Fallback si customerApp n'est pas disponible
+            this.uiManager.updateClientInfo(authData.user);
+            await this.showClientPanel();
         }
     }
 

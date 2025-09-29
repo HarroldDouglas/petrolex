@@ -32,6 +32,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
+        \App\Events\UserCreatedEvent::class => [
+            \App\Listeners\CreateUserRelatedEntitiesListener::class,
+        ],
         EmptyBottleReturnedEvent::class => [
             CreateBottleMovementForReturnedBottleListener::class,
         ],

@@ -73,7 +73,31 @@
                                     <div class="invalid-feedback">{{ __($message) }}</div>
                                 @enderror
                             </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="country_code" class="form-label">Pays</label>
+                                <select class="form-select @error('country_code') is-invalid @enderror" id="country_code" wire:model.live.debounce.500ms="country_code">
+                                    @foreach($countries as $code => $name)
+                                        <option value="{{ $code }}">{{ $name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('country_code')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                     
+                            <div class="col-md-6 mb-3">
+                                <label for="language" class="form-label">Langue</label>
+                                <select class="form-select @error('language') is-invalid @enderror" id="language" wire:model.live.debounce.500ms="language">
+                                    @foreach($languages as $langCode => $langLabel)
+                                        <option value="{{ $langCode }}">{{ $langLabel }}</option>
+                                    @endforeach
+                                </select>
+                                @error('language')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <div class="col-md-6 mb-3">
                                 <label for="phone_number" class="form-label">Téléphone</label>
                                 <input type="text" 

@@ -20,7 +20,7 @@
         <h3 style="margin-top: 0; color: #721c24;">{{ __('email.payment_failure_details') }}</h3>
         <p><strong>{{ __('email.order_number') }}:</strong> {{ $order->order_number }}</p>
         <p><strong>{{ __('email.order_total') }}:</strong> {{ \App\Enums\Currency::from(config('countries.default_currency', 'XAF'))->format($order->total_amount) }}</p>
-        <p><strong>{{ __('email.order_customer') }}:</strong> {{ $order->customer->user->name ?? __('email.unknown_customer') }}</p>
+        <p><strong>{{ __('email.order_customer') }}:</strong> {{ $order->customer->user->fullname ?? __('email.unknown_customer') }}</p>
         <p><strong>{{ __('email.failure_date') }}:</strong> {{ now()->format('d/m/Y H:i') }}</p>
         @if($order->delivery_address)
             <p><strong>{{ __('email.order_delivery_address') }}:</strong> {{ $order->delivery_address }}</p>

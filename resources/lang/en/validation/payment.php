@@ -5,7 +5,6 @@ return [
     'payment_method_invalid' => 'Invalid payment method',
     'phone_required' => 'The phone number is required',
     'phone_format' => 'The phone number format is invalid',
-    'name_required' => 'The name is required',
     'card_number_required' => 'The card number is required',
     'card_number_format' => 'The card number format is invalid',
     'cvv_required' => 'The CVV is required',

@@ -47,6 +47,8 @@ class OrderController {
             console.log("🔍 [OrderController] Filtres:", filters);
             console.log("🔍 [OrderController] Page:", page);
             const response = await this.apiService.getMyOrders(filters, page);
+            
+            console.log("✅ [OrderController] Réponse API reçue:", response);
 
             // Retourner la réponse pour que CustomerOrderManager la traite
             return response;

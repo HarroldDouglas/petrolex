@@ -29,7 +29,8 @@
       "Bash(netstat:*)",
       "Bash(netstat:*)",
       "WebSearch",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "Bash(timeout 60 php artisan queue:work:*)"
     ],
     "deny": [],
     "ask": []

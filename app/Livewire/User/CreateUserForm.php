@@ -39,11 +39,12 @@ class CreateUserForm extends AbstractUserForm
                 is_active: $validatedData['is_active'] ?? true,
                 role: UserRole::from($validatedData['role']),
                 distribution_center_ids: $validatedData['distribution_center_ids'] ?? [],
-                image: $validatedData['image']
+                image: $validatedData['image'],
+                country_code: $validatedData['country_code'] ?? $this->country_code,
+                language: $validatedData['language'] ?? $this->language
             );
 
             $dtoArray = $dto->toArray();
-
             $dtoArray['image'] = $this->image;
 
             /** @var User */

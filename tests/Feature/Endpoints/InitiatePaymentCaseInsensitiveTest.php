@@ -173,6 +173,6 @@ class InitiatePaymentCaseInsensitiveTest extends TestCase
             ]);
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['payment_details.phone', 'payment_details.name']);
+        $response->assertJsonValidationErrors(['payment_details.phone']);
     }
 }

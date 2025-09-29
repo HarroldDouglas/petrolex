@@ -91,6 +91,11 @@ class OrderDetailResource extends JsonResource
             // Order items with complete details
             'items' => $order->items->map(function ($item): array {
                 $category = $item->productCategory;
+                $image = null;
+                if ($category && method_exists($category, 'getImages')) {
+                    $images = $category->getImages();
+                    $image = $images[0] ?? null;
+                }
 
                 return [
                     'id' => $item->id,
@@ -99,6 +104,7 @@ class OrderDetailResource extends JsonResource
                     'total_price' => $item->total_price,
                     'bottle_type' => $item->bottle_type,
                     'bottle_type_label' => $item->bottle_type ? (BottleOrderType::from($item->bottle_type)->label ?? $item->bottle_type) : null,
+                    'image' => $image,
                     'product_category' => $category ? [
                         'id' => $category->id,
                         'name' => $category->name,

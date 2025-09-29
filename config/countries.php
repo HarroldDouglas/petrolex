@@ -15,6 +15,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default Country Code
+    |--------------------------------------------------------------------------
+    |
+    | The default country code to use throughout the application.
+    | This should match one of the valid_codes values.
+    |
+    */
+
+    'default_country_code' => 'CM',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Language
+    |--------------------------------------------------------------------------
+    |
+    | The default language code to use throughout the application.
+    | This should match one of the supported language codes.
+    |
+    */
+
+    'default_language' => 'fr',
+
+    /*
+    |--------------------------------------------------------------------------
     | Currency Decimal Places
     |--------------------------------------------------------------------------
     |

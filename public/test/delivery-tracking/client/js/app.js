@@ -68,7 +68,7 @@ class CustomerApp {
             this.setupWebSocketEventHandlers();
             this.bindMainEvents();
 
-            await this.orderController.loadCustomerOrders(this.currentUser);
+            await this.loadMyOrders();
 
             this.ui.uiManager.showSuccess(
                 `Bienvenue ${this.currentUser.full_name || this.currentUser.email}!`,
