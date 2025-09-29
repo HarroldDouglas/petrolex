@@ -1,10 +1,44 @@
 // Configuration globale partagée pour tous les modules de delivery tracking
 // Centralise toutes les configurations pour éviter la duplication
 
+// 🌍 Auto-détection de l'environnement Production/Développement
+const isProduction = () => {
+    const hostname = window.location.hostname;
+    return hostname !== 'localhost' && hostname !== '127.0.0.1' && !hostname.includes('test');
+};
+
+const getEnvironmentConfig = () => {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    const isSSL = protocol === 'https:';
+    
+    if (isProduction()) {
+        console.log('🌍 [Config] Production environment detected:', hostname);
+        return {
+            HOST: hostname,
+            API_BASE_URL: `${protocol}//${hostname}:8001/api`,
+            WS_HOST: hostname,
+            WS_PORT: 8080,
+            FORCE_TLS: isSSL
+        };
+    } else {
+        console.log('🛠️ [Config] Development environment detected');
+        return {
+            HOST: '127.0.0.1',
+            API_BASE_URL: 'http://127.0.0.1:8001/api',
+            WS_HOST: '127.0.0.1',
+            WS_PORT: 8080,
+            FORCE_TLS: false
+        };
+    }
+};
+
+const ENV_CONFIG = getEnvironmentConfig();
+
 const SHARED_CONFIG = {
     // Configuration API centralisée
     API: {
-        BASE_URL: 'http://127.0.0.1:8001/api',
+        BASE_URL: ENV_CONFIG.API_BASE_URL,
         TIMEOUT: 30000,
         RETRY_ATTEMPTS: 3,
         RETRY_DELAY: 1000,
@@ -95,9 +129,9 @@ const SHARED_CONFIG = {
         ENABLED: true, // Réactivé avec config Laravel Reverb
         APP_KEY: 'petro-key-12345',
         APP_SECRET: 'petro-secret-67890',
-        HOST: '127.0.0.1',  // 🔧 CORRECTION: utiliser 127.0.0.1 comme dans Reverb
-        PORT: 8080,
-        FORCE_TLS: false,
+        HOST: ENV_CONFIG.WS_HOST,  // 🌍 Auto-détection production/dev
+        PORT: ENV_CONFIG.WS_PORT,
+        FORCE_TLS: ENV_CONFIG.FORCE_TLS,
         ENABLED_TRANSPORTS: ['websocket', 'polling'],
         // Configuration spécifique pour Laravel Reverb
         PUSHER_APP_ID: 'petro-app',

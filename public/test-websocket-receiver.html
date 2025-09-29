@@ -22,6 +22,22 @@
         <h1>📥 WebSocket Récepteur</h1>
         <div id="status" class="status disconnected">❌ Non connecté</div>
         
+        <!-- Informations de configuration pour Flutter -->
+        <div style="background-color: #f3e5f5; padding: 15px; margin: 15px 0; border-radius: 8px;">
+            <h3>📱 Configuration Flutter</h3>
+            <p><strong>URL WebSocket:</strong> <code id="wsUrl"></code></p>
+            <p><strong>App Key:</strong> <code>petro-key-12345</code></p>
+            <p><strong>Canal Test:</strong> <code>test-communication</code></p>
+            <p><strong>Dependency:</strong> <code>web_socket_channel: ^2.4.0</code></p>
+            <p><strong>Format Souscription:</strong></p>
+            <code style="display: block; background: #fff; padding: 8px; margin: 5px 0;">
+            {<br>
+            &nbsp;&nbsp;"event": "pusher:subscribe",<br>
+            &nbsp;&nbsp;"data": {"channel": "test-communication"}<br>
+            }
+            </code>
+        </div>
+        
         <button onclick="connectWebSocket()">Se connecter</button>
         <button onclick="disconnectWebSocket()">Se déconnecter</button>
         
@@ -41,6 +57,9 @@
         <h3>📋 Journal technique :</h3>
         <div id="technicalMessages"></div>
     </div>
+
+    <!-- Shared Configuration -->
+    <script src="test/delivery-tracking/shared-config.js"></script>
 
     <script>
         let websocket = null;
@@ -98,7 +117,12 @@
                 websocket.close();
             }
             
-            const wsUrl = 'ws://127.0.0.1:8080/app/petro-key-12345?protocol=7&client=js&version=8.3.0&flash=false';
+            // Use shared configuration for WebSocket connection
+            const wsUrl = `ws://${SHARED_CONFIG.WEBSOCKET.HOST}:${SHARED_CONFIG.WEBSOCKET.PORT}/app/${SHARED_CONFIG.WEBSOCKET.APP_KEY}?protocol=7&client=js&version=8.3.0&flash=false`;
+            
+            // Afficher l'URL dans l'interface pour Flutter
+            document.getElementById('wsUrl').textContent = wsUrl;
+            
             log(`🚀 Connexion au canal de réception...`, 'connection');
             
             try {

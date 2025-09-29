@@ -1,4 +1,15 @@
+/**
+ * Delivery Tracking Service - Handles real-time tracking simulation and updates
+ * Manages route calculation, position simulation, and server communication
+ */
 class DeliveryTrackingService {
+    // Constants for configuration
+    static ROUTE_UPDATE_THROTTLE_MS = 3000; // Minimum interval between route redraws
+    static MIN_SIMULATION_SPEED_KMH = 10;
+    static MAX_SIMULATION_SPEED_KMH = 80;
+    static DEFAULT_SIMULATION_SPEED_KMH = 40;
+    static POSITION_UPDATE_INTERVAL_MS = 2000; // Position update frequency
+
     constructor(apiService, mapService, ui, orderManager = null) {
         this.apiService = apiService;
         this.trackingApi = new DeliveryTrackingApiService(apiService);
@@ -244,19 +255,49 @@ class DeliveryTrackingService {
         return !isNaN(lat) && !isNaN(lng) ? { lat, lng } : null;
     }
 
+    /**
+     * Start route simulation with calculated timing
+     * @param {number} speed - Simulation speed in km/h
+     * @param {number} estimatedDurationMinutes - Total estimated duration
+     */
     startSimulation(speed, estimatedDurationMinutes) {
-        if (this.intervals.simulation) {
-            clearInterval(this.intervals.simulation);
-        }
-
-        const totalDurationMs = this.calculateSimulationDuration(estimatedDurationMinutes);
-        const interval = totalDurationMs / this.state.routeCoordinates.length;
-
+        this._clearExistingSimulation();
+        
+        const interval = this._calculateSimulationInterval(estimatedDurationMinutes);
+        
+        console.log(`🚀 [TrackingService] Starting simulation: ${this.state.routeCoordinates.length} points, ${interval}ms interval`);
+        
         this.intervals.simulation = setInterval(() => {
             this.executeSimulationStep(speed);
         }, interval);
     }
 
+    /**
+     * Clear existing simulation interval if running
+     * @private
+     */
+    _clearExistingSimulation() {
+        if (this.intervals.simulation) {
+            clearInterval(this.intervals.simulation);
+        }
+    }
+
+    /**
+     * Calculate simulation step interval based on duration and route complexity
+     * @private
+     * @param {number} estimatedDurationMinutes - Total estimated duration
+     * @returns {number} Interval in milliseconds
+     */
+    _calculateSimulationInterval(estimatedDurationMinutes) {
+        const totalDurationMs = this.calculateSimulationDuration(estimatedDurationMinutes);
+        return totalDurationMs / this.state.routeCoordinates.length;
+    }
+
+    /**
+     * Calculate total simulation duration
+     * @param {number} estimatedDurationMinutes - Estimated duration in minutes
+     * @returns {number} Duration in milliseconds
+     */
     calculateSimulationDuration(estimatedDurationMinutes) {
         if (estimatedDurationMinutes && estimatedDurationMinutes > 0) {
             return estimatedDurationMinutes * 60 * 1000;
@@ -289,6 +330,12 @@ class DeliveryTrackingService {
         this.state.currentIndex++;
     }
 
+    /**
+     * Update current driver position and redraw route with throttling
+     * @param {number} lat - Current latitude
+     * @param {number} lng - Current longitude  
+     * @param {number} speed - Current speed in km/h
+     */
     updateCurrentPosition(lat, lng, speed) {
         this.mapService.updateDriverPosition(
             lat,
@@ -297,46 +344,84 @@ class DeliveryTrackingService {
             this.ui?.getTravelSpeed() || speed,
         );
         
-        // Throttle route redrawing to avoid too many API calls
-        if (!this.state.lastRouteUpdate) {
-            this.state.lastRouteUpdate = 0;
-        }
-        
-        const now = Date.now();
-        const timeSinceLastUpdate = now - this.state.lastRouteUpdate;
-        const MIN_UPDATE_INTERVAL = 3000; // Minimum 3 seconds between route redraws
-        
-        // Redraw route from current position to destination (same as client interface)
-        if (this.state.currentOrder && this.state.destination && timeSinceLastUpdate >= MIN_UPDATE_INTERVAL) {
-            console.log('🗺️ [TrackingService] Redrawing route from current position to destination');
-            this.state.lastRouteUpdate = now;
-            
-            this.mapService.drawRoute(
-                lat,
-                lng,
-                this.state.destination.lat,
-                this.state.destination.lng
-            ).then(() => {
-                console.log('✅ [TrackingService] Route successfully redrawn');
-            }).catch(error => {
-                console.warn('⚠️ [TrackingService] Failed to redraw route:', error);
-            });
-        } else if (this.state.currentOrder && this.state.destination) {
-            console.log(`⏳ [TrackingService] Route redraw throttled (${timeSinceLastUpdate}ms < ${MIN_UPDATE_INTERVAL}ms)`);
-        }
+        this._updateRouteIfNeeded(lat, lng);
     }
 
+    /**
+     * Update route with throttling to prevent excessive API calls
+     * @private
+     * @param {number} lat - Current latitude
+     * @param {number} lng - Current longitude
+     */
+    _updateRouteIfNeeded(lat, lng) {
+        if (!this._shouldUpdateRoute()) return;
+
+        const now = Date.now();
+        const timeSinceLastUpdate = now - (this.state.lastRouteUpdate || 0);
+        
+        if (timeSinceLastUpdate < DeliveryTrackingService.ROUTE_UPDATE_THROTTLE_MS) {
+            console.log(`⏳ [TrackingService] Route update throttled (${timeSinceLastUpdate}ms remaining)`);
+            return;
+        }
+
+        this._performRouteUpdate(lat, lng, now);
+    }
+
+    /**
+     * Check if route should be updated
+     * @private
+     * @returns {boolean} True if route update is needed
+     */
+    _shouldUpdateRoute() {
+        return this.state.currentOrder && this.state.destination;
+    }
+
+    /**
+     * Perform the actual route update
+     * @private
+     * @param {number} lat - Current latitude
+     * @param {number} lng - Current longitude
+     * @param {number} timestamp - Current timestamp
+     */
+    _performRouteUpdate(lat, lng, timestamp) {
+        console.log('🗺️ [TrackingService] Updating route from current position to destination');
+        this.state.lastRouteUpdate = timestamp;
+        
+        this.mapService.drawRoute(lat, lng, this.state.destination.lat, this.state.destination.lng)
+            .then(() => console.log('✅ [TrackingService] Route successfully updated'))
+            .catch(error => console.warn('⚠️ [TrackingService] Route update failed:', error.message));
+    }
+
+    /**
+     * Start periodic position updates to server
+     * Includes initial delay to avoid overwriting existing data
+     */
     startPositionUpdates() {
-        // 🔧 ATTENDRE AVANT LE PREMIER ENVOI pour éviter d'écraser les données existantes
+        const INITIAL_DELAY_MS = 5000;
+        
         setTimeout(async () => {
-            // Premier envoi après délai
-            await this.sendPositionUpdate();
+            // Send initial position update
+            await this._sendPositionUpdateSafely();
             
-            // Puis intervalle régulier
+            // Start regular position updates
             this.intervals.positionUpdate = setInterval(async () => {
-                await this.sendPositionUpdate();
-            }, DELIVERY_CONFIG.SIMULATION.POSITION_UPDATE_INTERVAL);
-        }, 5000); // Attendre 5 secondes au démarrage
+                await this._sendPositionUpdateSafely();
+            }, DeliveryTrackingService.POSITION_UPDATE_INTERVAL_MS);
+        }, INITIAL_DELAY_MS);
+        
+        console.log("✅ [TrackingService] Position update scheduling started");
+    }
+
+    /**
+     * Send position update with error handling
+     * @private
+     */
+    async _sendPositionUpdateSafely() {
+        try {
+            await this.sendPositionUpdate();
+        } catch (error) {
+            console.error("❌ [TrackingService] Position update failed:", error.message);
+        }
     }
 
     async sendPositionUpdate() {

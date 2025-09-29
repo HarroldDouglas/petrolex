@@ -1,21 +1,43 @@
-// Service WebSocket pour clients avec ReverbClient
+/**
+ * Customer WebSocket Service - Handles real-time communication with Reverb server
+ * Manages connection state, channel subscriptions, and event dispatching
+ */
 class CustomerWebSocketService {
+    // Connection configuration constants
+    static MAX_RECONNECT_ATTEMPTS = 5;
+    static RECONNECT_BASE_DELAY_MS = 2000;
+    static HEARTBEAT_INTERVAL_MS = 30000;
+
+    // Channel names
+    static CHANNELS = {
+        MAIN_TRACKING: "delivery-tracking",
+        ORDER_PREFIX: "delivery-"
+    };
+
+    // Events
+    static EVENTS = {
+        POSITION_UPDATED: "delivery-position-updated",
+        STATUS_UPDATED: "delivery-status-updated"
+    };
+
     constructor() {
         this.reverb = null;
         this.channels = new Map();
         this.connected = false;
         this.reconnectAttempts = 0;
-        this.maxReconnectAttempts = 5;
-        this.reconnectDelay = 2000;
         this.heartbeatInterval = null;
         this.cache = new CustomerCacheService();
     }
 
+    /**
+     * Initialize WebSocket connection and setup event handlers
+     * @returns {boolean} True if initialization successful
+     */
     initialize() {
-        console.log("🚀 Initialisation CustomerWebSocketService avec ReverbClient...");
+        console.log("🚀 [WebSocket] Initializing CustomerWebSocketService with ReverbClient");
         
         if (!CUSTOMER_CONFIG.WEBSOCKET.ENABLED) {
-            console.warn("WebSocket désactivé dans la configuration");
+            console.warn("❌ [WebSocket] WebSocket disabled in configuration");
             this.updateStatus(false);
             return false;
         }
@@ -65,22 +87,54 @@ class CustomerWebSocketService {
         this.subscribeToMainTrackingChannel();
     }
 
+    /**
+     * Subscribe to main tracking channel for general delivery updates
+     * @private
+     */
     subscribeToMainTrackingChannel() {
-        const channel = this.reverb.subscribe("delivery-tracking");
-        this.channels.set("delivery-tracking", channel);
+        const channelName = CustomerWebSocketService.CHANNELS.MAIN_TRACKING;
+        const channel = this.reverb.subscribe(channelName);
+        this.channels.set(channelName, channel);
 
-        channel.bind("delivery-position-updated", (data) => {
-            console.log("📍 Position mise à jour reçue:", data);
-            if (data.order_number) {
-                this.cache.cacheDriverPosition(data.order_number, data);
-            }
-            this.emit("position_updated", data);
+        this._bindChannelEvents(channel);
+    }
+
+    /**
+     * Bind standard events to a channel
+     * @private
+     * @param {Object} channel - ReverbClient channel instance
+     */
+    _bindChannelEvents(channel) {
+        channel.bind(CustomerWebSocketService.EVENTS.POSITION_UPDATED, (data) => {
+            console.log("📍 [WebSocket] Position update received:", data?.order_number);
+            this._handlePositionUpdate(data);
         });
 
-        channel.bind("delivery-status-updated", (data) => {
-            console.log("📊 Statut mise à jour reçu:", data);
-            this.emit("status_updated", data);
+        channel.bind(CustomerWebSocketService.EVENTS.STATUS_UPDATED, (data) => {
+            console.log("📊 [WebSocket] Status update received:", data?.order_number);
+            this._handleStatusUpdate(data);
         });
+    }
+
+    /**
+     * Handle position update data
+     * @private
+     * @param {Object} data - Position update data
+     */
+    _handlePositionUpdate(data) {
+        if (data?.order_number) {
+            this.cache.cacheDriverPosition(data.order_number, data);
+        }
+        this.emit("position_updated", data);
+    }
+
+    /**
+     * Handle status update data
+     * @private
+     * @param {Object} data - Status update data
+     */
+    _handleStatusUpdate(data) {
+        this.emit("status_updated", data);
     }
 
     updateStatus(connected) {
@@ -98,56 +152,99 @@ class CustomerWebSocketService {
         console.log(`🎯 Statut WebSocket mis à jour: ${connected ? 'Connecté' : 'Déconnecté'}`);
     }
 
+    /**
+     * Attempt to reconnect with exponential backoff
+     * @private
+     */
     attemptReconnect() {
-        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        if (this.reconnectAttempts >= CustomerWebSocketService.MAX_RECONNECT_ATTEMPTS) {
+            console.error("❌ [WebSocket] Max reconnection attempts reached");
             this.emit("reconnect_failed");
             return;
         }
 
         this.reconnectAttempts++;
+        const delay = CustomerWebSocketService.RECONNECT_BASE_DELAY_MS * this.reconnectAttempts;
+        
+        console.log(`🔄 [WebSocket] Reconnection attempt ${this.reconnectAttempts}/${CustomerWebSocketService.MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
 
         setTimeout(() => {
             if (this.reverb) {
                 this.reverb.connect();
             }
-        }, this.reconnectDelay * this.reconnectAttempts);
+        }, delay);
     }
 
+    /**
+     * Subscribe to order-specific delivery tracking channel
+     * @param {string} orderNumber - Order number to track
+     * @returns {Object|null} Channel instance or null if failed
+     */
     subscribeToDeliveryTracking(orderNumber) {
-        if (!this.reverb || !this.connected) {
-            console.warn("❌ Impossible de souscrire: WebSocket non connecté");
+        if (!this._canSubscribe()) {
+            console.warn("❌ [WebSocket] Cannot subscribe: not connected");
             return null;
         }
 
-        const channelName = `delivery-${orderNumber}`;
+        const channelName = this._getOrderChannelName(orderNumber);
 
+        // Return existing channel if already subscribed
         if (this.channels.has(channelName)) {
+            console.log(`📡 [WebSocket] Already subscribed to: ${channelName}`);
             return this.channels.get(channelName);
         }
 
+        return this._createOrderSubscription(channelName, orderNumber);
+    }
+
+    /**
+     * Check if service can subscribe to channels
+     * @private
+     * @returns {boolean} True if can subscribe
+     */
+    _canSubscribe() {
+        return this.reverb && this.connected;
+    }
+
+    /**
+     * Generate order-specific channel name
+     * @private
+     * @param {string} orderNumber - Order number
+     * @returns {string} Channel name
+     */
+    _getOrderChannelName(orderNumber) {
+        return `${CustomerWebSocketService.CHANNELS.ORDER_PREFIX}${orderNumber}`;
+    }
+
+    /**
+     * Create new order subscription
+     * @private
+     * @param {string} channelName - Channel name
+     * @param {string} orderNumber - Order number
+     * @returns {Object} Channel instance
+     */
+    _createOrderSubscription(channelName, orderNumber) {
         const channel = this.reverb.subscribe(channelName);
         this.channels.set(channelName, channel);
 
-        channel.bind("delivery-position-updated", (data) => {
-            this.cache.cacheDriverPosition(orderNumber, data);
-            this.emit("position_updated", data);
-        });
+        this._bindChannelEvents(channel);
 
-        channel.bind("delivery-status-updated", (data) => {
-            this.emit("status_updated", data);
-        });
-
-        console.log(`📡 Souscrit au canal: ${channelName}`);
+        console.log(`📡 [WebSocket] Subscribed to order channel: ${channelName}`);
         return channel;
     }
 
+    /**
+     * Unsubscribe from order-specific delivery tracking channel
+     * @param {string} orderNumber - Order number to unsubscribe from
+     */
     unsubscribeFromDeliveryTracking(orderNumber) {
-        const channelName = `delivery-${orderNumber}`;
-        const channel = this.channels.get(channelName);
-
-        if (channel) {
+        const channelName = this._getOrderChannelName(orderNumber);
+        
+        if (this.channels.has(channelName)) {
             this.channels.delete(channelName);
-            console.log(`📡 Désinscrit du canal: ${channelName}`);
+            console.log(`📡 [WebSocket] Unsubscribed from: ${channelName}`);
+        } else {
+            console.log(`📡 [WebSocket] Channel not found for unsubscribe: ${channelName}`);
         }
     }
 

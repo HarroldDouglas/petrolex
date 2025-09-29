@@ -81,21 +81,43 @@ class CustomerApp {
         }
     }
 
+    /**
+     * Setup WebSocket event handlers to connect real-time updates to the tracking system
+     * Routes incoming WebSocket events to appropriate controllers
+     */
     setupWebSocketEventHandlers() {
-        console.log("🔗 [CustomerApp] Configuration des event handlers WebSocket");
+        const eventHandlers = {
+            position_updated: (data) => this.handlePositionUpdate(data),
+            status_updated: (data) => this.handleStatusUpdate(data)
+        };
+
+        Object.entries(eventHandlers).forEach(([event, handler]) => {
+            this.websocketManager.on(event, handler);
+        });
+
+        console.log("✅ [CustomerApp] WebSocket event handlers configured");
+    }
+
+    /**
+     * Handle position updates from WebSocket
+     * @param {Object} data - Position update data from WebSocket
+     */
+    handlePositionUpdate(data) {
+        if (!data || !this.trackingController) return;
         
-        // Écouter les événements WebSocket et les transmettre au TrackingController
-        this.websocketManager.on("position_updated", (data) => {
-            console.log("📍 [CustomerApp] Position reçue, transmission au TrackingController:", data);
-            this.trackingController.handleLocationUpdate(data);
-        });
+        console.log("📍 [CustomerApp] Processing position update:", data.order_number);
+        this.trackingController.handleLocationUpdate(data);
+    }
 
-        this.websocketManager.on("status_updated", (data) => {
-            console.log("📊 [CustomerApp] Statut reçu, transmission au TrackingController:", data);
-            this.trackingController.handleStatusUpdate(data);
-        });
-
-        console.log("✅ [CustomerApp] Event handlers WebSocket configurés");
+    /**
+     * Handle status updates from WebSocket
+     * @param {Object} data - Status update data from WebSocket
+     */
+    handleStatusUpdate(data) {
+        if (!data || !this.trackingController) return;
+        
+        console.log("📊 [CustomerApp] Processing status update:", data.order_number, data.status);
+        this.trackingController.handleStatusUpdate(data);
     }
 
     async initializeMap() {
