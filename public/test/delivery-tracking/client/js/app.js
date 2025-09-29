@@ -65,6 +65,7 @@ class CustomerApp {
 
             await this.initializeMap();
             this.websocketManager.initialize();
+            this.setupWebSocketEventHandlers();
             this.bindMainEvents();
 
             await this.orderController.loadCustomerOrders(this.currentUser);
@@ -78,6 +79,23 @@ class CustomerApp {
                 "Erreur lors de l'initialisation de l'application",
             );
         }
+    }
+
+    setupWebSocketEventHandlers() {
+        console.log("🔗 [CustomerApp] Configuration des event handlers WebSocket");
+        
+        // Écouter les événements WebSocket et les transmettre au TrackingController
+        this.websocketManager.on("position_updated", (data) => {
+            console.log("📍 [CustomerApp] Position reçue, transmission au TrackingController:", data);
+            this.trackingController.handleLocationUpdate(data);
+        });
+
+        this.websocketManager.on("status_updated", (data) => {
+            console.log("📊 [CustomerApp] Statut reçu, transmission au TrackingController:", data);
+            this.trackingController.handleStatusUpdate(data);
+        });
+
+        console.log("✅ [CustomerApp] Event handlers WebSocket configurés");
     }
 
     async initializeMap() {

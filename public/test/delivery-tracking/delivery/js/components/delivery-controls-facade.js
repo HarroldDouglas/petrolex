@@ -80,12 +80,10 @@ class DeliveryControlsFacade {
         // La route est déjà calculée lors de selectOrder() dans order-manager.js
         console.log('📍 Route déjà calculée par orderManager - pas de recalcul nécessaire');
         
-        // Seulement pour les commandes en cours qui ont besoin de mise à jour spéciale
+        // Orders with tracking data should use API data, not recalculate
         if (order.status === DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS && order.trackingData) {
-            console.log('🔄 Mise à jour spéciale pour commande en cours');
-            if (this.deliveryManager) {
-                await this.deliveryManager.calculateRouteForSelectedOrder();
-            }
+            console.log('Order has tracking data - skipping route calculation');
+            // The delivery-manager will handle this via API data
         }
     }
     

@@ -1,31 +1,31 @@
-// Configuration pour l'interface livreur
-// Utilise la configuration partagée
+// Delivery interface configuration
+// Uses shared configuration
 
-// Attendre que SHARED_CONFIG soit chargé
+// Wait for SHARED_CONFIG to load
 if (typeof SHARED_CONFIG !== 'undefined') {
-    // Étendre la configuration partagée au lieu de redéclarer DELIVERY_CONFIG
+    // Extend shared config instead of redeclaring DELIVERY_CONFIG
     if (typeof DELIVERY_CONFIG === 'undefined') {
         window.DELIVERY_CONFIG = {
             ...SHARED_CONFIG,
-            // Spécifique au livreur
+            // Delivery-specific settings
             MODULE: 'delivery',
             
-            // Valeurs par défaut pour les tests
+            // Default values for testing
             DEFAULT_CREDENTIALS: {
                 email: 'delivery1@test.com',
                 password: 'password'
             },
             
-            // Configuration de simulation
+            // Simulation configuration
             SIMULATION: {
-                POSITION_UPDATE_INTERVAL: 2000, // 2 secondes
+                POSITION_UPDATE_INTERVAL: 2000, // 2 seconds
                 DEFAULT_SPEED_KMH: 40,
                 MIN_SPEED_KMH: 10,
                 MAX_SPEED_KMH: 80
             }
         };
     } else {
-        // Si DELIVERY_CONFIG existe déjà, juste ajouter nos spécificités
+        // If DELIVERY_CONFIG already exists, just add our specific settings
         Object.assign(DELIVERY_CONFIG, {
             MODULE: 'delivery',
             DEFAULT_CREDENTIALS: {
@@ -33,7 +33,7 @@ if (typeof SHARED_CONFIG !== 'undefined') {
                 password: 'password'
             },
             SIMULATION: {
-                POSITION_UPDATE_INTERVAL: 2000, // 2 secondes
+                POSITION_UPDATE_INTERVAL: 2000, // 2 seconds
                 DEFAULT_SPEED_KMH: 40,
                 MIN_SPEED_KMH: 10,
                 MAX_SPEED_KMH: 80
@@ -41,11 +41,11 @@ if (typeof SHARED_CONFIG !== 'undefined') {
         });
     }
 
-    console.log('🚚 Configuration livreur chargée:', {
+    console.log('🚚 Delivery configuration loaded:', {
         module: DELIVERY_CONFIG.MODULE,
         apiUrl: DELIVERY_CONFIG.API.BASE_URL,
         defaultEmail: DELIVERY_CONFIG.DEFAULT_CREDENTIALS.email
     });
 } else {
-    console.error('❌ SHARED_CONFIG non trouvé ! Vérifiez que shared-config.js est chargé avant config.js');
+    console.error('❌ SHARED_CONFIG not found! Check that shared-config.js is loaded before config.js');
 }

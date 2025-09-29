@@ -13,10 +13,11 @@ class DeliveryPersonApp {
     initServices() {
         this.services = {
             api: new DeliveryPersonApiService(),
-            map: new DeliveryGoogleMapService(), // Utiliser Google Maps au lieu de Mapbox
+            map: new DeliveryGoogleMapService(),
             tracking: null
         };
         this.ui = new DeliveryPersonUIComponents();
+        this.websocketManager = new DeliveryWebSocketManager();
     }
 
     initManagers() {
@@ -57,6 +58,13 @@ class DeliveryPersonApp {
             if (this.controlsFacade) {
                 this.deliveryManager.setControlsFacade(this.controlsFacade);
             }
+
+            // Connect WebSocket and link to deliveryManager
+            this.websocketManager.setDeliveryManager(this.deliveryManager);
+            // TODO: Fix Reverb library import before enabling WebSocket
+            // this.websocketManager.connect().catch(error => {
+            //     console.error('WebSocket connection failed:', error);
+            // });
         });
         
         // AJOUT: Connecter orderManager à l'UI de tracking pour l'accès aux données de commande

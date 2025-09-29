@@ -7,7 +7,6 @@ class TrackingManager {
         this.websocketManager = null; // Manager WebSocket
         this.currentOrderId = null;
         this.lastTrackingData = null; // Dernières données reçues du WebSocket
-        this.pollingInterval = null; // Pour le polling API
         this.initTrackingElements();
     }
     
@@ -24,6 +23,7 @@ class TrackingManager {
             trackingDeliveryAddress: document.getElementById("trackingDeliveryAddress"),
             trackingETA: document.getElementById("trackingETA"),
             trackingDistance: document.getElementById("trackingDistance"),
+            trackingSpeed: document.getElementById("trackingSpeed"),
             trackingProgress: document.getElementById("trackingProgress"),
             trackingProgressBar: document.getElementById("trackingProgressBar"),
             trackingHistory: document.getElementById("trackingHistory"),
@@ -57,17 +57,13 @@ class TrackingManager {
         
         this.currentOrderId = orderId;
         
-        // Utiliser WebSocket OU API polling (pas les deux)
+        // Use WebSocket only
         if (this.websocketManager && this.websocketManager.isConnected()) {
-            // Mode WebSocket: souscrire aux mises à jour en temps réel
             this.websocketManager.subscribeToDeliveryTracking(orderId);
-            console.log(`✅ Suivi activé pour la commande ${orderId} via WebSocket`);
+            console.log(`Tracking enabled for order ${orderId} via WebSocket`);
         } else {
-            // Mode API: récupérer les données de tracking via polling
-            console.warn("⚠️ WebSocket non connecté - utilisation de l'API pour le tracking");
-            this.uiManager.showInfo("Mode tracking via API (WebSocket indisponible)");
-            this.startApiPolling(orderId);
-            console.log(`✅ Suivi activé pour la commande ${orderId} via API polling`);
+            console.warn("WebSocket not connected - tracking unavailable");
+            this.uiManager.showError("WebSocket connection required for tracking");
         }
         
         // Initialiser l'affichage
@@ -77,68 +73,10 @@ class TrackingManager {
         return true;
     }
 
-    // Polling API pour le tracking quand WebSocket n'est pas disponible
-    startApiPolling(orderId) {
-        // Arrêter tout polling existant
-        if (this.pollingInterval) {
-            clearInterval(this.pollingInterval);
-        }
-        
-        // Récupérer les données initiales
-        this.fetchTrackingData(orderId);
-        
-        // Polling toutes les 10 secondes
-        this.pollingInterval = setInterval(() => {
-            this.fetchTrackingData(orderId);
-        }, 10000);
-    }
-    
-    async fetchTrackingData(orderId) {
-        try {
-            console.log(`📡 Récupération des vraies données de tracking pour commande ${orderId}`);
-            
-            // Appel API réel pour récupérer les données de tracking
-            const response = await fetch(`${SHARED_CONFIG.API.BASE_URL}/tracking/delivery/${orderId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('api_token')}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data && data.data) {
-                console.log("📊 Données reçues de l'API:", data.data);
-                console.log("📈 Progression:", data.data.progress_percentage + "%");
-                console.log("📍 Distance restante:", data.data.distance_remaining);
-                console.log("⏱️ ETA:", data.data.estimated_arrival);
-                this.handleRealTimeUpdate(data.data);
-                console.log("✅ Vraies données de tracking récupérées via API:", data.data);
-            } else {
-                console.warn("⚠️ Aucune donnée de tracking disponible");
-            }
-            
-        } catch (error) {
-            console.error("❌ Erreur lors de la récupération des données de tracking:", error);
-            // En cas d'erreur, afficher un message informatif
-            this.uiManager.showError("Impossible de récupérer les données de tracking");
-        }
-    }
 
     stopTracking() {
         console.log("🛑 Arrêt du suivi");
         
-        // Arrêter le polling API
-        if (this.pollingInterval) {
-            clearInterval(this.pollingInterval);
-            this.pollingInterval = null;
-        }
         
         // Arrêter WebSocket si connecté
         if (this.currentOrderId && this.websocketManager) {
@@ -153,12 +91,6 @@ class TrackingManager {
     handleRealTimeUpdate(trackingData) {
         console.log("📡 Mise à jour reçue via WebSocket:", trackingData);
         
-        // Si on reçoit des données WebSocket, arrêter le polling
-        if (this.pollingInterval) {
-            console.log("🛑 Arrêt du polling - WebSocket fonctionnel");
-            clearInterval(this.pollingInterval);
-            this.pollingInterval = null;
-        }
         
         this.lastTrackingData = trackingData;
 
@@ -243,6 +175,20 @@ class TrackingManager {
                     distance = `${distance} km`;
                 }
                 this.elements.trackingDistance.textContent = distance;
+            }
+        }
+
+        // Vitesse actuelle
+        if (this.elements.trackingSpeed) {
+            let speed = trackingData.current_speed || trackingData.speed;
+            if (speed) {
+                // Si c'est un nombre, ajouter "km/h"
+                if (typeof speed === 'number') {
+                    speed = `${speed} km/h`;
+                } else if (typeof speed === 'string' && !speed.includes('km/h')) {
+                    speed = `${speed} km/h`;
+                }
+                this.elements.trackingSpeed.textContent = speed;
             }
         }
 

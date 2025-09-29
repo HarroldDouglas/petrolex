@@ -178,12 +178,9 @@ class TrackingController {
 
     startPeriodicUpdates() {
         this.stopPeriodicUpdates();
-
-        this.updateInterval = setInterval(async () => {
-            if (this.currentTrackingOrder) {
-                await this.updateTrackingData();
-            }
-        }, CUSTOMER_CONFIG.UI.UPDATE_INTERVAL);
+        
+        // WebSocket only - no more polling
+        console.log('Using WebSocket only, no polling needed');
     }
 
     stopPeriodicUpdates() {

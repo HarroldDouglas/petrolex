@@ -229,6 +229,9 @@ class DeliveryTrackingService {
                 delete this.state.existingProgress;
             }
             
+            // Allow immediate route updates during simulation
+            this.state.lastRouteUpdate = 0;
+            
             this.startSimulation(speed, estimatedDurationMinutes);
         } else {
             throw new Error("Impossible de calculer la route");
@@ -293,6 +296,34 @@ class DeliveryTrackingService {
             `En livraison - ${this.state.currentOrder?.order_number}`,
             this.ui?.getTravelSpeed() || speed,
         );
+        
+        // Throttle route redrawing to avoid too many API calls
+        if (!this.state.lastRouteUpdate) {
+            this.state.lastRouteUpdate = 0;
+        }
+        
+        const now = Date.now();
+        const timeSinceLastUpdate = now - this.state.lastRouteUpdate;
+        const MIN_UPDATE_INTERVAL = 3000; // Minimum 3 seconds between route redraws
+        
+        // Redraw route from current position to destination (same as client interface)
+        if (this.state.currentOrder && this.state.destination && timeSinceLastUpdate >= MIN_UPDATE_INTERVAL) {
+            console.log('🗺️ [TrackingService] Redrawing route from current position to destination');
+            this.state.lastRouteUpdate = now;
+            
+            this.mapService.drawRoute(
+                lat,
+                lng,
+                this.state.destination.lat,
+                this.state.destination.lng
+            ).then(() => {
+                console.log('✅ [TrackingService] Route successfully redrawn');
+            }).catch(error => {
+                console.warn('⚠️ [TrackingService] Failed to redraw route:', error);
+            });
+        } else if (this.state.currentOrder && this.state.destination) {
+            console.log(`⏳ [TrackingService] Route redraw throttled (${timeSinceLastUpdate}ms < ${MIN_UPDATE_INTERVAL}ms)`);
+        }
     }
 
     startPositionUpdates() {
@@ -474,6 +505,7 @@ class DeliveryTrackingService {
         this.state.currentOrder = null;
         this.state.routeCoordinates = [];
         this.state.currentIndex = 0;
+        this.state.lastRouteUpdate = 0;
 
         Object.values(this.intervals).forEach((interval) => {
             if (interval) clearInterval(interval);

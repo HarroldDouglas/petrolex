@@ -43,15 +43,6 @@ const SHARED_CONFIG = {
         }
     },
 
-    // Configuration Mapbox (temporaire - à migrer vers Google Maps)
-    MAPBOX: {
-        ACCESS_TOKEN: 'pk.eyJ1IjoidGVzdCIsImEiOiJjbG5kanQ3emoxa3EzMmpxdXhvZzVuM25tIn0.test', // Token temporaire
-        STYLE: 'mapbox://styles/mapbox/streets-v11',
-        DEFAULT_CENTER: [11.502, 3.848], // Yaoundé, Cameroun [lng, lat]
-        DEFAULT_ZOOM: 12,
-        // Mode fallback - utiliser Google Maps si Mapbox échoue
-        USE_GOOGLE_MAPS_FALLBACK: true
-    },
 
     // Configuration des statuts de commandes
     ORDER_STATUS: {

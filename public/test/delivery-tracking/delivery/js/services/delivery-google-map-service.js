@@ -43,7 +43,7 @@ class DeliveryGoogleMapService {
             this.routeRenderer = new google.maps.DirectionsRenderer({
                 suppressMarkers: true, // On gère nos propres marqueurs
                 polylineOptions: {
-                    strokeColor: "#28a745",
+                    strokeColor: "#3887be", // Same blue color as client
                     strokeWeight: 5,
                     strokeOpacity: 0.75
                 }

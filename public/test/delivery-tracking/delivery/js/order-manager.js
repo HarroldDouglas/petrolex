@@ -119,7 +119,14 @@ class OrderManager {
             this.ui.highlightSelectedOrder(orderId);
             
             if (this.deliveryManager) {
-                await this.deliveryManager.calculateRouteForSelectedOrder();
+                // For orders with existing tracking, load API data and display on map
+                if (orderData.trackingData && orderData.status === 'processing') {
+                    console.log('Loading existing tracking data for map display');
+                    await this.deliveryManager.loadExistingTrackingData(orderData);
+                } else {
+                    // For new orders, calculate route
+                    await this.deliveryManager.calculateRouteForSelectedOrder();
+                }
             }
             
             return orderData;
