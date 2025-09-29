@@ -7,7 +7,7 @@
     <li class="breadcrumb-item active">Liste des Municipalités</li>
 @endsection
 
-@section('content')
+@section('main-content')
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">

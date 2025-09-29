@@ -27,9 +27,14 @@ class MunicipalityList extends Component
     public function render()
     {
         $municipalities = Municipality::query()
+            ->with('city') // Eager load city relationship to avoid N+1 queries
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%'.$this->search.'%');
+                $query->where('name', 'like', '%'.$this->search.'%')
+                      ->orWhereHas('city', function ($subQuery) {
+                          $subQuery->where('name', 'like', '%'.$this->search.'%');
+                      });
             })
+            ->orderBy('created_at', 'desc') // Show newest municipalities first
             ->paginate(10);
 
         return view('livewire.municipality.municipality-list', [

@@ -2,6 +2,22 @@
 
 @section('title', 'Éditer une Municipalité')
 
+@section('css')
+    <!-- select2 css -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/select/select2.min.css') }}">
+    <style>
+        .select2-container--default .select2-selection--multiple {
+            border-color: #d1d3e2;
+            min-height: 38px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+    </style>
+@endsection
+
 @section('breadcrumb-items')
     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Tableau de bord</a></li>
     <li class="breadcrumb-item"><a href="{{ route('municipalities.index') }}">Liste des Municipalités</a></li>
@@ -23,4 +39,9 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <!-- select2 -->
+    <script src="{{ asset('assets/vendor/select/select2.min.js') }}"></script>
 @endsection
