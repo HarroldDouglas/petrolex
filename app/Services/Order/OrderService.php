@@ -17,6 +17,8 @@ use App\Events\OrderStatusChanged;
 use App\Models\AccessoryType;
 use App\Models\Bottle;
 use App\Models\BottleType;
+use App\Models\CustomerDeliveryAddress;
+use App\Models\DistributionCenter;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\Contracts\BottleRepositoryInterface;
@@ -109,6 +111,8 @@ class OrderService extends BaseServiceForEntity
     public function createWithoutPayment(CreateOrderWithoutPaymentDTO $orderDTO): Order
     {
         return $this->executeInTransaction(function () use ($orderDTO) {
+            // Validation des municipalités
+            $this->validateSameMunicipality($orderDTO);
             $orderItemsData = array_map(function (OrderItemDTO $itemDTO): OrderItemDTO {
                 // Calculate total_price for each item even though prices are already validated
                 $itemDTO->total_price = $itemDTO->unit_price * $itemDTO->quantity;
@@ -376,5 +380,21 @@ class OrderService extends BaseServiceForEntity
         }
 
         return $result;
+    }
+
+    /**
+     * Validate that delivery address and distribution center are in the same municipality
+     */
+    private function validateSameMunicipality(CreateOrderWithoutPaymentDTO $orderDTO): void
+    {
+        $deliveryAddress = CustomerDeliveryAddress::findOrFail($orderDTO->delivery_address_id);
+        $distributionCenter = DistributionCenter::findOrFail($orderDTO->distribution_center_id);
+
+        $deliveryMunicipalityId = $deliveryAddress->neighborhood->municipality_id;
+        $centerMunicipalityId = $distributionCenter->neighborhood->municipality_id;
+
+        if ($deliveryMunicipalityId !== $centerMunicipalityId) {
+            throw new \Exception(__('validation/order.messages.different_municipalities'));
+        }
     }
 }

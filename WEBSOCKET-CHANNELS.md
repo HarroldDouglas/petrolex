@@ -24,26 +24,7 @@ wss://mondomaine.com:8080/app/petro-key-12345?protocol=7&client=js&version=8.3.0
 
 ## 📡 Canaux Disponibles
 
-### 1. 🚚 Canal Principal de Tracking
-**Nom**: `delivery-tracking`
-
-**Événements diffusés**:
-- `delivery-position-updated`
-- `delivery-status-updated`
-
-**Usage**: Écoute globale de tous les événements de livraison
-
-**Souscription**:
-```json
-{
-    "event": "pusher:subscribe",
-    "data": {
-        "channel": "delivery-tracking"
-    }
-}
-```
-
-### 2. 📦 Canal Spécifique par Commande  
+### 1. 📦 Canal Spécifique par Commande (RECOMMANDÉ)  
 **Nom**: `delivery-{ORDER_NUMBER}`
 
 **Exemples**:
@@ -54,7 +35,13 @@ wss://mondomaine.com:8080/app/petro-key-12345?protocol=7&client=js&version=8.3.0
 - `delivery-position-updated`
 - `delivery-status-updated`
 
-**Usage**: Suivi spécifique d'une commande
+**Usage**: Suivi spécifique d'une commande - SEULE MÉTHODE RECOMMANDÉE
+
+**Avantages**:
+- ✅ Confidentialité : Chaque client ne reçoit que SES données
+- ✅ Performance : Trafic minimal 
+- ✅ Sécurité : Pas d'exposition de données d'autres clients
+- ✅ Scalabilité : Performance constante même avec 1000+ livraisons
 
 **Souscription**:
 ```json
@@ -65,6 +52,21 @@ wss://mondomaine.com:8080/app/petro-key-12345?protocol=7&client=js&version=8.3.0
     }
 }
 ```
+
+### 2. ⚠️ Canal Global (SUPPRIMÉ - FAILLE DE SÉCURITÉ)
+
+**Nom**: `delivery-tracking`
+
+**Faille critique corrigée**:
+- ❌ **EXPOSITION MASSIVE DE DONNÉES**: Tous les clients recevaient TOUTES les données de TOUTES les livraisons
+- ❌ **VIOLATION DE CONFIDENTIALITÉ**: Les clients pouvaient voir les positions et statuts des autres livraisons
+- ❌ **RISQUE SÉCURITAIRE MAJEUR**: Données sensibles (adresses, noms clients, positions GPS) exposées
+- ❌ **PERFORMANCE DÉGRADÉE**: Trafic réseau excessif
+
+**Status**: **COMPLÈTEMENT SUPPRIMÉ** ✅
+- Serveur: Événements ne diffusent plus sur canal global
+- Client: Toutes les souscriptions globales supprimées
+- Delivery: Interface livreur utilise uniquement canaux spécifiques
 
 ---
 

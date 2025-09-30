@@ -4,6 +4,7 @@ namespace App\Livewire\User;
 
 use App\Enums\UserRole;
 use App\Services\DistributionCenter\DistributionCenterService;
+use App\Services\Geography\CountryService;
 use App\Services\Shared\Media\MediaServiceInterface;
 use App\Services\User\UserService;
 use Illuminate\Foundation\Http\FormRequest;
@@ -12,7 +13,6 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
-use App\Services\Geography\CountryService;
 
 abstract class AbstractUserForm extends Component
 {
@@ -63,7 +63,7 @@ abstract class AbstractUserForm extends Component
         $this->country_code = $this->country_code ?: config('countries.default_country_code');
 
         $this->languages = collect(\App\Enums\Language::cases())
-            ->mapWithKeys(fn($case) => [$case->value => $case->label])
+            ->mapWithKeys(fn ($case) => [$case->value => $case->label])
             ->toArray();
         $this->language = $this->language ?: config('countries.default_language', 'fr');
     }

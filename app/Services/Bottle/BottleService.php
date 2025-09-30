@@ -30,19 +30,18 @@ class BottleService extends BaseServiceWithMedia
 
     public function checkBottleStatusByBarcode(string $barcode): array
     {
-        //TODO Remove comment after mobile test
+        // TODO Remove comment after mobile test
         return ['authentic' => true];
-        
+
         $bottle = $this->bottleRepository->findByBarcodeAndStatus(
             $barcode,
             [BottleStatus::WITH_DELIVERY_PERSON()]
         );
-        
 
         if (! $bottle || ! $bottle->is_filled) {
             return ['authentic' => false];
         }
-        
+
         $orderBottleScan = $this->orderBottleScanRepository
             ->getLatestOrderBottleScanForBottle($bottle->id);
 

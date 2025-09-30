@@ -44,7 +44,7 @@ class DeliveryWebSocketManager {
                 });
             });
 
-            this.subscribeToDeliveryTracking();
+            // No global subscription - will subscribe to specific delivery when needed
 
         } catch (error) {
             console.error('[WebSocket] Connection failed:', error);
@@ -52,29 +52,34 @@ class DeliveryWebSocketManager {
         }
     }
 
-    subscribeToDeliveryTracking() {
+    subscribeToSpecificDelivery(orderNumber) {
+        if (!orderNumber) {
+            console.error("[WebSocket] Cannot subscribe: orderNumber required");
+            return;
+        }
+
         try {
-            console.log("[WebSocket] Subscribing to 'delivery-tracking' channel...");
-            this.trackingChannel = this.reverb.subscribe("delivery-tracking");
+            const channelName = `delivery-${orderNumber}`;
+            console.log(`[WebSocket] Subscribing to specific channel: ${channelName}`);
+            this.trackingChannel = this.reverb.subscribe(channelName);
 
             this.trackingChannel.bind('pusher:subscription_succeeded', () => {
-                console.log("[WebSocket] Successfully subscribed to 'delivery-tracking' channel");
+                console.log(`[WebSocket] Successfully subscribed to ${channelName}`);
             });
 
             this.trackingChannel.bind('pusher:subscription_error', (status) => {
-                console.error("[WebSocket] Subscription error for 'delivery-tracking':", status);
+                console.error(`[WebSocket] Subscription error for ${channelName}:`, status);
             });
 
-            // Listen for position updates (same as client)
             this.trackingChannel.bind("delivery-position-updated", (data) => {
-                console.log("[WebSocket] Event received: 'delivery-position-updated'", data);
+                console.log("[WebSocket] Position update received:", data);
                 if (this.deliveryManager) {
                     this.deliveryManager.handleRealTimeUpdate(data);
                 }
             });
 
             this.trackingChannel.bind("delivery-status-updated", (data) => {
-                console.log("[WebSocket] Event received: 'delivery-status-updated'", data);
+                console.log("[WebSocket] Status update received:", data);
                 if (this.deliveryManager) {
                     this.deliveryManager.handleRealTimeUpdate(data);
                 }
@@ -88,7 +93,7 @@ class DeliveryWebSocketManager {
     disconnect() {
         if (this.trackingChannel) {
             this.trackingChannel.unbind_all();
-            this.reverb.unsubscribe("delivery-tracking");
+            this.trackingChannel = null;
         }
         
         if (this.reverb) {

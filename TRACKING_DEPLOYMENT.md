@@ -36,16 +36,7 @@ REVERB_SCHEME=wss
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key
 ```
 
-### 2. Google Maps API Setup
-1. Create a Google Cloud Platform project
-2. Enable these APIs:
-   - Maps JavaScript API
-   - Directions API
-   - Places API (optional)
-3. Create API key and restrict to your domain
-4. Update the API key in configuration files
-
-### 3. Frontend Configuration Files
+### 2. Frontend Configuration Files
 
 #### Update `/public/test/delivery-tracking/shared-config.js`:
 ```javascript

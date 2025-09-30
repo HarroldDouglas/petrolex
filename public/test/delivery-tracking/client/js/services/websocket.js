@@ -83,21 +83,10 @@ class CustomerWebSocketService {
             }
         });
 
-        // Souscrire au canal principal de tracking
-        this.subscribeToMainTrackingChannel();
+        // No global channel subscription - security fix
     }
 
-    /**
-     * Subscribe to main tracking channel for general delivery updates
-     * @private
-     */
-    subscribeToMainTrackingChannel() {
-        const channelName = CustomerWebSocketService.CHANNELS.MAIN_TRACKING;
-        const channel = this.reverb.subscribe(channelName);
-        this.channels.set(channelName, channel);
-
-        this._bindChannelEvents(channel);
-    }
+    // Global channel subscription removed for security
 
     /**
      * Bind standard events to a channel
@@ -337,22 +326,14 @@ class CustomerWebSocketBaseService {
                 this.triggerCallback("error", error);
             });
 
-            this.channel = this.pusher.subscribe("delivery-tracking");
-
-            this.channel.bind("delivery-position-updated", (data) => {
-                this.triggerCallback("positionUpdate", data);
-            });
-
-            this.channel.bind("delivery-status-updated", (data) => {
-                this.triggerCallback("statusUpdate", data);
-            });
+            this.setupEventHandlers();
         } catch (error) {
             this.triggerCallback("error", error);
         }
     }
 
     subscribeToDelivery(orderNumber) {
-        if (!this.pusher) {
+        if (!this.pusher || !orderNumber) {
             return;
         }
 
@@ -360,15 +341,19 @@ class CustomerWebSocketBaseService {
             this.pusher.unsubscribe(this.channel.name);
         }
 
-        this.channel = this.pusher.subscribe(`delivery.${orderNumber}`);
+        this.channel = this.pusher.subscribe(`delivery-${orderNumber}`);
 
-        this.channel.bind("DeliveryLocationUpdated", (data) => {
-            this.triggerCallback("locationUpdated", data);
+        this.channel.bind("delivery-position-updated", (data) => {
+            this.triggerCallback("positionUpdate", data);
         });
 
-        this.channel.bind("DeliveryStatusUpdated", (data) => {
-            this.triggerCallback("statusUpdated", data);
+        this.channel.bind("delivery-status-updated", (data) => {
+            this.triggerCallback("statusUpdate", data);
         });
+    }
+
+    setupEventHandlers() {
+        // No global channel subscription - only specific channels
     }
 
     on(event, callback) {

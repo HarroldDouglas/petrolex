@@ -45,21 +45,12 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Put(
- *     path="/api/customers/{customer}/delivery-addresses/{deliveryAddress}",
- *     summary="Mettre à jour une adresse de livraison d'un client",
- *     description="Permet de mettre à jour une adresse de livraison existante associée à un client spécifique.",
- *     operationId="api.customers.delivery-addresses.update",
+ *     path="/api/my/delivery-addresses/{deliveryAddress}",
+ *     summary="Mettre à jour une adresse de livraison de l'utilisateur connecté",
+ *     description="Permet de mettre à jour une adresse de livraison existante de l'utilisateur connecté.",
+ *     operationId="api.my.delivery-addresses.update",
  *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
- *
- *     @OA\Parameter(
- *         name="customer",
- *         in="path",
- *         required=true,
- *         description="ID du client",
- *
- *         @OA\Schema(type="integer", example=1)
- *     ),
  *
  *     @OA\Parameter(
  *         name="deliveryAddress",

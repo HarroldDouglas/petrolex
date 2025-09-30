@@ -152,6 +152,8 @@ class TrackingController {
     subscribeToOrderUpdates(orderNumber) {
         if (window.customerApp.websocketManager.isConnected()) {
             window.customerApp.websocketManager.subscribeToOrder(orderNumber);
+        } else {
+            console.warn("[TrackingController] WebSocket not connected, cannot subscribe to order updates");
         }
     }
 

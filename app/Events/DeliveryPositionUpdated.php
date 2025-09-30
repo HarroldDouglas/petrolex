@@ -60,7 +60,6 @@ class DeliveryPositionUpdated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new Channel('delivery-tracking'),
             new Channel('delivery-'.$this->delivery->order->order_number),
         ];
     }
@@ -140,7 +139,9 @@ class DeliveryPositionUpdated implements ShouldBroadcastNow
         // 🔧 UTILISER DIRECTEMENT LES DONNÉES DU LIVREUR - PAS DE CALCUL !
         return [
             'total_distance' => null,
-            'progress_percentage' => $this->delivery->progress_percentage,
+            'progress_percentage' => $this->delivery->progress_percentage !== null
+                ? (float) $this->delivery->progress_percentage
+                : null,
         ];
     }
 
