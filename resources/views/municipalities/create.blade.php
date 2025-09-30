@@ -33,7 +33,7 @@
                         <h5>Créer une Municipalité</h5>
                     </div>
                     <div class="card-body">
-                        @livewire('municipality.municipality-form')
+                        @livewire('municipality.create-municipality-form')
                     </div>
                 </div>
             </div>

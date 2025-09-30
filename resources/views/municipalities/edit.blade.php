@@ -24,7 +24,7 @@
     <li class="breadcrumb-item active">Éditer une Municipalité</li>
 @endsection
 
-@section('content')
+@section('main-content')
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
@@ -33,7 +33,7 @@
                         <h5>Éditer une Municipalité</h5>
                     </div>
                     <div class="card-body">
-                        @livewire('municipality.municipality-form', ['municipality' => $municipality])
+                        @livewire('municipality.edit-municipality-form', ['municipality' => $municipality])
                     </div>
                 </div>
             </div>
