@@ -519,8 +519,15 @@ class OrderServiceTest extends TestCase
 
         // Test 2: Invalid order (different municipalities) should fail
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('L\'adresse de livraison doit être dans la même municipalité que le centre de distribution.');
 
-        $orderService->createWithoutPayment(\App\DTOs\Order\CreateOrderWithoutPaymentDTO::from($invalidOrderData));
+        try {
+            $orderService->createWithoutPayment(\App\DTOs\Order\CreateOrderWithoutPaymentDTO::from($invalidOrderData));
+        } catch (\Exception $e) {
+            $this->assertContains($e->getMessage(), [
+                'L\'adresse de livraison doit être dans la même municipalité que le centre de distribution.',
+                'The delivery address must be in the same municipality as the distribution center.',
+            ]);
+            throw $e;
+        }
     }
 }

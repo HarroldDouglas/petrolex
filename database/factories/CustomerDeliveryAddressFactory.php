@@ -40,4 +40,24 @@ class CustomerDeliveryAddressFactory extends Factory
     {
         return $this->state(['is_default' => true]);
     }
+
+    /**
+     * Create address in a municipality where distribution centers exist.
+     * Ensures compatibility for order creation tests.
+     */
+    public function inDistributionCenterMunicipality(): static
+    {
+        return $this->state(function () {
+            // Get neighborhoods in municipalities that have distribution centers
+            $validNeighborhoods = Neighborhood::whereHas('municipality', function ($query) {
+                $query->whereIn('id', [8, 6, 2, 21]); // Douala I, Yaoundé VI, Yaoundé II, Commune Urbaine de Maroua
+            })->get();
+
+            $neighborhood = $validNeighborhoods->random();
+
+            return [
+                'neighborhood_id' => $neighborhood->id,
+            ];
+        });
+    }
 }

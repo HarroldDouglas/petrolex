@@ -113,6 +113,8 @@ class OrderManager {
             } else {
                 // Pour les commandes non-processing, pas de tracking à récupérer
                 console.log(`📦 Commande ${orderData.order_number} sélectionnée (statut: ${orderData.status}) - pas de tracking requis`);
+                // Reset la progression pour les nouvelles commandes
+                this.ui.updateProgress(0);
             }
             
             this.ui.updateSelectedOrderDetails(orderData);

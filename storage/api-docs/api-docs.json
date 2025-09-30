@@ -3109,7 +3109,7 @@
                     "Livraison"
                 ],
                 "summary": "Complete delivery tracking",
-                "description": "Marks a delivery as completed with optional final position and notes.",
+                "description": "Marks a delivery as completed with optional final position and notes. Accessible uniquement par le livreur assigné à cette commande.",
                 "operationId": "api.tracking.delivery.complete",
                 "parameters": [
                     {
@@ -3194,6 +3194,16 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request - Utilisateur non autorisé (seul le livreur assigné peut compléter la livraison)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "403": {
                         "description": "Forbidden - Not authorized to complete this delivery",
                         "content": {
@@ -3252,107 +3262,13 @@
                 ]
             }
         },
-        "/api/tracking/delivery": {
-            "post": {
-                "tags": [
-                    "Livraison"
-                ],
-                "summary": "Créer un nouveau enregistrement de suivi de livraison",
-                "description": "Initialise un nouvel enregistrement de suivi pour une livraison.",
-                "operationId": "api.tracking.delivery.create",
-                "requestBody": {
-                    "description": "Données pour créer un nouvel enregistrement de suivi de livraison",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "order_id"
-                                ],
-                                "properties": {
-                                    "order_id": {
-                                        "description": "L'ID de la commande à suivre",
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Suivi de livraison créé avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiResponse"
-                                        },
-                                        {
-                                            "properties": {
-                                                "data": {
-                                                    "$ref": "#/components/schemas/DeliveryTrackingData"
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Suivi de livraison créé avec succès."
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non autorisé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreur de validation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur serveur interne",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/tracking/delivery/{orderId}": {
             "get": {
                 "tags": [
                     "Livraison"
                 ],
                 "summary": "Obtenir les détails de suivi de livraison",
-                "description": "Récupère les détails de suivi pour une livraison spécifique.",
+                "description": "Récupère les détails de suivi pour une livraison spécifique. Accessible par le client propriétaire de la commande ou le livreur assigné.",
                 "operationId": "api.tracking.delivery.details",
                 "parameters": [
                     {
@@ -3402,6 +3318,16 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request - Utilisateur non autorisé (accessible uniquement au client ou au livreur assigné)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Livraison introuvable",
                         "content": {
@@ -3436,7 +3362,7 @@
                     "Livraison"
                 ],
                 "summary": "Démarrer le suivi de livraison",
-                "description": "Marque une livraison comme démarrée.",
+                "description": "Marque une livraison comme démarrée. Accessible uniquement par le livreur assigné à cette commande.",
                 "operationId": "api.tracking.delivery.start",
                 "parameters": [
                     {
@@ -3519,6 +3445,16 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request - Utilisateur non autorisé (seul le livreur assigné peut démarrer le suivi)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Delivery not found",
                         "content": {
@@ -3553,7 +3489,7 @@
                     "Livraison"
                 ],
                 "summary": "Mettre à jour la position de suivi de livraison",
-                "description": "Met à jour la position géographique d'une livraison.",
+                "description": "Met à jour la position géographique d'une livraison. Accessible uniquement par le livreur assigné à cette commande.",
                 "operationId": "api.tracking.delivery.position.update",
                 "parameters": [
                     {
@@ -3656,6 +3592,16 @@
                     },
                     "401": {
                         "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Utilisateur non autorisé (seul le livreur assigné peut mettre à jour la position)",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4966,14 +4912,14 @@
                 ],
                 "properties": {
                     "delivery_address_id": {
-                        "description": "ID de l'adresse de livraison du client",
+                        "description": "ID de l'adresse de livraison du client (doit être dans la même municipalité que le centre de distribution)",
                         "type": "integer",
-                        "example": 1
+                        "example": 65
                     },
                     "distribution_center_id": {
                         "description": "ID du centre de distribution",
                         "type": "integer",
-                        "example": 1
+                        "example": 2
                     },
                     "delivery_type": {
                         "description": "Type de livraison: normal (standard) ou fast (express)",
