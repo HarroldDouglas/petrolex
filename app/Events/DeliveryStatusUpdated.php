@@ -63,6 +63,14 @@ final class DeliveryStatusUpdated implements ShouldBroadcast
     }
 
     /**
+     * Get the broadcaster connection to use
+     */
+    public function broadcastVia(): array
+    {
+        return ['reverb'];
+    }
+
+    /**
      * Get the broadcast event name.
      */
     public function broadcastAs(): string

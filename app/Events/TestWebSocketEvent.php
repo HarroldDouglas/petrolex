@@ -34,6 +34,11 @@ class TestWebSocketEvent implements ShouldBroadcastNow
         ];
     }
 
+    public function broadcastVia(): array
+    {
+        return ['reverb'];
+    }
+
     public function broadcastAs(): string
     {
         return 'test-message';

@@ -360,15 +360,15 @@ class OrderSeeder extends Seeder
     private function createPaidOrders(): void
     {
         $this->command->info('Creating paid orders...');
-        
+
         // Get customer1 and delivery1 users
         $customer1 = User::where('email', 'customer1@test.com')->first()->customer;
         $delivery1 = User::where('email', 'delivery1@test.com')->first()->deliveryPerson;
-        
+
         // Get or create a geographically consistent delivery address in Yaoundé VI
         $yaoundeVIMunicipality = \App\Models\Geography\Municipality::where('name', 'Yaoundé VI')->first();
         $bastosNeighborhood = \App\Models\Geography\Neighborhood::where('municipality_id', $yaoundeVIMunicipality->id)->first();
-        
+
         $deliveryAddress = \App\Models\CustomerDeliveryAddress::firstOrCreate([
             'customer_id' => $customer1->id,
             'label' => 'Adresse Test Yaoundé VI',
@@ -378,12 +378,12 @@ class OrderSeeder extends Seeder
             'longitude' => 11.526700,
             'is_default' => false,
         ]);
-        
+
         // Get Centre Bastos Yaoundé (which is in Yaoundé VI)
         $centreBastos = DistributionCenter::where('name', 'Centre Bastos Yaoundé')->first();
-        
+
         $paidOrders = [];
-        
+
         // Create 5 paid orders with geographic consistency
         for ($i = 0; $i < 5; $i++) {
             $orderData = [
@@ -391,7 +391,7 @@ class OrderSeeder extends Seeder
                 'delivery_address_id' => $deliveryAddress->id,
                 'delivery_person_id' => $delivery1->id,
                 'distribution_center_id' => $centreBastos->id,
-                'order_number' => 'PAID-' . rand(100000, 999999),
+                'order_number' => 'PAID-'.rand(100000, 999999),
                 'status' => OrderStatus::PAID(),
                 'delivery_type' => DeliveryType::NORMAL(),
                 'subtotal' => 0,
@@ -400,13 +400,13 @@ class OrderSeeder extends Seeder
                 'order_date' => now()->subDays(rand(1, 30)),
                 'paid_at' => now()->subDays(rand(1, 30)),
             ];
-            
+
             $paidOrders[] = Order::create($orderData);
         }
 
         // Add items to orders
         $this->addOrderItems($paidOrders);
-        
+
         $this->orderTypeStats['paid'] = count($paidOrders);
         $this->command->info(count($paidOrders).' paid orders created between delivery1@test.com and customer1@test.com with geographic consistency.');
     }

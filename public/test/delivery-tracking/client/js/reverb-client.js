@@ -14,7 +14,9 @@ class ReverbClient {
     }
 
     connect() {
-        const url = `ws://${this.options.wsHost}:${this.options.wsPort}/app/${this.appKey}?protocol=7&client=js&version=8.3.0&flash=false`;
+        // Auto-détection du protocole WebSocket basé sur le protocole de la page
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const url = `${wsProtocol}//${this.options.wsHost}:${this.options.wsPort}/app/${this.appKey}?protocol=7&client=js&version=8.3.0&flash=false`;
         console.log("🔗 ReverbClient connecting to:", url);
 
         this.ws = new WebSocket(url);

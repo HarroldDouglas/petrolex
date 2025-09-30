@@ -30,7 +30,8 @@
       "Bash(netstat:*)",
       "WebSearch",
       "Bash(git branch:*)",
-      "Bash(timeout 60 php artisan queue:work:*)"
+      "Bash(timeout 60 php artisan queue:work:*)",
+      "WebFetch(domain:isogaz.afrik-solutions.com)"
     ],
     "deny": [],
     "ask": []
