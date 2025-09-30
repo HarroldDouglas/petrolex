@@ -26,12 +26,12 @@ final class DeliveryTrackingService implements DeliveryTrackingServiceInterface
     public function __construct(
         private readonly DeliveryTrackingRepositoryInterface $repository,
         private readonly CacheServiceInterface $cacheService,
-        private readonly RouteCalculatorInterface $mapboxService
+        private readonly RouteCalculatorInterface $routeCalculator
     ) {}
 
     public function calculateRoute(float $fromLng, float $fromLat, float $toLng, float $toLat): RouteDTO
     {
-        return $this->mapboxService->calculateRoute($fromLng, $fromLat, $toLng, $toLat);
+        return $this->routeCalculator->calculateRoute($fromLng, $fromLat, $toLng, $toLat);
     }
 
     public function updatePosition(int $orderId, UpdateDeliveryTrackingPositionRequest $request): DeliveryTracking
