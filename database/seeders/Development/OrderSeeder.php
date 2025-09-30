@@ -361,84 +361,54 @@ class OrderSeeder extends Seeder
     {
         $this->command->info('Creating paid orders...');
         
-        // Find customer1@test.com
-        $customer1User = User::where('email', 'customer1@test.com')->first();
-        if (!$customer1User || !$customer1User->customer) {
-            $this->command->error('Customer1 not found. Run UserSeeder first.');
-            return;
-        }
+        // Get customer1 and delivery1 users
+        $customer1 = User::where('email', 'customer1@test.com')->first()->customer;
+        $delivery1 = User::where('email', 'delivery1@test.com')->first()->deliveryPerson;
         
-        // Find delivery1@test.com  
-        $delivery1User = User::where('email', 'delivery1@test.com')->first();
-        if (!$delivery1User || !$delivery1User->deliveryPerson) {
-            $this->command->error('Delivery1 not found. Run UserSeeder first.');
-            return;
-        }
-
-        // Get customer's delivery addresses
-        $deliveryAddresses = $customer1User->customer->deliveryAddresses;
-        if ($deliveryAddresses->isEmpty()) {
-            $this->command->error('Customer1 has no delivery addresses.');
-            return;
-        }
-
-        // Get available centers
-        $centers = DistributionCenter::all();
-        if ($centers->isEmpty()) {
-            $this->command->error('No distribution centers found.');
-            return;
-        }
-
+        // Get or create a geographically consistent delivery address in Yaoundé VI
+        $yaoundeVIMunicipality = \App\Models\Geography\Municipality::where('name', 'Yaoundé VI')->first();
+        $bastosNeighborhood = \App\Models\Geography\Neighborhood::where('municipality_id', $yaoundeVIMunicipality->id)->first();
+        
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::firstOrCreate([
+            'customer_id' => $customer1->id,
+            'label' => 'Adresse Test Yaoundé VI',
+            'address' => 'Rue du Test, Yaoundé VI',
+            'neighborhood_id' => $bastosNeighborhood->id,
+            'latitude' => 3.876700,
+            'longitude' => 11.526700,
+            'is_default' => false,
+        ]);
+        
+        // Get Centre Bastos Yaoundé (which is in Yaoundé VI)
+        $centreBastos = DistributionCenter::where('name', 'Centre Bastos Yaoundé')->first();
+        
         $paidOrders = [];
         
-        // Create 5 paid orders
+        // Create 5 paid orders with geographic consistency
         for ($i = 0; $i < 5; $i++) {
-            $deliveryAddress = $deliveryAddresses->random();
-            $center = $centers->random();
-            
             $orderData = [
-                'customer_id' => $customer1User->customer->id,
-                'delivery_person_id' => $delivery1User->deliveryPerson->id,
-                'distribution_center_id' => $center->id,
+                'customer_id' => $customer1->id,
                 'delivery_address_id' => $deliveryAddress->id,
-                'order_number' => 'ORD-'.rand(100000, 999999),
-                'order_date' => now()->subDays(rand(1, 30)),
+                'delivery_person_id' => $delivery1->id,
+                'distribution_center_id' => $centreBastos->id,
+                'order_number' => 'PAID-' . rand(100000, 999999),
                 'status' => OrderStatus::PAID(),
                 'delivery_type' => DeliveryType::NORMAL(),
-                'subtotal' => 0, // Will be calculated after adding items
-                'delivery_fee' => DeliveryType::NORMAL()->fee(),
-                'total_amount' => 0, // Will be calculated after adding items
+                'subtotal' => 0,
+                'delivery_fee' => rand(500, 2000),
+                'total_amount' => 0,
+                'order_date' => now()->subDays(rand(1, 30)),
+                'paid_at' => now()->subDays(rand(1, 30)),
             ];
-
-            $order = Order::create($orderData);
-            $paidOrders[] = $order;
             
-            // Create payment record
-            $order->payments()->create([
-                'amount_paid' => $order->total_amount,
-                'amount_due' => 0,
-                'payment_method' => PaymentMethod::ORANGE_MONEY(),
-                'payment_status' => PaymentStatus::PAID(),
-                'payment_reference' => $this->generatePaymentReference(PaymentMethod::ORANGE_MONEY(), $order->order_date),
-                'payment_date' => $order->order_date->addMinutes(rand(5, 60)),
-                'payment_notes' => 'Test payment for paid order between delivery1 and customer1',
-            ]);
+            $paidOrders[] = Order::create($orderData);
         }
 
-        // Add items and calculate correct totals
+        // Add items to orders
         $this->addOrderItems($paidOrders);
         
-        // Update totals for each order after items are added
-        foreach ($paidOrders as $order) {
-            $subtotal = $order->items()->sum(\DB::raw('quantity * unit_price'));
-            $order->update([
-                'subtotal' => $subtotal,
-                'total_amount' => $subtotal + $order->delivery_fee,
-            ]);
-        }
-        
         $this->orderTypeStats['paid'] = count($paidOrders);
-        $this->command->info(count($paidOrders).' paid orders created between delivery1@test.com and customer1@test.com.');
+        $this->command->info(count($paidOrders).' paid orders created between delivery1@test.com and customer1@test.com with geographic consistency.');
     }
 
     /**
@@ -1380,9 +1350,11 @@ class OrderSeeder extends Seeder
             return;
         }
 
-        // Clean existing test orders for customer1
+        // Clean existing test orders for customer1 (EXCLUDE paid orders)
         $customer1 = $customer1User->customer;
-        $existingTestOrders = Order::where('customer_id', $customer1->id)->get();
+        $existingTestOrders = Order::where('customer_id', $customer1->id)
+            ->where('status', '!=', 'paid')  // NE PAS supprimer les commandes paid
+            ->get();
 
         foreach ($existingTestOrders as $order) {
             // Delete related records first
