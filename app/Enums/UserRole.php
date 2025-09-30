@@ -60,8 +60,10 @@ class UserRole extends Enum
         return match ($this->value) {
             'super_admin' => $allPermissions,
             'admin' => array_filter($allPermissions, function ($permission) {
-                // Admin has all permissions except managing roles and supplier deliveries
+                // Admin has all permissions except managing/creating/editing roles and supplier deliveries
                 return ! in_array($permission, [
+                    PermissionEnum::ROLES_CREATE()->value,
+                    PermissionEnum::ROLES_EDIT()->value,
                     PermissionEnum::ROLES_MANAGE()->value,
                     PermissionEnum::SUPPLIER_DELIVERIES_CREATE()->value,
                     PermissionEnum::SUPPLIER_DELIVERIES_EDIT()->value,
@@ -73,6 +75,9 @@ class UserRole extends Enum
                     PermissionEnum::USERS_CREATE()->value,
                     PermissionEnum::USERS_EDIT()->value,
                     PermissionEnum::USERS_DELETE()->value,
+                    PermissionEnum::ROLES_VIEW()->value,
+                    PermissionEnum::ROLES_CREATE()->value,
+                    PermissionEnum::ROLES_EDIT()->value,
                     PermissionEnum::ROLES_MANAGE()->value,
                     PermissionEnum::DISTRIBUTION_CENTERS_CREATE()->value,
                     PermissionEnum::DISTRIBUTION_CENTERS_EDIT()->value,
@@ -86,6 +91,7 @@ class UserRole extends Enum
             'accountant', 'gas_manager' => [
                 // Permissions en lecture seule uniquement
                 PermissionEnum::USERS_VIEW()->value,
+                PermissionEnum::ROLES_VIEW()->value,
                 PermissionEnum::DISTRIBUTION_CENTERS_VIEW()->value,
                 PermissionEnum::ORDERS_VIEW()->value,
                 PermissionEnum::DELIVERIES_VIEW()->value,
