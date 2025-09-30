@@ -73,6 +73,76 @@ class DeliveryTracker {
 }
 ```
 
+## 📋 Flow Complet de Livraison
+
+### 1. Démarrage de la livraison (Livreur)
+- **Action**: Cliquer sur "Démarrer la livraison"  
+- **Endpoint**: `POST /api/delivery/tracking/{orderId}/start`
+- **Réponse**: Status `started`, initialise les données de tracking
+
+### 2. Mise à jour des positions (Livreur en mouvement)
+- **Action**: App mobile envoie position toutes les 5 secondes
+- **Endpoint**: `POST /api/delivery/update-location`
+- **Données**: `{"order_id": 123, "lat": 3.848, "lng": 11.502, "speed": 25}`
+- **WebSocket**: Déclenche automatiquement `delivery-position-updated`
+
+### 3. Suivi temps réel (Client)
+- **Action**: Client peut consulter à tout moment
+- **Endpoint**: `GET /api/tracking/delivery/{orderId}`
+- **WebSocket**: Reçoit les mises à jour automatiquement sur canal `delivery-{ORDER_NUMBER}`
+
+### 4. Finalisation (Livreur)
+- **Action**: Cliquer sur "Marquer comme livré"
+- **Endpoint**: `POST /api/orders/{orderId}/status` → `delivered`
+- **Effet**: Progress = 100%, tracking terminé
+
+## 🔄 Endpoints API Mobiles
+
+### Authentification
+```http
+POST /api/login
+Content-Type: application/json
+
+{
+    "email": "delivery1@test.com",
+    "password": "password"
+}
+```
+
+### Démarrage tracking
+```http
+POST /api/delivery/tracking/{orderId}/start
+Authorization: Bearer {token}
+```
+
+### Mise à jour position
+```http
+POST /api/delivery/update-location
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "order_id": 123,
+    "lat": 3.848,
+    "lng": 11.502,
+    "speed": 25
+}
+```
+
+### Statut de livraison
+```http
+GET /api/tracking/delivery/{orderId}
+Authorization: Bearer {token}
+
+POST /api/orders/{orderId}/status
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "status": "delivered"
+}
+```
+
 ## 🧪 Test WebSocket
 
 1. **Ouvrir**: `https://mondomaine.com/test-websocket-sender.html`
@@ -88,3 +158,6 @@ class DeliveryTracker {
 - [ ] Réception des messages position
 - [ ] Mise à jour carte en temps réel
 - [ ] Gestion reconnexion automatique
+- [ ] Flow complet livreur testé
+- [ ] API endpoints fonctionnels
+- [ ] Authentification mobile OK

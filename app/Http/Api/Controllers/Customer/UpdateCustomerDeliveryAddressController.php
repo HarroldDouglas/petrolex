@@ -28,7 +28,6 @@ class UpdateCustomerDeliveryAddressController extends Controller
     ): UpdateCustomerDeliveryAddressResponse {
         $customer = $request->user()->customer;
 
-        // Ensure the delivery address belongs to the authenticated customer
         if ($deliveryAddress->customer_id !== $customer->id) {
             abort(404, 'Delivery address not found for this customer');
         }

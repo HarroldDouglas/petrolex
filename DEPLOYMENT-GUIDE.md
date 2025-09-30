@@ -1,6 +1,46 @@
-# 🚀 Guide de Déploiement Production - Système de Suivi Livraison
+# 🚀 Guide de Déploiement Staging - Système de Suivi Livraison
 
-## 📋 Configuration pour `mondomaine.com`
+## 📋 Configuration pour `isogaz.afrik-solutions.com`
+
+## ✅ **Ce qui est fait AUTOMATIQUEMENT par le script `deploy-staging.sh` :**
+
+### 🔄 **1. Backup automatique**
+- Sauvegarde de votre `.env` actuel
+- Sauvegarde des fichiers config modifiés
+
+### 📝 **2. Mise à jour automatique du .env**
+Le script ajoute automatiquement ces variables à votre `.env` existant :
+```env
+BROADCAST_CONNECTION=reverb
+REVERB_SERVER=laravel
+REVERB_HOST=0.0.0.0
+REVERB_PORT=8080
+REVERB_HOSTNAME=isogaz.afrik-solutions.com
+REVERB_SCHEME=https
+REVERB_APP_ID=petrolex-app
+REVERB_APP_KEY=petro-key-12345
+REVERB_APP_SECRET=petro-secret-67890
+REVERB_APP_HOST=isogaz.afrik-solutions.com
+REVERB_APP_PORT=8080
+REVERB_APP_SCHEME=https
+REVERB_SCALING_ENABLED=true
+REVERB_SCALING_CHANNEL=reverb
+```
+
+### ⚙️ **3. Création automatique des fichiers config**
+- **`config/reverb.php`** ➡️ Créé automatiquement
+- **`config/broadcasting.php`** ➡️ Section reverb ajoutée automatiquement
+
+### 🌐 **4. Configuration JavaScript**
+- **`public/test/delivery-tracking/shared-config.js`** ➡️ Mis à jour automatiquement
+
+## 🚀 **Usage Simple :**
+```bash
+chmod +x deploy-staging.sh
+./deploy-staging.sh
+```
+
+**Plus besoin de toucher manuellement aux fichiers !** 😊
 
 ### 1. Configuration Laravel Reverb
 
@@ -15,7 +55,7 @@ return [
         'laravel' => [
             'host' => env('REVERB_HOST', '0.0.0.0'),
             'port' => env('REVERB_PORT', 8080),
-            'hostname' => env('REVERB_HOSTNAME', 'mondomaine.com'),
+            'hostname' => env('REVERB_HOSTNAME', 'isogaz.afrik-solutions.com'),
             'options' => [
                 'tls' => [
                     'local_cert' => env('REVERB_SSL_CERT'),
@@ -54,9 +94,9 @@ return [
                 'scheme' => env('REVERB_APP_SCHEME', 'http'),
             ],
             'allowed_origins' => [
-                'https://mondomaine.com',
-                'http://mondomaine.com',
-                'https://*.mondomaine.com',
+                'https://isogaz.afrik-solutions.com',
+                'http://isogaz.afrik-solutions.com',
+                'https://*.afrik-solutions.com',
             ],
             'ping_interval' => env('REVERB_APP_PING_INTERVAL', 60),
             'max_message_size' => env('REVERB_APP_MAX_MESSAGE_SIZE', 10000),
