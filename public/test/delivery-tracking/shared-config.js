@@ -16,7 +16,7 @@ const getEnvironmentConfig = () => {
         console.log('🌍 [Config] Production environment detected:', hostname);
         return {
             HOST: hostname,
-            API_BASE_URL: `${protocol}//${hostname}:8001/api`,
+            API_BASE_URL: `${protocol}//${hostname}/api`,
             WS_HOST: hostname,
             WS_PORT: 8080,
             FORCE_TLS: isSSL
