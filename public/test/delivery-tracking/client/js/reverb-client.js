@@ -3,7 +3,7 @@ class ReverbClient {
         this.appKey = appKey;
         this.options = {
             wsHost: options.wsHost || "127.0.0.1",
-            wsPort: options.wsPort || 8080,
+            wsPort: options.wsPort || (typeof window !== "undefined" && window.location.protocol === "https:" ? 443 : 8080),
             ...options,
         };
         this.state = "initialized";
