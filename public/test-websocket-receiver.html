@@ -118,7 +118,9 @@
             }
             
             // Use shared configuration for WebSocket connection
-            const wsUrl = `ws://${SHARED_CONFIG.WEBSOCKET.HOST}:${SHARED_CONFIG.WEBSOCKET.PORT}/app/${SHARED_CONFIG.WEBSOCKET.APP_KEY}?protocol=7&client=js&version=8.3.0&flash=false`;
+            const protocol = SHARED_CONFIG.WEBSOCKET.FORCE_TLS ? 'wss' : 'ws';
+            const port = SHARED_CONFIG.WEBSOCKET.FORCE_TLS ? '' : `:${SHARED_CONFIG.WEBSOCKET.PORT}`;
+            const wsUrl = `${protocol}://${SHARED_CONFIG.WEBSOCKET.HOST}${port}/app/${SHARED_CONFIG.WEBSOCKET.APP_KEY}?protocol=7&client=js&version=8.3.0&flash=false`;
             
             // Afficher l'URL dans l'interface pour Flutter
             document.getElementById('wsUrl').textContent = wsUrl;
