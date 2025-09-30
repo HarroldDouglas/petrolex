@@ -123,101 +123,51 @@ else
     done
 fi
 
-# 2. Mise à jour du shared-config.js
-print_status "Mise à jour de la configuration JavaScript..."
+# 2. Mise à jour du shared-config.js (préservation de la détection auto des ports)
+print_status "Mise à jour de la configuration JavaScript (API et Google Maps seulement)..."
 
 SHARED_CONFIG_FILE="public/test/delivery-tracking/shared-config.js"
 
 if [[ "$DRY_RUN" = false ]]; then
     if [[ -f "$SHARED_CONFIG_FILE" ]]; then
-        # Créer une nouvelle version du shared-config.js
-        cat > "$SHARED_CONFIG_FILE" << EOF
-// 🌍 CONFIGURATION PARTAGÉE - STAGING
-const SHARED_CONFIG = {
-    WEBSOCKET: {
-        ENABLED: true,
-        HOST: '$DOMAIN',
-        PORT: 8080,
-        FORCE_TLS: true,
-        APP_KEY: 'petro-key-12345',
-        ENABLED_TRANSPORTS: ['websocket', 'polling']
-    },
-    
-    API: {
-        BASE_URL: 'https://$DOMAIN/api',
-        TIMEOUT: 10000
-    },
-
-    GOOGLE_MAPS: {
-        API_KEY: '$GOOGLE_MAPS_KEY',
-        DEFAULT_CENTER: { lat: 3.848, lng: 11.502 },
-        DEFAULT_ZOOM: 12
-    },
-    
-    // Configuration par environnement
-    ENVIRONMENT: 'staging'
-};
-
-// Auto-detect development vs production
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    SHARED_CONFIG.WEBSOCKET.HOST = '127.0.0.1';
-    SHARED_CONFIG.WEBSOCKET.FORCE_TLS = false;
-    SHARED_CONFIG.API.BASE_URL = 'http://localhost:8000/api';
-    SHARED_CONFIG.ENVIRONMENT = 'development';
-}
-
-// Export pour Customer et Delivery
-const CUSTOMER_CONFIG = {
-    ...SHARED_CONFIG,
-    WEBSOCKET: {
-        ...SHARED_CONFIG.WEBSOCKET,
-        APP_KEY: SHARED_CONFIG.WEBSOCKET.APP_KEY
-    }
-};
-
-const DELIVERY_CONFIG = {
-    ...SHARED_CONFIG,
-    WEBSOCKET: {
-        ...SHARED_CONFIG.WEBSOCKET,
-        APP_KEY: SHARED_CONFIG.WEBSOCKET.APP_KEY
-    }
-};
-EOF
-        print_success "Configuration JavaScript mise à jour"
+        # Mise à jour sélective sans écraser la détection auto des ports
+        sed -i "s|API_BASE_URL: .*|API_BASE_URL: 'https://$DOMAIN/api',|" "$SHARED_CONFIG_FILE"
+        sed -i "s|API_KEY: '.*'|API_KEY: '$GOOGLE_MAPS_KEY'|" "$SHARED_CONFIG_FILE"
+        print_success "Configuration JavaScript mise à jour (ports WebSocket préservés)"
     else
         print_warning "Fichier $SHARED_CONFIG_FILE non trouvé"
     fi
 else
-    echo "DRY RUN - Fichier shared-config.js qui serait créé avec:"
+    echo "DRY RUN - Modifications qui seraient appliquées à shared-config.js:"
     echo "  - API_BASE_URL: https://$DOMAIN/api"
-    echo "  - WS_HOST: $DOMAIN"
     echo "  - GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_KEY:0:20}..."
+    echo "  - PORTS WEBSOCKET: Préservés (détection automatique maintenue)"
 fi
 
-# 3. Mise à jour des autres fichiers de configuration
-print_status "Recherche et mise à jour des autres fichiers de configuration..."
+# 3. Mise à jour des autres fichiers de configuration (API seulement)
+print_status "Mise à jour des configurations API (WebSocket préservé)..."
 
 CONFIG_FILES=(
     "public/test/delivery-tracking/delivery/js/config.js"
     "public/test/delivery-tracking/client/js/components/login-form.js"
-    "public/test/delivery-tracking/client/js/reverb-client.js"
 )
 
 for file in "${CONFIG_FILES[@]}"; do
     if [[ -f "$file" ]]; then
         if [[ "$DRY_RUN" = false ]]; then
-            # Remplacer localhost/127.0.0.1 par le domaine de staging
+            # Remplacer seulement les URLs API, pas les WebSocket
             sed -i "s|127\.0\.0\.1:8001|$DOMAIN|g" "$file"
             sed -i "s|localhost:8001|$DOMAIN|g" "$file"
-            sed -i "s|127\.0\.0\.1:8080|$DOMAIN:8080|g" "$file"
-            sed -i "s|localhost:8080|$DOMAIN:8080|g" "$file"
-            sed -i "s|ws://|wss://|g" "$file"
-            print_status "Mis à jour: $file"
+            # NE PAS remplacer les ports WebSocket - détection automatique maintenue
+            print_status "Mis à jour API: $file"
         else
-            echo "DRY RUN - Fichier qui serait modifié: $file"
+            echo "DRY RUN - Fichier API qui serait modifié: $file"
         fi
     fi
 done
+
+print_warning "⚠️  Ports WebSocket préservés - détection automatique maintenue"
+print_warning "⚠️  Ne pas modifier reverb-client.js - contient la détection auto HTTP/HTTPS"
 
 # 4. Vérification des fichiers de configuration Laravel
 print_status "Vérification des fichiers de configuration Laravel..."
