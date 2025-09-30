@@ -72,18 +72,25 @@ final class OrderTranslationTest extends TestCase
             'user_id' => $this->englishCustomerUser->id,
         ]);
 
+        // Create neighborhood for addresses
+        $neighborhood = \App\Models\Geography\Neighborhood::factory()->create();
+
         // Create French delivery address
         $this->frenchDeliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->frenchCustomer->id,
+            'neighborhood_id' => $neighborhood->id,
         ]);
 
         // Create English delivery address
         $this->englishDeliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->englishCustomer->id,
+            'neighborhood_id' => $neighborhood->id,
         ]);
 
         // Create distribution center
-        $this->distributionCenter = DistributionCenter::factory()->create();
+        $this->distributionCenter = DistributionCenter::factory()->create([
+            'neighborhood_id' => $neighborhood->id,
+        ]);
 
         // Create product category
         $this->productCategory = ProductCategory::factory()->accessoryType()->create();

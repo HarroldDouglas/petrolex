@@ -39,6 +39,11 @@ class StartDeliveryTrackingControllerTest extends TestCase
         $this->deliveryPerson = User::factory()->create();
         $this->deliveryPerson->assignRole(UserRole::DELIVERY_PERSON()->value);
 
+        // Create delivery person record
+        $deliveryPersonRecord = \App\Models\DeliveryPerson::factory()->create([
+            'user_id' => $this->deliveryPerson->id,
+        ]);
+
         $this->customerUser = User::factory()->create();
         $this->customerUser->assignRole(UserRole::CUSTOMER()->value);
 
@@ -64,7 +69,7 @@ class StartDeliveryTrackingControllerTest extends TestCase
             'customer_id' => $this->customer->id,
             'distribution_center_id' => $this->distributionCenter->id,
             'delivery_address_id' => $this->deliveryAddress->id,
-            'delivery_person_id' => $this->deliveryPerson->id,
+            'delivery_person_id' => $deliveryPersonRecord->id,
         ]);
     }
 
@@ -97,10 +102,53 @@ class StartDeliveryTrackingControllerTest extends TestCase
             'driver_lng' => 2.3522,
         ]);
 
-        // Verify the request was processed successfully
-        $response->assertSuccessful();
-        $this->assertDatabaseHas('delivery_trackings', [
-            'order_id' => $this->order->id,
+        $response->assertStatus(200)
+            ->assertJson([
+                '_metadata' => [
+                    'success' => true,
+                ],
+                'data' => [
+                    'order_id' => $this->order->id,
+                    'status' => 'started',
+                ],
+            ]);
+    }
+
+    public function test_start_delivery_tracking_fails_for_unauthorized_delivery_person(): void
+    {
+        $unauthorizedDeliveryPerson = User::factory()->create();
+        $unauthorizedDeliveryPerson->assignRole(UserRole::DELIVERY_PERSON()->value);
+
+        // Create delivery person record for unauthorized user
+        \App\Models\DeliveryPerson::factory()->create([
+            'user_id' => $unauthorizedDeliveryPerson->id,
         ]);
+
+        Sanctum::actingAs($unauthorizedDeliveryPerson);
+
+        $response = $this->postJson("/api/tracking/delivery/{$this->order->id}/start", [
+            'driver_lat' => 48.8566,
+            'driver_lng' => 2.3522,
+        ]);
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'message' => 'You are not authorized to access this delivery',
+            ]);
+    }
+
+    public function test_start_delivery_tracking_fails_for_customer(): void
+    {
+        Sanctum::actingAs($this->customerUser);
+
+        $response = $this->postJson("/api/tracking/delivery/{$this->order->id}/start", [
+            'driver_lat' => 48.8566,
+            'driver_lng' => 2.3522,
+        ]);
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'message' => 'You are not authorized to access this delivery',
+            ]);
     }
 }

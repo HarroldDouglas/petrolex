@@ -24,6 +24,23 @@ class CustomerNotificationService {
         }, duration);
     }
 
+    // Méthodes de raccourci
+    success(message, duration = 5000) {
+        this.showNotification(message, "success", duration);
+    }
+
+    error(message, duration = 5000) {
+        this.showNotification(message, "error", duration);
+    }
+
+    warning(message, duration = 5000) {
+        this.showNotification(message, "warning", duration);
+    }
+
+    info(message, duration = 5000) {
+        this.showNotification(message, "info", duration);
+    }
+
     getBootstrapClass(type) {
         const classes = {
             success: "success",

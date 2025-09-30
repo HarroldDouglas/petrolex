@@ -58,7 +58,6 @@ final class DeliveryStatusUpdated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel(self::CHANNEL_PREFIX_GENERAL),
             new Channel(self::CHANNEL_PREFIX_SPECIFIC.$this->delivery->order->order_number),
         ];
     }

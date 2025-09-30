@@ -2,9 +2,11 @@
 // Affichage, filtrage, pagination des commandes
 
 class CustomerOrderManager {
-    constructor(uiManager) {
+    constructor(orderController, uiManager) {
+        this.orderController = orderController;
         this.uiManager = uiManager;
         this.initOrderElements();
+        this.bindFilterEvents();
     }
 
     initOrderElements() {
@@ -17,23 +19,76 @@ class CustomerOrderManager {
         };
     }
 
+    bindFilterEvents() {
+        console.log('🔗 [OrderManager] Liaison des événements de filtre');
+        
+        // Événement sur le filtre de statut
+        if (this.elements.statusFilter) {
+            this.elements.statusFilter.addEventListener('change', () => {
+                console.log('🔍 [OrderManager] Filtre statut changé:', this.elements.statusFilter.value);
+                this.applyFilters();
+            });
+        }
+        
+        // Événement sur le filtre de numéro de commande
+        if (this.elements.orderNumberFilter) {
+            this.elements.orderNumberFilter.addEventListener('input', () => {
+                console.log('🔍 [OrderManager] Filtre numéro changé:', this.elements.orderNumberFilter.value);
+                this.applyFilters();
+            });
+        }
+        
+        // Événement sur le bouton refresh
+        if (this.elements.refreshOrdersBtn) {
+            this.elements.refreshOrdersBtn.addEventListener('click', () => {
+                console.log('🔄 [OrderManager] Bouton refresh cliqué');
+                this.refreshOrders();
+            });
+        }
+    }
+    
+    async applyFilters() {
+        console.log('🔍 [OrderManager] Application des filtres');
+        if (window.customerApp && window.customerApp.currentUser) {
+            await this.loadOrders(window.customerApp.currentUser.id);
+        }
+    }
+
     // === RENDU DES COMMANDES ===
 
     renderOrders(orders, currentPage = 1, totalPages = 1) {
+        console.log('🎨 [OrderManager] renderOrders appelé avec:', {
+            orders: orders,
+            ordersCount: orders?.length,
+            currentPage,
+            totalPages
+        });
+        
         const list = this.elements.ordersList;
+        console.log('🎨 [OrderManager] ordersList element:', list);
+        
+        if (!list) {
+            console.error('❌ [OrderManager] ordersList element non trouvé!');
+            return;
+        }
+        
         list.innerHTML = "";
 
         if (!orders || orders.length === 0) {
+            console.log('⚠️ [OrderManager] Aucune commande à afficher');
             list.innerHTML =
                 '<div class="text-center text-muted py-3">Aucune commande trouvée</div>';
             return;
         }
 
-        orders.forEach((order) => {
+        console.log('🏗️ [OrderManager] Création de', orders.length, 'cartes de commandes');
+        orders.forEach((order, index) => {
+            console.log(`🏷️ [OrderManager] Commande ${index + 1}:`, order.order_number, order.status);
             const orderCard = this.createOrderCard(order);
             list.appendChild(orderCard);
         });
 
+        console.log('✅ [OrderManager] Commandes affichées dans ordersList');
         this.updatePagination(currentPage, totalPages);
     }
 
@@ -77,17 +132,25 @@ class CustomerOrderManager {
 
     getTrackingActionButton(order) {
         switch (order.status) {
-            case CUSTOMER_CONFIG.ORDER_STATUS.IN_PROGRESS:  // 🔧 CORRECTION: IN_PROGRESS au lieu de PROCESSING
+            case CUSTOMER_CONFIG.ORDER_STATUS.PROCESSING:  // En cours de livraison
                 return `<button class="btn btn-sm btn-success w-100" onclick="window.customerApp.startTracking('${order.order_number}')">
                     <i class="fas fa-map-marker-alt"></i> Suivre
                 </button>`;
-            case CUSTOMER_CONFIG.ORDER_STATUS.CONFIRMED:
+            case CUSTOMER_CONFIG.ORDER_STATUS.PAID:  // Payée, en attente de traitement
+                return `<button class="btn btn-sm btn-info w-100" disabled>
+                    <i class="fas fa-credit-card"></i> Payée
+                </button>`;
+            case CUSTOMER_CONFIG.ORDER_STATUS.PENDING:  // En attente de paiement
                 return `<button class="btn btn-sm btn-warning w-100" disabled>
                     <i class="fas fa-clock"></i> En attente
                 </button>`;
             case CUSTOMER_CONFIG.ORDER_STATUS.DELIVERED:
                 return `<button class="btn btn-sm btn-outline-success w-100" disabled>
                     <i class="fas fa-check"></i> Livrée
+                </button>`;
+            case CUSTOMER_CONFIG.ORDER_STATUS.CANCELLED:
+                return `<button class="btn btn-sm btn-outline-danger w-100" disabled>
+                    <i class="fas fa-times"></i> Annulée
                 </button>`;
             default:
                 const statusLabel =
@@ -158,6 +221,7 @@ class CustomerOrderManager {
             filters.order_number = this.elements.orderNumberFilter.value.trim();
         }
 
+        console.log('🔍 [OrderManager] Filtres appliqués:', filters);
         return filters;
     }
 
@@ -199,5 +263,56 @@ class CustomerOrderManager {
             this.elements.ordersPagination.innerHTML = "";
         }
         this.clearFilters();
+    }
+
+    // === CHARGEMENT DES COMMANDES ===
+
+    async loadOrders(customerId, page = 1) {
+        try {
+            console.log(`📦 Chargement des commandes pour client ${customerId}, page ${page}`);
+            
+            // Afficher un loader
+            this.elements.ordersList.innerHTML = '<div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>';
+            
+            // Obtenir les filtres
+            const filters = this.getFilters();
+            
+            // Appeler l'API via le controller
+            const response = await this.orderController.loadCustomerOrders(customerId, filters, page);
+            
+            if (response && response.data) {
+                // Rendre les commandes
+                this.renderOrders(response.data.data || response.data, response.data.current_page || page, response.data.last_page || 1);
+                
+                // Mettre à jour la pagination
+                this.updatePagination(response.data.current_page || page, response.data.last_page || 1);
+                
+                console.log(`✅ ${response.data.data?.length || response.data.length || 0} commandes chargées`);
+            } else {
+                this.elements.ordersList.innerHTML = '<div class="text-center text-muted py-3">Aucune commande trouvée</div>';
+            }
+            
+        } catch (error) {
+            console.error('❌ Erreur lors du chargement des commandes:', error);
+            this.elements.ordersList.innerHTML = '<div class="text-center text-danger py-3"><i class="fas fa-exclamation-triangle"></i> Erreur de chargement</div>';
+            
+            // Afficher une notification d'erreur
+            if (window.customerApp && window.customerApp.notificationService) {
+                window.customerApp.notificationService.error('Erreur lors du chargement des commandes');
+            }
+        } finally {
+            // Remettre le bouton à l'état normal
+            if (this.elements.refreshOrdersBtn) {
+                this.elements.refreshOrdersBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser';
+                this.elements.refreshOrdersBtn.disabled = false;
+            }
+        }
+    }
+
+    // Méthode de rechargement rapide
+    async refreshOrders() {
+        if (window.customerApp && window.customerApp.currentUser) {
+            await this.loadOrders(window.customerApp.currentUser.id);
+        }
     }
 }

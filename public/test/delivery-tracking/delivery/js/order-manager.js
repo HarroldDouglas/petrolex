@@ -53,7 +53,9 @@ class OrderManager {
                 throw new Error(response._metadata?.message || 'Impossible de charger les commandes');
             }
         } catch (error) {
-            this.ui.showError(error.message || 'Erreur lors du chargement des commandes');
+            console.error('Erreur chargement commandes:', error);
+            const errorMessage = error?.message || error?.toString() || 'Erreur lors du chargement des commandes';
+            this.ui.showError(errorMessage);
         } finally {
             this.ui.setLoadingState('refreshOrdersBtn', false);
         }
@@ -83,14 +85,14 @@ class OrderManager {
             this.selectedOrderData = orderData;
             this.selectedOrder = orderData;
             
-            if (orderData.status === DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS) {
+            if (orderData.status === DELIVERY_CONFIG.ORDER_STATUS.PROCESSING || orderData.status === 'processing') {
                 try {
                     const trackingResponse = await this.apiService.getOrderTracking(orderId);
                     if (trackingResponse && trackingResponse.data) {
                         orderData.trackingData = trackingResponse.data;
                         
                         const trackingData = trackingResponse.data;
-                        if (trackingData.status === DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS || trackingData.status === 'started') {
+                        if (trackingData.status === DELIVERY_CONFIG.ORDER_STATUS.PROCESSING || trackingData.status === 'started' || trackingData.status === 'processing') {
                             // Initialiser l'affichage des estimations avec les données existantes
                             if (trackingData.progress_percentage !== undefined && 
                                 trackingData.distance_remaining !== undefined && 
@@ -109,15 +111,25 @@ class OrderManager {
                     console.warn('Tracking data not available for in-progress order:', trackingError.message);
                 }
             } else {
-                // Pour les commandes confirmées, pas de tracking à récupérer
+                // Pour les commandes non-processing, pas de tracking à récupérer
                 console.log(`📦 Commande ${orderData.order_number} sélectionnée (statut: ${orderData.status}) - pas de tracking requis`);
+                // Reset la progression pour les nouvelles commandes
+                this.ui.updateProgress(0);
             }
             
             this.ui.updateSelectedOrderDetails(orderData);
             this.ui.highlightSelectedOrder(orderId);
             
             if (this.deliveryManager) {
-                await this.deliveryManager.calculateRouteForSelectedOrder();
+                // For orders with existing tracking, load API data and display on map
+                if (orderData.trackingData && orderData.status === 'processing') {
+                    console.log('Loading existing tracking data for map display');
+                    await this.deliveryManager.loadExistingTrackingData(orderData);
+                } else {
+                    // For new orders (paid) or orders without tracking, calculate route
+                    console.log(`📍 Calcul de route pour commande ${orderData.status}: ${orderData.order_number}`);
+                    await this.deliveryManager.calculateRouteForSelectedOrder();
+                }
             }
             
             return orderData;
@@ -144,6 +156,19 @@ class OrderManager {
                 this.currentPage = 1;
                 this.loadOrders();
             }, 500);
+        });
+        
+        // Event delegation pour les boutons de sélection de commande
+        this.ui.elements.ordersList.addEventListener('click', (e) => {
+            const button = e.target.closest('.select-order-btn');
+            if (button) {
+                const orderNumber = button.dataset.orderNumber;
+                if (orderNumber && window.deliveryPersonApp) {
+                    window.deliveryPersonApp.selectOrder(orderNumber);
+                } else {
+                    console.error('Order number missing or app not ready:', orderNumber);
+                }
+            }
         });
     }
 

@@ -6,7 +6,7 @@ use OpenApi\Annotations as OA;
  * @OA\Patch(
  *     path="/api/tracking/delivery/{orderId}/complete",
  *     summary="Complete delivery tracking",
- *     description="Marks a delivery as completed with optional final position and notes.",
+ *     description="Marks a delivery as completed with optional final position and notes. Accessible uniquement par le livreur assigné à cette commande.",
  *     operationId="api.tracking.delivery.complete",
  *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
@@ -74,6 +74,13 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=401,
  *         description="Unauthorized",
+ *
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad Request - Utilisateur non autorisé (seul le livreur assigné peut compléter la livraison)",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),
