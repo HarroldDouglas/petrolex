@@ -74,25 +74,25 @@ abstract class AbstractMunicipalityForm extends Component
 
     public function loadNeighborhoods()
     {
-        if ($this->cityId) {
-            $neighborhoods = $this->neighborhoodService->getNeighborhoodsByCity($this->cityId);
-            $this->neighborhoods = $neighborhoods->map(function ($neighborhood) {
-                return [
-                    'id' => $neighborhood->id,
-                    'name' => $neighborhood->name,
-                ];
-            })->toArray();
-
-        } else {
+        
+        if (!$this->cityId) {
             $this->neighborhoods = [];
+            return;
         }
 
-        $this->selectedNeighborhoods = [];
+        $this->neighborhoods = $this->neighborhoodService
+            ->getNeighborhoodsByCity($this->cityId)
+            ->pluck('name', 'id')
+            ->map(fn($name, $id) => ['id' => $id, 'name' => $name])
+            ->values()
+            ->toArray();
 
-        $this->dispatch('neighborhoodsUpdated', ['count' => count($this->neighborhoods)]);
+        $count = count($this->neighborhoods);
 
-        if (count($this->neighborhoods) > 0) {
-            session()->flash('info', count($this->neighborhoods).' quartier(s) chargé(s) pour cette ville.');
+        $this->dispatch('neighborhoodsUpdated', ['count' => $count]);
+
+        if ($count > 0) {
+            session()->flash('info', "{$count} quartier(s) chargé(s) pour cette ville.");
         }
     }
 

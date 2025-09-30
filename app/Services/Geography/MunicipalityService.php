@@ -50,10 +50,8 @@ class MunicipalityService extends BaseServiceForEntity
         /** @var Municipality $municipality */
         $municipality = $this->municipalityRepository->create($attributes);
 
-        // Ensure municipality is refreshed and has the latest data
         $municipality->refresh();
 
-        // Attach neighborhoods if any are provided
         if (! empty($neighborhoodIds)) {
             $this->municipalityRepository->attachNeighborhoods($municipality, $neighborhoodIds);
         }
@@ -69,10 +67,9 @@ class MunicipalityService extends BaseServiceForEntity
         /** @var Municipality $municipality */
         $municipality = $this->municipalityRepository->update($municipality, $attributes);
 
-        // Ensure municipality is refreshed and has the latest data
+        
         $municipality->refresh();
 
-        // Sync neighborhoods (whether empty or not)
         $this->municipalityRepository->syncNeighborhoods($municipality, $neighborhoodIds);
 
         return $municipality;
