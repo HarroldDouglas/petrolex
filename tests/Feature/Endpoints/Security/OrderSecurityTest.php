@@ -181,7 +181,7 @@ final class OrderSecurityTest extends TestCase
         ])->patchJson(route('api.orders.deliver', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', "You are not authorized to mark this order as delivered");
+            ->assertJsonPath('message', 'You are not authorized to mark this order as delivered');
     }
 
     #[Test]
@@ -217,7 +217,7 @@ final class OrderSecurityTest extends TestCase
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', "You are not authorized to scan bottles for this order");
+            ->assertJsonPath('message', 'You are not authorized to scan bottles for this order');
     }
 
     #[Test]

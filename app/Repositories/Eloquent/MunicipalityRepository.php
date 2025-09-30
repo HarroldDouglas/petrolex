@@ -18,11 +18,19 @@ class MunicipalityRepository extends BaseEloquentRepository implements Municipal
         /** @var Municipality $municipality */
         $municipality = $this->model->create($attributes);
 
+        if (! $municipality->id) {
+            throw new \RuntimeException('Failed to create municipality - no ID assigned after creation.');
+        }
+
         return $municipality;
     }
 
     public function attachNeighborhoods(Municipality $municipality, array $neighborhoodIds): void
     {
+        if (! $municipality->id) {
+            throw new \InvalidArgumentException('Municipality must have an ID before attaching neighborhoods. Municipality: '.json_encode($municipality->toArray()));
+        }
+
         Neighborhood::whereIn('id', $neighborhoodIds)->update(['municipality_id' => $municipality->id]);
     }
 
@@ -33,10 +41,25 @@ class MunicipalityRepository extends BaseEloquentRepository implements Municipal
 
     public function syncNeighborhoods(Municipality $municipality, array $neighborhoodIds): void
     {
-        // 1. Unset municipality_id for neighborhoods that are no longer associated
-        $municipality->neighborhoods()->whereNotIn('id', $neighborhoodIds)->update(['municipality_id' => null]);
+        if (! $municipality->id) {
+            throw new \InvalidArgumentException('Municipality must have an ID before syncing neighborhoods. Municipality: '.json_encode($municipality->toArray()));
+        }
 
-        // 2. Set municipality_id for the new list of neighborhoods
-        Neighborhood::whereIn('id', $neighborhoodIds)->update(['municipality_id' => $municipality->id]);
+        $currentNeighborhoodIds = $municipality->neighborhoods()->pluck('id')->toArray();
+
+        $toUnassign = array_diff($currentNeighborhoodIds, $neighborhoodIds);
+
+        if (! empty($toUnassign)) {
+            $defaultMunicipality = Municipality::firstOrCreate([
+                'name' => 'Non assigné',
+                'city_id' => $municipality->city_id, // Same city as the current municipality
+            ]);
+
+            Neighborhood::whereIn('id', $toUnassign)->update(['municipality_id' => $defaultMunicipality->id]);
+        }
+
+        if (! empty($neighborhoodIds)) {
+            Neighborhood::whereIn('id', $neighborhoodIds)->update(['municipality_id' => $municipality->id]);
+        }
     }
 }
