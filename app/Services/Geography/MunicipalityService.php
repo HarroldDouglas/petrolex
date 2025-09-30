@@ -50,6 +50,8 @@ class MunicipalityService extends BaseServiceForEntity
         /** @var Municipality $municipality */
         $municipality = $this->municipalityRepository->create($attributes);
 
+        $municipality->refresh();
+
         if (! empty($neighborhoodIds)) {
             $this->municipalityRepository->attachNeighborhoods($municipality, $neighborhoodIds);
         }
@@ -65,11 +67,10 @@ class MunicipalityService extends BaseServiceForEntity
         /** @var Municipality $municipality */
         $municipality = $this->municipalityRepository->update($municipality, $attributes);
 
-        if (! empty($neighborhoodIds)) {
-            $this->municipalityRepository->syncNeighborhoods($municipality, $neighborhoodIds);
-        } else {
-            $this->municipalityRepository->syncNeighborhoods($municipality, []); // Detach all if none provided
-        }
+        
+        $municipality->refresh();
+
+        $this->municipalityRepository->syncNeighborhoods($municipality, $neighborhoodIds);
 
         return $municipality;
     }
