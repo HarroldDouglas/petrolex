@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Role;
 
+use App\Enums\UserRole;
 use App\Services\Role\RoleService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,21 +32,7 @@ class RoleDataTable extends BaseDataTable
             Column::make('Nom', 'name')
                 ->sortable()
                 ->searchable()
-                ->label(function ($row) {
-                    // Show French label instead of raw value
-                    $labels = [
-                        'super_admin' => 'Super Administrateur',
-                        'admin' => 'Administrateur',
-                        'manager' => 'Gestionnaire',
-                        'accountant' => 'Comptable',
-                        'gas_manager' => 'Gestionnaire de Gaz',
-                        'center_manager' => 'Responsable de Centre',
-                        'delivery_person' => 'Livreur',
-                        'customer' => 'Client',
-                    ];
-                    
-                    return $labels[$row->name] ?? ucfirst(str_replace('_', ' ', $row->name));
-                }),
+                ->label(fn ($row) =>UserRole::from($row->name)->label ),
 
             Column::make('Permissions')
                 ->label(function ($row) {
