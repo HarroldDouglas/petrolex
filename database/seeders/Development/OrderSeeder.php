@@ -8,6 +8,7 @@ use App\Enums\BottleMovementType;
 use App\Enums\BottleOrderType;
 use App\Enums\BottleStatus;
 use App\Enums\Currency;
+use App\Enums\DeliveryType;
 use App\Enums\NotificationType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
@@ -70,6 +71,10 @@ class OrderSeeder extends Seeder
         $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES CONFIRMÉES =====');
         $this->displayAllCenterStats($centers, $productCategories);
 
+        $this->createPaidOrders();
+        $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES PAYÉES =====');
+        $this->displayAllCenterStats($centers, $productCategories);
+
         $this->createProcessingOrders();
         $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES EN TRAITEMENT =====');
         $this->displayAllCenterStats($centers, $productCategories);
@@ -100,6 +105,7 @@ class OrderSeeder extends Seeder
         $this->command->info('==============================================');
         $this->command->info('ORDERS CREATED SUMMARY:');
         $this->command->info("Confirmed orders: {$this->orderTypeStats['confirmed']}");
+        $this->command->info("Paid orders: {$this->orderTypeStats['paid']}");
         $this->command->info("Processing orders: {$this->orderTypeStats['processing']}");
         $this->command->info("Delivered orders: {$this->orderTypeStats['delivered']}");
         $this->command->info("Cancelled orders: {$this->orderTypeStats['cancelled']}");
@@ -346,6 +352,93 @@ class OrderSeeder extends Seeder
         $this->orderTypeStats['confirmed'] = count($confirmedOrders);
 
         $this->command->info(count($confirmedOrders).' confirmed orders created.');
+    }
+
+    /**
+     * Create orders with paid status between delivery1@test.com and customer1@test.com
+     */
+    private function createPaidOrders(): void
+    {
+        $this->command->info('Creating paid orders...');
+        
+        // Find customer1@test.com
+        $customer1User = User::where('email', 'customer1@test.com')->first();
+        if (!$customer1User || !$customer1User->customer) {
+            $this->command->error('Customer1 not found. Run UserSeeder first.');
+            return;
+        }
+        
+        // Find delivery1@test.com  
+        $delivery1User = User::where('email', 'delivery1@test.com')->first();
+        if (!$delivery1User || !$delivery1User->deliveryPerson) {
+            $this->command->error('Delivery1 not found. Run UserSeeder first.');
+            return;
+        }
+
+        // Get customer's delivery addresses
+        $deliveryAddresses = $customer1User->customer->deliveryAddresses;
+        if ($deliveryAddresses->isEmpty()) {
+            $this->command->error('Customer1 has no delivery addresses.');
+            return;
+        }
+
+        // Get available centers
+        $centers = DistributionCenter::all();
+        if ($centers->isEmpty()) {
+            $this->command->error('No distribution centers found.');
+            return;
+        }
+
+        $paidOrders = [];
+        
+        // Create 5 paid orders
+        for ($i = 0; $i < 5; $i++) {
+            $deliveryAddress = $deliveryAddresses->random();
+            $center = $centers->random();
+            
+            $orderData = [
+                'customer_id' => $customer1User->customer->id,
+                'delivery_person_id' => $delivery1User->deliveryPerson->id,
+                'distribution_center_id' => $center->id,
+                'delivery_address_id' => $deliveryAddress->id,
+                'order_number' => 'ORD-'.rand(100000, 999999),
+                'order_date' => now()->subDays(rand(1, 30)),
+                'status' => OrderStatus::PAID(),
+                'delivery_type' => DeliveryType::NORMAL(),
+                'subtotal' => 0, // Will be calculated after adding items
+                'delivery_fee' => DeliveryType::NORMAL()->fee(),
+                'total_amount' => 0, // Will be calculated after adding items
+            ];
+
+            $order = Order::create($orderData);
+            $paidOrders[] = $order;
+            
+            // Create payment record
+            $order->payments()->create([
+                'amount_paid' => $order->total_amount,
+                'amount_due' => 0,
+                'payment_method' => PaymentMethod::ORANGE_MONEY(),
+                'payment_status' => PaymentStatus::PAID(),
+                'payment_reference' => $this->generatePaymentReference(PaymentMethod::ORANGE_MONEY(), $order->order_date),
+                'payment_date' => $order->order_date->addMinutes(rand(5, 60)),
+                'payment_notes' => 'Test payment for paid order between delivery1 and customer1',
+            ]);
+        }
+
+        // Add items and calculate correct totals
+        $this->addOrderItems($paidOrders);
+        
+        // Update totals for each order after items are added
+        foreach ($paidOrders as $order) {
+            $subtotal = $order->items()->sum(\DB::raw('quantity * unit_price'));
+            $order->update([
+                'subtotal' => $subtotal,
+                'total_amount' => $subtotal + $order->delivery_fee,
+            ]);
+        }
+        
+        $this->orderTypeStats['paid'] = count($paidOrders);
+        $this->command->info(count($paidOrders).' paid orders created between delivery1@test.com and customer1@test.com.');
     }
 
     /**
