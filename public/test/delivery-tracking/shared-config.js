@@ -18,7 +18,7 @@ const getEnvironmentConfig = () => {
             HOST: hostname,
             API_BASE_URL: `${protocol}//${hostname}/api`,
             WS_HOST: hostname,
-            WS_PORT: 8080,
+            WS_PORT: (typeof window !== "undefined" && window.location.protocol === "https:" ? 443 : 8080),
             FORCE_TLS: isSSL
         };
     } else {
@@ -27,7 +27,7 @@ const getEnvironmentConfig = () => {
             HOST: '127.0.0.1',
             API_BASE_URL: 'http://127.0.0.1:8001/api',
             WS_HOST: '127.0.0.1',
-            WS_PORT: 8080,
+            WS_PORT: (typeof window !== "undefined" && window.location.protocol === "https:" ? 443 : 8080),
             FORCE_TLS: false
         };
     }
