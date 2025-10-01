@@ -19,29 +19,12 @@ class CreateRoleForm extends AbstractRoleForm
 
     public function submit()
     {
-        // Map selectedPermissions to permissions for validation
-        $this->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[a-zA-Z0-9àâäçéèêëïîôöùûüÿñæœ\s\-_]+$/u',
-                \Illuminate\Validation\Rule::unique('roles', 'name')->where('guard_name', $this->guard_name)
-            ],
-            'guard_name' => 'sometimes|string|in:web,api',
-            'selectedPermissions' => 'sometimes|array',
-            'selectedPermissions.*' => 'string|exists:permissions,name'
-        ], [
-            'name.required' => 'Le nom du rôle est requis.',
-            'name.unique' => 'Ce nom de rôle existe déjà.',
-            'name.regex' => 'Le nom du rôle ne peut contenir que des lettres, chiffres, espaces, tirets et underscores.',
-            'selectedPermissions.*.exists' => 'Une ou plusieurs permissions sélectionnées n\'existent pas.',
-        ]);
+        $validatedData = $this->validate();
 
         $data = [
-            'name' => $this->name,
-            'guard_name' => $this->guard_name,
-            'permissions' => $this->selectedPermissions ?? [],
+            'name' => $validatedData['name'],
+            'guard_name' => $validatedData['guard_name'] ?? 'web',
+            'permissions' => $validatedData['selectedPermissions'] ?? [],
         ];
 
         $this->roleService->create($data);

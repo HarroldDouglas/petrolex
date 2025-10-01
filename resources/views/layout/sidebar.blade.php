@@ -95,7 +95,7 @@
                 $permissionEnum::ROLES_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#roles">
-                        <i class="iconoir-shield-check"></i> Rôles
+                        <i class="iconoir-shield-check"></i> Rôles et permissions
                     </a>
                     <ul class="collapse" id="roles">
                         @can($permissionEnum::ROLES_VIEW()->value)

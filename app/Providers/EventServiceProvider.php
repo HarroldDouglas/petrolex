@@ -8,6 +8,7 @@ use App\Events\EmptyBottleReturnedEvent;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
 use App\Events\PasswordUpdatedEvent;
+use App\Events\Role\RolePermissionsUpdatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
 use App\Listeners\AddOrderItemsToOrderListener;
@@ -20,6 +21,7 @@ use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
 use App\Listeners\Order\AssignDeliveryPersonToOrderListener;
 use App\Listeners\Order\SendOrderCreatedNotification;
+use App\Listeners\Role\AssignPermissionsToRoleListener;
 use App\Listeners\SendPasswordUpdatedNotification;
 use App\Listeners\UpdateBottleStatusAndMovementOnOrderDelivered;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -62,6 +64,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         CustomerCreatedEvent::class => [
             LogCustomerCreatedListener::class,
+        ],
+        RolePermissionsUpdatedEvent::class => [
+            AssignPermissionsToRoleListener::class,
         ],
     ];
 

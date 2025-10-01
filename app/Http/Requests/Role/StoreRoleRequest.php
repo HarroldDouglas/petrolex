@@ -19,7 +19,6 @@ class StoreRoleRequest extends BaseRoleRequest
     {
         $rules = parent::rules();
         
-        // Add unique constraint for creating new roles
         $rules['name'][] = $this->getNameUniqueRule();
         
         return $rules;

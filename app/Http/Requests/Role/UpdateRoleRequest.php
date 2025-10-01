@@ -22,7 +22,6 @@ class UpdateRoleRequest extends BaseRoleRequest
     {
         $rules = parent::rules();
         
-        // Add unique constraint for updating roles (ignore current role)
         $role = $this->route('role');
         if ($role instanceof Role) {
             $rules['name'][] = Rule::unique('roles', 'name')

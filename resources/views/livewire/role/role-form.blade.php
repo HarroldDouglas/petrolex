@@ -107,56 +107,55 @@
             </button>
         </div>
     </form>
+    
     <style>
-.permissions-container {
-    max-height: 600px;
-    overflow-y: auto;
-}
+        .permissions-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
 
-.permission-item-wrapper {
-    transition: all 0.2s ease;
-}
+        .permission-item-wrapper {
+            transition: all 0.2s ease;
+        }
 
-.permission-item-wrapper:hover {
-    background-color: #e3f2fd;
-    border-color: #007bff !important;
-}
+        .permission-item-wrapper:hover {
+            background-color: #e3f2fd;
+            border-color: #007bff !important;
+        }
 
-.form-check-label {
-    font-size: 0.95rem;
-    color: #495057;
-    cursor: pointer;
-    font-weight: 500;
-}
+        .form-check-label {
+            font-size: 0.95rem;
+            color: #495057;
+            cursor: pointer;
+            font-weight: 500;
+        }
 
-.form-check-input {
-    width: 1.2em;
-    height: 1.2em;
-    cursor: pointer;
-}
+        .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+            cursor: pointer;
+        }
 
-.form-check-input:checked {
-    background-color: #007bff;
-    border-color: #007bff;
-}
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
 
-.permission-group h6 {
-    color: #007bff;
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+        .permission-group h6 {
+            color: #007bff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-.group-checkbox {
-    transform: scale(1.2);
-}
+        .group-checkbox {
+            transform: scale(1.2);
+        }
 
-.permissions-list {
-    max-height: 700px;
-    overflow: auto;
-}
-
-
-</style>
+        .permissions-list {
+            max-height: 700px;
+            overflow: auto;
+        }
+    </style>
 </div>

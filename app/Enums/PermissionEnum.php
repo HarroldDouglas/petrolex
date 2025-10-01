@@ -223,4 +223,30 @@ class PermissionEnum extends Enum
             'municipalities.create' => 'Créer des municipalités',
         ];
     }
+
+    /**
+     * Get module labels for permission grouping
+     */
+    public static function moduleLabels(): array
+    {
+        return [
+            'users' => 'Gestion des utilisateurs',
+            'roles' => 'Gestion des rôles',
+            'distribution_centers' => 'Centres de distribution',
+            'orders' => 'Gestion des commandes',
+            'deliveries' => 'Gestion des livraisons',
+            'products' => 'Gestion des produits',
+            'supplier_deliveries' => 'Livraisons fournisseurs',
+            'customers' => 'Gestion des clients',
+            'payments' => 'Gestion des paiements',
+            'reports' => 'Rapports et analyses',
+            'gas' => 'Gestion du gaz',
+            'comments' => 'Gestion des commentaires',
+            'mobile' => 'Accès mobile',
+            'delivery' => 'Suivi des livraisons',
+            'profile' => 'Profil utilisateur',
+            'history' => 'Historique',
+            'municipalities' => 'Gestion des municipalités',
+        ];
+    }
 }

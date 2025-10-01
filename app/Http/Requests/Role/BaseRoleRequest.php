@@ -19,8 +19,8 @@ abstract class BaseRoleRequest extends FormRequest
                 'max:255',
             ],
             'guard_name' => 'sometimes|string|in:web,api',
-            'permissions' => 'sometimes|array',
-            'permissions.*' => 'string|exists:permissions,name'
+            'selectedPermissions' => 'sometimes|array',
+            'selectedPermissions.*' => 'string|exists:permissions,name'
         ];
     }
 
@@ -35,9 +35,9 @@ abstract class BaseRoleRequest extends FormRequest
             'name.max' => 'Le nom du rôle ne doit pas dépasser 255 caractères.',
             'guard_name.string' => 'Le guard doit être une chaîne de caractères.',
             'guard_name.in' => 'Le guard doit être soit "web" soit "api".',
-            'permissions.array' => 'Les permissions doivent être un tableau.',
-            'permissions.*.string' => 'Chaque permission doit être une chaîne de caractères.',
-            'permissions.*.exists' => 'Une ou plusieurs permissions sélectionnées n\'existent pas.',
+            'selectedPermissions.array' => 'Les permissions doivent être un tableau.',
+            'selectedPermissions.*.string' => 'Chaque permission doit être une chaîne de caractères.',
+            'selectedPermissions.*.exists' => 'Une ou plusieurs permissions sélectionnées n\'existent pas.',
         ];
     }
 

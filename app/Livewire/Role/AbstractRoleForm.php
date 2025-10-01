@@ -37,53 +37,7 @@ abstract class AbstractRoleForm extends Component
 
     protected function loadAvailablePermissions()
     {
-        $this->availablePermissions = Permission::all()
-            ->groupBy(function ($permission) {
-                // Group permissions by module (e.g., 'users.view' -> 'Users')
-                $parts = explode('.', $permission->name);
-                $module = $parts[0];
-                
-                // Map module names to proper display names
-                $moduleNames = [
-                    'users' => 'Gestion des utilisateurs',
-                    'roles' => 'Gestion des rôles',
-                    'distribution_centers' => 'Centres de distribution',
-                    'orders' => 'Gestion des commandes',
-                    'deliveries' => 'Gestion des livraisons',
-                    'products' => 'Gestion des produits',
-                    'supplier_deliveries' => 'Livraisons fournisseurs',
-                    'customers' => 'Gestion des clients',
-                    'payments' => 'Gestion des paiements',
-                    'reports' => 'Rapports et analyses',
-                    'gas' => 'Gestion du gaz',
-                    'comments' => 'Gestion des commentaires',
-                    'mobile' => 'Accès mobile',
-                    'delivery' => 'Suivi des livraisons',
-                    'profile' => 'Profil utilisateur',
-                    'history' => 'Historique',
-                    'municipalities' => 'Gestion des municipalités',
-                ];
-                
-                return $moduleNames[$module] ?? ucfirst($module);
-            })
-            ->map(function ($permissions, $module) {
-                return [
-                    'module' => $module,
-                    'permissions' => $permissions->map(function ($permission) {
-                        return [
-                            'name' => $permission->name,
-                            'label' => $this->formatPermissionLabel($permission->name)
-                        ];
-                    })->toArray()
-                ];
-            })
-            ->toArray();
-    }
-
-    protected function formatPermissionLabel(string $permissionName): string
-    {
-        $labels = PermissionEnum::labels();
-        return $labels[$permissionName] ?? ucfirst(str_replace(['.', '_'], ' ', $permissionName));
+        $this->availablePermissions = $this->roleService->getAvailablePermissions();
     }
 
     public function toggleGroup(string $module)
@@ -95,10 +49,8 @@ abstract class AbstractRoleForm extends Component
         $selectedInModule = array_intersect($this->selectedPermissions, $modulePermissions);
         
         if (count($selectedInModule) === count($modulePermissions)) {
-            // All selected, so unselect all
-            $this->selectedPermissions = array_diff($this->selectedPermissions, $modulePermissions);
+           $this->selectedPermissions = array_diff($this->selectedPermissions, $modulePermissions);
         } else {
-            // Not all selected, so select all
             $this->selectedPermissions = array_unique(array_merge($this->selectedPermissions, $modulePermissions));
         }
     }
