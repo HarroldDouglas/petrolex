@@ -40,10 +40,7 @@
             <div class="col-lg-12 col-xxl-12">
                 <div class="card">
                     <div class="card-body">
-                        {{-- TODO: Add role creation form component --}}
-                        <div class="text-center p-4">
-                            <p class="text-muted">Fonctionnalité en cours de développement</p>
-                        </div>
+                        @livewire('role.create-role-form')
                     </div>
                 </div>
             </div>

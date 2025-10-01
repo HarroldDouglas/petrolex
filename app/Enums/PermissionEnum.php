@@ -78,8 +78,8 @@ class PermissionEnum extends Enum
             'DISTRIBUTION_CENTERS_CREATE' => 'distribution_centers.create',
             'DISTRIBUTION_CENTERS_EDIT' => 'distribution_centers.edit',
             'DISTRIBUTION_CENTERS_DELETE' => 'distribution_centers.delete',
-            'DISTRIBUTION_CENTER_MANAGE_OWN' => 'distribution_center.manage_own',
-            'DISTRIBUTION_CENTER_ASSIGN_DELIVERERS' => 'distribution_center.assign_deliverers',
+            'DISTRIBUTION_CENTER_MANAGE_OWN' => 'distribution_centers.manage_own',
+            'DISTRIBUTION_CENTER_ASSIGN_DELIVERERS' => 'distribution_centers.assign_deliverers',
 
             // ORDERS
             'ORDERS_VIEW' => 'orders.view',
@@ -138,6 +138,89 @@ class PermissionEnum extends Enum
             // MUNICIPALITIES
             'MUNICIPALITIES_VIEW' => 'municipalities.view',
             'MUNICIPALITIES_CREATE' => 'municipalities.create',
+        ];
+    }
+
+    public static function labels(): array
+    {
+        return [
+            // USER MANAGEMENT
+            'users.view' => 'Voir les utilisateurs',
+            'users.create' => 'Créer des utilisateurs',
+            'users.edit' => 'Modifier les utilisateurs',
+            'users.delete' => 'Supprimer les utilisateurs',
+
+            // ROLE MANAGEMENT
+            'roles.view' => 'Voir les rôles',
+            'roles.create' => 'Créer des rôles',
+            'roles.edit' => 'Modifier les rôles',
+            'roles.manage' => 'Gérer les rôles',
+
+            // DISTRIBUTION CENTERS
+            'distribution_centers.view' => 'Voir les centres de distribution',
+            'distribution_centers.create' => 'Créer des centres de distribution',
+            'distribution_centers.edit' => 'Modifier les centres de distribution',
+            'distribution_centers.delete' => 'Supprimer les centres de distribution',
+            'distribution_centers.manage_own' => 'Gérer son propre centre',
+            'distribution_centers.assign_deliverers' => 'Assigner des livreurs',
+
+            // ORDERS
+            'orders.view' => 'Voir les commandes',
+            'orders.create' => 'Créer des commandes',
+            'orders.edit' => 'Modifier les commandes',
+            'orders.delete' => 'Supprimer les commandes',
+            'orders.assign' => 'Assigner les commandes',
+            'orders.view_own' => 'Voir ses propres commandes',
+            'orders.create_own' => 'Créer ses propres commandes',
+            'orders.view_assigned' => 'Voir les commandes assignées',
+
+            // DELIVERIES
+            'deliveries.view' => 'Voir les livraisons',
+            'deliveries.create' => 'Créer des livraisons',
+            'deliveries.edit' => 'Modifier les livraisons',
+            'deliveries.delete' => 'Supprimer les livraisons',
+            'deliveries.assign' => 'Assigner les livraisons',
+            'deliveries.view_own' => 'Voir ses propres livraisons',
+            'deliveries.edit_own' => 'Modifier ses propres livraisons',
+            'deliveries.track_own' => 'Suivre ses propres livraisons',
+
+            // PRODUCTS
+            'products.view' => 'Voir les produits',
+            'products.create' => 'Créer des produits',
+            'products.edit' => 'Modifier les produits',
+            'products.delete' => 'Supprimer les produits',
+
+            // SUPPLIERS DELIVERIES
+            'supplier_deliveries.view' => 'Voir les livraisons fournisseurs',
+            'supplier_deliveries.create' => 'Créer des livraisons fournisseurs',
+            'supplier_deliveries.edit' => 'Modifier les livraisons fournisseurs',
+            'supplier_deliveries.delete' => 'Supprimer les livraisons fournisseurs',
+
+            // CUSTOMERS
+            'customers.view' => 'Voir les clients',
+
+            // PAYMENTS
+            'payments.manage' => 'Gérer les paiements',
+
+            // REPORTS AND ANALYTICS
+            'reports.manage' => 'Gérer les rapports',
+
+            // GAS MANAGEMENT
+            'gas.manage' => 'Gérer le gaz',
+
+            // COMMENTS
+            'comments.view' => 'Voir les commentaires',
+            'comments.manage' => 'Gérer les commentaires',
+
+            // MOBILE ACCESS
+            'mobile.access' => 'Accès mobile',
+            'delivery.track_location' => 'Suivre la localisation',
+            'profile.edit' => 'Modifier le profil',
+            'history.view_own' => 'Voir son propre historique',
+
+            // MUNICIPALITIES
+            'municipalities.view' => 'Voir les municipalités',
+            'municipalities.create' => 'Créer des municipalités',
         ];
     }
 }
