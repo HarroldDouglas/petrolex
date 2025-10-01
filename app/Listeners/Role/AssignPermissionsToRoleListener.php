@@ -2,7 +2,7 @@
 
 namespace App\Listeners\Role;
 
-use App\Events\Role\RolePermissionsUpdatedEvent;
+use App\Events\Role\RolePermissionCreatedEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +14,7 @@ class AssignPermissionsToRoleListener implements ShouldQueue
     /**
      * Handle the event.
      */
-    public function handle(RolePermissionsUpdatedEvent $event): void
+    public function handle(RolePermissionCreatedEvent $event): void
     {
         try {
             $event->role->syncPermissions($event->permissions);

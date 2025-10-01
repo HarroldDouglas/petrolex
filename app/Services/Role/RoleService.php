@@ -2,7 +2,7 @@
 
 namespace App\Services\Role;
 
-use App\Events\Role\RolePermissionsUpdatedEvent;
+use App\Events\Role\RolePermissionCreatedEvent;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\Permission\PermissionService;
@@ -30,15 +30,14 @@ class RoleService extends BaseServiceForEntity
     public function create(array $data): Model
     {
         return $this->executeInTransaction(function () use ($data) {
-            // Create the role
+            
             $role = $this->repository->create([
                 'name' => $data['name'],
                 'guard_name' => $data['guard_name'] ?? 'web',
             ]);
 
-            // Dispatch event to assign permissions
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                event(new RolePermissionsUpdatedEvent($role, $data['permissions']));
+                event(new RolePermissionCreatedEvent($role, $data['permissions']));
             }
 
             return $role;
@@ -59,7 +58,7 @@ class RoleService extends BaseServiceForEntity
 
             // Dispatch event to assign permissions
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                event(new RolePermissionsUpdatedEvent($updatedRole, $data['permissions']));
+                event(new RolePermissionCreatedEvent($updatedRole, $data['permissions']));
             }
 
             return $updatedRole;

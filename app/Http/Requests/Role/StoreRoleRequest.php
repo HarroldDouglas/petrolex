@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Role;
 
+use Illuminate\Validation\Rule;
+
 class StoreRoleRequest extends BaseRoleRequest
 {
     /**
@@ -19,7 +21,9 @@ class StoreRoleRequest extends BaseRoleRequest
     {
         $rules = parent::rules();
         
-        $rules['name'][] = $this->getNameUniqueRule();
+        // Add unique constraint for creating new roles
+        $rules['name'][] = Rule::unique('roles', 'name')
+            ->where('guard_name', $this->input('guard_name', 'web'));
         
         return $rules;
     }

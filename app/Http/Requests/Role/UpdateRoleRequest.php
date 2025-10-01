@@ -7,12 +7,20 @@ use Spatie\Permission\Models\Role;
 
 class UpdateRoleRequest extends BaseRoleRequest
 {
+    protected $roleId;
+
+    public function __construct($roleId = null)
+    {
+        parent::__construct();
+        $this->roleId = $roleId;
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user()->can('roles.edit');
+        return true;
     }
 
     /**
@@ -22,14 +30,9 @@ class UpdateRoleRequest extends BaseRoleRequest
     {
         $rules = parent::rules();
         
-        $role = $this->route('role');
-        if ($role instanceof Role) {
-            $rules['name'][] = Rule::unique('roles', 'name')
-                ->ignore($role->id)
-                ->where('guard_name', $role->guard_name);
-        } else {
-            $rules['name'][] = $this->getNameUniqueRule();
-        }
+        // Add unique constraint for role name, ignoring the current role being updated
+        $rules['name'][] = Rule::unique('roles', 'name')
+            ->ignore($this->roleId);
         
         return $rules;
     }
