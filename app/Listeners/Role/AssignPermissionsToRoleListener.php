@@ -14,17 +14,9 @@ class AssignPermissionsToRoleListener
     public function handle(RolePermissionUpdatedEvent $event): void
     {
         try {
-            // Log before syncing
-            Log::info("Starting permission sync for role: {$event->role->name}", [
-                'role_id' => $event->role->id,
-                'current_permissions' => $event->role->permissions->pluck('name')->toArray(),
-                'new_permissions' => $event->permissions,
-                'permissions_count' => count($event->permissions)
-            ]);
 
             $event->role->syncPermissions($event->permissions);
             
-            // Log after syncing to confirm
             $event->role->refresh();
             Log::info("Permissions successfully synced to role: {$event->role->name}", [
                 'role_id' => $event->role->id,
