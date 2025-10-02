@@ -6,6 +6,8 @@ use App\Enums\UserRole;
 use App\Services\Role\RoleService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Spatie\Permission\Models\Role;
@@ -86,7 +88,7 @@ class RoleDataTable extends BaseDataTable
 
     }
 
-    public function deleteRole(int $roleId): void
+    public function deleteRole($roleId)
     {
         try {
             $roleService = app(RoleService::class);
@@ -95,12 +97,39 @@ class RoleDataTable extends BaseDataTable
             if (!$role) {
                 throw new \Exception('Rôle non trouvé.');
             }
-            
-            $roleService->delete($role);
-            
-            $this->notify('Rôle supprimé avec succès.', 'success');
+
+            // Prevent deletion of super admin role
+            if ($role->name === 'Super Admin' || $role->name === 'super-admin') {
+                throw new \Exception('Le rôle Super Admin ne peut pas être supprimé.');
+            }
+
+            // Check if role has users assigned
+            if ($role->users()->count() > 0) {
+                throw new \Exception('Ce rôle ne peut pas être supprimé car il est assigné à des utilisateurs.');
+            }
+
+            $name = $role->name;
+            $result = $roleService->delete($role);
+
+            if ($result) {
+                session()->flash('success', "Le rôle {$name} a été supprimé avec succès.");
+
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Rôle supprimé !',
+                    'message' => "Le rôle {$name} a été supprimé définitivement.",
+                    'timer' => 3000,
+                ]);
+            }
         } catch (\Exception $e) {
-            $this->notify($e->getMessage(), 'error');
+            Log::error('Error deleting role: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => $e->getMessage(),
+                'timer' => 5000,
+            ]);
         }
     }
 }

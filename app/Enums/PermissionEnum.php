@@ -12,6 +12,7 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self ROLES_VIEW()
  * @method static self ROLES_CREATE()
  * @method static self ROLES_EDIT()
+ * @method static self ROLES_DELETE()
  * @method static self ROLES_MANAGE()
  * @method static self DISTRIBUTION_CENTERS_VIEW()
  * @method static self DISTRIBUTION_CENTERS_CREATE()
@@ -71,6 +72,7 @@ class PermissionEnum extends Enum
             'ROLES_VIEW' => 'roles.view',
             'ROLES_CREATE' => 'roles.create',
             'ROLES_EDIT' => 'roles.edit',
+            'ROLES_DELETE' => 'roles.delete',
             'ROLES_MANAGE' => 'roles.manage',
 
             // DISTRIBUTION CENTERS
@@ -154,6 +156,7 @@ class PermissionEnum extends Enum
             'roles.view' => 'Voir les rôles',
             'roles.create' => 'Créer des rôles',
             'roles.edit' => 'Modifier les rôles',
+            'roles.delete' => 'Supprimer les rôles',
             'roles.manage' => 'Gérer les rôles',
 
             // DISTRIBUTION CENTERS

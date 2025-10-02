@@ -11,7 +11,7 @@
             </a>
         </li>
         
-        @can('roles.manage')
+        @can('roles.delete')
             <li>
                 <a class="dropdown-item" href="#"
                     onclick="confirmActionWithInput({

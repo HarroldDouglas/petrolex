@@ -58,7 +58,41 @@
     </div>
 @endsection
 
+<x-sweet-alert-notification-listener />
+
 @section('script')
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
     <script src="{{ asset('assets/js/ticket.js') }}"></script>
+    <script src="{{ asset('assets/js/custom/sweet_alert_confirm_actions.js') }}" defer></script>
+    
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            // Close loading modal when any Livewire request completes
+            Livewire.hook('morph.updated', ({ component, cleanup }) => {
+                // Check if there's a loading SweetAlert and close it
+                if (typeof Swal !== 'undefined') {
+                    const swalContainer = document.querySelector('.swal2-container');
+                    if (swalContainer && swalContainer.querySelector('.swal2-loader')) {
+                        // There's a loading modal, close it
+                        setTimeout(() => {
+                            Swal.close();
+                        }, 500); // Small delay to ensure the operation completes
+                    }
+                }
+            });
+
+            // Also listen for the show-notification event as a backup
+            Livewire.on('show-notification', (event) => {
+                // Close any loading modal when notification is shown
+                setTimeout(() => {
+                    if (typeof Swal !== 'undefined') {
+                        const swalContainer = document.querySelector('.swal2-container');
+                        if (swalContainer && swalContainer.querySelector('.swal2-loader')) {
+                            Swal.close();
+                        }
+                    }
+                }, 100);
+            });
+        });
+    </script>
 @endsection
