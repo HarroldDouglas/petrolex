@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Language;
 use App\Models\Geography\Country;
 use App\Traits\HasMediaCollections;
+use App\Traits\ManagesUserPermissions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -59,6 +60,7 @@ class User extends Authenticatable implements HasMedia
     use HasFactory;
     use HasMediaCollections;
     use HasRoles;
+    use ManagesUserPermissions;
     use Notifiable;
     use SoftDeletes;
 

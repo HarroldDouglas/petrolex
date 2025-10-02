@@ -28,6 +28,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     require __DIR__.'/web/orders.php';
     require __DIR__.'/web/municipalities.php';
     require __DIR__.'/web/roles.php';
+    require __DIR__.'/web/test.php';
 });
 
 Route::get('/test/manager/dashboard', function () {

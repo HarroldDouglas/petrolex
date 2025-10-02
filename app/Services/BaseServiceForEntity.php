@@ -24,6 +24,12 @@ abstract class BaseServiceForEntity implements BaseServiceForEntityInterface
         });
     }
 
+    /**
+     * Find a model by ID
+     * 
+     * @param int $id
+     * @return Model|null
+     */
     public function find(int $id): ?Model
     {
         return $this->repository->find($id);

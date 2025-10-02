@@ -20,11 +20,11 @@ class StoreRoleRequest extends BaseRoleRequest
     public function rules(): array
     {
         $rules = parent::rules();
-        
+
         // Add unique constraint for creating new roles
         $rules['name'][] = Rule::unique('roles', 'name')
             ->where('guard_name', $this->input('guard_name', 'web'));
-        
+
         return $rules;
     }
 

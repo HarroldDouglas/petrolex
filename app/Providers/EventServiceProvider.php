@@ -8,7 +8,6 @@ use App\Events\EmptyBottleReturnedEvent;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
 use App\Events\PasswordUpdatedEvent;
-use App\Events\Role\RoleDeletedEvent;
 use App\Events\Role\RoleDeletingEvent;
 use App\Events\Role\RolePermissionUpdatedEvent;
 use App\Events\UserDeletedEvent;

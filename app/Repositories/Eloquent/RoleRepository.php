@@ -10,7 +10,7 @@ class RoleRepository extends BaseEloquentRepository implements RoleRepositoryInt
 {
     public function __construct()
     {
-        parent::__construct(new Role());
+        parent::__construct(new Role);
     }
 
     /**

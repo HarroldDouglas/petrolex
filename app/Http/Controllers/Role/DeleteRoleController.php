@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Role;
 
 use App\Http\Controllers\Controller;
-use App\Services\Role\RoleService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
@@ -18,6 +16,6 @@ class DeleteRoleController extends Controller
      */
     public function __invoke(Request $request, Role $role)
     {
-        // 
+        //
     }
 }

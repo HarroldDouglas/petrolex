@@ -10,7 +10,7 @@ class PermissionRepository extends BaseEloquentRepository implements PermissionR
 {
     public function __construct()
     {
-        parent::__construct(new Permission());
+        parent::__construct(new Permission);
     }
 
     /**

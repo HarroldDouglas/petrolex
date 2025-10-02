@@ -9,7 +9,6 @@ use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\Permission\PermissionService;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
@@ -19,7 +18,20 @@ class RoleService extends BaseServiceForEntity
         protected RoleRepositoryInterface $roleRepository,
         protected PermissionService $permissionService
     ) {
-        parent::__construct($this->roleRepository);
+        parent::__construct($roleRepository);
+    }
+
+    /**
+     * Find a role by ID
+     * 
+     * @param int $id
+     * @return Role|null
+     */
+    public function find(int $id): ?Model
+    {
+        /** @var Role|null $role */
+        $role = parent::find($id);
+        return $role;
     }
 
     protected function getModel(): string
@@ -33,7 +45,7 @@ class RoleService extends BaseServiceForEntity
     public function create(array $data): Model
     {
         return $this->executeInTransaction(function () use ($data) {
-            
+
             $role = $this->repository->create([
                 'name' => $data['name'],
                 'guard_name' => $data['guard_name'] ?? 'web',
@@ -49,16 +61,21 @@ class RoleService extends BaseServiceForEntity
 
     /**
      * Update an existing role with permissions
+     * 
+     * @param Role $role
+     * @param array $data
+     * @return Role
      */
     public function update(Model $role, array $data): Model
     {
         return $this->executeInTransaction(function () use ($role, $data) {
-            Log::info("RoleService: Starting role update", [
+            /** @var Role $role */
+            Log::info('RoleService: Starting role update', [
                 'role_id' => $role->id,
                 'role_name' => $role->name,
                 'new_name' => $data['name'],
                 'permissions_data' => $data['permissions'] ?? 'no permissions',
-                'permissions_count' => isset($data['permissions']) ? count($data['permissions']) : 0
+                'permissions_count' => isset($data['permissions']) ? count($data['permissions']) : 0,
             ]);
 
             // Update the role
@@ -69,15 +86,17 @@ class RoleService extends BaseServiceForEntity
 
             // Dispatch event to assign permissions
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                Log::info("RoleService: Dispatching permission event", [
+                /** @var Role $updatedRole */
+                Log::info('RoleService: Dispatching permission event', [
                     'role_id' => $updatedRole->id,
-                    'permissions' => $data['permissions']
+                    'permissions' => $data['permissions'],
                 ]);
                 event(new RolePermissionUpdatedEvent($updatedRole, $data['permissions']));
             } else {
-                Log::warning("RoleService: No permissions data to assign", [
+                /** @var Role $updatedRole */
+                Log::warning('RoleService: No permissions data to assign', [
                     'role_id' => $updatedRole->id,
-                    'data_keys' => array_keys($data)
+                    'data_keys' => array_keys($data),
                 ]);
             }
 
@@ -85,17 +104,20 @@ class RoleService extends BaseServiceForEntity
         });
     }
 
-        /**
+    /**
      * Delete a role - permissions will be detached by event listener
+     * 
+     * @param Role $role
+     * @return bool
      */
     public function delete(Model $role): bool
     {
         return $this->executeInTransaction(function () use ($role) {
-            Log::info("RoleService: Starting role deletion", [
+            Log::info('RoleService: Starting role deletion', [
                 'role_id' => $role->id,
                 'role_name' => $role->name,
                 'permissions_count' => $role->permissions()->count(),
-                'users_count' => $role->users()->count()
+                'users_count' => $role->users()->count(),
             ]);
 
             RoleDeletingEvent::dispatch($role);
@@ -105,14 +127,14 @@ class RoleService extends BaseServiceForEntity
             if ($deleted) {
                 RoleDeletedEvent::dispatch($role);
 
-                Log::info("RoleService: Role successfully deleted", [
+                Log::info('RoleService: Role successfully deleted', [
                     'role_id' => $role->id,
-                    'role_name' => $role->name
+                    'role_name' => $role->name,
                 ]);
             } else {
-                Log::error("RoleService: Failed to delete role", [
+                Log::error('RoleService: Failed to delete role', [
                     'role_id' => $role->id,
-                    'role_name' => $role->name
+                    'role_name' => $role->name,
                 ]);
             }
 

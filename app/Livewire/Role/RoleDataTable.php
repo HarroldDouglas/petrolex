@@ -6,7 +6,6 @@ use App\Enums\UserRole;
 use App\Services\Role\RoleService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -40,6 +39,7 @@ class RoleDataTable extends BaseDataTable
                 ->label(function ($row) {
                     $count = $row->permissions_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-primary' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' permission(s)</span>'
                     );
@@ -49,6 +49,7 @@ class RoleDataTable extends BaseDataTable
                 ->label(function ($row) {
                     $count = $row->users_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-success' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' utilisateur(s)</span>'
                     );
@@ -78,7 +79,7 @@ class RoleDataTable extends BaseDataTable
      */
     private function getRoleDisplayName(string $roleName): string
     {
-       $enum = UserRole::tryFrom($roleName);
+        $enum = UserRole::tryFrom($roleName);
 
         if ($enum) {
             return $enum->label;
@@ -93,8 +94,8 @@ class RoleDataTable extends BaseDataTable
         try {
             $roleService = app(RoleService::class);
             $role = $roleService->find($roleId);
-            
-            if (!$role) {
+
+            if (! $role) {
                 throw new \Exception('Rôle non trouvé.');
             }
 

@@ -87,7 +87,7 @@ class UserRole extends Enum
                 return ! in_array($permission, $restrictedPermissions);
             }),
             'accountant', 'gas_manager' => [
-               PermissionEnum::USERS_VIEW()->value,
+                PermissionEnum::USERS_VIEW()->value,
                 PermissionEnum::ROLES_VIEW()->value,
                 PermissionEnum::DISTRIBUTION_CENTERS_VIEW()->value,
                 PermissionEnum::ORDERS_VIEW()->value,
