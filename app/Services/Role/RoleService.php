@@ -98,14 +98,11 @@ class RoleService extends BaseServiceForEntity
                 'users_count' => $role->users()->count()
             ]);
 
-            // Dispatch deleting event BEFORE deletion (listener will detach permissions)
             RoleDeletingEvent::dispatch($role);
 
-            // Delete the role
             $deleted = $this->repository->delete($role);
 
             if ($deleted) {
-                // Dispatch deleted event AFTER successful deletion
                 RoleDeletedEvent::dispatch($role);
 
                 Log::info("RoleService: Role successfully deleted", [

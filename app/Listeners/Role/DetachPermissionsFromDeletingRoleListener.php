@@ -15,16 +15,9 @@ class DetachPermissionsFromDeletingRoleListener
         try {
             $role = $event->role;
             
-            Log::info("DetachPermissionsFromDeletingRoleListener: Starting permission detachment", [
-                'role_id' => $role->id,
-                'role_name' => $role->name,
-                'permissions_count' => $role->permissions()->count()
-            ]);
 
-            // Get the permissions before detachment for logging
             $permissionNames = $role->permissions->pluck('name')->toArray();
 
-            // Detach all permissions from the role
             $detachedCount = $role->permissions()->detach();
 
             Log::info("DetachPermissionsFromDeletedRoleListener: Permissions successfully detached", [
@@ -42,7 +35,6 @@ class DetachPermissionsFromDeletingRoleListener
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // Re-throw the exception to ensure the transaction fails
             throw $e;
         }
     }

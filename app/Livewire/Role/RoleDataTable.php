@@ -98,12 +98,10 @@ class RoleDataTable extends BaseDataTable
                 throw new \Exception('Rôle non trouvé.');
             }
 
-            // Prevent deletion of super admin role
-            if ($role->name === 'Super Admin' || $role->name === 'super-admin') {
+            if ($role->name === UserRole::SUPER_ADMIN()->value) {
                 throw new \Exception('Le rôle Super Admin ne peut pas être supprimé.');
             }
 
-            // Check if role has users assigned
             if ($role->users()->count() > 0) {
                 throw new \Exception('Ce rôle ne peut pas être supprimé car il est assigné à des utilisateurs.');
             }
