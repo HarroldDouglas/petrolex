@@ -8,7 +8,7 @@ use App\Events\EmptyBottleReturnedEvent;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
 use App\Events\PasswordUpdatedEvent;
-use App\Events\Role\RolePermissionCreatedEvent;
+use App\Events\Role\RolePermissionUpdatedEvent;
 use App\Events\UserDeletedEvent;
 use App\Events\UserUpdatedEvent;
 use App\Listeners\AddOrderItemsToOrderListener;
@@ -65,7 +65,7 @@ class EventServiceProvider extends ServiceProvider
         CustomerCreatedEvent::class => [
             LogCustomerCreatedListener::class,
         ],
-        RolePermissionCreatedEvent::class => [
+        RolePermissionUpdatedEvent::class => [
             AssignPermissionsToRoleListener::class,
         ],
     ];

@@ -2,12 +2,13 @@
 
 namespace App\Services\Role;
 
-use App\Events\Role\RolePermissionCreatedEvent;
+use App\Events\Role\RolePermissionUpdatedEvent;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\Permission\PermissionService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 class RoleService extends BaseServiceForEntity
@@ -37,7 +38,7 @@ class RoleService extends BaseServiceForEntity
             ]);
 
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                event(new RolePermissionCreatedEvent($role, $data['permissions']));
+                event(new RolePermissionUpdatedEvent($role, $data['permissions']));
             }
 
             return $role;
@@ -50,6 +51,14 @@ class RoleService extends BaseServiceForEntity
     public function update(Model $role, array $data): Model
     {
         return $this->executeInTransaction(function () use ($role, $data) {
+            Log::info("RoleService: Starting role update", [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+                'new_name' => $data['name'],
+                'permissions_data' => $data['permissions'] ?? 'no permissions',
+                'permissions_count' => isset($data['permissions']) ? count($data['permissions']) : 0
+            ]);
+
             // Update the role
             $updatedRole = $this->repository->update($role, [
                 'name' => $data['name'],
@@ -58,7 +67,16 @@ class RoleService extends BaseServiceForEntity
 
             // Dispatch event to assign permissions
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                event(new RolePermissionCreatedEvent($updatedRole, $data['permissions']));
+                Log::info("RoleService: Dispatching permission event", [
+                    'role_id' => $updatedRole->id,
+                    'permissions' => $data['permissions']
+                ]);
+                event(new RolePermissionUpdatedEvent($updatedRole, $data['permissions']));
+            } else {
+                Log::warning("RoleService: No permissions data to assign", [
+                    'role_id' => $updatedRole->id,
+                    'data_keys' => array_keys($data)
+                ]);
             }
 
             return $updatedRole;
