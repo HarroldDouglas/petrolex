@@ -1,0 +1,484 @@
+/* Additional styles for Payment Test Interface */
+
+/* Custom scrollbar for console */
+.console-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.console-section::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.console-section::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.console-section::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+/* Animated status indicators */
+.status-indicator.status-pending {
+    animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { 
+        opacity: 1; 
+        box-shadow: 0 0 5px rgba(255, 170, 0, 0.5);
+    }
+    50% { 
+        opacity: 0.6; 
+        box-shadow: 0 0 15px rgba(255, 170, 0, 0.8);
+    }
+}
+
+/* Enhanced log entry animations */
+.log-entry {
+    animation: slideIn 0.3s ease-out;
+    border-left: 3px solid transparent;
+}
+
+.log-entry.log-success {
+    border-left-color: #00ff00;
+    background-color: rgba(0, 255, 0, 0.05);
+}
+
+.log-entry.log-error {
+    border-left-color: #ff4444;
+    background-color: rgba(255, 68, 68, 0.05);
+}
+
+.log-entry.log-warning {
+    border-left-color: #ffaa00;
+    background-color: rgba(255, 170, 0, 0.05);
+}
+
+.log-entry.log-info {
+    border-left-color: #00bfff;
+    background-color: rgba(0, 191, 255, 0.05);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Loading spinner for form submission */
+.btn-test.loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-test.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -8px 0 0 -8px;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Enhanced form styling */
+.form-select:focus,
+.form-control:focus {
+    border-color: #ff9500;
+    box-shadow: 0 0 0 0.2rem rgba(255, 149, 0, 0.25);
+}
+
+/* Provider status indicators - simple text style */
+.provider-badge {
+    background: none !important;
+    border: none !important;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    cursor: default;
+    transition: opacity 0.2s ease;
+}
+
+.provider-badge:hover {
+    opacity: 0.8;
+}
+
+.provider-badge:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Statistics cards animations */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Console terminal effect */
+.console-section {
+    background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+    border: 1px solid #333;
+    position: relative;
+}
+
+.console-section::before {
+    content: '●●●';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #666;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+/* Responsive improvements */
+@media (max-width: 991px) {
+    .hero-section {
+        padding: 1rem 0.5rem;
+    }
+    
+    .payment-form {
+        padding: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .console-section {
+        min-height: 300px !important;
+        margin-bottom: 1rem;
+    }
+    
+    .provider-badge {
+        display: inline-block;
+        margin: 0.2rem;
+        font-size: 0.8rem;
+    }
+    
+    /* Stack vertically on mobile */
+    .row > .col-lg-7,
+    .row > .col-lg-5 {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (min-width: 992px) {
+    /* Desktop layout optimizations */
+    .console-section {
+        min-height: 550px;
+        max-height: 70vh;
+    }
+    
+    .payment-form {
+        position: sticky;
+        top: 1rem;
+    }
+}
+
+/* Reduce overall page spacing */
+.hero-section {
+    padding: 1rem 0 !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Enhanced form styling for side layout */
+.payment-form {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+/* Better console layout for side positioning */
+.console-section {
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Console control buttons styling */
+.console-controls .btn {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.console-controls .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.console-controls .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.console-controls .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.console-controls .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.console-controls .btn:active {
+    transform: translateY(0);
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+    .payment-form {
+        background: #2a2a2a;
+        color: #ffffff;
+    }
+    
+    .form-control,
+    .form-select {
+        background-color: #3a3a3a;
+        border-color: #555;
+        color: #ffffff;
+    }
+    
+    .form-control::placeholder {
+        color: #aaa;
+    }
+}
+
+/* Custom tooltip styles */
+.tooltip-hint {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip-hint::after {
+    content: attr(data-hint);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.tooltip-hint:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: 110%;
+}
+
+/* Callback entry styles */
+.callback-entry {
+    border-left: 3px solid #00bfff;
+    background: rgba(0, 191, 255, 0.05);
+    animation: slideInCallback 0.5s ease-out;
+}
+
+.callback-badge {
+    display: inline-block;
+    background: #00bfff;
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.callback-details {
+    color: #aaa;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+@keyframes slideInCallback {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+        background: rgba(0, 191, 255, 0.2);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+        background: rgba(0, 191, 255, 0.05);
+    }
+}
+
+@keyframes pulse-success {
+    0%, 100% { 
+        background: rgba(0, 255, 0, 0.15); 
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+    }
+    50% { 
+        background: rgba(0, 255, 0, 0.25); 
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+    }
+}
+
+/* Test number quick-fill buttons (if added) */
+.test-number-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    margin: 0.1rem;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255, 149, 0, 0.1);
+    color: #ff9500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.test-number-btn:hover {
+    background: rgba(255, 149, 0, 0.2);
+    transform: scale(1.05);
+}
+
+/* Backend log styling */
+.log-entry.backend-log {
+    background-color: rgba(100, 149, 237, 0.1) !important;
+    border-left: 3px solid #6495ED !important;
+    position: relative;
+}
+
+.backend-badge {
+    background: linear-gradient(135deg, #6495ED, #4169E1);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 8px;
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(100, 149, 237, 0.3);
+}
+
+/* Callback badge styling enhancement */
+.callback-badge {
+    background: linear-gradient(135deg, #ff6b35, #ff9500);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 8px;
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+}
+
+/* Backend log animation */
+.backend-log {
+    animation: slideInBackend 0.4s ease-out;
+}
+
+@keyframes slideInBackend {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+        border-left-width: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+        border-left-width: 3px;
+    }
+}
+
+/* Transaction Status Section Styling */
+.form-select-sm {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+#transactionSelect {
+    background: #fff;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease;
+}
+
+#transactionSelect:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+#transactionSelect option {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+}
+
+/* Check Status Button Styling */
+.btn-outline-success {
+    color: #28a745;
+    border-color: #28a745;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-success:hover {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-outline-success:active {
+    transform: translateY(0);
+}
+
+/* Transaction Status Row Spacing */
+.row.g-2.mt-2 {
+    margin-top: 0.75rem !important;
+}
+
+/* Responsive adjustments for transaction section */
+@media (max-width: 576px) {
+    .row.g-2 .col-8,
+    .row.g-2 .col-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-outline-success {
+        width: 100% !important;
+    }
+}
