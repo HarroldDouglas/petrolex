@@ -148,8 +148,20 @@ class DeliveryManager {
             }
             
             console.log('🗺️ Calcul de nouvelle route...');
-            let currentPosition = await this.mapService.getCurrentGPSPosition();
-            
+
+            // 🔧 UTILISER LE CENTRE DE DISTRIBUTION comme point de départ (pas le GPS)
+            let currentPosition;
+            if (selectedOrder.distribution_center?.latitude && selectedOrder.distribution_center?.longitude) {
+                currentPosition = {
+                    lat: parseFloat(selectedOrder.distribution_center.latitude),
+                    lng: parseFloat(selectedOrder.distribution_center.longitude)
+                };
+                console.log('📍 Position de départ: Centre de distribution', selectedOrder.distribution_center.name);
+            } else {
+                console.warn('⚠️ Pas de centre de distribution, fallback GPS');
+                currentPosition = await this.mapService.getCurrentGPSPosition();
+            }
+
             console.log('📍 Position actuelle:', currentPosition);
             console.log('🏠 Destination:', selectedOrder.delivery_address);
             
@@ -760,11 +772,28 @@ class DeliveryManager {
                 return;
             }
 
-            // Récupérer la position actuelle
-            const currentPosition = await this.getCurrentPosition();
-            if (!currentPosition) {
-                console.error('❌ Impossible de récupérer la position actuelle');
+            // 🔧 Récupérer la commande pour obtenir le centre de distribution
+            const selectedOrder = this.orderManager.getSelectedOrder();
+            if (!selectedOrder) {
+                console.error('❌ Aucune commande sélectionnée');
                 return;
+            }
+
+            // 🔧 UTILISER LE CENTRE DE DISTRIBUTION (pas le GPS du livreur)
+            let currentPosition;
+            if (selectedOrder.distribution_center?.latitude && selectedOrder.distribution_center?.longitude) {
+                currentPosition = {
+                    lat: parseFloat(selectedOrder.distribution_center.latitude),
+                    lng: parseFloat(selectedOrder.distribution_center.longitude)
+                };
+                console.log('✅ Position de départ: Centre de distribution', selectedOrder.distribution_center.name);
+            } else {
+                console.warn('⚠️ Pas de centre de distribution, fallback GPS');
+                currentPosition = await this.getCurrentPosition();
+                if (!currentPosition) {
+                    console.error('❌ Impossible de récupérer la position');
+                    return;
+                }
             }
 
             // Appeler l'API POST /start pour créer le tracking
