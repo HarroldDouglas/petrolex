@@ -108,9 +108,6 @@ final class StartDeliveryTrackingController extends Controller
             'status' => DeliveryTrackingStatus::PENDING(),
             'total_distance' => $totalDistance,
             'distance_remaining' => $totalDistance,
-            'destination_lat' => $order->destination_lat,
-            'destination_lng' => $order->destination_lng,
-            'destination_address' => $order->deliveryAddress?->address,
         ]);
     }
 
@@ -125,7 +122,7 @@ final class StartDeliveryTrackingController extends Controller
             'status' => DeliveryTrackingStatus::STARTED(),
             'driver_lat' => $coordinates['lat'],
             'driver_lng' => $coordinates['lng'],
-            'estimated_duration' => $routeData->duration,
+            'estimated_duration' => $routeData->duration, // En secondes (Google Maps API)
             'distance_remaining' => $routeData->distance,
             'route_geometry' => $routeData->geometry,
             'started_at' => now(),

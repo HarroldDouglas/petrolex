@@ -153,8 +153,45 @@ class DeliveryTrackingService {
                 return { apiResponse, orderDetails, currentPosition };
             }
         }
-        
-        currentPosition = await this.mapService.getCurrentGPSPosition();
+
+        // 🔧 CORRECTION: Charger les détails de commande AVANT de démarrer le tracking
+        let orderDetails;
+
+        if (typeof orderIdentifier === 'number') {
+            // C'est un ID, convertir en order_number et charger depuis le cache
+            const orderNumber = this.apiService.getOrderNumberFromId(orderIdentifier);
+            if (orderNumber) {
+                orderDetails = this.apiService.getOrderFromCache(orderNumber);
+            }
+        } else {
+            // C'est un order_number
+            orderDetails = this.apiService.getOrderFromCache(orderIdentifier);
+        }
+
+        if (!orderDetails || !orderDetails.delivery_address) {
+            throw new Error("Détails de commande introuvables. Veuillez recharger la page.");
+        }
+
+        // 🔧 CORRECTION CRITIQUE: Déterminer la position initiale du livreur
+        let currentPosition;
+
+        if (orderDetails.distribution_center?.latitude && orderDetails.distribution_center?.longitude) {
+            // ✅ UTILISER LA POSITION DU CENTRE DE DISTRIBUTION
+            currentPosition = {
+                lat: parseFloat(orderDetails.distribution_center.latitude),
+                lng: parseFloat(orderDetails.distribution_center.longitude)
+            };
+            console.log('✅ [TrackingService] Position initiale: Centre de distribution', {
+                center: orderDetails.distribution_center.name,
+                position: currentPosition
+            });
+        } else {
+            // ⚠️ FALLBACK: GPS uniquement si pas de centre de distribution
+            console.warn('⚠️ [TrackingService] Pas de centre de distribution, utilisation GPS');
+            currentPosition = await this.mapService.getCurrentGPSPosition();
+        }
+
+        // Démarrer le tracking avec la position correcte
         const apiResponse = await this.trackingApi.startTracking(orderIdentifier, currentPosition);
 
         if (!apiResponse._metadata?.success || !apiResponse.data) {
@@ -164,41 +201,6 @@ class DeliveryTrackingService {
         this.state.currentOrder = apiResponse.data;
         this.state.isTracking = true;
         this.state.isPaused = false;
-
-        let orderDetails;
-        
-        if (this.state.currentOrder.destination_lat && this.state.currentOrder.destination_lng) {
-            orderDetails = {
-                id: this.state.currentOrder.order_id,
-                order_number: this.state.currentOrder.order_number,
-                delivery_address: {
-                    latitude: this.state.currentOrder.destination_lat,
-                    longitude: this.state.currentOrder.destination_lng,
-                    name: this.state.currentOrder.destination_address || "Adresse de livraison"
-                },
-                customer: {
-                    full_name: this.state.currentOrder.customer_name || "Client",
-                    phone_number: this.state.currentOrder.driver_phone
-                }
-            };
-        } else {
-            const orderNumber = this.state.currentOrder.order_number;
-            orderDetails = this.apiService.getOrderFromCache(orderNumber);
-            
-            if (!orderDetails) {
-                const orderId = this.state.currentOrder.order_id;
-                if (orderId) {
-                    const convertedOrderNumber = this.apiService.getOrderNumberFromId(orderId);
-                    if (convertedOrderNumber) {
-                        orderDetails = this.apiService.getOrderFromCache(convertedOrderNumber);
-                    }
-                }
-            }
-        }
-        
-        if (!orderDetails || !orderDetails.delivery_address) {
-            throw new Error("Détails de commande introuvables. Veuillez recharger.");
-        }
 
         this.mapService.updateDriverPosition(
             currentPosition.lat,
