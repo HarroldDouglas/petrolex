@@ -172,9 +172,7 @@ class DeliveryTrackingService {
             throw new Error("Détails de commande introuvables. Veuillez recharger la page.");
         }
 
-        // 🔧 CORRECTION CRITIQUE: Déterminer la position initiale du livreur
-        let currentPosition;
-
+        // 🔧 CORRECTION CRITIQUE: Déterminer la position initiale du livreur (currentPosition déjà déclaré ligne 73)
         if (orderDetails.distribution_center?.latitude && orderDetails.distribution_center?.longitude) {
             // ✅ UTILISER LA POSITION DU CENTRE DE DISTRIBUTION
             currentPosition = {

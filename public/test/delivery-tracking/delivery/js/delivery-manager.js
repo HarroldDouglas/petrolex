@@ -223,17 +223,14 @@ class DeliveryManager {
                 const existingTrackingFromDB = await this.checkExistingTrackingInDB(selectedOrder.id);
                 
                 if (!hasExistingTracking && !existingTrackingFromDB) {
-                    // Pas de tracking existant - utiliser nouvelles données calculées
-                    console.log('📡 Pas de tracking existant - initialisation avec nouvelles données');
+                    // Pas de tracking existant - DÉMARRER le tracking d'abord
+                    console.log('📡 Pas de tracking existant - démarrage du tracking');
                     this.ui.updateRouteEstimates(adjustedDuration, distanceKm);
                     this.currentEstimatedDuration = adjustedDuration;
                     this.ui.updateCurrentPosition(null, currentSpeed);
-                    
-                    await this.updateTrackingData(selectedOrder.id, {
-                        distance_remaining: parseFloat(distanceKm.toFixed(2)),
-                        estimated_duration: adjustedDuration,
-                        progress_percentage: 0 // Nouveau calcul, donc 0%
-                    });
+
+                    // 🔧 CORRECTION: Appeler /start pour créer le tracking
+                    await this.startTrackingForOrder(selectedOrder.id);
                 } else {
                     // Tracking existant - utiliser données existantes
                     const existingProgress = parseFloat(selectedOrder.trackingData.progress_percentage);
@@ -747,6 +744,54 @@ class DeliveryManager {
             };
             const speed = trackingData.current_speed || trackingData.speed;
             this.ui.updateCurrentPosition(position, speed);
+        }
+    }
+
+    /**
+     * 🔧 NOUVELLE MÉTHODE: Démarrer le tracking pour une commande (appelle l'API /start)
+     */
+    async startTrackingForOrder(orderId) {
+        try {
+            console.log(`📡 Démarrage du tracking pour la commande: ${orderId}`);
+
+            const token = localStorage.getItem('delivery_person_token');
+            if (!token) {
+                console.error('❌ Pas de token d\'authentification');
+                return;
+            }
+
+            // Récupérer la position actuelle
+            const currentPosition = await this.getCurrentPosition();
+            if (!currentPosition) {
+                console.error('❌ Impossible de récupérer la position actuelle');
+                return;
+            }
+
+            // Appeler l'API POST /start pour créer le tracking
+            const response = await fetch(`${SHARED_CONFIG.API.BASE_URL}/tracking/delivery/${orderId}/start`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    driver_lat: currentPosition.lat,
+                    driver_lng: currentPosition.lng
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log(`✅ Tracking démarré avec succès:`, result);
+            return result;
+
+        } catch (error) {
+            console.error('❌ Erreur lors du démarrage du tracking:', error);
+            throw error;
         }
     }
 }
