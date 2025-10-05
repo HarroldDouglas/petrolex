@@ -18,142 +18,79 @@ class DistributionCenterSeeder extends Seeder
         $this->command->info('Creating distribution centers...');
 
         $cameroon = Country::where('code', 'CM')->first();
-        $douala = $cameroon ? City::where('name', 'Douala')->where('country_id', $cameroon->id)->first() : null;
-        $bonanjo = $douala ? Neighborhood::where('name', 'Bonanjo')->whereHas('municipality', function ($query) use ($douala) {
-            $query->where('city_id', $douala->id);
-        })->first() : null;
 
-        $yaounde = $cameroon ? City::where('name', 'Yaoundé')->where('country_id', $cameroon->id)->first() : null;
-        $bastos = $yaounde ? Neighborhood::where('name', 'Bastos')->whereHas('municipality', function ($query) use ($yaounde) {
-            $query->where('city_id', $yaounde->id);
-        })->first() : null;
-        $nkoabang = $yaounde ? Neighborhood::where('name', 'Nkoabang')->whereHas('municipality', function ($query) use ($yaounde) {
-            $query->where('city_id', $yaounde->id);
-        })->first() : null;
-        $mimboman = $yaounde ? Neighborhood::where('name', 'Mimboman')->whereHas('municipality', function ($query) use ($yaounde) {
-            $query->where('city_id', $yaounde->id);
-        })->first() : null;
-        $omnisport = $yaounde ? Neighborhood::where('name', 'Omnisport')->whereHas('municipality', function ($query) use ($yaounde) {
-            $query->where('city_id', $yaounde->id);
-        })->first() : null;
-        $odza = $yaounde ? Neighborhood::where('name', 'Odza')->whereHas('municipality', function ($query) use ($yaounde) {
-            $query->where('city_id', $yaounde->id);
-        })->first() : null;
-        $mokolo = $yaounde ? Neighborhood::where('name', 'Mokolo')->whereHas('municipality', function ($query) use ($yaounde) {
-            $query->where('city_id', $yaounde->id);
-        })->first() : null;
+        // Helper pour récupérer un quartier
+        $getNeighborhood = function (string $cityName, string $neighborhoodName) use ($cameroon) {
+            $city = $cameroon ? City::where('name', $cityName)->where('country_id', $cameroon->id)->first() : null;
 
-        $maroua = $cameroon ? City::where('name', 'Maroua')->where('country_id', $cameroon->id)->first() : null;
-        $marouaNeighborhood = null;
-        if ($maroua) {
-            $marouaMunicipality = $maroua->municipalities->first();
-            if ($marouaMunicipality) {
-                $marouaNeighborhood = $marouaMunicipality->neighborhoods->first();
-            }
-        }
+            return $city ? Neighborhood::where('name', $neighborhoodName)->whereHas('municipality', function ($query) use ($city) {
+                $query->where('city_id', $city->id);
+            })->first() : null;
+        };
 
+        // ✅ Un centre par municipalité pour une couverture totale
         $centersData = [
-            [
-                'name' => 'Centre Principal Douala',
-                'neighborhood_id' => $bonanjo->id ?? null,
-                'address' => '123 Rue Principale, Douala',
-                'description' => 'Centre de distribution principal avec toutes les commodités',
-                'phone' => '+237612345678',
-                'email' => 'bonanjo@petrolex.cm',
-                'latitude' => 4.0511,
-                'longitude' => 9.7679,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Centre Bastos Yaoundé',
-                'neighborhood_id' => $bastos->id ?? null,
-                'address' => '45 Avenue Nord, Yaoundé',
-                'description' => 'Centre de distribution pour la région du Nord',
-                'phone' => '+237623456789',
-                'email' => 'bastos@petrolex.cm',
-                'latitude' => 3.8667,
-                'longitude' => 11.5167,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Centre Nkoabang Yaoundé',
-                'neighborhood_id' => $nkoabang->id ?? null,
-                'address' => 'Rue Nkoabang, Yaoundé',
-                'description' => 'Centre de distribution à Nkoabang',
-                'phone' => '+237690123456',
-                'email' => 'nkoabang@petrolex.cm',
-                'latitude' => 4.1,
-                'longitude' => 12.3167,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Centre Mimboman Yaoundé',
-                'neighborhood_id' => $mimboman->id ?? null,
-                'address' => 'Rue Mimboman, Yaoundé',
-                'description' => 'Centre de distribution à Mimboman',
-                'phone' => '+237690123457',
-                'email' => 'mimboman@petrolex.cm',
-                'latitude' => 3.85,
-                'longitude' => 11.5375,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Centre Omnisport Yaoundé',
-                'neighborhood_id' => $omnisport->id ?? null,
-                'address' => 'Stade Omnisport, Yaoundé',
-                'description' => 'Centre de distribution à Omnisport',
-                'phone' => '+237690123458',
-                'email' => 'omnisport@petrolex.cm',
-                'latitude' => 3.8856,
-                'longitude' => 11.5406,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Centre Odza Yaoundé',
-                'neighborhood_id' => $odza->id ?? null,
-                'address' => 'Rue Odza, Yaoundé',
-                'description' => 'Centre de distribution à Odza',
-                'phone' => '+237690123459',
-                'email' => 'odza@petrolex.cm',
-                'latitude' => 3.7833,
-                'longitude' => 11.5333,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Centre Mokolo Yaoundé',
-                'neighborhood_id' => $mokolo->id ?? null,
-                'address' => 'Marché Mokolo, Yaoundé',
-                'description' => 'Centre de distribution à Mokolo',
-                'phone' => '+237690123460',
-                'email' => 'mokolo@petrolex.cm',
-                'latitude' => 3.8747,
-                'longitude' => 11.4997,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Centre Sud Maroua',
-                'neighborhood_id' => $marouaNeighborhood->id ?? null,
-                'address' => '78 Avenue Sud, Maroua',
-                'description' => 'Centre de distribution pour la région du Sud',
-                'phone' => '+237634567890',
-                'email' => 'maroua@petrolex.cm',
-                'latitude' => 10.5897,
-                'longitude' => 14.3267,
-                'is_active' => true,
-            ],
+            // YAOUNDÉ - 7 municipalités
+            ['name' => 'Centre Yaoundé I', 'city' => 'Yaoundé', 'neighborhood' => 'Melen', 'email' => 'yaounde1@petrolex.cm', 'phone' => '+237670001001', 'lat' => 3.856, 'lng' => 11.495],
+            ['name' => 'Centre Yaoundé II', 'city' => 'Yaoundé', 'neighborhood' => 'Omnisport', 'email' => 'yaounde2@petrolex.cm', 'phone' => '+237670001002', 'lat' => 3.880, 'lng' => 11.510],
+            ['name' => 'Centre Yaoundé III', 'city' => 'Yaoundé', 'neighborhood' => 'Ekounou', 'email' => 'yaounde3@petrolex.cm', 'phone' => '+237670001003', 'lat' => 3.850, 'lng' => 11.550],
+            ['name' => 'Centre Yaoundé IV', 'city' => 'Yaoundé', 'neighborhood' => 'Nkoldongo', 'email' => 'yaounde4@petrolex.cm', 'phone' => '+237670001004', 'lat' => 3.840, 'lng' => 11.520],
+            ['name' => 'Centre Yaoundé V', 'city' => 'Yaoundé', 'neighborhood' => 'Nlongkak', 'email' => 'yaounde5@petrolex.cm', 'phone' => '+237670001005', 'lat' => 3.870, 'lng' => 11.510],
+            ['name' => 'Centre Yaoundé VI', 'city' => 'Yaoundé', 'neighborhood' => 'Bastos', 'email' => 'yaounde6@petrolex.cm', 'phone' => '+237670001006', 'lat' => 3.880, 'lng' => 11.500],
+
+            // DOUALA - 6 municipalités (sauf Douala IV qui est vide)
+            ['name' => 'Centre Douala I', 'city' => 'Douala', 'neighborhood' => 'Bonanjo', 'email' => 'douala1@petrolex.cm', 'phone' => '+237670002001', 'lat' => 4.040, 'lng' => 9.690],
+            ['name' => 'Centre Douala II', 'city' => 'Douala', 'neighborhood' => 'New Bell', 'email' => 'douala2@petrolex.cm', 'phone' => '+237670002002', 'lat' => 4.030, 'lng' => 9.720],
+            ['name' => 'Centre Douala III', 'city' => 'Douala', 'neighborhood' => 'Deido', 'email' => 'douala3@petrolex.cm', 'phone' => '+237670002003', 'lat' => 4.060, 'lng' => 9.700],
+            ['name' => 'Centre Douala V', 'city' => 'Douala', 'neighborhood' => 'Makepe', 'email' => 'douala5@petrolex.cm', 'phone' => '+237670002005', 'lat' => 4.080, 'lng' => 9.730],
+            ['name' => 'Centre Douala VI', 'city' => 'Douala', 'neighborhood' => 'Bali', 'email' => 'douala6@petrolex.cm', 'phone' => '+237670002006', 'lat' => 4.020, 'lng' => 9.700],
+
+            // BAMENDA - 3 municipalités
+            ['name' => 'Centre Bamenda I', 'city' => 'Bamenda', 'neighborhood' => 'Commercial Avenue', 'email' => 'bamenda1@petrolex.cm', 'phone' => '+237670003001', 'lat' => 5.960, 'lng' => 10.150],
+            ['name' => 'Centre Bamenda II', 'city' => 'Bamenda', 'neighborhood' => 'Nkwen', 'email' => 'bamenda2@petrolex.cm', 'phone' => '+237670003002', 'lat' => 5.980, 'lng' => 10.160],
+            ['name' => 'Centre Bamenda III', 'city' => 'Bamenda', 'neighborhood' => 'Ntarikon', 'email' => 'bamenda3@petrolex.cm', 'phone' => '+237670003003', 'lat' => 5.940, 'lng' => 10.160],
+
+            // BAFOUSSAM - 3 municipalités
+            ['name' => 'Centre Bafoussam I', 'city' => 'Bafoussam', 'neighborhood' => 'Centre-ville', 'email' => 'bafoussam1@petrolex.cm', 'phone' => '+237670004001', 'lat' => 5.470, 'lng' => 10.410],
+            ['name' => 'Centre Bafoussam II', 'city' => 'Bafoussam', 'neighborhood' => 'Kaptchouo', 'email' => 'bafoussam2@petrolex.cm', 'phone' => '+237670004002', 'lat' => 5.490, 'lng' => 10.430],
+            ['name' => 'Centre Bafoussam III', 'city' => 'Bafoussam', 'neighborhood' => 'Tamdja', 'email' => 'bafoussam3@petrolex.cm', 'phone' => '+237670004003', 'lat' => 5.450, 'lng' => 10.440],
+
+            // GAROUA - 1 commune
+            ['name' => 'Centre Garoua', 'city' => 'Garoua', 'neighborhood' => 'Centre-ville', 'email' => 'garoua@petrolex.cm', 'phone' => '+237670005001', 'lat' => 9.300, 'lng' => 13.400],
+
+            // MAROUA - 1 commune
+            ['name' => 'Centre Maroua', 'city' => 'Maroua', 'neighborhood' => 'Centre-ville', 'email' => 'maroua@petrolex.cm', 'phone' => '+237670006001', 'lat' => 10.590, 'lng' => 14.310],
         ];
 
-        foreach ($centersData as $center) {
-            if ($center['neighborhood_id']) {
+        $createdCount = 0;
+        $skippedCount = 0;
+
+        foreach ($centersData as $centerData) {
+            $neighborhood = $getNeighborhood($centerData['city'], $centerData['neighborhood']);
+
+            if ($neighborhood) {
                 DistributionCenter::firstOrCreate(
-                    ['email' => $center['email']],
-                    $center
+                    ['email' => $centerData['email']],
+                    [
+                        'name' => $centerData['name'],
+                        'neighborhood_id' => $neighborhood->id,
+                        'address' => "{$centerData['neighborhood']}, {$centerData['city']}",
+                        'description' => "Centre de distribution - {$centerData['name']}",
+                        'phone' => $centerData['phone'],
+                        'email' => $centerData['email'],
+                        'latitude' => $centerData['lat'],
+                        'longitude' => $centerData['lng'],
+                        'is_active' => true,
+                    ]
                 );
+                $this->command->info("✅ {$centerData['name']}");
+                $createdCount++;
             } else {
-                $this->command->warn('Skipping creation of '.$center['name'].' due to missing geographic data.');
+                $this->command->warn("⚠️ {$centerData['name']} - quartier '{$centerData['neighborhood']}' introuvable");
+                $skippedCount++;
             }
         }
 
-        $this->command->info('Distribution centers created successfully!');
+        $this->command->info("\n✅ {$createdCount} centres créés, {$skippedCount} ignorés");
     }
 }
