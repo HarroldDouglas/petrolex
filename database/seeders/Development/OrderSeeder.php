@@ -379,8 +379,8 @@ class OrderSeeder extends Seeder
             'is_default' => false,
         ]);
 
-        // Get Centre Bastos Yaoundé (which is in Yaoundé VI)
-        $centreBastos = DistributionCenter::where('name', 'Centre Bastos Yaoundé')->first();
+        // Get Centre Yaoundé VI (which covers Bastos neighborhood)
+        $centreBastos = DistributionCenter::where('name', 'Centre Yaoundé VI')->first();
 
         $paidOrders = [];
 
