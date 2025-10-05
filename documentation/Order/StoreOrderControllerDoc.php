@@ -22,14 +22,14 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="delivery_address_id",
  *         type="integer",
- *         example=65,
- *         description="ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée."
+ *         example=2,
+ *         description="ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée. L'adresse ID 2 (Nkoabang) est dans Yaoundé I."
  *     ),
  *     @OA\Property(
  *         property="distribution_center_id",
  *         type="integer",
- *         example=2,
- *         description="ID du centre de distribution. **Important**: le centre de distribution doit être dans la même municipalité que l'adresse de livraison."
+ *         example=1,
+ *         description="ID du centre de distribution. **Important**: le centre de distribution doit être dans la même municipalité que l'adresse de livraison. Le centre ID 1 (Centre Yaoundé I) dessert la municipalité Yaoundé I."
  *     ),
  *     @OA\Property(property="delivery_type", type="string", enum={"normal", "fast"}, example="normal", description="Type de livraison: normal (standard) ou fast (express)"),
  *     @OA\Property(

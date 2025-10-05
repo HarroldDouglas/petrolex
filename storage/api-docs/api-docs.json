@@ -4959,14 +4959,14 @@
                 ],
                 "properties": {
                     "delivery_address_id": {
-                        "description": "ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée.",
-                        "type": "integer",
-                        "example": 65
-                    },
-                    "distribution_center_id": {
-                        "description": "ID du centre de distribution. **Important**: le centre de distribution doit être dans la même municipalité que l'adresse de livraison.",
+                        "description": "ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée. L'adresse ID 2 (Nkoabang) est dans Yaoundé I.",
                         "type": "integer",
                         "example": 2
+                    },
+                    "distribution_center_id": {
+                        "description": "ID du centre de distribution. **Important**: le centre de distribution doit être dans la même municipalité que l'adresse de livraison. Le centre ID 1 (Centre Yaoundé I) dessert la municipalité Yaoundé I.",
+                        "type": "integer",
+                        "example": 1
                     },
                     "delivery_type": {
                         "description": "Type de livraison: normal (standard) ou fast (express)",
