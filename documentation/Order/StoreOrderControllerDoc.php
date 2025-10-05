@@ -19,8 +19,18 @@ use OpenApi\Annotations as OA;
  *     type="object",
  *     required={"delivery_address_id", "distribution_center_id", "delivery_type", "items", "delivery_fee", "total_amount"},
  *
- *     @OA\Property(property="delivery_address_id", type="integer", example=65, description="ID de l'adresse de livraison du client (doit être dans la même municipalité que le centre de distribution)"),
- *     @OA\Property(property="distribution_center_id", type="integer", example=2, description="ID du centre de distribution"),
+ *     @OA\Property(
+ *         property="delivery_address_id",
+ *         type="integer",
+ *         example=65,
+ *         description="ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée."
+ *     ),
+ *     @OA\Property(
+ *         property="distribution_center_id",
+ *         type="integer",
+ *         example=2,
+ *         description="ID du centre de distribution. **Important**: le centre de distribution doit être dans la même municipalité que l'adresse de livraison."
+ *     ),
  *     @OA\Property(property="delivery_type", type="string", enum={"normal", "fast"}, example="normal", description="Type de livraison: normal (standard) ou fast (express)"),
  *     @OA\Property(
  *         property="items",
@@ -107,8 +117,54 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=422,
  *         description="Erreur de validation",
- *
- *         @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
+ *         @OA\JsonContent(
+ *             allOf={
+ *                 @OA\Schema(ref="#/components/schemas/ValidationErrorResponse"),
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="errors",
+ *                         type="object",
+ *                         description="Erreurs de validation possibles",
+ *                         @OA\Property(
+ *                             property="distribution_center_id",
+ *                             type="array",
+ *                             description="Erreur de cohérence géographique: l'adresse de livraison et le centre de distribution doivent être dans la même municipalité",
+ *                             @OA\Items(
+ *                                 type="string",
+ *                                 example="L'adresse de livraison (municipalité Yaoundé II) doit être dans la même municipalité que le centre de distribution (municipalité Yaoundé I)."
+ *                             )
+ *                         ),
+ *                         @OA\Property(
+ *                             property="items.0.unit_price",
+ *                             type="array",
+ *                             description="Prix incorrect",
+ *                             @OA\Items(
+ *                                 type="string",
+ *                                 example="Prix incorrect: attendu 3900, fourni 4000"
+ *                             )
+ *                         ),
+ *                         @OA\Property(
+ *                             property="delivery_fee",
+ *                             type="array",
+ *                             description="Frais de livraison incorrects",
+ *                             @OA\Items(
+ *                                 type="string",
+ *                                 example="Frais de livraison incorrect: attendu 500, fourni 600"
+ *                             )
+ *                         ),
+ *                         @OA\Property(
+ *                             property="total_amount",
+ *                             type="array",
+ *                             description="Montant total incorrect",
+ *                             @OA\Items(
+ *                                 type="string",
+ *                                 example="Montant total incorrect: attendu 15800, fourni 16000"
+ *                             )
+ *                         )
+ *                     )
+ *                 )
+ *             }
+ *         )
  *     )
  * )
  */

@@ -2833,7 +2833,54 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ValidationErrorResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "errors": {
+                                                    "description": "Erreurs de validation possibles",
+                                                    "properties": {
+                                                        "distribution_center_id": {
+                                                            "description": "Erreur de cohérence géographique: l'adresse de livraison et le centre de distribution doivent être dans la même municipalité",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "L'adresse de livraison (municipalité Yaoundé II) doit être dans la même municipalité que le centre de distribution (municipalité Yaoundé I)."
+                                                            }
+                                                        },
+                                                        "items.0.unit_price": {
+                                                            "description": "Prix incorrect",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "Prix incorrect: attendu 3900, fourni 4000"
+                                                            }
+                                                        },
+                                                        "delivery_fee": {
+                                                            "description": "Frais de livraison incorrects",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "Frais de livraison incorrect: attendu 500, fourni 600"
+                                                            }
+                                                        },
+                                                        "total_amount": {
+                                                            "description": "Montant total incorrect",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "Montant total incorrect: attendu 15800, fourni 16000"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -4912,12 +4959,12 @@
                 ],
                 "properties": {
                     "delivery_address_id": {
-                        "description": "ID de l'adresse de livraison du client (doit être dans la même municipalité que le centre de distribution)",
+                        "description": "ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée.",
                         "type": "integer",
                         "example": 65
                     },
                     "distribution_center_id": {
-                        "description": "ID du centre de distribution",
+                        "description": "ID du centre de distribution. **Important**: le centre de distribution doit être dans la même municipalité que l'adresse de livraison.",
                         "type": "integer",
                         "example": 2
                     },
@@ -6659,9 +6706,9 @@
                         "example": 67.2
                     },
                     "estimated_duration": {
-                        "description": "Estimated duration in minutes",
+                        "description": "Estimated duration in seconds (from Google Maps API)",
                         "type": "integer",
-                        "example": 18
+                        "example": 1800
                     },
                     "route_geometry": {
                         "description": "GeoJSON route geometry",
