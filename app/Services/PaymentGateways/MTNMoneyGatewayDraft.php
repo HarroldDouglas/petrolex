@@ -84,10 +84,7 @@ class MTNMoneyGatewayDraft
 
             Log::info('MTN MoMo: Calling MTN API', [
                 'api_url' => $mtnApiUrl,
-                'reference_id' => $referenceId,
-                'external_id' => $mtnRequestData['externalId'],
-                'amount' => $mtnRequestData['amount'],
-                'phone' => $paymentData['phone_number']
+                'body' => $mtnRequestData,
             ]);
 
             // Call MTN MoMo API
