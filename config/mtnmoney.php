@@ -31,7 +31,7 @@ return [
     ],
 
     // MTN MoMo API Credentials (to be filled with actual values)
-    'subscription_key' => env('MTN_MOMO_SUBSCRIPTION_KEY', 'FRI:127126687/MM'),
+    'subscription_key' => env('MTN_MOMO_SUBSCRIPTION_KEY', '6cefa52fcefc41849cc60e40f85dd42b'),
     'api_user' => env('MTN_MOMO_API_USER', '34215f01-19f9-43b9-a712-35a7e710ba82'),
     'api_key' => env('MTN_MOMO_API_KEY', '1cbb6828241b49abaca2d12dae2f2592'),
     

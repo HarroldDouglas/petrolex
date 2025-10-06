@@ -40,6 +40,12 @@ class PaymentConsole {
 
     log(message, type = 'info') {
         const timestamp = new Date().toLocaleString('fr-FR');
+        
+        // Auto-detect PENDING status and override type
+        if (message.includes('PENDING') && type !== 'error') {
+            type = 'pending';
+        }
+        
         const logEntry = document.createElement('div');
         logEntry.className = `log-entry log-${type}`;
         
@@ -49,11 +55,18 @@ class PaymentConsole {
             logEntry.style.borderLeft = '4px solid #00ff00';
         }
         
+        // Add special styling for pending messages
+        if (type === 'pending') {
+            logEntry.style.backgroundColor = 'rgba(253, 126, 20, 0.1)';
+            logEntry.style.borderLeft = '4px solid #fd7e14';
+        }
+        
         let icon = '';
         switch(type) {
             case 'success': icon = '<i class="fas fa-check-circle"></i>'; break;
             case 'error': icon = '<i class="fas fa-times-circle"></i>'; break;
             case 'warning': icon = '<i class="fas fa-exclamation-triangle"></i>'; break;
+            case 'pending': icon = '<i class="fas fa-clock"></i>'; break;
             default: icon = '<i class="fas fa-info-circle"></i>';
         }
         
@@ -184,18 +197,31 @@ class PaymentConsole {
         }
 
         const timestamp = new Date(log.timestamp).toLocaleString('fr-FR');
+        
+        // Auto-detect PENDING status in backend logs
+        let logLevel = log.level;
+        if (logText.includes('PENDING') && logLevel !== 'error') {
+            logLevel = 'pending';
+        }
+        
         const logEntry = document.createElement('div');
-        logEntry.className = `log-entry log-${log.level} backend-log`;
+        logEntry.className = `log-entry log-${logLevel} backend-log`;
         
         // Special styling for backend logs
-        logEntry.style.backgroundColor = 'rgba(100, 149, 237, 0.1)';
-        logEntry.style.borderLeft = '3px solid #6495ED';
+        if (logLevel === 'pending') {
+            logEntry.style.backgroundColor = 'rgba(253, 126, 20, 0.1)';
+            logEntry.style.borderLeft = '3px solid #fd7e14';
+        } else {
+            logEntry.style.backgroundColor = 'rgba(100, 149, 237, 0.1)';
+            logEntry.style.borderLeft = '3px solid #6495ED';
+        }
         
         let icon = '🔧';
-        switch(log.level) {
+        switch(logLevel) {
             case 'success': icon = '✅'; break;
             case 'error': icon = '❌'; break;
             case 'warning': icon = '⚠️'; break;
+            case 'pending': icon = '🕐'; break;
             case 'info': icon = 'ℹ️'; break;
             default: icon = '🔧';
         }

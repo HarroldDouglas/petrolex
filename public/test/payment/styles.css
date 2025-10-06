@@ -56,6 +56,12 @@
     background-color: rgba(255, 170, 0, 0.05);
 }
 
+.log-entry.log-pending {
+    color: #ffffff;
+    border-left-color: #fd7e14;
+    background-color: rgba(253, 126, 20, 0.05);
+}
+
 .log-entry.log-info {
     border-left-color: #00bfff;
     background-color: rgba(0, 191, 255, 0.05);
