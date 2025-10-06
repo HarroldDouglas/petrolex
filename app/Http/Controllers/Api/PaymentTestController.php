@@ -51,7 +51,7 @@ class PaymentTestController extends Controller
         
         $validator = Validator::make($request->all(), [
             'phone_number' => 'required|string|min:9|max:15',
-            'amount' => 'required|numeric|min:100|max:1000000',
+            'amount' => 'required|numeric|min:10|max:1000000',
             'test_mode' => 'sometimes|in:sandbox,live',
             'external_id' => 'sometimes|string|max:50'
         ]);

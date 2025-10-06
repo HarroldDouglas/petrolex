@@ -288,8 +288,8 @@ function validateForm(data) {
         return false;
     }
     
-    if (!data.amount || data.amount < 100) {
-        console.log('❌ Le montant doit être supérieur à 100 FCFA', 'error');
+    if (!data.amount || data.amount < 10) {
+        console.log('❌ Le montant doit être supérieur à 10 FCFA', 'error');
         updateStats('error');
         return false;
     }
