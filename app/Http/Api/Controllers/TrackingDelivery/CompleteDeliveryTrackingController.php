@@ -35,7 +35,7 @@ final class CompleteDeliveryTrackingController extends Controller
     {
         Log::info('Attempting to complete delivery tracking for order ID: '.$orderId);
 
-        $this->validateDeliveryPersonAccess($orderId);
+        $this->validateUserAccess($orderId);
         $deliveryTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
         if (! $deliveryTracking) {
@@ -44,10 +44,14 @@ final class CompleteDeliveryTrackingController extends Controller
             return DeliveryTrackingResponse::error('Delivery tracking not found.', null, Response::HTTP_NOT_FOUND);
         }
 
+        // 🔧 IDEMPOTENT: Si déjà complété, retourner succès sans erreur
         if ($deliveryTracking->status->value === DeliveryTrackingStatus::DELIVERED()->value) {
-            Log::info('Delivery tracking for order ID '.$orderId.' is already completed.');
+            Log::info('Delivery tracking for order ID '.$orderId.' is already completed. Returning success.');
 
-            return DeliveryTrackingResponse::error('Delivery tracking is already completed.', null, Response::HTTP_CONFLICT);
+            return DeliveryTrackingResponse::make(
+                $deliveryTracking,
+                'Delivery already completed.'
+            );
         }
 
         $previousStatus = $deliveryTracking->status->value;
@@ -75,7 +79,10 @@ final class CompleteDeliveryTrackingController extends Controller
         );
     }
 
-    private function validateDeliveryPersonAccess(int $orderId): void
+    /**
+     * 🔧 CORRECTION: Autoriser le CLIENT et le LIVREUR
+     */
+    private function validateUserAccess(int $orderId): void
     {
         /** @var Order|null $order */
         $order = $this->orderRepository->find($orderId);
@@ -85,14 +92,18 @@ final class CompleteDeliveryTrackingController extends Controller
             abort(404, 'Order not found');
         }
 
-        $order->load('deliveryPerson');
+        $order->load('customer', 'deliveryPerson');
         $authenticatedUser = auth()->user();
 
-        if (! $order->deliveryPerson || $order->deliveryPerson->user_id !== $authenticatedUser->id) {
-            Log::warning('Unauthorized delivery person access attempt', [
+        $isCustomer = $order->customer && $order->customer->user_id === $authenticatedUser->id;
+        $isDeliveryPerson = $order->deliveryPerson && $order->deliveryPerson->user_id === $authenticatedUser->id;
+
+        if (! $isCustomer && ! $isDeliveryPerson) {
+            Log::warning('Unauthorized access attempt to complete delivery', [
                 'order_id' => $order->id,
                 'authenticated_user_id' => $authenticatedUser->id,
-                'assigned_delivery_person_id' => $order->deliveryPerson?->user_id,
+                'customer_user_id' => $order->customer?->user_id,
+                'delivery_person_user_id' => $order->deliveryPerson?->user_id,
             ]);
 
             throw new \InvalidArgumentException('You are not authorized to access this delivery');

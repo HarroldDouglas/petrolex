@@ -33,10 +33,20 @@ class DemoDataSeeder extends Seeder
 
     private function createDemoDistributionCenters(): void
     {
+        // Get or create a demo neighborhood (use existing one or create in Yaoundé I)
+        $demoNeighborhood = \App\Models\Geography\Neighborhood::first();
+
+        if (!$demoNeighborhood) {
+            $this->command->error('No neighborhoods found. Please seed geographic data first.');
+            return;
+        }
+
         $this->demoCenter = DistributionCenter::firstOrCreate(
             ['name' => 'Demo Distribution Center'],
             [
+                'neighborhood_id' => $demoNeighborhood->id,
                 'address' => '123 Main Street, Demo City',
+                'description' => 'Demo center for testing',
                 'latitude' => 4.0511,
                 'longitude' => 9.7679,
                 'phone' => '123456789',

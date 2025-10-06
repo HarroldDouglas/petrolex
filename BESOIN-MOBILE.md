@@ -2,10 +2,11 @@
 
 ## 🌍 Configuration Serveur
 
-- **URL API**: `https://mondomaine.com/api`
-- **WebSocket URL**: `wss://mondomaine.com:8080/app/petro-key-12345`
-- **Port WebSocket**: `8080`
+- **URL API**: `https://isogaz.afrik-solutions.com/api`
+- **WebSocket URL**: `wss://isogaz.afrik-solutions.com:443/app/petro-key-12345`
+- **Port WebSocket**: `443`
 - **App Key**: `petro-key-12345`
+
 
 ## 🔗 Canal WebSocket
 
@@ -45,7 +46,7 @@ class DeliveryTracker {
     
     void connectToTracking(String orderNumber) {
         _channel = WebSocketChannel.connect(
-            Uri.parse('wss://mondomaine.com:8080/app/petro-key-12345?protocol=7&client=js&version=8.3.0&flash=false')
+            Uri.parse('wss://isogaz.afrik-solutions.com:443/app/petro-key-12345?protocol=7&client=js&version=8.3.0&flash=false')
         );
         
         // Souscrire au canal
@@ -70,6 +71,122 @@ class DeliveryTracker {
             }
         });
     }
+
+    void disconnect() {
+        _channel?.sink.close();
+        _channel = null;
+    }
+    
+    // Gestion de la reconnexion automatique
+    void _setupReconnection() {
+        _channel!.stream.listen(
+            (message) {
+                // Traitement des messages
+            },
+            onError: (error) {
+                print('WebSocket error: $error');
+                // Reconnexion après 3 secondes
+                Future.delayed(Duration(seconds: 3), () {
+                    if (_channel == null) connectToTracking(orderNumber);
+                });
+            },
+            onDone: () {
+                print('WebSocket closed');
+                // Reconnexion automatique
+                Future.delayed(Duration(seconds: 2), () {
+                    if (_channel == null) connectToTracking(orderNumber);
+                });
+            }
+        );
+    }
+}
+```
+
+## 🔄 Code Flutter Complet avec Reconnexion
+
+```dart
+class DeliveryTracker {
+    WebSocketChannel? _channel;
+    String? _currentOrderNumber;
+    Timer? _reconnectTimer;
+    bool _isConnecting = false;
+    
+    void connectToTracking(String orderNumber) {
+        if (_isConnecting) return;
+        
+        _isConnecting = true;
+        _currentOrderNumber = orderNumber;
+        
+        try {
+            _channel = WebSocketChannel.connect(
+                Uri.parse('wss://isogaz.afrik-solutions.com:443/app/petro-key-12345?protocol=7&client=js&version=8.3.0&flash=false')
+            );
+            
+            _setupStreamListener();
+            _subscribeToChannel(orderNumber);
+            
+        } catch (e) {
+            print('Connection failed: $e');
+            _scheduleReconnect();
+        } finally {
+            _isConnecting = false;
+        }
+    }
+    
+    void _setupStreamListener() {
+        _channel!.stream.listen(
+            (message) {
+                final data = jsonDecode(message);
+                
+                if (data['event'] == 'pusher:connection_established') {
+                    print('WebSocket connected successfully');
+                    _subscribeToChannel(_currentOrderNumber!);
+                }
+                
+                if (data['event'] == 'delivery-position-updated') {
+                    final positionData = jsonDecode(data['data']);
+                    updateDriverPosition(
+                        positionData['driver_lat'],
+                        positionData['driver_lng']
+                    );
+                    updateProgress(positionData['progress_percentage']);
+                }
+            },
+            onError: (error) {
+                print('WebSocket error: $error');
+                _scheduleReconnect();
+            },
+            onDone: () {
+                print('WebSocket disconnected');
+                _scheduleReconnect();
+            }
+        );
+    }
+    
+    void _subscribeToChannel(String orderNumber) {
+        _channel?.sink.add(jsonEncode({
+            'event': 'pusher:subscribe',
+            'data': {'channel': 'delivery-$orderNumber'}
+        }));
+    }
+    
+    void _scheduleReconnect() {
+        _channel = null;
+        _reconnectTimer?.cancel();
+        
+        _reconnectTimer = Timer(Duration(seconds: 3), () {
+            if (_currentOrderNumber != null) {
+                connectToTracking(_currentOrderNumber!);
+            }
+        });
+    }
+    
+    void disconnect() {
+        _reconnectTimer?.cancel();
+        _channel?.sink.close();
+        _channel = null;
+        _currentOrderNumber = null;
+    }
 }
 ```
 
@@ -77,13 +194,13 @@ class DeliveryTracker {
 
 ### 1. Démarrage de la livraison (Livreur)
 - **Action**: Cliquer sur "Démarrer la livraison"  
-- **Endpoint**: `POST /api/delivery/tracking/{orderId}/start`
+- **Endpoint**: `POST /api/tracking/delivery/{orderId}/start`
 - **Réponse**: Status `started`, initialise les données de tracking
 
 ### 2. Mise à jour des positions (Livreur en mouvement)
 - **Action**: App mobile envoie position toutes les 5 secondes
-- **Endpoint**: `POST /api/delivery/update-location`
-- **Données**: `{"order_id": 123, "lat": 3.848, "lng": 11.502, "speed": 25}`
+- **Endpoint**: `PATCH /api/tracking/delivery/{orderId}/position`
+- **Données**: `{"lat": 3.848, "lng": 11.502, "speed": 25}`
 - **WebSocket**: Déclenche automatiquement `delivery-position-updated`
 
 ### 3. Suivi temps réel (Client)
@@ -93,8 +210,8 @@ class DeliveryTracker {
 
 ### 4. Finalisation (Livreur)
 - **Action**: Cliquer sur "Marquer comme livré"
-- **Endpoint**: `POST /api/orders/{orderId}/status` → `delivered`
-- **Effet**: Progress = 100%, tracking terminé
+- **Endpoint**: `PATCH /api/tracking/delivery/{orderId}/complete`
+- **Effet**: Progress = 100%, tracking terminé, statut order → `delivered`
 
 ## 🔄 Endpoints API Mobiles
 
@@ -111,45 +228,42 @@ Content-Type: application/json
 
 ### Démarrage tracking
 ```http
-POST /api/delivery/tracking/{orderId}/start
+POST /api/tracking/delivery/{orderId}/start
 Authorization: Bearer {token}
 ```
 
 ### Mise à jour position
 ```http
-POST /api/delivery/update-location
+PATCH /api/tracking/delivery/{orderId}/position
 Authorization: Bearer {token}
 Content-Type: application/json
 
 {
-    "order_id": 123,
     "lat": 3.848,
     "lng": 11.502,
     "speed": 25
 }
 ```
 
-### Statut de livraison
+### Consulter statut de livraison
 ```http
 GET /api/tracking/delivery/{orderId}
 Authorization: Bearer {token}
+```
 
-POST /api/orders/{orderId}/status
+### Finaliser livraison
+```http
+PATCH /api/tracking/delivery/{orderId}/complete
 Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-    "status": "delivered"
-}
 ```
 
 ## 🧪 Test WebSocket
 
-1. **Ouvrir**: `https://mondomaine.com/test-websocket-sender.html`
+1. **Ouvrir**: `https://isogaz.afrik-solutions.com/test-websocket-sender.html`
 2. **Cliquer**: "Se connecter"
 3. **Dans Flutter**: Se connecter au même WebSocket
 4. **Test 1**: Envoyer message depuis web → recevoir dans Flutter
-5. **Test 2**: Envoyer depuis Flutter → recevoir sur `test-websocket-receiver.html`
+5. **Test 2**: Envoyer depuis Flutter → recevoir sur `https://isogaz.afrik-solutions.com/test-websocket-receiver.html`
 
 ## 📋 Checklist
 

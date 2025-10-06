@@ -387,14 +387,19 @@ class OrderService extends BaseServiceForEntity
      */
     private function validateSameMunicipality(CreateOrderWithoutPaymentDTO $orderDTO): void
     {
-        $deliveryAddress = CustomerDeliveryAddress::findOrFail($orderDTO->delivery_address_id);
-        $distributionCenter = DistributionCenter::findOrFail($orderDTO->distribution_center_id);
+        $deliveryAddress = CustomerDeliveryAddress::with(['neighborhood.municipality'])->findOrFail($orderDTO->delivery_address_id);
+        $distributionCenter = DistributionCenter::with(['neighborhood.municipality'])->findOrFail($orderDTO->distribution_center_id);
 
         $deliveryMunicipalityId = $deliveryAddress->neighborhood->municipality_id;
         $centerMunicipalityId = $distributionCenter->neighborhood->municipality_id;
 
         if ($deliveryMunicipalityId !== $centerMunicipalityId) {
-            throw new \Exception(__('validation/order.messages.different_municipalities'));
+            throw new \InvalidArgumentException(
+                __('validation/order.messages.different_municipalities', [
+                    'delivery_municipality' => $deliveryAddress->neighborhood->municipality->name,
+                    'center_municipality' => $distributionCenter->neighborhood->municipality->name,
+                ])
+            );
         }
     }
 }

@@ -31,7 +31,9 @@
       "WebSearch",
       "Bash(git branch:*)",
       "Bash(timeout 60 php artisan queue:work:*)",
-      "WebFetch(domain:isogaz.afrik-solutions.com)"
+      "WebFetch(domain:isogaz.afrik-solutions.com)",
+      "Bash(./tests/E2E/order/test_geographic_coherence.sh:*)",
+      "Bash(TOKEN=\"3|1qCDhe6GtQGNaGciJxJjprDASYFRT6tjfwrVI3v6e00616c1\")"
     ],
     "deny": [],
     "ask": []
