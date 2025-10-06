@@ -155,20 +155,25 @@ class MTNMoneyGatewayDraft
             if ($response->successful()) {
                 $data = $response->json();
                 
-                Log::info('MTN MoMo: Transaction status retrieved', [
+                // Log detailed response for debugging
+                Log::info('MTN MoMo: Detailed transaction status', [
                     'reference_id' => $referenceId,
-                    'status' => $data['status'] ?? 'UNKNOWN'
+                    'status' => $data['status'] ?? 'UNKNOWN',
+                    'reason' => $data['reason'] ?? 'No reason provided',
+                    'financial_transaction_id' => $data['financialTransactionId'] ?? null,
+                    'full_response' => $data
                 ]);
 
                 return [
                     'success' => true,
                     'data' => $data,
                     'status' => $data['status'] ?? 'UNKNOWN',
+                    'reason' => $data['reason'] ?? 'Transaction failed without specific reason',
                     'financial_transaction_id' => $data['financialTransactionId'] ?? null,
                     'external_id' => $data['externalId'] ?? null,
                     'amount' => $data['amount'] ?? null,
                     'currency' => $data['currency'] ?? null,
-                    'message' => 'Status retrieved successfully'
+                    'message' => $this->getStatusMessage($data['status'] ?? 'UNKNOWN', $data['reason'] ?? null)
                 ];
             }
 
@@ -267,6 +272,23 @@ class MTNMoneyGatewayDraft
         
         // Default: assume Cameroon number and add 237
         return '237' . $cleaned;
+    }
+
+    /**
+     * Get user-friendly status message based on MTN response
+     */
+    private function getStatusMessage(string $status, ?string $reason): string
+    {
+        return match($status) {
+            'SUCCESSFUL' => 'Payment completed successfully',
+            'FAILED' => 'Payment failed: ' . ($reason ?? 'User declined, insufficient funds, or network issue'),
+            'PENDING' => 'Payment is being processed - waiting for user confirmation',
+            'TIMEOUT' => 'Payment timed out - user did not respond within time limit',
+            'EXPIRED' => 'Payment request expired',
+            'CANCELLED' => 'Payment was cancelled by user or system',
+            'REJECTED' => 'Payment was rejected: ' . ($reason ?? 'Transaction not allowed'),
+            default => 'Payment status: ' . $status . ($reason ? ' - ' . $reason : '')
+        };
     }
 
     /**
