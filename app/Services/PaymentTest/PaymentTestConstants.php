@@ -25,6 +25,19 @@ class PaymentTestConstants
     public const STATUS_EXPIRED = 'EXPIRED';
     public const STATUS_TIMEOUT = 'TIMEOUT';
     
+    // Status Groups for Callback Processing
+    public const SUCCESS_STATUSES = [
+        'SUCCESS', 'SUCCESSFUL', 'COMPLETED', 'OK'
+    ];
+    
+    public const FAILED_STATUSES = [
+        'FAILED', 'FAILURE', 'ERROR', 'DECLINED', 'REJECTED', 'CANCELLED'
+    ];
+    
+    public const PENDING_STATUSES = [
+        'PENDING', 'PROCESSING', 'ONGOING', 'IN_PROGRESS'
+    ];
+    
     // Test Scenarios
     public const SCENARIO_SUCCESS = 'SUCCESS';
     public const SCENARIO_FAILED = 'FAILED';

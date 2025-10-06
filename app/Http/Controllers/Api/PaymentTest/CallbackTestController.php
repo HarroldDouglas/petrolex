@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api\PaymentTest;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PaymentTest\CallbackTestRequest;
+use App\Services\PaymentTest\PaymentTestService;
+use App\Services\PaymentTest\PaymentTestConstants;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -11,32 +14,65 @@ use Illuminate\Support\Facades\Log;
 class CallbackTestController extends Controller
 {
     /**
+     * CallbackTestController constructor.
+     */
+    public function __construct(
+        protected PaymentTestService $paymentTestService
+    ) {}
+
+    /**
      * Handle payment provider callbacks for testing
      */
-    public function handleCallback(Request $request, string $provider): JsonResponse
+    public function handleCallback(CallbackTestRequest $request, string $provider): JsonResponse
     {
-        $callbackData = $request->all();
+        $callbackData = $request->getNormalizedCallbackData($provider);
         $timestamp = now()->toISOString();
         
         Log::info("📞 Test callback received", [
             'provider' => $provider,
             'data' => $callbackData,
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent()
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent()
         ]);
 
-        try {
-            // Process callback based on provider
-            if ($provider === 'orange') {
-                return $this->handleOrangeCallback($callbackData, $timestamp);
-            } elseif ($provider === 'mtn') {
-                return $this->handleMTNCallback($callbackData, $timestamp);
-            }
-
+        // Validate provider
+        if (!PaymentTestConstants::isValidProvider($provider)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid provider for callback'
+                'message' => 'Invalid provider for callback',
+                'provider' => $provider
             ], 400);
+        }
+
+        try {
+            // Get status category
+            $statusCategory = $request->getStatusCategory();
+            
+            // Generate logs for frontend display
+            $logs = $this->paymentTestService->generateCallbackLogs($provider, $callbackData, $statusCategory);
+            
+            // Process callback through service
+            $result = $this->paymentTestService->processCallback($provider, $callbackData);
+            
+            // Broadcast callback to test console
+            $this->broadcastCallbackToTestConsole([
+                'provider' => strtoupper($provider),
+                'level' => $statusCategory === PaymentTestConstants::STATUS_SUCCESSFUL ? 'success' : 
+                          ($statusCategory === PaymentTestConstants::STATUS_FAILED ? 'error' : 'warning'),
+                'message' => $logs[1]['message'] ?? 'Callback processed',
+                'details' => $callbackData,
+                'timestamp' => $timestamp,
+                'isSuccess' => $statusCategory === PaymentTestConstants::STATUS_SUCCESSFUL
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => strtoupper($provider) . ' test callback processed successfully',
+                'status' => $callbackData['status'] ?? 'UNKNOWN',
+                'category' => $statusCategory,
+                'logs' => $logs,
+                'timestamp' => $timestamp
+            ]);
 
         } catch (\Exception $e) {
             Log::error("💥 Test callback processing error", [
@@ -48,154 +84,15 @@ class CallbackTestController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Callback processing failed',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'logs' => [
+                    ['level' => 'error', 'message' => "💥 Critical error: {$e->getMessage()}", 'timestamp' => $timestamp]
+                ]
             ], 500);
         }
     }
 
-    /**
-     * Handle Orange Money callback for testing
-     */
-    protected function handleOrangeCallback(array $data, string $timestamp): JsonResponse
-    {
-        $payToken = $data['payToken'] ?? 'N/A';
-        $status = $data['status'] ?? 'UNKNOWN';
-        $message = $data['message'] ?? 'No message';
-        $txnid = $data['txnid'] ?? 'N/A';
 
-        Log::info("🍊 Orange Money test callback processed", [
-            'pay_token' => $payToken,
-            'status' => $status,
-            'transaction_id' => $txnid,
-            'message' => $message
-        ]);
-
-        // Determine log level and message based on status
-        $logLevel = 'info';
-        $logMessage = '';
-        $isSuccess = false;
-
-        switch (strtoupper($status)) {
-            case 'SUCCESS':
-            case 'SUCCESSFUL':
-            case 'COMPLETED':
-                $logLevel = 'success';
-                $logMessage = "🎉 Orange Money Test: Paiement confirmé avec succès!";
-                $isSuccess = true;
-                break;
-            
-            case 'FAILED':
-            case 'FAILURE':
-            case 'ERROR':
-                $logLevel = 'error';
-                $logMessage = "❌ Orange Money Test: Paiement échoué - {$message}";
-                break;
-            
-            case 'PENDING':
-            case 'PROCESSING':
-                $logLevel = 'warning';
-                $logMessage = "⏳ Orange Money Test: Paiement en cours de traitement";
-                break;
-            
-            default:
-                $logLevel = 'info';
-                $logMessage = "📋 Orange Money Test: Status - {$status}";
-        }
-
-        // Broadcast callback to test console
-        $this->broadcastCallbackToTestConsole([
-            'provider' => 'ORANGE',
-            'level' => $logLevel,
-            'message' => $logMessage,
-            'details' => [
-                'payToken' => $payToken,
-                'txnid' => $txnid,
-                'status' => $status,
-                'originalMessage' => $message
-            ],
-            'timestamp' => $timestamp,
-            'isSuccess' => $isSuccess
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Orange Money test callback processed successfully',
-            'status' => $status,
-            'transaction_id' => $txnid
-        ]);
-    }
-
-    /**
-     * Handle MTN MoMo callback for testing
-     */
-    protected function handleMTNCallback(array $data, string $timestamp): JsonResponse
-    {
-        // MTN MoMo typically sends different callback format
-        $referenceId = $data['referenceId'] ?? $data['reference_id'] ?? 'N/A';
-        $status = $data['status'] ?? 'UNKNOWN';
-        $financialTransactionId = $data['financialTransactionId'] ?? $data['financial_transaction_id'] ?? 'N/A';
-        $reason = $data['reason'] ?? $data['message'] ?? 'No reason provided';
-
-        Log::info("📱 MTN MoMo test callback processed", [
-            'reference_id' => $referenceId,
-            'status' => $status,
-            'financial_transaction_id' => $financialTransactionId,
-            'reason' => $reason
-        ]);
-
-        // Determine log level and message based on status
-        $logLevel = 'info';
-        $logMessage = '';
-        $isSuccess = false;
-
-        switch (strtoupper($status)) {
-            case 'SUCCESSFUL':
-            case 'SUCCESS':
-            case 'COMPLETED':
-                $logLevel = 'success';
-                $logMessage = "🎉 MTN MoMo Test: Transaction confirmée avec succès!";
-                $isSuccess = true;
-                break;
-            
-            case 'FAILED':
-            case 'FAILURE':
-                $logLevel = 'error';
-                $logMessage = "❌ MTN MoMo Test: Transaction échouée - {$reason}";
-                break;
-            
-            case 'PENDING':
-            case 'ONGOING':
-                $logLevel = 'warning';
-                $logMessage = "⏳ MTN MoMo Test: Transaction en attente de confirmation";
-                break;
-            
-            default:
-                $logLevel = 'info';
-                $logMessage = "📋 MTN MoMo Test: Status - {$status}";
-        }
-
-        // Broadcast callback to test console
-        $this->broadcastCallbackToTestConsole([
-            'provider' => 'MTN',
-            'level' => $logLevel,
-            'message' => $logMessage,
-            'details' => [
-                'referenceId' => $referenceId,
-                'financialTransactionId' => $financialTransactionId,
-                'status' => $status,
-                'reason' => $reason
-            ],
-            'timestamp' => $timestamp,
-            'isSuccess' => $isSuccess
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'MTN MoMo test callback processed successfully',
-            'status' => $status,
-            'reference_id' => $referenceId
-        ]);
-    }
 
     /**
      * Handle MTN Money callback from external server (test environment)

@@ -74,7 +74,6 @@ class StatusTestController extends Controller
             $callbacks = [];
             $cacheKeys = cache()->get('callback_keys', []);
             
-            // Get all cached callbacks
             foreach ($cacheKeys as $key) {
                 $callback = cache()->get($key);
                 if ($callback) {
@@ -82,12 +81,10 @@ class StatusTestController extends Controller
                 }
             }
             
-            // Sort by timestamp (newest first)
             usort($callbacks, function($a, $b) {
                 return strtotime($b['timestamp']) - strtotime($a['timestamp']);
             });
             
-            // Return last 10 callbacks
             $recentCallbacks = array_slice($callbacks, 0, 10);
             
             Log::info("📋 Recent callbacks retrieved", [
@@ -119,10 +116,8 @@ class StatusTestController extends Controller
     public function getTransactionHistory(Request $request): JsonResponse
     {
         try {
-            // Get transaction history from cache (in production, this would be from database)
             $transactions = Cache::get('test_transactions', []);
             
-            // Filter by provider if specified
             if ($request->has('provider')) {
                 $provider = strtoupper($request->provider);
                 $transactions = array_filter($transactions, function($transaction) use ($provider) {
@@ -130,12 +125,10 @@ class StatusTestController extends Controller
                 });
             }
             
-            // Sort by timestamp (newest first)
             usort($transactions, function($a, $b) {
                 return strtotime($b['timestamp']) - strtotime($a['timestamp']);
             });
             
-            // Limit results
             $limit = min($request->get('limit', 20), 50);
             $transactions = array_slice($transactions, 0, $limit);
             
@@ -178,7 +171,6 @@ class StatusTestController extends Controller
                 'processing_time_ms' => $transactionData['processing_time_ms'] ?? null
             ];
             
-            // Keep only last 100 transactions
             if (count($transactions) > 100) {
                 $transactions = array_slice($transactions, -100);
             }

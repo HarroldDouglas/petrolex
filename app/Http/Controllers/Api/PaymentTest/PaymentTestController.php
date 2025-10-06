@@ -26,7 +26,13 @@ class PaymentTestController extends Controller
         $startTime = microtime(true);
         
         // Get validated data from the request
-        $paymentData = $request->getPaymentData();
+        $paymentData = [
+            'phone_number' => $request->validated('phone_number'),
+            'amount' => $request->validated('amount'),
+            'external_id' => $request->validated('external_id'),
+            'test_mode' => $request->validated('test_mode', PaymentTestConstants::MODE_SANDBOX),
+            'reference' => $request->validated('reference') ?? 'Petrolex Test Payment - ' . now()->format('Y-m-d H:i:s')
+        ];
         
         $logContext = [
             'provider' => $provider,

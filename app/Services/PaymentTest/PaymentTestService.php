@@ -127,6 +127,88 @@ class PaymentTestService
     }
 
     /**
+     * Process callback using appropriate gateway
+     */
+    public function processCallback(string $provider, array $callbackData): array
+    {
+        try {
+            Log::info("📞 PaymentTestService: Processing {$provider} callback", [
+                'service' => 'PaymentTestService',
+                'method' => 'processCallback',
+                'provider' => $provider,
+                'data_keys' => array_keys($callbackData)
+            ]);
+
+            $gateway = $this->createGateway($provider, PaymentTestConstants::MODE_LIVE);
+            return $gateway->handleCallback($callbackData);
+            
+        } catch (Exception $e) {
+            Log::error("💥 Callback processing failed", [
+                'provider' => $provider,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'callback_data' => $callbackData
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => 'Callback processing failed',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Generate callback logs for frontend display
+     */
+    public function generateCallbackLogs(string $provider, array $callbackData, string $statusCategory): array
+    {
+        $logs = [];
+        $timestamp = now()->toISOString();
+        $providerName = strtoupper($provider);
+
+        // Initial log
+        $logs[] = ['level' => 'info', 'message' => "📞 {$providerName} callback received", 'timestamp' => $timestamp];
+
+        // Status-based logs
+        switch ($statusCategory) {
+            case PaymentTestConstants::STATUS_SUCCESSFUL:
+                $logs[] = ['level' => 'success', 'message' => "🎉 {$providerName}: Transaction confirmée avec succès!", 'timestamp' => $timestamp];
+                break;
+            case PaymentTestConstants::STATUS_FAILED:
+                $reason = $callbackData['reason'] ?? $callbackData['message'] ?? 'Unknown error';
+                $logs[] = ['level' => 'error', 'message' => "❌ {$providerName}: Transaction échouée - {$reason}", 'timestamp' => $timestamp];
+                break;
+            case PaymentTestConstants::STATUS_PENDING:
+                $logs[] = ['level' => 'warning', 'message' => "⏳ {$providerName}: Transaction en cours de traitement", 'timestamp' => $timestamp];
+                break;
+            default:
+                $status = $callbackData['status'] ?? 'UNKNOWN';
+                $logs[] = ['level' => 'info', 'message' => "📋 {$providerName}: Status - {$status}", 'timestamp' => $timestamp];
+        }
+
+        // Add transaction details
+        if ($provider === PaymentTestConstants::PROVIDER_MTN) {
+            if (isset($callbackData['reference_id'])) {
+                $logs[] = ['level' => 'info', 'message' => "🔗 Reference ID: {$callbackData['reference_id']}", 'timestamp' => $timestamp];
+            }
+            if (isset($callbackData['financial_transaction_id'])) {
+                $logs[] = ['level' => 'info', 'message' => "🏦 Financial Transaction ID: {$callbackData['financial_transaction_id']}", 'timestamp' => $timestamp];
+            }
+        } elseif ($provider === PaymentTestConstants::PROVIDER_ORANGE) {
+            if (isset($callbackData['pay_token'])) {
+                $logs[] = ['level' => 'info', 'message' => "🎫 Pay Token: {$callbackData['pay_token']}", 'timestamp' => $timestamp];
+            }
+            if (isset($callbackData['transaction_id'])) {
+                $logs[] = ['level' => 'info', 'message' => "🆔 Transaction ID: {$callbackData['transaction_id']}", 'timestamp' => $timestamp];
+            }
+        }
+
+        return $logs;
+    }
+
+    /**
      * Create gateway instance for provider
      */
     protected function createGateway(string $provider, string $testMode): MTNMoneyTestGateway|OrangeMoneyTestGateway

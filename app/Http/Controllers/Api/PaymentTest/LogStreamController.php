@@ -26,7 +26,6 @@ class LogStreamController extends Controller
                 ]);
             }
 
-            // Get the last N lines from the log file
             $lineCount = $request->get('lines', 100); // Default 100 lines for test environment
             $lines = $this->getLastLines($logFile, min($lineCount, 500)); // Max 500 lines
             $parsedLogs = [];
@@ -40,7 +39,6 @@ class LogStreamController extends Controller
                 }
             }
 
-            // Enhanced filtering for payment test logs
             $filterType = $request->get('filter', 'payment');
             
             if ($filterType === 'payment') {
@@ -51,7 +49,6 @@ class LogStreamController extends Controller
                 $parsedLogs = $this->filterCallbackLogs($parsedLogs);
             }
 
-            // Sort by timestamp (newest first)
             usort($parsedLogs, function($a, $b) {
                 return strtotime($b['timestamp']) - strtotime($a['timestamp']);
             });
