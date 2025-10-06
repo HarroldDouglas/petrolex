@@ -1,8 +1,8 @@
 // Payment Test Configuration
 const PAYMENT_CONFIG = {
     endpoints: {
-        mtn: '/api/payment/test/mtn',
-        orange: '/api/payment/test/orange'
+        mtn: '/api/test/payment/mtn',
+        orange: '/api/test/payment/orange'
     },
     
     // Test phone numbers for different scenarios
@@ -92,7 +92,7 @@ class PaymentConsole {
         setInterval(async () => {
             try {
                 // Poll for callbacks
-                const callbackResponse = await fetch('/api/payment/test/callbacks/recent', {
+                const callbackResponse = await fetch('/api/test/payment/callbacks/recent', {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
@@ -114,7 +114,7 @@ class PaymentConsole {
                 }
 
                 // Poll for recent backend logs (payment-related only)
-                const logResponse = await fetch('/api/logs/recent?payment_only=1', {
+                const logResponse = await fetch('/api/test/payment/logs/recent?filter=payment&lines=50', {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
@@ -535,7 +535,7 @@ async function checkTransactionStatus() {
         console.log(`🔍 Checking status for transaction: ${transaction.id}`, 'info');
         
         // Call the appropriate status endpoint
-        const endpoint = `/api/payment/test/${transaction.provider}/status/${transaction.reference_id || transaction.external_id}`;
+        const endpoint = `/api/test/payment/status/${transaction.provider}/${transaction.reference_id || transaction.external_id}`;
         
         const response = await fetch(endpoint, {
             headers: {
