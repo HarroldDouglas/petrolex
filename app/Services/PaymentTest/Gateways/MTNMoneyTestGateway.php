@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+use function Illuminate\Log\log;
+
 /**
  * MTN Money Gateway for Payment Testing
  *
@@ -22,11 +24,11 @@ class MTNMoneyTestGateway
 
     public function __construct(string $testEnvironment = 'sandbox')
     {
-        $this->config = config('mtnmoney');
         $this->testEnvironment = $testEnvironment;
+         $this->config = config('mtnmoney', []);
 
-        if (!$this->config || !is_array($this->config)) {
-            throw new \Exception('MTN MoMo configuration not found. Please ensure config/mtnmoney.php exists and is properly configured, or pass config directly to constructor.');
+        if (empty($this->config)) {
+            log::warning('⚠️ MTNMoneyTestGateway: mtnmoney config is empty!');
         }
 
         if (!isset($this->config['base_url']) || empty($this->config['base_url'])) {
