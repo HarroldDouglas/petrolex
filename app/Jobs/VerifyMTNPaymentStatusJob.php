@@ -31,146 +31,90 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
 
     public function handle(): void
     {
-        Log::info('🔍 MTN Payment Status Verification Started', [
+        Log::info('� MTN Payment Verification Job Started', [
             'reference_id' => $this->referenceId,
             'attempt' => $this->attemptCount,
             'max_attempts' => self::MAX_ATTEMPTS,
-            'config_check' => [
-                'mtn_config_exists' => config('mtnmoney') !== null,
-                'mtn_base_url' => config('mtnmoney.base_url'),
-            ],
         ]);
 
         try {
-            $transactionId = $this->getTransactionId();
-            if (!$transactionId) {
-                Log::error('❌ MTN Payment Status Check Failed: Transaction ID not found', [
-                    'payment_id' => $this->referenceId,
-                ]);
-                return;
-            }
-
-            // Initialize MTN gateway with proper configuration
-            try {
-                $mtnGateway = new MTNMoneyTestGateway('live'); // Use live for status checks
-            } catch (\Exception $initException) {
-                Log::error('❌ Failed to initialize MTN Gateway', [
-                    'reference_id' => $this->referenceId,
-                    'attempt' => $this->attemptCount,
-                    'error' => $initException->getMessage(),
-                ]);
-                
-                // Retry if not at max attempts
-                if ($this->attemptCount < self::MAX_ATTEMPTS) {
-                    $this->scheduleNextAttempt();
-                } else {
-                    $this->handleMaxAttemptsReached('GATEWAY_INIT_ERROR');
-                }
-                return;
-            }
+            // Initialize MTN gateway
+            $mtnGateway = new MTNMoneyTestGateway();
             
-            $statusResponse = $mtnGateway->getTransactionStatus($transactionId);
+            // Call the gateway's verify method
+            $result = $mtnGateway->verify($this->referenceId, $this->attemptCount);
             
-            Log::info('📊 MTN Status Check Response', [
-                'payment_id' => $this->referenceId,
-                'attempt' => $this->attemptCount,
-                'transaction_id' => $transactionId,
-                'response' => $statusResponse,
-            ]);
-
-            if (!$statusResponse['success']) {
-                Log::warning('⚠️ MTN Status Check API Failed', [
-                    'payment_id' => $this->referenceId,
-                    'attempt' => $this->attemptCount,
-                    'error' => $statusResponse['error'] ?? 'Unknown error',
-                ]);
-
-                if ($this->attemptCount < self::MAX_ATTEMPTS) {
-                    $this->scheduleNextAttempt();
-                } else {
-                    $this->handleMaxAttemptsReached('API_ERROR');
-                }
-                return;
-            }
-
-            $currentStatus = strtoupper($statusResponse['status'] ?? 'UNKNOWN');
-            
-            if ($this->isSuccessfulStatus($currentStatus)) {
-                $this->handleSuccessfulPayment($currentStatus, $statusResponse);
-                return;
-            }
-
-            if ($this->isFailedStatus($currentStatus)) {
-                $this->handleFailedPayment($currentStatus, $statusResponse);
-                return;
-            }
-
-            if ($this->isPendingStatus($currentStatus)) {
-                if ($this->attemptCount < self::MAX_ATTEMPTS) {
-                    Log::info('⏳ MTN Payment Still Pending, Scheduling Next Check', [
-                        'payment_id' => $this->referenceId,
+            // Handle the result
+            if (!$result['success']) {
+                // Verification failed - check if should retry
+                if ($result['should_retry']) {
+                    Log::info('� MTN Verification Failed, Scheduling Retry', [
+                        'reference_id' => $this->referenceId,
                         'attempt' => $this->attemptCount,
-                        'status' => $currentStatus,
-                        'next_check_in' => self::CHECK_INTERVAL . ' seconds',
+                        'status' => $result['status'],
+                        'next_attempt_in' => self::CHECK_INTERVAL . ' seconds',
                     ]);
                     
                     $this->scheduleNextAttempt();
                 } else {
-                    $this->handleMaxAttemptsReached('TIMEOUT_PENDING');
+                    Log::error('🏁 MTN Verification Completed - Failed', [
+                        'reference_id' => $this->referenceId,
+                        'final_status' => $result['status'],
+                        'message' => $result['message'],
+                        'attempts' => $result['total_attempts'] ?? $this->attemptCount,
+                    ]);
                 }
                 return;
             }
 
-            Log::warning('⚠️ Unknown MTN Payment Status', [
-                'payment_id' => $this->referenceId,
-                'attempt' => $this->attemptCount,
-                'status' => $currentStatus,
-            ]);
-
-            if ($this->attemptCount < self::MAX_ATTEMPTS) {
+            // Verification was successful or pending
+            if ($result['should_retry']) {
+                Log::info('⏳ MTN Payment Still Pending, Scheduling Next Check', [
+                    'reference_id' => $this->referenceId,
+                    'attempt' => $this->attemptCount,
+                    'status' => $result['status'],
+                    'next_check_in' => self::CHECK_INTERVAL . ' seconds',
+                ]);
+                
                 $this->scheduleNextAttempt();
             } else {
-                $this->handleMaxAttemptsReached('UNKNOWN_STATUS');
+                Log::info('🏁 MTN Verification Completed - Success', [
+                    'reference_id' => $this->referenceId,
+                    'final_status' => $result['status'],
+                    'message' => $result['message'],
+                    'attempts' => $result['total_attempts'] ?? $this->attemptCount,
+                    'total_time' => $result['total_time_seconds'] ?? 'N/A',
+                ]);
             }
 
         } catch (\Exception $e) {
-            Log::error('❌ MTN Payment Status Verification Exception', [
-                'payment_id' => $this->referenceId,
+            Log::error('💥 MTN Verification Job Exception', [
+                'reference_id' => $this->referenceId,
                 'attempt' => $this->attemptCount,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
+            // Retry on exception if not at max attempts
             if ($this->attemptCount < self::MAX_ATTEMPTS) {
+                Log::info('🔄 Scheduling Retry After Exception', [
+                    'reference_id' => $this->referenceId,
+                    'current_attempt' => $this->attemptCount,
+                    'next_attempt' => $this->attemptCount + 1,
+                ]);
+                
                 $this->scheduleNextAttempt();
             } else {
-                $this->handleMaxAttemptsReached('EXCEPTION');
+                Log::error('🚫 Max Attempts Reached After Exception', [
+                    'reference_id' => $this->referenceId,
+                    'max_attempts' => self::MAX_ATTEMPTS,
+                    'final_error' => $e->getMessage(),
+                ]);
             }
         }
     }
 
-    private function getTransactionId(): ?string
-    {
-        return $this->referenceId;
-    }
-
-    private function isSuccessfulStatus(string $status): bool
-    {
-        $successStatuses = config('payment.status_mappings.success_statuses', []);
-        return in_array($status, $successStatuses);
-    }
-
-    private function isFailedStatus(string $status): bool
-    {
-        $failedStatuses = config('payment.status_mappings.failed_statuses', []);
-        return in_array($status, $failedStatuses);
-    }
-
-    private function isPendingStatus(string $status): bool
-    {
-        $pendingStatuses = config('payment.status_mappings.pending_statuses', []);
-        return in_array($status, $pendingStatuses);
-    }
+    
 
     private function scheduleNextAttempt(): void
     {
@@ -186,61 +130,7 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
         dispatch(new self($this->referenceId, $nextAttempt));
     }
 
-    private function handleSuccessfulPayment(string $status, array $response): void
-    {
-        $totalTime = $this->attemptCount * self::CHECK_INTERVAL;
-        
-        Log::info('✅ MTN Payment Verification Successful', [
-            'payment_id' => $this->referenceId,
-            'final_status' => $status,
-            'total_attempts' => $this->attemptCount,
-            'total_time_seconds' => $totalTime,
-            'response' => $response,
-        ]);
 
-        // TODO: Update payment record in database when requirement is ready
-        // $this->updatePaymentStatus($status, 'success', $response);
-    }
-
-    private function handleFailedPayment(string $status, array $response): void
-    {
-        $totalTime = $this->attemptCount * self::CHECK_INTERVAL;
-        
-        Log::error('❌ MTN Payment Verification Failed', [
-            'payment_id' => $this->referenceId,
-            'final_status' => $status,
-            'total_attempts' => $this->attemptCount,
-            'total_time_seconds' => $totalTime,
-            'response' => $response,
-        ]);
-
-        // TODO: Update payment record in database when requirement is ready
-        // $this->updatePaymentStatus($status, 'failed', $response);
-    }
-
-    private function handleMaxAttemptsReached(string $reason): void
-    {
-        $totalTime = self::MAX_ATTEMPTS * self::CHECK_INTERVAL;
-        
-        Log::error('⏰ MTN Payment Verification Timeout', [
-            'payment_id' => $this->referenceId,
-            'reason' => $reason,
-            'max_attempts_reached' => self::MAX_ATTEMPTS,
-            'total_time_seconds' => $totalTime,
-            'total_time_minutes' => $totalTime / 60,
-        ]);
-
-        // Consider payment as failed after timeout
-        // TODO: Update payment record in database when requirement is ready
-        // $this->updatePaymentStatus('FAILED', 'timeout', ['reason' => $reason]);
-    }
-
-    // TODO: Implement when database update requirement is ready
-    // private function updatePaymentStatus(string $status, string $result, array $data): void
-    // {
-    //     // Update payment record with final status
-    //     // This will be implemented when database updates are required
-    // }
 
     /**
      * Handle job failure

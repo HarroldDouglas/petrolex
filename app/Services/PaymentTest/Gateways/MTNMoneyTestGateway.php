@@ -478,4 +478,203 @@ class MTNMoneyTestGateway
     {
         return $this->initPayment($paymentData);
     }
+
+    /**
+     * Verify payment status with polling logic
+     * 
+     * @param string $referenceId The MTN reference ID to verify
+     * @param int $attemptCount Current attempt number (for recursive calls)
+     * @return array Verification result with status and details
+     */
+    public function verify(string $referenceId, int $attemptCount = 1): array
+    {
+        $maxAttempts = 18; // 3 minutes / 10 seconds = 18 attempts
+        
+        Log::info('🔍 MTN Payment Status Verification', [
+            'reference_id' => $referenceId,
+            'attempt' => $attemptCount,
+            'max_attempts' => $maxAttempts,
+        ]);
+
+        try {
+            // Get current status from MTN API
+            $statusResponse = $this->getTransactionStatus($referenceId);
+            
+            Log::info('📊 MTN Status Response', [
+                'reference_id' => $referenceId,
+                'attempt' => $attemptCount,
+                'response' => $statusResponse,
+            ]);
+
+            if (!$statusResponse['success']) {
+                Log::warning('⚠️ MTN Status Check Failed', [
+                    'reference_id' => $referenceId,
+                    'attempt' => $attemptCount,
+                    'error' => $statusResponse['error'] ?? 'Unknown error',
+                ]);
+
+                return [
+                    'success' => false,
+                    'status' => 'API_ERROR',
+                    'message' => 'Status check API failed',
+                    'error' => $statusResponse['error'] ?? 'Unknown API error',
+                    'attempt' => $attemptCount,
+                    'should_retry' => $attemptCount < $maxAttempts,
+                ];
+            }
+
+            $currentStatus = strtoupper($statusResponse['status'] ?? 'UNKNOWN');
+            
+            // Check if status indicates success
+            if ($this->isSuccessfulStatus($currentStatus)) {
+                $totalTime = $attemptCount * 10; // 10 seconds per attempt
+                
+                Log::info('✅ MTN Payment Verification Successful', [
+                    'reference_id' => $referenceId,
+                    'final_status' => $currentStatus,
+                    'total_attempts' => $attemptCount,
+                    'total_time_seconds' => $totalTime,
+                ]);
+
+                return [
+                    'success' => true,
+                    'status' => $currentStatus,
+                    'message' => 'Payment verified as successful',
+                    'final_status' => $currentStatus,
+                    'total_attempts' => $attemptCount,
+                    'total_time_seconds' => $totalTime,
+                    'should_retry' => false,
+                    'response_data' => $statusResponse,
+                ];
+            }
+
+            // Check if status indicates failure
+            if ($this->isFailedStatus($currentStatus)) {
+                $totalTime = $attemptCount * 10;
+                
+                Log::error('❌ MTN Payment Verification Failed', [
+                    'reference_id' => $referenceId,
+                    'final_status' => $currentStatus,
+                    'total_attempts' => $attemptCount,
+                    'total_time_seconds' => $totalTime,
+                ]);
+
+                return [
+                    'success' => false,
+                    'status' => $currentStatus,
+                    'message' => 'Payment failed',
+                    'final_status' => $currentStatus,
+                    'total_attempts' => $attemptCount,
+                    'total_time_seconds' => $totalTime,
+                    'should_retry' => false,
+                    'response_data' => $statusResponse,
+                ];
+            }
+
+            // Status is still pending
+            if ($this->isPendingStatus($currentStatus) || $currentStatus === 'UNKNOWN') {
+                // Check if max attempts reached
+                if ($attemptCount >= $maxAttempts) {
+                    $totalTime = $maxAttempts * 10;
+                    
+                    Log::error('⏰ MTN Payment Verification Timeout', [
+                        'reference_id' => $referenceId,
+                        'final_status' => 'TIMEOUT_PENDING',
+                        'max_attempts_reached' => $maxAttempts,
+                        'total_time_seconds' => $totalTime,
+                    ]);
+
+                    return [
+                        'success' => false,
+                        'status' => 'TIMEOUT_PENDING',
+                        'message' => 'Payment verification timed out - considered failed',
+                        'final_status' => 'FAILED',
+                        'total_attempts' => $attemptCount,
+                        'total_time_seconds' => $totalTime,
+                        'should_retry' => false,
+                        'timeout_reason' => 'Still pending after 3 minutes',
+                    ];
+                }
+
+                // Continue pending, should retry
+                Log::info('⏳ MTN Payment Still Pending', [
+                    'reference_id' => $referenceId,
+                    'attempt' => $attemptCount,
+                    'status' => $currentStatus,
+                    'next_check_in' => '10 seconds',
+                ]);
+
+                return [
+                    'success' => true,
+                    'status' => $currentStatus,
+                    'message' => 'Payment still pending, continue checking',
+                    'current_status' => $currentStatus,
+                    'attempt' => $attemptCount,
+                    'should_retry' => true,
+                    'next_attempt' => $attemptCount + 1,
+                ];
+            }
+
+            // Unknown status - treat as pending but log warning
+            Log::warning('⚠️ Unknown MTN Payment Status', [
+                'reference_id' => $referenceId,
+                'attempt' => $attemptCount,
+                'unknown_status' => $currentStatus,
+            ]);
+
+            return [
+                'success' => true,
+                'status' => 'UNKNOWN_PENDING',
+                'message' => 'Unknown status detected, treating as pending',
+                'current_status' => $currentStatus,
+                'attempt' => $attemptCount,
+                'should_retry' => $attemptCount < $maxAttempts,
+                'next_attempt' => $attemptCount + 1,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('❌ MTN Payment Verification Exception', [
+                'reference_id' => $referenceId,
+                'attempt' => $attemptCount,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'status' => 'EXCEPTION',
+                'message' => 'Verification failed due to exception',
+                'error' => $e->getMessage(),
+                'attempt' => $attemptCount,
+                'should_retry' => $attemptCount < $maxAttempts,
+            ];
+        }
+    }
+
+    /**
+     * Check if status indicates success
+     */
+    private function isSuccessfulStatus(string $status): bool
+    {
+        $successStatuses = config('payment.status_mappings.success_statuses', []);
+        return in_array($status, $successStatuses);
+    }
+
+    /**
+     * Check if status indicates failure
+     */
+    private function isFailedStatus(string $status): bool
+    {
+        $failedStatuses = config('payment.status_mappings.failed_statuses', []);
+        return in_array($status, $failedStatuses);
+    }
+
+    /**
+     * Check if status indicates pending
+     */
+    private function isPendingStatus(string $status): bool
+    {
+        $pendingStatuses = config('payment.status_mappings.pending_statuses', []);
+        return in_array($status, $pendingStatuses);
+    }
 }
