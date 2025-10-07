@@ -20,9 +20,9 @@ class MTNMoneyTestGateway
     protected ?string $accessToken = null;
     protected string $testEnvironment;
 
-    public function __construct(string $testEnvironment = 'sandbox', ?array $config = null)
+    public function __construct(string $testEnvironment = 'sandbox')
     {
-        $this->config = $config ?? config('mtnmoney');
+        $this->config = config('mtnmoney');
         $this->testEnvironment = $testEnvironment;
 
         if (!$this->config || !is_array($this->config)) {
@@ -37,7 +37,7 @@ class MTNMoneyTestGateway
             'environment' => $testEnvironment,
             'base_url' => $this->config['base_url'],
             'config_loaded' => true,
-            'config_source' => $config !== null ? 'parameter' : 'laravel_config',
+            'config_source' => 'laravel_config',
         ]);
     }
 
@@ -142,7 +142,7 @@ class MTNMoneyTestGateway
                     'external_id' => $paymentData['external_id'],
                     'test_environment' => $this->testEnvironment,
                 ]);
-
+Log::info('Config', [$this->config]);
                 VerifyMTNPaymentStatusJob::dispatch($referenceId, $this->config);
                 
                 Log::info('📅 MTN Payment Status Verification Job Dispatched', [
