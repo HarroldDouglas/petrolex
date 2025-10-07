@@ -447,23 +447,98 @@ function clearLogs() {
 }
 
 function refreshLogs() {
-    // Silent refresh - no console spam
+    // Update status indicator to show refreshing
     const statusIndicator = document.querySelector('.status-indicator');
     if (statusIndicator) {
-        statusIndicator.className = 'status-indicator status-success';
+        statusIndicator.className = 'status-indicator status-warning';
         statusIndicator.parentElement.innerHTML = `
-            <span class="status-indicator status-success"></span>
-            Connecté - Actualisé
+            <span class="status-indicator status-warning"></span>
+            Actualisation...
         `;
-        
-        // Reset to normal after 2 seconds
-        setTimeout(() => {
-            statusIndicator.parentElement.innerHTML = `
-                <span class="status-indicator status-success"></span>
-                Connecté
-            `;
-        }, 2000);
     }
+
+    // Fetch fresh logs from server
+    fetch('/api/test/payment/logs/recent?limit=50')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                // Clear existing logs
+                clearLogs();
+                
+                // Add fresh logs
+                if (data.data.logs && data.data.logs.length > 0) {
+                    data.data.logs.forEach(log => {
+                        // Determine log type based on content and level
+                        let logType = 'info';
+                        if (log.level) {
+                            switch(log.level.toLowerCase()) {
+                                case 'error': logType = 'error'; break;
+                                case 'warning': logType = 'warning'; break;
+                                case 'info': logType = 'info'; break;
+                                default: logType = 'info';
+                            }
+                        }
+                        
+                        // Auto-detect type from message content
+                        if (log.message && typeof log.message === 'string') {
+                            if (log.message.includes('ERROR') || log.message.includes('❌')) {
+                                logType = 'error';
+                            } else if (log.message.includes('SUCCESS') || log.message.includes('✅')) {
+                                logType = 'success';
+                            } else if (log.message.includes('PENDING') || log.message.includes('⏳')) {
+                                logType = 'pending';
+                            }
+                        }
+                        
+                        console.log(log.message || JSON.stringify(log), logType);
+                    });
+                    
+                    console.log(`✅ ${data.data.logs.length} logs actualisés avec succès`, 'success');
+                } else {
+                    console.log('ℹ️ Aucun log récent trouvé', 'info');
+                }
+                
+                // Update status indicator to success
+                if (statusIndicator) {
+                    statusIndicator.className = 'status-indicator status-success';
+                    statusIndicator.parentElement.innerHTML = `
+                        <span class="status-indicator status-success"></span>
+                        Connecté - Actualisé
+                    `;
+                    
+                    // Reset to normal after 2 seconds
+                    setTimeout(() => {
+                        statusIndicator.parentElement.innerHTML = `
+                            <span class="status-indicator status-success"></span>
+                            Connecté
+                        `;
+                    }, 2000);
+                }
+            } else {
+                throw new Error(data.message || 'Erreur lors du chargement des logs');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'actualisation des logs:', error);
+            console.log(`❌ Erreur: ${error.message}`, 'error');
+            
+            // Update status indicator to error
+            if (statusIndicator) {
+                statusIndicator.className = 'status-indicator status-error';
+                statusIndicator.parentElement.innerHTML = `
+                    <span class="status-indicator status-error"></span>
+                    Erreur d'actualisation
+                `;
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    statusIndicator.parentElement.innerHTML = `
+                        <span class="status-indicator status-success"></span>
+                        Connecté
+                    `;
+                }, 3000);
+            }
+        });
 }
 
 // Test number helpers

@@ -2,6 +2,7 @@
 
 namespace App\Services\PaymentTest\Gateways;
 
+use App\Jobs\VerifyMTNPaymentStatusJob;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -132,6 +133,15 @@ class MTNMoneyTestGateway
                     'test_environment' => $this->testEnvironment,
                 ]);
 
+                // Dispatch MTN payment status verification job
+                VerifyMTNPaymentStatusJob::dispatch($referenceId);
+                
+                Log::info('📅 MTN Payment Status Verification Job Dispatched', [
+                    'reference_id' => $referenceId,
+                    'external_id' => $paymentData['external_id'],
+                    'verification_schedule' => 'Every 10 seconds for 3 minutes (max 18 attempts)',
+                ]);
+
                 return [
                     'success' => true,
                     'reference_id' => $referenceId,
@@ -143,6 +153,7 @@ class MTNMoneyTestGateway
                     'phone' => $formattedPhone,
                     'test_environment' => $this->testEnvironment,
                     'mtn_response_status' => $response->status(),
+                    'status_verification' => 'Job scheduled for automatic status checking',
                 ];
             }
 
