@@ -144,7 +144,7 @@ class MTNMoneyTestGateway
                     'external_id' => $paymentData['external_id'],
                     'test_environment' => $this->testEnvironment,
                 ]);
-Log::info('Config', [$this->config]);
+
                 VerifyMTNPaymentStatusJob::dispatch($referenceId, $this->config);
                 
                 Log::info('📅 MTN Payment Status Verification Job Dispatched', [
