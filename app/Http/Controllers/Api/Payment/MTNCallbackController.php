@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Payment\MTNCallbackRequest;
-use App\Services\PaymentTest\CallbackNormalizationService;
 use App\Services\PaymentTest\CallbackStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -14,7 +13,6 @@ use Throwable;
 class MTNCallbackController extends Controller
 {
     public function __construct(
-        private readonly CallbackNormalizationService $normalizationService,
         private readonly CallbackStorageService $storageService
     ) {}
 
@@ -49,9 +47,33 @@ class MTNCallbackController extends Controller
 
     private function processCallback(array $callbackData): array
     {
-        $normalizedData = $this->normalizationService->normalize('mtn', $callbackData);
+        $normalizedData = $this->normalizeMTNCallback($callbackData);
 
         return $this->storageService->store('mtn', $callbackData, $normalizedData);
+    }
+
+    /**
+     * Normalize MTN Mobile Money callback data
+     */
+    private function normalizeMTNCallback(array $data): array
+    {
+        return [
+            'transaction_id' => $data['financialTransactionId'] ?? 'N/A',
+            'external_id' => $data['externalId'] ?? 'N/A',
+            'reference_id' => $data['externalId'] ?? 'N/A',
+            'status' => $data['status'] ?? 'UNKNOWN',
+            'amount' => $data['amount'] ?? '0',
+            'currency' => $data['currency'] ?? config('payment.defaults.currency', 'XAF'),
+            'payer_phone' => $data['payer']['partyId'] ?? 'N/A',
+            'payer_type' => $data['payer']['partyIdType'] ?? 'N/A',
+            'reason' => $data['reason'] ?? null,
+            'payer_message' => $data['payerMessage'] ?? null,
+            'payee_note' => $data['payeeNote'] ?? null,
+            'provider_specific' => [
+                'financialTransactionId' => $data['financialTransactionId'] ?? null,
+                'payer' => $data['payer'] ?? null,
+            ],
+        ];
     }
 
     private function logIncomingCallback(MTNCallbackRequest $request): void

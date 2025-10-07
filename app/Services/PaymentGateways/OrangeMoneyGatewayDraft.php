@@ -138,7 +138,6 @@ class OrangeMoneyGatewayDraft
                 'amount' => $serverRequestData['amount'],
             ]);
 
-            // Call external payment server
             $response = Http::timeout($timeout)->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
@@ -226,75 +225,5 @@ class OrangeMoneyGatewayDraft
         }
     }
 
-    /**
-     * Simulate payment for testing
-     */
-    public function simulatePayment(array $paymentData): array
-    {
-        $phoneNumber = $paymentData['phone_number'];
-        $amount = $paymentData['amount'];
 
-        Log::info('Orange Money: Starting payment simulation', [
-            'phone' => $phoneNumber,
-            'amount' => $amount,
-        ]);
-
-        // Simulate processing delay
-        usleep(300000); // 0.3 second delay
-
-        // Simulate different responses based on test numbers
-        if (in_array($phoneNumber, ['699000001', '699000010'])) {
-            Log::info('Orange Money: Simulating success scenario', ['phone' => $phoneNumber]);
-
-            return [
-                'success' => true,
-                'status' => 'SUCCESS',
-                'transaction_id' => 'OM_'.uniqid(),
-                'order_id' => $paymentData['external_id'] ?? uniqid('OM_'),
-                'message' => 'Payment completed successfully',
-                'amount' => $amount,
-                'phone_number' => $phoneNumber,
-            ];
-        }
-
-        if (in_array($phoneNumber, ['699000002', '699000020'])) {
-            Log::info('Orange Money: Simulating pending scenario', ['phone' => $phoneNumber]);
-
-            return [
-                'success' => true,
-                'status' => 'PENDING',
-                'transaction_id' => 'OM_'.uniqid(),
-                'order_id' => $paymentData['external_id'] ?? uniqid('OM_'),
-                'message' => 'Payment is being processed',
-                'amount' => $amount,
-                'phone_number' => $phoneNumber,
-            ];
-        }
-
-        if (in_array($phoneNumber, ['699000003', '699000030'])) {
-            Log::warning('Orange Money: Simulating failure scenario', ['phone' => $phoneNumber]);
-
-            return [
-                'success' => false,
-                'status' => 'FAILED',
-                'error' => 'Insufficient funds',
-                'message' => 'Payment failed - Insufficient funds',
-                'amount' => $amount,
-                'phone_number' => $phoneNumber,
-            ];
-        }
-
-        // Default success for other numbers
-        Log::info('Orange Money: Simulating default success scenario', ['phone' => $phoneNumber]);
-
-        return [
-            'success' => true,
-            'status' => 'SUCCESS',
-            'transaction_id' => 'OM_'.uniqid(),
-            'order_id' => $paymentData['external_id'] ?? uniqid('OM_'),
-            'message' => 'Payment completed successfully',
-            'amount' => $amount,
-            'phone_number' => $phoneNumber,
-        ];
-    }
 }

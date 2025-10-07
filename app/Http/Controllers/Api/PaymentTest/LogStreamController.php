@@ -15,14 +15,14 @@ class LogStreamController extends Controller
     public function getRecentLogs(Request $request): JsonResponse
     {
         try {
-            $logFile = storage_path('logs/laravel-'.date('Y-m-d').'.log');
-
-            if (! File::exists($logFile)) {
+            $logFile = storage_path('logs/laravel-' . date('Y-m-d') . '.log');
+            
+            if (!File::exists($logFile)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No log file found for today',
                     'logs' => [],
-                    'timestamp' => now()->toISOString(),
+                    'timestamp' => now()->toISOString()
                 ]);
             }
 
@@ -31,10 +31,8 @@ class LogStreamController extends Controller
             $parsedLogs = [];
 
             foreach ($lines as $line) {
-                if (empty(trim($line))) {
-                    continue;
-                }
-
+                if (empty(trim($line))) continue;
+                
                 $logEntry = $this->parseLogLine($line);
                 if ($logEntry) {
                     $parsedLogs[] = $logEntry;
@@ -42,7 +40,7 @@ class LogStreamController extends Controller
             }
 
             $filterType = $request->get('filter', 'payment');
-
+            
             if ($filterType === 'payment') {
                 $parsedLogs = $this->filterPaymentLogs($parsedLogs);
             } elseif ($filterType === 'test') {
@@ -51,7 +49,7 @@ class LogStreamController extends Controller
                 $parsedLogs = $this->filterCallbackLogs($parsedLogs);
             }
 
-            usort($parsedLogs, function ($a, $b) {
+            usort($parsedLogs, function($a, $b) {
                 return strtotime($b['timestamp']) - strtotime($a['timestamp']);
             });
 
@@ -60,14 +58,14 @@ class LogStreamController extends Controller
                 'logs' => array_values($parsedLogs),
                 'count' => count($parsedLogs),
                 'filter' => $filterType,
-                'timestamp' => now()->toISOString(),
+                'timestamp' => now()->toISOString()
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch payment test logs',
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -78,26 +76,24 @@ class LogStreamController extends Controller
     public function getLivePaymentLogs(Request $request): JsonResponse
     {
         try {
-            // Get logs from the last 5 minutes for live streaming
             $since = now()->subMinutes(5)->format('Y-m-d H:i:s');
             $logs = $this->getRecentLogsSince($since);
-
-            // Filter for payment-related activities
+            
             $paymentLogs = $this->filterPaymentLogs($logs);
-
+            
             return response()->json([
                 'success' => true,
                 'logs' => $paymentLogs,
                 'count' => count($paymentLogs),
                 'since' => $since,
-                'timestamp' => now()->toISOString(),
+                'timestamp' => now()->toISOString()
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch live payment logs',
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -108,13 +104,13 @@ class LogStreamController extends Controller
     public function getPaymentTestStats(Request $request): JsonResponse
     {
         try {
-            $logFile = storage_path('logs/laravel-'.date('Y-m-d').'.log');
-
-            if (! File::exists($logFile)) {
+            $logFile = storage_path('logs/laravel-' . date('Y-m-d') . '.log');
+            
+            if (!File::exists($logFile)) {
                 return response()->json([
                     'success' => true,
                     'stats' => $this->getEmptyStats(),
-                    'timestamp' => now()->toISOString(),
+                    'timestamp' => now()->toISOString()
                 ]);
             }
 
@@ -122,10 +118,8 @@ class LogStreamController extends Controller
             $parsedLogs = [];
 
             foreach ($lines as $line) {
-                if (empty(trim($line))) {
-                    continue;
-                }
-
+                if (empty(trim($line))) continue;
+                
                 $logEntry = $this->parseLogLine($line);
                 if ($logEntry && $this->isPaymentLog($logEntry)) {
                     $parsedLogs[] = $logEntry;
@@ -137,14 +131,14 @@ class LogStreamController extends Controller
             return response()->json([
                 'success' => true,
                 'stats' => $stats,
-                'timestamp' => now()->toISOString(),
+                'timestamp' => now()->toISOString()
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to calculate payment test stats',
-                'error' => $e->getMessage(),
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -154,8 +148,7 @@ class LogStreamController extends Controller
      */
     private function parseLogLine(string $line): ?array
     {
-        // Laravel log format: [2025-10-03 15:25:49] local.INFO: Message {"context"} []
-        if (! preg_match('/^\[([^\]]+)\] (\w+)\.(\w+): (.+)/', $line, $matches)) {
+       if (!preg_match('/^\[([^\]]+)\] (\w+)\.(\w+): (.+)/', $line, $matches)) {
             return null;
         }
 
@@ -164,20 +157,18 @@ class LogStreamController extends Controller
         $level = strtolower($matches[3]);
         $messageAndContext = $matches[4];
 
-        // Extract message and context
         $message = $messageAndContext;
         $context = null;
-
+        
         if (strpos($messageAndContext, '{"') !== false) {
             $parts = explode(' {"', $messageAndContext, 2);
             $message = $parts[0];
             if (isset($parts[1])) {
-                $contextStr = '{"'.$parts[1];
+                $contextStr = '{"' . $parts[1];
                 $context = json_decode(trim($contextStr, ' []'), true);
             }
         }
 
-        // Enhanced level mapping for payment tests
         $levelMap = [
             'info' => 'info',
             'error' => 'error',
@@ -185,7 +176,7 @@ class LogStreamController extends Controller
             'debug' => 'info',
             'critical' => 'error',
             'alert' => 'error',
-            'emergency' => 'error',
+            'emergency' => 'error'
         ];
 
         $logEntry = [
@@ -194,10 +185,9 @@ class LogStreamController extends Controller
             'message' => trim($message),
             'environment' => $environment,
             'context' => $context,
-            'raw' => $line,
+            'raw' => $line
         ];
 
-        // Auto-detect payment types and enhance metadata
         $logEntry = $this->enhanceLogEntry($logEntry);
 
         return $logEntry;
@@ -209,15 +199,13 @@ class LogStreamController extends Controller
     private function enhanceLogEntry(array $logEntry): array
     {
         $message = $logEntry['message'];
-
-        // Detect payment providers
+        
         if (stripos($message, 'mtn') !== false || stripos($message, 'momo') !== false) {
             $logEntry['provider'] = 'MTN';
         } elseif (stripos($message, 'orange') !== false) {
             $logEntry['provider'] = 'ORANGE';
         }
 
-        // Detect payment actions
         if (stripos($message, 'payment test initiated') !== false) {
             $logEntry['action'] = 'INITIATE';
         } elseif (stripos($message, 'callback') !== false) {
@@ -228,10 +216,9 @@ class LogStreamController extends Controller
             $logEntry['action'] = 'COMPLETE';
         }
 
-        // Detect status from message
         if (stripos($message, 'PENDING') !== false) {
             $logEntry['payment_status'] = 'PENDING';
-            $logEntry['level'] = 'pending'; // Override level for PENDING
+            $logEntry['level'] = 'pending';
         } elseif (stripos($message, 'SUCCESSFUL') !== false || stripos($message, 'SUCCESS') !== false) {
             $logEntry['payment_status'] = 'SUCCESS';
         } elseif (stripos($message, 'FAILED') !== false || stripos($message, 'FAILURE') !== false) {
@@ -246,7 +233,7 @@ class LogStreamController extends Controller
      */
     private function filterPaymentLogs(array $logs): array
     {
-        return array_filter($logs, function ($log) {
+        return array_filter($logs, function($log) {
             return $this->isPaymentLog($log);
         });
     }
@@ -256,9 +243,8 @@ class LogStreamController extends Controller
      */
     private function filterTestLogs(array $logs): array
     {
-        return array_filter($logs, function ($log) {
+        return array_filter($logs, function($log) {
             $message = strtolower($log['message']);
-
             return stripos($message, 'test') !== false ||
                    stripos($message, 'simulation') !== false ||
                    stripos($message, 'sandbox') !== false;
@@ -270,9 +256,8 @@ class LogStreamController extends Controller
      */
     private function filterCallbackLogs(array $logs): array
     {
-        return array_filter($logs, function ($log) {
+        return array_filter($logs, function($log) {
             $message = strtolower($log['message']);
-
             return stripos($message, 'callback') !== false ||
                    stripos($message, 'external') !== false;
         });
@@ -284,10 +269,10 @@ class LogStreamController extends Controller
     private function isPaymentLog(array $log): bool
     {
         $message = strtolower($log['message']);
-
+        
         $paymentKeywords = [
             'payment', 'mtn', 'orange', 'momo', 'callback', 'transaction',
-            'gateway', 'processing', 'external_id', 'reference_id',
+            'gateway', 'processing', 'external_id', 'reference_id'
         ];
 
         foreach ($paymentKeywords as $keyword) {
@@ -314,7 +299,7 @@ class LogStreamController extends Controller
             'sandbox_payments' => 0,
             'live_payments' => 0,
             'callbacks_received' => 0,
-            'avg_processing_time' => 0,
+            'avg_processing_time' => 0
         ];
 
         $processingTimes = [];
@@ -322,11 +307,9 @@ class LogStreamController extends Controller
         foreach ($logs as $log) {
             $message = strtolower($log['message']);
 
-            // Count payment initiations
             if (stripos($message, 'payment test initiated') !== false) {
                 $stats['total_payments']++;
 
-                // Count by provider
                 if (isset($log['provider'])) {
                     if ($log['provider'] === 'MTN') {
                         $stats['mtn_payments']++;
@@ -335,7 +318,6 @@ class LogStreamController extends Controller
                     }
                 }
 
-                // Count by mode
                 if (stripos($message, 'sandbox') !== false) {
                     $stats['sandbox_payments']++;
                 } elseif (stripos($message, 'live') !== false) {
@@ -343,7 +325,6 @@ class LogStreamController extends Controller
                 }
             }
 
-            // Count by status
             if (isset($log['payment_status'])) {
                 switch ($log['payment_status']) {
                     case 'SUCCESS':
@@ -356,21 +337,17 @@ class LogStreamController extends Controller
                         $stats['pending_payments']++;
                         break;
                 }
-            }
-
-            // Count callbacks
+            }*
             if (stripos($message, 'callback') !== false) {
                 $stats['callbacks_received']++;
             }
 
-            // Extract processing time
             if (preg_match('/processing time: ([\d.]+)ms/', $message, $matches)) {
                 $processingTimes[] = floatval($matches[1]);
             }
         }
 
-        // Calculate average processing time
-        if (! empty($processingTimes)) {
+        if (!empty($processingTimes)) {
             $stats['avg_processing_time'] = round(array_sum($processingTimes) / count($processingTimes), 2);
         }
 
@@ -392,7 +369,7 @@ class LogStreamController extends Controller
             'sandbox_payments' => 0,
             'live_payments' => 0,
             'callbacks_received' => 0,
-            'avg_processing_time' => 0,
+            'avg_processing_time' => 0
         ];
     }
 
@@ -401,9 +378,9 @@ class LogStreamController extends Controller
      */
     private function getRecentLogsSince(string $since): array
     {
-        $logFile = storage_path('logs/laravel-'.date('Y-m-d').'.log');
-
-        if (! File::exists($logFile)) {
+        $logFile = storage_path('logs/laravel-' . date('Y-m-d') . '.log');
+        
+        if (!File::exists($logFile)) {
             return [];
         }
 
@@ -412,10 +389,8 @@ class LogStreamController extends Controller
         $sinceTimestamp = strtotime($since);
 
         foreach ($lines as $line) {
-            if (empty(trim($line))) {
-                continue;
-            }
-
+            if (empty(trim($line))) continue;
+            
             $logEntry = $this->parseLogLine($line);
             if ($logEntry) {
                 $logTimestamp = strtotime($logEntry['timestamp']);
@@ -434,7 +409,7 @@ class LogStreamController extends Controller
     private function getLastLines(string $filename, int $lines = 50): array
     {
         $handle = fopen($filename, 'r');
-        if (! $handle) {
+        if (!$handle) {
             return [];
         }
 
@@ -444,7 +419,7 @@ class LogStreamController extends Controller
         $text = [];
 
         while ($linecounter > 0) {
-            $t = ' ';
+            $t = " ";
             while ($t != "\n") {
                 if (fseek($handle, $pos, SEEK_END) == -1) {
                     $beginning = true;
@@ -458,13 +433,10 @@ class LogStreamController extends Controller
                 rewind($handle);
             }
             $text[$lines - $linecounter - 1] = fgets($handle);
-            if ($beginning) {
-                break;
-            }
+            if ($beginning) break;
         }
 
         fclose($handle);
-
         return array_reverse($text);
     }
 }

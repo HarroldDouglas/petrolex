@@ -40,29 +40,8 @@ require __DIR__.'/api/tracking.php';
 require __DIR__.'/api/geography.php';
 require __DIR__.'/api/app.php';
 
-// Payment Test Routes (isolated)
 require __DIR__.'/api/payment-test.php';
 
-// Log streaming endpoints (moved to payment test routes)
-// Note: Log endpoints are now available at /api/test/payment/logs/
-
-// External callback routes (for compatibility with external server callbacks)
-// Note: These routes are now handled in payment-test.php but kept here for backward compatibility
-Route::post('/callback/cm/momo', function () {
-    return response()->json([
-        'success' => false,
-        'message' => 'This endpoint has been moved to /api/test/payment/callback/external/mtn',
-    ], 301);
-})->name('callback.mtn.deprecated');
-
-Route::post('/callback/cm/orange', function () {
-    return response()->json([
-        'success' => false,
-        'message' => 'This endpoint has been moved to /api/test/payment/callback/external/orange',
-    ], 301);
-})->name('callback.orange.deprecated');
-
-// Route de test WebSocket
 Route::post('test-websocket-event', function () {
     event(new \App\Events\TestWebSocketEvent);
 

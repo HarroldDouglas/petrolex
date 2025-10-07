@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Payment\OrangeCallbackRequest;
-use App\Services\PaymentTest\CallbackNormalizationService;
 use App\Services\PaymentTest\CallbackStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -14,7 +13,6 @@ use Throwable;
 class OrangeCallbackController extends Controller
 {
     public function __construct(
-        private readonly CallbackNormalizationService $normalizationService,
         private readonly CallbackStorageService $storageService
     ) {}
 
@@ -49,9 +47,34 @@ class OrangeCallbackController extends Controller
 
     private function processCallback(array $callbackData): array
     {
-        $normalizedData = $this->normalizationService->normalize('orange', $callbackData);
+        $normalizedData = $this->normalizeOrangeCallback($callbackData);
 
         return $this->storageService->store('orange', $callbackData, $normalizedData);
+    }
+
+    /**
+     * Normalize Orange Money callback data
+     */
+    private function normalizeOrangeCallback(array $data): array
+    {
+        return [
+            'transaction_id' => $data['txnid'] ?? 'N/A',
+            'external_id' => $data['payToken'] ?? 'N/A',
+            'reference_id' => $data['payToken'] ?? 'N/A',
+            'status' => $data['status'] ?? 'UNKNOWN',
+            'amount' => 'N/A',
+            'currency' => config('payment.defaults.currency', 'XAF'),
+            'payer_phone' => 'N/A',
+            'payer_type' => 'MSISDN',
+            'reason' => $data['message'] ?? null,
+            'payer_message' => null,
+            'payee_note' => null,
+            'provider_specific' => [
+                'payToken' => $data['payToken'] ?? null,
+                'txnid' => $data['txnid'] ?? null,
+                'message' => $data['message'] ?? null,
+            ],
+        ];
     }
 
     private function logIncomingCallback(OrangeCallbackRequest $request): void
