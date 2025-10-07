@@ -14,53 +14,56 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private string $referenceId;
-    private int $attemptCount;
-    private const MAX_ATTEMPTS = 18;
-    private const CHECK_INTERVAL = 10; 
+    public int $tries = 1;
+    public int $timeout = 300;
 
-    public function __construct(string $referenceId, int $attemptCount = 1)
+    private string $referenceId;
+    private array $mtnConfig;
+    private int $attemptCount;
+
+    private const MAX_ATTEMPTS = 18;
+    private const CHECK_INTERVAL = 10;
+
+    public function __construct(string $referenceId, array $mtnConfig, int $attemptCount = 1)
     {
         $this->referenceId = $referenceId;
+        $this->mtnConfig = $mtnConfig;
         $this->attemptCount = $attemptCount;
-        
-        if ($attemptCount > 1) {
-            $this->delay(now()->addSeconds(self::CHECK_INTERVAL));
-        }
     }
 
     public function handle(): void
     {
-        Log::info('� MTN Payment Verification Job Started', [
+        Log::info('🚀 MTN Payment Status Verification Job Started', [
             'reference_id' => $this->referenceId,
             'attempt' => $this->attemptCount,
-            'max_attempts' => self::MAX_ATTEMPTS,
+            'config_available' => !empty($this->mtnConfig),
         ]);
 
         try {
-            // Initialize MTN gateway
-            $mtnGateway = new MTNMoneyTestGateway();
-            
-            // Call the gateway's verify method
+            $mtnGateway = new MTNMoneyTestGateway('live', $this->mtnConfig);
             $result = $mtnGateway->verify($this->referenceId, $this->attemptCount);
-            
-            // Handle the result
+
+            Log::info('📋 MTN Verification Result', [
+                'reference_id' => $this->referenceId,
+                'attempt' => $this->attemptCount,
+                'result' => $result,
+            ]);
+
             if (!$result['success']) {
                 // Verification failed - check if should retry
-                if ($result['should_retry']) {
-                    Log::info('� MTN Verification Failed, Scheduling Retry', [
+                if (($result['should_retry'] ?? false) && $this->attemptCount < self::MAX_ATTEMPTS) {
+                    Log::info('⏳ MTN Verification Failed, Scheduling Retry', [
                         'reference_id' => $this->referenceId,
                         'attempt' => $this->attemptCount,
-                        'status' => $result['status'],
+                        'status' => $result['status'] ?? null,
                         'next_attempt_in' => self::CHECK_INTERVAL . ' seconds',
                     ]);
-                    
                     $this->scheduleNextAttempt();
                 } else {
                     Log::error('🏁 MTN Verification Completed - Failed', [
                         'reference_id' => $this->referenceId,
-                        'final_status' => $result['status'],
-                        'message' => $result['message'],
+                        'final_status' => $result['status'] ?? null,
+                        'message' => $result['message'] ?? null,
                         'attempts' => $result['total_attempts'] ?? $this->attemptCount,
                     ]);
                 }
@@ -68,25 +71,23 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
             }
 
             // Verification was successful or pending
-            if ($result['should_retry']) {
+            if ($result['should_retry'] ?? false) {
                 Log::info('⏳ MTN Payment Still Pending, Scheduling Next Check', [
                     'reference_id' => $this->referenceId,
                     'attempt' => $this->attemptCount,
-                    'status' => $result['status'],
+                    'status' => $result['status'] ?? null,
                     'next_check_in' => self::CHECK_INTERVAL . ' seconds',
                 ]);
-                
                 $this->scheduleNextAttempt();
             } else {
                 Log::info('🏁 MTN Verification Completed - Success', [
                     'reference_id' => $this->referenceId,
-                    'final_status' => $result['status'],
-                    'message' => $result['message'],
+                    'final_status' => $result['status'] ?? null,
+                    'message' => $result['message'] ?? null,
                     'attempts' => $result['total_attempts'] ?? $this->attemptCount,
                     'total_time' => $result['total_time_seconds'] ?? 'N/A',
                 ]);
             }
-
         } catch (\Exception $e) {
             Log::error('💥 MTN Verification Job Exception', [
                 'reference_id' => $this->referenceId,
@@ -102,7 +103,6 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
                     'current_attempt' => $this->attemptCount,
                     'next_attempt' => $this->attemptCount + 1,
                 ]);
-                
                 $this->scheduleNextAttempt();
             } else {
                 Log::error('🚫 Max Attempts Reached After Exception', [
@@ -114,23 +114,19 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
         }
     }
 
-    
-
     private function scheduleNextAttempt(): void
     {
         $nextAttempt = $this->attemptCount + 1;
-        
+
         Log::info('📅 Scheduling Next MTN Payment Status Check', [
-            'payment_id' => $this->referenceId,
+            'reference_id' => $this->referenceId,
             'current_attempt' => $this->attemptCount,
             'next_attempt' => $nextAttempt,
             'delay' => self::CHECK_INTERVAL . ' seconds',
         ]);
 
-        dispatch(new self($this->referenceId, $nextAttempt));
+        dispatch((new self($this->referenceId, $this->mtnConfig, $nextAttempt))->delay(now()->addSeconds(self::CHECK_INTERVAL)));
     }
-
-
 
     /**
      * Handle job failure
@@ -138,7 +134,7 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
     public function failed(\Throwable $exception): void
     {
         Log::error('💥 MTN Payment Status Job Failed Completely', [
-            'payment_id' => $this->referenceId,
+            'reference_id' => $this->referenceId,
             'attempt' => $this->attemptCount,
             'exception' => $exception->getMessage(),
             'trace' => $exception->getTraceAsString(),

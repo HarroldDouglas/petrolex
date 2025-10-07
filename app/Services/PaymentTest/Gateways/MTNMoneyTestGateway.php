@@ -20,14 +20,13 @@ class MTNMoneyTestGateway
     protected ?string $accessToken = null;
     protected string $testEnvironment;
 
-    public function __construct(string $testEnvironment = 'sandbox')
+    public function __construct(string $testEnvironment = 'sandbox', ?array $config = null)
     {
-        $this->config = config('mtnmoney');
+        $this->config = $config ?? config('mtnmoney');
         $this->testEnvironment = $testEnvironment;
 
-        // Validate configuration is loaded
         if (!$this->config || !is_array($this->config)) {
-            throw new \Exception('MTN MoMo configuration not found. Please ensure config/mtnmoney.php exists and is properly configured.');
+            throw new \Exception('MTN MoMo configuration not found. Please ensure config/mtnmoney.php exists and is properly configured, or pass config directly to constructor.');
         }
 
         if (!isset($this->config['base_url']) || empty($this->config['base_url'])) {
@@ -38,6 +37,7 @@ class MTNMoneyTestGateway
             'environment' => $testEnvironment,
             'base_url' => $this->config['base_url'],
             'config_loaded' => true,
+            'config_source' => $config !== null ? 'parameter' : 'laravel_config',
         ]);
     }
 
@@ -143,13 +143,13 @@ class MTNMoneyTestGateway
                     'test_environment' => $this->testEnvironment,
                 ]);
 
-                // Dispatch MTN payment status verification job
-                VerifyMTNPaymentStatusJob::dispatch($referenceId);
+                VerifyMTNPaymentStatusJob::dispatch($referenceId, $this->config);
                 
                 Log::info('📅 MTN Payment Status Verification Job Dispatched', [
                     'reference_id' => $referenceId,
                     'external_id' => $paymentData['external_id'],
                     'verification_schedule' => 'Every 10 seconds for 3 minutes (max 18 attempts)',
+                    'config_passed' => true,
                 ]);
 
                 return [
