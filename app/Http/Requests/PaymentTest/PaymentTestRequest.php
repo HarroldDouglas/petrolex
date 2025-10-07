@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests\PaymentTest;
 
-use App\Services\PaymentTest\PaymentTestConstants;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Foundation\Http\FormRequest;
 
 class PaymentTestRequest extends FormRequest
 {
@@ -29,31 +27,31 @@ class PaymentTestRequest extends FormRequest
                 'required',
                 'string',
                 'min:9',
-                'max:15'
+                'max:15',
             ],
             'amount' => [
                 'required',
                 'numeric',
                 'min:10',
-                'max:1000000'
+                'max:1000000',
             ],
             'test_mode' => [
                 'sometimes',
                 'string',
-                'in:' . PaymentTestConstants::MODE_SANDBOX . ',' . PaymentTestConstants::MODE_LIVE
+                'in:sandbox,live',
             ],
             'external_id' => [
                 'sometimes',
                 'nullable',
                 'string',
-                'max:50'
+                'max:50',
             ],
             'reference' => [
                 'sometimes',
                 'nullable',
                 'string',
-                'max:100'
-            ]
+                'max:100',
+            ],
         ];
     }
 
@@ -72,7 +70,7 @@ class PaymentTestRequest extends FormRequest
             'amount.max' => '💰 Maximum amount is 1,000,000 FCFA',
             'test_mode.in' => '🔧 Test mode must be either "sandbox" or "live"',
             'external_id.max' => '🆔 External ID cannot exceed 50 characters',
-            'reference.max' => '📝 Reference cannot exceed 100 characters'
+            'reference.max' => '📝 Reference cannot exceed 100 characters',
         ];
     }
 
@@ -84,9 +82,7 @@ class PaymentTestRequest extends FormRequest
         return [
             'phone_number' => 'phone number',
             'external_id' => 'external ID',
-            'test_mode' => 'test mode'
+            'test_mode' => 'test mode',
         ];
     }
-
-
 }

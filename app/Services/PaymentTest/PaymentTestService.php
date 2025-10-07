@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Payment Test Service
- * 
+ *
  * Central service for handling payment test operations.
  * Manages gateway selection and payment processing.
  */
@@ -23,38 +23,39 @@ class PaymentTestService
         try {
             Log::info("🔄 PaymentTestService: Processing {$provider} payment", array_merge($logContext, [
                 'service' => 'PaymentTestService',
-                'method' => 'processPayment'
+                'method' => 'processPayment',
             ]));
 
             $gateway = $this->createGateway($provider, $paymentData['test_mode']);
-            
-            if ($paymentData['test_mode'] === PaymentTestConstants::MODE_SANDBOX) {
-                Log::info("🧪 PaymentTestService: Using sandbox simulation", array_merge($logContext, [
-                    'mode' => PaymentTestConstants::MODE_SANDBOX,
-                    'provider' => $provider
+
+            if ($paymentData['test_mode'] === 'sandbox') {
+                Log::info('🧪 PaymentTestService: Using sandbox simulation', array_merge($logContext, [
+                    'mode' => 'sandbox',
+                    'provider' => $provider,
                 ]));
+
                 return $gateway->simulatePayment($paymentData);
             }
-            
-            Log::info("🌐 PaymentTestService: Using live gateway", array_merge($logContext, [
-                'mode' => PaymentTestConstants::MODE_LIVE,
+
+            Log::info('🌐 PaymentTestService: Using live gateway', array_merge($logContext, [
+                'mode' => 'live',
                 'provider' => $provider,
-                'server' => 'isogaz.afrik-solutions.com'
+                'server' => 'isogaz.afrik-solutions.com',
             ]));
-            
+
             return $gateway->initPayment($paymentData);
 
         } catch (Exception $e) {
-            Log::error("💥 Payment processing failed", array_merge($logContext, [
+            Log::error('💥 Payment processing failed', array_merge($logContext, [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
             ]));
-            
+
             return [
                 'success' => false,
                 'message' => 'Payment processing failed',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -64,7 +65,7 @@ class PaymentTestService
      */
     public function generateExternalId(string $provider): string
     {
-        return strtoupper($provider) . '_TEST_' . uniqid() . '_' . time();
+        return strtoupper($provider).'_TEST_'.uniqid().'_'.time();
     }
 
     /**
@@ -90,20 +91,20 @@ class PaymentTestService
         $logs[] = ['level' => 'info', 'message' => "📱 Initializing {$providerName} gateway", 'timestamp' => $timestamp];
 
         // Mode-specific logs
-        if ($paymentData['test_mode'] === PaymentTestConstants::MODE_SANDBOX) {
-            $logs[] = ['level' => 'warning', 'message' => "🧪 Running in SANDBOX mode", 'timestamp' => $timestamp];
+        if ($paymentData['test_mode'] === 'sandbox') {
+            $logs[] = ['level' => 'warning', 'message' => '🧪 Running in SANDBOX mode', 'timestamp' => $timestamp];
         } else {
-            $logs[] = ['level' => 'info', 'message' => "🌐 Running in LIVE mode", 'timestamp' => $timestamp];
+            $logs[] = ['level' => 'info', 'message' => '🌐 Running in LIVE mode', 'timestamp' => $timestamp];
         }
 
         // Processing logs based on result
         if ($result['success']) {
-            $logs[] = ['level' => 'success', 'message' => "✅ Payment processed successfully", 'timestamp' => $timestamp];
-            
+            $logs[] = ['level' => 'success', 'message' => '✅ Payment processed successfully', 'timestamp' => $timestamp];
+
             if (isset($result['reference_id'])) {
                 $logs[] = ['level' => 'success', 'message' => "🔗 Reference ID: {$result['reference_id']}", 'timestamp' => $timestamp];
             }
-            
+
             if (isset($result['financial_transaction_id'])) {
                 $logs[] = ['level' => 'success', 'message' => "🏦 Financial Transaction ID: {$result['financial_transaction_id']}", 'timestamp' => $timestamp];
             }
@@ -114,7 +115,7 @@ class PaymentTestService
         } else {
             $error = $result['error'] ?? $result['message'] ?? 'Unknown error';
             $logs[] = ['level' => 'error', 'message' => "❌ Payment failed: {$error}", 'timestamp' => $timestamp];
-            
+
             if (isset($result['error_code'])) {
                 $logs[] = ['level' => 'error', 'message' => "🔢 Error Code: {$result['error_code']}", 'timestamp' => $timestamp];
             }
@@ -136,25 +137,26 @@ class PaymentTestService
                 'service' => 'PaymentTestService',
                 'method' => 'processCallback',
                 'provider' => $provider,
-                'data_keys' => array_keys($callbackData)
+                'data_keys' => array_keys($callbackData),
             ]);
 
-            $gateway = $this->createGateway($provider, PaymentTestConstants::MODE_LIVE);
+            $gateway = $this->createGateway($provider, 'live');
+
             return $gateway->handleCallback($callbackData);
-            
+
         } catch (Exception $e) {
-            Log::error("💥 Callback processing failed", [
+            Log::error('💥 Callback processing failed', [
                 'provider' => $provider,
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'callback_data' => $callbackData
+                'callback_data' => $callbackData,
             ]);
-            
+
             return [
                 'success' => false,
                 'message' => 'Callback processing failed',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -166,21 +168,21 @@ class PaymentTestService
     {
         $logs = [];
         $timestamp = now()->toISOString();
-        $providerName = strtoupper($provider);
+        $providerName = $this->getProviderDisplayName($provider);
 
         // Initial log
         $logs[] = ['level' => 'info', 'message' => "📞 {$providerName} callback received", 'timestamp' => $timestamp];
 
         // Status-based logs
         switch ($statusCategory) {
-            case PaymentTestConstants::STATUS_SUCCESSFUL:
+            case 'success':
                 $logs[] = ['level' => 'success', 'message' => "🎉 {$providerName}: Transaction confirmée avec succès!", 'timestamp' => $timestamp];
                 break;
-            case PaymentTestConstants::STATUS_FAILED:
+            case 'failed':
                 $reason = $callbackData['reason'] ?? $callbackData['message'] ?? 'Unknown error';
                 $logs[] = ['level' => 'error', 'message' => "❌ {$providerName}: Transaction échouée - {$reason}", 'timestamp' => $timestamp];
                 break;
-            case PaymentTestConstants::STATUS_PENDING:
+            case 'pending':
                 $logs[] = ['level' => 'warning', 'message' => "⏳ {$providerName}: Transaction en cours de traitement", 'timestamp' => $timestamp];
                 break;
             default:
@@ -189,14 +191,14 @@ class PaymentTestService
         }
 
         // Add transaction details
-        if ($provider === PaymentTestConstants::PROVIDER_MTN) {
+        if ($provider === 'mtn') {
             if (isset($callbackData['reference_id'])) {
                 $logs[] = ['level' => 'info', 'message' => "🔗 Reference ID: {$callbackData['reference_id']}", 'timestamp' => $timestamp];
             }
             if (isset($callbackData['financial_transaction_id'])) {
                 $logs[] = ['level' => 'info', 'message' => "🏦 Financial Transaction ID: {$callbackData['financial_transaction_id']}", 'timestamp' => $timestamp];
             }
-        } elseif ($provider === PaymentTestConstants::PROVIDER_ORANGE) {
+        } elseif ($provider === 'orange') {
             if (isset($callbackData['pay_token'])) {
                 $logs[] = ['level' => 'info', 'message' => "🎫 Pay Token: {$callbackData['pay_token']}", 'timestamp' => $timestamp];
             }
@@ -213,10 +215,18 @@ class PaymentTestService
      */
     protected function createGateway(string $provider, string $testMode): MTNMoneyTestGateway|OrangeMoneyTestGateway
     {
-        return match($provider) {
-            PaymentTestConstants::PROVIDER_MTN => new MTNMoneyTestGateway($testMode),
-            PaymentTestConstants::PROVIDER_ORANGE => new OrangeMoneyTestGateway($testMode),
+        return match ($provider) {
+            'mtn' => new MTNMoneyTestGateway($testMode),
+            'orange' => new OrangeMoneyTestGateway($testMode),
             default => throw new Exception("Unsupported payment provider: {$provider}")
         };
+    }
+
+    /**
+     * Get provider display name from config
+     */
+    private function getProviderDisplayName(string $provider): string
+    {
+        return config("payment.providers.{$provider}.name", strtoupper($provider));
     }
 }

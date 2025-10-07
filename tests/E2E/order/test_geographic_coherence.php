@@ -9,7 +9,7 @@
  * =============================================================================
  */
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__.'/../../../vendor/autoload.php';
 
 use App\Models\CustomerDeliveryAddress;
 use App\Models\DistributionCenter;
@@ -18,7 +18,7 @@ use App\Models\Geography\Neighborhood;
 use Illuminate\Support\Facades\Http;
 
 // Bootstrap Laravel
-$app = require_once __DIR__ . '/../../../bootstrap/app.php';
+$app = require_once __DIR__.'/../../../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 // Configuration
@@ -80,11 +80,12 @@ function getAuthToken($baseUrl, $email, $password)
 
     if ($response->successful() && isset($response->json()['data']['access_token'])) {
         printSuccess('Authentication successful');
+
         return $response->json()['data']['access_token'];
     }
 
     printError('Failed to authenticate');
-    echo json_encode($response->json(), JSON_PRETTY_PRINT) . "\n";
+    echo json_encode($response->json(), JSON_PRETTY_PRINT)."\n";
     exit(1);
 }
 
@@ -104,9 +105,10 @@ function runTestCase($testName, $centerId, $deliveryNeighborhoodId, $shouldSucce
     $neighborhood = Neighborhood::with(['municipality.city'])->find($deliveryNeighborhoodId);
     $center = DistributionCenter::with(['neighborhood.municipality.city'])->find($centerId);
 
-    if (!$neighborhood || !$center) {
+    if (! $neighborhood || ! $center) {
         printError("Invalid test data: Neighborhood ID $deliveryNeighborhoodId or Center ID $centerId not found");
         $failedTests++;
+
         return;
     }
 
@@ -131,8 +133,9 @@ function runTestCase($testName, $centerId, $deliveryNeighborhoodId, $shouldSucce
 
         $deliveryAddressId = $deliveryAddress->id;
     } catch (\Exception $e) {
-        printError("Failed to create delivery address: " . $e->getMessage());
+        printError('Failed to create delivery address: '.$e->getMessage());
         $failedTests++;
+
         return;
     }
 
@@ -140,21 +143,21 @@ function runTestCase($testName, $centerId, $deliveryNeighborhoodId, $shouldSucce
     $orderResponse = Http::withToken($token)
         ->withHeaders(['Accept' => 'application/json'])
         ->post("$baseUrl/api/orders", [
-        'delivery_address_id' => $deliveryAddressId,
-        'distribution_center_id' => $centerId,
-        'delivery_type' => 'normal',
-        'items' => [
-            [
-                'product_category_id' => 1,
-                'quantity' => 1,
-                'unit_price' => 5000,
-                'option' => 'bottle_with_content',
+            'delivery_address_id' => $deliveryAddressId,
+            'distribution_center_id' => $centerId,
+            'delivery_type' => 'normal',
+            'items' => [
+                [
+                    'product_category_id' => 1,
+                    'quantity' => 1,
+                    'unit_price' => 5000,
+                    'option' => 'bottle_with_content',
+                ],
             ],
-        ],
-        'delivery_fee' => 500,
-        'total_amount' => 5500,
-        'comments' => 'E2E Test - Geographic Coherence',
-    ]);
+            'delivery_fee' => 500,
+            'total_amount' => 5500,
+            'comments' => 'E2E Test - Geographic Coherence',
+        ]);
 
     $orderCreated = $orderResponse->successful() && isset($orderResponse->json()['data']['order']['id']);
 
@@ -172,11 +175,11 @@ function runTestCase($testName, $centerId, $deliveryNeighborhoodId, $shouldSucce
             Http::withToken($token)->delete("$baseUrl/api/orders/$orderId");
         } else {
             printError('❌ Order should have been ACCEPTED but was REJECTED');
-            echo json_encode($orderResponse->json(), JSON_PRETTY_PRINT) . "\n";
+            echo json_encode($orderResponse->json(), JSON_PRETTY_PRINT)."\n";
             $failedTests++;
         }
     } else {
-        if (!$orderCreated) {
+        if (! $orderCreated) {
             // Check for proper error message
             $responseJson = $orderResponse->json();
             $errorMsg = $responseJson['message'] ?? 'unknown';
@@ -192,7 +195,7 @@ function runTestCase($testName, $centerId, $deliveryNeighborhoodId, $shouldSucce
 
             if (stripos($errorString, 'municipality') !== false || stripos($errorString, 'municipalité') !== false) {
                 printSuccess('✅ Order correctly REJECTED with proper error (different municipality)');
-                printInfo("  Error: " . (is_string($errorMsg) ? $errorMsg : json_encode($errorMsg)));
+                printInfo('  Error: '.(is_string($errorMsg) ? $errorMsg : json_encode($errorMsg)));
             } else {
                 printWarning('⚠️  Order correctly REJECTED but error message unclear');
                 printInfo("  Error: $errorString");
@@ -200,7 +203,7 @@ function runTestCase($testName, $centerId, $deliveryNeighborhoodId, $shouldSucce
             $passedTests++;
         } else {
             printError('❌ Order should have been REJECTED but was ACCEPTED');
-            echo json_encode($orderResponse->json(), JSON_PRETTY_PRINT) . "\n";
+            echo json_encode($orderResponse->json(), JSON_PRETTY_PRINT)."\n";
             $failedTests++;
 
             // Clean up the incorrectly created order

@@ -202,13 +202,14 @@ class UserSeeder extends Seeder
 
         // Use Melen neighborhood in Yaoundé I (should be the first one created)
         $neighborhood = \App\Models\Geography\Neighborhood::where('name', 'Melen')
-            ->whereHas('municipality', function($q) {
+            ->whereHas('municipality', function ($q) {
                 $q->where('name', 'Yaoundé I');
             })
             ->first();
 
         if (! $neighborhood) {
             $this->command->error('Melen neighborhood not found. Please seed geographic data first.');
+
             return;
         }
 

@@ -51,14 +51,14 @@ require __DIR__.'/api/payment-test.php';
 Route::post('/callback/cm/momo', function () {
     return response()->json([
         'success' => false,
-        'message' => 'This endpoint has been moved to /api/test/payment/callback/external/mtn'
+        'message' => 'This endpoint has been moved to /api/test/payment/callback/external/mtn',
     ], 301);
 })->name('callback.mtn.deprecated');
 
 Route::post('/callback/cm/orange', function () {
     return response()->json([
         'success' => false,
-        'message' => 'This endpoint has been moved to /api/test/payment/callback/external/orange'
+        'message' => 'This endpoint has been moved to /api/test/payment/callback/external/orange',
     ], 301);
 })->name('callback.orange.deprecated');
 

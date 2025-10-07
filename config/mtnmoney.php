@@ -11,7 +11,6 @@ return [
     |
     */
 
-    // API Base URL and Endpoints
     'base_url' => env('MTN_MOMO_BASE_URL', 'https://proxy.momoapi.mtn.com'),
 
     'endpoints' => [
@@ -30,35 +29,28 @@ return [
         ],
     ],
 
-    // MTN MoMo API Credentials (to be filled with actual values)
     'subscription_key' => env('MTN_MOMO_SUBSCRIPTION_KEY', '6cefa52fcefc41849cc60e40f85dd42b'),
-    'api_user' => env('MTN_MOMO_API_USER', '34215f01-19f9-43b9-a712-35a7e710ba82'),
-    'api_key' => env('MTN_MOMO_API_KEY', '1cbb6828241b49abaca2d12dae2f2592'),
-    
-    // Environment Configuration
+    'api_user' => env('MTN_MOMO_API_USER', 'be1ad2e9-3b15-4e32-8d98-b2b704954ccd'),
+    'api_key' => env('MTN_MOMO_API_KEY', '9ede20c6fd0a4506ac94bc9814f61398'),
+
     'target_environment' => env('MTN_MOMO_TARGET_ENVIRONMENT', 'mtncameroon'),
     'currency' => env('MTN_MOMO_CURRENCY', 'XAF'),
-    
-    // Callback URLs
-    'callback_url' => env('MTN_MOMO_CALLBACK_URL', env('APP_URL').'/callback/cm/momo'),
-    
-    // Request Configuration
+
+    'callback_url' => env('MTN_MOMO_CALLBACK_URL', env('APP_URL').'/api/callback/cm/momo'),
+
     'timeout' => env('MTN_MOMO_TIMEOUT', 30),
-    
-    // Default Messages
+
     'default_payer_message' => env('MTN_MOMO_PAYER_MESSAGE', 'Paiement Petrolex'),
     'default_payee_note' => env('MTN_MOMO_PAYEE_NOTE', 'Transaction Petrolex'),
-    
-    // Test numbers for different scenarios
+
     'test_numbers' => [
         'success' => ['237677000001', '237677000010'],
-        'pending' => ['237677000002', '237677000020'], 
+        'pending' => ['237677000002', '237677000020'],
         'failure' => ['237677000003', '237677000030'],
         'timeout' => ['237677000004', '237677000040'],
         'invalid' => ['237677000005', '237677000050'],
     ],
-    
-    // Party ID Type (usually MSISDN for phone numbers)
+
     'party_id_type' => 'MSISDN',
-    
+
 ];
