@@ -337,7 +337,7 @@ class LogStreamController extends Controller
                         $stats['pending_payments']++;
                         break;
                 }
-            }*
+            }
             if (stripos($message, 'callback') !== false) {
                 $stats['callbacks_received']++;
             }
