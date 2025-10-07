@@ -25,9 +25,19 @@ class MTNMoneyTestGateway
         $this->config = config('mtnmoney');
         $this->testEnvironment = $testEnvironment;
 
+        // Validate configuration is loaded
+        if (!$this->config || !is_array($this->config)) {
+            throw new \Exception('MTN MoMo configuration not found. Please ensure config/mtnmoney.php exists and is properly configured.');
+        }
+
+        if (!isset($this->config['base_url']) || empty($this->config['base_url'])) {
+            throw new \Exception('MTN MoMo base URL is not configured. Please check MTN_MOMO_BASE_URL environment variable.');
+        }
+
         Log::info('MTN MoMo Test Gateway initialized', [
             'environment' => $testEnvironment,
             'base_url' => $this->config['base_url'],
+            'config_loaded' => true,
         ]);
     }
 

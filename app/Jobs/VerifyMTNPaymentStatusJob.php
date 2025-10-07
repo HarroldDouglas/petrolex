@@ -16,15 +16,14 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
 
     private string $referenceId;
     private int $attemptCount;
-    private const MAX_ATTEMPTS = 18; // 3 minutes / 10 seconds = 18 attempts
-    private const CHECK_INTERVAL = 10; // 10 seconds
+    private const MAX_ATTEMPTS = 18;
+    private const CHECK_INTERVAL = 10; 
 
     public function __construct(string $referenceId, int $attemptCount = 1)
     {
         $this->referenceId = $referenceId;
         $this->attemptCount = $attemptCount;
         
-        // Delay the job execution by 10 seconds if it's not the first attempt
         if ($attemptCount > 1) {
             $this->delay(now()->addSeconds(self::CHECK_INTERVAL));
         }
@@ -36,10 +35,13 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
             'reference_id' => $this->referenceId,
             'attempt' => $this->attemptCount,
             'max_attempts' => self::MAX_ATTEMPTS,
+            'config_check' => [
+                'mtn_config_exists' => config('mtnmoney') !== null,
+                'mtn_base_url' => config('mtnmoney.base_url'),
+            ],
         ]);
 
         try {
-            // Get the payment transaction details
             $transactionId = $this->getTransactionId();
             if (!$transactionId) {
                 Log::error('❌ MTN Payment Status Check Failed: Transaction ID not found', [
@@ -48,10 +50,25 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
                 return;
             }
 
-            // Initialize MTN gateway
-            $mtnGateway = new MTNMoneyTestGateway();
+            // Initialize MTN gateway with proper configuration
+            try {
+                $mtnGateway = new MTNMoneyTestGateway('live'); // Use live for status checks
+            } catch (\Exception $initException) {
+                Log::error('❌ Failed to initialize MTN Gateway', [
+                    'reference_id' => $this->referenceId,
+                    'attempt' => $this->attemptCount,
+                    'error' => $initException->getMessage(),
+                ]);
+                
+                // Retry if not at max attempts
+                if ($this->attemptCount < self::MAX_ATTEMPTS) {
+                    $this->scheduleNextAttempt();
+                } else {
+                    $this->handleMaxAttemptsReached('GATEWAY_INIT_ERROR');
+                }
+                return;
+            }
             
-            // Check payment status
             $statusResponse = $mtnGateway->getTransactionStatus($transactionId);
             
             Log::info('📊 MTN Status Check Response', [
@@ -68,7 +85,6 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
                     'error' => $statusResponse['error'] ?? 'Unknown error',
                 ]);
 
-                // Retry if not at max attempts
                 if ($this->attemptCount < self::MAX_ATTEMPTS) {
                     $this->scheduleNextAttempt();
                 } else {
@@ -79,21 +95,17 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
 
             $currentStatus = strtoupper($statusResponse['status'] ?? 'UNKNOWN');
             
-            // Check if status is successful
             if ($this->isSuccessfulStatus($currentStatus)) {
                 $this->handleSuccessfulPayment($currentStatus, $statusResponse);
                 return;
             }
 
-            // Check if status is failed
             if ($this->isFailedStatus($currentStatus)) {
                 $this->handleFailedPayment($currentStatus, $statusResponse);
                 return;
             }
 
-            // Status is still pending
             if ($this->isPendingStatus($currentStatus)) {
-                // Continue polling if not at max attempts
                 if ($this->attemptCount < self::MAX_ATTEMPTS) {
                     Log::info('⏳ MTN Payment Still Pending, Scheduling Next Check', [
                         'payment_id' => $this->referenceId,
@@ -109,7 +121,6 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
                 return;
             }
 
-            // Unknown status - treat as pending
             Log::warning('⚠️ Unknown MTN Payment Status', [
                 'payment_id' => $this->referenceId,
                 'attempt' => $this->attemptCount,
@@ -130,7 +141,6 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            // Retry on exception if not at max attempts
             if ($this->attemptCount < self::MAX_ATTEMPTS) {
                 $this->scheduleNextAttempt();
             } else {
@@ -141,8 +151,6 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
 
     private function getTransactionId(): ?string
     {
-        // The referenceId passed to the job is already the MTN reference ID
-        // that should be used for status checking
         return $this->referenceId;
     }
 
@@ -175,7 +183,6 @@ class VerifyMTNPaymentStatusJob implements ShouldQueue
             'delay' => self::CHECK_INTERVAL . ' seconds',
         ]);
 
-        // Dispatch the next attempt
         dispatch(new self($this->referenceId, $nextAttempt));
     }
 
