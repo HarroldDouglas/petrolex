@@ -106,15 +106,40 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'attempt' => $this->attemptCount,
                     'status' => $result['status'] ?? null,
                 ]);
-                $paymentResponse = (object) [
-                    'success' => $result['success'] ?? false,
-                    'status' => $result['status'] ?? null,
-                    'transactionReference' => $result['reference_id'] ?? $this->referenceId,
-                    'amount' => $result['amount'] ?? null,
-                ];
 
+                // Find the order payment using the external ID (PETROLEX reference) from gateway response
+                $gatewayResponse = $response->gatewayResponse ?? [];
+                $externalId = $gatewayResponse['externalId'] ?? null;
+                
+                if (!$externalId) {
+                    Log::error('❌ Cannot find externalId in gateway response for callback', [
+                        'reference_id' => $this->referenceId,
+                        'gateway_response' => $gatewayResponse,
+                    ]);
+                    return;
+                }
+
+                // Find the OrderPayment by payment_reference (PETROLEX reference)
+                $orderPayment = \App\Models\OrderPayment::where('payment_reference', $externalId)->first();
+                
+                if (!$orderPayment) {
+                    Log::error('❌ Cannot find OrderPayment for externalId', [
+                        'external_id' => $externalId,
+                        'mtn_reference' => $this->referenceId,
+                    ]);
+                    return;
+                }
+
+                Log::info('🔗 Found OrderPayment for callback', [
+                    'external_id' => $externalId,
+                    'mtn_reference' => $this->referenceId,
+                    'order_payment_id' => $orderPayment->id,
+                    'order_id' => $orderPayment->order_id,
+                ]);
+
+                // Call handleCallback with the order ID (not the MTN reference)
                 $this->paymentService->handleCallback(
-                    $this->referenceId,
+                    (string) $orderPayment->order_id,
                     $result + [
                         'transaction_ref' => $result['reference_id'] ?? $this->referenceId,
                         'transaction_status' => $result['status'] ?? null,
