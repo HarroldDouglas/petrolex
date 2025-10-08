@@ -277,6 +277,13 @@ class MTNMoneyGateway implements PaymentGateway
                 'Ocp-Apim-Subscription-Key' => $this->config['subscription_key'],
             ])->get($this->config['base_url'].$endpoint);
 
+            Log::info('MTN MoMo Test: Checking transaction status', [
+                'response' => $response,
+                'reference_id' => $transactionReference,
+                'endpoint' => $endpoint,
+                'full_url' => $this->config['base_url'].$endpoint,
+            ]);
+
             if ($response->successful()) {
                 $data = $response->json();
 
