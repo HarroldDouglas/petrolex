@@ -46,12 +46,28 @@ class PaymentService
         DB::transaction(function () use ($orderId, $callbackData) {
             $payment = $this->findPaymentByOrderId($orderId);
             $gateway = $this->gatewayFactory->create($payment->payment_method->value);
+            Log::info('🔔 Received Payment Callback', [
+                'payment_id' => $payment->id,
+                'order_id' => $payment->order->id,
+                'order_number' => $payment->order->order_number,
+                'callback_data' => $callbackData,
+            ]);
+            
             $callbackDto = new PaymentCallbackData(
                 transactionReference: $callbackData['transaction_ref'],
                 status: $this->mapTransactionStatusToPaymentStatus($callbackData['transaction_status']),
                 amount: $callbackData['transaction_amount'],
                 rawData: $callbackData
             );
+
+            Log::info('🔔 Handling Payment Callback', [
+                'payment_id' => $payment->id,
+                'order_id' => $payment->order->id,
+                'order_number' => $payment->order->order_number,
+                'transaction_reference' => $callbackDto->transactionReference,
+                'status' => $callbackDto->status,
+                'amount' => $callbackDto->amount,
+            ]);
 
             // Create PaymentResponse from callback data
             $response = new PaymentResponse(
