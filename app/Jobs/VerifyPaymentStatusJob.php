@@ -42,7 +42,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
 
     public function handle(): void
     {
-        Log::info('🚀 '.$this->paymentMethod.' Payment Status Verification Job Started', [
+        Log::info('🚀 '.$this->paymentMethod.' NEW Payment Status Verification Job Started', [
             'reference_id' => $this->referenceId,
             'attempt' => $this->attemptCount,
         ]);

@@ -7,7 +7,6 @@ use App\DTOs\PaymentCallbackData;
 use App\DTOs\PaymentDetailsData;
 use App\DTOs\PaymentResponse;
 use App\Enums\PaymentStatus;
-use App\Jobs\VerifyPaymentStatusJob;
 use App\Models\OrderPayment;
 use Exception;
 use Illuminate\Support\Facades\Http;
@@ -158,9 +157,6 @@ class MTNMoneyGateway implements PaymentGateway
                     'external_id' => $payment->payment_reference,
                     'environment' => $this->config['target_environment'],
                 ]);
-
-                VerifyPaymentStatusJob::dispatch($referenceId);
-                
                 Log::info('📅 MTN Payment Status Verification Job Dispatched', [
                     'reference_id' => $referenceId,
                     'external_id' => $payment->payment_reference,
