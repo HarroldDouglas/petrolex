@@ -60,7 +60,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                 'should_retry' => $response->status === 'PENDING',
             ];
 
-            Log::info('📋 IN JOB PAYMENT Verification Result', [
+            Log::info('📋 NEW IN JOB PAYMENT Verification Result', [
                 'reference_id' => $this->referenceId,
                 'attempt' => $this->attemptCount,
                 'result' => $result,
@@ -81,7 +81,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     ]);
                     $this->scheduleNextAttempt();
                 } else {
-                    Log::error('🏁 '.$this->paymentMethod.' Verification Completed - Failed', [
+                    Log::error('🏁 '.$this->paymentMethod.' NEW Verification Completed - Failed', [
                         'reference_id' => $this->referenceId,
                         'final_status' => $result['status'] ?? null,
                         'message' => $result['message'] ?? null,
@@ -93,7 +93,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
             }
 
             if ($result['should_retry'] ?? false) {
-                Log::info('⏳'.$this->paymentMethod.' Payment Still Pending, Scheduling Next Check', [
+                Log::info('⏳'.$this->paymentMethod.' NEW Payment Still Pending, Scheduling Next Check', [
                     'reference_id' => $this->referenceId,
                     'attempt' => $this->attemptCount,
                     'status' => $result['status'] ?? null,
@@ -101,7 +101,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                 ]);
                 $this->scheduleNextAttempt();
             } else {
-                Log::info('✅ IN JOB '.$this->paymentMethod.' Payment Verification Successful', [
+                Log::info('✅ IN JOB '.$this->paymentMethod.' NEW Payment Verification Successful', [
                     'reference_id' => $this->referenceId,
                     'attempt' => $this->attemptCount,
                     'status' => $result['status'] ?? null,
@@ -122,7 +122,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     ]
                 );
 
-                Log::info('🏁 '.$this->paymentMethod.' Verification Completed - Success', [
+                Log::info('🏁 '.$this->paymentMethod.' NEW Verification Completed - Success', [
                     'reference_id' => $this->referenceId,
                     'final_status' => $result['status'] ?? null,
                     'message' => $result['message'] ?? null,
@@ -131,7 +131,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('💥 '.$this->paymentMethod.' Verification Job Exception', [
+            Log::error('💥 '.$this->paymentMethod.' NEW Verification Job Exception', [
                 'reference_id' => $this->referenceId,
                 'attempt' => $this->attemptCount,
                 'error' => $e->getMessage(),
@@ -139,14 +139,14 @@ class VerifyPaymentStatusJob implements ShouldQueue
             ]);
 
             if ($this->attemptCount < self::MAX_ATTEMPTS) {
-                Log::info('🔄 Scheduling Retry After Exception', [
+                Log::info('🔄 NEW Scheduling Retry After Exception', [
                     'reference_id' => $this->referenceId,
                     'current_attempt' => $this->attemptCount,
                     'next_attempt' => $this->attemptCount + 1,
                 ]);
                 $this->scheduleNextAttempt();
             } else {
-                Log::error('🚫 Max Attempts Reached After Exception', [
+                Log::error('🚫 NEW Max Attempts Reached After Exception', [
                     'reference_id' => $this->referenceId,
                     'max_attempts' => self::MAX_ATTEMPTS,
                     'final_error' => $e->getMessage(),
@@ -159,7 +159,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
     {
         $nextAttempt = $this->attemptCount + 1;
 
-        Log::info('📅 Scheduling Next Payment Status Check', [
+        Log::info('📅 NEW Scheduling Next Payment Status Check', [
             'reference_id' => $this->referenceId,
             'current_attempt' => $this->attemptCount,
             'next_attempt' => $nextAttempt,
@@ -174,7 +174,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error('💥 Payment Status Job Failed Completely', [
+        Log::error('💥 NEW Payment Status Job Failed Completely', [
             'reference_id' => $this->referenceId,
             'attempt' => $this->attemptCount,
             'exception' => $exception->getMessage(),
