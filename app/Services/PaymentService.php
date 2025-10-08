@@ -10,6 +10,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\OrderPayment;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 class PaymentService
@@ -41,13 +42,6 @@ class PaymentService
     public function handleCallback(string $orderId, array $callbackData): void
     {
         DB::transaction(function () use ($orderId, $callbackData) {
-
-            // Update payment based on callback data
-
-            // Update order based on payment status
-
-            // Affect delivery person to order if payment is successful
-
             $payment = $this->findPaymentByOrderId($orderId);
             $gateway = $this->gatewayFactory->create($payment->payment_method->value);
             $callbackDto = new PaymentCallbackData(
@@ -118,6 +112,11 @@ class PaymentService
 
     private function processPaymentResponse(OrderPayment $payment, PaymentResponse $response): void
     {
+        Log::info('Processing payment response', [
+            'payment_id' => $payment->id,
+            'response' => $response,
+        ]);
+
         $payment->update([
             'payment_status' => $response->status,
             'payment_date' => ($response->status === PaymentStatus::PAID()->value) ? now() : null,
@@ -132,11 +131,19 @@ class PaymentService
         }
 
         if ($response->success && $response->status === PaymentStatus::PAID()->value) {
+            Log::info('Payment successful, updating order status', [
+                'order_id' => $payment->order->id,
+                'order_number' => $payment->order->order_number,
+            ]);
             $payment->order->update([
                 'status' => OrderStatus::PAID()->value,
                 'paid_at' => now(),
             ]);
         } elseif ($response->status === PaymentStatus::FAILED()->value) {
+            Log::info('Payment successful, updating order status', [
+                'order_id' => $payment->order->id,
+                'order_number' => $payment->order->order_number,
+            ]);
             $payment->order->update([
                 'status' => OrderStatus::FAILED()->value,
             ]);
