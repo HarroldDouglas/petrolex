@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTOs\PaymentCallbackData;
+use App\DTOs\PaymentDetailsData;
 use App\DTOs\PaymentResponse;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
@@ -20,8 +21,15 @@ class PaymentService
     public function initiatePayment(Order $order, PaymentMethod $method, array $paymentDetails = []): OrderPayment
     {
         $payment = $this->createOrderPayment($order, $method);
+
+        // Load necessary relationships for the payment gateway
+        $payment->load('order.customer.user');
+
+        // Create payment details DTO
+        $paymentDetailsDto = PaymentDetailsData::from($paymentDetails);
+
         $gateway = $this->gatewayFactory->create($method->value);
-        $response = $gateway->initiatePayment($payment);
+        $response = $gateway->initiatePayment($payment, $paymentDetailsDto);
         $this->updatePaymentFromResponse($payment, $response);
 
         // TODO: Remove this simulation when real payment callbacks are implemented
@@ -33,6 +41,13 @@ class PaymentService
     public function handleCallback(string $orderId, array $callbackData): void
     {
         DB::transaction(function () use ($orderId, $callbackData) {
+
+            // Update payment based on callback data
+
+            // Update order based on payment status
+
+            // Affect delivery person to order if payment is successful
+
             $payment = $this->findPaymentByOrderId($orderId);
             $gateway = $this->gatewayFactory->create($payment->payment_method->value);
             $callbackDto = new PaymentCallbackData(
@@ -41,7 +56,18 @@ class PaymentService
                 amount: $callbackData['transaction_amount'],
                 rawData: $callbackData
             );
-            $response = $gateway->handleCallback($callbackDto);
+
+            // Create PaymentResponse from callback data
+            $response = new PaymentResponse(
+                success: $callbackDto->status === 'SUCCESS',
+                status: $callbackDto->status,
+                transactionReference: $callbackDto->transactionReference,
+                paymentUrl: null,
+                amount: $callbackDto->amount,
+                errorMessage: null,
+                gatewayResponse: $callbackDto->rawData
+            );
+
             $this->processPaymentResponse($payment, $response);
         });
     }
@@ -119,6 +145,10 @@ class PaymentService
 
     private function schedulePaymentCallback(OrderPayment $payment): void
     {
-        dispatch(new \App\Jobs\UpdatePaymentStatusJob($payment->id))->delay(now()->addSeconds(30));
+        dispatch(new \App\Jobs\VerifyPaymentStatusJob(
+            $payment->id,
+            $payment->payment_method,
+            $this
+        ))->delay(now()->addSeconds(30));
     }
 }

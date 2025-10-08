@@ -25,13 +25,13 @@ class MTNMoneyTestGateway
     public function __construct(string $testEnvironment = 'sandbox')
     {
         $this->testEnvironment = $testEnvironment;
-         $this->config = config('mtnmoney', []);
+        $this->config = config('mtnmoney', []);
 
         if (empty($this->config)) {
             log::warning('⚠️ MTNMoneyTestGateway: mtnmoney config is empty!');
         }
 
-        if (!isset($this->config['base_url']) || empty($this->config['base_url'])) {
+        if (! isset($this->config['base_url']) || empty($this->config['base_url'])) {
             throw new \Exception('MTN MoMo base URL is not configured. Please check MTN_MOMO_BASE_URL environment variable.');
         }
 
@@ -145,13 +145,13 @@ class MTNMoneyTestGateway
                     'test_environment' => $this->testEnvironment,
                 ]);
 
-                VerifyMTNPaymentStatusJob::dispatch($referenceId, $this->config);
-                
+                VerifyMTNPaymentStatusJob::dispatch($referenceId);
+
                 Log::info('📅 MTN Payment Status Verification Job Dispatched', [
                     'reference_id' => $referenceId,
                     'external_id' => $paymentData['external_id'],
                     'verification_schedule' => 'Every 10 seconds for 3 minutes (max 18 attempts)',
-                    'config_passed' => true,
+                    'attempt_count' => 1,
                 ]);
 
                 return [
@@ -483,15 +483,15 @@ class MTNMoneyTestGateway
 
     /**
      * Verify payment status with polling logic
-     * 
-     * @param string $referenceId The MTN reference ID to verify
-     * @param int $attemptCount Current attempt number (for recursive calls)
+     *
+     * @param  string  $referenceId  The MTN reference ID to verify
+     * @param  int  $attemptCount  Current attempt number (for recursive calls)
      * @return array Verification result with status and details
      */
     public function verify(string $referenceId, int $attemptCount = 1): array
     {
         $maxAttempts = 18; // 3 minutes / 10 seconds = 18 attempts
-        
+
         Log::info('🔍 MTN Payment Status Verification', [
             'reference_id' => $referenceId,
             'attempt' => $attemptCount,
@@ -501,14 +501,14 @@ class MTNMoneyTestGateway
         try {
             // Get current status from MTN API
             $statusResponse = $this->getTransactionStatus($referenceId);
-            
+
             Log::info('📊 MTN Status Response', [
                 'reference_id' => $referenceId,
                 'attempt' => $attemptCount,
                 'response' => $statusResponse,
             ]);
 
-            if (!$statusResponse['success']) {
+            if (! $statusResponse['success']) {
                 Log::warning('⚠️ MTN Status Check Failed', [
                     'reference_id' => $referenceId,
                     'attempt' => $attemptCount,
@@ -526,11 +526,11 @@ class MTNMoneyTestGateway
             }
 
             $currentStatus = strtoupper($statusResponse['status'] ?? 'UNKNOWN');
-            
+
             // Check if status indicates success
             if ($this->isSuccessfulStatus($currentStatus)) {
                 $totalTime = $attemptCount * 10; // 10 seconds per attempt
-                
+
                 Log::info('✅ MTN Payment Verification Successful', [
                     'reference_id' => $referenceId,
                     'final_status' => $currentStatus,
@@ -553,7 +553,7 @@ class MTNMoneyTestGateway
             // Check if status indicates failure
             if ($this->isFailedStatus($currentStatus)) {
                 $totalTime = $attemptCount * 10;
-                
+
                 Log::error('❌ MTN Payment Verification Failed', [
                     'reference_id' => $referenceId,
                     'final_status' => $currentStatus,
@@ -578,7 +578,7 @@ class MTNMoneyTestGateway
                 // Check if max attempts reached
                 if ($attemptCount >= $maxAttempts) {
                     $totalTime = $maxAttempts * 10;
-                    
+
                     Log::error('⏰ MTN Payment Verification Timeout', [
                         'reference_id' => $referenceId,
                         'final_status' => 'TIMEOUT_PENDING',
@@ -659,6 +659,7 @@ class MTNMoneyTestGateway
     private function isSuccessfulStatus(string $status): bool
     {
         $successStatuses = config('payment.status_mappings.success_statuses', []);
+
         return in_array($status, $successStatuses);
     }
 
@@ -668,6 +669,7 @@ class MTNMoneyTestGateway
     private function isFailedStatus(string $status): bool
     {
         $failedStatuses = config('payment.status_mappings.failed_statuses', []);
+
         return in_array($status, $failedStatuses);
     }
 
@@ -677,6 +679,7 @@ class MTNMoneyTestGateway
     private function isPendingStatus(string $status): bool
     {
         $pendingStatuses = config('payment.status_mappings.pending_statuses', []);
+
         return in_array($status, $pendingStatuses);
     }
 }
