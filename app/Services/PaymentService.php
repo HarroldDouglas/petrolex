@@ -129,6 +129,13 @@ class PaymentService
             'payment_notes' => $response->notes ?? null,
         ]);
 
+        Log::info('Ready to update order', [
+            'order_id' => $payment->order->id,
+            'order_number' => $payment->order->order_number,
+            'response_status' => $response->status,
+            'response_success' => $response->success,
+        ]);
+
         // Update order status using OrderService to ensure events are fired
         if ($response->success && $response->status === PaymentStatus::PAID()->value) {
             Log::info('Payment successful, updating order status via OrderService', [
@@ -144,45 +151,6 @@ class PaymentService
                 'order_id' => $payment->order->id,
                 'order_number' => $payment->order->order_number,
             ]);
-            $this->orderService->update($payment->order, [
-                'status' => OrderStatus::FAILED()->value,
-            ]);
-        }
-    }
-
-    /**
-     * Update payment status and related order status
-     * This method ensures both payment and order are updated properly with events
-     */
-    public function updatePaymentStatus(OrderPayment $payment, PaymentStatus $newStatus, ?string $notes = null): void
-    {
-        Log::info('Updating payment status', [
-            'payment_id' => $payment->id,
-            'old_status' => $payment->payment_status->value,
-            'new_status' => $newStatus->value,
-        ]);
-
-        // Update payment record
-        $updateData = [
-            'payment_status' => $newStatus->value,
-            'payment_date' => ($newStatus === PaymentStatus::PAID()) ? now() : null,
-            'amount_paid' => ($newStatus === PaymentStatus::PAID()) ? $payment->amount_due : $payment->amount_paid,
-            'amount_due' => ($newStatus === PaymentStatus::PAID()) ? 0 : $payment->amount_due,
-        ];
-
-        if ($notes) {
-            $updateData['payment_notes'] = $notes;
-        }
-
-        $payment->update($updateData);
-
-        // Update order status using OrderService to ensure events are fired
-        if ($newStatus === PaymentStatus::PAID()) {
-            $this->orderService->update($payment->order, [
-                'status' => OrderStatus::PAID()->value,
-                'paid_at' => now(),
-            ]);
-        } elseif ($newStatus === PaymentStatus::FAILED()) {
             $this->orderService->update($payment->order, [
                 'status' => OrderStatus::FAILED()->value,
             ]);
