@@ -107,14 +107,35 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'status' => $result['status'] ?? null,
                 ]);
 
+               
+
                 // Find the order payment using the external ID (PETROLEX reference) from gateway response
                 $gatewayResponse = $response->gatewayResponse ?? [];
                 $externalId = $gatewayResponse['externalId'] ?? null;
+                
+                Log::info('🔍 Searching for OrderPayment', [
+                    'reference_id' => $this->referenceId,
+                    'gateway_response_keys' => array_keys($gatewayResponse),
+                    'external_id' => $externalId,
+                    'full_gateway_response' => $gatewayResponse,
+                ]);
                 
                 if (!$externalId) {
                     Log::error('❌ Cannot find externalId in gateway response for callback', [
                         'reference_id' => $this->referenceId,
                         'gateway_response' => $gatewayResponse,
+                        'available_keys' => array_keys($gatewayResponse),
+                    ]);
+                    
+                    // Try alternative approaches to find the payment
+                    Log::info('🔄 Attempting alternative payment lookup methods', [
+                        'mtn_reference' => $this->referenceId,
+                    ]);
+                    
+                    // Skip callback processing instead of causing error
+                    Log::warning('⚠️ Skipping payment callback due to missing externalId', [
+                        'reference_id' => $this->referenceId,
+                        'attempt' => $this->attemptCount,
                     ]);
                     return;
                 }
@@ -127,6 +148,19 @@ class VerifyPaymentStatusJob implements ShouldQueue
                         'external_id' => $externalId,
                         'mtn_reference' => $this->referenceId,
                     ]);
+                    
+                    // List recent payments for debugging
+                    $recentPayments = \App\Models\OrderPayment::select('id', 'order_id', 'payment_reference')
+                        ->orderBy('created_at', 'desc')
+                        ->limit(5)
+                        ->get()
+                        ->toArray();
+                        
+                    Log::info('📋 Recent payments for debugging', [
+                        'recent_payments' => $recentPayments,
+                        'searching_for' => $externalId,
+                    ]);
+                    
                     return;
                 }
 
@@ -137,15 +171,54 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'order_id' => $orderPayment->order_id,
                 ]);
 
+                // Validate order_id before calling callback
+                if (!$orderPayment->order_id || !is_numeric($orderPayment->order_id)) {
+                    Log::error('❌ Invalid order_id for callback', [
+                        'order_payment_id' => $orderPayment->id,
+                        'order_id' => $orderPayment->order_id,
+                        'external_id' => $externalId,
+                    ]);
+                    return;
+                }
+
                 // Call handleCallback with the order ID (not the MTN reference)
-                $this->paymentService->handleCallback(
-                    (string) $orderPayment->order_id,
-                    $result + [
-                        'transaction_ref' => $result['reference_id'] ?? $this->referenceId,
-                        'transaction_status' => $result['status'] ?? null,
-                        'transaction_amount' => $result['amount'] ?? null,
-                    ]
-                );
+                // SAFETY CHECK: Ensure we're never passing UUID format to handleCallback
+                $orderIdForCallback = (string) $orderPayment->order_id;
+                if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $orderIdForCallback)) {
+                    Log::error('🚨 CRITICAL: Attempted to call handleCallback with UUID format', [
+                        'suspected_uuid' => $orderIdForCallback,
+                        'order_payment_id' => $orderPayment->id,
+                        'external_id' => $externalId,
+                        'mtn_reference' => $this->referenceId,
+                    ]);
+                    return;
+                }
+                
+                try {
+                    $this->paymentService->handleCallback(
+                        $orderIdForCallback,
+                        $result + [
+                            'transaction_ref' => $result['reference_id'] ?? $this->referenceId,
+                            'transaction_status' => $result['status'] ?? null,
+                            'transaction_amount' => $result['amount'] ?? null,
+                        ]
+                    );
+
+                    Log::info('✅ Payment callback processed successfully', [
+                        'order_id' => $orderPayment->order_id,
+                        'external_id' => $externalId,
+                        'mtn_reference' => $this->referenceId,
+                    ]);
+                } catch (\Exception $callbackException) {
+                    Log::error('💥 Payment callback failed', [
+                        'order_id' => $orderPayment->order_id,
+                        'external_id' => $externalId,
+                        'mtn_reference' => $this->referenceId,
+                        'callback_error' => $callbackException->getMessage(),
+                        'callback_trace' => $callbackException->getTraceAsString(),
+                    ]);
+                    // Don't rethrow - just log and continue
+                }
 
                 Log::info('🏁 '.$this->paymentMethod.' NEW Verification Completed - Success', [
                     'reference_id' => $this->referenceId,
@@ -155,28 +228,28 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'total_time' => $result['total_time_seconds'] ?? 'N/A',
                 ]);
             }
-        } catch (\Exception $e) {
-            Log::error('💥 '.$this->paymentMethod.' NEW Verification Job Exception', [
-                'reference_id' => $this->referenceId,
-                'attempt' => $this->attemptCount,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            } catch (\Exception $e) {
+                Log::error('💥 '.$this->paymentMethod.' NEW Verification Job Exception', [
+                    'reference_id' => $this->referenceId,
+                    'attempt' => $this->attemptCount,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
 
-            if ($this->attemptCount < self::MAX_ATTEMPTS) {
-                Log::info('🔄 NEW Scheduling Retry After Exception', [
-                    'reference_id' => $this->referenceId,
-                    'current_attempt' => $this->attemptCount,
-                    'next_attempt' => $this->attemptCount + 1,
-                ]);
-                $this->scheduleNextAttempt();
-            } else {
-                Log::error('🚫 NEW Max Attempts Reached After Exception', [
-                    'reference_id' => $this->referenceId,
-                    'max_attempts' => self::MAX_ATTEMPTS,
-                    'final_error' => $e->getMessage(),
-                ]);
-            }
+                if ($this->attemptCount < self::MAX_ATTEMPTS) {
+                    Log::info('🔄 NEW Scheduling Retry After Exception', [
+                        'reference_id' => $this->referenceId,
+                        'current_attempt' => $this->attemptCount,
+                        'next_attempt' => $this->attemptCount + 1,
+                    ]);
+                    $this->scheduleNextAttempt();
+                } else {
+                    Log::error('🚫 NEW Max Attempts Reached After Exception', [
+                        'reference_id' => $this->referenceId,
+                        'max_attempts' => self::MAX_ATTEMPTS,
+                        'final_error' => $e->getMessage(),
+                    ]);
+                }
         }
     }
 
