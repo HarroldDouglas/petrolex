@@ -34,7 +34,7 @@ class PaymentService
         $this->updatePaymentFromResponse($payment, $response);
 
         // TODO: Remove this simulation when real payment callbacks are implemented
-        $this->schedulePaymentCallback($payment);
+        $this->schedulePaymentCallback($payment, $response);
 
         return $payment->refresh();
     }
@@ -152,10 +152,12 @@ class PaymentService
         }
     }
 
-    private function schedulePaymentCallback(OrderPayment $payment): void
+    private function schedulePaymentCallback(OrderPayment $payment, PaymentResponse $response): void
     {
+        $referenceId = $response->transactionReference ?? $payment->payment_reference;
+        
         dispatch(new \App\Jobs\VerifyPaymentStatusJob(
-            $payment->payment_reference,
+            $referenceId,
             $payment->payment_method,
             $this
         ))->delay(now()->addSeconds(30));

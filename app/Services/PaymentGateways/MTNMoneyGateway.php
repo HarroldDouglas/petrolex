@@ -30,7 +30,7 @@ class MTNMoneyGateway implements PaymentGateway
             throw new \Exception('MTN MoMo base URL is not configured. Please check MTN_MOMO_BASE_URL environment variable.');
         }
 
-        Log::info('MTN MoMo Test Gateway initialized', [
+        Log::info('MTN MoMo Gateway initialized', [
             'environment' => $this->config['target_environment'],
             'base_url' => $this->config['base_url'],
             'config_loaded' => true,
@@ -43,7 +43,7 @@ class MTNMoneyGateway implements PaymentGateway
         try {
             $endpoint = $this->config['endpoints'][$product]['token'];
 
-            Log::info('MTN MoMo Test: Requesting access token', [
+            Log::info('MTN MoMo: Requesting access token', [
                 'product' => $product,
                 'endpoint' => $endpoint,
                 'environment' => $this->config['target_environment'],
@@ -59,7 +59,7 @@ class MTNMoneyGateway implements PaymentGateway
                 $data = $response->json();
                 $this->accessToken = $data['access_token'];
 
-                Log::info('MTN MoMo Test: Access token obtained successfully', [
+                Log::info('MTN MoMo: Access token obtained successfully', [
                     'product' => $product,
                     'token_length' => strlen($this->accessToken),
                 ]);
@@ -69,7 +69,7 @@ class MTNMoneyGateway implements PaymentGateway
 
             throw new Exception('Failed to get access token: '.$response->body());
         } catch (Exception $e) {
-            Log::error('MTN MoMo Test Token Error: '.$e->getMessage(), [
+            Log::error('MTN MoMo Token Error: '.$e->getMessage(), [
                 'product' => $product,
                 'environment' => $this->config['target_environment'],
             ]);
@@ -90,7 +90,7 @@ class MTNMoneyGateway implements PaymentGateway
             // Get phone number from payment details (custom request) or fallback to order customer's user
             $phoneNumber = $paymentDetails->getPhone() ?? $payment->order->customer->user->phone_number ?? null;
             if (empty($phoneNumber)) {
-                Log::error('MTN MoMo Test Request Error: Phone number is required for MTN Money payment', [
+                Log::error('MTN MoMo Request Error: Phone number is required for MTN Money payment', [
                     'payment_id' => $payment->id,
                     'order_id' => $payment->order_id,
                     'customer_id' => $payment->order->customer_id,
@@ -104,7 +104,7 @@ class MTNMoneyGateway implements PaymentGateway
             $formattedPhone = $this->formatPhoneNumber($phoneNumber);
             $amount = '10'; // TODO put back $payment->amount_due after testing
 
-            Log::info('MTN MoMo Test: Phone number source', [
+            Log::info('MTN MoMo: Phone number source', [
                 'phone_from_payment_details' => $paymentDetails->getPhone(),
                 'phone_from_customer_user' => $payment->order->customer->user->phone_number ?? null,
                 'selected_phone' => $phoneNumber,
@@ -120,10 +120,10 @@ class MTNMoneyGateway implements PaymentGateway
                     'partyId' => $formattedPhone,
                 ],
                 'payerMessage' => $payment->payment_reference ?? 'Test Payment',
-                'payeeNote' => 'MTN MoMo Test Payment via Petrolex',
+                'payeeNote' => 'MTN MoMo Payment via Petrolex',
             ];
 
-            Log::info('MTN MoMo Test: API configuration', [
+            Log::info('MTN MoMo: API configuration', [
                 'base_url' => $this->config['base_url'],
                 'endpoint' => $endpoint,
                 'full_url' => $this->config['base_url'].$endpoint,
@@ -131,7 +131,7 @@ class MTNMoneyGateway implements PaymentGateway
                 'enviroenment' => $this->config['target_environment'],
             ]);
 
-            Log::info('MTN MoMo Test: Calling MTN API', [
+            Log::info('MTN MoMo: Calling MTN API', [
                 'api_url' => $this->config['base_url'].$endpoint,
                 'reference_id' => $referenceId,
                 'external_id' => $payment->payment_reference,
@@ -151,7 +151,7 @@ class MTNMoneyGateway implements PaymentGateway
             ])->post($url, $requestData);
 
             if ($response->status() === 202) {
-                Log::info('MTN MoMo Test: Payment request sent successfully to MTN API', [
+                Log::info('MTN MoMo: Payment request sent successfully to MTN API', [
                     'response_status' => $response->status(),
                     'reference_id' => $referenceId,
                     'external_id' => $payment->payment_reference,
@@ -175,7 +175,7 @@ class MTNMoneyGateway implements PaymentGateway
 
             throw new Exception('MTN API request failed with status: '.$response->status().' - '.$response->body());
         } catch (Exception $e) {
-            Log::error('MTN MoMo Test Request Error: '.$e->getMessage(), [
+            Log::error('MTN MoMo Request Error: '.$e->getMessage(), [
                 'payment_data' => $payment,
                 'environment' => $this->config['target_environment'],
             ]);
@@ -274,7 +274,7 @@ class MTNMoneyGateway implements PaymentGateway
             ])->get($this->config['base_url'].$endpoint);
             
 
-            Log::info('NEW MTN MoMo Test: Checking transaction status', [
+            Log::info('NEW MTN MoMo: Checking transaction status', [
                 'response' => $response,
                 'reference_id' => $transactionReference,
                 'endpoint' => $endpoint,
