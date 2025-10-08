@@ -102,12 +102,11 @@ class PaymentService
 
     private function mapTransactionStatusToPaymentStatus(string $transactionStatus): string
     {
-        $endingStates = config('payment.ending_states', []);
+        $statusMappings = config('payment.status_mappings', []);
 
         return match (true) {
-            in_array($transactionStatus, $endingStates['success']) => PaymentStatus::PAID()->value,
-            in_array($transactionStatus, $endingStates['failed']) => PaymentStatus::FAILED()->value,
-            in_array($transactionStatus, $endingStates['cancelled']) => PaymentStatus::FAILED()->value,
+            in_array($transactionStatus, $statusMappings['success_statuses'] ?? []) => PaymentStatus::PAID()->value,
+            in_array($transactionStatus, $statusMappings['failed_statuses'] ?? []) => PaymentStatus::FAILED()->value,
             default => PaymentStatus::PENDING()->value,
         };
     }

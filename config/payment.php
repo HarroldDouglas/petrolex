@@ -16,7 +16,8 @@ return [
     'status_mappings' => [
         'success_statuses' => [
             'SUCCESS',
-            'SUCCESSFULL',
+            'SUCCESSFUL',   // MTN returns this variant  
+            'SUCCESSFULL',  // Keep existing variant
             'COMPLETED',
             'PAID',
         ],
