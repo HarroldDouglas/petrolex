@@ -153,7 +153,7 @@ class PaymentService
     private function schedulePaymentCallback(OrderPayment $payment): void
     {
         dispatch(new \App\Jobs\VerifyPaymentStatusJob(
-            $payment->id,
+            $payment->payment_reference,
             $payment->payment_method,
             $this
         ))->delay(now()->addSeconds(30));

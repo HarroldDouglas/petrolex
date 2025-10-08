@@ -7,7 +7,7 @@ use App\DTOs\PaymentCallbackData;
 use App\DTOs\PaymentDetailsData;
 use App\DTOs\PaymentResponse;
 use App\Enums\PaymentStatus;
-use App\Jobs\VerifyMTNPaymentStatusJob;
+use App\Jobs\VerifyPaymentStatusJob;
 use App\Models\OrderPayment;
 use Exception;
 use Illuminate\Support\Facades\Http;
@@ -159,7 +159,7 @@ class MTNMoneyGateway implements PaymentGateway
                     'environment' => $this->config['target_environment'],
                 ]);
 
-                VerifyMTNPaymentStatusJob::dispatch($referenceId);
+                VerifyPaymentStatusJob::dispatch($referenceId);
                 
                 Log::info('📅 MTN Payment Status Verification Job Dispatched', [
                     'reference_id' => $referenceId,
@@ -276,6 +276,7 @@ class MTNMoneyGateway implements PaymentGateway
                 'X-Target-Environment' => $this->config['target_environment'],
                 'Ocp-Apim-Subscription-Key' => $this->config['subscription_key'],
             ])->get($this->config['base_url'].$endpoint);
+            
 
             Log::info('NEW MTN MoMo Test: Checking transaction status', [
                 'response' => $response,
