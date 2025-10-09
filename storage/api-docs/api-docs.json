@@ -5059,6 +5059,11 @@
                         "description": "Le libellé lisible de la méthode de paiement",
                         "type": "string",
                         "example": "Carte de Crédit"
+                    },
+                    "validation_text": {
+                        "description": "Texte d'instruction de validation pour le paiement (traduit dynamiquement selon la langue de l'utilisateur via Laravel translations)",
+                        "type": "string",
+                        "example": "<div>La fenêtre ne s'affiche pas ? Composez <span class='validation-code'>*126#</span>, puis entrez votre code secret pour valider le paiement.</div>"
                     }
                 },
                 "type": "object"

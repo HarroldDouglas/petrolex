@@ -181,18 +181,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     return;
                 }
 
-                // Call handleCallback with the order ID (not the MTN reference)
-                // SAFETY CHECK: Ensure we're never passing UUID format to handleCallback
                 $orderIdForCallback = (string) $orderPayment->order_id;
-                if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $orderIdForCallback)) {
-                    Log::error('🚨 CRITICAL: Attempted to call handleCallback with UUID format', [
-                        'suspected_uuid' => $orderIdForCallback,
-                        'order_payment_id' => $orderPayment->id,
-                        'external_id' => $externalId,
-                        'mtn_reference' => $this->referenceId,
-                    ]);
-                    return;
-                }
                 
                 try {
                     $this->paymentService->handleCallback(

@@ -28,4 +28,18 @@ class PaymentMethod extends Enum
             'CREDIT_CARD' => 'credit_card',
         ];
     }
+
+    public static function validationTextKeys(): array
+    {
+        return [
+            'orange_money' => __('payment.orange_money'),
+            'mtn_money' => __('payment.mtn_money'),
+            'credit_card' => __('payment.credit_card'),
+        ];
+    }
+
+    public function validationText(): ?string
+    {
+        return static::validationTextKeys()[$this->value] ?? null;
+    }
 }
