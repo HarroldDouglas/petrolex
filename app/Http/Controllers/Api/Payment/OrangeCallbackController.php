@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Payment\OrangeCallbackRequest;
-use App\Services\PaymentTest\CallbackStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -12,9 +11,6 @@ use Throwable;
 
 class OrangeCallbackController extends Controller
 {
-    public function __construct(
-        private readonly CallbackStorageService $storageService
-    ) {}
 
     /**
      * Handle Orange Money callbacks
@@ -49,11 +45,20 @@ class OrangeCallbackController extends Controller
     {
         $normalizedData = $this->normalizeOrangeCallback($callbackData);
 
-        return $this->storageService->store(
-            config('payment.providers.orange.name'), 
-            $callbackData, 
-            $normalizedData
-        );
+        // Log the processed callback data
+        Log::info('Orange callback processed', [
+            'provider' => config('payment.providers.orange.name', 'ORANGE'),
+            'raw_data' => $callbackData,
+            'normalized_data' => $normalizedData,
+        ]);
+
+        // TODO: Implement actual payment processing logic here
+        // This should update the payment status in the database
+        
+        return [
+            'status' => 'processed',
+            'normalized_data' => $normalizedData
+        ];
     }
 
     /**

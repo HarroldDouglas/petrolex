@@ -25,17 +25,14 @@ class PaymentService
     {
         $payment = $this->createOrderPayment($order, $method);
 
-        // Load necessary relationships for the payment gateway
         $payment->load('order.customer.user');
 
-        // Create payment details DTO
         $paymentDetailsDto = PaymentDetailsData::from($paymentDetails);
 
         $gateway = $this->gatewayFactory->create($method->value);
         $response = $gateway->initiatePayment($payment, $paymentDetailsDto);
         $this->updatePaymentFromResponse($payment, $response);
 
-        // TODO: Remove this simulation when real payment callbacks are implemented
         $this->schedulePaymentCallback($payment, $response);
 
         return $payment->refresh();
@@ -52,7 +49,7 @@ class PaymentService
                 'order_number' => $payment->order->order_number,
                 'callback_data' => $callbackData,
             ]);
-            
+
             $callbackDto = new PaymentCallbackData(
                 transactionReference: $callbackData['transaction_ref'],
                 status: $this->mapTransactionStatusToPaymentStatus($callbackData['transaction_status']),
@@ -69,7 +66,6 @@ class PaymentService
                 'amount' => $callbackDto->amount,
             ]);
 
-            // Create PaymentResponse from callback data
             $response = new PaymentResponse(
                 success: $callbackDto->status === PaymentStatus::PAID()->value,
                 status: $callbackDto->status,
@@ -89,10 +85,10 @@ class PaymentService
         return OrderPayment::create([
             'order_id' => $order->id,
             'payment_method' => $method->value,
-            'amount_paid' => $order->total_amount, // Assuming order has total_amount
-            'amount_due' => $order->total_amount, // Initially, amount due is total amount
+            'amount_paid' => $order->total_amount,
+            'amount_due' => $order->total_amount,
             'payment_status' => PaymentStatus::PENDING()->value,
-            'payment_reference' => 'PETROLEX_'.uniqid(), // Generate a unique reference
+            'payment_reference' => 'PETROLEX_'.uniqid(),
         ]);
     }
 

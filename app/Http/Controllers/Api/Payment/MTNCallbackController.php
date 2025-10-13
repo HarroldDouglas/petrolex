@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Payment\MTNCallbackRequest;
-use App\Services\PaymentTest\CallbackStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -12,9 +11,6 @@ use Throwable;
 
 class MTNCallbackController extends Controller
 {
-    public function __construct(
-        private readonly CallbackStorageService $storageService
-    ) {}
 
     /**
      * Handle MTN Mobile Money callbacks
@@ -49,11 +45,20 @@ class MTNCallbackController extends Controller
     {
         $normalizedData = $this->normalizeMTNCallback($callbackData);
 
-        return $this->storageService->store(
-            config('payment.providers.mtn.name'), 
-            $callbackData, 
-            $normalizedData
-        );
+        // Log the processed callback data
+        Log::info('MTN callback processed', [
+            'provider' => config('payment.providers.mtn.name', 'MTN'),
+            'raw_data' => $callbackData,
+            'normalized_data' => $normalizedData,
+        ]);
+
+        // TODO: Implement actual payment processing logic here
+        // This should update the payment status in the database
+        
+        return [
+            'status' => 'processed',
+            'normalized_data' => $normalizedData
+        ];
     }
 
     /**

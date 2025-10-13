@@ -14,10 +14,8 @@ class CreditCardGateway implements PaymentGateway
 {
     public function initiatePayment(OrderPayment $payment, PaymentDetailsData $paymentDetails): PaymentResponse
     {
-        // Logique d'intégration avec une API de carte bancaire (ex: Stripe, PayGate)
         $cardDetails = $paymentDetails->getCardDetails();
 
-        // Log card payment details (without sensitive data)
         Log::info('Credit Card Payment Initiated', [
             'payment_id' => $payment->id,
             'cardholder_name' => $cardDetails['cardholder_name'] ?? null,
@@ -38,8 +36,7 @@ class CreditCardGateway implements PaymentGateway
 
     public function handleCallback(PaymentCallbackData $callbackData): PaymentResponse
     {
-        // Traitement du callback Carte Bancaire
-        return new PaymentResponse(
+       return new PaymentResponse(
             success: true,
             status: $callbackData->status,
             transactionReference: $callbackData->transactionReference
@@ -48,7 +45,6 @@ class CreditCardGateway implements PaymentGateway
 
     public function verifyPayment(string $transactionReference): PaymentResponse
     {
-        // Vérification du statut de paiement auprès du prestataire de carte bancaire
         return new PaymentResponse(
             success: true,
             status: PaymentStatus::PAID()->value,

@@ -13,9 +13,6 @@ class OrangeMoneyGateway implements PaymentGateway
 {
     public function initiatePayment(OrderPayment $payment, PaymentDetailsData $paymentDetails): PaymentResponse
     {
-        // Logique d'intégration avec l'API Orange Money
-        // Pour l'instant, une implémentation de base
-
         $phoneNumber = $paymentDetails->getPhone() ?? $payment->order->customer->user->phone_number ?? null;
 
         return new PaymentResponse(
@@ -31,8 +28,6 @@ class OrangeMoneyGateway implements PaymentGateway
 
     public function handleCallback(PaymentCallbackData $callbackData): PaymentResponse
     {
-        // Traitement du callback Orange Money
-        // Vérifier la signature, mettre à jour le statut, etc.
         return new PaymentResponse(
             success: true,
             status: $callbackData->status,
@@ -42,7 +37,6 @@ class OrangeMoneyGateway implements PaymentGateway
 
     public function verifyPayment(string $transactionReference): PaymentResponse
     {
-        // Vérification du statut de paiement auprès d'Orange Money
         return new PaymentResponse(
             success: true,
             status: PaymentStatus::PAID()->value,
