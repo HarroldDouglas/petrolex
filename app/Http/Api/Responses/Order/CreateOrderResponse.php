@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Responses\Order;
 
+use App\Enums\PaymentMethod;
 use App\Http\Api\Resources\Order\OrderDetailResource;
 use App\Http\Api\Responses\ApiResponse;
 use App\Models\Order;
@@ -35,6 +36,7 @@ final class CreateOrderResponse extends ApiResponse
                 'payment_status_label' => $payment->payment_status->label ?? $payment->payment_status->value,
                 'payment_method' => $payment->payment_method->value,
                 'payment_method_label' => $payment->payment_method->label ?? $payment->payment_method->value,
+                'payment_method_validation_text' => $payment->payment_method->validationText(),
                 'amount_due' => $payment->amount_due,
                 'amount_paid' => $payment->amount_paid,
             ],

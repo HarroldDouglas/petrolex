@@ -3,12 +3,13 @@
 namespace App\Contracts;
 
 use App\DTOs\PaymentCallbackData;
+use App\DTOs\PaymentDetailsData;
 use App\DTOs\PaymentResponse;
 use App\Models\OrderPayment;
 
 interface PaymentGateway
 {
-    public function initiatePayment(OrderPayment $payment): PaymentResponse;
+    public function initiatePayment(OrderPayment $payment, PaymentDetailsData $paymentDetails): PaymentResponse;
 
     public function handleCallback(PaymentCallbackData $callbackData): PaymentResponse;
 

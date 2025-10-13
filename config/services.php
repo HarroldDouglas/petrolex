@@ -46,4 +46,14 @@ return [
             'api_key' => env('GOOGLE_MAPS_API_KEY'),
         ],
     ],
+
+    // Payment Gateway External Server Configuration
+    'payment_gateways' => [
+        'external_server' => [
+            'base_url' => env('PAYMENT_EXTERNAL_SERVER_BASE', env('APP_URL')),
+            'timeout' => env('PAYMENT_EXTERNAL_SERVER_TIMEOUT', 30),
+            'mtn_endpoint' => env('PAYMENT_EXTERNAL_MTN_ENDPOINT', '/callback/cm/momo'),
+            'orange_endpoint' => env('PAYMENT_EXTERNAL_ORANGE_ENDPOINT', '/callback/cm/orange'),
+        ],
+    ],
 ];
