@@ -48,11 +48,9 @@ class VerifyPaymentStatusJob implements ShouldQueue
         ]);
 
         try {
-            // Ask the concrete gateway to verify status for the reference id
-            $gateway = $this->gatewayFactory->create($this->paymentMethod->value);
+            *$gateway = $this->gatewayFactory->create($this->paymentMethod->value);
 
             $response = $gateway->verifyPayment($this->referenceId);
-            // Normalize to array structure expected below
             $result = [
                 'success' => $response->success,
                 'status' => $response->status,
@@ -107,9 +105,6 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'status' => $result['status'] ?? null,
                 ]);
 
-               
-
-                // Find the order payment using the external ID (PETROLEX reference) from gateway response
                 $gatewayResponse = $response->gatewayResponse ?? [];
                 $externalId = $gatewayResponse['externalId'] ?? null;
                 
@@ -127,12 +122,10 @@ class VerifyPaymentStatusJob implements ShouldQueue
                         'available_keys' => array_keys($gatewayResponse),
                     ]);
                     
-                    // Try alternative approaches to find the payment
                     Log::info('🔄 Attempting alternative payment lookup methods', [
                         'mtn_reference' => $this->referenceId,
                     ]);
                     
-                    // Skip callback processing instead of causing error
                     Log::warning('⚠️ Skipping payment callback due to missing externalId', [
                         'reference_id' => $this->referenceId,
                         'attempt' => $this->attemptCount,
@@ -140,7 +133,6 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     return;
                 }
 
-                // Find the OrderPayment by payment_reference (PETROLEX reference)
                 $orderPayment = \App\Models\OrderPayment::where('payment_reference', $externalId)->first();
                 
                 if (!$orderPayment) {
@@ -149,7 +141,6 @@ class VerifyPaymentStatusJob implements ShouldQueue
                         'mtn_reference' => $this->referenceId,
                     ]);
                     
-                    // List recent payments for debugging
                     $recentPayments = \App\Models\OrderPayment::select('id', 'order_id', 'payment_reference')
                         ->orderBy('created_at', 'desc')
                         ->limit(5)
@@ -171,7 +162,6 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'order_id' => $orderPayment->order_id,
                 ]);
 
-                // Validate order_id before calling callback
                 if (!$orderPayment->order_id || !is_numeric($orderPayment->order_id)) {
                     Log::error('❌ Invalid order_id for callback', [
                         'order_payment_id' => $orderPayment->id,
@@ -206,7 +196,6 @@ class VerifyPaymentStatusJob implements ShouldQueue
                         'callback_error' => $callbackException->getMessage(),
                         'callback_trace' => $callbackException->getTraceAsString(),
                     ]);
-                    // Don't rethrow - just log and continue
                 }
 
                 Log::info('🏁 '.$this->paymentMethod.' NEW Verification Completed - Success', [
