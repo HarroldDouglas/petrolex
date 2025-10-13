@@ -29,9 +29,9 @@ return [
         ],
     ],
 
-    'subscription_key' => env('MTN_MOMO_SUBSCRIPTION_KEY', '6cefa52fcefc41849cc60e40f85dd42b'),
-    'api_user' => env('MTN_MOMO_API_USER', 'be1ad2e9-3b15-4e32-8d98-b2b704954ccd'),
-    'api_key' => env('MTN_MOMO_API_KEY', '9ede20c6fd0a4506ac94bc9814f61398'),
+    'subscription_key' => env('MTN_MOMO_SUBSCRIPTION_KEY'),
+    'api_user' => env('MTN_MOMO_API_USER'),
+    'api_key' => env('MTN_MOMO_API_KEY'),
 
     'target_environment' => env('MTN_MOMO_TARGET_ENVIRONMENT', 'mtncameroon'),
     'currency' => env('MTN_MOMO_CURRENCY', 'XAF'),

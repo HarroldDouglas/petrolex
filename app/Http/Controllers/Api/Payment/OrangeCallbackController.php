@@ -49,7 +49,11 @@ class OrangeCallbackController extends Controller
     {
         $normalizedData = $this->normalizeOrangeCallback($callbackData);
 
-        return $this->storageService->store('orange', $callbackData, $normalizedData);
+        return $this->storageService->store(
+            config('payment.providers.orange.name'), 
+            $callbackData, 
+            $normalizedData
+        );
     }
 
     /**
@@ -80,7 +84,7 @@ class OrangeCallbackController extends Controller
     private function logIncomingCallback(OrangeCallbackRequest $request): void
     {
         Log::info('📞 Orange callback received', [
-            'provider' => 'ORANGE',
+            'provider' => config('payment.providers.orange.name'),
             'payload' => $request->validated(),
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
@@ -90,7 +94,7 @@ class OrangeCallbackController extends Controller
     private function logCallbackError(Throwable $exception, array $payload): void
     {
         Log::error('❌ Orange callback processing failed', [
-            'provider' => 'ORANGE',
+            'provider' => config('payment.providers.orange.name', 'ORANGE'),
             'error' => $exception->getMessage(),
             'payload' => $payload,
             'trace' => $exception->getTraceAsString(),

@@ -49,7 +49,11 @@ class MTNCallbackController extends Controller
     {
         $normalizedData = $this->normalizeMTNCallback($callbackData);
 
-        return $this->storageService->store('mtn', $callbackData, $normalizedData);
+        return $this->storageService->store(
+            config('payment.providers.mtn.name'), 
+            $callbackData, 
+            $normalizedData
+        );
     }
 
     /**
@@ -79,7 +83,7 @@ class MTNCallbackController extends Controller
     private function logIncomingCallback(MTNCallbackRequest $request): void
     {
         Log::info('📞 MTN callback received', [
-            'provider' => 'MTN',
+            'provider' => config('payment.providers.mtn.name'),
             'payload' => $request->validated(),
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
@@ -89,7 +93,7 @@ class MTNCallbackController extends Controller
     private function logCallbackError(Throwable $exception, array $payload): void
     {
         Log::error('❌ MTN callback processing failed', [
-            'provider' => 'MTN',
+            'provider' => config('payment.providers.mtn.name', 'MTN'),
             'error' => $exception->getMessage(),
             'payload' => $payload,
             'trace' => $exception->getTraceAsString(),
