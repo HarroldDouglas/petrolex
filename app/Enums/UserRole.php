@@ -61,9 +61,6 @@ class UserRole extends Enum
             'super_admin' => $allPermissions,
             'admin' => array_filter($allPermissions, function ($permission) {
                return ! in_array($permission, [
-                    PermissionEnum::ROLES_CREATE()->value,
-                    PermissionEnum::ROLES_EDIT()->value,
-                    PermissionEnum::ROLES_MANAGE()->value,
                     PermissionEnum::SUPPLIER_DELIVERIES_CREATE()->value,
                     PermissionEnum::SUPPLIER_DELIVERIES_EDIT()->value,
                 ]);
