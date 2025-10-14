@@ -9,6 +9,9 @@ use Spatie\Enum\Laravel\Enum;
  * @method static self USERS_CREATE()
  * @method static self USERS_EDIT()
  * @method static self USERS_DELETE()
+ * @method static self ROLES_VIEW()
+ * @method static self ROLES_CREATE()
+ * @method static self ROLES_EDIT()
  * @method static self ROLES_MANAGE()
  * @method static self DISTRIBUTION_CENTERS_VIEW()
  * @method static self DISTRIBUTION_CENTERS_CREATE()
@@ -65,6 +68,9 @@ class PermissionEnum extends Enum
             'USERS_DELETE' => 'users.delete',
 
             // ROLE MANAGEMENT
+            'ROLES_VIEW' => 'roles.view',
+            'ROLES_CREATE' => 'roles.create',
+            'ROLES_EDIT' => 'roles.edit',
             'ROLES_MANAGE' => 'roles.manage',
 
             // DISTRIBUTION CENTERS
