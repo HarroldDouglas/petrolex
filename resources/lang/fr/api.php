@@ -47,7 +47,7 @@ return [
     'order_not_belongs_to_you' => 'Cette commande ne vous appartient pas',
     'order_cannot_be_cancelled' => 'Cette commande ne peut plus être annulée. Seules les commandes en attente ou payées peuvent être annulées.',
     'order_cannot_be_delivered' => 'Cette commande ne peut pas être marquée comme livrée',
-    'order_cannot_accept_payment' => 'Cette commande ne peut pas accepter de paiement',
+    'order_cannot_accept_payment' => 'Cette commande ne peut pas accepter de paiement. Les commandes avec des paiements en cours ou terminés ne peuvent pas être payées à nouveau.',
     'order_cannot_receive_feedback' => 'Vous ne pouvez laisser un avis que sur des commandes livrées ou annulées',
     'order_invoice_not_belongs_to_you' => 'Cette facture ne vous appartient pas',
     'order_not_authorized_to_deliver' => 'Vous n\'êtes pas autorisé à marquer cette commande comme livrée',

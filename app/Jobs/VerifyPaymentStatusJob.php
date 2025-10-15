@@ -242,8 +242,12 @@ class VerifyPaymentStatusJob implements ShouldQueue
             'delay' => self::CHECK_INTERVAL.' seconds',
         ]);
 
+<<<<<<< HEAD
         dispatch((new self($this->referenceId, $this->paymentMethod, $this->paymentService, 
                     $nextAttempt))->delay(now()->addSeconds(self::CHECK_INTERVAL)));
+=======
+        dispatch((new self($this->referenceId, $this->paymentMethod, $this->paymentService, $nextAttempt))->delay(now()->addSeconds(self::CHECK_INTERVAL)));
+>>>>>>> dev
     }
 
     /**

@@ -91,6 +91,23 @@
                 </li>
             @endcanany
 
+            @canany([$permissionEnum::ROLES_VIEW()->value,
+                $permissionEnum::ROLES_CREATE()->value])
+                <li>
+                    <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#roles">
+                        <i class="iconoir-shield-check"></i> Rôles
+                    </a>
+                    <ul class="collapse" id="roles">
+                        @can($permissionEnum::ROLES_VIEW()->value)
+                            <li><a href="{{ route('roles.list') }}"> Liste</a></li>
+                        @endcan
+                        @can($permissionEnum::ROLES_CREATE()->value)
+                            <li><a href="{{ route('roles.create') }}"> Nouveau</a></li>
+                        @endcan
+                    </ul>
+                </li>
+            @endcanany
+
             @canany([$permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value,
                 $permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value])
                 <li>

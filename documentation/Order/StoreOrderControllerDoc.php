@@ -117,10 +117,13 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=422,
  *         description="Erreur de validation",
+ *
  *         @OA\JsonContent(
  *             allOf={
+ *
  *                 @OA\Schema(ref="#/components/schemas/ValidationErrorResponse"),
  *                 @OA\Schema(
+ *
  *                     @OA\Property(
  *                         property="errors",
  *                         type="object",
@@ -129,33 +132,40 @@ use OpenApi\Annotations as OA;
  *                             property="distribution_center_id",
  *                             type="array",
  *                             description="Erreur de cohérence géographique: l'adresse de livraison et le centre de distribution doivent être dans la même municipalité",
+ *
  *                             @OA\Items(
  *                                 type="string",
  *                                 example="L'adresse de livraison (municipalité Yaoundé II) doit être dans la même municipalité que le centre de distribution (municipalité Yaoundé I)."
  *                             )
  *                         ),
+ *
  *                         @OA\Property(
  *                             property="items.0.unit_price",
  *                             type="array",
  *                             description="Prix incorrect",
+ *
  *                             @OA\Items(
  *                                 type="string",
  *                                 example="Prix incorrect: attendu 3900, fourni 4000"
  *                             )
  *                         ),
+ *
  *                         @OA\Property(
  *                             property="delivery_fee",
  *                             type="array",
  *                             description="Frais de livraison incorrects",
+ *
  *                             @OA\Items(
  *                                 type="string",
  *                                 example="Frais de livraison incorrect: attendu 500, fourni 600"
  *                             )
  *                         ),
+ *
  *                         @OA\Property(
  *                             property="total_amount",
  *                             type="array",
  *                             description="Montant total incorrect",
+ *
  *                             @OA\Items(
  *                                 type="string",
  *                                 example="Montant total incorrect: attendu 15800, fourni 16000"

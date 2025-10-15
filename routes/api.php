@@ -40,7 +40,6 @@ require __DIR__.'/api/tracking.php';
 require __DIR__.'/api/geography.php';
 require __DIR__.'/api/app.php';
 
-// Route de test WebSocket
 Route::post('test-websocket-event', function () {
     event(new \App\Events\TestWebSocketEvent);
 

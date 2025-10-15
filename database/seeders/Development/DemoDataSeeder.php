@@ -36,8 +36,9 @@ class DemoDataSeeder extends Seeder
         // Get or create a demo neighborhood (use existing one or create in Yaoundé I)
         $demoNeighborhood = \App\Models\Geography\Neighborhood::first();
 
-        if (!$demoNeighborhood) {
+        if (! $demoNeighborhood) {
             $this->command->error('No neighborhoods found. Please seed geographic data first.');
+
             return;
         }
 
