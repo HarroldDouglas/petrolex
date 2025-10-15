@@ -35,6 +35,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
         \App\Repositories\Contracts\NeighborhoodRepositoryInterface::class => \App\Repositories\Eloquent\NeighborhoodRepository::class,
         \App\Repositories\Contracts\MunicipalityRepositoryInterface::class => \App\Repositories\Eloquent\MunicipalityRepository::class,
         \App\Repositories\Contracts\RoleRepositoryInterface::class => \App\Repositories\Eloquent\RoleRepository::class,
+        \App\Repositories\Contracts\OrderPaymentRepositoryInterface::class => \App\Repositories\Eloquent\OrderPaymentRepository::class,
     ];
 
     /**

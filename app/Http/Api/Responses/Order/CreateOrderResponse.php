@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Api\Responses\Order;
 
-use App\Enums\PaymentMethod;
 use App\Http\Api\Resources\Order\OrderDetailResource;
 use App\Http\Api\Responses\ApiResponse;
 use App\Models\Order;

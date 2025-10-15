@@ -20,7 +20,7 @@ final class PaymentCallbackTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create required roles for all tests
         foreach (UserRole::cases() as $role) {
             Role::create(['name' => $role->value]);

@@ -32,12 +32,13 @@ class RoleDataTable extends BaseDataTable
             Column::make('Nom', 'name')
                 ->sortable()
                 ->searchable()
-                ->label(fn ($row) =>UserRole::from($row->name)->label ),
+                ->label(fn ($row) => UserRole::from($row->name)->label),
 
             Column::make('Permissions')
                 ->label(function ($row) {
                     $count = $row->permissions_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-primary' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' permission(s)</span>'
                     );
@@ -47,6 +48,7 @@ class RoleDataTable extends BaseDataTable
                 ->label(function ($row) {
                     $count = $row->users_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-success' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' utilisateur(s)</span>'
                     );
@@ -76,9 +78,9 @@ class RoleDataTable extends BaseDataTable
         try {
             $roleService = app(RoleService::class);
             $role = $roleService->findOrFail($roleId);
-            
+
             $roleService->delete($role);
-            
+
             $this->notify('Rôle supprimé avec succès.', 'success');
         } catch (\Exception $e) {
             $this->notify($e->getMessage(), 'error');

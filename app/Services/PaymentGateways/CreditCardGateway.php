@@ -36,7 +36,7 @@ class CreditCardGateway implements PaymentGateway
 
     public function handleCallback(PaymentCallbackData $callbackData): PaymentResponse
     {
-       return new PaymentResponse(
+        return new PaymentResponse(
             success: true,
             status: $callbackData->status,
             transactionReference: $callbackData->transactionReference
