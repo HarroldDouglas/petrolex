@@ -12,8 +12,8 @@ use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Repositories\Contracts\OrderPaymentRepositoryInterface;
 use App\Services\Order\OrderService;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PaymentService
 {
@@ -34,7 +34,7 @@ class PaymentService
         $gateway = $this->gatewayFactory->create($method->value);
         $response = $gateway->initiatePayment($payment, $paymentDetailsDto);
         $this->updatePaymentFromResponse($payment, $response);
-        
+
         Log::info('gateway response', [
             'payment_id' => $payment->id,
             'gateway_response' => $response->gatewayResponse,
@@ -46,7 +46,7 @@ class PaymentService
         $this->schedulePaymentCallback($payment, $response);
 
         return $payment->refresh();
-        }
+    }
 
     public function handleCallback(string $orderId, array $callbackData): void
     {
@@ -93,6 +93,7 @@ class PaymentService
 
     private function createOrderPayment(Order $order, PaymentMethod $method): OrderPayment
     {
+        /** @var OrderPayment */
         return $this->orderPaymentRepository->create([
             'order_id' => $order->id,
             'payment_method' => $method->value,
@@ -122,8 +123,6 @@ class PaymentService
         $this->orderPaymentRepository->update($payment, $updateData);
     }
 
-
-
     private function mapTransactionStatusToPaymentStatus(string $transactionStatus): string
     {
         $statusMappings = config('payment.status_mappings', []);
@@ -142,71 +141,65 @@ class PaymentService
             'response' => $response,
         ]);
 
-        // Update payment record
+        $status     = $response->status;
+        $amountDue  = $payment->amount_due;
+        $now        = now();
+
         $updateData = [
-            'payment_status' => $response->status,
-            'payment_notes' => $response->notes ?? null,
-            'gateway_response' => $response->gatewayResponse,
+            'payment_status'       => $status,
+            'payment_notes'        => $response->notes ?? null,
+            'gateway_response'     => $response,
+            'transaction_reference'=> $response->transactionReference,
+            'payment_date'         => in_array($status, [PaymentStatus::PAID()->value, PaymentStatus::FAILED()->value]) ? $now : null,
+            'amount_paid'          => $status === PaymentStatus::PAID()->value ? $amountDue : 0,
+            'amount_due'           => $status === PaymentStatus::PAID()->value ? 0 : $amountDue,
         ];
 
-        // Handle successful payments
-        if ($response->status === PaymentStatus::PAID()->value) {
-            $updateData['payment_date'] = now();
-            $updateData['amount_paid'] = $payment->amount_due;
-            $updateData['amount_due'] = 0;
-        }
-        
-        // Handle failed payments
-        elseif ($response->status === PaymentStatus::FAILED()->value) {
-            $updateData['payment_date'] = now();
-            // Keep original amounts for failed payments
-            $updateData['amount_paid'] = 0;
-            $updateData['amount_due'] = $payment->amount_due;
-        }
-
-        // Add transaction reference if available
-        if ($response->transactionReference) {
-            $updateData['transaction_reference'] = $response->transactionReference;
-        }
+        // Clean out null values (like transaction_reference when missing)
+        $updateData = array_filter($updateData, fn($value) => !is_null($value));
 
         $this->orderPaymentRepository->update($payment, $updateData);
 
         Log::info('Ready to update order', [
-            'order_id' => $payment->order->id,
-            'order_number' => $payment->order->order_number,
-            'response_status' => $response->status,
+            'order_id'         => $payment->order->id,
+            'order_number'     => $payment->order->order_number,
+            'response_status'  => $status,
             'response_success' => $response->success,
         ]);
 
-        // Update order status using OrderService to ensure events are fired
-        if ($response->success && $response->status === PaymentStatus::PAID()->value) {
-            Log::info('Payment successful, updating order status via OrderService', [
-                'order_id' => $payment->order->id,
-                'order_number' => $payment->order->order_number,
-            ]);
-            $this->orderService->update($payment->order, [
-                'status' => OrderStatus::PAID()->value,
-                'paid_at' => now(),
-            ]);
-        } elseif ($response->status === PaymentStatus::FAILED()->value) {
-            Log::info('Payment failed, updating order status via OrderService', [
-                'order_id' => $payment->order->id,
-                'order_number' => $payment->order->order_number,
-            ]);
-            $this->orderService->update($payment->order, [
+        $orderUpdateData = match ($status) {
+            PaymentStatus::PAID()->value => [
+                'status'  => OrderStatus::PAID()->value,
+                'paid_at' => $now,
+            ],
+            PaymentStatus::FAILED()->value => [
                 'status' => OrderStatus::FAILED()->value,
+            ],
+            default => null
+        };
+
+        if ($orderUpdateData && $response->success || $status === PaymentStatus::FAILED()->value) {
+            Log::info('Updating order status via OrderService', [
+                'order_id'     => $payment->order->id,
+                'order_number' => $payment->order->order_number,
+                'new_status'   => $orderUpdateData['status'],
             ]);
+
+            $this->orderService->update($payment->order, $orderUpdateData);
         }
     }
+
 
     private function schedulePaymentCallback(OrderPayment $payment, PaymentResponse $response): void
     {
         $referenceId = $response->transactionReference ?? $payment->payment_reference;
-        
+
         dispatch(new \App\Jobs\VerifyPaymentStatusJob(
             $referenceId,
             $payment->payment_method,
-            $this
+            $this,
+            1,
+            $this->orderPaymentRepository
         ))->delay(now()->addSeconds(30));
     }
 }

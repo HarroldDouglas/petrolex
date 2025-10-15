@@ -60,7 +60,7 @@ class UserRole extends Enum
         return match ($this->value) {
             'super_admin' => $allPermissions,
             'admin' => array_filter($allPermissions, function ($permission) {
-               return ! in_array($permission, [
+                return ! in_array($permission, [
                     PermissionEnum::SUPPLIER_DELIVERIES_CREATE()->value,
                     PermissionEnum::SUPPLIER_DELIVERIES_EDIT()->value,
                 ]);
@@ -98,25 +98,25 @@ class UserRole extends Enum
             'center_manager' => [
                 PermissionEnum::DISTRIBUTION_CENTER_MANAGE_OWN()->value,
                 PermissionEnum::DISTRIBUTION_CENTER_ASSIGN_DELIVERERS()->value,
-                
+
                 PermissionEnum::ORDERS_VIEW()->value,
                 PermissionEnum::ORDERS_CREATE()->value,
                 PermissionEnum::ORDERS_EDIT()->value,
                 PermissionEnum::ORDERS_ASSIGN()->value,
-                
+
                 PermissionEnum::USERS_VIEW()->value,
-                
+
                 PermissionEnum::DELIVERIES_VIEW()->value,
                 PermissionEnum::DELIVERIES_CREATE()->value,
                 PermissionEnum::DELIVERIES_EDIT()->value,
                 PermissionEnum::DELIVERIES_ASSIGN()->value,
-                
+
                 PermissionEnum::SUPPLIER_DELIVERIES_VIEW()->value,
                 PermissionEnum::SUPPLIER_DELIVERIES_CREATE()->value,
                 PermissionEnum::SUPPLIER_DELIVERIES_EDIT()->value,
-                
+
                 PermissionEnum::CUSTOMERS_VIEW()->value,
-                
+
                 PermissionEnum::REPORTS_MANAGE()->value,
             ],
             'delivery_person' => [

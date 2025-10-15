@@ -159,7 +159,7 @@ class Order extends Model
     /**
      * Check if the order can accept a new payment.
      */
-   public function canAcceptPayment(): bool
+    public function canAcceptPayment(): bool
     {
         $canBePaid = in_array($this->status, [
             OrderStatus::PENDING(),
@@ -167,12 +167,11 @@ class Order extends Model
         ], true);
 
         $hasOngoingOrPaidPayment = $this->payments()
-            ->whereIn('payment_status', [ PaymentStatus::PAID()->value, PaymentStatus::PENDING()->value, ])
+            ->whereIn('payment_status', [PaymentStatus::PAID()->value, PaymentStatus::PENDING()->value])
             ->exists();
-            
+
         return $canBePaid && ! $hasOngoingOrPaidPayment;
     }
-
 
     /**
      * Get the items for the order.

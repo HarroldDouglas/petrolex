@@ -152,6 +152,7 @@ class MTNMoneyGateway implements PaymentGateway
 
             if ($response->status() === 202) {
                 Log::info('MTN MoMo: Payment request sent successfully to MTN API', [
+                    'response' => $response,
                     'response_status' => $response->status(),
                     'reference_id' => $referenceId,
                     'external_id' => $payment->payment_reference,
@@ -162,7 +163,8 @@ class MTNMoneyGateway implements PaymentGateway
                     'external_id' => $payment->payment_reference,
                     'verification_schedule' => 'Every 10 seconds for 3 minutes (max 18 attempts)',
                     'attempt_count' => 1,
-                ]);                return new PaymentResponse(
+                ]);                
+                return new PaymentResponse(
                     success: true,
                     status: PaymentStatus::PENDING()->value,
                     transactionReference: $referenceId,

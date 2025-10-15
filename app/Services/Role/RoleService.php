@@ -4,12 +4,10 @@ namespace App\Services\Role;
 
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Services\BaseServiceForEntity;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Role;
 
 class RoleService extends BaseServiceForEntity
 {
-
     public function __construct(
         protected RoleRepositoryInterface $roleRepository
     ) {
@@ -20,5 +18,4 @@ class RoleService extends BaseServiceForEntity
     {
         return Role::class;
     }
-
 }

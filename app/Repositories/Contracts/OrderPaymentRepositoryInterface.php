@@ -10,4 +10,9 @@ interface OrderPaymentRepositoryInterface extends BaseRepositoryInterface
      * Find payment by order ID
      */
     public function findByOrderId(string $orderId): ?OrderPayment;
+
+    /**
+     * Find payment by payment reference
+     */
+    public function findByPaymentReference(string $paymentReference): ?OrderPayment;
 }

@@ -16,7 +16,7 @@ return [
     'status_mappings' => [
         'success_statuses' => [
             'SUCCESS',
-            'SUCCESSFUL', 
+            'SUCCESSFUL',
             'SUCCESSFULL',
             'COMPLETED',
             'PAID',
