@@ -48,7 +48,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
         ]);
 
         try {
-            *$gateway = $this->gatewayFactory->create($this->paymentMethod->value);
+            $gateway = $this->gatewayFactory->create($this->paymentMethod->value);
 
             $response = $gateway->verifyPayment($this->referenceId);
             $result = [
@@ -242,7 +242,12 @@ class VerifyPaymentStatusJob implements ShouldQueue
             'delay' => self::CHECK_INTERVAL.' seconds',
         ]);
 
+<<<<<<< HEAD
+        dispatch((new self($this->referenceId, $this->paymentMethod, $this->paymentService, 
+                    $nextAttempt))->delay(now()->addSeconds(self::CHECK_INTERVAL)));
+=======
         dispatch((new self($this->referenceId, $this->paymentMethod, $this->paymentService, $nextAttempt))->delay(now()->addSeconds(self::CHECK_INTERVAL)));
+>>>>>>> dev
     }
 
     /**
