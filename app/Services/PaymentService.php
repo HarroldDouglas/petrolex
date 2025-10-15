@@ -10,6 +10,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\OrderPayment;
+use App\Repositories\Contracts\OrderPaymentRepositoryInterface;
 use App\Services\Order\OrderService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,8 @@ class PaymentService
 {
     public function __construct(
         private PaymentGatewayFactory $gatewayFactory,
-        private OrderService $orderService
+        private OrderService $orderService,
+        private OrderPaymentRepositoryInterface $orderPaymentRepository
     ) {}
 
     public function initiatePayment(Order $order, PaymentMethod $method, array $paymentDetails = []): OrderPayment
@@ -32,17 +34,26 @@ class PaymentService
         $gateway = $this->gatewayFactory->create($method->value);
         $response = $gateway->initiatePayment($payment, $paymentDetailsDto);
         $this->updatePaymentFromResponse($payment, $response);
+        
+        Log::info('gateway response', [
+            'payment_id' => $payment->id,
+            'gateway_response' => $response->gatewayResponse,
+            'order_number' => $payment->order->order_number,
+            'transaction_reference' => $response->transactionReference,
+            'status' => $response->status,
+        ]);
 
         $this->schedulePaymentCallback($payment, $response);
 
         return $payment->refresh();
-    }
+        }
 
     public function handleCallback(string $orderId, array $callbackData): void
     {
         DB::transaction(function () use ($orderId, $callbackData) {
-            $payment = $this->findPaymentByOrderId($orderId);
-            $gateway = $this->gatewayFactory->create($payment->payment_method->value);
+            $payment = $this->orderPaymentRepository->findByOrderId($orderId);
+
+            $gateway = $this->gatewayFactory->create($payment?->payment_method?->value);
             Log::info('🔔 Received Payment Callback', [
                 'payment_id' => $payment->id,
                 'order_id' => $payment->order->id,
@@ -82,37 +93,36 @@ class PaymentService
 
     private function createOrderPayment(Order $order, PaymentMethod $method): OrderPayment
     {
-        return OrderPayment::create([
+        return $this->orderPaymentRepository->create([
             'order_id' => $order->id,
             'payment_method' => $method->value,
-            'amount_paid' => $order->total_amount,
+            'amount_paid' => 0,
             'amount_due' => $order->total_amount,
             'payment_status' => PaymentStatus::PENDING()->value,
             'payment_reference' => 'PETROLEX_'.uniqid(),
+            'transaction_reference' => null,
+            'payment_url' => null,
+            'gateway_response' => null,
         ]);
     }
 
     private function updatePaymentFromResponse(OrderPayment $payment, PaymentResponse $response): void
     {
-        $payment->update([
+        $updateData = [
             'payment_status' => $response->status,
             'payment_date' => ($response->status === PaymentStatus::PAID()->value) ? now() : null,
             'amount_paid' => ($response->status === PaymentStatus::PAID()->value) ? $payment->amount_due : $payment->amount_paid,
             'amount_due' => ($response->status === PaymentStatus::PAID()->value) ? 0 : $payment->amount_due,
-            'payment_notes' => $response->notes ?? null,
-        ]);
+            'payment_notes' => $response->errorMessage ?? null,
+            'gateway_response' => $response->gatewayResponse,
+            'transaction_reference' => $response->transactionReference,
+            'payment_url' => $response->paymentUrl,
+        ];
+
+        $this->orderPaymentRepository->update($payment, $updateData);
     }
 
-    private function findPaymentByOrderId(string $orderId): OrderPayment
-    {
-        $payment = OrderPayment::where('order_id', $orderId)->first();
 
-        if (! $payment) {
-            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel(OrderPayment::class, [$orderId]);
-        }
-
-        return $payment;
-    }
 
     private function mapTransactionStatusToPaymentStatus(string $transactionStatus): string
     {
@@ -133,13 +143,33 @@ class PaymentService
         ]);
 
         // Update payment record
-        $payment->update([
+        $updateData = [
             'payment_status' => $response->status,
-            'payment_date' => ($response->status === PaymentStatus::PAID()->value) ? now() : null,
-            'amount_paid' => ($response->status === PaymentStatus::PAID()->value) ? $payment->amount_due : $payment->amount_paid,
-            'amount_due' => ($response->status === PaymentStatus::PAID()->value) ? 0 : $payment->amount_due,
             'payment_notes' => $response->notes ?? null,
-        ]);
+            'gateway_response' => $response->gatewayResponse,
+        ];
+
+        // Handle successful payments
+        if ($response->status === PaymentStatus::PAID()->value) {
+            $updateData['payment_date'] = now();
+            $updateData['amount_paid'] = $payment->amount_due;
+            $updateData['amount_due'] = 0;
+        }
+        
+        // Handle failed payments
+        elseif ($response->status === PaymentStatus::FAILED()->value) {
+            $updateData['payment_date'] = now();
+            // Keep original amounts for failed payments
+            $updateData['amount_paid'] = 0;
+            $updateData['amount_due'] = $payment->amount_due;
+        }
+
+        // Add transaction reference if available
+        if ($response->transactionReference) {
+            $updateData['transaction_reference'] = $response->transactionReference;
+        }
+
+        $this->orderPaymentRepository->update($payment, $updateData);
 
         Log::info('Ready to update order', [
             'order_id' => $payment->order->id,
