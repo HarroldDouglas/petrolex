@@ -85,7 +85,6 @@ class RoleDataTable extends BaseDataTable
         }
 
         return ucwords(str_replace(['_', '-'], ' ', $roleName));
-
     }
 
     public function deleteRole(int $roleId): void

@@ -17,7 +17,7 @@ class RoleService extends BaseServiceForEntity
         protected RoleRepositoryInterface $roleRepository,
         protected PermissionService $permissionService
     ) {
-        parent::__construct($this->roleRepository);
+        parent::__construct($roleRepository);
     }
 
     protected function getModel(): string
