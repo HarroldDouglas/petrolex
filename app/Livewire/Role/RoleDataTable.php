@@ -88,7 +88,7 @@ class RoleDataTable extends BaseDataTable
 
     }
 
-    public function deleteRole($roleId)
+    public function deleteRole(int $roleId)
     {
         try {
             $roleService = app(RoleService::class);
