@@ -32,7 +32,7 @@ class RoleDataTable extends BaseDataTable
             Column::make('Nom', 'name')
                 ->sortable()
                 ->searchable()
-                ->label(fn ($row) => UserRole::from($row->name)->label),
+                ->label(fn ($row) => $this->getRoleDisplayName($row->name)),
 
             Column::make('Permissions')
                 ->label(function ($row) {
@@ -73,13 +73,26 @@ class RoleDataTable extends BaseDataTable
             ->withCount(['permissions', 'users']);
     }
 
+    /**
+     * Get display name for role (predefined or custom)
+     */
+    private function getRoleDisplayName(string $roleName): string
+    {
+       $enum = UserRole::tryFrom($roleName);
+
+        if ($enum) {
+            return $enum->label;
+        }
+
+        return ucwords(str_replace(['_', '-'], ' ', $roleName));
+    }
+
     public function deleteRole(int $roleId): void
     {
         try {
-            $roleService = app(RoleService::class);
-            $role = $roleService->findOrFail($roleId);
+           $role = $this->roleService->findOrFail($roleId);
 
-            $roleService->delete($role);
+            $this->roleService->delete($role);
 
             $this->notify('Rôle supprimé avec succès.', 'success');
         } catch (\Exception $e) {
