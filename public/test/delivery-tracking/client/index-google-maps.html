@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Client - Suivi Livraison Google Maps</title>
+    
+    <!-- External Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link href="css/styles.css" rel="stylesheet">
+    
+    <style>
+        /* Ajustements spécifiques pour Google Maps */
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        
+        /* Styles pour les marqueurs personnalisés */
+        .driver-marker {
+            background-color: #1E88E5;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .destination-marker {
+            background-color: #E53935;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        .map-legend {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5><span class="status-indicator status-offline" id="connectionStatus"></span>Interface Client - Google Maps</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Connexion client -->
+                        <div id="loginPanel">
+                            <div class="section-header">
+                                <h6><i class="fas fa-user-circle"></i> Connexion Client</h6>
+                            </div>
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="clientEmail" autocomplete="email" value="customer1@test.com" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="clientPassword" autocomplete="current-password" value="password" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100" id="loginBtn">
+                                    <i class="fas fa-sign-in-alt"></i> Se connecter
+                                </button>
+                            </form>
+                            <div id="loginError" class="alert alert-danger mt-3" style="display: none;"></div>
+                        </div>
+
+                        <!-- Panel principal client -->
+                        <div id="clientPanel" style="display: none;">
+                            <div class="client-info-section">
+                                <div class="section-header">
+                                    <h6><i class="fas fa-user"></i> Informations Client</h6>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-1"><strong>Nom:</strong> <span id="currentClientName"></span></p>
+                                        <p class="mb-1"><strong>Email:</strong> <span id="currentClientEmail"></span></p>
+                                        <p class="mb-0"><strong>Statut:</strong> <span id="currentStatus" class="badge bg-success">Connecté</span></p>
+                                    </div>
+                                    <button class="btn btn-outline-danger btn-sm" id="logoutBtn">
+                                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Mes commandes -->
+                            <div class="mb-3">
+                                <div class="section-header d-flex justify-content-between align-items-center">
+                                    <h6><i class="fas fa-shopping-cart"></i> Mes Commandes</h6>
+                                    <button class="btn btn-outline-primary btn-sm" id="refreshOrdersBtn">
+                                        <i class="fas fa-sync-alt"></i> Actualiser
+                                    </button>
+                                </div>
+                                
+                                <!-- Filtres -->
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select class="form-select form-select-sm" id="statusFilter">
+                                                <option value="">Tous les statuts</option>
+                                                <option value="pending">En attente</option>
+                                                <option value="paid">Payées</option>
+                                                <option value="processing">En cours de livraison</option>
+                                                <option value="delivered">Livrées</option>
+                                                <option value="cancelled">Annulées</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   id="orderNumberFilter" placeholder="N° commande">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="ordersList"></div>
+                                
+                                <!-- Pagination -->
+                                <div id="ordersPagination" class="d-flex justify-content-center mt-3"></div>
+                            </div>
+
+                            <!-- Commande sélectionnée pour suivi -->
+                            <div id="selectedOrderPanel" style="display: none;">
+                                <div class="section-header">
+                                    <h6><i class="fas fa-map-marker-alt"></i> Suivi en Temps Réel</h6>
+                                </div>
+                                <div class="tracking-info-card">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h6 id="trackingOrderNumber" class="text-primary mb-2"></h6>
+                                            <p class="mb-1"><strong>Statut:</strong> <span id="trackingOrderStatus" class="badge"></span></p>
+                                            <p class="mb-1"><strong>Livreur:</strong> <span id="trackingDriverName">-</span></p>
+                                            <p class="mb-0"><strong>Adresse:</strong> <span id="trackingDeliveryAddress"></span></p>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <div class="tracking-stats">
+                                                <div class="stat-item">
+                                                    <i class="fas fa-clock text-warning"></i>
+                                                    <span id="trackingETA">-</span>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <i class="fas fa-route text-info"></i>
+                                                    <span id="trackingDistance">-</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Barre de progression -->
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted">Progression de la livraison</small>
+                                            <small class="text-muted"><span id="trackingProgress">0%</span></small>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" id="trackingProgressBar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="mt-3">
+                                    <button class="btn btn-outline-secondary btn-sm w-100" id="stopTrackingBtn">
+                                        <i class="fas fa-times"></i> Arrêter le suivi
+                                    </button>
+                                </div>
+
+                                <!-- Informations temps réel -->
+                                <div class="mt-3">
+                                    <div class="section-header">
+                                        <h6><i class="fas fa-satellite-dish"></i> Suivi Temps Réel</h6>
+                                    </div>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i>
+                                        Le suivi se fait automatiquement. 
+                                        Les mises à jour arrivent du livreur en temps réel.
+                                    </div>
+                                    
+                                    <!-- Status WebSocket -->
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">État de la connexion:</small>
+                                        <span id="connectionStatus" class="badge bg-secondary">
+                                            <i class="fas fa-circle"></i> Vérification...
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Historique des mises à jour -->
+                            <div id="trackingHistoryPanel" class="mt-3" style="display: none;">
+                                <div class="section-header">
+                                    <h6><i class="fas fa-history"></i> Historique</h6>
+                                </div>
+                                <div id="trackingHistory" class="tracking-history"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-map"></i> Google Maps - Suivi de Livraison</h6>
+                    </div>
+                    <div class="card-body p-0" style="position: relative;">
+                        <div id="map"></div>
+                        
+                        <!-- Contrôles de la carte -->
+                        <div class="map-controls">
+                            <button class="btn btn-sm btn-light" id="centerMapBtn" title="Centrer sur livreur">
+                                <i class="fas fa-crosshairs"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light" id="fitBoundsBtn" title="Voir toute la route">
+                                <i class="fas fa-expand-arrows-alt"></i>
+                            </button>
+                        </div>
+
+                        <!-- Légende de la carte -->
+                        <div class="map-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #1E88E5;"></div>
+                                <small>Livreur</small>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #E53935;"></div>
+                                <small>Destination</small>
+                            </div>
+                            <div class="legend-item">
+                                <div style="width: 16px; height: 3px; background-color: #3887be; margin-right: 8px;"></div>
+                                <small>Route</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informations de connexion -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="connection-info">
+                                    <i class="fas fa-wifi text-primary"></i>
+                                    <small class="d-block">WebSocket</small>
+                                    <span id="websocketStatus" class="badge bg-secondary">Déconnecté</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="connection-info">
+                                    <i class="fas fa-server text-success"></i>
+                                    <small class="d-block">API</small>
+                                    <span id="apiStatus" class="badge bg-success">Connecté</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="connection-info">
+                                    <i class="fas fa-map text-info"></i>
+                                    <small class="d-block">Google Maps</small>
+                                    <span id="mapStatus" class="badge bg-info">Chargé</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="connection-info">
+                                    <i class="fas fa-clock text-warning"></i>
+                                    <small class="d-block">Dernière MAJ</small>
+                                    <span id="lastUpdateTime">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration partagée (à charger en premier) -->
+    <script src="../shared-config.js"></script>
+    
+    <!-- ReverbClient (script global) -->
+    <script>
+        // ReverbClient global
+        class ReverbClient {
+            constructor(appKey, options = {}) {
+                this.appKey = appKey;
+                this.options = {
+                    wsHost: options.wsHost || "127.0.0.1",
+                    wsPort: options.wsPort || (typeof window !== "undefined" && window.location.protocol === "https:" ? 443 : 8080),
+                    ...options,
+                };
+                this.state = "initialized";
+                this.channels = new Map();
+                this.callbacks = new Map();
+                this.socketId = null;
+                this.connection = { bind: this.bind.bind(this) };
+                
+                console.log("🔗 ReverbClient créé avec configuration:", {
+                    appKey: this.appKey,
+                    host: this.options.wsHost,
+                    port: this.options.wsPort
+                });
+                
+                this.connect();
+            }
+
+            connect() {
+                const url = `ws://${this.options.wsHost}:${this.options.wsPort}/app/${this.appKey}?protocol=7&client=js&version=8.3.0&flash=false`;
+                console.log("🔗 ReverbClient connecting to:", url);
+
+                this.ws = new WebSocket(url);
+
+                this.ws.onopen = () => {
+                    console.log("📡 WebSocket onopen - état: connecting");
+                    this.setState("connecting");
+                };
+
+                this.ws.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    console.log("📨 Message reçu:", message);
+                    this.handleMessage(message);
+                };
+
+                this.ws.onerror = (error) => {
+                    console.error("❌ ReverbClient error:", error);
+                    this.setState("failed");
+                };
+
+                this.ws.onclose = (event) => {
+                    console.log("🔒 ReverbClient closed:", event.code, event.reason);
+                    this.setState("disconnected");
+                };
+            }
+
+            handleMessage(message) {
+                console.log("🔄 Traitement message:", message.event);
+                
+                if (message.event === "pusher:ping") {
+                    console.log("🏓 Ping reçu, envoi pong");
+                    this.send({
+                        event: "pusher:pong",
+                        data: {},
+                    });
+                    return;
+                }
+
+                if (message.event === "pusher:connection_established") {
+                    console.log("✅ Connexion établie!");
+                    this.socketId = JSON.parse(message.data).socket_id;
+                    this.setState("connected");
+                    this.trigger("connected");
+                } else if (message.channel) {
+                    const channel = this.channels.get(message.channel);
+                    if (channel) {
+                        console.log(`📡 Événement pour canal ${message.channel}:`, message.event);
+                        channel.trigger(
+                            message.event,
+                            JSON.parse(message.data || "{}"),
+                        );
+                    }
+                }
+            }
+
+            setState(newState) {
+                const previousState = this.state;
+                this.state = newState;
+                console.log(`🔄 ReverbClient: ${previousState} → ${newState}`);
+                this.trigger("state_change", {
+                    previous: previousState,
+                    current: newState,
+                });
+            }
+
+            subscribe(channelName) {
+                console.log(`📡 Souscription au canal: ${channelName}`);
+                const channel = new ReverbChannel(this, channelName);
+                this.channels.set(channelName, channel);
+
+                if (this.state === "connected") {
+                    channel.subscribe();
+                } else {
+                    console.log(`⏳ Souscription en attente pour: ${channelName}`);
+                }
+
+                return channel;
+            }
+
+            bind(event, callback) {
+                if (!this.callbacks.has(event)) {
+                    this.callbacks.set(event, []);
+                }
+                this.callbacks.get(event).push(callback);
+                console.log(`🎯 Événement écouté: ${event}`);
+            }
+
+            trigger(event, data) {
+                const callbacks = this.callbacks.get(event) || [];
+                console.log(`🔔 Déclenchement événement ${event} pour ${callbacks.length} callbacks`);
+                callbacks.forEach((callback) => callback(data));
+            }
+
+            send(data) {
+                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    console.log("📤 Envoi message:", data);
+                    this.ws.send(JSON.stringify(data));
+                } else {
+                    console.warn("⚠️ WebSocket non ouvert, impossible d'envoyer:", data);
+                }
+            }
+        }
+
+        class ReverbChannel {
+            constructor(client, name) {
+                this.client = client;
+                this.name = name;
+                this.callbacks = new Map();
+                this.subscribed = false;
+                console.log(`📺 Canal créé: ${name}`);
+            }
+
+            subscribe() {
+                console.log(`📡 Envoi souscription pour: ${this.name}`);
+                this.client.send({
+                    event: "pusher:subscribe",
+                    data: { channel: this.name },
+                });
+            }
+
+            bind(event, callback) {
+                if (!this.callbacks.has(event)) {
+                    this.callbacks.set(event, []);
+                }
+                this.callbacks.get(event).push(callback);
+                console.log(`🎯 Canal ${this.name} écoute événement: ${event}`);
+            }
+
+            trigger(event, data) {
+                const callbacks = this.callbacks.get(event) || [];
+                console.log(`🔔 Canal ${this.name}: événement ${event} pour ${callbacks.length} callbacks`);
+                callbacks.forEach((callback) => callback(data));
+
+                if (event === "pusher_internal:subscription_succeeded") {
+                    this.subscribed = true;
+                    console.log(`✅ Souscrit au canal: ${this.name}`);
+                }
+            }
+        }
+
+        // Rendre disponible globalement
+        window.ReverbClient = ReverbClient;
+        console.log("🌟 ReverbClient disponible globalement");
+    </script>
+
+    <script src="js/services/notification.js"></script>
+    <script src="js/services/cache.js"></script>
+    <script src="js/services/websocket.js"></script>
+    <script src="js/services/google-map.js"></script>
+    <script src="js/services/api-auth.js"></script>
+
+    <!-- Composants individuels AVANT l'orchestrateur principal -->
+    <script src="js/components/ui-manager.js"></script>
+    <script src="js/components/order-manager.js"></script>
+    <script src="js/components/tracking-manager.js"></script>
+    <script src="js/components/login-form.js"></script>
+    
+    <!-- Orchestrateur principal qui utilise tous les composants -->
+    <script src="js/components.js"></script>
+
+    <!-- Contrôleurs -->
+    <script src="js/controllers/auth-controller.js"></script>
+    <script src="js/controllers/order-controller.js"></script>  
+    <script src="js/controllers/tracking-controller.js"></script>
+    <script src="js/controllers/websocket-manager.js"></script>
+
+    <script src="js/error-handling.js"></script>
+    
+    <!-- Application principale avec Google Maps -->
+    <script>
+        // Application principale modifiée pour Google Maps
+        class CustomerTrackingApp {
+            constructor() {
+                this.config = CUSTOMER_CONFIG;
+                
+                // Services
+                this.mapService = new CustomerGoogleMapService();
+                this.authService = new CustomerAuthService();
+                this.apiService = new CustomerApiService();
+                this.apiService.setAuthService(this.authService);
+                this.notificationService = new CustomerNotificationService();
+                this.cacheService = new CustomerCacheService();
+                this.websocketService = new CustomerWebSocketService();
+                
+                // UI Managers (d'abord)
+                this.uiManager = new UIManager();
+                
+                // Composants (ensuite)
+                this.authController = new AuthController(this.authService, this.notificationService);
+                this.orderController = new OrderController(this.apiService, this.uiManager, this.notificationService);
+                this.trackingController = new TrackingController(this.mapService, this.websocketService, this.notificationService);
+                this.websocketManager = new WebSocketManager(this.websocketService, this.notificationService);
+                
+                // Managers spécialisés
+                this.orderManager = new CustomerOrderManager(this.orderController, this.uiManager);
+                this.trackingManager = new TrackingManager(this.trackingController, this.uiManager, this.mapService);
+                
+                // Connecter le WebSocket au TrackingManager
+                if (this.websocketManager) {
+                    this.trackingManager.setWebSocketManager(this.websocketManager);
+                }
+                
+                // Rendre l'app accessible globalement pour les autres composants
+                window.customerApp = this;
+                
+                // Pour l'instant, on va gérer la connexion manuellement
+                this.setupSimpleLogin();
+
+                this.currentUser = null;
+                this.trackingInterval = null;
+
+                this.init();
+            }
+
+            async init() {
+                try {
+                    console.log("🚀 Initialisation de l'application client Google Maps...");
+                    
+                    // Attendre que Google Maps soit chargé
+                    await this.waitForGoogleMaps();
+                    
+                    // Initialiser la carte
+                    this.mapService.initialize('map');
+                    document.getElementById('mapStatus').textContent = 'Chargé';
+                    document.getElementById('mapStatus').className = 'badge bg-success';
+                    
+                    // Initialiser les composants
+                    this.setupEventListeners();
+                    this.setupMapControls();
+                    
+                    // Vérifier s'il y a un utilisateur authentifié
+                    this.checkExistingAuth();
+
+                    console.log("✅ Application initialisée avec succès");
+                    this.notificationService.success("Application prête");
+                    
+                } catch (error) {
+                    console.error("❌ Erreur lors de l'initialisation:", error);
+                    this.notificationService.error("Erreur d'initialisation: " + error.message);
+                }
+            }
+
+            async checkExistingAuth() {
+                try {
+                    // Vérifier d'abord si l'utilisateur est authentifié
+                    if (this.authService.isAuthenticated()) {
+                        const userData = this.authService.getUser();
+                        if (userData) {
+                            console.log("🔐 Utilisateur authentifié trouvé en cache:", userData.email);
+                            await this.handleSuccessfulLogin(userData);
+                            return;
+                        }
+                    }
+                    
+                    // Sinon, vérifier le cache
+                    const cachedUser = this.cacheService.get('current_user');
+                    if (cachedUser) {
+                        console.log("📦 Utilisateur trouvé en cache:", cachedUser.email);
+                        await this.handleSuccessfulLogin(cachedUser);
+                        return;
+                    }
+                    
+                    console.log("🔓 Aucun utilisateur authentifié - affichage du formulaire de connexion");
+                } catch (error) {
+                    console.error("❌ Erreur lors de la vérification d'auth:", error);
+                    // En cas d'erreur, nettoyer les caches
+                    this.authService.clearExpiredToken();
+                    this.cacheService.clear('current_user');
+                }
+            }
+
+            async waitForGoogleMaps() {
+                return new Promise((resolve, reject) => {
+                    if (typeof google !== 'undefined' && google.maps) {
+                        resolve();
+                        return;
+                    }
+
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Google Maps loading timeout'));
+                    }, 10000);
+
+                    const checkGoogleMaps = () => {
+                        if (typeof google !== 'undefined' && google.maps) {
+                            clearTimeout(timeout);
+                            resolve();
+                        } else {
+                            setTimeout(checkGoogleMaps, 100);
+                        }
+                    };
+
+                    checkGoogleMaps();
+                });
+            }
+
+            setupSimpleLogin() {
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const email = document.getElementById('clientEmail').value;
+                        const password = document.getElementById('clientPassword').value;
+                        
+                        try {
+                            const userData = await this.authService.login(email, password);
+                            this.handleSuccessfulLogin(userData.user);
+                        } catch (error) {
+                            console.error('Erreur de connexion:', error);
+                            this.notificationService.error('Erreur de connexion: ' + error.message);
+                        }
+                    });
+                }
+            }
+
+            setupEventListeners() {
+                // Boutons de contrôle de carte
+                document.getElementById('centerMapBtn')?.addEventListener('click', () => {
+                    if (this.trackingController.currentTracking) {
+                        const tracking = this.trackingController.currentTracking;
+                        if (tracking.driver_location) {
+                            this.mapService.centerOnLocation(
+                                tracking.driver_location.latitude,
+                                tracking.driver_location.longitude
+                            );
+                        }
+                    }
+                });
+
+                document.getElementById('fitBoundsBtn')?.addEventListener('click', () => {
+                    this.mapService.fitBoundsToMarkers();
+                });
+
+                // Simulation de mouvement
+                document.getElementById('simulateMovementBtn')?.addEventListener('click', () => {
+                    this.simulateDriverMovement();
+                });
+
+                // Événements de déconnexion
+                document.getElementById('logoutBtn')?.addEventListener('click', () => {
+                    this.handleLogout();
+                });
+
+                // Événements des filtres
+                document.getElementById('statusFilter')?.addEventListener('change', () => {
+                    if (this.currentUser) {
+                        this.orderManager.loadOrders(this.currentUser.id);
+                    }
+                });
+
+                document.getElementById('orderNumberFilter')?.addEventListener('input', (e) => {
+                    // Debounce pour éviter trop d'appels
+                    clearTimeout(this.filterTimeout);
+                    this.filterTimeout = setTimeout(() => {
+                        if (this.currentUser) {
+                            this.orderManager.loadOrders(this.currentUser.id);
+                        }
+                    }, 500);
+                });
+
+                document.getElementById('refreshOrdersBtn')?.addEventListener('click', () => {
+                    if (this.currentUser) {
+                        this.orderManager.loadOrders(this.currentUser.id);
+                    }
+                });
+            }
+
+            setupMapControls() {
+                // Les contrôles sont déjà définis dans le HTML
+                console.log("🗺️ Contrôles de carte configurés");
+            }
+
+            async handleLogout() {
+                try {
+                    console.log("🚪 Déconnexion en cours...");
+                    
+                    // Déconnexion API
+                    await this.authService.logout();
+                    
+                    // Nettoyer les données locales
+                    this.cacheService.clear();
+                    this.currentUser = null;
+                    
+                    // Arrêter le tracking si actif
+                    if (this.trackingInterval) {
+                        clearInterval(this.trackingInterval);
+                        this.trackingInterval = null;
+                    }
+                    
+                    // Déconnecter WebSocket
+                    this.websocketManager.disconnect();
+                    
+                    // Nettoyer la carte
+                    this.mapService.clearMarkers();
+                    this.mapService.clearRoute();
+                    
+                    // Afficher le formulaire de connexion
+                    document.getElementById('clientPanel').style.display = 'none';
+                    document.getElementById('loginPanel').style.display = 'block';
+                    document.getElementById('selectedOrderPanel').style.display = 'none';
+                    document.getElementById('trackingHistoryPanel').style.display = 'none';
+                    
+                    this.notificationService.success("Déconnecté avec succès");
+                    console.log("✅ Déconnexion réussie");
+                    
+                } catch (error) {
+                    console.error("❌ Erreur lors de la déconnexion:", error);
+                    this.notificationService.error("Erreur lors de la déconnexion");
+                }
+            }
+
+            async handleSuccessfulLogin(userData) {
+                this.currentUser = userData;
+                this.cacheService.set('current_user', userData);
+                
+                // Masquer le panel de connexion et afficher le panel client
+                document.getElementById('loginPanel').style.display = 'none';
+                document.getElementById('clientPanel').style.display = 'block';
+                
+                // Mettre à jour les informations utilisateur
+                document.getElementById('currentClientName').textContent = userData.name || userData.email;
+                document.getElementById('currentClientEmail').textContent = userData.email;
+                
+                // Charger les commandes
+                await this.orderManager.loadOrders(userData.id);
+                
+                // Connecter WebSocket
+                this.websocketManager.initialize();
+                
+                this.notificationService.success(`Connecté en tant que ${userData.name || userData.email}`);
+            }
+
+            async handleOrderSelection(orderData) {
+                try {
+                    console.log("📦 Commande sélectionnée:", orderData);
+                    
+                    // Démarrer le suivi
+                    await this.trackingManager.startTracking(orderData.id);
+                    
+                    // Afficher le panel de suivi
+                    document.getElementById('selectedOrderPanel').style.display = 'block';
+                    document.getElementById('trackingHistoryPanel').style.display = 'block';
+                    
+                    this.notificationService.info(`Suivi démarré pour la commande #${orderData.id}`);
+                    
+                } catch (error) {
+                    console.error("❌ Erreur lors de la sélection de commande:", error);
+                    this.notificationService.error("Erreur lors du démarrage du suivi");
+                }
+            }
+
+            async handleTrackingUpdate(trackingData) {
+                try {
+                    console.log("📍 Mise à jour de suivi:", trackingData);
+                    
+                    // Mettre à jour la carte
+                    if (trackingData.driver_location) {
+                        this.mapService.updateDriverPosition(
+                            trackingData.driver_location.latitude,
+                            trackingData.driver_location.longitude,
+                            trackingData.driver_info || {}
+                        );
+                    }
+                    
+                    if (trackingData.delivery_location) {
+                        this.mapService.setDestination(
+                            trackingData.delivery_location.latitude,
+                            trackingData.delivery_location.longitude,
+                            trackingData.customer_info || {}
+                        );
+                    }
+                    
+                    // Tracer la route si on a les deux positions
+                    if (trackingData.driver_location && trackingData.delivery_location) {
+                        const routeInfo = await this.mapService.drawRoute(
+                            trackingData.driver_location.latitude,
+                            trackingData.driver_location.longitude,
+                            trackingData.delivery_location.latitude,
+                            trackingData.delivery_location.longitude
+                        );
+                        
+                        if (routeInfo) {
+                            // Mettre à jour les informations de route
+                            document.getElementById('trackingETA').textContent = routeInfo.durationText || '-';
+                            document.getElementById('trackingDistance').textContent = routeInfo.distanceText || '-';
+                        }
+                    }
+                    
+                    // Mettre à jour le timestamp
+                    document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
+                    
+                } catch (error) {
+                    console.error("❌ Erreur lors de la mise à jour:", error);
+                }
+            }
+
+            async startTracking(orderNumber) {
+                try {
+                    console.log("🚗 Démarrage du suivi pour la commande:", orderNumber);
+                    
+                    // Trouver la commande par son numéro
+                    const orderCard = document.querySelector(`[data-order-number="${orderNumber}"]`);
+                    if (!orderCard) {
+                        this.notificationService.error("Commande non trouvée");
+                        return;
+                    }
+                    
+                    const orderId = orderCard.dataset.orderId;
+                    
+                    // Démarrer le suivi via le tracking manager
+                    await this.trackingManager.startTracking(orderId);
+                    
+                    // Afficher le panel de suivi
+                    document.getElementById('selectedOrderPanel').style.display = 'block';
+                    document.getElementById('trackingHistoryPanel').style.display = 'block';
+                    
+                    // Mettre à jour les informations de suivi
+                    document.getElementById('trackingOrderNumber').textContent = `Commande ${orderNumber}`;
+                    document.getElementById('trackingOrderStatus').textContent = 'En cours de livraison';
+                    document.getElementById('trackingOrderStatus').className = 'badge bg-primary';
+                    
+                    this.notificationService.success(`Suivi activé pour ${orderNumber}`);
+                    
+                    // Le client ne fait que recevoir les données via WebSocket - pas de simulation
+                    
+                } catch (error) {
+                    console.error("❌ Erreur lors du démarrage du suivi:", error);
+                    this.notificationService.error("Erreur lors du démarrage du suivi");
+                }
+            }
+
+            // SUPPRIMÉ: Plus de simulation côté client
+            // Le client reçoit uniquement les données via WebSocket
+        }
+
+        // Initialiser l'application quand Google Maps est chargé
+        function initMap() {
+            console.log("🗺️ Google Maps callback appelé");
+            window.customerApp = new CustomerTrackingApp();
+        }
+
+        // Gestion d'erreur Google Maps
+        window.gm_authFailure = function() {
+            console.error("❌ Erreur d'authentification Google Maps");
+            document.getElementById('mapStatus').textContent = 'Erreur';
+            document.getElementById('mapStatus').className = 'badge bg-danger';
+        };
+    </script>
+    
+    <!-- Charger Google Maps avec la clé API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0w8HLsobdoJgK7WUTQxLFUuZOirvmUCI&libraries=places&callback=initMap&loading=async" async defer></script>
+</body>
+</html>

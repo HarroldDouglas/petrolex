@@ -6,7 +6,7 @@ use OpenApi\Annotations as OA;
  * @OA\Patch(
  *     path="/api/tracking/delivery/{orderId}/position",
  *     summary="Mettre à jour la position de suivi de livraison",
- *     description="Met à jour la position géographique d'une livraison.",
+ *     description="Met à jour la position géographique d'une livraison. Accessible uniquement par le livreur assigné à cette commande.",
  *     operationId="api.tracking.delivery.position.update",
  *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
@@ -100,6 +100,13 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=401,
  *         description="Non autorisé",
+ *
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad Request - Utilisateur non autorisé (seul le livreur assigné peut mettre à jour la position)",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),

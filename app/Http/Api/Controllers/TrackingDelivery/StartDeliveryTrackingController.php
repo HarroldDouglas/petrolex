@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DeliveryTracking;
 use App\Models\Order;
 use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\Order\OrderService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,37 +27,28 @@ final class StartDeliveryTrackingController extends Controller
     public function __construct(
         private readonly DeliveryTrackingServiceInterface $deliveryTrackingService,
         private readonly DeliveryTrackingRepositoryInterface $deliveryTrackingRepository,
+        private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderService $orderService,
     ) {}
 
-    /**
-     * Start a delivery tracking.
-     *
-     * @throws \Exception
-     */
     public function __invoke(StartDeliveryTrackingRequest $request, int $orderId): ApiResponse
     {
         Log::info('Starting delivery tracking', ['order_id' => $orderId]);
 
         return DB::transaction(function () use ($request, $orderId) {
             $order = $this->getValidatedOrder($orderId);
+            $this->validateDeliveryPersonAccess($order);
             $existingTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
-            if ($this->isTrackingAlreadyCompleted($existingTracking)) {
+            if ($this->isTrackingCompleted($existingTracking)) {
                 return $this->createConflictResponse();
             }
 
             $coordinatesData = $this->extractCoordinatesData($request);
-            $routeData = $this->calculateDeliveryRoute($order, $coordinatesData);
+            $tracking = $this->ensureTrackingExists($existingTracking, $order, $coordinatesData);
 
-            $tracking = $this->processDeliveryTracking(
-                $existingTracking,
-                $orderId,
-                $coordinatesData,
-                $routeData
-            );
-
-            $this->updateOrderToProcessing($order);
+            $this->startTrackingProcess($tracking, $coordinatesData, $order);
+            $this->updateOrderStatus($order);
             $this->broadcastDeliveryUpdate($tracking);
 
             Log::info('Delivery tracking started successfully', ['order_id' => $orderId]);
@@ -67,36 +59,27 @@ final class StartDeliveryTrackingController extends Controller
 
     private function getValidatedOrder(int $orderId): Order
     {
-        /** @var Order */
-        $order = $this->orderService->find($orderId);
+        /** @var Order|null $order */
+        $order = $this->orderRepository->find($orderId);
 
         if (! $order) {
             Log::warning('Order not found', ['order_id' => $orderId]);
             throw new \InvalidArgumentException('Order not found');
         }
 
-        $order->load('deliveryAddress');
+        if (! $order->canBeTracked()) {
+            Log::warning('Order cannot be tracked', ['order_id' => $orderId]);
+            throw new \InvalidArgumentException('Order cannot be tracked');
+        }
 
-        return $order;
+        return $order->load('deliveryAddress', 'distributionCenter', 'deliveryPerson');
     }
 
-    private function isTrackingAlreadyCompleted(?DeliveryTracking $tracking): bool
+    private function isTrackingCompleted(?DeliveryTracking $tracking): bool
     {
-        return $tracking?->status->value === DeliveryTrackingStatus::DELIVERED()->value;
+        return $tracking !== null && $tracking->status->equals(DeliveryTrackingStatus::DELIVERED());
     }
 
-    private function createConflictResponse(): ApiResponse
-    {
-        return DeliveryTrackingResponse::error(
-            'Delivery tracking already completed for this order.',
-            null,
-            Response::HTTP_CONFLICT
-        );
-    }
-
-    /**
-     * @return array{lat: float, lng: float}
-     */
     private function extractCoordinatesData(StartDeliveryTrackingRequest $request): array
     {
         $validated = $request->validated();
@@ -105,6 +88,82 @@ final class StartDeliveryTrackingController extends Controller
             'lat' => (float) $validated['driver_lat'],
             'lng' => (float) $validated['driver_lng'],
         ];
+    }
+
+    private function ensureTrackingExists(
+        ?DeliveryTracking $existingTracking,
+        Order $order,
+        array $coordinates
+    ): DeliveryTracking {
+        if ($existingTracking) {
+            return $existingTracking;
+        }
+
+        Log::info('Creating new tracking', ['order_id' => $order->id]);
+
+        $totalDistance = $this->calculateInitialDistance($order);
+
+        return $this->deliveryTrackingRepository->create([
+            'order_id' => $order->id,
+            'status' => DeliveryTrackingStatus::PENDING(),
+            'total_distance' => $totalDistance,
+            'distance_remaining' => $totalDistance,
+        ]);
+    }
+
+    private function startTrackingProcess(
+        DeliveryTracking $tracking,
+        array $coordinates,
+        Order $order
+    ): void {
+        $routeData = $this->calculateDeliveryRoute($order, $coordinates);
+
+        $tracking->update([
+            'status' => DeliveryTrackingStatus::STARTED(),
+            'driver_lat' => $coordinates['lat'],
+            'driver_lng' => $coordinates['lng'],
+            'estimated_duration' => $routeData->duration, // En secondes (Google Maps API)
+            'distance_remaining' => $routeData->distance,
+            'route_geometry' => $routeData->geometry,
+            'started_at' => now(),
+        ]);
+    }
+
+    private function calculateInitialDistance(Order $order): float
+    {
+        if (! $this->hasValidCoordinates($order)) {
+            return 0.0;
+        }
+
+        $startLat = (float) $order->distributionCenter->latitude;
+        $startLng = (float) $order->distributionCenter->longitude;
+        $endLat = (float) $order->deliveryAddress->latitude;
+        $endLng = (float) $order->deliveryAddress->longitude;
+
+        return $this->calculateHaversineDistance($startLat, $startLng, $endLat, $endLng);
+    }
+
+    private function hasValidCoordinates(Order $order): bool
+    {
+        return $order->distributionCenter?->latitude !== null
+            && $order->distributionCenter?->longitude !== null
+            && $order->deliveryAddress?->latitude !== null
+            && $order->deliveryAddress?->longitude !== null;
+    }
+
+    private function calculateHaversineDistance(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadiusKm = 6371;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLng / 2) * sin($dLng / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return round($earthRadiusKm * $c, 2);
     }
 
     private function calculateDeliveryRoute(Order $order, array $coordinates): object
@@ -127,59 +186,7 @@ final class StartDeliveryTrackingController extends Controller
         return $order->destination_lng === null || $order->destination_lat === null;
     }
 
-    private function processDeliveryTracking(
-        ?DeliveryTracking $existingTracking,
-        int $orderId,
-        array $coordinates,
-        object $routeData
-    ): DeliveryTracking {
-        return $existingTracking
-            ? $this->updateExistingTracking($existingTracking, $coordinates, $routeData)
-            : $this->createNewTracking($orderId, $coordinates, $routeData);
-    }
-
-    private function updateExistingTracking(
-        DeliveryTracking $tracking,
-        array $coordinates,
-        object $routeData
-    ): DeliveryTracking {
-        Log::info('Updating existing tracking', ['tracking_id' => $tracking->id]);
-
-        $tracking->update([
-            'status' => DeliveryTrackingStatus::STARTED(),
-            'driver_lat' => $coordinates['lat'],
-            'driver_lng' => $coordinates['lng'],
-            'estimated_duration' => $routeData->duration,
-            'distance_remaining' => $routeData->distance,
-            'route_geometry' => $routeData->geometry,
-            'started_at' => now(),
-            'total_distance' => $tracking->total_distance ?? $routeData->distance,
-        ]);
-
-        return $tracking;
-    }
-
-    private function createNewTracking(
-        int $orderId,
-        array $coordinates,
-        object $routeData
-    ): DeliveryTracking {
-        Log::info('Creating new tracking', ['order_id' => $orderId]);
-
-        return $this->deliveryTrackingRepository->create([
-            'order_id' => $orderId,
-            'status' => DeliveryTrackingStatus::STARTED(),
-            'driver_lat' => $coordinates['lat'],
-            'driver_lng' => $coordinates['lng'],
-            'estimated_duration' => $routeData->duration,
-            'distance_remaining' => $routeData->distance,
-            'total_distance' => $routeData->distance,
-            'route_geometry' => $routeData->geometry,
-            'started_at' => now(),
-        ]);
-    }
-
-    private function updateOrderToProcessing(Order $order): void
+    private function updateOrderStatus(Order $order): void
     {
         $updateDto = new UpdateOrderDTO(status: OrderStatus::PROCESSING());
         $this->orderService->update($order, $updateDto->toArrayFiltered());
@@ -190,11 +197,35 @@ final class StartDeliveryTrackingController extends Controller
         broadcast(new DeliveryPositionUpdated($tracking));
     }
 
+    private function createConflictResponse(): ApiResponse
+    {
+        return DeliveryTrackingResponse::error(
+            'Delivery tracking already completed for this order.',
+            null,
+            Response::HTTP_CONFLICT
+        );
+    }
+
     private function createSuccessResponse(DeliveryTracking $tracking, bool $wasRestarted): ApiResponse
     {
         $message = $wasRestarted ? 'Delivery restarted successfully.' : 'Delivery started successfully.';
         $freshTracking = $tracking->fresh()->load('order.customer', 'order.deliveryAddress');
 
         return DeliveryTrackingResponse::make($freshTracking, $message);
+    }
+
+    private function validateDeliveryPersonAccess(Order $order): void
+    {
+        $authenticatedUser = auth()->user();
+
+        if (! $order->deliveryPerson || $order->deliveryPerson->user_id !== $authenticatedUser->id) {
+            Log::warning('Unauthorized delivery person access attempt', [
+                'order_id' => $order->id,
+                'authenticated_user_id' => $authenticatedUser->id,
+                'assigned_delivery_person_id' => $order->deliveryPerson?->user_id,
+            ]);
+
+            throw new \InvalidArgumentException('You are not authorized to access this delivery');
+        }
     }
 }

@@ -38,6 +38,7 @@ class RoleDataTable extends BaseDataTable
                 ->label(function ($row) {
                     $count = $row->permissions_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-primary' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' permission(s)</span>'
                     );
@@ -47,6 +48,7 @@ class RoleDataTable extends BaseDataTable
                 ->label(function ($row) {
                     $count = $row->users_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-success' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' utilisateur(s)</span>'
                     );
@@ -83,21 +85,15 @@ class RoleDataTable extends BaseDataTable
         }
 
         return ucwords(str_replace(['_', '-'], ' ', $roleName));
-
     }
 
     public function deleteRole(int $roleId): void
     {
         try {
-            $roleService = app(RoleService::class);
-            $role = $roleService->find($roleId);
-            
-            if (!$role) {
-                throw new \Exception('Rôle non trouvé.');
-            }
-            
-            $roleService->delete($role);
-            
+           $role = $this->roleService->findOrFail($roleId);
+
+            $this->roleService->delete($role);
+
             $this->notify('Rôle supprimé avec succès.', 'success');
         } catch (\Exception $e) {
             $this->notify($e->getMessage(), 'error');

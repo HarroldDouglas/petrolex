@@ -74,16 +74,17 @@ abstract class AbstractMunicipalityForm extends Component
 
     public function loadNeighborhoods()
     {
-        
-        if (!$this->cityId) {
+
+        if (! $this->cityId) {
             $this->neighborhoods = [];
+
             return;
         }
 
         $this->neighborhoods = $this->neighborhoodService
             ->getNeighborhoodsByCity($this->cityId)
             ->pluck('name', 'id')
-            ->map(fn($name, $id) => ['id' => $id, 'name' => $name])
+            ->map(fn ($name, $id) => ['id' => $id, 'name' => $name])
             ->values()
             ->toArray();
 

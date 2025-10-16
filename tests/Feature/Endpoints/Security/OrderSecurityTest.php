@@ -81,7 +81,7 @@ final class OrderSecurityTest extends TestCase
         ])->getJson(route('api.orders.download.invoice', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Cette facture ne vous appartient pas');
+            ->assertJsonPath('message', __('api.order_invoice_not_belongs_to_you'));
     }
 
     #[Test]
@@ -181,14 +181,14 @@ final class OrderSecurityTest extends TestCase
         ])->patchJson(route('api.orders.deliver', ['order' => $otherOrder->id]));
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'You are not authorized to mark this order as delivered');
+            ->assertJsonPath('message', __('api.order_not_authorized_to_deliver'));
     }
 
     #[Test]
     public function customer_cannot_scan_bottles_for_other_customers_order(): void
     {
         // Create another customer and their order
-        $otherCustomer = Customer::factory()->create(['language' => 'en']);
+        $otherCustomer = Customer::factory()->create();
         $distributionCenter = \App\Models\DistributionCenter::factory()->create();
         $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
             'customer_id' => $otherCustomer->id,
@@ -217,7 +217,7 @@ final class OrderSecurityTest extends TestCase
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'You are not authorized to scan bottles for this order');
+            ->assertJsonPath('message', __('api.order_not_authorized_to_scan_bottles'));
     }
 
     #[Test]

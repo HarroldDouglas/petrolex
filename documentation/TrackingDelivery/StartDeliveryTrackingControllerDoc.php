@@ -6,7 +6,7 @@ use OpenApi\Annotations as OA;
  * @OA\Post(
  *     path="/api/tracking/delivery/{orderId}/start",
  *     summary="Démarrer le suivi de livraison",
- *     description="Marque une livraison comme démarrée.",
+ *     description="Marque une livraison comme démarrée. Accessible uniquement par le livreur assigné à cette commande.",
  *     operationId="api.tracking.delivery.start",
  *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
@@ -68,6 +68,13 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=401,
  *         description="Unauthorized",
+ *
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad Request - Utilisateur non autorisé (seul le livreur assigné peut démarrer le suivi)",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),

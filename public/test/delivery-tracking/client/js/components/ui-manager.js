@@ -45,8 +45,19 @@ class UIManager {
     }
 
     showClientPanel() {
-        this.elements.loginPanel.style.display = "none";
-        this.elements.clientPanel.style.display = "block";
+        console.log('🎛️ [UIManager] showClientPanel appelé');
+        console.log('🎛️ [UIManager] loginPanel:', this.elements.loginPanel);
+        console.log('🎛️ [UIManager] clientPanel:', this.elements.clientPanel);
+        
+        if (this.elements.loginPanel) {
+            this.elements.loginPanel.style.display = "none";
+        }
+        if (this.elements.clientPanel) {
+            this.elements.clientPanel.style.display = "block";
+            console.log('✅ [UIManager] clientPanel affiché');
+        } else {
+            console.error('❌ [UIManager] clientPanel introuvable!');
+        }
         this.updateConnectionStatus(true);
     }
 
@@ -157,6 +168,9 @@ class UIManager {
                 if (element.dataset.originalText) {
                     element.innerHTML = element.dataset.originalText;
                     delete element.dataset.originalText;
+                } else {
+                    // Fallback si pas d'originalText sauvegardé
+                    element.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser';
                 }
             }
         }

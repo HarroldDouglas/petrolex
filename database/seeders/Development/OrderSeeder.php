@@ -8,6 +8,7 @@ use App\Enums\BottleMovementType;
 use App\Enums\BottleOrderType;
 use App\Enums\BottleStatus;
 use App\Enums\Currency;
+use App\Enums\DeliveryType;
 use App\Enums\NotificationType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
@@ -70,6 +71,10 @@ class OrderSeeder extends Seeder
         $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES CONFIRMÉES =====');
         $this->displayAllCenterStats($centers, $productCategories);
 
+        $this->createPaidOrders();
+        $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES PAYÉES =====');
+        $this->displayAllCenterStats($centers, $productCategories);
+
         $this->createProcessingOrders();
         $this->command->info('===== ÉTAT DES STOCKS APRÈS COMMANDES EN TRAITEMENT =====');
         $this->displayAllCenterStats($centers, $productCategories);
@@ -100,6 +105,7 @@ class OrderSeeder extends Seeder
         $this->command->info('==============================================');
         $this->command->info('ORDERS CREATED SUMMARY:');
         $this->command->info("Confirmed orders: {$this->orderTypeStats['confirmed']}");
+        $this->command->info("Paid orders: {$this->orderTypeStats['paid']}");
         $this->command->info("Processing orders: {$this->orderTypeStats['processing']}");
         $this->command->info("Delivered orders: {$this->orderTypeStats['delivered']}");
         $this->command->info("Cancelled orders: {$this->orderTypeStats['cancelled']}");
@@ -346,6 +352,63 @@ class OrderSeeder extends Seeder
         $this->orderTypeStats['confirmed'] = count($confirmedOrders);
 
         $this->command->info(count($confirmedOrders).' confirmed orders created.');
+    }
+
+    /**
+     * Create orders with paid status between delivery1@test.com and customer1@test.com
+     */
+    private function createPaidOrders(): void
+    {
+        $this->command->info('Creating paid orders...');
+
+        // Get customer1 and delivery1 users
+        $customer1 = User::where('email', 'customer1@test.com')->first()->customer;
+        $delivery1 = User::where('email', 'delivery1@test.com')->first()->deliveryPerson;
+
+        // Get or create a geographically consistent delivery address in Yaoundé VI
+        $yaoundeVIMunicipality = \App\Models\Geography\Municipality::where('name', 'Yaoundé VI')->first();
+        $bastosNeighborhood = \App\Models\Geography\Neighborhood::where('municipality_id', $yaoundeVIMunicipality->id)->first();
+
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::firstOrCreate([
+            'customer_id' => $customer1->id,
+            'label' => 'Adresse Test Yaoundé VI',
+            'address' => 'Rue du Test, Yaoundé VI',
+            'neighborhood_id' => $bastosNeighborhood->id,
+            'latitude' => 3.876700,
+            'longitude' => 11.526700,
+            'is_default' => false,
+        ]);
+
+        // Get Centre Yaoundé VI (which covers Bastos neighborhood)
+        $centreBastos = DistributionCenter::where('name', 'Centre Yaoundé VI')->first();
+
+        $paidOrders = [];
+
+        // Create 5 paid orders with geographic consistency
+        for ($i = 0; $i < 5; $i++) {
+            $orderData = [
+                'customer_id' => $customer1->id,
+                'delivery_address_id' => $deliveryAddress->id,
+                'delivery_person_id' => $delivery1->id,
+                'distribution_center_id' => $centreBastos->id,
+                'order_number' => 'PAID-'.rand(100000, 999999),
+                'status' => OrderStatus::PAID(),
+                'delivery_type' => DeliveryType::NORMAL(),
+                'subtotal' => 0,
+                'delivery_fee' => rand(500, 2000),
+                'total_amount' => 0,
+                'order_date' => now()->subDays(rand(1, 30)),
+                'paid_at' => now()->subDays(rand(1, 30)),
+            ];
+
+            $paidOrders[] = Order::create($orderData);
+        }
+
+        // Add items to orders
+        $this->addOrderItems($paidOrders);
+
+        $this->orderTypeStats['paid'] = count($paidOrders);
+        $this->command->info(count($paidOrders).' paid orders created between delivery1@test.com and customer1@test.com with geographic consistency.');
     }
 
     /**
@@ -1287,10 +1350,10 @@ class OrderSeeder extends Seeder
             return;
         }
 
-        // Clean existing test orders for customer1
+        // Clean existing test orders for customer1 (EXCLUDE paid orders)
         $customer1 = $customer1User->customer;
         $existingTestOrders = Order::where('customer_id', $customer1->id)
-            ->where('order_number', 'LIKE', 'TEST-C'.$customer1->id.'-%')
+            ->where('status', '!=', 'paid')  // NE PAS supprimer les commandes paid
             ->get();
 
         foreach ($existingTestOrders as $order) {
@@ -1298,6 +1361,10 @@ class OrderSeeder extends Seeder
             $order->items()->delete();
             $order->payment()->delete();
             \App\Models\Refund::where('order_id', $order->id)->delete();
+            // Delete bottle scans
+            \App\Models\OrderBottleScans::whereHas('orderItem', function ($query) use ($order) {
+                $query->where('order_id', $order->id);
+            })->delete();
             $order->delete();
         }
 
@@ -1312,34 +1379,32 @@ class OrderSeeder extends Seeder
             return;
         }
 
-        // Define order scenarios with varied data
+        // Define order scenarios with varied data - Focus on delivery orders (PROCESSING status)
         $orderScenarios = [
-            // Pending orders (3)
+            // Processing orders (7+ orders for delivery testing) - using specific delivery addresses
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 1, 'needs_delivery_person' => true, 'delivery_address' => 'Nkoabang'],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 2, 'needs_delivery_person' => true, 'delivery_address' => 'Poste Centrale'],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 3, 'needs_delivery_person' => true, 'delivery_address' => 'Essos'],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 4, 'needs_delivery_person' => true, 'delivery_address' => 'Nkoabang'],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 5, 'needs_delivery_person' => true, 'delivery_address' => 'Poste Centrale'],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 6, 'needs_delivery_person' => true, 'delivery_address' => 'Essos'],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 7, 'needs_delivery_person' => true, 'delivery_address' => 'Nkoabang'],
+            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 8, 'needs_delivery_person' => true, 'delivery_address' => 'Poste Centrale'],
+
+            // Pending orders (2)
             ['status' => OrderStatus::PENDING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PENDING(), 'days_ago' => 1],
             ['status' => OrderStatus::PENDING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PENDING(), 'days_ago' => 2],
-            ['status' => OrderStatus::PENDING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::FAILED(), 'days_ago' => 3],
 
-            // Confirmed orders (4)
+            // Confirmed orders (2)
             ['status' => OrderStatus::PAID(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 4],
             ['status' => OrderStatus::PAID(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 5],
-            ['status' => OrderStatus::PAID(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 6],
-            ['status' => OrderStatus::PAID(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 7],
 
-            // Processing orders (4)
-            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 8, 'needs_delivery_person' => true],
-            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 9, 'needs_delivery_person' => true],
-            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 10, 'needs_delivery_person' => true],
-            ['status' => OrderStatus::PROCESSING(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 11, 'needs_delivery_person' => true],
-
-            // Delivered orders (4)
+            // Delivered orders (2)
             ['status' => OrderStatus::DELIVERED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 15, 'needs_delivery_person' => true, 'delivered' => true, 'rating' => 4.5, 'comment' => 'Excellent service!'],
             ['status' => OrderStatus::DELIVERED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 20, 'needs_delivery_person' => true, 'delivered' => true, 'rating' => 5.0, 'comment' => 'Perfect delivery'],
-            ['status' => OrderStatus::DELIVERED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 25, 'needs_delivery_person' => true, 'delivered' => true, 'rating' => 3.5],
-            ['status' => OrderStatus::DELIVERED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::CREDIT_CARD(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 30, 'needs_delivery_person' => true, 'delivered' => true, 'rating' => 4.0, 'comment' => 'Good service, on time'],
 
-            // Cancelled orders (2)
+            // Cancelled orders (1)
             ['status' => OrderStatus::CANCELLED(), 'delivery_type' => \App\Enums\DeliveryType::NORMAL(), 'payment_method' => PaymentMethod::ORANGE_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 12, 'cancelled' => true],
-            ['status' => OrderStatus::CANCELLED(), 'delivery_type' => \App\Enums\DeliveryType::FAST(), 'payment_method' => PaymentMethod::MTN_MONEY(), 'payment_status' => PaymentStatus::PAID(), 'days_ago' => 18, 'cancelled' => true],
         ];
 
         $createdOrders = [];
@@ -1358,8 +1423,20 @@ class OrderSeeder extends Seeder
      */
     private function createCustomer1Order(Customer $customer, Collection $centers, Collection $deliveryPersons, array $scenario, int $orderNumber): ?Order
     {
-        $center = $centers->random();
-        $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
+        // Use specific delivery address if provided, otherwise random
+        if (isset($scenario['delivery_address'])) {
+            $deliveryAddress = $customer->deliveryAddresses()->where('label', $scenario['delivery_address'])->first();
+            if (! $deliveryAddress) {
+                $this->command->warn("Delivery address '{$scenario['delivery_address']}' not found for customer1. Using random address.");
+                $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
+            }
+        } else {
+            $deliveryAddress = $customer->deliveryAddresses()->inRandomOrder()->first();
+        }
+
+        // Choose distribution center based on delivery address location for geographic proximity
+        // For test orders, prioritize Yaoundé centers to ensure same city
+        $center = $this->getOptimalDistributionCenter($centers, $deliveryAddress, true);
 
         if (! $deliveryAddress) {
             $this->command->error('No delivery addresses found for customer1.');
@@ -1374,7 +1451,7 @@ class OrderSeeder extends Seeder
             'customer_id' => $customer->id,
             'distribution_center_id' => $center->id,
             'delivery_address_id' => $deliveryAddress->id,
-            'order_number' => 'TEST-C'.$customer->id.'-'.str_pad($orderNumber, 3, '0', STR_PAD_LEFT),
+            'order_number' => 'TEST-C'.$customer->id.'-'.time().'-'.str_pad($orderNumber, 3, '0', STR_PAD_LEFT),
             'order_date' => $orderDate,
             'delivery_type' => $scenario['delivery_type'],
             'status' => $scenario['status'],
@@ -1383,9 +1460,19 @@ class OrderSeeder extends Seeder
             'total_amount' => $scenario['delivery_type']->fee(),
         ];
 
-        // Set delivery person for orders that need one
+        // Set delivery person for orders that need one - Use delivery1@test.com for processing orders
         if (isset($scenario['needs_delivery_person']) && $deliveryPersons->isNotEmpty()) {
-            $orderData['delivery_person_id'] = $deliveryPersons->random()->id;
+            if ($scenario['status']->equals(OrderStatus::PROCESSING())) {
+                // Find delivery1@test.com specifically for processing orders
+                $delivery1User = User::where('email', 'delivery1@test.com')->first();
+                if ($delivery1User && $delivery1User->deliveryPerson) {
+                    $orderData['delivery_person_id'] = $delivery1User->deliveryPerson->id;
+                } else {
+                    $orderData['delivery_person_id'] = $deliveryPersons->random()->id;
+                }
+            } else {
+                $orderData['delivery_person_id'] = $deliveryPersons->random()->id;
+            }
         }
 
         // Set timestamps based on status
@@ -1513,5 +1600,76 @@ class OrderSeeder extends Seeder
                 $this->createRefundForCancelledOrder($order, $totalAmount);
             }
         }
+    }
+
+    /**
+     * Get the optimal distribution center based on geographic proximity to delivery address
+     */
+    private function getOptimalDistributionCenter(Collection $centers, $deliveryAddress, bool $prioritizeYaounde = false): ?DistributionCenter
+    {
+        // If prioritizing Yaoundé for test orders, filter to Yaoundé centers first
+        if ($prioritizeYaounde) {
+            $yaoundeCenters = $centers->filter(function ($center) {
+                return str_contains(strtolower($center->name), 'yaoundé') || str_contains(strtolower($center->name), 'yaounde');
+            });
+
+            if ($yaoundeCenters->isNotEmpty()) {
+                $centers = $yaoundeCenters;
+                $this->command->info('Using Yaoundé center for test order');
+            }
+        }
+
+        if (! $deliveryAddress || ! $deliveryAddress->latitude || ! $deliveryAddress->longitude) {
+            return $centers->random();
+        }
+
+        $deliveryLat = $deliveryAddress->latitude;
+        $deliveryLng = $deliveryAddress->longitude;
+
+        // Calculate distances and find the closest center
+        $closestCenter = null;
+        $minDistance = PHP_FLOAT_MAX;
+
+        foreach ($centers as $center) {
+            if (! $center->latitude || ! $center->longitude) {
+                continue;
+            }
+
+            $distance = $this->calculateDistance(
+                $deliveryLat, $deliveryLng,
+                $center->latitude, $center->longitude
+            );
+
+            if ($distance < $minDistance) {
+                $minDistance = $distance;
+                $closestCenter = $center;
+            }
+        }
+
+        // Log the selection for debugging
+        if ($closestCenter) {
+            $this->command->info("Selected {$closestCenter->name} for delivery to {$deliveryAddress->label} (distance: ".round($minDistance, 2).' km)');
+        }
+
+        return $closestCenter ?: $centers->random();
+    }
+
+    /**
+     * Calculate distance between two geographic points using Haversine formula
+     */
+    private function calculateDistance(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadius = 6371; // Earth's radius in kilometers
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLng / 2) * sin($dLng / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
     }
 }

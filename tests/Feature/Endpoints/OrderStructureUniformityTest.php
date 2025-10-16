@@ -222,9 +222,14 @@ final class OrderStructureUniformityTest extends TestCase
     #[Test]
     public function create_order_endpoint_returns_uniform_structure(): void
     {
-        $distributionCenter = \App\Models\DistributionCenter::factory()->create();
+        // Create neighborhood and city to ensure they're in the same municipality
+        $neighborhood = \App\Models\Geography\Neighborhood::factory()->create();
+        $distributionCenter = \App\Models\DistributionCenter::factory()->create([
+            'neighborhood_id' => $neighborhood->id,
+        ]);
         $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
+            'neighborhood_id' => $neighborhood->id,
         ]);
         $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
 
@@ -279,9 +284,14 @@ final class OrderStructureUniformityTest extends TestCase
     public function all_order_endpoints_have_identical_structure(): void
     {
         // Create an order for testing create endpoint
-        $distributionCenter = \App\Models\DistributionCenter::factory()->create();
+        // Create neighborhood and city to ensure they're in the same municipality
+        $neighborhood = \App\Models\Geography\Neighborhood::factory()->create();
+        $distributionCenter = \App\Models\DistributionCenter::factory()->create([
+            'neighborhood_id' => $neighborhood->id,
+        ]);
         $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
+            'neighborhood_id' => $neighborhood->id,
         ]);
         $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
 

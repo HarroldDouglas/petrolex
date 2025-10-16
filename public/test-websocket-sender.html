@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📤 WebSocket Émetteur</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #e3f2fd; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .message { background-color: #fff3cd; color: #856404; padding: 10px; margin: 5px 0; border-radius: 3px; }
+        button { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background-color: #218838; }
+        input, textarea { padding: 8px; margin: 5px; width: 90%; border: 1px solid #ccc; border-radius: 4px; }
+        .send-button { background-color: #007bff; }
+        .send-button:hover { background-color: #0056b3; }
+        h1 { color: #1976d2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📤 WebSocket Émetteur</h1>
+        <div id="status" class="status disconnected">❌ Non connecté</div>
+        
+        <!-- Informations de configuration -->
+        <div style="background-color: #e3f2fd; padding: 15px; margin: 15px 0; border-radius: 8px;">
+            <h3>📋 Infos Configuration</h3>
+            <p><strong>URL WebSocket:</strong> <code id="wsUrl"></code></p>
+            <p><strong>App Key:</strong> <code>petro-key-12345</code></p>
+            <p><strong>Canal Test:</strong> <code>test-communication</code></p>
+            <p><strong>Protocole:</strong> Pusher v7</p>
+        </div>
+        
+        <button onclick="connectWebSocket()">Se connecter</button>
+        <button onclick="disconnectWebSocket()">Se déconnecter</button>
+        
+        <div style="margin: 20px 0; padding: 15px; border: 2px solid #007bff; border-radius: 8px;">
+            <h3>📤 Envoyer un message</h3>
+            <input type="text" id="messageInput" placeholder="Tapez votre message ici..." style="width: 70%;">
+            <button class="send-button" onclick="sendMessage()">Envoyer</button>
+            <br><br>
+            <textarea id="messageArea" placeholder="Ou tapez un message plus long ici..." rows="3"></textarea>
+            <br>
+            <button class="send-button" onclick="sendLongMessage()">Envoyer Long Message</button>
+        </div>
+        
+        <button onclick="clearMessages()">Effacer Messages</button>
+        
+        <h3>📋 Journal d'activité :</h3>
+        <div id="messages"></div>
+    </div>
+
+    <!-- Shared Configuration -->
+    <script src="test/delivery-tracking/shared-config.js"></script>
+
+    <script>
+        let websocket = null;
+        let messageCounter = 0;
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const messagesDiv = document.getElementById('messages');
+            const colorClass = type === 'sent' ? 'background-color: #d1ecf1; color: #0c5460;' : 
+                              type === 'received' ? 'background-color: #d4edda; color: #155724;' : 
+                              'background-color: #fff3cd; color: #856404;';
+            messagesDiv.innerHTML += `<div class="message" style="${colorClass}">${timestamp} - ${message}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function updateStatus(status, message) {
+            const statusDiv = document.getElementById('status');
+            if (status === 'connected') {
+                statusDiv.className = 'status connected';
+                statusDiv.innerHTML = '✅ Connecté' + (message ? ` - ${message}` : '');
+            } else {
+                statusDiv.className = 'status disconnected';
+                statusDiv.innerHTML = '❌ ' + (message || 'Non connecté');
+            }
+        }
+        
+        function connectWebSocket() {
+            if (websocket) {
+                websocket.close();
+            }
+            
+            // Use shared configuration for WebSocket connection
+            const protocol = SHARED_CONFIG.WEBSOCKET.FORCE_TLS ? 'wss' : 'ws';
+            const port = SHARED_CONFIG.WEBSOCKET.FORCE_TLS ? '' : `:${SHARED_CONFIG.WEBSOCKET.PORT}`;
+            const wsUrl = `${protocol}://${SHARED_CONFIG.WEBSOCKET.HOST}${port}/app/${SHARED_CONFIG.WEBSOCKET.APP_KEY}?protocol=7&client=js&version=8.3.0&flash=false`;
+            
+            // Afficher l'URL dans l'interface
+            document.getElementById('wsUrl').textContent = wsUrl;
+            
+            log(`🚀 Connexion au canal d'émission...`);
+            
+            try {
+                websocket = new WebSocket(wsUrl);
+                
+                websocket.onopen = function(event) {
+                    log('✅ WebSocket connecté - Prêt à émettre !', 'sent');
+                    updateStatus('connected', 'Émetteur actif');
+                    
+                    // S'abonner au canal de test
+                    const subscribeMessage = JSON.stringify({
+                        event: 'pusher:subscribe',
+                        data: {
+                            channel: 'test-communication'
+                        }
+                    });
+                    websocket.send(subscribeMessage);
+                    log(`📡 Abonnement au canal: test-communication`, 'sent');
+                };
+                
+                websocket.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        
+                        if (data.event === 'pusher:connection_established') {
+                            log(`🔗 Connexion établie - Socket ID: ${JSON.parse(data.data).socket_id}`, 'received');
+                        } else if (data.event === 'pusher_internal:subscription_succeeded') {
+                            log(`✅ Abonnement réussi au canal: ${data.channel}`, 'received');
+                        } else if (data.event === 'pusher:ping') {
+                            const pong = JSON.stringify({
+                                event: 'pusher:pong',
+                                data: {}
+                            });
+                            websocket.send(pong);
+                            log(`🏓 Ping reçu, Pong envoyé`);
+                        } else {
+                            log(`📨 Message reçu: ${JSON.stringify(data)}`, 'received');
+                        }
+                    } catch (e) {
+                        log(`📨 Message brut: ${event.data}`, 'received');
+                    }
+                };
+                
+                websocket.onclose = function(event) {
+                    log(`🔌 Connexion fermée - Code: ${event.code}`);
+                    updateStatus('disconnected', `Fermé (${event.code})`);
+                };
+                
+                websocket.onerror = function(error) {
+                    log(`❌ Erreur WebSocket`, 'error');
+                    updateStatus('disconnected', 'Erreur');
+                };
+                
+            } catch (error) {
+                log(`❌ Erreur création: ${error.message}`);
+                updateStatus('disconnected', 'Erreur');
+            }
+        }
+        
+        function disconnectWebSocket() {
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+                log('🔌 Déconnexion manuelle');
+            }
+        }
+        
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                alert('Entrez un message');
+                return;
+            }
+            
+            if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                alert('WebSocket non connecté');
+                return;
+            }
+            
+            messageCounter++;
+            const messageData = {
+                event: 'client-message',
+                data: {
+                    message: message,
+                    sender: 'Émetteur',
+                    timestamp: new Date().toISOString(),
+                    id: messageCounter
+                },
+                channel: 'test-communication'
+            };
+            
+            try {
+                websocket.send(JSON.stringify(messageData));
+                log(`📤 Message #${messageCounter} envoyé: "${message}"`, 'sent');
+                messageInput.value = '';
+            } catch (error) {
+                log(`❌ Erreur envoi: ${error.message}`);
+            }
+        }
+        
+        function sendLongMessage() {
+            const messageArea = document.getElementById('messageArea');
+            const message = messageArea.value.trim();
+            
+            if (!message) {
+                alert('Entrez un message long');
+                return;
+            }
+            
+            if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                alert('WebSocket non connecté');
+                return;
+            }
+            
+            messageCounter++;
+            const messageData = {
+                event: 'client-long-message',
+                data: {
+                    message: message,
+                    sender: 'Émetteur',
+                    timestamp: new Date().toISOString(),
+                    id: messageCounter,
+                    type: 'long'
+                },
+                channel: 'test-communication'
+            };
+            
+            try {
+                websocket.send(JSON.stringify(messageData));
+                log(`📤 Message long #${messageCounter} envoyé (${message.length} caractères)`, 'sent');
+                messageArea.value = '';
+            } catch (error) {
+                log(`❌ Erreur envoi: ${error.message}`);
+            }
+        }
+        
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+            messageCounter = 0;
+        }
+        
+        // Permettre l'envoi avec Enter
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        window.onload = function() {
+            log('📤 Émetteur WebSocket prêt');
+            log('ℹ️ Connectez-vous et envoyez des messages vers le récepteur');
+        };
+    </script>
+</body>
+</html>

@@ -433,4 +433,101 @@ class OrderServiceTest extends TestCase
         $this->assertGreaterThan(0, $orderWithRelations->items->count());
         $this->assertTrue($orderWithRelations->items->first()->relationLoaded('productCategory'));
     }
+
+    public function test_it_validates_delivery_address_and_distribution_center_same_municipality(): void
+    {
+        // Create municipality, neighborhoods, and geography hierarchy
+        $municipality1 = \App\Models\Geography\Municipality::factory()->create(['name' => 'Yaoundé VI']);
+        $municipality2 = \App\Models\Geography\Municipality::factory()->create(['name' => 'Douala III']);
+
+        $neighborhood1 = \App\Models\Geography\Neighborhood::factory()->create([
+            'name' => 'Bastos',
+            'municipality_id' => $municipality1->id,
+        ]);
+        $neighborhood2 = \App\Models\Geography\Neighborhood::factory()->create([
+            'name' => 'Mvog-Mbi',
+            'municipality_id' => $municipality1->id,
+        ]);
+        $neighborhood3 = \App\Models\Geography\Neighborhood::factory()->create([
+            'name' => 'Deido',
+            'municipality_id' => $municipality2->id,
+        ]);
+
+        // Create distribution centers and delivery addresses
+        $distributionCenter1 = DistributionCenter::factory()->create([
+            'neighborhood_id' => $neighborhood1->id, // Bastos, Yaoundé VI
+        ]);
+        $distributionCenter2 = DistributionCenter::factory()->create([
+            'neighborhood_id' => $neighborhood3->id, // Deido, Douala III
+        ]);
+
+        $deliveryAddressSameMunicipality = CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $this->customer->id,
+            'neighborhood_id' => $neighborhood2->id, // Mvog-Mbi, Yaoundé VI (same as center 1)
+        ]);
+
+        $deliveryAddressDifferentMunicipality = CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $this->customer->id,
+            'neighborhood_id' => $neighborhood3->id, // Deido, Douala III (different from center 1)
+        ]);
+
+        $bottleCategory = $this->createBottleProductCategory();
+
+        // Test data for valid order (same municipality)
+        $validOrderData = [
+            'customer_id' => $this->customer->id,
+            'delivery_address_id' => $deliveryAddressSameMunicipality->id,
+            'distribution_center_id' => $distributionCenter1->id,
+            'delivery_type' => DeliveryType::NORMAL(),
+            'delivery_fee' => 500,
+            'total_amount' => 2000,
+            'items' => [
+                [
+                    'product_category_id' => $bottleCategory->id,
+                    'quantity' => 1,
+                    'unit_price' => 1500,
+                    'option' => BottleOrderType::RECHARGE()->value,
+                ],
+            ],
+        ];
+
+        // Test data for invalid order (different municipalities)
+        $invalidOrderData = [
+            'customer_id' => $this->customer->id,
+            'delivery_address_id' => $deliveryAddressDifferentMunicipality->id,
+            'distribution_center_id' => $distributionCenter1->id,
+            'delivery_type' => DeliveryType::NORMAL(),
+            'delivery_fee' => 500,
+            'total_amount' => 2000,
+            'items' => [
+                [
+                    'product_category_id' => $bottleCategory->id,
+                    'quantity' => 1,
+                    'unit_price' => 1500,
+                    'option' => BottleOrderType::RECHARGE()->value,
+                ],
+            ],
+        ];
+
+        // Test 1: Valid order (same municipality) should succeed
+        $orderService = $this->mockOrderServiceWithOrderNumber();
+        $validOrder = $orderService->createWithoutPayment(\App\DTOs\Order\CreateOrderWithoutPaymentDTO::from($validOrderData));
+
+        $this->assertInstanceOf(Order::class, $validOrder);
+        $this->assertEquals($deliveryAddressSameMunicipality->id, $validOrder->delivery_address_id);
+        $this->assertEquals($distributionCenter1->id, $validOrder->distribution_center_id);
+
+        // Test 2: Invalid order (different municipalities) should fail
+        $this->expectException(\Exception::class);
+
+        try {
+            $orderService->createWithoutPayment(\App\DTOs\Order\CreateOrderWithoutPaymentDTO::from($invalidOrderData));
+        } catch (\Exception $e) {
+            $this->assertContains($e->getMessage(), [
+                'L\'adresse de livraison doit être dans la même municipalité que le centre de distribution.',
+                'The delivery address must be in the same municipality as the distribution center.',
+            ]);
+            throw $e;
+        }
+    }
 }

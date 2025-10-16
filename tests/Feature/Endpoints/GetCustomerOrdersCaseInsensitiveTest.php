@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class GetCustomerOrdersCaseInsensitiveTest extends TestCase
@@ -25,7 +26,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         $this->customer = Customer::factory()->create(['user_id' => $this->user->id]);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_status_filter_in_uppercase()
     {
         Order::factory()->create([
@@ -43,7 +44,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_status_filter_in_mixed_case()
     {
         Order::factory()->create([
@@ -57,7 +58,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_delivery_type_filter_in_uppercase()
     {
         Order::factory()->create([
@@ -71,7 +72,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_payment_method_filter_in_mixed_case()
     {
         Order::factory()->create([
@@ -84,7 +85,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_invalid_status_values()
     {
         $response = $this->actingAs($this->user)
@@ -94,7 +95,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         $response->assertJsonValidationErrors('status');
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_all_valid_status_values_in_different_cases()
     {
         $validStatuses = [
@@ -114,7 +115,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_confirmed_status_which_does_not_exist_in_enum()
     {
         $invalidStatuses = ['confirmed', 'CONFIRMED', 'Confirmed'];
@@ -128,7 +129,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_delivery_types_in_different_cases()
     {
         $validDeliveryTypes = [
@@ -144,7 +145,7 @@ class GetCustomerOrdersCaseInsensitiveTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_payment_methods_in_different_cases()
     {
         $validPaymentMethods = [

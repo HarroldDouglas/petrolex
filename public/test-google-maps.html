@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Google Maps - Recherche de lieux</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            position: relative;
+        }
+        #searchInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        #searchInput:focus {
+            border-color: #4285f4;
+            outline: none;
+        }
+        .pac-container {
+            z-index: 1000;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        #searchBtn {
+            padding: 12px 20px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #searchBtn:hover {
+            background-color: #3367d6;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        .place-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #4285f4;
+            cursor: pointer;
+        }
+        .place-item:hover {
+            background-color: #e8f0fe;
+        }
+        .place-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .place-address {
+            color: #666;
+            font-size: 14px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ Test Google Maps - Recherche de lieux au Cameroun</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Tapez pour rechercher un lieu (ex: Yaoundé, Douala, Hôpital Central...)">
+            <button id="searchBtn">🔍 Rechercher</button>
+        </div>
+
+        <div id="status"></div>
+        
+        <div id="map"></div>
+        
+        <div id="results" class="results" style="display: none;">
+            <h3>Résultats de la recherche :</h3>
+            <div id="placesList"></div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let service;
+        let infowindow;
+        let markers = [];
+        let autocomplete;
+
+        // Initialiser la carte
+        function initMap() {
+            // Centrer sur Yaoundé
+            const yaounde = { lat: 3.848, lng: 11.502 };
+            
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 13,
+                center: yaounde,
+            });
+
+            service = new google.maps.places.PlacesService(map);
+            infowindow = new google.maps.InfoWindow();
+
+            // Initialiser l'autocomplétion
+            initAutocomplete();
+
+            // Afficher le statut de succès
+            showStatus("✅ Google Maps chargé avec succès ! Tapez pour voir l'autocomplétion en temps réel.", "success");
+
+            // Event listener pour le bouton de recherche
+            document.getElementById('searchBtn').addEventListener('click', searchPlaces);
+            
+            // Event listener pour la touche Entrée
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchPlaces();
+                }
+            });
+        }
+
+        // Initialiser l'autocomplétion
+        function initAutocomplete() {
+            const input = document.getElementById('searchInput');
+            
+            // Créer l'autocomplétion avec focus sur le Cameroun
+            autocomplete = new google.maps.places.Autocomplete(input, {
+                types: ['establishment', 'geocode'], // Lieux et adresses
+                componentRestrictions: { country: 'cm' }, // Limiter au Cameroun
+                fields: ['place_id', 'geometry', 'name', 'formatted_address', 'rating', 'types']
+            });
+
+            // Biais géographique vers le Cameroun
+            autocomplete.setBounds(
+                new google.maps.LatLngBounds(
+                    new google.maps.LatLng(1.6, 8.5),   // Sud-Ouest du Cameroun
+                    new google.maps.LatLng(13, 16.2)    // Nord-Est du Cameroun
+                )
+            );
+
+            // Écouter la sélection d'un lieu
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                
+                if (!place.geometry) {
+                    showStatus("❌ Aucun détail disponible pour ce lieu", "error");
+                    return;
+                }
+
+                // Centrer la carte sur le lieu sélectionné
+                if (place.geometry.viewport) {
+                    map.fitBounds(place.geometry.viewport);
+                } else {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(16);
+                }
+
+                // Effacer les anciens marqueurs
+                clearMarkers();
+
+                // Ajouter un marqueur pour le lieu sélectionné
+                const marker = new google.maps.Marker({
+                    position: place.geometry.location,
+                    map: map,
+                    title: place.name,
+                    animation: google.maps.Animation.DROP
+                });
+
+                markers.push(marker);
+
+                // Afficher les infos du lieu
+                const content = `
+                    <div style="max-width: 300px;">
+                        <h3 style="margin: 0 0 10px 0; color: #333;">${place.name}</h3>
+                        <p style="margin: 5px 0; color: #666;">${place.formatted_address}</p>
+                        ${place.rating ? `<p style="margin: 5px 0; color: #ff9800;">⭐ ${place.rating}/5</p>` : ''}
+                        <p style="margin: 5px 0; font-size: 12px; color: #999;">
+                            Types: ${place.types ? place.types.slice(0, 3).join(', ') : 'Non spécifié'}
+                        </p>
+                    </div>
+                `;
+
+                infowindow.setContent(content);
+                infowindow.open(map, marker);
+
+                showStatus(`✅ Lieu trouvé: ${place.name}`, "success");
+
+                // Mettre à jour la liste des résultats
+                displaySingleResult(place);
+            });
+        }
+
+        // Fonction de recherche de lieux
+        function searchPlaces() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                showStatus("❌ Veuillez entrer un terme de recherche", "error");
+                return;
+            }
+
+            showStatus("🔍 Recherche en cours...", "");
+            clearMarkers();
+
+            // Recherche textuelle
+            const request = {
+                query: query,
+                location: { lat: 3.848, lng: 11.502 }, // Yaoundé
+                radius: 50000, // 50km autour de Yaoundé
+            };
+
+            service.textSearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    showStatus(`✅ ${results.length} lieu(x) trouvé(s) !`, "success");
+                    displayResults(results);
+                    
+                    // Centrer la carte sur le premier résultat
+                    if (results.length > 0) {
+                        map.setCenter(results[0].geometry.location);
+                    }
+                } else {
+                    showStatus(`❌ Aucun résultat trouvé. Statut: ${status}`, "error");
+                    document.getElementById('results').style.display = 'none';
+                }
+            });
+        }
+
+        // Afficher les résultats
+        function displayResults(places) {
+            const resultsDiv = document.getElementById('results');
+            const placesList = document.getElementById('placesList');
+            
+            placesList.innerHTML = '';
+            
+            places.forEach((place, index) => {
+                // Créer un marqueur sur la carte
+                const marker = new google.maps.Marker({
+                    position: place.geometry.location,
+                    map: map,
+                    title: place.name,
+                    label: (index + 1).toString()
+                });
+
+                markers.push(marker);
+
+                // Info window pour le marqueur
+                marker.addListener('click', () => {
+                    infowindow.setContent(`
+                        <div>
+                            <strong>${place.name}</strong><br>
+                            ${place.formatted_address || 'Adresse non disponible'}<br>
+                            ${place.rating ? `⭐ ${place.rating}/5` : ''}
+                        </div>
+                    `);
+                    infowindow.open(map, marker);
+                });
+
+                // Créer l'élément de liste
+                const placeDiv = document.createElement('div');
+                placeDiv.className = 'place-item';
+                placeDiv.innerHTML = `
+                    <div class="place-name">${index + 1}. ${place.name}</div>
+                    <div class="place-address">${place.formatted_address || 'Adresse non disponible'}</div>
+                    ${place.rating ? `<div style="color: #ff9800;">⭐ ${place.rating}/5</div>` : ''}
+                `;
+
+                // Cliquer sur un résultat centre la carte
+                placeDiv.addEventListener('click', () => {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(16);
+                    infowindow.setContent(`
+                        <div>
+                            <strong>${place.name}</strong><br>
+                            ${place.formatted_address || 'Adresse non disponible'}<br>
+                            ${place.rating ? `⭐ ${place.rating}/5` : ''}
+                        </div>
+                    `);
+                    infowindow.open(map, marker);
+                });
+
+                placesList.appendChild(placeDiv);
+            });
+
+            resultsDiv.style.display = 'block';
+        }
+
+        // Effacer les marqueurs
+        function clearMarkers() {
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+        }
+
+        // Afficher un seul résultat (pour l'autocomplétion)
+        function displaySingleResult(place) {
+            const resultsDiv = document.getElementById('results');
+            const placesList = document.getElementById('placesList');
+            
+            placesList.innerHTML = '';
+            
+            const placeDiv = document.createElement('div');
+            placeDiv.className = 'place-item';
+            placeDiv.innerHTML = `
+                <div class="place-name">📍 ${place.name}</div>
+                <div class="place-address">${place.formatted_address || 'Adresse non disponible'}</div>
+                ${place.rating ? `<div style="color: #ff9800;">⭐ ${place.rating}/5</div>` : ''}
+                <div style="color: #999; font-size: 12px; margin-top: 5px;">
+                    Types: ${place.types ? place.types.slice(0, 3).join(', ') : 'Non spécifié'}
+                </div>
+            `;
+
+            placesList.appendChild(placeDiv);
+            resultsDiv.style.display = 'block';
+        }
+
+        // Afficher le statut
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        // Gérer les erreurs de chargement
+        window.gm_authFailure = function() {
+            showStatus("❌ Erreur d'authentification Google Maps. Vérifiez votre clé API.", "error");
+        };
+    </script>
+
+    <!-- Charger Google Maps avec votre clé API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0w8HLsobdoJgK7WUTQxLFUuZOirvmUCI&libraries=places&callback=initMap" async defer></script>
+</body>
+</html>

@@ -18,11 +18,12 @@ class StoreCustomerDeliveryAddressController extends Controller
     /**
      * Store new customer delivery address.
      *
-     * Route: POST /customers/{customer}/delivery-addresses
-     * Name: api.customers.delivery-addresses.store
+     * Route: POST /my/delivery-addresses
+     * Name: api.my.delivery-addresses.store
      */
-    public function __invoke(StoreCustomerDeliveryAddressRequest $request, Customer $customer): StoreCustomerDeliveryAddressResponse
+    public function __invoke(StoreCustomerDeliveryAddressRequest $request): StoreCustomerDeliveryAddressResponse
     {
+        $customer = $request->user()->customer;
         $dto = CustomerDeliveryAddressDTO::from($request->validated());
         $deliveryAddress = $this->customerService->createDeliveryAddress($customer, $dto);
 

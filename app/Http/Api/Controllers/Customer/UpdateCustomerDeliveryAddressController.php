@@ -19,15 +19,15 @@ class UpdateCustomerDeliveryAddressController extends Controller
     /**
      * Update a customer delivery address.
      *
-     * Route: PUT /customers/{customer}/delivery-addresses/{deliveryAddress}
-     * Name: api.customers.delivery-addresses.update
+     * Route: PUT /my/delivery-addresses/{deliveryAddress}
+     * Name: api.my.delivery-addresses.update
      */
     public function __invoke(
         UpdateCustomerDeliveryAddressRequest $request,
-        Customer $customer,
         CustomerDeliveryAddress $deliveryAddress
     ): UpdateCustomerDeliveryAddressResponse {
-        // Ensure the delivery address belongs to the customer
+        $customer = $request->user()->customer;
+
         if ($deliveryAddress->customer_id !== $customer->id) {
             abort(404, 'Delivery address not found for this customer');
         }

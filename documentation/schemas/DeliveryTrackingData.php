@@ -26,7 +26,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="total_distance", type="number", format="float", example=12.8, description="Total distance in kilometers"),
  *     @OA\Property(property="distance_remaining", type="number", format="float", example=4.2, description="Remaining distance in kilometers"),
  *     @OA\Property(property="progress_percentage", type="number", format="float", minimum=0, maximum=100, example=67.2, description="Delivery progress percentage"),
- *     @OA\Property(property="estimated_duration", type="integer", example=18, description="Estimated duration in minutes"),
+ *     @OA\Property(property="estimated_duration", type="integer", example=1800, description="Estimated duration in seconds (from Google Maps API)"),
  *     @OA\Property(property="route_geometry", type="object", description="GeoJSON route geometry"),
  *     @OA\Property(property="delivery_notes", type="string", nullable=true, description="Delivery completion notes"),
  *     @OA\Property(property="started_at", type="string", format="date-time", example="2025-01-09T14:30:00Z", nullable=true, description="When the delivery was started"),

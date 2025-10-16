@@ -9,6 +9,7 @@ readonly class PaymentResponse
         public string $status,
         public ?string $transactionReference = null,
         public ?string $paymentUrl = null,
+        public ?float $amount = null,
         public ?string $errorMessage = null,
         public ?array $gatewayResponse = null
     ) {}

@@ -30,6 +30,7 @@ return [
         'delivery_fee_numeric' => 'Les frais de livraison doivent être un nombre',
         'total_amount_required' => 'Le montant total est requis',
         'total_amount_numeric' => 'Le montant total doit être un nombre',
+        'different_municipalities' => 'L\'adresse de livraison (municipalité :delivery_municipality) doit être dans la même municipalité que le centre de distribution (municipalité :center_municipality).',
     ],
 
     'attributes' => [

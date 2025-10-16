@@ -30,13 +30,11 @@ class RoleService extends BaseServiceForEntity
     public function create(array $data): Model
     {
         return $this->executeInTransaction(function () use ($data) {
-            // Create the role
             $role = $this->repository->create([
                 'name' => $data['name'],
                 'guard_name' => $data['guard_name'] ?? 'web',
             ]);
 
-            // Dispatch event to assign permissions
             if (isset($data['permissions']) && is_array($data['permissions'])) {
                 event(new RolePermissionsUpdatedEvent($role, $data['permissions']));
             }
@@ -51,13 +49,11 @@ class RoleService extends BaseServiceForEntity
     public function update(Model $role, array $data): Model
     {
         return $this->executeInTransaction(function () use ($role, $data) {
-            // Update the role
             $updatedRole = $this->repository->update($role, [
                 'name' => $data['name'],
                 'guard_name' => $data['guard_name'] ?? $role->guard_name,
             ]);
 
-            // Dispatch event to assign permissions
             if (isset($data['permissions']) && is_array($data['permissions'])) {
                 event(new RolePermissionsUpdatedEvent($updatedRole, $data['permissions']));
             }
@@ -74,3 +70,4 @@ class RoleService extends BaseServiceForEntity
         return $this->permissionService->getGroupedPermissions();
     }
 }
+

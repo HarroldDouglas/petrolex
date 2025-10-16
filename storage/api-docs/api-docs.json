@@ -1767,26 +1767,14 @@
                 }
             }
         },
-        "/api/customers/{customer}/delivery-addresses": {
+        "/api/my/delivery-addresses": {
             "post": {
                 "tags": [
                     "Livraison"
                 ],
-                "summary": "Créer une nouvelle adresse de livraison pour un client",
-                "description": "Permet de créer une nouvelle adresse de livraison associée à un client spécifique.",
-                "operationId": "api.customers.delivery-addresses.store",
-                "parameters": [
-                    {
-                        "name": "customer",
-                        "in": "path",
-                        "description": "ID du client",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
+                "summary": "Créer une nouvelle adresse de livraison pour l'utilisateur connecté",
+                "description": "Permet de créer une nouvelle adresse de livraison pour l'utilisateur connecté.",
+                "operationId": "api.my.delivery-addresses.store",
                 "requestBody": {
                     "description": "Données de l'adresse de livraison à créer",
                     "required": true,
@@ -1857,25 +1845,15 @@
                 ]
             }
         },
-        "/api/customers/{customer}/delivery-addresses/{deliveryAddress}": {
+        "/api/my/delivery-addresses/{deliveryAddress}": {
             "put": {
                 "tags": [
                     "Livraison"
                 ],
-                "summary": "Mettre à jour une adresse de livraison d'un client",
-                "description": "Permet de mettre à jour une adresse de livraison existante associée à un client spécifique.",
-                "operationId": "api.customers.delivery-addresses.update",
+                "summary": "Mettre à jour une adresse de livraison de l'utilisateur connecté",
+                "description": "Permet de mettre à jour une adresse de livraison existante de l'utilisateur connecté.",
+                "operationId": "api.my.delivery-addresses.update",
                 "parameters": [
-                    {
-                        "name": "customer",
-                        "in": "path",
-                        "description": "ID du client",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    },
                     {
                         "name": "deliveryAddress",
                         "in": "path",
@@ -2855,7 +2833,54 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ValidationErrorResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "errors": {
+                                                    "description": "Erreurs de validation possibles",
+                                                    "properties": {
+                                                        "distribution_center_id": {
+                                                            "description": "Erreur de cohérence géographique: l'adresse de livraison et le centre de distribution doivent être dans la même municipalité",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "L'adresse de livraison (municipalité Yaoundé II) doit être dans la même municipalité que le centre de distribution (municipalité Yaoundé I)."
+                                                            }
+                                                        },
+                                                        "items.0.unit_price": {
+                                                            "description": "Prix incorrect",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "Prix incorrect: attendu 3900, fourni 4000"
+                                                            }
+                                                        },
+                                                        "delivery_fee": {
+                                                            "description": "Frais de livraison incorrects",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "Frais de livraison incorrect: attendu 500, fourni 600"
+                                                            }
+                                                        },
+                                                        "total_amount": {
+                                                            "description": "Montant total incorrect",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "Montant total incorrect: attendu 15800, fourni 16000"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -3131,7 +3156,7 @@
                     "Livraison"
                 ],
                 "summary": "Complete delivery tracking",
-                "description": "Marks a delivery as completed with optional final position and notes.",
+                "description": "Marks a delivery as completed with optional final position and notes. Accessible uniquement par le livreur assigné à cette commande.",
                 "operationId": "api.tracking.delivery.complete",
                 "parameters": [
                     {
@@ -3216,6 +3241,16 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request - Utilisateur non autorisé (seul le livreur assigné peut compléter la livraison)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "403": {
                         "description": "Forbidden - Not authorized to complete this delivery",
                         "content": {
@@ -3274,107 +3309,13 @@
                 ]
             }
         },
-        "/api/tracking/delivery": {
-            "post": {
-                "tags": [
-                    "Livraison"
-                ],
-                "summary": "Créer un nouveau enregistrement de suivi de livraison",
-                "description": "Initialise un nouvel enregistrement de suivi pour une livraison.",
-                "operationId": "api.tracking.delivery.create",
-                "requestBody": {
-                    "description": "Données pour créer un nouvel enregistrement de suivi de livraison",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "order_id"
-                                ],
-                                "properties": {
-                                    "order_id": {
-                                        "description": "L'ID de la commande à suivre",
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Suivi de livraison créé avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/ApiResponse"
-                                        },
-                                        {
-                                            "properties": {
-                                                "data": {
-                                                    "$ref": "#/components/schemas/DeliveryTrackingData"
-                                                },
-                                                "message": {
-                                                    "type": "string",
-                                                    "example": "Suivi de livraison créé avec succès."
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non autorisé",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreur de validation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Erreur serveur interne",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/tracking/delivery/{orderId}": {
             "get": {
                 "tags": [
                     "Livraison"
                 ],
                 "summary": "Obtenir les détails de suivi de livraison",
-                "description": "Récupère les détails de suivi pour une livraison spécifique.",
+                "description": "Récupère les détails de suivi pour une livraison spécifique. Accessible par le client propriétaire de la commande ou le livreur assigné.",
                 "operationId": "api.tracking.delivery.details",
                 "parameters": [
                     {
@@ -3424,6 +3365,16 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request - Utilisateur non autorisé (accessible uniquement au client ou au livreur assigné)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Livraison introuvable",
                         "content": {
@@ -3458,7 +3409,7 @@
                     "Livraison"
                 ],
                 "summary": "Démarrer le suivi de livraison",
-                "description": "Marque une livraison comme démarrée.",
+                "description": "Marque une livraison comme démarrée. Accessible uniquement par le livreur assigné à cette commande.",
                 "operationId": "api.tracking.delivery.start",
                 "parameters": [
                     {
@@ -3541,6 +3492,16 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request - Utilisateur non autorisé (seul le livreur assigné peut démarrer le suivi)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Delivery not found",
                         "content": {
@@ -3575,7 +3536,7 @@
                     "Livraison"
                 ],
                 "summary": "Mettre à jour la position de suivi de livraison",
-                "description": "Met à jour la position géographique d'une livraison.",
+                "description": "Met à jour la position géographique d'une livraison. Accessible uniquement par le livreur assigné à cette commande.",
                 "operationId": "api.tracking.delivery.position.update",
                 "parameters": [
                     {
@@ -3678,6 +3639,16 @@
                     },
                     "401": {
                         "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Utilisateur non autorisé (seul le livreur assigné peut mettre à jour la position)",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4988,12 +4959,12 @@
                 ],
                 "properties": {
                     "delivery_address_id": {
-                        "description": "ID de l'adresse de livraison du client",
+                        "description": "ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée. L'adresse ID 2 (Nkoabang) est dans Yaoundé I.",
                         "type": "integer",
-                        "example": 1
+                        "example": 2
                     },
                     "distribution_center_id": {
-                        "description": "ID du centre de distribution",
+                        "description": "ID du centre de distribution. **Important**: le centre de distribution doit être dans la même municipalité que l'adresse de livraison. Le centre ID 1 (Centre Yaoundé I) dessert la municipalité Yaoundé I.",
                         "type": "integer",
                         "example": 1
                     },
@@ -5088,6 +5059,11 @@
                         "description": "Le libellé lisible de la méthode de paiement",
                         "type": "string",
                         "example": "Carte de Crédit"
+                    },
+                    "validation_text": {
+                        "description": "Texte d'instruction de validation pour le paiement (traduit dynamiquement selon la langue de l'utilisateur via Laravel translations)",
+                        "type": "string",
+                        "example": "<div>La fenêtre ne s'affiche pas ? Composez <span class='validation-code'>*126#</span>, puis entrez votre code secret pour valider le paiement.</div>"
                     }
                 },
                 "type": "object"
@@ -6735,9 +6711,9 @@
                         "example": 67.2
                     },
                     "estimated_duration": {
-                        "description": "Estimated duration in minutes",
+                        "description": "Estimated duration in seconds (from Google Maps API)",
                         "type": "integer",
-                        "example": 18
+                        "example": 1800
                     },
                     "route_geometry": {
                         "description": "GeoJSON route geometry",

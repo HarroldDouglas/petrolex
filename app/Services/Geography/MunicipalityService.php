@@ -67,7 +67,6 @@ class MunicipalityService extends BaseServiceForEntity
         /** @var Municipality $municipality */
         $municipality = $this->municipalityRepository->update($municipality, $attributes);
 
-        
         $municipality->refresh();
 
         $this->municipalityRepository->syncNeighborhoods($municipality, $neighborhoodIds);
