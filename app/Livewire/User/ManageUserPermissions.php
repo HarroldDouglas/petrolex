@@ -36,6 +36,7 @@ class ManageUserPermissions extends Component
     {
         $this->permissionStates = $this->userPermissionService->getUserPermissionStates($this->user);
     }
+
     public function initializeSelectedPermissions()
     {
         $this->selectedPermissions = $this->getAllPermissions()
@@ -55,32 +56,14 @@ class ManageUserPermissions extends Component
             return UserPermissionState::NONE()->value;
         }
 
-        $isCurrentlySelected = $this->isPermissionSelected($permissionName);
+        $isCurrentlySelected = in_array($permissionName, $this->selectedPermissions);
         $originalState = UserPermissionState::tryFrom($originalPermission['state']) ?? UserPermissionState::NONE();
 
         return $this->getCurrentState($originalState, $isCurrentlySelected)->value;
     }
 
     /**
-     * Find the original permission data by name
-     */
-    private function findOriginalPermission(string $permissionName): ?array
-    {
-        return collect($this->permissionStates)
-            ->flatMap(fn ($moduleData) => $moduleData['permissions'])
-            ->firstWhere('name', $permissionName) ?: null;
-    }
-
-    /**
-     * Check if a permission is currently selected
-     */
-    private function isPermissionSelected(string $permissionName): bool
-    {
-        return in_array($permissionName, $this->selectedPermissions);
-    }
-
-    /**
-     * Calculate the current state based on original state and selection
+     * Get the current state based on original state and selection
      */
     private function getCurrentState(UserPermissionState $originalState, bool $isSelected): UserPermissionState
     {
@@ -94,49 +77,13 @@ class ManageUserPermissions extends Component
     }
 
     /**
-     * Toggle all permissions in a module
+     * Find the original permission data by name
      */
-    public function toggleGroup(string $module): void
+    private function findOriginalPermission(string $permissionName): ?array
     {
-        if (! $this->hasModule($module)) {
-            return;
-        }
-
-        $modulePermissions = $this->getModulePermissions($module);
-
-        if ($this->areAllPermissionsRevoked($modulePermissions)) {
-            $this->selectAllRevokedPermissions($modulePermissions);
-
-            return;
-        }
-
-        if ($this->areAllInheritedPermissionsSelected($modulePermissions)) {
-            $this->revokeAllInheritedPermissions($modulePermissions);
-
-            return;
-        }
-
-        if ($this->areAllManageablePermissionsSelected($modulePermissions)) {
-            $this->unselectManageablePermissions($modulePermissions);
-        } else {
-            $this->selectAllManageablePermissions($modulePermissions);
-        }
-    }
-
-    /**
-     * Check if module exists in permission states
-     */
-    private function hasModule(string $module): bool
-    {
-        return isset($this->permissionStates[$module]);
-    }
-
-    /**
-     * Get permissions for a specific module
-     */
-    private function getModulePermissions(string $module): array
-    {
-        return $this->permissionStates[$module]['permissions'];
+        return collect($this->permissionStates)
+            ->flatMap(fn ($moduleData) => $moduleData['permissions'])
+            ->firstWhere('name', $permissionName) ?: null;
     }
 
     /**
@@ -149,296 +96,56 @@ class ManageUserPermissions extends Component
     }
 
     /**
-     * Check if all permissions in a module are currently revoked
+     * Toggle all permissions in a module
      */
-    private function areAllPermissionsRevoked(array $modulePermissions): bool
+    public function toggleGroup(string $module): void
     {
-        if (empty($modulePermissions)) {
-            return false;
-        }
-
-        return collect($modulePermissions)
-            ->every(fn ($permission) => $this->getCurrentPermissionState($permission['name']) === UserPermissionState::REVOKED()->value
-            );
-    }
-
-    /**
-     * Check if all permissions are originally inherited and currently selected
-     */
-    private function areAllInheritedPermissionsSelected(array $modulePermissions): bool
-    {
-        if (empty($modulePermissions)) {
-            return false;
-        }
-
-        return collect($modulePermissions)
-            ->every(fn ($permission) => $permission['state'] === UserPermissionState::ROLE()->value &&
-                $permission['checked'] &&
-                $this->isPermissionSelected($permission['name'])
-            );
-    }
-
-    /**
-     * Check if all manageable permissions are selected
-     */
-    private function areAllManageablePermissionsSelected(array $modulePermissions): bool
-    {
-        $manageablePermissions = $this->getManageablePermissions($modulePermissions);
-
-        if ($manageablePermissions->isEmpty()) {
-            return false;
-        }
-
-        return $manageablePermissions
-            ->every(fn ($permission) => $this->isPermissionSelected($permission['name']));
-    }
-
-    /**
-     * Get permissions that can be managed (exclude already selected inherited ones)
-     */
-    private function getManageablePermissions(array $modulePermissions): Collection
-    {
-        return collect($modulePermissions)
-            ->reject(fn ($permission) => $permission['state'] === UserPermissionState::ROLE()->value &&
-                $this->isPermissionSelected($permission['name'])
-            );
-    }
-
-    /**
-     * Select all currently revoked permissions
-     */
-    private function selectAllRevokedPermissions(array $modulePermissions): void
-    {
-        $permissionNames = collect($modulePermissions)
-            ->pluck('name')
-            ->reject(fn ($name) => $this->isPermissionSelected($name))
-            ->toArray();
-
-        $this->selectedPermissions = array_unique([...$this->selectedPermissions, ...$permissionNames]);
-    }
-
-    /**
-     * Revoke all inherited permissions
-     */
-    private function revokeAllInheritedPermissions(array $modulePermissions): void
-    {
-        $permissionNames = collect($modulePermissions)->pluck('name')->toArray();
-        $this->selectedPermissions = array_values(array_diff($this->selectedPermissions, $permissionNames));
-    }
-
-    /**
-     * Unselect manageable permissions (keep inherited ones)
-     */
-    private function unselectManageablePermissions(array $modulePermissions): void
-    {
-        $permissionsToUnselect = collect($modulePermissions)
-            ->reject(fn ($permission) => $permission['state'] === UserPermissionState::ROLE()->value &&
-                $permission['checked']
-            )
-            ->pluck('name')
-            ->toArray();
-
-        $this->selectedPermissions = array_values(array_diff($this->selectedPermissions, $permissionsToUnselect));
-    }
-
-    /**
-     * Select all manageable permissions
-     */
-    private function selectAllManageablePermissions(array $modulePermissions): void
-    {
-        $permissionsToSelect = collect($modulePermissions)
-            ->filter(function ($permission) {
-                $permissionName = $permission['name'];
-                $originalState = UserPermissionState::make($permission['state']);
-
-                if ($this->isPermissionSelected($permissionName)) {
-                    return false;
-                }
-
-                return match ($originalState->value) {
-                    'role' => $permission['checked'],
-                    'revoked', 'direct', 'none' => true,
-                    default => false,
-                };
-            })
-            ->pluck('name')
-            ->toArray();
-
-        $this->selectedPermissions = array_unique([...$this->selectedPermissions, ...$permissionsToSelect]);
-    }
-
-    /**
-     * Check if all permissions in a group are fully selected
-     */
-    public function isGroupFullySelected(string $module): bool
-    {
-        if (! $this->hasModule($module)) {
-            return false;
-        }
-
-        $modulePermissions = $this->getModulePermissions($module);
-
-        if (empty($modulePermissions)) {
-            return false;
-        }
-
-        // All permissions must be visually checked for group to be fully selected
-        return collect($modulePermissions)->every(function ($permission) {
-            return $this->isPermissionVisuallyChecked($permission['name']);
-        });
-    }
-
-    /**
-     * Check if a permission is effectively selected (visible as selected to user)
-     */
-    private function isPermissionEffectivelySelected(string $currentState): bool
-    {
-        return in_array($currentState, [
-            UserPermissionState::ROLE()->value,
-            UserPermissionState::DIRECT()->value,
-        ]);
-    }
-
-    /**
-     * Check if a permission is visually checked (in UI checkbox)
-     */
-    private function isPermissionVisuallyChecked(string $permissionName): bool
-    {
-        $currentState = $this->getCurrentPermissionState($permissionName);
-        $isInSelectedArray = in_array($permissionName, $this->selectedPermissions);
-
-        // Visually checked means: in selectedPermissions array AND not revoked
-        return $isInSelectedArray && $currentState !== UserPermissionState::REVOKED()->value;
-    }
-
-    /**
-     * Updated when selectedPermissions changes to ensure reactivity
-     */
-    public function updatedSelectedPermissions()
-    {
-        // This method is called every time selectedPermissions array changes
-        // We need to ensure group checkboxes reflect the correct state
-        $this->validateGroupStatesAfterIndividualChange();
-    }
-
-    /**
-     * Validate and correct group states after individual permission changes
-     */
-    private function validateGroupStatesAfterIndividualChange(): void
-    {
-        foreach ($this->permissionStates as $module => $moduleData) {
-            $this->ensureCorrectGroupState($module);
-        }
-    }
-
-    /**
-     * Ensure the correct group state based on individual permission states
-     */
-    private function ensureCorrectGroupState(string $module): void
-    {
-        $modulePermissions = $this->getModulePermissions($module);
-
-        if (empty($modulePermissions)) {
+        if (! isset($this->permissionStates[$module])) {
             return;
         }
 
-        $permissionStates = $this->analyzeModulePermissionStates($modulePermissions);
-
-        // If all items have the same final state, adjust selectedPermissions to match
-        if ($this->shouldForceGroupSelection($permissionStates)) {
-            $this->forceSelectAllPermissionsInModule($modulePermissions);
-        } elseif ($this->shouldForceGroupDeselection($permissionStates)) {
-            $this->forceDeselectAllPermissionsInModule($modulePermissions);
+        $modulePermissions = $this->permissionStates[$module]['permissions'];
+        $permissionNames = collect($modulePermissions)->pluck('name')->toArray();
+        
+        $allSelected = collect($permissionNames)->every(fn ($name) => in_array($name, $this->selectedPermissions));
+        
+        if ($allSelected) {
+            $this->selectedPermissions = array_values(array_diff($this->selectedPermissions, $permissionNames));
+        } else {
+            $this->selectedPermissions = array_unique([...$this->selectedPermissions, ...$permissionNames]);
         }
     }
 
     /**
-     * Analyze the current states of all permissions in a module
+     * Check if all permissions in a group are selected
      */
-    private function analyzeModulePermissionStates(array $modulePermissions): array
+    public function isGroupFullySelected(string $module): bool
     {
-        $states = [
-            'total' => count($modulePermissions),
-            'visuallyChecked' => 0,
-            'revoked' => 0,
-            'inherited' => 0,
-            'direct' => 0,
-            'none' => 0,
-        ];
-
-        foreach ($modulePermissions as $permission) {
-            $permissionName = $permission['name'];
-            $currentState = $this->getCurrentPermissionState($permissionName);
-            $isVisuallyChecked = $this->isPermissionVisuallyChecked($permissionName);
-
-            if ($isVisuallyChecked) {
-                $states['visuallyChecked']++;
-            }
-
-            switch ($currentState) {
-                case UserPermissionState::REVOKED()->value:
-                    $states['revoked']++;
-                    break;
-                case UserPermissionState::ROLE()->value:
-                    $states['inherited']++;
-                    break;
-                case UserPermissionState::DIRECT()->value:
-                    $states['direct']++;
-                    break;
-                case UserPermissionState::NONE()->value:
-                    $states['none']++;
-                    break;
-            }
+        if (! isset($this->permissionStates[$module])) {
+            return false;
         }
 
-        return $states;
+        $modulePermissions = $this->permissionStates[$module]['permissions'];
+        $permissionNames = collect($modulePermissions)->pluck('name');
+
+        return $permissionNames->every(fn ($name) => in_array($name, $this->selectedPermissions));
     }
 
     /**
-     * Determine if we should force all permissions to be selected
+     * Check if a group is partially selected
      */
-    private function shouldForceGroupSelection(array $states): bool
+    public function isGroupPartiallySelected(string $module): bool
     {
-        // If all permissions are inherited or direct (and not revoked),
-        // then select-all should be true
-        return ($states['inherited'] + $states['direct']) === $states['total'] &&
-               $states['revoked'] === 0;
-    }
-
-    /**
-     * Determine if we should force all permissions to be deselected
-     */
-    private function shouldForceGroupDeselection(array $states): bool
-    {
-        // If all permissions are revoked or none, then select-all should be false
-        return ($states['revoked'] + $states['none']) === $states['total'];
-    }
-
-    /**
-     * Force select all permissions in a module (add to selectedPermissions)
-     */
-    private function forceSelectAllPermissionsInModule(array $modulePermissions): void
-    {
-        foreach ($modulePermissions as $permission) {
-            $permissionName = $permission['name'];
-            if (! in_array($permissionName, $this->selectedPermissions)) {
-                $this->selectedPermissions[] = $permissionName;
-            }
+        if (! isset($this->permissionStates[$module])) {
+            return false;
         }
-    }
 
-    /**
-     * Force deselect all permissions in a module (remove from selectedPermissions)
-     */
-    private function forceDeselectAllPermissionsInModule(array $modulePermissions): void
-    {
-        foreach ($modulePermissions as $permission) {
-            $permissionName = $permission['name'];
-            $index = array_search($permissionName, $this->selectedPermissions);
-            if ($index !== false) {
-                array_splice($this->selectedPermissions, $index, 1);
-            }
-        }
+        $modulePermissions = $this->permissionStates[$module]['permissions'];
+        $permissionNames = collect($modulePermissions)->pluck('name');
+        
+        $selectedCount = $permissionNames->filter(fn ($name) => in_array($name, $this->selectedPermissions))->count();
+        
+        return $selectedCount > 0 && $selectedCount < $permissionNames->count();
     }
 
     /**
@@ -453,89 +160,50 @@ class ManageUserPermissions extends Component
     }
 
     /**
-     * Debug helper to understand group selection state
+     * Check if a permission should be visually checked (for UI)
      */
-    public function debugGroupState(string $module): array
+    public function isPermissionChecked(string $permissionName): bool
     {
-        $modulePermissions = $this->getModulePermissions($module);
-        $debug = [
-            'module' => $module,
-            'permissions' => [],
-        ];
-
-        foreach ($modulePermissions as $permission) {
-            $permissionName = $permission['name'];
-            $currentState = $this->getCurrentPermissionState($permissionName);
-            $isInSelectedArray = $this->isPermissionSelected($permissionName);
-            $isEffective = $this->isPermissionEffectivelySelected($currentState);
-            $isVisuallyChecked = $this->isPermissionVisuallyChecked($permissionName);
-
-            $debug['permissions'][] = [
-                'name' => $permissionName,
-                'currentState' => $currentState,
-                'isInSelectedArray' => $isInSelectedArray,
-                'isEffective' => $isEffective,
-                'isVisuallyChecked' => $isVisuallyChecked,
-            ];
-        }
-
-        $debug['isFullySelected'] = $this->isGroupFullySelected($module);
-        $debug['isPartiallySelected'] = $this->isGroupPartiallySelected($module);
-        $debug['stateAnalysis'] = $this->analyzeModulePermissionStates($modulePermissions);
-        $debug['shouldForceSelect'] = $this->shouldForceGroupSelection($debug['stateAnalysis']);
-        $debug['shouldForceDeselect'] = $this->shouldForceGroupDeselection($debug['stateAnalysis']);
-
-        return $debug;
+        $currentState = $this->getCurrentPermissionState($permissionName);
+        
+        return in_array($currentState, [
+            UserPermissionState::ROLE()->value,
+            UserPermissionState::DIRECT()->value,
+        ]);
     }
 
     /**
-     * Check if a group is partially selected
+     * Submit form - process all permission changes
      */
-    public function isGroupPartiallySelected(string $module): bool
-    {
-        if (! $this->hasModule($module)) {
-            return false;
-        }
-
-        $modulePermissions = $this->getModulePermissions($module);
-
-        if (empty($modulePermissions)) {
-            return false;
-        }
-
-        $visuallyCheckedCount = collect($modulePermissions)
-            ->filter(fn ($permission) => $this->isPermissionVisuallyChecked($permission['name']))
-            ->count();
-
-        $totalCount = count($modulePermissions);
-
-        // Partially selected: some but not all permissions are visually checked
-        return $visuallyCheckedCount > 0 && $visuallyCheckedCount < $totalCount;
-    }
-
     public function submit()
     {
         try {
-            $this->processPermissionUpdates();
+            $this->getAllPermissions()
+                ->filter(fn ($permission) => $this->hasPermissionChanged($permission))
+                ->each(fn ($permission) => $this->userPermissionService->toggleUserPermission($this->user, $permission['name']));
 
-            $this->showSuccessNotification();
+            $this->dispatch('show-notification', [
+                'type' => 'success',
+                'title' => 'Permissions mises à jour !',
+                'message' => "Les permissions ont été mises à jour avec succès pour {$this->user->full_name}.",
+                'timer' => 3000,
+            ]);
 
             return redirect()->route('users.list');
 
         } catch (\Exception $e) {
-            $this->logError($e);
-            $this->showErrorNotification();
+            Log::error('Error updating user permissions', [
+                'user_id' => $this->user->id,
+                'error' => $e->getMessage(),
+            ]);
+            
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => 'Une erreur est survenue lors de la mise à jour des permissions.',
+                'timer' => 3000,
+            ]);
         }
-    }
-
-    /**
-     * Process all permission updates
-     */
-    private function processPermissionUpdates(): void
-    {
-        $this->getAllPermissions()
-            ->filter(fn ($permission) => $this->hasPermissionChanged($permission))
-            ->each(fn ($permission) => $this->togglePermission($permission['name']));
     }
 
     /**
@@ -543,56 +211,9 @@ class ManageUserPermissions extends Component
      */
     private function hasPermissionChanged(array $permission): bool
     {
-        $permissionName = $permission['name'];
-        $isCurrentlySelected = $this->isPermissionSelected($permissionName);
-        $wasSelected = $permission['checked'];
-
-        return $isCurrentlySelected !== $wasSelected;
-    }
-
-    /**
-     * Toggle a specific permission
-     */
-    private function togglePermission(string $permissionName): void
-    {
-        $this->userPermissionService->toggleUserPermission($this->user, $permissionName);
-    }
-
-    /**
-     * Show success notification
-     */
-    private function showSuccessNotification(): void
-    {
-        $this->dispatch('show-notification', [
-            'type' => 'success',
-            'title' => 'Permissions mises à jour !',
-            'message' => "Les permissions ont été mises à jour avec succès pour {$this->user->full_name}.",
-            'timer' => 3000,
-        ]);
-    }
-
-    /**
-     * Show error notification
-     */
-    private function showErrorNotification(): void
-    {
-        $this->dispatch('show-notification', [
-            'type' => 'error',
-            'title' => 'Erreur !',
-            'message' => 'Une erreur est survenue lors de la mise à jour des permissions.',
-            'timer' => 3000,
-        ]);
-    }
-
-    /**
-     * Log error details
-     */
-    private function logError(\Exception $e): void
-    {
-        Log::error('Error updating user permissions', [
-            'user_id' => $this->user->id,
-            'error' => $e->getMessage(),
-        ]);
+        $isCurrentlySelected = in_array($permission['name'], $this->selectedPermissions);
+        
+        return $isCurrentlySelected !== $permission['checked'];
     }
 
     public function render()
