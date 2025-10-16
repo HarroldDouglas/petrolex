@@ -19,6 +19,7 @@ class GetPaymentMethodsController extends Controller
             ->map(fn ($case) => [
                 'value' => $case->value,
                 'label' => $case->label,
+                'validation_text' => $case->validationText(),
             ])->toArray();
 
         return ApiResponse::success(

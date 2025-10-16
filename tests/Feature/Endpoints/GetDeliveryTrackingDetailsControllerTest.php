@@ -40,6 +40,11 @@ class GetDeliveryTrackingDetailsControllerTest extends TestCase
         $this->deliveryPerson = User::factory()->create();
         $this->deliveryPerson->assignRole(UserRole::DELIVERY_PERSON()->value);
 
+        // Create delivery person record
+        $deliveryPersonRecord = \App\Models\DeliveryPerson::factory()->create([
+            'user_id' => $this->deliveryPerson->id,
+        ]);
+
         $this->customerUser = User::factory()->create();
         $this->customerUser->assignRole(UserRole::CUSTOMER()->value);
 
@@ -65,7 +70,7 @@ class GetDeliveryTrackingDetailsControllerTest extends TestCase
             'customer_id' => $this->customer->id,
             'distribution_center_id' => $this->distributionCenter->id,
             'delivery_address_id' => $this->deliveryAddress->id,
-            'delivery_person_id' => $this->deliveryPerson->id,
+            'delivery_person_id' => $deliveryPersonRecord->id,
         ]);
     }
 
@@ -85,8 +90,17 @@ class GetDeliveryTrackingDetailsControllerTest extends TestCase
 
         $response = $this->getJson("/api/tracking/delivery/{$this->order->id}");
 
-        $response->assertOk();
-        $response->assertJsonStructure(['data']);
+        $response->assertStatus(200)
+            ->assertJson([
+                '_metadata' => [
+                    'success' => true,
+                    'message' => 'Delivery tracking details retrieved successfully.',
+                ],
+                'data' => [
+                    'order_id' => $this->order->id,
+                    'status' => 'in_progress',
+                ],
+            ]);
     }
 
     public function test_get_delivery_tracking_details_handles_nonexistent_order(): void
@@ -103,5 +117,73 @@ class GetDeliveryTrackingDetailsControllerTest extends TestCase
         // Ensure it's not a successful response
         $this->assertFalse($response->isSuccessful(),
             'Response should not be successful for nonexistent order');
+    }
+
+    public function test_get_delivery_tracking_details_accessible_by_customer(): void
+    {
+        Sanctum::actingAs($this->customerUser);
+
+        $tracking = DeliveryTracking::factory()->inProgress()->create([
+            'order_id' => $this->order->id,
+        ]);
+
+        $response = $this->getJson("/api/tracking/delivery/{$this->order->id}");
+
+        $response->assertStatus(200)
+            ->assertJson([
+                '_metadata' => [
+                    'success' => true,
+                    'message' => 'Delivery tracking details retrieved successfully.',
+                ],
+                'data' => [
+                    'order_id' => $this->order->id,
+                    'status' => 'in_progress',
+                ],
+            ]);
+    }
+
+    public function test_get_delivery_tracking_details_fails_for_unauthorized_delivery_person(): void
+    {
+        $tracking = DeliveryTracking::factory()->inProgress()->create([
+            'order_id' => $this->order->id,
+        ]);
+
+        // Create a different delivery person
+        $unauthorizedDeliveryPerson = User::factory()->create();
+        $unauthorizedDeliveryPerson->assignRole(UserRole::DELIVERY_PERSON()->value);
+
+        // Create delivery person record for unauthorized user
+        \App\Models\DeliveryPerson::factory()->create([
+            'user_id' => $unauthorizedDeliveryPerson->id,
+        ]);
+
+        Sanctum::actingAs($unauthorizedDeliveryPerson);
+
+        $response = $this->getJson("/api/tracking/delivery/{$this->order->id}");
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'message' => 'You are not authorized to access this delivery',
+            ]);
+    }
+
+    public function test_get_delivery_tracking_details_fails_for_unauthorized_customer(): void
+    {
+        $tracking = DeliveryTracking::factory()->inProgress()->create([
+            'order_id' => $this->order->id,
+        ]);
+
+        // Create a different customer
+        $unauthorizedCustomerUser = User::factory()->create();
+        $unauthorizedCustomerUser->assignRole(UserRole::CUSTOMER()->value);
+
+        Sanctum::actingAs($unauthorizedCustomerUser);
+
+        $response = $this->getJson("/api/tracking/delivery/{$this->order->id}");
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'message' => 'You are not authorized to access this delivery',
+            ]);
     }
 }

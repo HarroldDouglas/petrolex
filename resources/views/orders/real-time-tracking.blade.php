@@ -9,8 +9,8 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Mapbox CSS -->
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <!-- google_maps CSS -->
+    <link href="https://api.google_maps.com/google_maps-gl-js/v2.15.0/google_maps-gl.css" rel="stylesheet">
     
     <!-- Custom CSS -->
     <style>
@@ -304,7 +304,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="https://api.google_maps.com/google_maps-gl-js/v2.15.0/google_maps-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     
     <!-- Reverb Client -->
@@ -484,11 +484,11 @@
             }
 
             initializeMap() {
-                mapboxgl.accessToken = MANAGER_TRACKING_CONFIG.mapbox.access_token;
+                google_mapsgl.accessToken = MANAGER_TRACKING_CONFIG.google_maps.access_token;
                 
-                this.map = new mapboxgl.Map({
+                this.map = new google_mapsgl.Map({
                     container: 'map',
-                    style: 'mapbox://styles/mapbox/streets-v12',
+                    style: 'google_maps://styles/google_maps/streets-v12',
                     center: [11.5021, 3.8480], // Yaoundé
                     zoom: 12
                 });
@@ -603,9 +603,9 @@
                     if (this.driverMarker) {
                         this.driverMarker.setLngLat(driverPosition);
                     } else {
-                        this.driverMarker = new mapboxgl.Marker({ color: '#007bff' })
+                        this.driverMarker = new google_mapsgl.Marker({ color: '#007bff' })
                             .setLngLat(driverPosition)
-                            .setPopup(new mapboxgl.Popup().setHTML('<strong>Livreur</strong>'))
+                            .setPopup(new google_mapsgl.Popup().setHTML('<strong>Livreur</strong>'))
                             .addTo(this.map);
                     }
                 }
@@ -618,9 +618,9 @@
                     ];
 
                     if (!this.destinationMarker) {
-                        this.destinationMarker = new mapboxgl.Marker({ color: '#dc3545' })
+                        this.destinationMarker = new google_mapsgl.Marker({ color: '#dc3545' })
                             .setLngLat(destinationPosition)
-                            .setPopup(new mapboxgl.Popup().setHTML('<strong>Destination</strong>'))
+                            .setPopup(new google_mapsgl.Popup().setHTML('<strong>Destination</strong>'))
                             .addTo(this.map);
                     }
                 }
@@ -643,7 +643,7 @@
 
                 try {
                     const response = await fetch(
-                        `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${MANAGER_TRACKING_CONFIG.mapbox.access_token}`
+                        `https://api.google_maps.com/directions/v5/google_maps/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${MANAGER_TRACKING_CONFIG.google_maps.access_token}`
                     );
                     
                     const data = await response.json();
@@ -700,7 +700,7 @@
                 }
 
                 if (points.length > 0) {
-                    const bounds = new mapboxgl.LngLatBounds();
+                    const bounds = new google_mapsgl.LngLatBounds();
                     points.forEach(point => bounds.extend(point));
                     
                     this.map.fitBounds(bounds, {

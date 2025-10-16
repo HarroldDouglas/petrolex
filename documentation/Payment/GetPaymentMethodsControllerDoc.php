@@ -19,6 +19,12 @@ use OpenApi\Annotations as OA;
  *         type="string",
  *         description="Le libellé lisible de la méthode de paiement",
  *         example="Carte de Crédit"
+ *     ),
+ *     @OA\Property(
+ *         property="validation_text",
+ *         type="string",
+ *         description="Texte d'instruction de validation pour le paiement (traduit dynamiquement selon la langue de l'utilisateur via Laravel translations)",
+ *         example="<div>La fenêtre ne s'affiche pas ? Composez <span class='validation-code'>*126#</span>, puis entrez votre code secret pour valider le paiement.</div>"
  *     )
  * )
  *

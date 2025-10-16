@@ -5,19 +5,32 @@ declare(strict_types=1);
 namespace Tests\Feature\Endpoints;
 
 use App\Enums\PaymentStatus;
+use App\Enums\UserRole;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 final class PaymentCallbackTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Create required roles for all tests
+        foreach (UserRole::cases() as $role) {
+            Role::create(['name' => $role->value]);
+        }
+    }
+
     #[Test]
     public function it_can_process_successful_payment_callback(): void
     {
+
         $customer = \App\Models\Customer::factory()->create();
         $distributionCenter = \App\Models\DistributionCenter::factory()->create();
         $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
@@ -476,6 +489,6 @@ final class PaymentCallbackTest extends TestCase
         ]);
 
         $response->assertStatus(403)
-            ->assertJsonPath('message', 'Cette commande ne vous appartient pas');
+            ->assertJsonPath('message', __('api.order_not_belongs_to_you'));
     }
 }

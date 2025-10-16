@@ -20,8 +20,8 @@ class CustomerDeliveryAddressFactory extends Factory
             'customer_id' => Customer::factory(),
             'label' => fake()->randomElement(['Domicile', 'Bureau', 'Entrepôt', 'Magasin']),
             'address' => fake()->address(),
-            'latitude' => fake()->latitude(-4.3, -4.2), // Abidjan coords
-            'longitude' => fake()->longitude(-4.1, -3.9),
+            'latitude' => fake()->latitude(3.8, 4.1), // Cameroun coords (Yaoundé-Douala region)
+            'longitude' => fake()->longitude(9.6, 11.6), // Cameroun coords (Douala-Yaoundé region)
             'phone' => fake()->phoneNumber(),
             'phone_country_code' => '+237',
             'contact_firstname' => fake()->firstName(),
@@ -39,5 +39,25 @@ class CustomerDeliveryAddressFactory extends Factory
     public function default(): static
     {
         return $this->state(['is_default' => true]);
+    }
+
+    /**
+     * Create address in a municipality where distribution centers exist.
+     * Ensures compatibility for order creation tests.
+     */
+    public function inDistributionCenterMunicipality(): static
+    {
+        return $this->state(function () {
+            // Get neighborhoods in municipalities that have distribution centers
+            $validNeighborhoods = Neighborhood::whereHas('municipality', function ($query) {
+                $query->whereIn('id', [8, 6, 2, 21]); // Douala I, Yaoundé VI, Yaoundé II, Commune Urbaine de Maroua
+            })->get();
+
+            $neighborhood = $validNeighborhoods->random();
+
+            return [
+                'neighborhood_id' => $neighborhood->id,
+            ];
+        });
     }
 }

@@ -78,7 +78,7 @@ class UpdateCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->putJson("/api/customers/{$this->customer->id}/delivery-addresses/{$this->deliveryAddress->id}", $requestData);
+            ->putJson("/api/my/delivery-addresses/{$this->deliveryAddress->id}", $requestData);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -106,7 +106,7 @@ class UpdateCustomerDeliveryAddressTest extends TestCase
     public function test_validates_required_fields(): void
     {
         $response = $this->actingAs($this->user)
-            ->putJson("/api/customers/{$this->customer->id}/delivery-addresses/{$this->deliveryAddress->id}", []);
+            ->putJson("/api/my/delivery-addresses/{$this->deliveryAddress->id}", []);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['label', 'address', 'neighborhood_id']);
@@ -121,7 +121,7 @@ class UpdateCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->putJson("/api/customers/{$this->customer->id}/delivery-addresses/{$this->deliveryAddress->id}", $requestData);
+            ->putJson("/api/my/delivery-addresses/{$this->deliveryAddress->id}", $requestData);
 
         $response->assertStatus(200)
             ->assertJsonStructure([

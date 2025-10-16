@@ -13,7 +13,7 @@
     <div class="container-fluid">
         <!-- Breadcrumb start -->
         <div class="row m-1">
-            <div class="col-8 p-0">
+            <div class="col-12 p-0">
                 <h4 class="main-title">
                     {{ auth()->user()->role == \App\Enums\UserRole::CENTER_MANAGER() ? 'Mes Commandes' : 'Commandes' }}</h4>
                 <ul class="app-line-breadcrumbs mb-3">
@@ -27,14 +27,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="col-4 p-0">
-                <div class="d-flex justify-content-end text-success-dark">
-                    <a type="button" href="{{ route('orders.create') }}"
-                        class="waves-effect btn btn-success btn-md mb-2">
-                        <i class="ti ti-plus"></i> Nouveau
-                    </a>
-                </div>
-            </div>
+        </div>
         </div>
             <!-- Breadcrumb end -->
 

@@ -6,7 +6,7 @@ use OpenApi\Annotations as OA;
  * @OA\Get(
  *     path="/api/tracking/delivery/{orderId}",
  *     summary="Obtenir les détails de suivi de livraison",
- *     description="Récupère les détails de suivi pour une livraison spécifique.",
+ *     description="Récupère les détails de suivi pour une livraison spécifique. Accessible par le client propriétaire de la commande ou le livreur assigné.",
  *     operationId="api.tracking.delivery.details",
  *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
@@ -40,6 +40,13 @@ use OpenApi\Annotations as OA;
  *     @OA\Response(
  *         response=401,
  *         description="Non autorisé",
+ *
+ *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad Request - Utilisateur non autorisé (accessible uniquement au client ou au livreur assigné)",
  *
  *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
  *     ),

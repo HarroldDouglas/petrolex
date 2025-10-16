@@ -38,54 +38,29 @@ class OrderController {
         }
     }
 
-    async loadCustomerOrders(user, page = 1) {
+    async loadCustomerOrders(user, filters = {}, page = 1) {
         if (!user) return;
-
-        const filters = this.ui.getFilters();
         this.ui.setLoadingState("refreshOrdersBtn", true);
 
         try {
-            const customerId = user.customer_id || user.id;
-            const response = await this.apiService.getCustomerOrders(
-                customerId,
-                filters,
-                page,
-            );
+            console.log("🔍 Chargement des commandes pour l'utilisateur:", user);
+            console.log("🔍 [OrderController] Filtres:", filters);
+            console.log("🔍 [OrderController] Page:", page);
+            const response = await this.apiService.getMyOrders(filters, page);
+            
+            console.log("✅ [OrderController] Réponse API reçue:", response);
 
-            if (response.data) {
-                const orders = Array.isArray(response.data)
-                    ? response.data
-                    : response.data.data || [];
-                const pagination = response._metadata?.pagination || {
-                    current_page: 1,
-                    last_page: 1,
-                };
-
-                this.ui.renderOrders(
-                    orders,
-                    pagination.current_page || 1,
-                    pagination.last_page || 1,
-                );
-
-                if (orders.length === 0 && page === 1) {
-                    this.ui.showInfo("Aucune commande trouvée");
-                }
-
-                this.bindEvents();
-            }
+            // Retourner la réponse pour que CustomerOrderManager la traite
+            return response;
         } catch (error) {
-            const result = await this.errorHandler.handleApiError(
-                error,
-                "loadCustomerOrders",
-            );
-
-            if (result.shouldRetry) {
-                setTimeout(() => this.loadCustomerOrders(user, page), 1000);
-                return;
+            console.error("❌ Erreur lors du chargement des commandes:", error);
+            
+            // Gestion d'erreur simplifiée
+            if (window.customerApp && window.customerApp.notificationService) {
+                window.customerApp.notificationService.error("Impossible de charger vos commandes");
             }
-
-            this.ui.showError("Impossible de charger vos commandes");
         } finally {
+            // Toujours remettre le bouton à l'état normal
             this.ui.setLoadingState("refreshOrdersBtn", false);
         }
     }

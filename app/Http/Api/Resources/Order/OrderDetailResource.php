@@ -75,6 +75,7 @@ class OrderDetailResource extends JsonResource
                 'id' => $order->payment->id,
                 'payment_method' => $order->payment->payment_method->value,
                 'payment_method_label' => $order->payment->payment_method->label ?? $order->payment->payment_method->value,
+                'payment_method_validation_text' => $order->payment->payment_method->validationText(),
                 'payment_status' => $order->payment->payment_status->value,
                 'payment_status_label' => $order->payment->payment_status->label ?? $order->payment->payment_status->value,
                 'amount_paid' => $order->payment->amount_paid,

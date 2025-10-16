@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Api\TrackingDelivery;
 
-use App\Helpers\DeliveryProgressHelper;
+use App\Http\Api\Resources\CustomerResource;
+use App\Http\Api\Resources\Order\OrderDetailResource;
 use App\Models\DeliveryTracking;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,16 +28,15 @@ final class DeliveryTrackingResource extends JsonResource
         return [
             'id' => $this->id,
             'order_id' => $this->order_id,
-            'order_number' => $this->whenLoaded('order', fn () => $this->order->order_number),
-            'customer_name' => $this->whenLoaded('order', fn () => $this->order->customer->full_name ?? null),
-            'driver_name' => $this->whenLoaded('order', fn () => $this->order->deliveryPerson->full_name ?? null),
-            'driver_phone' => $this->whenLoaded('order', fn () => $this->order->deliveryPerson->phone_number ?? null),
+            'order' => $this->whenLoaded('order', fn () => new OrderDetailResource($this->order)),
+            'customer' => $this->whenLoaded('order', fn () => $this->order->customer ? new CustomerResource($this->order->customer) : null
+            ),
             'status' => $this->status->value,
             'driver_lat' => $this->driver_lat,
             'driver_lng' => $this->driver_lng,
-            'destination_lat' => $this->whenLoaded('order', fn () => $this->order->destination_lat),
-            'destination_lng' => $this->whenLoaded('order', fn () => $this->order->destination_lng),
-            'destination_address' => $this->whenLoaded('order', fn () => $this->order->deliveryAddress->full_address ?? null),
+            'destination_lat' => $this->whenLoaded('order', fn () => $this->order->deliveryAddress?->latitude),
+            'destination_lng' => $this->whenLoaded('order', fn () => $this->order->deliveryAddress?->longitude),
+            'destination_address' => $this->whenLoaded('order', fn () => $this->order->deliveryAddress?->fullAddress()),
             'estimated_duration' => $this->estimated_duration,
             'distance_remaining' => $this->distance_remaining,
             'total_distance' => $this->total_distance,
@@ -46,10 +46,7 @@ final class DeliveryTrackingResource extends JsonResource
             'delivered_at' => $this->delivered_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'progress_percentage' => DeliveryProgressHelper::calculateProgressPercentageWithLogging(
-                $this->total_distance,
-                $this->distance_remaining
-            ),
+            'progress_percentage' => $this->progress_percentage,
         ];
     }
 }

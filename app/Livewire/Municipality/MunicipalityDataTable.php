@@ -47,6 +47,7 @@ class MunicipalityDataTable extends BaseDataTable
                 ->label(function ($row) {
                     $count = $row->neighborhoods_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-primary' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' quartier(s)</span>'
                     );
@@ -78,7 +79,7 @@ class MunicipalityDataTable extends BaseDataTable
             $municipalityService = app(MunicipalityService::class);
             $municipality = $municipalityService->find($municipalityId);
             $municipalityService->deleteMunicipality($municipality);
-            
+
             $this->notify('Municipalité supprimée avec succès.', 'success');
         } catch (\Exception $e) {
             $this->notify('Erreur lors de la suppression de la municipalité.', 'error');

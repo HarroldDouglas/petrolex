@@ -63,10 +63,10 @@ class DeliveryOrdersUI {
 
     getOrderActions(order) {
         switch (order.status) {
-            case DELIVERY_CONFIG.ORDER_STATUS.CONFIRMED:
+            case DELIVERY_CONFIG.ORDER_STATUS.PAID:
             case DELIVERY_CONFIG.ORDER_STATUS.PROCESSING:
             case DELIVERY_CONFIG.ORDER_STATUS.IN_PROGRESS:
-                return `<button class="btn btn-sm btn-success w-100" onclick="window.deliveryPersonApp.selectOrder('${order.order_number}')">
+                return `<button class="btn btn-sm btn-success w-100 select-order-btn" data-order-number="${order.order_number}">
                     <i class="fas fa-play"></i> Sélectionner
                 </button>`;
             default:

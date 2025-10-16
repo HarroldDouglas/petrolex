@@ -6,8 +6,18 @@
     <title>Interface Client - Suivi Livraison Réel</title>
     
     <!-- External Libraries -->
-    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <script>
+        // Fonction de callback pour Google Maps
+        window.initGoogleMaps = function() {
+            console.log('🗺️ Google Maps API chargée');
+            // Déclencher l'événement personnalisé si l'app existe déjà
+            if (window.customerApp && window.customerApp.onGoogleMapsReady) {
+                window.customerApp.onGoogleMapsReady();
+            }
+        };
+    </script>
+    <!-- Google Maps JavaScript API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0w8HLsobdoJgK7WUTQxLFUuZOirvmUCI&libraries=places&callback=initGoogleMaps"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
@@ -32,11 +42,11 @@
                             <form id="loginForm">
                                 <div class="mb-3">
                                     <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="clientEmail" required>
+                                    <input type="email" class="form-control" id="clientEmail" value="customer1@test.com" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Mot de passe</label>
-                                    <input type="password" class="form-control" id="clientPassword" required>
+                                    <input type="password" class="form-control" id="clientPassword" value="password" required>
                                 </div>
                                 <button type="submit" class="btn btn-success w-100" id="loginBtn">
                                     <i class="fas fa-sign-in-alt"></i> Se connecter
@@ -79,6 +89,7 @@
                                             <select class="form-select form-select-sm" id="statusFilter">
                                                 <option value="">Tous les statuts</option>
                                                 <option value="confirmed">Confirmées</option>
+                                                <option value="paid">Payées</option>
                                                 <option value="processing">En cours</option>
                                                 <option value="delivered">Livrées</option>
                                             </select>
@@ -118,6 +129,10 @@
                                                 <div class="stat-item">
                                                     <i class="fas fa-route text-info"></i>
                                                     <span id="trackingDistance">-</span>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <i class="fas fa-tachometer-alt text-success"></i>
+                                                    <span id="trackingSpeed">-</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -186,7 +201,7 @@
                             <div class="col-md-3">
                                 <div class="connection-info">
                                     <i class="fas fa-map text-info"></i>
-                                    <small class="d-block">Mapbox</small>
+                                    <small class="d-block">Google Maps</small>
                                     <span id="mapStatus" class="badge bg-info">Chargé</span>
                                 </div>
                             </div>
@@ -205,7 +220,7 @@
     </div>
 
     <!-- JavaScript Files -->
-    <script src="js/config.js"></script>
+    <script src="../shared-config.js"></script>
     
     <!-- ReverbClient (script global) -->
     <script>
@@ -215,7 +230,7 @@
                 this.appKey = appKey;
                 this.options = {
                     wsHost: options.wsHost || "127.0.0.1",
-                    wsPort: options.wsPort || 8080,
+                    wsPort: options.wsPort || (typeof window !== "undefined" && window.location.protocol === "https:" ? 443 : 8080),
                     ...options,
                 };
                 this.state = "initialized";
@@ -234,7 +249,9 @@
             }
 
             connect() {
-                const url = `ws://${this.options.wsHost}:${this.options.wsPort}/app/${this.appKey}?protocol=7&client=js&version=8.3.0&flash=false`;
+                // Auto-détection du protocole WebSocket basé sur le protocole de la page
+                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const url = `${wsProtocol}//${this.options.wsHost}:${this.options.wsPort}/app/${this.appKey}?protocol=7&client=js&version=8.3.0&flash=false`;
                 console.log("🔗 ReverbClient connecting to:", url);
 
                 this.ws = new WebSocket(url);
@@ -382,7 +399,7 @@
     <script src="js/services/notification.js"></script>
     <script src="js/services/cache.js"></script>
     <script src="js/services/websocket.js"></script>
-    <script src="js/services/map.js"></script>
+    <script src="js/services/google-map.js"></script>
     <script src="js/services/api-auth.js"></script>
 
 
