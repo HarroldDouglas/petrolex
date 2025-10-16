@@ -12,8 +12,8 @@ class CountryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->unique()->country,
-            'code' => strtoupper($this->faker->unique()->lexify('??')),
+            'name' => $this->faker->unique()->country.' '.$this->faker->randomNumber(3),
+            'code' => strtoupper($this->faker->unique()->bothify('??')),
             'is_active' => true,
         ];
     }

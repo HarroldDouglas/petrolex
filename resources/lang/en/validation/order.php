@@ -18,6 +18,7 @@ return [
         'items.*.quantity.max' => 'The quantity cannot exceed 100',
         'items.*.option.in' => 'The option must be one of the following values: :values',
         'comments.max' => 'Comments cannot exceed 500 characters',
+        'different_municipalities' => 'The delivery address must be in the same municipality as the distribution center.',
     ],
 
     'attributes' => [

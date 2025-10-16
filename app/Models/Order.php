@@ -161,11 +161,16 @@ class Order extends Model
      */
     public function canAcceptPayment(): bool
     {
-        return $this->status === OrderStatus::PENDING() &&
-               ! $this->payments()->whereIn('payment_status', [
-                   PaymentStatus::PAID()->value,
-                   PaymentStatus::PENDING()->value,
-               ])->exists();
+        $canBePaid = in_array($this->status, [
+            OrderStatus::PENDING(),
+            OrderStatus::FAILED(),
+        ], true);
+
+        $hasOngoingOrPaidPayment = $this->payments()
+            ->whereIn('payment_status', [PaymentStatus::PAID()->value, PaymentStatus::PENDING()->value])
+            ->exists();
+
+        return $canBePaid && ! $hasOngoingOrPaidPayment;
     }
 
     /**

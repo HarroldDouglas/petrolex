@@ -18,14 +18,17 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->onDelete('restrict');
             
             $table->string('payment_reference')->nullable();
+            $table->string('transaction_reference')->nullable();
             $table->enum('payment_status', PaymentStatus::values())->default(PaymentStatus::PENDING());
             $table->enum('payment_method', PaymentMethod::values())->nullable();
             
             $table->decimal('amount_paid', 10, 2)->default(0);
             $table->decimal('amount_due', 10, 2)->default(0);
             
+            $table->string('payment_url')->nullable();
             $table->timestamp('payment_date')->nullable();
             $table->text('payment_notes')->nullable();
+            $table->json('gateway_response')->nullable();
             
             $table->timestamps();
             $table->softDeletes();

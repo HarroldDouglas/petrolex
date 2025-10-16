@@ -49,7 +49,7 @@ class UserPermissionService
     {
         $permissionName = $permission['name'];
         $state = $user->getPermissionState($permissionName);
-        $permissionState = UserPermissionState::tryFrom($state) ?? UserPermissionState::NONE;
+        $permissionState = UserPermissionState::make($state) ?? UserPermissionState::NONE();
 
         return [
             'name' => $permissionName,
@@ -57,7 +57,7 @@ class UserPermissionService
             'state' => $state,
             'checked' => $permissionState->isSelected(),
             'opacity' => $this->getPermissionOpacity($permissionState),
-            'crossed' => $permissionState === UserPermissionState::REVOKED,
+            'crossed' => $permissionState->equals(UserPermissionState::REVOKED()),
         ];
     }
 
@@ -66,14 +66,14 @@ class UserPermissionService
      */
     private function getPermissionOpacity(UserPermissionState $state): float
     {
-        return $state === UserPermissionState::ROLE
+        return $state->equals(UserPermissionState::ROLE())
             ? self::ROLE_PERMISSION_OPACITY
             : self::DEFAULT_PERMISSION_OPACITY;
     }
 
     public function toggleUserPermission(User $user, string $permissionName): void
     {
-        $currentState = UserPermissionState::tryFrom($user->getPermissionState($permissionName)) ?? UserPermissionState::NONE;
+        $currentState = UserPermissionState::make($user->getPermissionState($permissionName)) ?? UserPermissionState::NONE();
 
         $this->executePermissionAction($user, $permissionName, $currentState);
     }
@@ -83,11 +83,11 @@ class UserPermissionService
      */
     private function executePermissionAction(User $user, string $permissionName, UserPermissionState $currentState): void
     {
-        match ($currentState) {
-            UserPermissionState::ROLE => $user->revokeSpecificPermission($permissionName),
-            UserPermissionState::DIRECT => $user->revokePermissionTo($permissionName),
-            UserPermissionState::REVOKED => $user->restoreRevokedPermission($permissionName),
-            UserPermissionState::NONE => $user->givePermissionTo($permissionName),
+        match ($currentState->value) {
+            'role' => $user->revokeSpecificPermission($permissionName),
+            'direct' => $user->revokePermissionTo($permissionName),
+            'revoked' => $user->restoreRevokedPermission($permissionName),
+            'none' => $user->givePermissionTo($permissionName),
         };
     }
 

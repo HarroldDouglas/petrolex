@@ -81,11 +81,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initMap() {
-    mapboxgl.accessToken = 'pk.eyJ1IjoiaGFycm9sZHdhZm8iLCJhIjoiY21kcjkwenJxMGVtYzJsczY0aXgzbGN6OCJ9.WGRlvNUJFaEFbmvoeTTGlQ';
+    google_mapsgl.accessToken = 'pk.eyJ1IjoiaGFycm9sZHdhZm8iLCJhIjoiY21kcjkwenJxMGVtYzJsczY0aXgzbGN6OCJ9.WGRlvNUJFaEFbmvoeTTGlQ';
     
-    map = new mapboxgl.Map({
+    map = new google_mapsgl.Map({
         container: 'delivery-map',
-        style: 'mapbox://styles/mapbox/streets-v11',
+        style: 'google_maps://styles/google_maps/streets-v11',
         center: [11.502, 3.848], // Yaoundé, Cameroun
         zoom: 12
     });
@@ -137,7 +137,7 @@ function addDeliveryToMap(delivery) {
 
     // Ajouter marqueur livreur
     if (delivery.driver_lat && delivery.driver_lng) {
-        const driverPopup = new mapboxgl.Popup()
+        const driverPopup = new google_mapsgl.Popup()
             .setHTML(`
                 <h6>${delivery.driver_name || 'Livreur'}</h6>
                 <p>Commande: ${orderNumber}</p>
@@ -145,7 +145,7 @@ function addDeliveryToMap(delivery) {
                 <p>ETA: ${delivery.estimated_duration || 'N/A'} min</p>
             `);
 
-        const driverMarker = new mapboxgl.Marker({ color: '#1E88E5' })
+        const driverMarker = new google_mapsgl.Marker({ color: '#1E88E5' })
             .setLngLat([parseFloat(delivery.driver_lng), parseFloat(delivery.driver_lat)])
             .setPopup(driverPopup)
             .addTo(map);
@@ -155,14 +155,14 @@ function addDeliveryToMap(delivery) {
 
         // Ajouter marqueur destination si disponible
         if (delivery.destination_lat && delivery.destination_lng) {
-            const destPopup = new mapboxgl.Popup()
+            const destPopup = new google_mapsgl.Popup()
                 .setHTML(`
                     <h6>Destination</h6>
                     <p>Client: ${delivery.customer_name || 'N/A'}</p>
                     <p>${delivery.destination_address || 'Adresse non spécifiée'}</p>
                 `);
 
-            const destinationMarker = new mapboxgl.Marker({ color: '#E53935' })
+            const destinationMarker = new google_mapsgl.Marker({ color: '#E53935' })
                 .setLngLat([parseFloat(delivery.destination_lng), parseFloat(delivery.destination_lat)])
                 .setPopup(destPopup)
                 .addTo(map);

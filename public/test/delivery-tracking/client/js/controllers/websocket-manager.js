@@ -27,9 +27,9 @@ class WebSocketManager {
             forceTLS: CUSTOMER_CONFIG.WEBSOCKET.FORCE_TLS,
             enabledTransports: CUSTOMER_CONFIG.WEBSOCKET.ENABLED_TRANSPORTS,
             cluster: CUSTOMER_CONFIG.WEBSOCKET.PUSHER_APP_CLUSTER || "mt1",
-            // Ajout d'un timeout pour la connexion
-            activityTimeout: 10000, 
-            pongTimeout: 5000,
+            // Configuration pour Laravel Reverb local
+            activityTimeout: 30000, 
+            pongTimeout: 10000
         };
 
         console.log("[WebSocket] Configuration Pusher :", {
@@ -51,7 +51,8 @@ class WebSocketManager {
             });
 
             this.pusher.connection.bind("connected", () => {
-                console.log("[WebSocket] Connexion établie avec succès !");
+                console.log("✅ [WebSocket] Connexion établie avec succès !");
+                console.log("📊 [WebSocket] État de la connexion:", this.pusher.connection.state);
                 this.wsConnected = true;
                 this.ui.updateWebSocketStatus(true);
                 this.ui.showSuccess("Connexion temps réel établie", 2000);
@@ -66,44 +67,21 @@ class WebSocketManager {
             });
 
             this.pusher.connection.bind("error", (error) => {
-                console.error("[WebSocket] Erreur de connexion :", error);
+                console.error("❌ [WebSocket] Erreur de connexion :", error);
+                console.error("🔍 [WebSocket] Détails de l'erreur:", error.error);
                 this.wsConnected = false;
                 this.ui.updateWebSocketStatus(false);
                 this.ui.showError(`Erreur WebSocket: ${error.error?.data?.message || 'Vérifiez la console'}`);
             });
-            
-            this.pusher.connection.bind('failed', () => {
-                console.error('[WebSocket] La connexion a échoué (failed event).');
+
+            this.pusher.connection.bind("failed", () => {
+                console.error("❌ [WebSocket] Connexion échouée définitivement");
                 this.wsConnected = false;
                 this.ui.updateWebSocketStatus(false);
-                this.ui.showError("La connexion WebSocket a échoué.");
+                this.ui.showError("Connexion WebSocket échouée - Basculement en mode API");
             });
 
-            // === SOUSCRIPTION AUX CANAUX ===
-            console.log("[WebSocket] Souscription au canal 'delivery-tracking'...");
-            this.trackingChannel = this.pusher.subscribe("delivery-tracking");
-
-            this.trackingChannel.bind('pusher:subscription_succeeded', () => {
-                console.log("[WebSocket] Souscription au canal 'delivery-tracking' réussie.");
-            });
-
-            this.trackingChannel.bind('pusher:subscription_error', (status) => {
-                console.error("[WebSocket] Erreur de souscription au canal 'delivery-tracking':", status);
-            });
-
-            // === GESTION DES ÉVÉNEMENTS DE SUIVI ===
-            this.trackingChannel.bind("delivery-position-updated", (data) => {
-                console.log("[WebSocket] Événement reçu: 'delivery-position-updated'", data);
-                this.trackingController.handleLocationUpdate(data);
-            });
-
-            this.trackingChannel.bind("delivery-status-updated", (data) => {
-                console.log("[WebSocket] Événement reçu: 'delivery-status-updated'", data);
-                this.trackingController.handleStatusUpdate(data);
-                
-                // 🔧 CORRECTION CRITIQUE: Mettre à jour la liste des commandes aussi !
-                this.updateOrderCardStatus(data);
-            });
+            // No global channel subscription - security fix
 
         } catch (error) {
             console.error("[WebSocket] Erreur critique lors de l'initialisation de Pusher:", error);
@@ -113,11 +91,22 @@ class WebSocketManager {
 
     subscribeToOrder(orderNumber) {
         if (this.wsConnected) {
-            const channelName = `delivery.${orderNumber}`;
-            console.log(`[WebSocket] Souscription au canal de commande: ${channelName}`);
+            const channelName = `delivery-${orderNumber}`;
+            console.log(`[WebSocket] Subscribing to specific order channel: ${channelName}`);
             this.orderChannel = this.pusher.subscribe(channelName);
+            
+            this.orderChannel.bind("delivery-position-updated", (data) => {
+                console.log("[WebSocket] Position update received:", data);
+                this.trackingController.handleLocationUpdate(data);
+            });
+
+            this.orderChannel.bind("delivery-status-updated", (data) => {
+                console.log("[WebSocket] Status update received:", data);
+                this.trackingController.handleStatusUpdate(data);
+                this.updateOrderCardStatus(data);
+            });
         } else {
-            console.warn(`[WebSocket] Connexion non établie. Ajout de la souscription pour '${orderNumber}' à la file d'attente.`);
+            console.warn(`[WebSocket] Connection not established. Queuing subscription for '${orderNumber}'.`);
             this.pendingSubscriptions.push(orderNumber);
         }
     }

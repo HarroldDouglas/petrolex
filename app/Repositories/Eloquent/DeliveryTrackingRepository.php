@@ -9,9 +9,9 @@ use App\Repositories\Contracts\DeliveryTrackingRepositoryInterface;
 
 final class DeliveryTrackingRepository extends BaseEloquentRepository implements DeliveryTrackingRepositoryInterface
 {
-    public function __construct()
+    public function __construct(DeliveryTracking $deliveryTracking)
     {
-        parent::__construct(new DeliveryTracking);
+        parent::__construct($deliveryTracking);
     }
 
     public function create(array $attributes): DeliveryTracking

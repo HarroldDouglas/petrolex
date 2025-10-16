@@ -33,8 +33,8 @@ class RealTimeTrackingController extends Controller
         $trackingConfig = [
             'order_id' => $order->id,
             'order_number' => $order->order_number,
-            'mapbox' => [
-                'access_token' => config('services.mapbox.token'),
+            'google_maps' => [
+                'api_key' => config('services.google.maps.api_key'),
             ],
             'websocket' => [
                 'enabled' => true, // Always enabled since Reverb works

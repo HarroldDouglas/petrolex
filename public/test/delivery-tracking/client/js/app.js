@@ -4,7 +4,7 @@ class CustomerApp {
         this.authService = new CustomerAuthService();
         this.apiService = new CustomerApiService();
         this.ui = new CustomerUIComponents();
-        this.mapService = new CustomerMapService();
+        this.mapService = new CustomerGoogleMapService();
         this.errorHandler = new CustomerErrorHandlingService();
 
         // Délégation des responsabilités
@@ -28,6 +28,13 @@ class CustomerApp {
         this.currentUser = null;
 
         this.apiService.setAuthService(this.authService);
+        
+        // Initialiser l'orderManager avec le controller
+        this.ui.initOrderManager(this.orderController);
+        
+        // Exposer globalement pour accès depuis les components
+        window.components = this.ui;
+        window.customerApp = this;
     }
 
     async init() {
@@ -58,9 +65,10 @@ class CustomerApp {
 
             await this.initializeMap();
             this.websocketManager.initialize();
+            this.setupWebSocketEventHandlers();
             this.bindMainEvents();
 
-            await this.orderController.loadCustomerOrders(this.currentUser);
+            await this.loadMyOrders();
 
             this.ui.uiManager.showSuccess(
                 `Bienvenue ${this.currentUser.full_name || this.currentUser.email}!`,
@@ -71,6 +79,45 @@ class CustomerApp {
                 "Erreur lors de l'initialisation de l'application",
             );
         }
+    }
+
+    /**
+     * Setup WebSocket event handlers to connect real-time updates to the tracking system
+     * Routes incoming WebSocket events to appropriate controllers
+     */
+    setupWebSocketEventHandlers() {
+        const eventHandlers = {
+            position_updated: (data) => this.handlePositionUpdate(data),
+            status_updated: (data) => this.handleStatusUpdate(data)
+        };
+
+        Object.entries(eventHandlers).forEach(([event, handler]) => {
+            this.websocketManager.on(event, handler);
+        });
+
+        console.log("✅ [CustomerApp] WebSocket event handlers configured");
+    }
+
+    /**
+     * Handle position updates from WebSocket
+     * @param {Object} data - Position update data from WebSocket
+     */
+    handlePositionUpdate(data) {
+        if (!data || !this.trackingController) return;
+        
+        console.log("📍 [CustomerApp] Processing position update:", data.order_number);
+        this.trackingController.handleLocationUpdate(data);
+    }
+
+    /**
+     * Handle status updates from WebSocket
+     * @param {Object} data - Status update data from WebSocket
+     */
+    handleStatusUpdate(data) {
+        if (!data || !this.trackingController) return;
+        
+        console.log("📊 [CustomerApp] Processing status update:", data.order_number, data.status);
+        this.trackingController.handleStatusUpdate(data);
     }
 
     async initializeMap() {
@@ -116,7 +163,40 @@ class CustomerApp {
     }
 
     async loadMyOrders(page = 1) {
-        return this.orderController.loadCustomerOrders(this.currentUser, page);
+        console.log('📦 [CustomerApp] Chargement des commandes...');
+        try {
+            const response = await this.orderController.loadCustomerOrders(this.currentUser, {}, page);
+            console.log('✅ [CustomerApp] Commandes reçues:', response);
+            
+            if (response && response.data) {
+                console.log('📊 [CustomerApp] Données à afficher:', response.data.data || response.data);
+                console.log('📊 [CustomerApp] orderManager:', window.components?.orderManager);
+                
+                // Utiliser directement l'OrderManager pour afficher les commandes
+                if (window.components && window.components.orderManager) {
+                    const ordersData = response.data.data || response.data;
+                    const currentPage = response.data.current_page || page;
+                    const totalPages = response.data.last_page || 1;
+                    
+                    console.log('🎨 [CustomerApp] Appel renderOrders avec:', {
+                        ordersCount: ordersData.length,
+                        currentPage,
+                        totalPages
+                    });
+                    
+                    window.components.orderManager.renderOrders(ordersData, currentPage, totalPages);
+                } else {
+                    console.error('❌ [CustomerApp] orderManager non disponible');
+                }
+            } else {
+                console.error('❌ [CustomerApp] Aucune donnée dans la réponse');
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('❌ [CustomerApp] Erreur chargement commandes:', error);
+            throw error;
+        }
     }
 
     bindMainEvents() {

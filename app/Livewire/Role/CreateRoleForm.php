@@ -4,7 +4,6 @@ namespace App\Livewire\Role;
 
 use App\Http\Requests\Role\BaseRoleRequest;
 use App\Http\Requests\Role\StoreRoleRequest;
-use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRoleForm extends AbstractRoleForm
 {

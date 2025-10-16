@@ -40,6 +40,11 @@ class UpdateDeliveryTrackingPositionControllerTest extends TestCase
         $this->deliveryPerson = User::factory()->create();
         $this->deliveryPerson->assignRole(UserRole::DELIVERY_PERSON()->value);
 
+        // Create delivery person record
+        $deliveryPersonRecord = \App\Models\DeliveryPerson::factory()->create([
+            'user_id' => $this->deliveryPerson->id,
+        ]);
+
         $this->customerUser = User::factory()->create();
         $this->customerUser->assignRole(UserRole::CUSTOMER()->value);
 
@@ -65,7 +70,7 @@ class UpdateDeliveryTrackingPositionControllerTest extends TestCase
             'customer_id' => $this->customer->id,
             'distribution_center_id' => $this->distributionCenter->id,
             'delivery_address_id' => $this->deliveryAddress->id,
-            'delivery_person_id' => $this->deliveryPerson->id,
+            'delivery_person_id' => $deliveryPersonRecord->id,
         ]);
     }
 
@@ -125,5 +130,58 @@ class UpdateDeliveryTrackingPositionControllerTest extends TestCase
         // Verify that some values were updated (even if not exactly as expected)
         $this->assertNotEquals($originalLat, $tracking->driver_lat, 'Latitude should have been updated');
         $this->assertNotEquals($originalLng, $tracking->driver_lng, 'Longitude should have been updated');
+    }
+
+    public function test_update_delivery_position_fails_for_unauthorized_delivery_person(): void
+    {
+        Sanctum::actingAs($this->deliveryPerson);
+
+        // Create existing tracking
+        $tracking = DeliveryTracking::factory()->inProgress()->create([
+            'order_id' => $this->order->id,
+        ]);
+
+        // Create a different delivery person
+        $unauthorizedDeliveryPerson = User::factory()->create();
+        $unauthorizedDeliveryPerson->assignRole(UserRole::DELIVERY_PERSON()->value);
+
+        // Create delivery person record for unauthorized user
+        \App\Models\DeliveryPerson::factory()->create([
+            'user_id' => $unauthorizedDeliveryPerson->id,
+        ]);
+
+        Sanctum::actingAs($unauthorizedDeliveryPerson);
+
+        $response = $this->patchJson("/api/tracking/delivery/{$this->order->id}/position", [
+            'driver_lat' => 48.8700,
+            'driver_lng' => 2.3700,
+        ]);
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'message' => 'You are not authorized to access this delivery',
+            ]);
+    }
+
+    public function test_update_delivery_position_fails_for_customer(): void
+    {
+        Sanctum::actingAs($this->deliveryPerson);
+
+        // Create existing tracking
+        $tracking = DeliveryTracking::factory()->inProgress()->create([
+            'order_id' => $this->order->id,
+        ]);
+
+        Sanctum::actingAs($this->customerUser);
+
+        $response = $this->patchJson("/api/tracking/delivery/{$this->order->id}/position", [
+            'driver_lat' => 48.8700,
+            'driver_lng' => 2.3700,
+        ]);
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'message' => 'You are not authorized to access this delivery',
+            ]);
     }
 }

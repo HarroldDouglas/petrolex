@@ -21,19 +21,6 @@ class RoleService extends BaseServiceForEntity
         parent::__construct($roleRepository);
     }
 
-    /**
-     * Find a role by ID
-     * 
-     * @param int $id
-     * @return Role|null
-     */
-    public function find(int $id): ?Model
-    {
-        /** @var Role|null $role */
-        $role = parent::find($id);
-        return $role;
-    }
-
     protected function getModel(): string
     {
         return Role::class;
@@ -61,36 +48,20 @@ class RoleService extends BaseServiceForEntity
 
     /**
      * Update an existing role with permissions
-     * 
-     * @param Role $role
-     * @param array $data
+     *
+     * @param  Role  $role
      * @return Role
      */
     public function update(Model $role, array $data): Model
     {
         return $this->executeInTransaction(function () use ($role, $data) {
-            /** @var Role $role */
-            Log::info('RoleService: Starting role update', [
-                'role_id' => $role->id,
-                'role_name' => $role->name,
-                'new_name' => $data['name'],
-                'permissions_data' => $data['permissions'] ?? 'no permissions',
-                'permissions_count' => isset($data['permissions']) ? count($data['permissions']) : 0,
-            ]);
 
-            // Update the role
             $updatedRole = $this->repository->update($role, [
                 'name' => $data['name'],
                 'guard_name' => $data['guard_name'] ?? $role->guard_name,
             ]);
 
-            // Dispatch event to assign permissions
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                /** @var Role $updatedRole */
-                Log::info('RoleService: Dispatching permission event', [
-                    'role_id' => $updatedRole->id,
-                    'permissions' => $data['permissions'],
-                ]);
                 event(new RolePermissionUpdatedEvent($updatedRole, $data['permissions']));
             } else {
                 /** @var Role $updatedRole */
@@ -106,9 +77,8 @@ class RoleService extends BaseServiceForEntity
 
     /**
      * Delete a role - permissions will be detached by event listener
-     * 
-     * @param Role $role
-     * @return bool
+     *
+     * @param  Role  $role
      */
     public function delete(Model $role): bool
     {

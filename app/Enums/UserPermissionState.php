@@ -2,37 +2,61 @@
 
 namespace App\Enums;
 
-enum UserPermissionState: string
-{
-    case ROLE = 'role';
-    case DIRECT = 'direct';
-    case REVOKED = 'revoked';
-    case NONE = 'none';
+use Spatie\Enum\Laravel\Enum;
 
+/**
+ * @method static self ROLE()
+ * @method static self DIRECT()
+ * @method static self REVOKED()
+ * @method static self NONE()
+ */
+class UserPermissionState extends Enum
+{
     /**
      * Get the label for the permission state
      */
-    public function label(): string
+    public static function labels(): array
     {
-        return match ($this) {
-            self::ROLE => 'Hérité du rôle',
-            self::DIRECT => 'Permission directe',
-            self::REVOKED => 'Permission révoquée',
-            self::NONE => 'Non assigné',
-        };
+        return [
+            'ROLE' => 'Hérité du rôle',
+            'DIRECT' => 'Permission directe',
+            'REVOKED' => 'Permission révoquée',
+            'NONE' => 'Non assigné',
+        ];
+    }
+
+    /**
+     * Get the values for the permission states
+     */
+    public static function values(): array
+    {
+        return [
+            'ROLE' => 'role',
+            'DIRECT' => 'direct',
+            'REVOKED' => 'revoked',
+            'NONE' => 'none',
+        ];
     }
 
     /**
      * Get the CSS class for the permission state
      */
+    public static function cssClasses(): array
+    {
+        return [
+            'role' => 'checkbox-role',
+            'direct' => 'checkbox-direct',
+            'revoked' => 'checkbox-revoked',
+            'none' => 'checkbox-none',
+        ];
+    }
+
+    /**
+     * Get CSS class for this instance
+     */
     public function cssClass(): string
     {
-        return match ($this) {
-            self::ROLE => 'checkbox-role',
-            self::DIRECT => 'checkbox-direct',
-            self::REVOKED => 'checkbox-revoked',
-            self::NONE => 'checkbox-none',
-        };
+        return static::cssClasses()[$this->value];
     }
 
     /**
@@ -40,19 +64,22 @@ enum UserPermissionState: string
      */
     public function isSelected(): bool
     {
-        return match ($this) {
-            self::ROLE, self::DIRECT => true,
-            self::REVOKED, self::NONE => false,
-        };
+        return in_array($this->value, ['role', 'direct']);
     }
 
     /**
-     * Check if the state can be toggled by user action
+     * Get states that represent selected permissions
      */
-    public function isToggleable(): bool
+    public static function selectedStates(): array
     {
-        return match ($this) {
-            self::ROLE, self::DIRECT, self::REVOKED, self::NONE => true,
-        };
+        return ['role', 'direct'];
+    }
+
+    /**
+     * Get states that represent unselected permissions
+     */
+    public static function unselectedStates(): array
+    {
+        return ['revoked', 'none'];
     }
 }

@@ -45,21 +45,12 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Post(
- *     path="/api/customers/{customer}/delivery-addresses",
- *     summary="Créer une nouvelle adresse de livraison pour un client",
- *     description="Permet de créer une nouvelle adresse de livraison associée à un client spécifique.",
- *     operationId="api.customers.delivery-addresses.store",
+ *     path="/api/my/delivery-addresses",
+ *     summary="Créer une nouvelle adresse de livraison pour l'utilisateur connecté",
+ *     description="Permet de créer une nouvelle adresse de livraison pour l'utilisateur connecté.",
+ *     operationId="api.my.delivery-addresses.store",
  *     tags={"Livraison"},
  *     security={{"bearerAuth":{}}},
- *
- *     @OA\Parameter(
- *         name="customer",
- *         in="path",
- *         required=true,
- *         description="ID du client",
- *
- *         @OA\Schema(type="integer", example=1)
- *     ),
  *
  *     @OA\RequestBody(
  *         required=true,

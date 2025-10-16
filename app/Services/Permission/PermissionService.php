@@ -20,9 +20,9 @@ class PermissionService extends BaseServiceForEntity
         return Permission::class;
     }
 
-        /**
+    /**
      * Get all permissions grouped by module
-     * 
+     *
      * @return array<string, array{module: string, permissions: array<int, array{name: string, label: string}>}>
      */
     public function getGroupedPermissions(): array

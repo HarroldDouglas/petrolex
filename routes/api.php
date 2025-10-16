@@ -39,3 +39,13 @@ require __DIR__.'/api/delivery.php';
 require __DIR__.'/api/tracking.php';
 require __DIR__.'/api/geography.php';
 require __DIR__.'/api/app.php';
+
+Route::post('test-websocket-event', function () {
+    event(new \App\Events\TestWebSocketEvent);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Test WebSocket event dispatched',
+        'time' => now()->toISOString(),
+    ]);
+});

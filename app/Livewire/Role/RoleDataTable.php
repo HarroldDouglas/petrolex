@@ -86,18 +86,15 @@ class RoleDataTable extends BaseDataTable
         }
 
         return ucwords(str_replace(['_', '-'], ' ', $roleName));
-
     }
 
-    public function deleteRole($roleId)
+    public function deleteRole(int $roleId)
     {
         try {
             $roleService = app(RoleService::class);
-            $role = $roleService->find($roleId);
 
-            if (! $role) {
-                throw new \Exception('Rôle non trouvé.');
-            }
+            /** @var Role $role */
+            $role = $roleService->findOrFail($roleId);
 
             if ($role->name === UserRole::SUPER_ADMIN()->value) {
                 throw new \Exception('Le rôle Super Admin ne peut pas être supprimé.');
@@ -107,19 +104,9 @@ class RoleDataTable extends BaseDataTable
                 throw new \Exception('Ce rôle ne peut pas être supprimé car il est assigné à des utilisateurs.');
             }
 
-            $name = $role->name;
-            $result = $roleService->delete($role);
+            $roleService->delete($role);
 
-            if ($result) {
-                session()->flash('success', "Le rôle {$name} a été supprimé avec succès.");
-
-                $this->dispatch('show-notification', [
-                    'type' => 'success',
-                    'title' => 'Rôle supprimé !',
-                    'message' => "Le rôle {$name} a été supprimé définitivement.",
-                    'timer' => 3000,
-                ]);
-            }
+            $this->notify('Rôle supprimé avec succès.', 'success');
         } catch (\Exception $e) {
             Log::error('Error deleting role: '.$e->getMessage());
 

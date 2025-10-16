@@ -54,13 +54,13 @@ class ManageUserPermissions extends Component
         $originalPermission = $this->findOriginalPermission($permissionName);
 
         if (! $originalPermission) {
-            return UserPermissionState::NONE->value;
+            return UserPermissionState::NONE()->value;
         }
 
         $isCurrentlySelected = $this->isPermissionSelected($permissionName);
-        $originalState = UserPermissionState::tryFrom($originalPermission['state']) ?? UserPermissionState::NONE;
+        $originalState = UserPermissionState::make($originalPermission['state']) ?? UserPermissionState::NONE();
 
-        return $this->calculateCurrentState($originalState, $isCurrentlySelected)->value;
+        return $this->getCurrentState($originalState, $isCurrentlySelected)->value;
     }
 
     /**
@@ -90,13 +90,14 @@ class ManageUserPermissions extends Component
     /**
      * Calculate the current state based on original state and selection
      */
-    private function calculateCurrentState(UserPermissionState $originalState, bool $isSelected): UserPermissionState
+    private function getCurrentState(UserPermissionState $originalState, bool $isSelected): UserPermissionState
     {
-        return match ($originalState) {
-            UserPermissionState::REVOKED => $isSelected ? UserPermissionState::DIRECT : UserPermissionState::REVOKED,
-            UserPermissionState::ROLE => $isSelected ? UserPermissionState::ROLE : UserPermissionState::REVOKED,
-            UserPermissionState::DIRECT => $isSelected ? UserPermissionState::DIRECT : UserPermissionState::NONE,
-            UserPermissionState::NONE => $isSelected ? UserPermissionState::DIRECT : UserPermissionState::NONE,
+        return match ($originalState->value) {
+            'revoked' => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::REVOKED(),
+            'role' => $isSelected ? UserPermissionState::ROLE() : UserPermissionState::REVOKED(),
+            'direct' => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::NONE(),
+            'none' => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::NONE(),
+            default => UserPermissionState::NONE(),
         };
     }
 
@@ -167,7 +168,7 @@ class ManageUserPermissions extends Component
         }
 
         return collect($modulePermissions)
-            ->every(fn ($permission) => $this->getCurrentPermissionState($permission['name']) === UserPermissionState::REVOKED->value
+            ->every(fn ($permission) => $this->getCurrentPermissionState($permission['name']) === UserPermissionState::REVOKED()->value
             );
     }
 
@@ -181,7 +182,7 @@ class ManageUserPermissions extends Component
         }
 
         return collect($modulePermissions)
-            ->every(fn ($permission) => $permission['state'] === UserPermissionState::ROLE->value &&
+            ->every(fn ($permission) => $permission['state'] === UserPermissionState::ROLE()->value &&
                 $permission['checked'] &&
                 $this->isPermissionSelected($permission['name'])
             );
@@ -208,7 +209,7 @@ class ManageUserPermissions extends Component
     private function getManageablePermissions(array $modulePermissions): Collection
     {
         return collect($modulePermissions)
-            ->reject(fn ($permission) => $permission['state'] === UserPermissionState::ROLE->value &&
+            ->reject(fn ($permission) => $permission['state'] === UserPermissionState::ROLE()->value &&
                 $this->isPermissionSelected($permission['name'])
             );
     }
@@ -241,7 +242,7 @@ class ManageUserPermissions extends Component
     private function unselectManageablePermissions(array $modulePermissions): void
     {
         $permissionsToUnselect = collect($modulePermissions)
-            ->reject(fn ($permission) => $permission['state'] === UserPermissionState::ROLE->value &&
+            ->reject(fn ($permission) => $permission['state'] === UserPermissionState::ROLE()->value &&
                 $permission['checked']
             )
             ->pluck('name')
@@ -258,15 +259,15 @@ class ManageUserPermissions extends Component
         $permissionsToSelect = collect($modulePermissions)
             ->filter(function ($permission) {
                 $permissionName = $permission['name'];
-                $originalState = UserPermissionState::tryFrom($permission['state']);
+                $originalState = UserPermissionState::make($permission['state']);
 
                 if ($this->isPermissionSelected($permissionName)) {
                     return false;
                 }
 
-                return match ($originalState) {
-                    UserPermissionState::ROLE => $permission['checked'],
-                    UserPermissionState::REVOKED, UserPermissionState::DIRECT, UserPermissionState::NONE => true,
+                return match ($originalState->value) {
+                    'role' => $permission['checked'],
+                    'revoked', 'direct', 'none' => true,
                     default => false,
                 };
             })
@@ -303,8 +304,8 @@ class ManageUserPermissions extends Component
     private function isPermissionEffectivelySelected(string $currentState): bool
     {
         return in_array($currentState, [
-            UserPermissionState::ROLE->value,
-            UserPermissionState::DIRECT->value,
+            UserPermissionState::ROLE()->value,
+            UserPermissionState::DIRECT()->value,
         ]);
     }
 
@@ -317,7 +318,7 @@ class ManageUserPermissions extends Component
         $isInSelectedArray = in_array($permissionName, $this->selectedPermissions);
 
         // Visually checked means: in selectedPermissions array AND not revoked
-        return $isInSelectedArray && $currentState !== UserPermissionState::REVOKED->value;
+        return $isInSelectedArray && $currentState !== UserPermissionState::REVOKED()->value;
     }
 
     /**
@@ -385,16 +386,16 @@ class ManageUserPermissions extends Component
             }
 
             switch ($currentState) {
-                case UserPermissionState::REVOKED->value:
+                case UserPermissionState::REVOKED()->value:
                     $states['revoked']++;
                     break;
-                case UserPermissionState::ROLE->value:
+                case UserPermissionState::ROLE()->value:
                     $states['inherited']++;
                     break;
-                case UserPermissionState::DIRECT->value:
+                case UserPermissionState::DIRECT()->value:
                     $states['direct']++;
                     break;
-                case UserPermissionState::NONE->value:
+                case UserPermissionState::NONE()->value:
                     $states['none']++;
                     break;
             }

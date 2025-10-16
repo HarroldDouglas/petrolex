@@ -114,6 +114,11 @@
                             <i class="fas fa-truck-moving me-2"></i> Suivi de Livraison
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="false">
+                            <i class="fas fa-mobile-alt me-2"></i> Tests Paiement
+                        </button>
+                    </li>
                     <!-- Future tabs will be added here -->
                 </ul>
                 <div class="tab-content" id="testTabsContent">
@@ -122,7 +127,7 @@
                         <div class="test-section">
                             <h5><i class="fas fa-info-circle me-2"></i> Description</h5>
                             <p>Cette section regroupe les interfaces de test pour la gestion et l'affichage des produits. Vous pouvez simuler différentes interactions utilisateur et vérifier le comportement de l'application lié aux produits.</p>
-                            <a href="test/products/index.html" class="btn btn-primary mt-3">
+                            <a href="products/index.html" class="btn btn-primary mt-3">
                                 <i class="fas fa-external-link-alt me-2"></i> Accéder aux Tests Produits
                             </a>
                         </div>
@@ -133,11 +138,41 @@
                         <div class="test-section">
                             <h5><i class="fas fa-info-circle me-2"></i> Description</h5>
                             <p>Cette interface permet de simuler le suivi de livraison en temps réel pour les livreurs. Vous pouvez vous connecter en tant que livreur, gérer les commandes et simuler le déplacement sur une carte.</p>
-                            <a href="test/delivery-tracking/delivery/index.html" class="btn btn-primary mt-3 me-2">
+                            <a href="delivery-tracking/delivery/" class="btn btn-primary mt-3 me-2">
                                 <i class="fas fa-motorcycle me-2"></i> Tester le Livreur
                             </a>
-                            <a href="./delivery-tracking/client/index.html" class="btn btn-success mt-3" target="_blank">
+                            <a href="delivery-tracking/client/" class="btn btn-success mt-3" target="_blank">
                                 <i class="fas fa-user me-2"></i> Tester le Client
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Payment Tests Tab Content -->
+                    <div class="tab-pane fade" id="payment" role="tabpanel" aria-labelledby="payment-tab">
+                        <div class="test-section">
+                            <h5><i class="fas fa-info-circle me-2"></i> Description</h5>
+                            <p>Interface de test pour les fournisseurs de paiement mobile MTN Money et Orange Money. Testez l'initiation de paiements, visualisez les logs en temps réel et utilisez des numéros de test pour différents scénarios (succès, échec, attente).</p>
+                            
+                            <div class="alert alert-info mt-3">
+                                <h6><i class="fas fa-lightbulb me-2"></i> Numéros de Test Disponibles</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>MTN Money:</strong><br>
+                                        <span class="text-success">✅ Succès: 677000001</span><br>
+                                        <span class="text-warning">⏳ Attente: 677000002</span><br>
+                                        <span class="text-danger">❌ Échec: 677000003</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Orange Money:</strong><br>
+                                        <span class="text-success">✅ Succès: 699000001</span><br>
+                                        <span class="text-warning">⏳ Attente: 699000002</span><br>
+                                        <span class="text-danger">❌ Échec: 699000003</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <a href="test/payment/index.html" class="btn btn-primary mt-3">
+                                <i class="fas fa-credit-card me-2"></i> Accéder aux Tests de Paiement
                             </a>
                         </div>
                     </div>

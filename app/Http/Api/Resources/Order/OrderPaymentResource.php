@@ -34,6 +34,7 @@ class OrderPaymentResource extends JsonResource
             'reference' => $this->payment_reference,
             'method' => $this->payment_method ? $this->payment_method->value : null,
             'method_label' => $this->payment_method ? ($this->payment_method->label ?? $this->payment_method->value) : null,
+            'method_validation_text' => $this->payment_method?->validationText(),
         ];
     }
 }

@@ -8,9 +8,9 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionRepository extends BaseEloquentRepository implements PermissionRepositoryInterface
 {
-    public function __construct()
+    public function __construct(Permission $permission)
     {
-        parent::__construct(new Permission);
+        parent::__construct($permission);
     }
 
     /**

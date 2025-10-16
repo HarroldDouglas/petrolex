@@ -13,7 +13,7 @@ use App\Services\Auth\OtpService;
 use App\Services\BaseServiceForEntity;
 use App\Services\BaseServiceForEntityInterface;
 use App\Services\DeliveryTrackingService;
-use App\Services\MapboxService;
+use App\Services\GoogleMapsService;
 use App\Services\Permissions\PermissionService;
 use App\Services\Permissions\PermissionServiceInterface;
 use App\Services\Shared\Media\MediaServiceInterface;
@@ -37,8 +37,16 @@ class ServiceServiceProvider extends ServiceProvider implements DeferrableProvid
         BaseServiceForEntityInterface::class => BaseServiceForEntity::class,
         MediaServiceInterface::class => SpatieMediaService::class,
         DeliveryTrackingServiceInterface::class => DeliveryTrackingService::class,
-        RouteCalculatorInterface::class => MapboxService::class,
     ];
+
+    public function register(): void
+    {
+        parent::register();
+
+        $this->app->bind(RouteCalculatorInterface::class, function ($app) {
+            return new GoogleMapsService(config('services.google.maps.api_key'));
+        });
+    }
 
     /**
      * @return array<class-string>

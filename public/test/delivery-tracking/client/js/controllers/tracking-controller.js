@@ -112,23 +112,14 @@ class TrackingController {
                             address: orderData.delivery_address?.name || orderData.delivery_address?.address || "Destination"
                         });
                         
-                        // Dessiner la route entre les points
+                        // Dessiner la route entre les points (Google Maps format)
                         this.mapService.drawRoute(
-                            [driverLng, driverLat],
-                            [destLng, destLat]
+                            driverLat, driverLng, destLat, destLng
                         );
                         
-                        // Centrer la vue pour voir les deux points
+                        // Centrer la vue pour voir les deux points avec Google Maps
                         try {
-                            // 🔧 CORRECTION: Créer les bounds correctement pour le service de carte
-                            const bounds = new mapboxgl.LngLatBounds();
-                            bounds.extend([driverLng, driverLat]);
-                            bounds.extend([destLng, destLat]);
-                            
-                            this.mapService.map.fitBounds(bounds, {
-                                padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                                duration: CUSTOMER_CONFIG.UI.ANIMATION_DURATION,
-                            });
+                            this.mapService.fitBoundsToMarkers();
                         } catch (error) {
                             console.warn("⚠️ [TrackingController] Impossible d'ajuster la vue:", error);
                             // Fallback: centrer sur le livreur
@@ -149,6 +140,11 @@ class TrackingController {
             }
         } catch (error) {
             console.error("❌ [TrackingController] Erreur de chargement:", error);
+            
+            if (error.message.includes("404") || error.message.includes("not found")) {
+                throw new Error("Le suivi n'est pas encore disponible. Le livreur n'a pas encore démarré la livraison.");
+            }
+            
             throw new Error(`Impossible de charger les données de suivi: ${error.message}`);
         }
     }
@@ -156,6 +152,8 @@ class TrackingController {
     subscribeToOrderUpdates(orderNumber) {
         if (window.customerApp.websocketManager.isConnected()) {
             window.customerApp.websocketManager.subscribeToOrder(orderNumber);
+        } else {
+            console.warn("[TrackingController] WebSocket not connected, cannot subscribe to order updates");
         }
     }
 
@@ -182,12 +180,9 @@ class TrackingController {
 
     startPeriodicUpdates() {
         this.stopPeriodicUpdates();
-
-        this.updateInterval = setInterval(async () => {
-            if (this.currentTrackingOrder) {
-                await this.updateTrackingData();
-            }
-        }, CUSTOMER_CONFIG.UI.UPDATE_INTERVAL);
+        
+        // WebSocket only - no more polling
+        console.log('Using WebSocket only, no polling needed');
     }
 
     stopPeriodicUpdates() {
@@ -295,8 +290,7 @@ class TrackingController {
                     
                     if (!isNaN(destLat) && !isNaN(destLng)) {
                         this.mapService.drawRoute(
-                            [driverLng, driverLat],
-                            [destLng, destLat]
+                            driverLat, driverLng, destLat, destLng
                         );
                     }
                 }

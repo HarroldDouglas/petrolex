@@ -101,8 +101,8 @@
                                                        for="permission_{{ $permission['name'] }}"
                                                        style="cursor: pointer;">
                                                     <span class="permission-label 
-                                                        @if($currentState === \App\Enums\UserPermissionState::ROLE->value) text-muted @endif
-                                                        @if($currentState === \App\Enums\UserPermissionState::REVOKED->value) text-decoration-line-through text-danger @endif">
+                                                        @if($currentState === \App\Enums\UserPermissionState::ROLE()->value) text-muted @endif
+                                                        @if($currentState === \App\Enums\UserPermissionState::REVOKED()->value) text-decoration-line-through text-danger @endif">
                                                         {{ $permission['label'] }}
                                                     </span>
                                                 </label>
