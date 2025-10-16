@@ -161,19 +161,12 @@ trait ManagesUserPermissions
      */
     private function determinePermissionState(string $permissionName, array $permissions): string
     {
-        if ($permissions['revoked_permissions']->contains($permissionName)) {
-            return UserPermissionState::REVOKED()->value;
-        }
-
-        if ($permissions['direct_permissions']->contains($permissionName)) {
-            return UserPermissionState::DIRECT()->value;
-        }
-
-        if ($permissions['role_permissions']->contains($permissionName)) {
-            return UserPermissionState::ROLE()->value;
-        }
-
-        return UserPermissionState::NONE()->value;
+        return match (true) {
+            $permissions['revoked_permissions']->contains($permissionName) => UserPermissionState::REVOKED()->value,
+            $permissions['direct_permissions']->contains($permissionName) => UserPermissionState::DIRECT()->value,
+            $permissions['role_permissions']->contains($permissionName) => UserPermissionState::ROLE()->value,
+            default => UserPermissionState::NONE()->value,
+        };
     }
 
     /**

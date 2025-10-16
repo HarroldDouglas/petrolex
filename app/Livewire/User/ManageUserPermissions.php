@@ -14,7 +14,6 @@ class ManageUserPermissions extends Component
     public User $user;
     public array $permissionStates = [];
     public array $selectedPermissions = [];
-
     protected UserPermissionService $userPermissionService;
 
     public function boot(UserPermissionService $userPermissionService)
@@ -37,7 +36,6 @@ class ManageUserPermissions extends Component
     {
         $this->permissionStates = $this->userPermissionService->getUserPermissionStates($this->user);
     }
-
     public function initializeSelectedPermissions()
     {
         $this->selectedPermissions = $this->getAllPermissions()
@@ -58,7 +56,7 @@ class ManageUserPermissions extends Component
         }
 
         $isCurrentlySelected = $this->isPermissionSelected($permissionName);
-        $originalState = UserPermissionState::make($originalPermission['state']) ?? UserPermissionState::NONE();
+        $originalState = UserPermissionState::tryFrom($originalPermission['state']) ?? UserPermissionState::NONE();
 
         return $this->getCurrentState($originalState, $isCurrentlySelected)->value;
     }
@@ -68,15 +66,9 @@ class ManageUserPermissions extends Component
      */
     private function findOriginalPermission(string $permissionName): ?array
     {
-        foreach ($this->permissionStates as $moduleData) {
-            foreach ($moduleData['permissions'] as $permission) {
-                if ($permission['name'] === $permissionName) {
-                    return $permission;
-                }
-            }
-        }
-
-        return null;
+        return collect($this->permissionStates)
+            ->flatMap(fn ($moduleData) => $moduleData['permissions'])
+            ->firstWhere('name', $permissionName) ?: null;
     }
 
     /**
@@ -92,11 +84,11 @@ class ManageUserPermissions extends Component
      */
     private function getCurrentState(UserPermissionState $originalState, bool $isSelected): UserPermissionState
     {
-        return match ($originalState->value) {
-            'revoked' => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::REVOKED(),
-            'role' => $isSelected ? UserPermissionState::ROLE() : UserPermissionState::REVOKED(),
-            'direct' => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::NONE(),
-            'none' => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::NONE(),
+        return match ($originalState) {
+            UserPermissionState::REVOKED() => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::REVOKED(),
+            UserPermissionState::ROLE() => $isSelected ? UserPermissionState::ROLE() : UserPermissionState::REVOKED(),
+            UserPermissionState::DIRECT() => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::NONE(),
+            UserPermissionState::NONE() => $isSelected ? UserPermissionState::DIRECT() : UserPermissionState::NONE(),
             default => UserPermissionState::NONE(),
         };
     }
@@ -112,7 +104,6 @@ class ManageUserPermissions extends Component
 
         $modulePermissions = $this->getModulePermissions($module);
 
-        // Handle special cases first
         if ($this->areAllPermissionsRevoked($modulePermissions)) {
             $this->selectAllRevokedPermissions($modulePermissions);
 
@@ -125,7 +116,6 @@ class ManageUserPermissions extends Component
             return;
         }
 
-        // Handle normal toggle logic
         if ($this->areAllManageablePermissionsSelected($modulePermissions)) {
             $this->unselectManageablePermissions($modulePermissions);
         } else {
