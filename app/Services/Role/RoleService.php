@@ -2,6 +2,8 @@
 
 namespace App\Services\Role;
 
+use App\Events\Role\RoleDeletedEvent;
+use App\Events\Role\RoleDeletingEvent;
 use App\Events\Role\RolePermissionUpdatedEvent;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Services\BaseServiceForEntity;
@@ -67,6 +69,41 @@ class RoleService extends BaseServiceForEntity
             }
 
             return $updatedRole;
+        });
+    }
+
+        /**
+     * Delete a role - permissions will be detached by event listener
+     */
+    public function delete(Model $role): bool
+    {
+        return $this->executeInTransaction(function () use ($role) {
+            Log::info("RoleService: Starting role deletion", [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+                'permissions_count' => $role->permissions()->count(),
+                'users_count' => $role->users()->count()
+            ]);
+
+            RoleDeletingEvent::dispatch($role);
+
+            $deleted = $this->repository->delete($role);
+
+            if ($deleted) {
+                RoleDeletedEvent::dispatch($role);
+
+                Log::info("RoleService: Role successfully deleted", [
+                    'role_id' => $role->id,
+                    'role_name' => $role->name
+                ]);
+            } else {
+                Log::error("RoleService: Failed to delete role", [
+                    'role_id' => $role->id,
+                    'role_name' => $role->name
+                ]);
+            }
+
+            return $deleted;
         });
     }
 

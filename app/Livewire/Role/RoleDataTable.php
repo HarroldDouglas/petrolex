@@ -6,6 +6,8 @@ use App\Enums\UserRole;
 use App\Services\Role\RoleService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Spatie\Permission\Models\Role;
@@ -16,6 +18,8 @@ class RoleDataTable extends BaseDataTable
 
     protected const DEFAULT_SORT_FIELD = 'created_at';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
+
+
 
     protected function getExportFileName(): string
     {
@@ -87,16 +91,33 @@ class RoleDataTable extends BaseDataTable
         return ucwords(str_replace(['_', '-'], ' ', $roleName));
     }
 
-    public function deleteRole(int $roleId): void
+    public function deleteRole(int $roleId)
     {
         try {
-            $role = $this->roleService->findOrFail($roleId);
+            $roleService = app(RoleService::class);
+            
+            $role = $roleService->findOrFail($roleId);
 
-            $this->roleService->delete($role);
+            if ($role->name === UserRole::SUPER_ADMIN()->value) {
+                throw new \Exception('Le rôle Super Admin ne peut pas être supprimé.');
+            }
+ 
+            if ($role->users()->count() > 0) {
+                throw new \Exception('Ce rôle ne peut pas être supprimé car il est assigné à des utilisateurs.');
+            }
+
+            $roleService->delete($role);
 
             $this->notify('Rôle supprimé avec succès.', 'success');
         } catch (\Exception $e) {
-            $this->notify($e->getMessage(), 'error');
+            Log::error('Error deleting role: '.$e->getMessage());
+
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => $e->getMessage(),
+                'timer' => 5000,
+            ]);
         }
     }
 }
