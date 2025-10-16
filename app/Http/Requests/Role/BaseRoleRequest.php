@@ -40,15 +40,4 @@ abstract class BaseRoleRequest extends FormRequest
             'selectedPermissions.*.exists' => 'Une ou plusieurs permissions sélectionnées n\'existent pas.',
         ];
     }
-
-    /**
-     * Get the unique validation rule for role name
-     */
-    protected function getNameUniqueRule(): \Illuminate\Validation\Rules\Unique
-    {
-        return Rule::unique('roles', 'name')
-            ->where(function ($query) {
-                $query->where('guard_name', request()->input('guard_name', 'web'));
-            });
-    }
 }

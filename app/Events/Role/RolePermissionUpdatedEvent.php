@@ -6,7 +6,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Spatie\Permission\Models\Role;
 
-class RolePermissionsUpdatedEvent
+class RolePermissionUpdatedEvent
 {
     use Dispatchable, SerializesModels;
 

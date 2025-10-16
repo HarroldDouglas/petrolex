@@ -90,7 +90,7 @@ class RoleDataTable extends BaseDataTable
     public function deleteRole(int $roleId): void
     {
         try {
-           $role = $this->roleService->findOrFail($roleId);
+            $role = $this->roleService->findOrFail($roleId);
 
             $this->roleService->delete($role);
 

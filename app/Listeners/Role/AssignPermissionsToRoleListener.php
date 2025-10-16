@@ -2,27 +2,26 @@
 
 namespace App\Listeners\Role;
 
-use App\Events\Role\RolePermissionsUpdatedEvent;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Events\Role\RolePermissionUpdatedEvent;
 use Illuminate\Support\Facades\Log;
 
-class AssignPermissionsToRoleListener implements ShouldQueue
+class AssignPermissionsToRoleListener
 {
-    use InteractsWithQueue;
 
     /**
      * Handle the event.
      */
-    public function handle(RolePermissionsUpdatedEvent $event): void
+    public function handle(RolePermissionUpdatedEvent $event): void
     {
         try {
+
             $event->role->syncPermissions($event->permissions);
             
-            Log::info("Permissions assigned to role: {$event->role->name}", [
+            $event->role->refresh();
+            Log::info("Permissions successfully synced to role: {$event->role->name}", [
                 'role_id' => $event->role->id,
-                'permissions_count' => count($event->permissions),
-                'permissions' => $event->permissions
+                'final_permissions' => $event->role->permissions->pluck('name')->toArray(),
+                'permissions_count' => count($event->role->permissions)
             ]);
         } catch (\Exception $e) {
             Log::error("Failed to assign permissions to role: {$event->role->name}", [

@@ -41,21 +41,23 @@
                                 <!-- Group Header with Select All Checkbox -->
                                 <div class="d-flex align-items-center justify-content-between @if($loop->even) p-3 pt-0 ps-2 @endif ">
                                     <h6 class="text-primary fw-bold mb-0 p-0">{{ $moduleData['module'] }}</h6>
-                                    <div class="form-check">
-                                        <input class="form-check-input group-checkbox" 
-                                               type="checkbox" 
-                                               id="group_{{ $module }}"
-                                               wire:click="toggleGroup('{{ $module }}')"
-                                               @if($this->isGroupFullySelected($module)) checked @endif
-                                               @if($this->isGroupPartiallySelected($module)) style="opacity: 0.5;" @endif>
-                                        <label class="form-check-label small text-muted" for="group_{{ $module }}">
-                                             sélectionner
-                                        </label>
-                                    </div>
                                 </div>
                                 
                                 <!-- Permissions Grid -->
                                 <div class="permissions-list">
+                                    <div class="permission-item-wrapper mb-2 p-2">
+                                        <div class="form-check d-flex align-items-center">
+                                            <input class="form-check-input  me-3" 
+                                                type="checkbox" 
+                                                id="group_{{ $module }}"
+                                                wire:click="toggleGroup('{{ $module }}')"
+                                                @if($this->isGroupFullySelected($module)) checked @endif
+                                                @if($this->isGroupPartiallySelected($module)) style="opacity: 0.5;" @endif>
+                                            <label class="form-check-label small text-muted" for="group_{{ $module }}">
+                                                Sélectionner
+                                            </label>
+                                        </div>
+                                    </div>
                                     @foreach($moduleData['permissions'] as $permission)
                                         <div class="permission-item-wrapper mb-2 p-2">
                                             <div class="form-check d-flex align-items-center">

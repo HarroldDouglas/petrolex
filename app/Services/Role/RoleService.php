@@ -2,12 +2,13 @@
 
 namespace App\Services\Role;
 
-use App\Events\Role\RolePermissionsUpdatedEvent;
+use App\Events\Role\RolePermissionUpdatedEvent;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\Permission\PermissionService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 class RoleService extends BaseServiceForEntity
@@ -30,13 +31,14 @@ class RoleService extends BaseServiceForEntity
     public function create(array $data): Model
     {
         return $this->executeInTransaction(function () use ($data) {
+            
             $role = $this->repository->create([
                 'name' => $data['name'],
                 'guard_name' => $data['guard_name'] ?? 'web',
             ]);
 
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                event(new RolePermissionsUpdatedEvent($role, $data['permissions']));
+                event(new RolePermissionUpdatedEvent($role, $data['permissions']));
             }
 
             return $role;
@@ -49,13 +51,19 @@ class RoleService extends BaseServiceForEntity
     public function update(Model $role, array $data): Model
     {
         return $this->executeInTransaction(function () use ($role, $data) {
+           
             $updatedRole = $this->repository->update($role, [
                 'name' => $data['name'],
                 'guard_name' => $data['guard_name'] ?? $role->guard_name,
             ]);
 
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                event(new RolePermissionsUpdatedEvent($updatedRole, $data['permissions']));
+                event(new RolePermissionUpdatedEvent($updatedRole, $data['permissions']));
+            } else {
+                Log::warning("RoleService: No permissions data to assign", [
+                    'role_id' => $updatedRole->id,
+                    'data_keys' => array_keys($data)
+                ]);
             }
 
             return $updatedRole;
@@ -70,4 +78,3 @@ class RoleService extends BaseServiceForEntity
         return $this->permissionService->getGroupedPermissions();
     }
 }
-
