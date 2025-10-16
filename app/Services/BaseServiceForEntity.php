@@ -29,6 +29,18 @@ abstract class BaseServiceForEntity implements BaseServiceForEntityInterface
         return $this->repository->find($id);
     }
 
+    public function findOrFail(int $id): Model
+    {
+        $model = $this->repository->find($id);
+        
+        if (!$model) {
+            $modelClass = $this->getModel();
+            throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel($modelClass, [$id]);
+        }
+        
+        return $model;
+    }
+
     public function update(Model $model, array $data): Model
     {
         return $this->executeInTransaction(function () use ($model, $data) {

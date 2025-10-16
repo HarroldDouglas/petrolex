@@ -6,7 +6,7 @@
 class CustomerUIComponents {
     constructor() {
         this.uiManager = new UIManager();
-        this.orderManager = new CustomerOrderManager(this.uiManager);
+        this.orderManager = null; // Sera initialisé plus tard avec le controller
         this.trackingManager = new TrackingManager(this.uiManager);
         this.loginForm = null;
 
@@ -16,6 +16,14 @@ class CustomerUIComponents {
     init() {
         this.uiManager.initElements();
         this.bindGlobalEvents();
+    }
+    
+    // Méthode pour initialiser l'orderManager avec le controller
+    initOrderManager(orderController) {
+        if (!this.orderManager && orderController) {
+            this.orderManager = new CustomerOrderManager(orderController, this.uiManager);
+            console.log('📦 [Components] OrderManager initialisé');
+        }
     }
 
     bindGlobalEvents() {
@@ -43,21 +51,28 @@ class CustomerUIComponents {
         }
     }
 
-    showClientPanel() {
+    async showClientPanel() {
         this.uiManager.showClientPanel();
         if (this.loginForm) {
             this.loginForm.hide();
         }
+        
+        // NE PAS charger les commandes ici - ça sera fait par initMainApp()
+        console.log('🎯 [Components] showClientPanel - Panel affiché, chargement des commandes délégué à initMainApp()');
     }
 
-    onLoginSuccess(authData) {
+    async onLoginSuccess(authData) {
         console.log("🔐 [Components] Connexion réussie:", authData.user);
-        this.uiManager.updateClientInfo(authData.user);
-        this.showClientPanel();
-
-        // Charger les commandes initiales
-        if (window.customerApp && window.customerApp.loadMyOrders) {
-            window.customerApp.loadMyOrders();
+        
+        // IMPORTANT : Appeler handleLoginSuccess() de CustomerApp pour initialiser l'app complète
+        if (window.customerApp && window.customerApp.handleLoginSuccess) {
+            console.log('🎯 [Components] Appel de handleLoginSuccess() pour initialiser l\'app complète');
+            await window.customerApp.handleLoginSuccess(authData);
+        } else {
+            console.error('❌ [Components] customerApp.handleLoginSuccess non disponible');
+            // Fallback si customerApp n'est pas disponible
+            this.uiManager.updateClientInfo(authData.user);
+            await this.showClientPanel();
         }
     }
 
@@ -113,19 +128,27 @@ class CustomerUIComponents {
     }
 
     updateTrackingStats(data) {
-        return this.trackingManager.updateStats(data);
+        return this.trackingManager.updateTrackingDisplay(data);
     }
 
     updateTrackingProgress(percent) {
-        return this.trackingManager.updateProgress(percent);
+        // La progression est gérée directement via les éléments DOM
+        if (this.trackingManager.elements.trackingProgress) {
+            this.trackingManager.elements.trackingProgress.textContent = `${Math.round(percent)}%`;
+        }
+        if (this.trackingManager.elements.trackingProgressBar) {
+            this.trackingManager.elements.trackingProgressBar.style.width = `${percent}%`;
+        }
     }
 
     addTrackingHistoryItem(message, type) {
-        return this.trackingManager.addHistoryItem(message, type);
+        return this.trackingManager.addToHistory(message, type);
     }
 
     clearTrackingHistory() {
-        return this.trackingManager.clearHistory();
+        if (this.trackingManager.elements.trackingHistory) {
+            this.trackingManager.elements.trackingHistory.innerHTML = '';
+        }
     }
 
     // Gestion UI générale

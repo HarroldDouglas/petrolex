@@ -35,6 +35,12 @@ class DeliveryUIBase {
         this.elements.currentStatus = document.getElementById("currentStatus");
         this.elements.connectionStatus =
             document.getElementById("connectionStatus");
+        
+        // Status elements
+        this.elements.websocketStatus = document.getElementById("websocketStatus");
+        this.elements.apiStatus = document.getElementById("apiStatus");
+        this.elements.mapStatus = document.getElementById("mapStatus");
+        this.elements.lastUpdateTime = document.getElementById("lastUpdateTime");
 
         // Commandes
         this.elements.ordersList = document.getElementById("ordersList");
@@ -136,6 +142,48 @@ class DeliveryUIBase {
     updateConnectionStatus(connected) {
         const statusClass = connected ? "status-online" : "status-offline";
         this.elements.connectionStatus.className = `status-indicator ${statusClass}`;
+    }
+
+    updateMapStatus(isConnected) {
+        if (this.elements.mapStatus) {
+            if (isConnected) {
+                this.elements.mapStatus.className = "badge bg-success";
+                this.elements.mapStatus.textContent = "Connectée";
+            } else {
+                this.elements.mapStatus.className = "badge bg-danger";
+                this.elements.mapStatus.textContent = "Erreur";
+            }
+        }
+    }
+
+    updateWebSocketStatus(isConnected) {
+        if (this.elements.websocketStatus) {
+            if (isConnected) {
+                this.elements.websocketStatus.className = "badge bg-success";
+                this.elements.websocketStatus.textContent = "Connecté";
+            } else {
+                this.elements.websocketStatus.className = "badge bg-danger";
+                this.elements.websocketStatus.textContent = "Déconnecté";
+            }
+        }
+    }
+
+    updateApiStatus(isConnected) {
+        if (this.elements.apiStatus) {
+            if (isConnected) {
+                this.elements.apiStatus.className = "badge bg-success";
+                this.elements.apiStatus.textContent = "Connecté";
+            } else {
+                this.elements.apiStatus.className = "badge bg-danger";
+                this.elements.apiStatus.textContent = "Erreur";
+            }
+        }
+    }
+
+    updateLastUpdateTime() {
+        if (this.elements.lastUpdateTime) {
+            this.elements.lastUpdateTime.textContent = new Date().toLocaleTimeString();
+        }
     }
 
     updateDeliveryPersonInfo(deliveryPerson) {
@@ -310,7 +358,7 @@ class DeliveryControlsManager {
     constructor(elements) {
         this.elements = elements;
         this.strategies = {
-            'confirmed': new ConfirmedOrderStrategy(),
+            'paid': new ConfirmedOrderStrategy(),
             'processing': new InProgressOrderStrategy(),
             'tracking_active': new ActiveTrackingStrategy(),
             'tracking_paused': new PausedTrackingStrategy()

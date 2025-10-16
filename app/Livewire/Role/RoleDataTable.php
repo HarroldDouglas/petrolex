@@ -19,6 +19,8 @@ class RoleDataTable extends BaseDataTable
     protected const DEFAULT_SORT_FIELD = 'created_at';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
 
+
+
     protected function getExportFileName(): string
     {
         return 'roles';
@@ -40,6 +42,7 @@ class RoleDataTable extends BaseDataTable
                 ->label(function ($row) {
                     $count = $row->permissions_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-primary' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' permission(s)</span>'
                     );
@@ -49,6 +52,7 @@ class RoleDataTable extends BaseDataTable
                 ->label(function ($row) {
                     $count = $row->users_count ?? 0;
                     $badgeClass = $count > 0 ? 'bg-success' : 'bg-secondary';
+
                     return new HtmlString(
                         '<span class="badge '.$badgeClass.'">'.$count.' utilisateur(s)</span>'
                     );
@@ -85,40 +89,26 @@ class RoleDataTable extends BaseDataTable
         }
 
         return ucwords(str_replace(['_', '-'], ' ', $roleName));
-
     }
 
     public function deleteRole(int $roleId)
     {
         try {
             $roleService = app(RoleService::class);
-            $role = $roleService->find($roleId);
             
-            if (!$role) {
-                throw new \Exception('Rôle non trouvé.');
-            }
+            $role = $roleService->findOrFail($roleId);
 
             if ($role->name === UserRole::SUPER_ADMIN()->value) {
                 throw new \Exception('Le rôle Super Admin ne peut pas être supprimé.');
             }
-
+ 
             if ($role->users()->count() > 0) {
                 throw new \Exception('Ce rôle ne peut pas être supprimé car il est assigné à des utilisateurs.');
             }
 
-            $name = $role->name;
-            $result = $roleService->delete($role);
+            $roleService->delete($role);
 
-            if ($result) {
-                session()->flash('success', "Le rôle {$name} a été supprimé avec succès.");
-
-                $this->dispatch('show-notification', [
-                    'type' => 'success',
-                    'title' => 'Rôle supprimé !',
-                    'message' => "Le rôle {$name} a été supprimé définitivement.",
-                    'timer' => 3000,
-                ]);
-            }
+            $this->notify('Rôle supprimé avec succès.', 'success');
         } catch (\Exception $e) {
             Log::error('Error deleting role: '.$e->getMessage());
 

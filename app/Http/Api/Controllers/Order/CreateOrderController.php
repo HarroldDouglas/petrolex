@@ -29,7 +29,14 @@ final class CreateOrderController extends Controller
 
         $orderDTO = CreateOrderWithoutPaymentDTO::from($data);
 
-        $order = $this->orderService->createWithoutPayment($orderDTO);
+        try {
+            $order = $this->orderService->createWithoutPayment($orderDTO);
+        } catch (\InvalidArgumentException $e) {
+            // Convert InvalidArgumentException to validation error (422)
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'distribution_center_id' => [$e->getMessage()],
+            ]);
+        }
 
         $order->loadDetailRelations();
 

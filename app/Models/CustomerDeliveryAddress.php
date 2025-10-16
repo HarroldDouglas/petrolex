@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $customer_id
- * @property int|null $neighborhood_id
+ * @property int $neighborhood_id
  * @property string $label
  * @property string $address
  * @property float|null $latitude

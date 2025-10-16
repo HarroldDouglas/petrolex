@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📥 WebSocket Récepteur</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f3e5f5; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .message { background-color: #e1f5fe; color: #01579b; padding: 10px; margin: 5px 0; border-radius: 3px; }
+        .received-message { background-color: #c8e6c9; color: #2e7d32; padding: 12px; margin: 8px 0; border-radius: 5px; border-left: 4px solid #4caf50; }
+        button { background-color: #9c27b0; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background-color: #7b1fa2; }
+        h1 { color: #7b1fa2; }
+        .stats { background-color: #fff; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #9c27b0; }
+        .counter { font-size: 18px; font-weight: bold; color: #7b1fa2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 WebSocket Récepteur</h1>
+        <div id="status" class="status disconnected">❌ Non connecté</div>
+        
+        <!-- Informations de configuration pour Flutter -->
+        <div style="background-color: #f3e5f5; padding: 15px; margin: 15px 0; border-radius: 8px;">
+            <h3>📱 Configuration Flutter</h3>
+            <p><strong>URL WebSocket:</strong> <code id="wsUrl"></code></p>
+            <p><strong>App Key:</strong> <code>petro-key-12345</code></p>
+            <p><strong>Canal Test:</strong> <code>test-communication</code></p>
+            <p><strong>Dependency:</strong> <code>web_socket_channel: ^2.4.0</code></p>
+            <p><strong>Format Souscription:</strong></p>
+            <code style="display: block; background: #fff; padding: 8px; margin: 5px 0;">
+            {<br>
+            &nbsp;&nbsp;"event": "pusher:subscribe",<br>
+            &nbsp;&nbsp;"data": {"channel": "test-communication"}<br>
+            }
+            </code>
+        </div>
+        
+        <button onclick="connectWebSocket()">Se connecter</button>
+        <button onclick="disconnectWebSocket()">Se déconnecter</button>
+        
+        <div class="stats">
+            <h3>📊 Statistiques de réception</h3>
+            <div class="counter">Messages reçus: <span id="messageCount">0</span></div>
+            <div class="counter">Messages longs: <span id="longMessageCount">0</span></div>
+            <div class="counter">Dernière réception: <span id="lastReceived">-</span></div>
+        </div>
+        
+        <button onclick="clearMessages()">Effacer Messages</button>
+        <button onclick="resetStats()">Reset Statistiques</button>
+        
+        <h3>📨 Messages reçus :</h3>
+        <div id="receivedMessages"></div>
+        
+        <h3>📋 Journal technique :</h3>
+        <div id="technicalMessages"></div>
+    </div>
+
+    <!-- Shared Configuration -->
+    <script src="test/delivery-tracking/shared-config.js"></script>
+
+    <script>
+        let websocket = null;
+        let messageCount = 0;
+        let longMessageCount = 0;
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const messagesDiv = document.getElementById('technicalMessages');
+            const colorClass = type === 'received' ? 'background-color: #e8f5e8; color: #2e7d32;' : 
+                              type === 'connection' ? 'background-color: #e3f2fd; color: #1565c0;' : 
+                              'background-color: #fff3e0; color: #ef6c00;';
+            messagesDiv.innerHTML += `<div class="message" style="${colorClass}">${timestamp} - ${message}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function logReceivedMessage(data) {
+            messageCount++;
+            if (data.type === 'long') {
+                longMessageCount++;
+            }
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const messagesDiv = document.getElementById('receivedMessages');
+            const messageType = data.type === 'long' ? '📜 Message Long' : '💬 Message';
+            
+            messagesDiv.innerHTML += `
+                <div class="received-message">
+                    <strong>${messageType} #${data.id}</strong> de <em>${data.sender}</em><br>
+                    <strong>Contenu:</strong> "${data.message}"<br>
+                    <small>Reçu à ${timestamp} | Envoyé à ${new Date(data.timestamp).toLocaleTimeString()}</small>
+                </div>
+            `;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            // Mettre à jour les statistiques
+            document.getElementById('messageCount').textContent = messageCount;
+            document.getElementById('longMessageCount').textContent = longMessageCount;
+            document.getElementById('lastReceived').textContent = timestamp;
+        }
+        
+        function updateStatus(status, message) {
+            const statusDiv = document.getElementById('status');
+            if (status === 'connected') {
+                statusDiv.className = 'status connected';
+                statusDiv.innerHTML = '✅ Connecté' + (message ? ` - ${message}` : '');
+            } else {
+                statusDiv.className = 'status disconnected';
+                statusDiv.innerHTML = '❌ ' + (message || 'Non connecté');
+            }
+        }
+        
+        function connectWebSocket() {
+            if (websocket) {
+                websocket.close();
+            }
+            
+            // Use shared configuration for WebSocket connection
+            const protocol = SHARED_CONFIG.WEBSOCKET.FORCE_TLS ? 'wss' : 'ws';
+            const port = SHARED_CONFIG.WEBSOCKET.FORCE_TLS ? '' : `:${SHARED_CONFIG.WEBSOCKET.PORT}`;
+            const wsUrl = `${protocol}://${SHARED_CONFIG.WEBSOCKET.HOST}${port}/app/${SHARED_CONFIG.WEBSOCKET.APP_KEY}?protocol=7&client=js&version=8.3.0&flash=false`;
+            
+            // Afficher l'URL dans l'interface pour Flutter
+            document.getElementById('wsUrl').textContent = wsUrl;
+            
+            log(`🚀 Connexion au canal de réception...`, 'connection');
+            
+            try {
+                websocket = new WebSocket(wsUrl);
+                
+                websocket.onopen = function(event) {
+                    log('✅ WebSocket connecté - Prêt à recevoir !', 'connection');
+                    updateStatus('connected', 'Récepteur actif');
+                    
+                    // S'abonner au canal de test
+                    const subscribeMessage = JSON.stringify({
+                        event: 'pusher:subscribe',
+                        data: {
+                            channel: 'test-communication'
+                        }
+                    });
+                    websocket.send(subscribeMessage);
+                    log(`📡 Écoute du canal: test-communication`, 'connection');
+                };
+                
+                websocket.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        
+                        if (data.event === 'pusher:connection_established') {
+                            const connectionData = JSON.parse(data.data);
+                            log(`🔗 Connexion établie - Socket ID: ${connectionData.socket_id}`, 'connection');
+                        } else if (data.event === 'pusher_internal:subscription_succeeded') {
+                            log(`✅ Abonnement réussi au canal: ${data.channel}`, 'connection');
+                            log(`👂 En écoute des messages...`, 'received');
+                        } else if (data.event === 'client-message' || data.event === 'client-long-message') {
+                            log(`📨 Message reçu de l'émetteur !`, 'received');
+                            logReceivedMessage(data.data);
+                        } else if (data.event === 'pusher:ping') {
+                            const pong = JSON.stringify({
+                                event: 'pusher:pong',
+                                data: {}
+                            });
+                            websocket.send(pong);
+                            log(`🏓 Ping reçu, Pong envoyé`);
+                        } else {
+                            log(`📨 Autre événement: ${data.event}`, 'received');
+                        }
+                    } catch (e) {
+                        log(`📨 Message brut: ${event.data}`, 'received');
+                    }
+                };
+                
+                websocket.onclose = function(event) {
+                    log(`🔌 Connexion fermée - Code: ${event.code}`);
+                    updateStatus('disconnected', `Fermé (${event.code})`);
+                };
+                
+                websocket.onerror = function(error) {
+                    log(`❌ Erreur WebSocket`);
+                    updateStatus('disconnected', 'Erreur');
+                };
+                
+            } catch (error) {
+                log(`❌ Erreur création: ${error.message}`);
+                updateStatus('disconnected', 'Erreur');
+            }
+        }
+        
+        function disconnectWebSocket() {
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+                log('🔌 Déconnexion manuelle');
+            }
+        }
+        
+        function clearMessages() {
+            document.getElementById('receivedMessages').innerHTML = '';
+            document.getElementById('technicalMessages').innerHTML = '';
+        }
+        
+        function resetStats() {
+            messageCount = 0;
+            longMessageCount = 0;
+            document.getElementById('messageCount').textContent = '0';
+            document.getElementById('longMessageCount').textContent = '0';
+            document.getElementById('lastReceived').textContent = '-';
+            log('🔄 Statistiques remises à zéro');
+        }
+        
+        window.onload = function() {
+            log('📥 Récepteur WebSocket prêt', 'connection');
+            log('ℹ️ Connectez-vous pour écouter les messages de l\'émetteur', 'connection');
+        };
+    </script>
+</body>
+</html>

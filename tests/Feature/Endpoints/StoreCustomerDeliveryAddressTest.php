@@ -64,7 +64,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->postJson("/api/customers/{$this->customer->id}/delivery-addresses", $requestData);
+            ->postJson('/api/my/delivery-addresses', $requestData);
 
         $response->assertStatus(201)
             ->assertJson([
@@ -126,7 +126,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->postJson("/api/customers/{$this->customer->id}/delivery-addresses", $requestData);
+            ->postJson('/api/my/delivery-addresses', $requestData);
 
         $response->assertStatus(201)
             ->assertJson([
@@ -167,7 +167,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->postJson("/api/customers/{$this->customer->id}/delivery-addresses", $requestData);
+            ->postJson('/api/my/delivery-addresses', $requestData);
 
         $response->assertStatus(201);
 
@@ -191,7 +191,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
             'neighborhood_id' => $this->neighborhood->id,
         ];
 
-        $response = $this->postJson("/api/customers/{$this->customer->id}/delivery-addresses", $requestData);
+        $response = $this->postJson('/api/my/delivery-addresses', $requestData);
 
         $response->assertStatus(401);
     }
@@ -199,7 +199,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
     public function test_validates_required_fields(): void
     {
         $response = $this->actingAs($this->user)
-            ->postJson("/api/customers/{$this->customer->id}/delivery-addresses", []);
+            ->postJson('/api/my/delivery-addresses', []);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['label', 'address', 'neighborhood_id']);
@@ -214,7 +214,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->postJson("/api/customers/{$this->customer->id}/delivery-addresses", $requestData);
+            ->postJson('/api/my/delivery-addresses', $requestData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['neighborhood_id']);
@@ -230,7 +230,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->postJson("/api/customers/{$this->customer->id}/delivery-addresses", $requestData);
+            ->postJson('/api/my/delivery-addresses', $requestData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
@@ -247,7 +247,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->postJson("/api/customers/{$this->customer->id}/delivery-addresses", $requestData);
+            ->postJson('/api/my/delivery-addresses', $requestData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['latitude', 'longitude']);
@@ -262,7 +262,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->postJson("/api/customers/{$this->customer->id}/delivery-addresses", $requestData);
+            ->postJson('/api/my/delivery-addresses', $requestData);
 
         $response->assertStatus(201)
             ->assertJsonStructure([

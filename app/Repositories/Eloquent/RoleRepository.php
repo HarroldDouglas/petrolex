@@ -8,9 +8,9 @@ use Spatie\Permission\Models\Role;
 
 class RoleRepository extends BaseEloquentRepository implements RoleRepositoryInterface
 {
-    public function __construct()
+    public function __construct(Role $role)
     {
-        parent::__construct(new Role());
+        parent::__construct($role);
     }
 
     /**

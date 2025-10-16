@@ -150,7 +150,7 @@ class AddressConsistencyTest extends TestCase
         // Créer une nouvelle adresse
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '.$token,
-        ])->postJson("/api/customers/{$user->customer->id}/delivery-addresses", [
+        ])->postJson('/api/my/delivery-addresses', [
             'label' => 'Test Address',
             'address' => '123 Test Street',
             'latitude' => 3.8617882,

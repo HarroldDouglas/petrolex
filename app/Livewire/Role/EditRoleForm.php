@@ -30,14 +30,6 @@ class EditRoleForm extends AbstractRoleForm
             'permissions' => $validatedData['selectedPermissions'] ?? [],
         ];
 
-        // Log what we're submitting
-        Log::info('EditRoleForm: Submitting role update', [
-            'role_id' => $this->role->id,
-            'validated_data' => $validatedData,
-            'final_data' => $data,
-            'selected_permissions_count' => count($data['permissions'])
-        ]);
-
         $this->roleService->update($this->role, $data);
 
         session()->flash('success', 'Rôle modifié avec succès!');

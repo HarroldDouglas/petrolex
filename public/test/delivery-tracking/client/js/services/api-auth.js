@@ -86,11 +86,25 @@ class CustomerAuthService {
     }
 
     isAuthenticated() {
+        // Vérifier directement le token api_token pour éviter les problèmes d'expiration
+        const apiToken = localStorage.getItem('api_token');
+        if (apiToken) {
+            return true;
+        }
+        
+        // Fallback vers le système d'auth complexe
         const authData = this.getAuthData();
         return authData && authData.token && !this.isTokenExpired();
     }
 
     getToken() {
+        // Priorité au token api_token
+        const apiToken = localStorage.getItem('api_token');
+        if (apiToken) {
+            return apiToken;
+        }
+        
+        // Fallback vers le système d'auth complexe
         if (this.isAuthenticated()) {
             const authData = this.getAuthData();
             return authData.token;
@@ -99,6 +113,20 @@ class CustomerAuthService {
     }
 
     getUser() {
+        // Si on utilise api_token, récupérer les données depuis current_user cache
+        const apiToken = localStorage.getItem('api_token');
+        if (apiToken) {
+            const cachedUser = localStorage.getItem('current_user');
+            if (cachedUser) {
+                try {
+                    return JSON.parse(cachedUser);
+                } catch (error) {
+                    console.error("Error parsing cached user:", error);
+                }
+            }
+        }
+        
+        // Fallback vers le système d'auth complexe
         if (this.isAuthenticated()) {
             const authData = this.getAuthData();
             return authData.user;
@@ -172,6 +200,19 @@ class CustomerApiService {
         if (search.trim()) {
             params.append("search", search.trim());
         }
+
+        endpoint += `?${params.toString()}`;
+        return this.request(endpoint);
+    }
+
+    async getMyOrders(filters = {}, page = 1) {
+        let endpoint = CUSTOMER_CONFIG.API.ENDPOINTS.MY_ORDERS;
+
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: CUSTOMER_CONFIG.UI.DEFAULT_PAGINATION.toString(),
+            ...filters,
+        });
 
         endpoint += `?${params.toString()}`;
         return this.request(endpoint);
