@@ -5,12 +5,7 @@
             <p class="text-muted mb-0">
                 Rôle actuel: 
                 @if($user->roles->count() > 0)
-                    @php
-                        $roleName = $user->roles->first()->name;
-                        $userRoleEnum = \App\Enums\UserRole::tryFrom($roleName);
-                        $displayName = $userRoleEnum ? $userRoleEnum->label : ucwords(str_replace(['_', '-'], ' ', $roleName));
-                    @endphp
-                    <span class="badge bg-primary">{{ $displayName }}</span>
+                    <span class="badge bg-primary">{{ \App\Enums\UserRole::tryFrom($user->roles->first()->name)?->label }}</span>
                 @else
                     <span class="text-warning">Aucun rôle assigné</span>
                 @endif
@@ -365,6 +360,5 @@
             color: #495057 !important;
         }
     </style>
-
 
 </div>
