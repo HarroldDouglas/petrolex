@@ -39,8 +39,15 @@ class ManageUserPermissions extends Component
 
     public function initializeSelectedPermissions()
     {
-        $this->selectedPermissions = $this->getAllPermissions()
-            ->filter(fn ($permission) => $permission['checked'])
+        $allPermissions = $this->getAllPermissions();
+        
+        if ($allPermissions->isEmpty()) {
+            $this->selectedPermissions = [];
+            return;
+        }
+        
+        $this->selectedPermissions = $allPermissions
+            ->filter(fn ($permission) => isset($permission['checked']) && $permission['checked'])
             ->pluck('name')
             ->toArray();
     }
@@ -91,8 +98,12 @@ class ManageUserPermissions extends Component
      */
     private function getAllPermissions(): Collection
     {
+        if (empty($this->permissionStates)) {
+            return collect([]);
+        }
+        
         return collect($this->permissionStates)
-            ->flatMap(fn ($moduleData) => $moduleData['permissions']);
+            ->flatMap(fn ($moduleData) => $moduleData['permissions'] ?? []);
     }
 
     /**
