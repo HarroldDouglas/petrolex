@@ -58,7 +58,7 @@ abstract class AbstractRoleForm extends Component
         if (! isset($this->availablePermissions[$module])) {
             return false;
         }
-        // TODO when the last revoked permission of a group is revoked, the select all item shoud be unchecked, the
+        
         $modulePermissions = collect($this->availablePermissions[$module]['permissions'])
             ->pluck('name')
             ->toArray();

@@ -30,7 +30,6 @@ class UpdateRoleRequest extends BaseRoleRequest
     {
         $rules = parent::rules();
 
-        // Add unique constraint for role name, ignoring the current role being updated
         $rules['name'][] = Rule::unique('roles', 'name')
             ->ignore($this->roleId);
 
