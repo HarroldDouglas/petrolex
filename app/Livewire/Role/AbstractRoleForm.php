@@ -58,7 +58,7 @@ abstract class AbstractRoleForm extends Component
         if (! isset($this->availablePermissions[$module])) {
             return false;
         }
-        
+
         $modulePermissions = collect($this->availablePermissions[$module]['permissions'])
             ->pluck('name')
             ->toArray();

@@ -155,7 +155,6 @@ class PaymentService
             'amount_due' => $status === PaymentStatus::PAID()->value ? 0 : $amountDue,
         ];
 
-        // Clean out null values (like transaction_reference when missing)
         $updateData = array_filter($updateData, fn ($value) => ! is_null($value));
 
         $this->orderPaymentRepository->update($payment, $updateData);
@@ -178,7 +177,20 @@ class PaymentService
             default => null
         };
 
-        if ($orderUpdateData && $response->success || $status === PaymentStatus::FAILED()->value) {
+        if ($orderUpdateData && ($response->success || $status === PaymentStatus::FAILED()->value)) {
+            $currentOrder = $payment->order->fresh();
+
+            if ($status === PaymentStatus::PAID()->value && $currentOrder->status->value === OrderStatus::PAID()->value) {
+                Log::info('Order is already paid, skipping update', [
+                    'order_id' => $currentOrder->id,
+                    'order_number' => $currentOrder->order_number,
+                    'current_status' => $currentOrder->status->value,
+                    'paid_at' => $currentOrder->paid_at,
+                ]);
+
+                return;
+            }
+
             Log::info('Updating order status via OrderService', [
                 'order_id' => $payment->order->id,
                 'order_number' => $payment->order->order_number,

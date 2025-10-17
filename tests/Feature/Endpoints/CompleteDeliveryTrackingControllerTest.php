@@ -168,7 +168,7 @@ class CompleteDeliveryTrackingControllerTest extends TestCase
             ]);
     }
 
-    public function test_complete_delivery_tracking_fails_for_customer(): void
+    public function test_complete_delivery_tracking_succeeds_for_customer(): void
     {
         Sanctum::actingAs($this->deliveryPerson);
 
@@ -178,6 +178,33 @@ class CompleteDeliveryTrackingControllerTest extends TestCase
         ]);
 
         Sanctum::actingAs($this->customerUser);
+
+        $response = $this->patchJson("/api/tracking/delivery/{$this->order->id}/complete", [
+            'notes' => 'Package delivered successfully',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                '_metadata' => [
+                    'message' => 'Delivery completed successfully.',
+                ],
+            ]);
+    }
+
+    public function test_complete_delivery_tracking_fails_for_unauthorized_user(): void
+    {
+        Sanctum::actingAs($this->deliveryPerson);
+
+        // Create in-progress tracking
+        $tracking = DeliveryTracking::factory()->inProgress()->create([
+            'order_id' => $this->order->id,
+        ]);
+
+        // Create a different user who is not related to this order
+        $unauthorizedUser = User::factory()->create();
+        $unauthorizedUser->assignRole(UserRole::CUSTOMER()->value);
+
+        Sanctum::actingAs($unauthorizedUser);
 
         $response = $this->patchJson("/api/tracking/delivery/{$this->order->id}/complete", [
             'notes' => 'Package delivered successfully',

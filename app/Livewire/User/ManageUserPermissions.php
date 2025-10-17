@@ -40,12 +40,13 @@ class ManageUserPermissions extends Component
     public function initializeSelectedPermissions()
     {
         $allPermissions = $this->getAllPermissions();
-        
+
         if ($allPermissions->isEmpty()) {
             $this->selectedPermissions = [];
+
             return;
         }
-        
+
         $this->selectedPermissions = $allPermissions
             ->filter(fn ($permission) => isset($permission['checked']) && $permission['checked'])
             ->pluck('name')
@@ -101,7 +102,7 @@ class ManageUserPermissions extends Component
         if (empty($this->permissionStates)) {
             return collect([]);
         }
-        
+
         return collect($this->permissionStates)
             ->flatMap(fn ($moduleData) => $moduleData['permissions'] ?? []);
     }
@@ -117,9 +118,9 @@ class ManageUserPermissions extends Component
 
         $modulePermissions = $this->permissionStates[$module]['permissions'];
         $permissionNames = collect($modulePermissions)->pluck('name')->toArray();
-        
+
         $allSelected = collect($permissionNames)->every(fn ($name) => in_array($name, $this->selectedPermissions));
-        
+
         if ($allSelected) {
             $this->selectedPermissions = array_values(array_diff($this->selectedPermissions, $permissionNames));
         } else {
@@ -153,9 +154,9 @@ class ManageUserPermissions extends Component
 
         $modulePermissions = $this->permissionStates[$module]['permissions'];
         $permissionNames = collect($modulePermissions)->pluck('name');
-        
+
         $selectedCount = $permissionNames->filter(fn ($name) => in_array($name, $this->selectedPermissions))->count();
-        
+
         return $selectedCount > 0 && $selectedCount < $permissionNames->count();
     }
 
@@ -176,7 +177,7 @@ class ManageUserPermissions extends Component
     public function isPermissionChecked(string $permissionName): bool
     {
         $currentState = $this->getCurrentPermissionState($permissionName);
-        
+
         return in_array($currentState, [
             UserPermissionState::ROLE()->value,
             UserPermissionState::DIRECT()->value,
@@ -207,7 +208,7 @@ class ManageUserPermissions extends Component
                 'user_id' => $this->user->id,
                 'error' => $e->getMessage(),
             ]);
-            
+
             $this->dispatch('show-notification', [
                 'type' => 'error',
                 'title' => 'Erreur !',
@@ -223,7 +224,7 @@ class ManageUserPermissions extends Component
     private function hasPermissionChanged(array $permission): bool
     {
         $isCurrentlySelected = in_array($permission['name'], $this->selectedPermissions);
-        
+
         return $isCurrentlySelected !== $permission['checked'];
     }
 

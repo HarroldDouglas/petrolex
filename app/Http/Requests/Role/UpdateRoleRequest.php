@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Role;
 
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
 
 class UpdateRoleRequest extends BaseRoleRequest
 {
