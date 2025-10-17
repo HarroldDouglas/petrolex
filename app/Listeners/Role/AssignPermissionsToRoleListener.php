@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Log;
 
 class AssignPermissionsToRoleListener
 {
-
     /**
      * Handle the event.
      */
@@ -16,20 +15,20 @@ class AssignPermissionsToRoleListener
         try {
 
             $event->role->syncPermissions($event->permissions);
-            
+
             $event->role->refresh();
             Log::info("Permissions successfully synced to role: {$event->role->name}", [
                 'role_id' => $event->role->id,
                 'final_permissions' => $event->role->permissions->pluck('name')->toArray(),
-                'permissions_count' => count($event->role->permissions)
+                'permissions_count' => count($event->role->permissions),
             ]);
         } catch (\Exception $e) {
             Log::error("Failed to assign permissions to role: {$event->role->name}", [
                 'role_id' => $event->role->id,
                 'error' => $e->getMessage(),
-                'permissions' => $event->permissions
+                'permissions' => $event->permissions,
             ]);
-            
+
             throw $e;
         }
     }

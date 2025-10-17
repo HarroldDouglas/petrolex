@@ -163,7 +163,8 @@ class MTNMoneyGateway implements PaymentGateway
                     'external_id' => $payment->payment_reference,
                     'verification_schedule' => 'Every 10 seconds for 3 minutes (max 18 attempts)',
                     'attempt_count' => 1,
-                ]);                
+                ]);
+
                 return new PaymentResponse(
                     success: true,
                     status: PaymentStatus::PENDING()->value,
@@ -274,7 +275,6 @@ class MTNMoneyGateway implements PaymentGateway
                 'X-Target-Environment' => $this->config['target_environment'],
                 'Ocp-Apim-Subscription-Key' => $this->config['subscription_key'],
             ])->get($this->config['base_url'].$endpoint);
-            
 
             Log::info('NEW MTN MoMo: Checking transaction status', [
                 'response' => $response,

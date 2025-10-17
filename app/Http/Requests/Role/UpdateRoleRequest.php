@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Role;
 
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
 
 class UpdateRoleRequest extends BaseRoleRequest
 {
@@ -29,11 +28,10 @@ class UpdateRoleRequest extends BaseRoleRequest
     public function rules(): array
     {
         $rules = parent::rules();
-        
-        // Add unique constraint for role name, ignoring the current role being updated
+
         $rules['name'][] = Rule::unique('roles', 'name')
             ->ignore($this->roleId);
-        
+
         return $rules;
     }
 

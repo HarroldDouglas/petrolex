@@ -2,11 +2,9 @@
 
 namespace App\Livewire\Role;
 
-use App\Enums\PermissionEnum;
+use App\Http\Requests\Role\BaseRoleRequest;
 use App\Services\Role\RoleService;
-use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 abstract class AbstractRoleForm extends Component
@@ -27,7 +25,7 @@ abstract class AbstractRoleForm extends Component
     public function initialize()
     {
         $this->loadAvailablePermissions();
-        
+
         if ($this->role) {
             $this->name = $this->role->name;
             $this->guard_name = $this->role->guard_name;
@@ -45,11 +43,11 @@ abstract class AbstractRoleForm extends Component
         $modulePermissions = collect($this->availablePermissions[$module]['permissions'])
             ->pluck('name')
             ->toArray();
-        
+
         $selectedInModule = array_intersect($this->selectedPermissions, $modulePermissions);
-        
+
         if (count($selectedInModule) === count($modulePermissions)) {
-           $this->selectedPermissions = array_diff($this->selectedPermissions, $modulePermissions);
+            $this->selectedPermissions = array_diff($this->selectedPermissions, $modulePermissions);
         } else {
             $this->selectedPermissions = array_unique(array_merge($this->selectedPermissions, $modulePermissions));
         }
@@ -57,32 +55,33 @@ abstract class AbstractRoleForm extends Component
 
     public function isGroupFullySelected(string $module): bool
     {
-        if (!isset($this->availablePermissions[$module])) {
+        if (! isset($this->availablePermissions[$module])) {
             return false;
         }
-        
+
         $modulePermissions = collect($this->availablePermissions[$module]['permissions'])
             ->pluck('name')
             ->toArray();
-        
+
         return count(array_intersect($this->selectedPermissions, $modulePermissions)) === count($modulePermissions);
     }
 
     public function isGroupPartiallySelected(string $module): bool
     {
-        if (!isset($this->availablePermissions[$module])) {
+        if (! isset($this->availablePermissions[$module])) {
             return false;
         }
-        
+
         $modulePermissions = collect($this->availablePermissions[$module]['permissions'])
             ->pluck('name')
             ->toArray();
-        
+
         $selectedInModule = array_intersect($this->selectedPermissions, $modulePermissions);
+
         return count($selectedInModule) > 0 && count($selectedInModule) < count($modulePermissions);
     }
 
-    abstract protected function customRequest(): FormRequest;
+    abstract protected function customRequest(): BaseRoleRequest;
 
     protected function rules(): array
     {

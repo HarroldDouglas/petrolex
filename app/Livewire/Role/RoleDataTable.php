@@ -6,7 +6,6 @@ use App\Enums\UserRole;
 use App\Services\Role\RoleService;
 use HarroldWafo\LaravelCustomDatatable\DataTables\BaseDataTable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -18,8 +17,6 @@ class RoleDataTable extends BaseDataTable
 
     protected const DEFAULT_SORT_FIELD = 'created_at';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
-
-
 
     protected function getExportFileName(): string
     {
@@ -82,7 +79,7 @@ class RoleDataTable extends BaseDataTable
      */
     private function getRoleDisplayName(string $roleName): string
     {
-       $enum = UserRole::tryFrom($roleName);
+        $enum = UserRole::tryFrom($roleName);
 
         if ($enum) {
             return $enum->label;
@@ -95,13 +92,14 @@ class RoleDataTable extends BaseDataTable
     {
         try {
             $roleService = app(RoleService::class);
-            
+
+            /** @var Role $role */
             $role = $roleService->findOrFail($roleId);
 
             if ($role->name === UserRole::SUPER_ADMIN()->value) {
                 throw new \Exception('Le rôle Super Admin ne peut pas être supprimé.');
             }
- 
+
             if ($role->users()->count() > 0) {
                 throw new \Exception('Ce rôle ne peut pas être supprimé car il est assigné à des utilisateurs.');
             }

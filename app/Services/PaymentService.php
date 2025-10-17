@@ -141,35 +141,34 @@ class PaymentService
             'response' => $response,
         ]);
 
-        $status     = $response->status;
-        $amountDue  = $payment->amount_due;
-        $now        = now();
+        $status = $response->status;
+        $amountDue = $payment->amount_due;
+        $now = now();
 
         $updateData = [
-            'payment_status'       => $status,
-            'payment_notes'        => $response->notes ?? null,
-            'gateway_response'     => $response,
-            'transaction_reference'=> $response->transactionReference,
-            'payment_date'         => in_array($status, [PaymentStatus::PAID()->value, PaymentStatus::FAILED()->value]) ? $now : null,
-            'amount_paid'          => $status === PaymentStatus::PAID()->value ? $amountDue : 0,
-            'amount_due'           => $status === PaymentStatus::PAID()->value ? 0 : $amountDue,
+            'payment_status' => $status,
+            'payment_notes' => $response->notes ?? null,
+            'gateway_response' => $response,
+            'transaction_reference' => $response->transactionReference,
+            'payment_date' => in_array($status, [PaymentStatus::PAID()->value, PaymentStatus::FAILED()->value]) ? $now : null,
+            'amount_paid' => $status === PaymentStatus::PAID()->value ? $amountDue : 0,
+            'amount_due' => $status === PaymentStatus::PAID()->value ? 0 : $amountDue,
         ];
 
-        // Clean out null values (like transaction_reference when missing)
-        $updateData = array_filter($updateData, fn($value) => !is_null($value));
+        $updateData = array_filter($updateData, fn ($value) => ! is_null($value));
 
         $this->orderPaymentRepository->update($payment, $updateData);
 
         Log::info('Ready to update order', [
-            'order_id'         => $payment->order->id,
-            'order_number'     => $payment->order->order_number,
-            'response_status'  => $status,
+            'order_id' => $payment->order->id,
+            'order_number' => $payment->order->order_number,
+            'response_status' => $status,
             'response_success' => $response->success,
         ]);
 
         $orderUpdateData = match ($status) {
             PaymentStatus::PAID()->value => [
-                'status'  => OrderStatus::PAID()->value,
+                'status' => OrderStatus::PAID()->value,
                 'paid_at' => $now,
             ],
             PaymentStatus::FAILED()->value => [
@@ -178,17 +177,29 @@ class PaymentService
             default => null
         };
 
-        if ($orderUpdateData && $response->success || $status === PaymentStatus::FAILED()->value) {
+        if ($orderUpdateData && ($response->success || $status === PaymentStatus::FAILED()->value)) {
+            $currentOrder = $payment->order->fresh();
+
+            if ($status === PaymentStatus::PAID()->value && $currentOrder->status->value === OrderStatus::PAID()->value) {
+                Log::info('Order is already paid, skipping update', [
+                    'order_id' => $currentOrder->id,
+                    'order_number' => $currentOrder->order_number,
+                    'current_status' => $currentOrder->status->value,
+                    'paid_at' => $currentOrder->paid_at,
+                ]);
+
+                return;
+            }
+
             Log::info('Updating order status via OrderService', [
-                'order_id'     => $payment->order->id,
+                'order_id' => $payment->order->id,
                 'order_number' => $payment->order->order_number,
-                'new_status'   => $orderUpdateData['status'],
+                'new_status' => $orderUpdateData['status'],
             ]);
 
             $this->orderService->update($payment->order, $orderUpdateData);
         }
     }
-
 
     private function schedulePaymentCallback(OrderPayment $payment, PaymentResponse $response): void
     {

@@ -27,6 +27,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
     private const CHECK_INTERVAL = 10;
     private const MAX_RETRY_ATTEMPTS = 5;
     private const RETRY_BASE_DELAY = 30;
+    private const TIMEOUT_CAP = 300; // Maximum delay in seconds (5 minutes)
 
     private PaymentGatewayFactory $gatewayFactory;
     private PaymentMethod $paymentMethod;
@@ -34,13 +35,12 @@ class VerifyPaymentStatusJob implements ShouldQueue
     private OrderPaymentRepositoryInterface $orderPaymentRepository;
 
     public function __construct(
-        string $referenceId, 
-        PaymentMethod $paymentMethod, 
-        PaymentService $paymentService, 
+        string $referenceId,
+        PaymentMethod $paymentMethod,
+        PaymentService $paymentService,
         int $attemptCount = 1,
         ?OrderPaymentRepositoryInterface $orderPaymentRepository = null
-    )
-    {
+    ) {
         $this->referenceId = $referenceId;
         $this->attemptCount = $attemptCount;
         $this->paymentMethod = $paymentMethod;
@@ -60,12 +60,11 @@ class VerifyPaymentStatusJob implements ShouldQueue
             $gateway = $this->gatewayFactory->create($this->paymentMethod->value);
 
             $response = $gateway->verifyPayment($this->referenceId);
-            
-            // Determine if this should be retried based on status AND error type
+
             $isNetworkTimeout = $this->isNetworkTimeoutError($response->errorMessage ?? '');
-            $shouldRetry = $response->status === 'PENDING' || 
+            $shouldRetry = $response->status === 'PENDING' ||
                           ($response->status === 'FAILED' && $isNetworkTimeout);
-            
+
             $result = [
                 'success' => $response->success,
                 'status' => $response->status,
@@ -83,7 +82,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'is_pending' => $response->status === 'PENDING',
                     'is_failed_with_network_timeout' => $response->status === 'FAILED' && $isNetworkTimeout,
                     'error_message' => $response->errorMessage ?? null,
-                ]
+                ],
             ]);
 
             if (! $response->success) {
@@ -93,9 +92,8 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'response' => $response,
                 ]);
 
-                // Use the network timeout flag from result calculation
                 $isNetworkTimeout = $result['is_network_timeout'] ?? false;
-                
+
                 if ($isNetworkTimeout && $this->attemptCount < self::MAX_RETRY_ATTEMPTS) {
                     $retryDelay = $this->calculateRetryDelay();
                     Log::info('🔄 Network timeout detected, scheduling retry with exponential backoff', [
@@ -105,8 +103,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                         'error_message' => $response->errorMessage ?? '',
                     ]);
                     $this->scheduleRetryAttempt($retryDelay);
-                } else if ($result['should_retry'] && !$isNetworkTimeout && $this->attemptCount < self::MAX_ATTEMPTS) {
-                    // Regular pending status retry (original logic)
+                } elseif ($result['should_retry'] && ! $isNetworkTimeout && $this->attemptCount < self::MAX_ATTEMPTS) {
                     Log::info('⏳'.$this->paymentMethod.' Payment Still Pending, Scheduling Retry', [
                         'reference_id' => $this->referenceId,
                         'attempt' => $this->attemptCount,
@@ -165,7 +162,6 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     return;
                 }
 
-                // Use service to find OrderPayment instead of direct database query
                 $orderPayment = $this->findOrderPaymentByReference($externalId);
 
                 if (! $orderPayment) {
@@ -173,6 +169,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                         'external_id' => $externalId,
                         'mtn_reference' => $this->referenceId,
                     ]);
+
                     return;
                 }
 
@@ -236,9 +233,8 @@ class VerifyPaymentStatusJob implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            // Check if this is a network timeout exception that should be retried
             $isNetworkTimeout = $this->isNetworkTimeoutError($e->getMessage());
-            
+
             if ($isNetworkTimeout && $this->attemptCount < self::MAX_RETRY_ATTEMPTS) {
                 $retryDelay = $this->calculateRetryDelay();
                 Log::info('🔄 Exception network timeout detected, scheduling retry', [
@@ -247,7 +243,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'retry_delay_seconds' => $retryDelay,
                 ]);
                 $this->scheduleRetryAttempt($retryDelay);
-            } else if ($this->attemptCount < self::MAX_ATTEMPTS) {
+            } elseif ($this->attemptCount < self::MAX_ATTEMPTS) {
                 Log::info('🔄 NEW Scheduling Retry After Exception', [
                     'reference_id' => $this->referenceId,
                     'current_attempt' => $this->attemptCount,
@@ -260,10 +256,9 @@ class VerifyPaymentStatusJob implements ShouldQueue
                     'max_attempts' => $this->attemptCount >= self::MAX_RETRY_ATTEMPTS ? self::MAX_RETRY_ATTEMPTS : self::MAX_ATTEMPTS,
                     'final_error' => $e->getMessage(),
                 ]);
-                
-                // Mark payment as failed if this was the final attempt
+
                 if ($isNetworkTimeout) {
-                    $mockResponse = (object)[
+                    $mockResponse = (object) [
                         'success' => false,
                         'errorMessage' => $e->getMessage(),
                         'gatewayResponse' => null,
@@ -300,6 +295,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                 'external_id' => $externalId,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -335,9 +331,9 @@ class VerifyPaymentStatusJob implements ShouldQueue
     {
         // Exponential backoff: 30s, 60s, 120s, 240s, 480s (max)
         $delay = self::RETRY_BASE_DELAY * (2 ** ($this->attemptCount - 1));
-        
+
         // Cap at 5 minutes (300 seconds)
-        return min($delay, 300);
+        return min($delay, self::TIMEOUT_CAP);
     }
 
     /**
@@ -364,7 +360,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
     private function handleFinalFailure($response, bool $wasNetworkTimeout): void
     {
         $failureReason = $wasNetworkTimeout ? 'Network timeout - max retries exceeded' : 'Payment verification failed';
-        
+
         Log::error('🏁 '.$this->paymentMethod.' Verification Completed - Final Failure', [
             'reference_id' => $this->referenceId,
             'failure_reason' => $failureReason,
@@ -375,21 +371,23 @@ class VerifyPaymentStatusJob implements ShouldQueue
         try {
             $gatewayResponse = $response->gatewayResponse ?? [];
             $externalId = $gatewayResponse['externalId'] ?? null;
-            
-            if (!$externalId) {
+
+            if (! $externalId) {
                 Log::warning('⚠️ Cannot update payment status - no externalId found', [
                     'reference_id' => $this->referenceId,
                 ]);
+
                 return;
             }
 
             $orderPayment = $this->findOrderPaymentByReference($externalId);
-            
-            if (!$orderPayment) {
+
+            if (! $orderPayment) {
                 Log::warning('⚠️ Cannot update payment status - OrderPayment not found', [
                     'external_id' => $externalId,
                     'reference_id' => $this->referenceId,
                 ]);
+
                 return;
             }
 

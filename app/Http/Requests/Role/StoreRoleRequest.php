@@ -20,10 +20,10 @@ class StoreRoleRequest extends BaseRoleRequest
     public function rules(): array
     {
         $rules = parent::rules();
-        
+
         $rules['name'][] = Rule::unique('roles', 'name')
             ->where('guard_name', $this->input('guard_name', 'web'));
-        
+
         return $rules;
     }
 

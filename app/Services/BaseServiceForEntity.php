@@ -24,6 +24,9 @@ abstract class BaseServiceForEntity implements BaseServiceForEntityInterface
         });
     }
 
+    /**
+     * Find a model by ID
+     */
     public function find(int $id): ?Model
     {
         return $this->repository->find($id);
@@ -32,12 +35,12 @@ abstract class BaseServiceForEntity implements BaseServiceForEntityInterface
     public function findOrFail(int $id): Model
     {
         $model = $this->repository->find($id);
-        
-        if (!$model) {
+
+        if (! $model) {
             $modelClass = $this->getModel();
             throw (new \Illuminate\Database\Eloquent\ModelNotFoundException)->setModel($modelClass, [$id]);
         }
-        
+
         return $model;
     }
 

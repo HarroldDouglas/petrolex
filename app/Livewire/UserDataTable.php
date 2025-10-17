@@ -153,7 +153,7 @@ class UserDataTable extends BaseDataTable
                     return match (true) {
                         $row->isDeliveryPerson() => view('partials.users.actions-delivery', ['user' => $row]),
                         $row->isCustomer() => view('partials.users.actions-customer', ['user' => $row]),
-                        default => view('partials.users.actions-admin', ['user' => $row]),
+                        default => view('partials.users.actions-admin', ['user' => $row, 'this' => $this]),
                     };
                 })
                 ->html(),

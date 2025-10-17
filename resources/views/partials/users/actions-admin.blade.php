@@ -14,6 +14,13 @@
                 <i class="ti ti-edit text-success me-2"></i> Editer
             </a>
         </li>
+        @if($user->canHavePermissionsManaged())
+        <li>
+            <a class="dropdown-item" href="{{ route('users.manage-permissions', $user->id) }}">
+                <i class="ti ti-shield-check text-info me-2"></i> Gérer les permissions
+            </a>
+        </li>
+        @endif
         <li>
             <a class="dropdown-item" href="#"
                 onclick="confirmAction({

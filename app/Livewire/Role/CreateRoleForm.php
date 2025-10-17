@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Role;
 
+use App\Http\Requests\Role\BaseRoleRequest;
 use App\Http\Requests\Role\StoreRoleRequest;
-use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRoleForm extends AbstractRoleForm
 {
@@ -12,7 +12,7 @@ class CreateRoleForm extends AbstractRoleForm
         $this->initialize();
     }
 
-    protected function customRequest(): FormRequest
+    protected function customRequest(): BaseRoleRequest
     {
         return new StoreRoleRequest;
     }
@@ -30,7 +30,7 @@ class CreateRoleForm extends AbstractRoleForm
         $this->roleService->create($data);
 
         session()->flash('success', 'Rôle créé avec succès!');
-        
+
         return redirect()->route('roles.list');
     }
 }

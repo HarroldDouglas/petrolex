@@ -16,6 +16,7 @@ use App\Http\Controllers\User\EditUserController;
 use App\Http\Controllers\User\GetUserDataTableController;
 use App\Http\Controllers\User\GetUserDetailsController;
 use App\Http\Controllers\User\GetUsersController;
+use App\Http\Controllers\User\ManageUserPermissionsController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
@@ -24,11 +25,12 @@ Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
     Route::get('/json', GetUserDataTableController::class)->name('json');
     Route::get('/profile', EditProfileController::class)->name('profile');
 
-    Route::group(['prefix' => '{user_id}'], function () {
+    Route::group(['prefix' => '{user}'], function () {
         Route::get('edit', EditUserController::class)->name('edit');
         Route::get('details', GetUserDetailsController::class)->name('details');
         Route::get('delivery/details', GetDeliveryPersonDetailsController::class)->name('delivery.details');
         Route::get('customer/details', GetCustomerDetailsController::class)->name('customer.details');
+        Route::get('manage-permissions', ManageUserPermissionsController::class)->name('manage-permissions');
         Route::delete('delete', DeleteUserController::class)->name('delete');
     });
 });

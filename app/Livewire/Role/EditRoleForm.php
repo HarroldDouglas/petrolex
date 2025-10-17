@@ -2,9 +2,8 @@
 
 namespace App\Livewire\Role;
 
-use App\Http\Requests\Role\UpdateRoleRequest;
 use App\Http\Requests\Role\BaseRoleRequest;
-use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Role\UpdateRoleRequest;
 use Spatie\Permission\Models\Role;
 
 class EditRoleForm extends AbstractRoleForm
@@ -33,7 +32,7 @@ class EditRoleForm extends AbstractRoleForm
         $this->roleService->update($this->role, $data);
 
         session()->flash('success', 'Rôle modifié avec succès!');
-        
+
         return redirect()->route('roles.list');
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 abstract class BaseRoleRequest extends FormRequest
 {
@@ -20,7 +19,7 @@ abstract class BaseRoleRequest extends FormRequest
             ],
             'guard_name' => 'sometimes|string|in:web,api',
             'selectedPermissions' => 'sometimes|array',
-            'selectedPermissions.*' => 'string|exists:permissions,name'
+            'selectedPermissions.*' => 'string|exists:permissions,name',
         ];
     }
 
