@@ -5,8 +5,8 @@ namespace App\Listeners\Order;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Events\OrderStatusChanged;
-use App\Models\ProductCategoryDistributionCenter;
 use App\Listeners\BaseListener;
+use App\Models\ProductCategoryDistributionCenter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -32,7 +32,6 @@ class RestoreStockOnCancellationListener extends BaseListener
      * Handle the event - Restore stock and credit wallet when order is cancelled
      *
      * @param  OrderStatusChanged  $event
-     * @return void
      */
     protected function handleEvent($event): void
     {
@@ -48,27 +47,28 @@ class RestoreStockOnCancellationListener extends BaseListener
         // Only restore stock if order was previously PAID
         // (no stock to restore if order was never paid)
         if ($event->oldStatus?->value !== OrderStatus::PAID()->value) {
-            Log::info("Order cancelled but was not paid, no stock to restore", [
+            Log::info('Order cancelled but was not paid, no stock to restore', [
                 'order_id' => $order->id,
                 'old_status' => $event->oldStatus?->value,
             ]);
+
             return;
         }
 
-        DB::transaction(function () use ($order, $event) {
+        DB::transaction(function () use ($order) {
             // 1. Restore stock
             $this->restoreStock($order);
 
             // 2. Credit customer wallet
             // TODO: Implement wallet system before enabling this
             // $this->creditWallet($order);
-            Log::info("Wallet credit skipped - wallet system not yet implemented", [
+            Log::info('Wallet credit skipped - wallet system not yet implemented', [
                 'order_id' => $order->id,
                 'amount_to_credit' => $order->total_amount,
             ]);
         });
 
-        Log::info("Stock restored and wallet credited for cancelled order", [
+        Log::info('Stock restored and wallet credited for cancelled order', [
             'order_id' => $order->id,
             'order_number' => $order->order_number,
             'total_amount' => $order->total_amount,
@@ -88,8 +88,8 @@ class RestoreStockOnCancellationListener extends BaseListener
                 ->lockForUpdate()
                 ->first();
 
-            if (!$stockRecord) {
-                Log::warning("Stock record not found for product category when restoring", [
+            if (! $stockRecord) {
+                Log::warning('Stock record not found for product category when restoring', [
                     'product_category_id' => $item->product_category_id,
                     'distribution_center_id' => $order->distribution_center_id,
                 ]);
@@ -103,7 +103,7 @@ class RestoreStockOnCancellationListener extends BaseListener
                 $newStockFilled = $stockRecord->stock_filled + $item->quantity;
                 $stockRecord->update(['stock_filled' => $newStockFilled]);
 
-                Log::info("Restored bottle stock", [
+                Log::info('Restored bottle stock', [
                     'product_category_id' => $item->product_category_id,
                     'quantity' => $item->quantity,
                     'old_stock_filled' => $stockRecord->stock_filled,
@@ -114,7 +114,7 @@ class RestoreStockOnCancellationListener extends BaseListener
                 $newStock = $stockRecord->stock + $item->quantity;
                 $stockRecord->update(['stock' => $newStock]);
 
-                Log::info("Restored accessory stock", [
+                Log::info('Restored accessory stock', [
                     'product_category_id' => $item->product_category_id,
                     'quantity' => $item->quantity,
                     'old_stock' => $stockRecord->stock,
@@ -131,17 +131,18 @@ class RestoreStockOnCancellationListener extends BaseListener
     {
         $customer = $order->customer;
 
-        if (!$customer) {
-            Log::error("Cannot credit wallet: customer not found for order", [
+        if (! $customer) {
+            Log::error('Cannot credit wallet: customer not found for order', [
                 'order_id' => $order->id,
             ]);
+
             return;
         }
 
         // Get customer's wallet or create if doesn't exist
         $wallet = $customer->wallet;
 
-        if (!$wallet) {
+        if (! $wallet) {
             // Create wallet if it doesn't exist
             $wallet = $customer->wallet()->create([
                 'balance' => 0,
@@ -152,7 +153,7 @@ class RestoreStockOnCancellationListener extends BaseListener
         $previousBalance = $wallet->balance;
         $wallet->increment('balance', $order->total_amount);
 
-        Log::info("Customer wallet credited for cancelled order", [
+        Log::info('Customer wallet credited for cancelled order', [
             'customer_id' => $customer->id,
             'order_id' => $order->id,
             'amount_credited' => $order->total_amount,

@@ -33,7 +33,6 @@ class SendOrderStatusChangedNotification extends BaseListener
      * Handle the event - Send notifications when order status changes
      *
      * @param  OrderStatusChanged  $event
-     * @return void
      */
     protected function handleEvent($event): void
     {

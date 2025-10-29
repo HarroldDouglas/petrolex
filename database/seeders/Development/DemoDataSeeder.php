@@ -220,10 +220,14 @@ class DemoDataSeeder extends Seeder
             ],
             [
                 'address' => '321 Demo Boulevard, Demo City',
-                'latitude' => fake()->latitude(),
-                'longitude' => fake()->longitude(),
+                'latitude' => fake()->latitude(3.8, 4.1),
+                'longitude' => fake()->longitude(9.6, 11.6),
                 'phone' => $customerRecord->user->phone_number,
-                'contact_name' => $customerRecord->user->first_name.' '.$customerRecord->user->last_name,
+                'phone_country_code' => '+237',
+                'contact_firstname' => $customerRecord->user->first_name,
+                'contact_lastname' => $customerRecord->user->last_name,
+                'email' => $customerRecord->user->email,
+                'address_precision' => 'Près de la grande place',
                 'is_default' => true,
                 'neighborhood_id' => $neighborhood->id,
             ]

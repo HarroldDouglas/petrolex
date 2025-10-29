@@ -376,6 +376,12 @@ class OrderSeeder extends Seeder
             'neighborhood_id' => $bastosNeighborhood->id,
             'latitude' => 3.876700,
             'longitude' => 11.526700,
+            'phone' => '+237677889900',
+            'phone_country_code' => '+237',
+            'contact_firstname' => 'Test',
+            'contact_lastname' => 'Customer',
+            'email' => 'customer1@test.com',
+            'address_precision' => 'Près du centre commercial',
             'is_default' => false,
         ]);
 

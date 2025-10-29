@@ -34,7 +34,6 @@ interface DistributionCenterRepositoryInterface extends BaseRepositoryInterface
     /**
      * Get all center managers for a distribution center
      *
-     * @param  int  $distributionCenterId
      * @return Collection<int, \App\Models\User>
      */
     public function getCenterManagers(int $distributionCenterId): Collection;

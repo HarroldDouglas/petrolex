@@ -13,11 +13,11 @@ use App\Models\DeliveryPerson;
 use App\Models\DistributionCenter;
 use App\Models\Geography\Country;
 use App\Models\Order;
-use Illuminate\Support\Facades\DB;
 use App\Models\ProductCategory;
 use App\Models\User;
 use App\Services\ProductCategoryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Tests\TestCase;
 
@@ -101,7 +101,7 @@ class CompleteOrderFlowTest extends TestCase
             ];
 
             $subtotal += $price * $quantity;
-            echo "   📦 {$name}: {$quantity}x @ {$price} FCFA" . ($option ? " ({$option->value})" : "") . "\n";
+            echo "   📦 {$name}: {$quantity}x @ {$price} FCFA".($option ? " ({$option->value})" : '')."\n";
         }
 
         $deliveryFee = 500.00;
@@ -156,7 +156,7 @@ class CompleteOrderFlowTest extends TestCase
             echo "   ⚠️  FINDING: Notifications are sent BEFORE payment!\n";
             foreach (DB::table('notifications')->get() as $notif) {
                 $user = User::find($notif->notifiable_id);
-                echo "      → {$notif->type} to " . ($user->email ?? 'Unknown') . "\n";
+                echo "      → {$notif->type} to ".($user->email ?? 'Unknown')."\n";
             }
         }
 
@@ -177,10 +177,10 @@ class CompleteOrderFlowTest extends TestCase
 
             $productCategory = \App\Models\ProductCategory::find($item['product_category_id']);
             if ($productCategory->product_type->value === \App\Enums\ProductType::BOTTLE()->value) {
-                $this->assertEquals(100, $stockRecord->stock_filled, "Bottle stock should still be 100 before payment");
+                $this->assertEquals(100, $stockRecord->stock_filled, 'Bottle stock should still be 100 before payment');
                 echo "      → Bottles stock_filled: {$stockRecord->stock_filled} (unchanged ✓)\n";
             } else {
-                $this->assertEquals(100, $stockRecord->stock, "Accessory stock should still be 100 before payment");
+                $this->assertEquals(100, $stockRecord->stock, 'Accessory stock should still be 100 before payment');
                 echo "      → Accessory stock: {$stockRecord->stock} (unchanged ✓)\n";
             }
         }
@@ -214,8 +214,8 @@ class CompleteOrderFlowTest extends TestCase
         $callbackResponse = $this->postJson('/api/payments/callback', [
             'application' => 'E2E_TEST_APP',
             'app_transaction_ref' => (string) $orderId,
-            'operator_transaction_ref' => 'OP-' . time(),
-            'transaction_ref' => 'TXN-' . time(),
+            'operator_transaction_ref' => 'OP-'.time(),
+            'transaction_ref' => 'TXN-'.time(),
             'transaction_type' => 'PAYIN',
             'transaction_amount' => $totalAmount,
             'transaction_fees' => 50,
@@ -225,12 +225,12 @@ class CompleteOrderFlowTest extends TestCase
             'transaction_reason' => 'Payment successful',
             'transaction_message' => 'Transaction completed successfully',
             'customer_phone_number' => '670000000',
-            'signature' => hash('sha256', 'test-signature-' . $orderId),
+            'signature' => hash('sha256', 'test-signature-'.$orderId),
         ]);
 
         if ($callbackResponse->status() !== 200) {
             echo "   ❌ Payment callback failed with status {$callbackResponse->status()}\n";
-            echo "   📄 Response: " . json_encode($callbackResponse->json(), JSON_PRETTY_PRINT) . "\n\n";
+            echo '   📄 Response: '.json_encode($callbackResponse->json(), JSON_PRETTY_PRINT)."\n\n";
         }
         $callbackResponse->assertStatus(200);
         echo "   ✅ Payment callback processed successfully\n\n";
@@ -288,7 +288,7 @@ class CompleteOrderFlowTest extends TestCase
         if ($managerNotification) {
             echo "   ✅ Distribution center manager notified\n";
             echo "   📧 Notification Type: {$managerNotification->type}\n";
-            echo "   📝 Notification: " . substr($managerNotification->data, 0, 100) . "...\n";
+            echo '   📝 Notification: '.substr($managerNotification->data, 0, 100)."...\n";
         } else {
             echo "   ⚠️  No notification found for distribution center manager\n";
             echo "      (This may be expected if notifications are disabled)\n";
@@ -325,7 +325,7 @@ class CompleteOrderFlowTest extends TestCase
             if ($deliveryPersonNotification) {
                 echo "   ✅ Delivery person notified\n";
                 echo "   📧 Notification Type: {$deliveryPersonNotification->type}\n";
-                echo "   📝 Notification: " . substr($deliveryPersonNotification->data, 0, 100) . "...\n";
+                echo '   📝 Notification: '.substr($deliveryPersonNotification->data, 0, 100)."...\n";
             } else {
                 echo "   ⚠️  No notification found for delivery person\n";
             }

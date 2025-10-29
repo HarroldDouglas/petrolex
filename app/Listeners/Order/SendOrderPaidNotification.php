@@ -13,8 +13,7 @@ class SendOrderPaidNotification extends BaseListener
 {
     public function __construct(
         private readonly DistributionCenterRepositoryInterface $distributionCenterRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Get unique identifiers for this event
@@ -36,7 +35,6 @@ class SendOrderPaidNotification extends BaseListener
      * Handle the event - Send notifications when order status changes to PAID
      *
      * @param  OrderStatusChanged  $event
-     * @return void
      */
     protected function handleEvent($event): void
     {

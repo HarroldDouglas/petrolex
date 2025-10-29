@@ -8,7 +8,6 @@ use App\Enums\ProductType;
 use App\Events\OrderStatusChanged;
 use App\Listeners\BaseListener;
 use App\Models\ProductCategoryDistributionCenter;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class DecrementStockOnPaymentListener extends BaseListener
@@ -33,7 +32,6 @@ class DecrementStockOnPaymentListener extends BaseListener
      * Handle the event - Decrement stock when order status changes to PAID
      *
      * @param  OrderStatusChanged  $event
-     * @return void
      */
     protected function handleEvent($event): void
     {
@@ -46,17 +44,18 @@ class DecrementStockOnPaymentListener extends BaseListener
 
         // Only decrement if status actually changed from non-paid to paid
         if ($event->oldStatus?->value === OrderStatus::PAID()->value) {
-            Log::info("DecrementStockOnPaymentListener skipped - order already paid", [
+            Log::info('DecrementStockOnPaymentListener skipped - order already paid', [
                 'order_id' => $event->order->id,
                 'old_status' => $event->oldStatus?->value,
                 'new_status' => $event->newStatus->value,
             ]);
+
             return;
         }
 
         $order = $event->order;
 
-        Log::info("DecrementStockOnPaymentListener triggered", [
+        Log::info('DecrementStockOnPaymentListener triggered', [
             'order_id' => $order->id,
             'order_number' => $order->order_number,
             'old_status' => $event->oldStatus?->value,
@@ -66,10 +65,10 @@ class DecrementStockOnPaymentListener extends BaseListener
         // Get order items with product category
         $orderItems = $order->items()->with('productCategory')->get();
 
-        Log::info("Processing order items for stock decrement", [
+        Log::info('Processing order items for stock decrement', [
             'order_id' => $order->id,
             'items_count' => $orderItems->count(),
-            'items' => $orderItems->map(fn($item) => [
+            'items' => $orderItems->map(fn (\App\Models\OrderItem $item) => [
                 'id' => $item->id,
                 'product_category_id' => $item->product_category_id,
                 'quantity' => $item->quantity,
@@ -98,11 +97,12 @@ class DecrementStockOnPaymentListener extends BaseListener
             ->lockForUpdate()
             ->first();
 
-        if (!$stockRecord) {
-            Log::warning("Stock record not found for product category", [
+        if (! $stockRecord) {
+            Log::warning('Stock record not found for product category', [
                 'product_category_id' => $item->product_category_id,
                 'distribution_center_id' => $distributionCenterId,
             ]);
+
             return;
         }
 
@@ -122,7 +122,7 @@ class DecrementStockOnPaymentListener extends BaseListener
                 $newStockEmpty = $oldStockEmpty + $item->quantity;
                 $updates['stock_empty'] = $newStockEmpty;
 
-                Log::info("Decremented bottle stock (RECHARGE - will receive empty bottles)", [
+                Log::info('Decremented bottle stock (RECHARGE - will receive empty bottles)', [
                     'product_category_id' => $item->product_category_id,
                     'quantity' => $item->quantity,
                     'old_stock_filled' => $oldStockFilled,
@@ -131,7 +131,7 @@ class DecrementStockOnPaymentListener extends BaseListener
                     'new_stock_empty' => $newStockEmpty,
                 ]);
             } else {
-                Log::info("Decremented bottle stock (FULL - customer keeps bottle)", [
+                Log::info('Decremented bottle stock (FULL - customer keeps bottle)', [
                     'product_category_id' => $item->product_category_id,
                     'quantity' => $item->quantity,
                     'old_stock_filled' => $oldStockFilled,
@@ -146,7 +146,7 @@ class DecrementStockOnPaymentListener extends BaseListener
             $newStock = max(0, $oldStock - $item->quantity);
             $stockRecord->update(['stock' => $newStock]);
 
-            Log::info("Decremented accessory stock", [
+            Log::info('Decremented accessory stock', [
                 'product_category_id' => $item->product_category_id,
                 'quantity' => $item->quantity,
                 'old_stock' => $oldStock,
