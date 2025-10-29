@@ -65,6 +65,7 @@ run_test "$SCRIPT_DIR/test_price_validation.sh" "Price Validation Tests"
 run_test "$SCRIPT_DIR/test_total_validation.sh" "Total Amount Validation Tests"
 run_test "$SCRIPT_DIR/test_payment_methods.sh" "Payment Methods Validation Tests"
 run_test "$SCRIPT_DIR/test_complete_flow.sh" "Complete Order Flow Test"
+run_test "$SCRIPT_DIR/test_order_cancellation.sh" "Order Cancellation Test"
 
 # Print final summary
 print_header "📊 Test Execution Summary"

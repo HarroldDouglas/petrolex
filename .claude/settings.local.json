@@ -35,7 +35,12 @@
       "Bash(./tests/E2E/order/test_geographic_coherence.sh:*)",
       "Bash(TOKEN=\"3|1qCDhe6GtQGNaGciJxJjprDASYFRT6tjfwrVI3v6e00616c1\")",
       "Bash(rm:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(tee:*)",
+      "Bash(wait:*)",
+      "Read(//tmp/**)",
+      "Read(//home/douglas/Documents/AfrikSolutions/Projects/web-whatsapp/app/Listeners/**)",
+      "Bash(./tests/E2E/order/test_order_cancellation.sh:*)"
     ],
     "deny": [],
     "ask": []

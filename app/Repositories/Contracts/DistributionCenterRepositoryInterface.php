@@ -30,4 +30,12 @@ interface DistributionCenterRepositoryInterface extends BaseRepositoryInterface
      * Prioritizes centers in the same municipality.
      */
     public function findClosestByNeighborhood(int $neighborhoodId): ?DistributionCenter;
+
+    /**
+     * Get all center managers for a distribution center
+     *
+     * @param  int  $distributionCenterId
+     * @return Collection<int, \App\Models\User>
+     */
+    public function getCenterManagers(int $distributionCenterId): Collection;
 }

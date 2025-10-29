@@ -7,6 +7,7 @@ use App\Events\DistributionCenterUpdatedEvent;
 use App\Events\EmptyBottleReturnedEvent;
 use App\Events\OrderCreatedEvent;
 use App\Events\OrderDeliveredEvent;
+use App\Events\OrderStatusChanged;
 use App\Events\PasswordUpdatedEvent;
 use App\Events\Role\RoleDeletingEvent;
 use App\Events\Role\RolePermissionUpdatedEvent;
@@ -21,7 +22,10 @@ use App\Listeners\LogOrderDelivered;
 use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
 use App\Listeners\Order\AssignDeliveryPersonToOrderListener;
-use App\Listeners\Order\SendOrderCreatedNotification;
+use App\Listeners\Order\DecrementStockOnPaymentListener;
+use App\Listeners\Order\RestoreStockOnCancellationListener;
+use App\Listeners\Order\SendOrderPaidNotification;
+use App\Listeners\Order\SendOrderStatusChangedNotification;
 use App\Listeners\Role\AssignPermissionsToRoleListener;
 use App\Listeners\Role\DetachPermissionsFromDeletingRoleListener;
 use App\Listeners\SendPasswordUpdatedNotification;
@@ -62,7 +66,6 @@ class EventServiceProvider extends ServiceProvider
             AddOrderItemsToOrderListener::class,
             LogOrderCreatedListener::class,
             AssignDeliveryPersonToOrderListener::class,
-            SendOrderCreatedNotification::class,
         ],
         CustomerCreatedEvent::class => [
             LogCustomerCreatedListener::class,
@@ -72,6 +75,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         RoleDeletingEvent::class => [
             DetachPermissionsFromDeletingRoleListener::class,
+        ],
+        OrderStatusChanged::class => [
+            SendOrderPaidNotification::class,
+            SendOrderStatusChangedNotification::class,
+            DecrementStockOnPaymentListener::class,
+            RestoreStockOnCancellationListener::class,
         ],
     ];
 

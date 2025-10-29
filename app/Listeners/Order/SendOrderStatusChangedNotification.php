@@ -4,20 +4,40 @@ namespace App\Listeners\Order;
 
 use App\Enums\OrderStatus;
 use App\Events\OrderStatusChanged;
+use App\Listeners\BaseListener;
 use App\Models\Order;
 use App\Notifications\OrderStatusChangedNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
-class SendOrderStatusChangedNotification implements ShouldQueue
+class SendOrderStatusChangedNotification extends BaseListener
 {
-    use InteractsWithQueue;
-
-    public function handle(OrderStatusChanged $event): void
+    /**
+     * Get unique identifiers for this event
+     *
+     * @param  OrderStatusChanged  $event
+     * @return array{order_id: int, old_status: string|null, new_status: string, event_type: string}
+     */
+    protected function getEventIdentifiers($event): array
     {
+        return [
+            'order_id' => $event->order->id,
+            'old_status' => $event->oldStatus?->value,
+            'new_status' => $event->newStatus->value,
+            'event_type' => 'order_status_changed_notification',
+        ];
+    }
+
+    /**
+     * Handle the event - Send notifications when order status changes
+     *
+     * @param  OrderStatusChanged  $event
+     * @return void
+     */
+    protected function handleEvent($event): void
+    {
+        /** @var OrderStatusChanged $event */
         /** @var Order $order */
         $order = $event->order;
         $recipients = $this->getRecipients($order);

@@ -79,4 +79,18 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
             ->orderBy('id') // Simple ordering as fallback
             ->first();
     }
+
+    /**
+     * Get all center managers for a distribution center
+     */
+    public function getCenterManagers(int $distributionCenterId): Collection
+    {
+        return \App\Models\User::whereHas('distributionCenters', function ($query) use ($distributionCenterId) {
+            $query->where('distribution_center_id', $distributionCenterId);
+        })
+            ->whereHas('roles', function ($query) {
+                $query->where('name', \App\Enums\UserRole::CENTER_MANAGER()->value);
+            })
+            ->get();
+    }
 }

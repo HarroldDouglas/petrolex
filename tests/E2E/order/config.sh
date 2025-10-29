@@ -13,7 +13,7 @@ export TEST_PASSWORD="password"
 
 # Test Data IDs
 export CUSTOMER_ID=1
-export DELIVERY_ADDRESS_ID=1
+export DELIVERY_ADDRESS_ID=2  # Using address ID 2 which is in Melen, same municipality as center
 export DISTRIBUTION_CENTER_ID=1
 
 # Product Categories with Expected Prices
