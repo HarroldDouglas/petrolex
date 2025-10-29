@@ -44,6 +44,11 @@ class CustomerResource extends UserResource
             $userData = [];
         }
 
+        // Load delivery addresses with all geographic relations
+        $customer->loadMissing([
+            'deliveryAddresses.neighborhood.municipality.city.country'
+        ]);
+
         return array_merge(
             $userData,
             [

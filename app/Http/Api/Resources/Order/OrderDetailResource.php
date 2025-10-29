@@ -26,6 +26,11 @@ class OrderDetailResource extends JsonResource
         /** @var Order&\Illuminate\Database\Eloquent\Model $order */
         $order = $this->resource;
 
+        // Load delivery address with all geographic relations
+        $order->loadMissing([
+            'deliveryAddress.neighborhood.municipality.city.country'
+        ]);
+
         return [
             // Basic order information
             'id' => $order->id,
