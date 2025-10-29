@@ -52,7 +52,9 @@ return [
     'order_invoice_not_belongs_to_you' => 'This invoice does not belong to you',
     'order_not_authorized_to_deliver' => 'You are not authorized to mark this order as delivered',
     'order_not_authorized_to_scan_bottles' => 'You are not authorized to scan bottles for this order',
+    'order_not_authorized_role_required' => 'You must be a customer or delivery person to access this resource',
     'customer_orders_retrieved_success' => 'Customer orders retrieved successfully',
+    'delivery_person_orders_retrieved_success' => 'Delivery person orders retrieved successfully',
 
     // Payment messages
     'payment_initiated_success' => 'Payment initiated successfully',

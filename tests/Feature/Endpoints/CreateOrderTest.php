@@ -411,4 +411,151 @@ final class CreateOrderTest extends TestCase
             0.01
         );
     }
+
+    #[Test]
+    public function it_validates_geographic_coherence_same_municipality(): void
+    {
+        // Create a city
+        $city = \App\Models\Geography\City::factory()->create();
+
+        // Create a municipality
+        $municipality = \App\Models\Geography\Municipality::factory()->create([
+            'city_id' => $city->id,
+        ]);
+
+        // Create a neighborhood in this municipality
+        $neighborhood = \App\Models\Geography\Neighborhood::factory()->create([
+            'municipality_id' => $municipality->id,
+        ]);
+
+        // Create distribution center in this neighborhood
+        $distributionCenter = \App\Models\DistributionCenter::factory()->create([
+            'neighborhood_id' => $neighborhood->id,
+        ]);
+
+        // Create delivery address in the SAME neighborhood (same municipality)
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $this->customer->id,
+            'neighborhood_id' => $neighborhood->id,
+        ]);
+
+        $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
+
+        // Get actual price
+        $actualPrice = app(\App\Services\ProductCategoryService::class)->getProductPrice(
+            $productCategory->id
+        );
+        $deliveryFee = 500.00;
+        $totalAmount = $actualPrice + $deliveryFee;
+
+        $orderData = [
+            'delivery_address_id' => $deliveryAddress->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_type' => DeliveryType::NORMAL()->value,
+            'items' => [
+                [
+                    'product_category_id' => $productCategory->id,
+                    'quantity' => 1,
+                    'unit_price' => $actualPrice,
+                ],
+            ],
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $totalAmount,
+        ];
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->authToken,
+            'Accept' => 'application/json',
+        ])->postJson(route('api.orders.store'), $orderData);
+
+        // Should succeed because both are in the same municipality
+        $response->assertStatus(201)
+            ->assertJsonPath('_metadata.success', true);
+    }
+
+    #[Test]
+    public function it_rejects_order_when_delivery_address_and_center_in_different_municipalities(): void
+    {
+        // Create a city
+        $city = \App\Models\Geography\City::factory()->create();
+
+        // Create two different municipalities in the same city
+        $municipality1 = \App\Models\Geography\Municipality::factory()->create([
+            'city_id' => $city->id,
+            'name' => 'Yaoundé I',
+        ]);
+
+        $municipality2 = \App\Models\Geography\Municipality::factory()->create([
+            'city_id' => $city->id,
+            'name' => 'Yaoundé II',
+        ]);
+
+        // Create neighborhoods in different municipalities
+        $neighborhood1 = \App\Models\Geography\Neighborhood::factory()->create([
+            'municipality_id' => $municipality1->id,
+        ]);
+
+        $neighborhood2 = \App\Models\Geography\Neighborhood::factory()->create([
+            'municipality_id' => $municipality2->id,
+        ]);
+
+        // Create distribution center in municipality 1
+        $distributionCenter = \App\Models\DistributionCenter::factory()->create([
+            'neighborhood_id' => $neighborhood1->id,
+        ]);
+
+        // Create delivery address in municipality 2 (DIFFERENT municipality)
+        $deliveryAddress = \App\Models\CustomerDeliveryAddress::factory()->create([
+            'customer_id' => $this->customer->id,
+            'neighborhood_id' => $neighborhood2->id,
+        ]);
+
+        $productCategory = \App\Models\ProductCategory::factory()->accessoryType()->create();
+
+        // Get actual price
+        $actualPrice = app(\App\Services\ProductCategoryService::class)->getProductPrice(
+            $productCategory->id
+        );
+        $deliveryFee = 500.00;
+        $totalAmount = $actualPrice + $deliveryFee;
+
+        $orderData = [
+            'delivery_address_id' => $deliveryAddress->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_type' => DeliveryType::NORMAL()->value,
+            'items' => [
+                [
+                    'product_category_id' => $productCategory->id,
+                    'quantity' => 1,
+                    'unit_price' => $actualPrice,
+                ],
+            ],
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $totalAmount,
+        ];
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$this->authToken,
+            'Accept' => 'application/json',
+        ])->postJson(route('api.orders.store'), $orderData);
+
+        // Should fail with 422 validation error
+        $response->assertStatus(422)
+            ->assertJsonStructure([
+                'message',
+                'errors' => [
+                    'distribution_center_id',
+                ],
+            ]);
+
+        // Verify error message mentions municipalities or contains validation message
+        $errorMessage = $response->json('errors.distribution_center_id.0');
+
+        // Check if the error message contains municipality names OR is the translated message
+        $isValid = str_contains($errorMessage, 'Yaoundé I') && str_contains($errorMessage, 'Yaoundé II')
+            || str_contains($errorMessage, 'municipalité')
+            || str_contains($errorMessage, 'municipality');
+
+        $this->assertTrue($isValid, "Error message should mention municipalities: {$errorMessage}");
+    }
 }

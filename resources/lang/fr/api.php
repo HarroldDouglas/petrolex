@@ -52,7 +52,9 @@ return [
     'order_invoice_not_belongs_to_you' => 'Cette facture ne vous appartient pas',
     'order_not_authorized_to_deliver' => 'Vous n\'êtes pas autorisé à marquer cette commande comme livrée',
     'order_not_authorized_to_scan_bottles' => 'Vous n\'êtes pas autorisé à scanner des bouteilles pour cette commande',
+    'order_not_authorized_role_required' => 'Vous devez être un client ou un livreur pour accéder à cette ressource',
     'customer_orders_retrieved_success' => 'Commandes client récupérées avec succès',
+    'delivery_person_orders_retrieved_success' => 'Commandes livreur récupérées avec succès',
 
     // Payment messages
     'payment_initiated_success' => 'Paiement initié avec succès',

@@ -7,7 +7,7 @@ use OpenApi\Annotations as OA;
  *     path="/api/my/orders",
  *     operationId="getMyOrders",
  *     summary="Récupérer mes commandes",
- *     description="Retourne la liste paginée des commandes du client authentifié avec filtres optionnels",
+ *     description="Retourne la liste paginée des commandes de l'utilisateur authentifié (client ou livreur) avec filtres optionnels",
  *     tags={"Commandes"},
  *     security={{"bearerAuth": {}}},
  *

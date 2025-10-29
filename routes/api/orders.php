@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Api\Controllers\Customer\GetCustomerOrdersController;
+use App\Http\Api\Controllers\GetMyOrdersController;
 use App\Http\Api\Controllers\Order\AddCustomerCommentToOrderController;
 use App\Http\Api\Controllers\Order\CancelOrderController;
 use App\Http\Api\Controllers\Order\CreateOrderController;
@@ -22,5 +22,5 @@ Route::middleware('auth:sanctum')->prefix('orders')->name('api.')->group(functio
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/my/orders', GetCustomerOrdersController::class)->name('api.my.orders.index');
+    Route::get('/my/orders', GetMyOrdersController::class)->name('api.my.orders.index');
 });
