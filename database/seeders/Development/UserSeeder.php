@@ -190,15 +190,21 @@ class UserSeeder extends Seeder
      */
     private function createTestCustomer(): void
     {
+        // Create user without addresses first
         $customerUser = User::factory()
-            ->customer()
-            ->create([
+            ->state([
                 'first_name' => 'Customer',
                 'last_name' => 'Test',
                 'email' => 'customer1@test.com',
-            ]);
+            ])
+            ->create();
 
-        $customer = $customerUser->customer;
+        // Manually create customer without using factory's afterCreating
+        $customerUser->assignRole(UserRole::CUSTOMER()->value);
+        $customer = Customer::create([
+            'user_id' => $customerUser->id,
+            'current_balance' => 0.0,
+        ]);
 
         // Use Melen neighborhood in Yaoundé I (should be the first one created)
         $neighborhood = \App\Models\Geography\Neighborhood::where('name', 'Melen')
@@ -213,9 +219,7 @@ class UserSeeder extends Seeder
             return;
         }
 
-        // Check if customer already has a default address
-        $hasDefaultAddress = $customer->deliveryAddresses()->where('is_default', true)->exists();
-
+        // Create first address as default
         $customer->deliveryAddresses()->create([
             'label' => 'Nkoabang',
             'address' => 'Nkoabang',
@@ -227,7 +231,7 @@ class UserSeeder extends Seeder
             'contact_lastname' => 'Dupont',
             'email' => 'marie.dupont@example.com',
             'address_precision' => 'Près du marché central',
-            'is_default' => ! $hasDefaultAddress, // Only set as default if no default exists
+            'is_default' => true,
             'neighborhood_id' => $neighborhood->id,
         ]);
 
