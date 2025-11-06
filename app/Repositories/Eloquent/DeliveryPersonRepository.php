@@ -76,6 +76,7 @@ class DeliveryPersonRepository extends BaseEloquentRepository implements Deliver
                 $filters->delivery_type !== null,
                 fn ($q) => $q->where('delivery_type', $filters->delivery_type)
             )
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
 }
