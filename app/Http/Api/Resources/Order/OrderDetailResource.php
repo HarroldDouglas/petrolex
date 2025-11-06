@@ -28,7 +28,7 @@ class OrderDetailResource extends JsonResource
 
         // Load delivery address with all geographic relations
         $order->loadMissing([
-            'deliveryAddress.neighborhood.municipality.city.country'
+            'deliveryAddress.neighborhood.municipality.city.country',
         ]);
 
         return [
