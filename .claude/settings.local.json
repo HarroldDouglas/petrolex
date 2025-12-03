@@ -40,7 +40,11 @@
       "Bash(wait:*)",
       "Read(//tmp/**)",
       "Read(//home/douglas/Documents/AfrikSolutions/Projects/web-whatsapp/app/Listeners/**)",
-      "Bash(./tests/E2E/order/test_order_cancellation.sh:*)"
+      "Bash(./tests/E2E/order/test_order_cancellation.sh:*)",
+      "Bash(TOKEN=\"2|5b1t4xFcMs84LXtUV8VuoLHVJf9myna0dPtz7Wtwedfbc6b1\")",
+      "Bash(TOKEN=\"3|gWQJvgFkOTqUXk1FDAL5EoHk9IdKVjjj4Bw0vnWX5dc410db\")",
+      "Bash(TOKEN=\"4|KtQ7asZKg3PwD2r77uHsibCqeLpc7yOELszsUSlI7cb22ceb\")",
+      "Bash(__NEW_LINE__ curl -s -X POST \"http://127.0.0.1:8001/api/orders\" )"
     ],
     "deny": [],
     "ask": []

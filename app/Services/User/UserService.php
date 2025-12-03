@@ -46,6 +46,11 @@ class UserService extends BaseServiceWithMedia
                 unset($attributes['country_code']);
             }
 
+            // Set default language if not provided
+            if (empty($attributes['language'])) {
+                $attributes['language'] = \App\Enums\Language::default();
+            }
+
             /** @var User $user */
             $user = parent::createWithMedia($attributes);
 

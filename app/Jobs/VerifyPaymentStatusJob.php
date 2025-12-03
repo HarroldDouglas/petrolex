@@ -23,41 +23,42 @@ class VerifyPaymentStatusJob implements ShouldQueue
     private string $referenceId;
     private int $attemptCount;
 
-    private const MAX_ATTEMPTS = 18;
+    // Runtime dependencies (resolved in handle(), not serialized)
+    private PaymentService $paymentService;
+    private OrderPaymentRepositoryInterface $orderPaymentRepository;
+
+    private const MAX_ATTEMPTS = 30; // 30 attempts × 10 seconds = 5 minutes
     private const CHECK_INTERVAL = 10;
     private const MAX_RETRY_ATTEMPTS = 5;
     private const RETRY_BASE_DELAY = 30;
     private const TIMEOUT_CAP = 300; // Maximum delay in seconds (5 minutes)
 
-    private PaymentGatewayFactory $gatewayFactory;
     private PaymentMethod $paymentMethod;
-    private PaymentService $paymentService;
-    private OrderPaymentRepositoryInterface $orderPaymentRepository;
 
     public function __construct(
         string $referenceId,
         PaymentMethod $paymentMethod,
-        PaymentService $paymentService,
-        int $attemptCount = 1,
-        ?OrderPaymentRepositoryInterface $orderPaymentRepository = null
+        int $attemptCount = 1
     ) {
         $this->referenceId = $referenceId;
         $this->attemptCount = $attemptCount;
         $this->paymentMethod = $paymentMethod;
-        $this->gatewayFactory = new PaymentGatewayFactory;
-        $this->paymentService = $paymentService;
-        $this->orderPaymentRepository = $orderPaymentRepository ?: app(OrderPaymentRepositoryInterface::class);
     }
 
     public function handle(): void
     {
+        // Resolve dependencies here (not in constructor) because job is unserialized from queue
+        $gatewayFactory = new PaymentGatewayFactory();
+        $this->paymentService = app(PaymentService::class);
+        $this->orderPaymentRepository = app(OrderPaymentRepositoryInterface::class);
+
         Log::info('🚀 '.$this->paymentMethod.' NEW Payment Status Verification Job Started', [
             'reference_id' => $this->referenceId,
             'attempt' => $this->attemptCount,
         ]);
 
         try {
-            $gateway = $this->gatewayFactory->create($this->paymentMethod->value);
+            $gateway = $gatewayFactory->create($this->paymentMethod->value);
 
             $response = $gateway->verifyPayment($this->referenceId);
 
@@ -280,7 +281,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
             'delay' => self::CHECK_INTERVAL.' seconds',
         ]);
 
-        dispatch((new self($this->referenceId, $this->paymentMethod, $this->paymentService, $nextAttempt, $this->orderPaymentRepository))->delay(now()->addSeconds(self::CHECK_INTERVAL)));
+        dispatch((new self($this->referenceId, $this->paymentMethod, $nextAttempt))->delay(now()->addSeconds(self::CHECK_INTERVAL)));
     }
 
     /**
@@ -350,7 +351,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
             'delay_seconds' => $delaySeconds,
         ]);
 
-        dispatch((new self($this->referenceId, $this->paymentMethod, $this->paymentService, $nextAttempt, $this->orderPaymentRepository))
+        dispatch((new self($this->referenceId, $this->paymentMethod, $nextAttempt))
             ->delay(now()->addSeconds($delaySeconds)));
     }
 

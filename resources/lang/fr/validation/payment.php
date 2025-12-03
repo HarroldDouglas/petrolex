@@ -14,4 +14,5 @@ return [
     'expiry_date_future' => 'La date d\'expiration doit être dans le futur',
     'cardholder_name_required' => 'Le nom du porteur de carte est requis',
     'invalid_card_number' => 'Numéro de carte invalide',
+    'wallet_insufficient' => 'Solde du portefeuille insuffisant. Votre solde: :balance FCFA. Montant requis: :required FCFA. Il vous manque: :missing FCFA. Veuillez fournir un moyen de paiement.',
 ];

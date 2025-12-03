@@ -16,7 +16,7 @@ class ProductType extends Enum
     public static function labels(): array
     {
         return [
-            'BOTTLE' => 'Bouteille',
+            'BOTTLE' => 'Consigne',
             'ACCESSORY' => 'Accessoire',
         ];
     }
@@ -41,7 +41,7 @@ class ProductType extends Enum
     {
         return [
             'BOTTLE' => [
-                'fr' => 'Bouteilles à gaz domestiques',
+                'fr' => 'Consignes de gaz domestiques',
                 'en' => 'Domestic Gas Bottles',
             ],
             'ACCESSORY' => [

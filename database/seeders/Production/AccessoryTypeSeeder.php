@@ -17,59 +17,106 @@ class AccessoryTypeSeeder extends Seeder
     {
         $this->command->info('Creating accessory types...');
 
+        // Skip if accessory types already exist (idempotent)
+        if (AccessoryType::count() > 0) {
+            $this->command->info('Accessory types already exist, skipping...');
+
+            return;
+        }
+
         $accessoryTypes = [
             [
-                'name' => 'Tuyau de gaz standard 5m',
-                'name_en' => 'Standard 5m Gas Hose',
-                'price' => 2500,
-                'description' => 'Tuyau flexible pour connecter la bouteille de gaz aux appareils',
-                'description_en' => 'Flexible hose to connect gas bottle to appliances',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Détendeur universel',
-                'name_en' => 'Universal Regulator',
-                'price' => 1500,
-                'description' => 'Détendeur compatible avec la plupart des bouteilles de gaz',
-                'description_en' => 'Regulator compatible with most gas bottles',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Protection anti-chute',
-                'name_en' => 'Fall Protection',
-                'price' => 500,
-                'description' => 'Protection pour éviter la chute des bouteilles',
-                'description_en' => 'Protection to prevent bottle falls',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Adaptateur pour réchaud',
-                'name_en' => 'Stove Adapter',
+                'name' => 'Brûleur à gaz avec soupape en laiton',
+                'name_en' => 'Gas burner with brass valve',
                 'price' => 2000,
-                'description' => 'Adaptateur spécifique pour connexion aux réchauds',
-                'description_en' => 'Specific adapter for stove connection',
+                'description' => 'Brûleur à gaz de haute qualité avec soupape en laiton pour une meilleure durabilité et sécurité.',
+                'description_en' => 'High quality gas burner with brass valve for better durability and safety.',
                 'is_active' => true,
+                'images' => [
+                    'image1.jpg',
+                    'image2.jpg',
+                    'image3.jpg',
+                    'image4.jpg',
+                    'WhatsApp Image 2025-11-26 at 14.00.35(1).png',
+                    'WhatsApp Image 2025-11-26 at 14.00.35.png',
+                    'WhatsApp Image 2025-11-26 at 14.00.36.png',
+                ],
+            ],
+            [
+                'name' => 'Support en fer noir (foyer)',
+                'name_en' => 'Black iron stand (stove)',
+                'price' => 4500,
+                'description' => 'Support en fer noir robuste pour cylindre de 6kg. Idéal pour une utilisation domestique.',
+                'description_en' => 'Sturdy black iron stand for 6kg cylinder. Ideal for domestic use.',
+                'is_active' => true,
+                'images' => [
+                    'image5.jpg',
+                    'Untitled6.jpg',
+                    'WhatsApp Image 2025-11-26 at 14.08.10(2).png',
+                    'WhatsApp Image 2025-11-26 at 14.08.10.png',
+                ],
+            ],
+            [
+                'name' => 'Régulateur de gaz avec clé (détendeur)',
+                'name_en' => 'Gas regulator with key (pressure regulator)',
+                'price' => 1500,
+                'description' => 'Régulateur de gaz avec clé de serrage. Taille : sortie de 8mm.',
+                'description_en' => 'Gas regulator with tightening key. Size: 8mm outlet.',
+                'is_active' => true,
+                'images' => [
+                    'Untitled9.jpg',
+                    'Untitled10.jpg',
+                ],
+            ],
+            [
+                'name' => 'Tuyau de gaz en PVC blanc 2m',
+                'name_en' => 'White PVC gas hose 2m',
+                'price' => 2000,
+                'description' => 'Tuyau de gaz en PVC blanc. Taille : 8x14mm x 2.0m.',
+                'description_en' => 'White PVC gas hose. Size: 8x14mm x 2.0m.',
+                'is_active' => true,
+                'images' => [
+                    'Untitled7.jpg',
+                    'Untitled8.jpg',
+                    'WhatsApp Image 2025-11-26 at 14.08.21.png',
+                    'WhatsApp Image 2025-11-26 at 14.08.22.png',
+                ],
+            ],
+            [
+                'name' => 'Tuyau de gaz en PVC blanc 1.5m',
+                'name_en' => 'White PVC gas hose 1.5m',
+                'price' => 1500,
+                'description' => 'Tuyau de gaz en PVC blanc. Taille : 8x14mm x 1.5m.',
+                'description_en' => 'White PVC gas hose. Size: 8x14mm x 1.5m.',
+                'is_active' => true,
+                'images' => [
+                    'Untitled7.jpg',
+                    'Untitled8.jpg',
+                    'WhatsApp Image 2025-11-26 at 14.08.21.png',
+                    'WhatsApp Image 2025-11-26 at 14.08.22.png',
+                ],
             ],
         ];
 
-        foreach ($accessoryTypes as $accessoryType) {
-            $accessory = AccessoryType::firstOrCreate(
-                ['name' => $accessoryType['name']],
-                $accessoryType
-            );
+        foreach ($accessoryTypes as $accessoryTypeData) {
+            // Extraire les images avant de créer l'accessoire
+            $images = $accessoryTypeData['images'] ?? [];
+            unset($accessoryTypeData['images']);
 
-            $this->addAccessoryImages($accessory);
+            $accessory = AccessoryType::create($accessoryTypeData);
+
+            $this->addAccessoryImages($accessory, $images);
         }
 
-        $this->command->info('Accessory types created successfully!');
+        $this->command->info('Accessory types created successfully! Total: '.count($accessoryTypes));
     }
 
     /**
      * Add images to accessory types
      */
-    private function addAccessoryImages(AccessoryType $accessory): void
+    private function addAccessoryImages(AccessoryType $accessory, array $imageNames): void
     {
-        $imagesPath = public_path('assets/images/mobile/products/accessories');
+        $imagesPath = public_path('zip/PRODUITS/Gadgets');
 
         if (! File::exists($imagesPath)) {
             $this->command->warn("Images directory not found: {$imagesPath}");
@@ -78,50 +125,34 @@ class AccessoryTypeSeeder extends Seeder
             return;
         }
 
-        $imageMapping = [
-            'Tuyau de gaz standard 5m' => [
-                'tuyau_gaz_standard_1.jpeg',
-            ],
-            'Détendeur universel' => [
-                'detendeur_universel_1.jpeg',
-            ],
-            'Protection anti-chute' => [
-                'protection_anti_chute_1.jpeg',
-            ],
-            'Adaptateur pour réchaud' => [
-                'adaptateur_pour_rechaud_1.jpeg',
-            ],
-        ];
+        if (empty($imageNames)) {
+            $this->command->info("No images defined for {$accessory->name}");
 
-        if (isset($imageMapping[$accessory->name])) {
-            $images = $imageMapping[$accessory->name];
-            $addedCount = 0;
-
-            foreach ($images as $imageName) {
-                $imagePath = $imagesPath.'/'.$imageName;
-
-                if (File::exists($imagePath)) {
-                    $existingMedia = $accessory->getMedia('images')->where('name', $imageName)->first();
-
-                    if (! $existingMedia) {
-                        $accessory->addMedia($imagePath)
-                            ->preservingOriginal()
-                            ->usingName($imageName)
-                            ->toMediaCollection('images');
-
-                        $addedCount++;
-                        $this->command->info("Added image {$imageName} to {$accessory->name}");
-                    }
-                } else {
-                    $this->command->warn("Image not found: {$imagePath}");
-                }
-            }
-
-            if ($addedCount === 0) {
-                $this->command->info("No new images added to {$accessory->name} (images may already exist or files not found)");
-            }
-        } else {
-            $this->command->info("No image mapping defined for {$accessory->name}");
+            return;
         }
+
+        $addedCount = 0;
+
+        foreach ($imageNames as $imageName) {
+            $imagePath = $imagesPath.'/'.$imageName;
+
+            if (File::exists($imagePath)) {
+                $existingMedia = $accessory->getMedia('images')->where('name', pathinfo($imageName, PATHINFO_FILENAME))->first();
+
+                if (! $existingMedia) {
+                    $accessory->addMedia($imagePath)
+                        ->preservingOriginal()
+                        ->usingName(pathinfo($imageName, PATHINFO_FILENAME))
+                        ->toMediaCollection('images');
+
+                    $addedCount++;
+                    $this->command->info("  ✓ Added image: {$imageName}");
+                }
+            } else {
+                $this->command->warn("  ✗ Image not found: {$imagePath}");
+            }
+        }
+
+        $this->command->info("  → {$addedCount} images added to {$accessory->name}");
     }
 }

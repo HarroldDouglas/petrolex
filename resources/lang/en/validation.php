@@ -133,8 +133,26 @@ return [
     'ulid' => 'The :attribute must be a valid ULID.',
     'uuid' => 'The :attribute must be a valid UUID.',
 
+    // Custom phone validation
+    'phone_invalid_format' => 'The phone number is invalid. :format',
+
+    // Custom email validation
+    'email_confirmation' => 'The email confirmation does not match.',
+
     'custom' => [
         'delivery_address_not_owned' => 'The delivery address does not belong to you.',
+        'email_confirmation_required' => 'The email confirmation is required.',
+        'email_confirmation_email' => 'The email confirmation must be a valid email address.',
+    ],
+
+    // Delivery address validation messages
+    'delivery_address' => [
+        'label_required' => 'The address label is required.',
+        'address_required' => 'The address is required.',
+        'neighborhood_required' => 'The neighborhood is required.',
+        'neighborhood_invalid' => 'The selected neighborhood is invalid.',
+        'email_invalid' => 'The email address is not valid.',
+        'phone_max' => 'The phone number must not exceed 20 characters.',
     ],
 
     'attributes' => [],

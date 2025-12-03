@@ -371,7 +371,8 @@ class OrderService extends BaseServiceForEntity
      */
     public function update(Model $model, array $data): Model
     {
-        $oldStatus = $model->status ?? null;
+        $oldStatusValue = $model->status ?? null;
+        $oldStatus = $oldStatusValue ? OrderStatus::tryFrom($oldStatusValue) : null;
 
         $result = parent::update($model, $data);
         if (isset($data['status']) && $result) {

@@ -8,10 +8,10 @@ use OpenApi\Annotations as OA;
  *     type="object",
  *     required={"product_category_id", "quantity", "unit_price"},
  *
- *     @OA\Property(property="product_category_id", type="integer", example=1, description="ID de la catégorie de produit"),
+ *     @OA\Property(property="product_category_id", type="integer", example=1, description="ID de la catégorie de produit (1=Bouteille 9Kg, 2=Brûleur, 3=Support fer, 4=Régulateur, 5=Tuyau 2m, 6=Tuyau 1.5m)"),
  *     @OA\Property(property="quantity", type="integer", minimum=1, maximum=100, example=2, description="Quantité commandée (1-100)"),
- *     @OA\Property(property="unit_price", type="number", format="float", example=3900.00, description="Prix unitaire du produit"),
- *     @OA\Property(property="option", type="string", nullable=true, enum={"content", "bottle_with_content"}, example="bottle_with_content", description="Option du produit: content (recharge seulement), bottle_with_content (bouteille pleine), ou null (accessoires)")
+ *     @OA\Property(property="unit_price", type="number", format="float", example=6000.00, description="Prix unitaire du produit (Bouteille: content=6000, bottle_with_content=6500; Accessoires: Brûleur=2000, Support=4500, Régulateur=1500, Tuyau 2m=2000, Tuyau 1.5m=1500)"),
+ *     @OA\Property(property="option", type="string", nullable=true, enum={"content", "bottle_with_content"}, example="content", description="Option du produit: content (recharge seulement 6000 XAF), bottle_with_content (bouteille pleine 6500 XAF), ou null (accessoires)")
  * )
  *
  * @OA\Schema(
@@ -22,8 +22,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="delivery_address_id",
  *         type="integer",
- *         example=2,
- *         description="ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée. L'adresse ID 2 (Nkoabang) est dans Yaoundé I."
+ *         example=1,
+ *         description="ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné."
  *     ),
  *     @OA\Property(
  *         property="distribution_center_id",
@@ -35,29 +35,29 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(
  *         property="items",
  *         type="array",
- *         description="Liste des articles de la commande - Exemple complet avec 3 items : 1 bouteille avec recharge, 1 bouteille pleine, 1 accessoire",
+ *         description="Liste des articles de la commande. Prix réels: Bouteille content=6000, bottle_with_content=6500; Brûleur=2000, Support=4500, Régulateur=1500, Tuyau 2m=2000, Tuyau 1.5m=1500",
  *         minItems=1,
  *         example={{
  *             "product_category_id": 1,
  *             "quantity": 2,
- *             "unit_price": 3900.00,
+ *             "unit_price": 6000.00,
  *             "option": "content"
  *         }, {
  *             "product_category_id": 1,
  *             "quantity": 1,
- *             "unit_price": 5000.00,
+ *             "unit_price": 6500.00,
  *             "option": "bottle_with_content"
  *         }, {
  *             "product_category_id": 4,
  *             "quantity": 1,
- *             "unit_price": 2500.00
+ *             "unit_price": 1500.00
  *         }},
  *
  *         @OA\Items(ref="#/components/schemas/CreateOrderItem")
  *     ),
  *
  *     @OA\Property(property="delivery_fee", type="number", format="float", example=500.00, description="Frais de livraison"),
- *     @OA\Property(property="total_amount", type="number", format="float", example=15800.00, description="Montant total de la commande (sous-total + frais de livraison)"),
+ *     @OA\Property(property="total_amount", type="number", format="float", example=20500.00, description="Montant total de la commande (sous-total + frais de livraison). Calcul: (6000×2) + (6500×1) + (1500×1) + 500 = 20500"),
  *     @OA\Property(property="comments", type="string", maxLength=500, nullable=true, example="Livrer avant 18h", description="Commentaires optionnels (max 500 caractères)")
  * )
  *

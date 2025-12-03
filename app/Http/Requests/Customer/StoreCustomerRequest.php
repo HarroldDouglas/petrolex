@@ -21,11 +21,4 @@ class StoreCustomerRequest extends BaseUserRequest
 
         return $rules;
     }
-
-    public function messages(): array
-    {
-        $messages = parent::messages();
-
-        return $messages;
-    }
 }

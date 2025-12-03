@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Api\Requests\Payment;
 
 use App\Enums\PaymentMethod;
+use App\Models\Order;
+use App\Services\Wallet\WalletService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -26,7 +28,9 @@ final class InitiatePaymentRequest extends FormRequest
         $paymentMethod = $this->input('payment_method');
 
         $rules = [
-            'payment_method' => ['required', 'string', Rule::in(PaymentMethod::values())],
+            // payment_method is nullable - wallet-only payment is allowed if balance is sufficient
+            'payment_method' => ['nullable', 'string', Rule::in(PaymentMethod::values())],
+            'use_wallet' => ['nullable', 'boolean'],
         ];
 
         if ($paymentMethod === PaymentMethod::ORANGE_MONEY()->value || $paymentMethod === PaymentMethod::MTN_MONEY()->value) {
@@ -44,10 +48,48 @@ final class InitiatePaymentRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            if ($this->input('payment_method') === PaymentMethod::CREDIT_CARD()->value) {
+            $paymentMethod = $this->input('payment_method');
+
+            if ($paymentMethod === PaymentMethod::CREDIT_CARD()->value) {
                 $this->validateCreditCard($validator);
             }
+
+            // If no payment method provided, check if wallet balance is sufficient
+            if (empty($paymentMethod)) {
+                $this->validateWalletSufficiency($validator);
+            }
         });
+    }
+
+    /**
+     * Validate that wallet balance is sufficient when no payment method is provided.
+     */
+    private function validateWalletSufficiency($validator): void
+    {
+        $customer = $this->user()?->customer;
+        if (! $customer) {
+            return;
+        }
+
+        /** @var Order|null $order */
+        $order = $this->route('order');
+        if (! $order) {
+            return;
+        }
+
+        $walletService = app(WalletService::class);
+        $breakdown = $walletService->calculatePaymentBreakdown($customer, (float) $order->total_amount);
+
+        if (! $breakdown['wallet_sufficient']) {
+            $validator->errors()->add(
+                'payment_method',
+                __('validation/payment.wallet_insufficient', [
+                    'balance' => number_format($breakdown['wallet_balance_before'], 0, ',', ' '),
+                    'required' => number_format($breakdown['total_amount'], 0, ',', ' '),
+                    'missing' => number_format($breakdown['payment_amount'], 0, ',', ' '),
+                ])
+            );
+        }
     }
 
     public function authorize(): bool
@@ -58,18 +100,18 @@ final class InitiatePaymentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'payment_method.required' => __('validation.payment.payment_method_required'),
-            'payment_method.in' => __('validation.payment.payment_method_invalid'),
-            'payment_details.phone.required' => __('validation.payment.phone_required'),
-            'payment_details.phone.regex' => __('validation.payment.phone_format'),
-            'payment_details.card_number.required' => __('validation.payment.card_number_required'),
-            'payment_details.card_number.regex' => __('validation.payment.card_number_format'),
-            'payment_details.cvv.required' => __('validation.payment.cvv_required'),
-            'payment_details.cvv.regex' => __('validation.payment.cvv_format'),
-            'payment_details.expiry_date.required' => __('validation.payment.expiry_date_required'),
-            'payment_details.expiry_date.date_format' => __('validation.payment.expiry_date_format'),
-            'payment_details.expiry_date.after' => __('validation.payment.expiry_date_future'),
-            'payment_details.cardholder_name.required' => __('validation.payment.cardholder_name_required'),
+            'payment_method.required' => __('validation/payment.payment_method_required'),
+            'payment_method.in' => __('validation/payment.payment_method_invalid'),
+            'payment_details.phone.required' => __('validation/payment.phone_required'),
+            'payment_details.phone.regex' => __('validation/payment.phone_format'),
+            'payment_details.card_number.required' => __('validation/payment.card_number_required'),
+            'payment_details.card_number.regex' => __('validation/payment.card_number_format'),
+            'payment_details.cvv.required' => __('validation/payment.cvv_required'),
+            'payment_details.cvv.regex' => __('validation/payment.cvv_format'),
+            'payment_details.expiry_date.required' => __('validation/payment.expiry_date_required'),
+            'payment_details.expiry_date.date_format' => __('validation/payment.expiry_date_format'),
+            'payment_details.expiry_date.after' => __('validation/payment.expiry_date_future'),
+            'payment_details.cardholder_name.required' => __('validation/payment.cardholder_name_required'),
         ];
     }
 
@@ -79,7 +121,7 @@ final class InitiatePaymentRequest extends FormRequest
 
         if (! $this->luhnCheck($cardNumber)) {
             $validator->errors()->add('payment_details.card_number',
-                __('validation.payment.invalid_card_number')
+                __('validation/payment.invalid_card_number')
             );
         }
     }

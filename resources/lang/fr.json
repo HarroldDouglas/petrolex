@@ -29,5 +29,20 @@
     "Remove All Filters": "Supprimer tous les filtres",
     "Clear Search": "Effacer la recherche",
     "From Date": "Du",
-    "To Date": "Au"
+    "To Date": "Au",
+    "capacity": "Capacité",
+    "height": "Hauteur",
+    "weight": "Poids",
+    "radius": "Rayon",
+    "diameter": "Diamètre",
+    "length": "Longueur",
+    "width": "Largeur",
+    "depth": "Profondeur",
+    "volume": "Volume",
+    "material": "Matériau",
+    "color": "Couleur",
+    "size": "Taille",
+    "dimensions": "Dimensions",
+    "specifications": "Spécifications",
+    "features": "Caractéristiques"
 }

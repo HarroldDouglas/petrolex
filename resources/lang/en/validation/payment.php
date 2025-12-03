@@ -14,4 +14,5 @@ return [
     'expiry_date_future' => 'The expiry date must be in the future',
     'cardholder_name_required' => 'The cardholder name is required',
     'invalid_card_number' => 'Invalid card number',
+    'wallet_insufficient' => 'Insufficient wallet balance. Your balance: :balance FCFA. Required: :required FCFA. Missing: :missing FCFA. Please provide a payment method.',
 ];

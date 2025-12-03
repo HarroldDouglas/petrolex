@@ -17,10 +17,7 @@ class DevelopmentSeeder extends Seeder
 
         $this->call(Development\DistributionCenterSeeder::class);
         $this->call(Development\UserSeeder::class);
-        $this->call(Production\AccessoryTypeSeeder::class);
-        // BottleTypeSeeder is already called in main DatabaseSeeder
-        $this->call(Production\ProductCategorySeeder::class);
-        $this->call(Production\ProductSeeder::class);
+        // ProductCategorySeeder and ProductSeeder are already called in main DatabaseSeeder
         $this->call(Development\BottleSeeder::class);
         $this->call(Development\AccessorySeeder::class);
         $this->call(Development\OrderSeeder::class);

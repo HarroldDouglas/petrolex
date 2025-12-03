@@ -65,18 +65,18 @@ final class CreateOrderRequest extends FormRequest
         return [
             'delivery_type.in' => "The delivery type must be one of: {$deliveryTypeValues}",
             'items.*.option.in' => "The option must be one of: {$bottleOrderTypeValues}",
-            'items.*.unit_price.required' => __('validation.order.unit_price_required'),
-            'items.*.unit_price.numeric' => __('validation.order.unit_price_numeric'),
-            'delivery_fee.required' => __('validation.order.delivery_fee_required'),
-            'delivery_fee.numeric' => __('validation.order.delivery_fee_numeric'),
-            'total_amount.required' => __('validation.order.total_amount_required'),
-            'total_amount.numeric' => __('validation.order.total_amount_numeric'),
+            'items.*.unit_price.required' => __('validation/order.unit_price_required'),
+            'items.*.unit_price.numeric' => __('validation/order.unit_price_numeric'),
+            'delivery_fee.required' => __('validation/order.delivery_fee_required'),
+            'delivery_fee.numeric' => __('validation/order.delivery_fee_numeric'),
+            'total_amount.required' => __('validation/order.total_amount_required'),
+            'total_amount.numeric' => __('validation/order.total_amount_numeric'),
         ];
     }
 
     public function attributes(): array
     {
-        $attributes = trans('validation.order.attributes');
+        $attributes = trans('validation/order.attributes');
 
         return is_array($attributes) ? $attributes : [];
     }
@@ -134,7 +134,7 @@ final class CreateOrderRequest extends FormRequest
 
             if (abs($item['unit_price'] - $expectedPrice) > 0.01) {
                 $validator->errors()->add("items.{$index}.unit_price",
-                    __('validation.order.price_mismatch', [
+                    __('validation/order.price_mismatch', [
                         'expected' => $expectedPrice,
                         'provided' => $item['unit_price'],
                     ])
@@ -158,7 +158,7 @@ final class CreateOrderRequest extends FormRequest
 
         if (abs($providedFee - $expectedFee) > 0.01) {
             $validator->errors()->add('delivery_fee',
-                __('validation.order.delivery_fee_mismatch', [
+                __('validation/order.delivery_fee_mismatch', [
                     'expected' => $expectedFee,
                     'provided' => $providedFee,
                 ])
@@ -189,7 +189,7 @@ final class CreateOrderRequest extends FormRequest
 
         if (abs($providedTotal - $expectedTotal) > 0.01) {
             $validator->errors()->add('total_amount',
-                __('validation.order.total_amount_mismatch', [
+                __('validation/order.total_amount_mismatch', [
                     'expected' => $expectedTotal,
                     'provided' => $providedTotal,
                 ])

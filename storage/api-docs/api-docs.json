@@ -5079,7 +5079,7 @@
                 ],
                 "properties": {
                     "product_category_id": {
-                        "description": "ID de la catégorie de produit",
+                        "description": "ID de la catégorie de produit (1=Bouteille 9Kg, 2=Brûleur, 3=Support fer, 4=Régulateur, 5=Tuyau 2m, 6=Tuyau 1.5m)",
                         "type": "integer",
                         "example": 1
                     },
@@ -5091,19 +5091,19 @@
                         "example": 2
                     },
                     "unit_price": {
-                        "description": "Prix unitaire du produit",
+                        "description": "Prix unitaire du produit (Bouteille: content=6000, bottle_with_content=6500; Accessoires: Brûleur=2000, Support=4500, Régulateur=1500, Tuyau 2m=2000, Tuyau 1.5m=1500)",
                         "type": "number",
                         "format": "float",
-                        "example": 3900
+                        "example": 6000
                     },
                     "option": {
-                        "description": "Option du produit: content (recharge seulement), bottle_with_content (bouteille pleine), ou null (accessoires)",
+                        "description": "Option du produit: content (recharge seulement 6000 XAF), bottle_with_content (bouteille pleine 6500 XAF), ou null (accessoires)",
                         "type": "string",
                         "enum": [
                             "content",
                             "bottle_with_content"
                         ],
-                        "example": "bottle_with_content",
+                        "example": "content",
                         "nullable": true
                     }
                 },
@@ -5120,9 +5120,9 @@
                 ],
                 "properties": {
                     "delivery_address_id": {
-                        "description": "ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné. Une erreur 422 sera retournée si cette contrainte n'est pas respectée. L'adresse ID 2 (Nkoabang) est dans Yaoundé I.",
+                        "description": "ID de l'adresse de livraison du client. **Important**: l'adresse de livraison doit être dans la même municipalité que le centre de distribution sélectionné.",
                         "type": "integer",
-                        "example": 2
+                        "example": 1
                     },
                     "distribution_center_id": {
                         "description": "ID du centre de distribution. **Important**: le centre de distribution doit être dans la même municipalité que l'adresse de livraison. Le centre ID 1 (Centre Yaoundé I) dessert la municipalité Yaoundé I.",
@@ -5139,7 +5139,7 @@
                         "example": "normal"
                     },
                     "items": {
-                        "description": "Liste des articles de la commande - Exemple complet avec 3 items : 1 bouteille avec recharge, 1 bouteille pleine, 1 accessoire",
+                        "description": "Liste des articles de la commande. Prix réels: Bouteille content=6000, bottle_with_content=6500; Brûleur=2000, Support=4500, Régulateur=1500, Tuyau 2m=2000, Tuyau 1.5m=1500",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/CreateOrderItem"
@@ -5149,19 +5149,19 @@
                             {
                                 "product_category_id": 1,
                                 "quantity": 2,
-                                "unit_price": 3900,
+                                "unit_price": 6000,
                                 "option": "content"
                             },
                             {
                                 "product_category_id": 1,
                                 "quantity": 1,
-                                "unit_price": 5000,
+                                "unit_price": 6500,
                                 "option": "bottle_with_content"
                             },
                             {
                                 "product_category_id": 4,
                                 "quantity": 1,
-                                "unit_price": 2500
+                                "unit_price": 1500
                             }
                         ]
                     },
@@ -5172,10 +5172,10 @@
                         "example": 500
                     },
                     "total_amount": {
-                        "description": "Montant total de la commande (sous-total + frais de livraison)",
+                        "description": "Montant total de la commande (sous-total + frais de livraison). Calcul: (6000×2) + (6500×1) + (1500×1) + 500 = 20500",
                         "type": "number",
                         "format": "float",
-                        "example": 15800
+                        "example": 20500
                     },
                     "comments": {
                         "description": "Commentaires optionnels (max 500 caractères)",

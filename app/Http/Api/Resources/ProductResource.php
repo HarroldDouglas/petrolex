@@ -36,11 +36,11 @@ class ProductResource extends JsonResource
             'id' => $productCategory->id,
             'type' => $productCategory->product_type->value,
             'type_label' => $productCategory->product_type->label ?? $productCategory->product_type->value,
-            'name' => $productTypeInstance->getLocalizedName(),
-            'description' => $productTypeInstance->getLocalizedDescription(),
+            'name' => $productTypeInstance?->getLocalizedName() ?? $productCategory->name,
+            'description' => $productTypeInstance?->getLocalizedDescription() ?? null,
             'category_name' => $productCategory->product_type->labelForMobile(),
             'quantity' => $this->getQuantity(),
-            'specifications' => $productTypeInstance->specifications ?? [],
+            'specifications' => $productTypeInstance?->specifications ?? [],
             'images' => $productCategory->getImages(),
         ];
 
@@ -58,6 +58,10 @@ class ProductResource extends JsonResource
         $accessoryType = $this->resource->productTypeInstance;
         $decimalPlaces = $this->getUserCountryDecimalPlaces();
 
+        if (! $accessoryType) {
+            return ['options' => []];
+        }
+
         return [
             'options' => [
                 [
@@ -74,6 +78,10 @@ class ProductResource extends JsonResource
     {
         $bottleType = $this->resource->productTypeInstance;
         $decimalPlaces = $this->getUserCountryDecimalPlaces();
+
+        if (! $bottleType) {
+            return ['options' => []];
+        }
 
         return [
             'options' => [

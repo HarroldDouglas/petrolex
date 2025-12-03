@@ -117,6 +117,12 @@ return [
     'url' => 'Le format de l\'URL de :attribute n\'est pas valide.',
     'uuid' => 'Le champ :attribute doit être un UUID valide',
 
+    // Custom phone validation
+    'phone_invalid_format' => 'Le numéro de téléphone est invalide. :format',
+
+    // Custom email validation
+    'email_confirmation' => 'La confirmation de l\'email ne correspond pas.',
+
     // Custom order validation messages
     'order' => [
         'price_mismatch' => 'Prix incorrect: attendu :expected FCFA, fourni :provided FCFA',
@@ -129,6 +135,23 @@ return [
         'delivery_fee_numeric' => 'Les frais de livraison doivent être un nombre',
         'total_amount_required' => 'Le montant total est requis',
         'total_amount_numeric' => 'Le montant total doit être un nombre',
+    ],
+
+    // Custom validation messages
+    'custom' => [
+        'delivery_address_not_owned' => 'Cette adresse de livraison ne vous appartient pas.',
+        'email_confirmation_required' => 'La confirmation de l\'email est obligatoire.',
+        'email_confirmation_email' => 'La confirmation de l\'email doit être une adresse email valide.',
+    ],
+
+    // Delivery address validation messages
+    'delivery_address' => [
+        'label_required' => 'Le libellé de l\'adresse est obligatoire.',
+        'address_required' => 'L\'adresse est obligatoire.',
+        'neighborhood_required' => 'Le quartier est obligatoire.',
+        'neighborhood_invalid' => 'Le quartier sélectionné n\'est pas valide.',
+        'email_invalid' => 'L\'adresse email n\'est pas valide.',
+        'phone_max' => 'Le numéro de téléphone ne doit pas dépasser 20 caractères.',
     ],
 
     /*

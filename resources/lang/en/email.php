@@ -185,4 +185,15 @@ return [
     'order_cancelled_manager_total' => 'Order Total: :total',
     'order_cancelled_manager_button' => 'View Order',
     'order_cancelled_manager_footer' => 'Please review the cancellation details.',
+
+    // Order Cancelled Refund
+    'order_cancelled_refund_subject' => 'Refund Completed - Order #:order_number',
+    'order_cancelled_refund_intro' => 'Following the cancellation of your order **#:order_number**, we have credited the amount to your wallet.',
+    'order_cancelled_refund_message' => 'Order #:order_number has been cancelled and :refund_amount FCFA has been credited to your wallet. Your new balance is :new_balance FCFA.',
+    'refund_confirmed' => 'Refund Confirmed',
+    'refund_amount' => 'Refund Amount',
+    'new_wallet_balance' => 'New Wallet Balance',
+    'refund_wallet_info' => 'Important Information',
+    'refund_wallet_message' => 'The amount of :amount has been credited to your wallet. You can use this balance to place a new order.',
+    'refund_reuse_message' => 'You can use this balance to place an equivalent order in the application.',
 ];

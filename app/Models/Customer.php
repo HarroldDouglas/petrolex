@@ -90,6 +90,14 @@ class Customer extends Model
         return $this->hasMany(BottleMovement::class);
     }
 
+    /**
+     * Get the wallet transactions for this customer.
+     */
+    public function walletTransactions(): HasMany
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
+
     // ===== ACCESSORS =====
 
     /**

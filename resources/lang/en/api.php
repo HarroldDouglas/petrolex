@@ -58,6 +58,7 @@ return [
 
     // Payment messages
     'payment_initiated_success' => 'Payment initiated successfully',
+    'payment_wallet_success' => 'Payment completed successfully via wallet',
     'payment_not_belongs_to_you' => 'This payment does not belong to you',
 
     // Bottle scanning messages

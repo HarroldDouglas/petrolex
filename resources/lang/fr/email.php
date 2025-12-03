@@ -186,4 +186,15 @@ return [
             'cancellation_reason' => 'Raison de l\'annulation',
         ],
     ],
+
+    // Order Cancelled Refund
+    'order_cancelled_refund_subject' => 'Remboursement effectué - Commande #:order_number',
+    'order_cancelled_refund_intro' => 'Suite à l\'annulation de votre commande **#:order_number**, nous avons crédité le montant sur votre portefeuille.',
+    'order_cancelled_refund_message' => 'La commande #:order_number a été annulée et :refund_amount FCFA ont été crédités sur votre portefeuille. Votre nouveau solde est de :new_balance FCFA.',
+    'refund_confirmed' => 'Remboursement confirmé',
+    'refund_amount' => 'Montant remboursé',
+    'new_wallet_balance' => 'Nouveau solde du portefeuille',
+    'refund_wallet_info' => 'Information importante',
+    'refund_wallet_message' => 'Le montant de :amount a été crédité sur votre portefeuille. Vous pouvez utiliser ce solde pour effectuer une nouvelle commande.',
+    'refund_reuse_message' => 'Vous pouvez utiliser ce solde pour passer une nouvelle commande équivalente dans l\'application.',
 ];

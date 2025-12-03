@@ -16,7 +16,7 @@ class BottleOrderType extends Enum
     public static function labels(): array
     {
         return [
-            'FULL' => 'Bouteille avec recharge',
+            'FULL' => 'Consigne avec recharge',
             'RECHARGE' => 'Recharge',
         ];
     }
@@ -41,8 +41,8 @@ class BottleOrderType extends Enum
     {
         return [
             'FULL' => [
-                'fr' => 'Bouteille avec recharge',
-                'en' => 'Bottle with refill',
+                'fr' => 'Consigne avec recharge',
+                'en' => 'Deposit with refill',
             ],
             'RECHARGE' => [
                 'fr' => 'Recharge',

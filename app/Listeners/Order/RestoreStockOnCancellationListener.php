@@ -7,11 +7,16 @@ use App\Enums\ProductType;
 use App\Events\OrderStatusChanged;
 use App\Listeners\BaseListener;
 use App\Models\ProductCategoryDistributionCenter;
+use App\Services\Wallet\WalletService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RestoreStockOnCancellationListener extends BaseListener
 {
+    public function __construct(
+        private WalletService $walletService
+    ) {}
+
     /**
      * Get unique identifiers for this event
      *
@@ -59,16 +64,11 @@ class RestoreStockOnCancellationListener extends BaseListener
             // 1. Restore stock
             $this->restoreStock($order);
 
-            // 2. Credit customer wallet
-            // TODO: Implement wallet system before enabling this
-            // $this->creditWallet($order);
-            Log::info('Wallet credit skipped - wallet system not yet implemented', [
-                'order_id' => $order->id,
-                'amount_to_credit' => $order->total_amount,
-            ]);
+            // 2. Credit customer wallet with full traceability
+            $this->creditCustomerWallet($order);
         });
 
-        Log::info('Stock restored and wallet credited for cancelled order', [
+        Log::info('Stock restored and customer wallet credited for cancelled order', [
             'order_id' => $order->id,
             'order_number' => $order->order_number,
             'total_amount' => $order->total_amount,
@@ -125,9 +125,9 @@ class RestoreStockOnCancellationListener extends BaseListener
     }
 
     /**
-     * Credit customer wallet with the order total amount
+     * Credit customer wallet with the order total amount using WalletService
      */
-    private function creditWallet($order): void
+    private function creditCustomerWallet($order): void
     {
         $customer = $order->customer;
 
@@ -139,26 +139,55 @@ class RestoreStockOnCancellationListener extends BaseListener
             return;
         }
 
-        // Get customer's wallet or create if doesn't exist
-        $wallet = $customer->wallet;
+        $refundAmount = (float) $order->total_amount;
 
-        if (! $wallet) {
-            // Create wallet if it doesn't exist
-            $wallet = $customer->wallet()->create([
-                'balance' => 0,
-            ]);
-        }
+        // Use WalletService for full traceability
+        $transaction = $this->walletService->refundOrder($customer, $order);
 
-        // Credit the wallet with the total order amount
-        $previousBalance = $wallet->balance;
-        $wallet->increment('balance', $order->total_amount);
+        // Update order's total_refunded_amount
+        $order->update([
+            'total_refunded_amount' => $refundAmount,
+        ]);
 
-        Log::info('Customer wallet credited for cancelled order', [
+        Log::info('Customer wallet credited for cancelled order via WalletService', [
             'customer_id' => $customer->id,
             'order_id' => $order->id,
-            'amount_credited' => $order->total_amount,
-            'previous_balance' => $previousBalance,
-            'new_balance' => $wallet->fresh()->balance,
+            'order_number' => $order->order_number,
+            'amount_credited' => $refundAmount,
+            'transaction_reference' => $transaction->reference,
+            'balance_before' => $transaction->balance_before,
+            'balance_after' => $transaction->balance_after,
         ]);
+
+        // Send notification to customer about the refund
+        $this->sendRefundNotification($customer, $order, $transaction->balance_before, $transaction->balance_after);
+    }
+
+    /**
+     * Send notification to customer about the refund
+     */
+    private function sendRefundNotification($customer, $order, $previousBalance, $newBalance): void
+    {
+        try {
+            $user = $customer->user;
+            if ($user && $user->email) {
+                $user->notify(new \App\Notifications\OrderCancelledRefundNotification(
+                    $order,
+                    $order->total_amount,
+                    $newBalance
+                ));
+                Log::info('Refund notification sent to customer', [
+                    'customer_id' => $customer->id,
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send refund notification', [
+                'customer_id' => $customer->id,
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

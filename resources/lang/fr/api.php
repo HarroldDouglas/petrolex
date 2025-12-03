@@ -58,6 +58,7 @@ return [
 
     // Payment messages
     'payment_initiated_success' => 'Paiement initié avec succès',
+    'payment_wallet_success' => 'Paiement effectué avec succès via le portefeuille',
     'payment_not_belongs_to_you' => 'Ce paiement ne vous appartient pas',
 
     // Bottle scanning messages

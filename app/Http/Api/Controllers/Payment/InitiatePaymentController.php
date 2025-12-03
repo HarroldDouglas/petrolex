@@ -29,15 +29,40 @@ final class InitiatePaymentController extends Controller
         }
 
         $data = $request->validated();
+        $useWallet = $data['use_wallet'] ?? true;
 
-        $payment = $this->paymentService->initiatePayment(
+        // Wallet-only payment (no external payment method provided)
+        if (empty($data['payment_method'])) {
+            $result = $this->paymentService->initiatePaymentWithWallet(
+                $order,
+                PaymentMethod::WALLET(), // Use wallet as the method
+                [],
+                $useWallet
+            );
+
+            $order->loadDetailRelations();
+
+            return OrderDetailsResponse::withOrder(
+                $order,
+                __('api.payment_wallet_success')
+            )->with('payment_breakdown', $result['payment_breakdown']);
+        }
+
+        // Payment with external method (optionally using wallet for partial amount)
+        $result = $this->paymentService->initiatePaymentWithWallet(
             $order,
             PaymentMethod::from($data['payment_method']),
-            $data['payment_details']
+            $data['payment_details'] ?? [],
+            $useWallet
         );
 
         $order->loadDetailRelations();
 
-        return OrderDetailsResponse::withOrder($order, __('api.payment_initiated_success'));
+        $message = $result['external_payment_required']
+            ? __('api.payment_initiated_success')
+            : __('api.payment_wallet_success');
+
+        return OrderDetailsResponse::withOrder($order, $message)
+            ->with('payment_breakdown', $result['payment_breakdown']);
     }
 }
