@@ -15,6 +15,167 @@
         }
     ],
     "paths": {
+        "/api/app/version": {
+            "get": {
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Obtenir les informations de version d'une application mobile",
+                "description": "Récupère les informations de version pour Android et iOS d'une application spécifique (client ou livreur)",
+                "operationId": "api.app.version",
+                "parameters": [
+                    {
+                        "name": "app_type",
+                        "in": "query",
+                        "description": "Type d'application (customer_app ou delivery_app)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "customer_app",
+                                "delivery_app"
+                            ],
+                            "example": "customer_app"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Informations de version récupérées avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Informations de version récupérées avec succès."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "android": {
+                                                    "properties": {
+                                                        "version_code": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "version_name": {
+                                                            "type": "string",
+                                                            "example": "1.0.0"
+                                                        },
+                                                        "update_required": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "release_notes": {
+                                                            "type": "string",
+                                                            "example": "Version initiale de l'application",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "ios": {
+                                                    "properties": {
+                                                        "version_code": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "version_name": {
+                                                            "type": "string",
+                                                            "example": "1.0.0"
+                                                        },
+                                                        "update_required": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "release_notes": {
+                                                            "type": "string",
+                                                            "example": "Version initiale de l'application",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucune version disponible pour cette application",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Aucune version disponible pour cette application."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Le champ app type est obligatoire."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "app_type": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Le champ app type est obligatoire."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/my/orders": {
             "get": {
                 "tags": [
@@ -7061,6 +7222,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Application",
+            "description": "Application"
+        },
         {
             "name": "Commandes",
             "description": "Commandes"
