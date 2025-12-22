@@ -56,10 +56,10 @@ php artisan optimize
 
 echo ""
 echo -e "${BLUE}🔐 Permissions...${NC}"
-chown -R www-data:www-data /var/www/html/isogaz
-chmod -R 755 /var/www/html/isogaz
-chmod -R 775 /var/www/html/isogaz/storage
-chmod -R 775 /var/www/html/isogaz/bootstrap/cache
+chown -R www-data:www-data /var/www/isogaz
+chmod -R 755 /var/www/isogaz
+chmod -R 775 /var/www/isogaz/storage
+chmod -R 775 /var/www/isogaz/bootstrap/cache
 
 echo ""
 echo -e "${BLUE}🔄 Redémarrage Supervisor...${NC}"
@@ -81,7 +81,7 @@ echo ""
 echo -e "${GREEN}🌐 https://isogaz.afrik-solutions.com${NC}"
 echo ""
 echo -e "${YELLOW}📝 Vérifie les logs si besoin :${NC}"
-echo "   tail -f /var/www/html/isogaz/storage/logs/laravel.log"
+echo "   tail -f /var/www/isogaz/storage/logs/laravel.log"
 echo ""
 echo -e "${BLUE}💡 Commandes utiles :${NC}"
 echo "   supervisorctl status          # Voir le statut des workers"
