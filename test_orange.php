@@ -14,17 +14,57 @@
  */
 
 // ============================================
-// CONFIGURATION (Sandbox)
+// CONFIGURATION (from .env based on argument)
 // ============================================
-$config = [
-    'base_url' => 'https://api-s1.orange.cm',
-    'client_id' => '5xpOluguHcEp6XGLZue3JQII2tsa',
-    'client_secret' => 'O_6smU_H1AOrRAnQdG72hX5m8I8a',
-    'api_username' => 'OMSANDBOXAPI',
-    'api_password' => 'OMS@NDBOX@PI',
-    'channel_user_msisdn' => '691301143',
-    'pin' => '2222',
-];
+
+// Load .env file
+$envFile = __DIR__ . '/.env';
+$env = [];
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos($line, '#') === 0) continue;
+        if (strpos($line, '=') !== false) {
+            [$key, $value] = explode('=', $line, 2);
+            $env[trim($key)] = trim($value, '"\'');
+        }
+    }
+}
+
+// Check argument: sandbox (default) or prod
+$mode = $argv[1] ?? 'sandbox';
+$mode = strtolower($mode);
+
+if (!in_array($mode, ['sandbox', 'prod'])) {
+    echo RED . "Usage: php test_orange.php [sandbox|prod]\n" . RESET;
+    exit(1);
+}
+
+// Configuration based on mode
+if ($mode === 'prod') {
+    $config = [
+        'base_url' => $env['OM_BASE_URL'] ?? 'https://apiis.orange.cm',
+        'client_id' => $env['OM_CLIENT_ID'] ?? '',
+        'client_secret' => $env['OM_CLIENT_SECRET'] ?? '',
+        'api_username' => $env['OM_API_USERNAME'] ?? '',
+        'api_password' => $env['OM_API_PASSWORD'] ?? '',
+        'channel_user_msisdn' => $env['OM_CHANNEL_USER_MSISDN'] ?? '',
+        'pin' => $env['OM_PIN'] ?? '',
+    ];
+    $modeName = 'PRODUCTION';
+} else {
+    // Sandbox hardcoded values (fallback if .env has prod config)
+    $config = [
+        'base_url' => 'https://api-s1.orange.cm',
+        'client_id' => '5xpOluguHcEp6XGLZue3JQII2tsa',
+        'client_secret' => 'O_6smU_H1AOrRAnQdG72hX5m8I8a',
+        'api_username' => 'OMSANDBOXAPI',
+        'api_password' => 'OMS@NDBOX@PI',
+        'channel_user_msisdn' => '691301143',
+        'pin' => '2222',
+    ];
+    $modeName = 'SANDBOX';
+}
 
 // Colors for terminal output
 define('GREEN', "\033[32m");
@@ -76,7 +116,8 @@ function httpRequest($method, $url, $headers = [], $body = null) {
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
 
     if ($method === 'POST') {
         curl_setopt($ch, CURLOPT_POST, true);
@@ -278,7 +319,7 @@ function pollPaymentStatus($config, $accessToken, $payToken, $maxAttempts = 30, 
 // MAIN SCRIPT
 // ============================================
 
-printHeader("ORANGE MONEY API TEST");
+printHeader("ORANGE MONEY API TEST [$modeName]");
 
 echo "This script will test the full Orange Money payment flow.\n";
 echo "A USSD push will be sent to your phone.\n\n";

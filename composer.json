@@ -11,7 +11,7 @@
     "require": {
         "php": "^8.2",
         "darkaonline/l5-swagger": "^9.0",
-        "harrold-wafo/laravel-custom-datatable": "^1.0",
+        "harrold-wafo/laravel-custom-datatable": "1.0.3",
         "laravel/framework": "^11.31",
         "laravel/reverb": "^1.5.0",
         "laravel/sanctum": "^4.0",
