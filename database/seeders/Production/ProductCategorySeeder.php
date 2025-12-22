@@ -85,9 +85,6 @@ class ProductCategorySeeder extends Seeder
     {
         $this->command->info('Linking product categories to distribution centers...');
 
-        // Use the update method to avoid inserting duplicate records
-        $this->command->call('db:seed', [
-            '--class' => 'Database\\Seeders\\Development\\ProductCategoryDistributionCenterSeeder',
-        ]);
+        $this->call(\Database\Seeders\Development\ProductCategoryDistributionCenterSeeder::class);
     }
 }

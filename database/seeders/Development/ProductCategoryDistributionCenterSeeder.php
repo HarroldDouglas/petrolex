@@ -46,20 +46,10 @@ class ProductCategoryDistributionCenterSeeder extends Seeder
         $linkCount = 0;
 
         foreach ($distributionCenters as $center) {
-            $isFirstBottle = true;
-
             foreach ($bottleCategories as $category) {
-                // Ensure first bottle has 0 stock (out of stock)
-                if ($isFirstBottle) {
-                    $stockEmpty = 0;
-                    $stockFilled = 0;
-                    $isFirstBottle = false;
-                    $this->command->info("Setting bottle '{$category->name}' to 0 stock for center '{$center->name}'");
-                } else {
-                    // Generate random stock values for other bottles
-                    $stockEmpty = rand(5, 30);
-                    $stockFilled = rand(10, 50);
-                }
+                // Generate random stock values for bottles
+                $stockEmpty = rand(20, 50);
+                $stockFilled = rand(100, 500);
 
                 // Insert or update through the relationship to avoid duplicate records
                 $center->productCategories()->syncWithoutDetaching([
