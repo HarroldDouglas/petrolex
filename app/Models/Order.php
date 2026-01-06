@@ -75,6 +75,8 @@ class Order extends Model
         'subtotal',
         'delivery_fee',
         'total_amount',
+        'wallet_amount_used',
+        'wallet_transaction_id',
         'order_date',
         'delivery_date',
         'comments',
@@ -97,6 +99,7 @@ class Order extends Model
         'subtotal' => 'decimal:2',
         'delivery_fee' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'wallet_amount_used' => 'decimal:2',
         'order_date' => 'datetime',
         'delivery_date' => 'datetime',
         'status' => OrderStatus::class,
@@ -146,6 +149,14 @@ class Order extends Model
     public function payment(): HasOne
     {
         return $this->hasOne(OrderPayment::class);
+    }
+
+    /**
+     * Get the wallet transaction used for this order.
+     */
+    public function walletTransaction(): BelongsTo
+    {
+        return $this->belongsTo(WalletTransaction::class);
     }
 
     /**

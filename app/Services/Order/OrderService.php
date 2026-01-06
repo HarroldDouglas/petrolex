@@ -27,10 +27,12 @@ use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Services\BaseServiceForEntity;
 use App\Services\ProductCategoryService;
+use App\Services\Wallet\WalletService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 
 class OrderService extends BaseServiceForEntity
 {
@@ -39,7 +41,8 @@ class OrderService extends BaseServiceForEntity
         private readonly BottleRepositoryInterface $bottleRepository,
         private readonly OrderBottleScanRepositoryInterface $orderBottleScanRepository,
         private readonly ProductRepositoryInterface $productRepository,
-        private readonly ProductCategoryService $productCategoryService
+        private readonly ProductCategoryService $productCategoryService,
+        private readonly WalletService $walletService
     ) {
         parent::__construct($this->orderRepository);
     }
@@ -107,6 +110,7 @@ class OrderService extends BaseServiceForEntity
 
     /**
      * Create a new order without payment processing.
+     * Automatically uses customer's wallet balance if available.
      */
     public function createWithoutPayment(CreateOrderWithoutPaymentDTO $orderDTO): Order
     {
@@ -132,6 +136,7 @@ class OrderService extends BaseServiceForEntity
             $orderData['subtotal'] = $subtotal;
             $orderData['status'] = OrderStatus::PENDING()->value;
             $orderData['order_date'] = now();
+            $orderData['wallet_amount_used'] = 0; // Initialize wallet amount
 
             /** @var Order $order */
             $order = $this->repository->create($orderData);
@@ -139,6 +144,61 @@ class OrderService extends BaseServiceForEntity
             Event::dispatch(new OrderCreatedEvent($order, $orderItemsData));
 
             $order->load('items.productCategory');
+
+            // Automatically use wallet if customer has balance
+            $customer = $order->customer;
+            $totalAmount = (float) $order->total_amount;
+
+            $breakdown = $this->walletService->calculatePaymentBreakdown($customer, $totalAmount);
+
+            $walletAmountUsed = 0;
+            $walletTransactionId = null;
+            $walletTransactionRef = null;
+            $amountToPay = $totalAmount;
+
+            if ($breakdown['wallet_amount'] > 0) {
+                // Use wallet (partially or fully)
+                $walletResult = $this->walletService->processOrderPayment($customer, $order, true);
+
+                $walletAmountUsed = $walletResult['wallet_amount_used'];
+                $walletTransactionId = $walletResult['wallet_transaction']?->id;
+                $walletTransactionRef = $walletResult['wallet_transaction']?->reference;
+                $amountToPay = $breakdown['payment_amount'];
+
+                Log::info('Wallet used at order creation', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'total_amount' => $totalAmount,
+                    'wallet_amount_used' => $walletAmountUsed,
+                    'amount_remaining' => $amountToPay,
+                    'wallet_transaction_reference' => $walletTransactionRef,
+                ]);
+
+                // Save wallet payment info to database
+                $updateData = [
+                    'wallet_amount_used' => $walletAmountUsed,
+                    'wallet_transaction_id' => $walletTransactionId,
+                ];
+
+                // If wallet covers full amount, mark order as paid
+                if ($breakdown['wallet_sufficient']) {
+                    $updateData['status'] = OrderStatus::PAID()->value;
+                    $updateData['paid_at'] = now();
+
+                    Log::info('Order automatically paid by wallet', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'wallet_amount' => $walletAmountUsed,
+                    ]);
+                }
+
+                $order = $this->update($order, $updateData);
+            }
+
+            // Set temporary attributes for response (wallet_balance_before and total_amount_to_pay)
+            $order->setAttribute('wallet_balance_before', $breakdown['wallet_balance_before']);
+            $order->setAttribute('total_amount_to_pay', $amountToPay);
+            $order->setAttribute('wallet_transaction_reference', $walletTransactionRef);
 
             return $order;
         });
