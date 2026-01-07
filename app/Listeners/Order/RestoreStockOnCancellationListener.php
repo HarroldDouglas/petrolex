@@ -49,14 +49,13 @@ class RestoreStockOnCancellationListener extends BaseListener
 
         $order = $event->order;
 
-        // Determine what needs to be done:
-        // - Restore stock: only if order was PAID (stock was decremented)
-        // - Refund wallet: if wallet was used (wallet_amount_used > 0), regardless of status
-        $shouldRestoreStock = $event->oldStatus?->value === OrderStatus::PAID()->value;
-        $shouldRefundWallet = (float) $order->wallet_amount_used > 0;
+        // Determine what needs to be done based on old status:
+        // - PAID → CANCELLED: Restore stock + refund FULL total_amount to wallet
+        // - PENDING → CANCELLED: Nothing to refund (wallet was never deducted for partial payments)
+        $wasPaid = $event->oldStatus?->value === OrderStatus::PAID()->value;
 
-        if (!$shouldRestoreStock && !$shouldRefundWallet) {
-            Log::info('Order cancelled but nothing to restore/refund', [
+        if (!$wasPaid) {
+            Log::info('PENDING order cancelled - nothing to restore/refund (wallet never deducted)', [
                 'order_id' => $order->id,
                 'old_status' => $event->oldStatus?->value,
                 'wallet_amount_used' => $order->wallet_amount_used,
@@ -65,16 +64,12 @@ class RestoreStockOnCancellationListener extends BaseListener
             return;
         }
 
-        DB::transaction(function () use ($order, $shouldRestoreStock, $shouldRefundWallet) {
-            // 1. Restore stock (only if order was PAID, meaning stock was decremented)
-            if ($shouldRestoreStock) {
-                $this->restoreStock($order);
-            }
-
-            // 2. Refund wallet (if wallet was used, regardless of order status)
-            if ($shouldRefundWallet) {
-                $this->refundWalletOnly($order);
-            }
+        DB::transaction(function () use ($order) {
+            // Order was PAID, then cancelled
+            // 1. Restore stock (was decremented when order became PAID)
+            // 2. Refund FULL total_amount to wallet (regardless of how it was originally paid)
+            $this->restoreStock($order);
+            $this->creditCustomerWallet($order);
         });
 
         Log::info('Stock restored and customer wallet credited for cancelled order', [

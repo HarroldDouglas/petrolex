@@ -156,43 +156,49 @@ class OrderService extends BaseServiceForEntity
             $walletTransactionRef = null;
             $amountToPay = $totalAmount;
 
-            if ($breakdown['wallet_amount'] > 0) {
-                // Use wallet (partially or fully)
+            // Only deduct wallet if it covers the FULL amount
+            // If partial, wallet will be deducted later during payment processing
+            if ($breakdown['wallet_sufficient']) {
+                // Wallet covers full amount - deduct immediately and mark as PAID
                 $walletResult = $this->walletService->processOrderPayment($customer, $order, true);
 
                 $walletAmountUsed = $walletResult['wallet_amount_used'];
                 $walletTransactionId = $walletResult['wallet_transaction']?->id;
                 $walletTransactionRef = $walletResult['wallet_transaction']?->reference;
-                $amountToPay = $breakdown['payment_amount'];
+                $amountToPay = 0;
 
-                Log::info('Wallet used at order creation', [
+                Log::info('Order fully paid by wallet at creation', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
                     'total_amount' => $totalAmount,
                     'wallet_amount_used' => $walletAmountUsed,
-                    'amount_remaining' => $amountToPay,
                     'wallet_transaction_reference' => $walletTransactionRef,
                 ]);
 
-                // Save wallet payment info to database
-                $updateData = [
+                $order = $this->update($order, [
                     'wallet_amount_used' => $walletAmountUsed,
                     'wallet_transaction_id' => $walletTransactionId,
-                ];
+                    'status' => OrderStatus::PAID()->value,
+                    'paid_at' => now(),
+                ]);
+            } elseif ($breakdown['wallet_amount'] > 0) {
+                // Wallet exists but doesn't cover full amount
+                // Store wallet_amount_used for information but DON'T deduct yet
+                // Deduction will happen during external payment processing
+                $walletAmountUsed = $breakdown['wallet_amount'];
+                $amountToPay = $breakdown['payment_amount'];
 
-                // If wallet covers full amount, mark order as paid
-                if ($breakdown['wallet_sufficient']) {
-                    $updateData['status'] = OrderStatus::PAID()->value;
-                    $updateData['paid_at'] = now();
+                Log::info('Wallet available but not sufficient - will be used during payment', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'total_amount' => $totalAmount,
+                    'wallet_available' => $walletAmountUsed,
+                    'amount_to_pay_externally' => $amountToPay,
+                ]);
 
-                    Log::info('Order automatically paid by wallet', [
-                        'order_id' => $order->id,
-                        'order_number' => $order->order_number,
-                        'wallet_amount' => $walletAmountUsed,
-                    ]);
-                }
-
-                $order = $this->update($order, $updateData);
+                $order = $this->update($order, [
+                    'wallet_amount_used' => $walletAmountUsed,
+                ]);
             }
 
             // Set temporary attributes for response (wallet_balance_before and total_amount_to_pay)
