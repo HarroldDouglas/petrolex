@@ -16,7 +16,7 @@ use OpenApi\Annotations as OA;
  *     summary="Obtenir les informations de version d'une application mobile",
  *     description="Récupère les informations de version pour Android et iOS d'une application spécifique (client ou livreur)",
  *     operationId="api.app.version",
- *     tags={"Application"},
+ *     tags={"App"},
  *
  *     @OA\Parameter(
  *         name="app_type",
