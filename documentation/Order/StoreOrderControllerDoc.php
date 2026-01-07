@@ -73,6 +73,23 @@ use OpenApi\Annotations as OA;
  *                 @OA\Property(
  *                     property="order",
  *                     ref="#/components/schemas/OrderDetailsData"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="wallet_info",
+ *                     type="object",
+ *                     description="Informations sur l'utilisation automatique du wallet lors de la création de la commande",
+ *                     @OA\Property(property="wallet_balance_before", type="number", format="float", example=10000, description="Solde du wallet avant la commande (en FCFA)"),
+ *                     @OA\Property(property="wallet_amount_used", type="number", format="float", example=7000, description="Montant automatiquement déduit du wallet (en FCFA)"),
+ *                     @OA\Property(property="wallet_balance_after", type="number", format="float", example=3000, description="Solde du wallet après déduction (en FCFA)"),
+ *                     @OA\Property(property="wallet_transaction_reference", type="string", nullable=true, example="WT_695D4FE8B8BE5_20260106190944", description="Référence de la transaction wallet (null si wallet non utilisé)")
+ *                 ),
+ *                 @OA\Property(
+ *                     property="payment_info",
+ *                     type="object",
+ *                     description="Informations de paiement après utilisation du wallet",
+ *                     @OA\Property(property="total_amount", type="number", format="float", example=7000, description="Montant total ORIGINAL de la commande (ne change jamais, en FCFA)"),
+ *                     @OA\Property(property="total_amount_to_pay", type="number", format="float", example=0, description="Montant RESTANT à payer après déduction du wallet (en FCFA). Si 0, la commande est automatiquement marquée comme 'paid'"),
+ *                     @OA\Property(property="payment_required", type="boolean", example=false, description="true = paiement externe requis (appeler POST /api/orders/{order}/payment), false = wallet a tout couvert, commande déjà payée")
  *                 )
  *             )
  *         )
@@ -81,8 +98,8 @@ use OpenApi\Annotations as OA;
  *
  * @OA\Post(
  *     path="/api/orders",
- *     summary="Créer une nouvelle commande",
- *     description="Crée une nouvelle commande. Utilisez ensuite l'endpoint POST /api/orders/{order}/payment pour initier le paiement.",
+ *     summary="Créer une nouvelle commande avec utilisation automatique du wallet",
+ *     description="Crée une nouvelle commande et utilise AUTOMATIQUEMENT le solde du wallet du client si disponible. **Comportement**: 1) Si wallet couvre tout → commande marquée 'paid', payment_required=false. 2) Si wallet couvre partiellement → wallet déduit, payment_required=true, appeler POST /api/orders/{order}/payment pour le reste. 3) Si wallet vide → payment_required=true, appeler POST /api/orders/{order}/payment pour le montant total.",
  *     operationId="api.orders.store",
  *     tags={"Commandes"},
  *     security={{"bearerAuth":{}}},
