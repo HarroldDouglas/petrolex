@@ -14,21 +14,21 @@ final class CreateOrderResponse extends ApiResponse
     public static function withOrder(Order $order): self
     {
         // wallet_amount_used is now from DB, wallet_balance_before and total_amount_to_pay are temporary attributes
-        $walletBalanceBefore = $order->getAttribute('wallet_balance_before') ?? 0;
+        $walletBalanceBefore = (float) ($order->getAttribute('wallet_balance_before') ?? 0);
         $walletAmountUsed = (float) $order->wallet_amount_used;
-        $totalAmountToPay = $order->getAttribute('total_amount_to_pay') ?? ((float) $order->total_amount - $walletAmountUsed);
+        $totalAmountToPay = (float) ($order->getAttribute('total_amount_to_pay') ?? ((float) $order->total_amount - $walletAmountUsed));
 
         $data = [
             'order' => new OrderDetailResource($order),
             'wallet_info' => [
-                'wallet_balance_before' => $walletBalanceBefore,
-                'wallet_amount_used' => $walletAmountUsed,
-                'wallet_balance_after' => $walletBalanceBefore - $walletAmountUsed,
+                'wallet_balance_before' => number_format($walletBalanceBefore, 2, '.', ''),
+                'wallet_amount_used' => number_format($walletAmountUsed, 2, '.', ''),
+                'wallet_balance_after' => number_format($walletBalanceBefore - $walletAmountUsed, 2, '.', ''),
                 'wallet_transaction_reference' => $order->getAttribute('wallet_transaction_reference'),
             ],
             'payment_info' => [
-                'total_amount' => (float) $order->total_amount,
-                'total_amount_to_pay' => $totalAmountToPay,
+                'total_amount' => number_format((float) $order->total_amount, 2, '.', ''),
+                'total_amount_to_pay' => number_format($totalAmountToPay, 2, '.', ''),
                 'payment_required' => $totalAmountToPay > 0,
             ],
         ];
