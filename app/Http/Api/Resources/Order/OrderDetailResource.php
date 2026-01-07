@@ -44,6 +44,8 @@ class OrderDetailResource extends JsonResource
             'subtotal' => $order->subtotal,
             'delivery_fee' => $order->delivery_fee,
             'total_amount' => $order->total_amount,
+            'wallet_amount_used' => $order->wallet_amount_used ?? 0,
+            'total_amount_to_pay' => (float) $order->total_amount - ((float) $order->wallet_amount_used ?? 0),
             'total_refunded_amount' => $order->getTotalRefundedAmount(),
 
             // Important dates
