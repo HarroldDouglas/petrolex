@@ -223,6 +223,25 @@ class WalletService
     }
 
     /**
+     * Refund only the wallet amount used for an order (for partial wallet payments).
+     */
+    public function refundOrderWallet(Customer $customer, Order $order, float $walletAmountUsed): WalletTransaction
+    {
+        return $this->credit(
+            $customer,
+            $walletAmountUsed,
+            $order,
+            __('wallet.order_wallet_refund', ['order_number' => $order->order_number]),
+            [
+                'order_number' => $order->order_number,
+                'order_total_amount' => $order->total_amount,
+                'wallet_amount_refunded' => $walletAmountUsed,
+                'refund_reason' => 'order_cancelled_wallet_refund',
+            ]
+        );
+    }
+
+    /**
      * Get transaction history for a customer.
      */
     public function getTransactionHistory(Customer $customer, int $perPage = 15)

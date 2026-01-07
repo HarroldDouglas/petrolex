@@ -49,23 +49,32 @@ class RestoreStockOnCancellationListener extends BaseListener
 
         $order = $event->order;
 
-        // Only restore stock if order was previously PAID
-        // (no stock to restore if order was never paid)
-        if ($event->oldStatus?->value !== OrderStatus::PAID()->value) {
-            Log::info('Order cancelled but was not paid, no stock to restore', [
+        // Determine what needs to be done:
+        // - Restore stock: only if order was PAID (stock was decremented)
+        // - Refund wallet: if wallet was used (wallet_amount_used > 0), regardless of status
+        $shouldRestoreStock = $event->oldStatus?->value === OrderStatus::PAID()->value;
+        $shouldRefundWallet = (float) $order->wallet_amount_used > 0;
+
+        if (!$shouldRestoreStock && !$shouldRefundWallet) {
+            Log::info('Order cancelled but nothing to restore/refund', [
                 'order_id' => $order->id,
                 'old_status' => $event->oldStatus?->value,
+                'wallet_amount_used' => $order->wallet_amount_used,
             ]);
 
             return;
         }
 
-        DB::transaction(function () use ($order) {
-            // 1. Restore stock
-            $this->restoreStock($order);
+        DB::transaction(function () use ($order, $shouldRestoreStock, $shouldRefundWallet) {
+            // 1. Restore stock (only if order was PAID, meaning stock was decremented)
+            if ($shouldRestoreStock) {
+                $this->restoreStock($order);
+            }
 
-            // 2. Credit customer wallet with full traceability
-            $this->creditCustomerWallet($order);
+            // 2. Refund wallet (if wallet was used, regardless of order status)
+            if ($shouldRefundWallet) {
+                $this->refundWalletOnly($order);
+            }
         });
 
         Log::info('Stock restored and customer wallet credited for cancelled order', [
@@ -125,7 +134,45 @@ class RestoreStockOnCancellationListener extends BaseListener
     }
 
     /**
-     * Credit customer wallet with the order total amount using WalletService
+     * Refund only the wallet amount used (for PENDING orders)
+     */
+    private function refundWalletOnly($order): void
+    {
+        $customer = $order->customer;
+
+        if (! $customer) {
+            Log::error('Cannot refund wallet: customer not found for order', [
+                'order_id' => $order->id,
+            ]);
+
+            return;
+        }
+
+        $walletAmountUsed = (float) $order->wallet_amount_used;
+
+        if ($walletAmountUsed <= 0) {
+            return;
+        }
+
+        // Refund only the wallet amount that was used
+        $transaction = $this->walletService->refundOrderWallet($customer, $order, $walletAmountUsed);
+
+        Log::info('Customer wallet refunded for cancelled order', [
+            'customer_id' => $customer->id,
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'wallet_amount_refunded' => $walletAmountUsed,
+            'transaction_reference' => $transaction->reference,
+            'balance_before' => $transaction->balance_before,
+            'balance_after' => $transaction->balance_after,
+        ]);
+
+        // Send notification to customer about the refund
+        $this->sendRefundNotification($customer, $order, $transaction->balance_before, $transaction->balance_after);
+    }
+
+    /**
+     * Credit customer wallet with the order total amount using WalletService (for PAID orders)
      */
     private function creditCustomerWallet($order): void
     {
