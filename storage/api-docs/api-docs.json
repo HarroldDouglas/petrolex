@@ -6169,6 +6169,18 @@
                         "format": "float",
                         "example": 2000
                     },
+                    "wallet_amount_used": {
+                        "description": "Montant payé par le wallet du client lors de la création de la commande",
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "total_amount_to_pay": {
+                        "description": "Montant restant à payer après déduction du wallet (total_amount - wallet_amount_used)",
+                        "type": "number",
+                        "format": "float",
+                        "example": 2000
+                    },
                     "total_refunded_amount": {
                         "type": "number",
                         "format": "float",

@@ -224,6 +224,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="subtotal", type="number", format="float", example=1500.00),
  *     @OA\Property(property="delivery_fee", type="number", format="float", example=500.00),
  *     @OA\Property(property="total_amount", type="number", format="float", example=2000.00),
+ *     @OA\Property(property="wallet_amount_used", type="number", format="float", example=0.00, description="Montant payé par le wallet du client lors de la création de la commande"),
+ *     @OA\Property(property="total_amount_to_pay", type="number", format="float", example=2000.00, description="Montant restant à payer après déduction du wallet (total_amount - wallet_amount_used)"),
  *     @OA\Property(property="total_refunded_amount", type="number", format="float", example=0.00),
  *     @OA\Property(property="order_date", type="string", format="date-time", example="2024-12-01T10:00:00.000000Z"),
  *     @OA\Property(property="delivery_date", type="string", format="date-time", nullable=true, example="2024-12-01T15:00:00.000000Z"),
