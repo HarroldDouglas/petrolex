@@ -78,17 +78,17 @@ use OpenApi\Annotations as OA;
  *                     property="wallet_info",
  *                     type="object",
  *                     description="Informations sur l'utilisation automatique du wallet lors de la création de la commande",
- *                     @OA\Property(property="wallet_balance_before", type="number", format="float", example=10000, description="Solde du wallet avant la commande (en FCFA)"),
- *                     @OA\Property(property="wallet_amount_used", type="number", format="float", example=7000, description="Montant automatiquement déduit du wallet (en FCFA)"),
- *                     @OA\Property(property="wallet_balance_after", type="number", format="float", example=3000, description="Solde du wallet après déduction (en FCFA)"),
+ *                     @OA\Property(property="wallet_balance_before", type="string", example="10000.00", description="Solde du wallet avant la commande (en FCFA, format string)"),
+ *                     @OA\Property(property="wallet_amount_used", type="string", example="7000.00", description="Montant automatiquement déduit du wallet (en FCFA, format string)"),
+ *                     @OA\Property(property="wallet_balance_after", type="string", example="3000.00", description="Solde du wallet après déduction (en FCFA, format string)"),
  *                     @OA\Property(property="wallet_transaction_reference", type="string", nullable=true, example="WT_695D4FE8B8BE5_20260106190944", description="Référence de la transaction wallet (null si wallet non utilisé)")
  *                 ),
  *                 @OA\Property(
  *                     property="payment_info",
  *                     type="object",
  *                     description="Informations de paiement après utilisation du wallet",
- *                     @OA\Property(property="total_amount", type="number", format="float", example=7000, description="Montant total ORIGINAL de la commande (ne change jamais, en FCFA)"),
- *                     @OA\Property(property="total_amount_to_pay", type="number", format="float", example=0, description="Montant RESTANT à payer après déduction du wallet (en FCFA). Si 0, la commande est automatiquement marquée comme 'paid'"),
+ *                     @OA\Property(property="total_amount", type="string", example="7000.00", description="Montant total ORIGINAL de la commande (ne change jamais, en FCFA, format string)"),
+ *                     @OA\Property(property="total_amount_to_pay", type="string", example="0.00", description="Montant RESTANT à payer après déduction du wallet (en FCFA, format string). Si 0.00, la commande est automatiquement marquée comme 'paid'"),
  *                     @OA\Property(property="payment_required", type="boolean", example=false, description="true = paiement externe requis (appeler POST /api/orders/{order}/payment), false = wallet a tout couvert, commande déjà payée")
  *                 )
  *             )

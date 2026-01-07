@@ -5203,22 +5203,19 @@
                                         "description": "Informations sur l'utilisation automatique du wallet lors de la création de la commande",
                                         "properties": {
                                             "wallet_balance_before": {
-                                                "description": "Solde du wallet avant la commande (en FCFA)",
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 10000
+                                                "description": "Solde du wallet avant la commande (en FCFA, format string)",
+                                                "type": "string",
+                                                "example": "10000.00"
                                             },
                                             "wallet_amount_used": {
-                                                "description": "Montant automatiquement déduit du wallet (en FCFA)",
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 7000
+                                                "description": "Montant automatiquement déduit du wallet (en FCFA, format string)",
+                                                "type": "string",
+                                                "example": "7000.00"
                                             },
                                             "wallet_balance_after": {
-                                                "description": "Solde du wallet après déduction (en FCFA)",
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 3000
+                                                "description": "Solde du wallet après déduction (en FCFA, format string)",
+                                                "type": "string",
+                                                "example": "3000.00"
                                             },
                                             "wallet_transaction_reference": {
                                                 "description": "Référence de la transaction wallet (null si wallet non utilisé)",
@@ -5233,16 +5230,14 @@
                                         "description": "Informations de paiement après utilisation du wallet",
                                         "properties": {
                                             "total_amount": {
-                                                "description": "Montant total ORIGINAL de la commande (ne change jamais, en FCFA)",
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 7000
+                                                "description": "Montant total ORIGINAL de la commande (ne change jamais, en FCFA, format string)",
+                                                "type": "string",
+                                                "example": "7000.00"
                                             },
                                             "total_amount_to_pay": {
-                                                "description": "Montant RESTANT à payer après déduction du wallet (en FCFA). Si 0, la commande est automatiquement marquée comme 'paid'",
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 0
+                                                "description": "Montant RESTANT à payer après déduction du wallet (en FCFA, format string). Si 0.00, la commande est automatiquement marquée comme 'paid'",
+                                                "type": "string",
+                                                "example": "0.00"
                                             },
                                             "payment_required": {
                                                 "description": "true = paiement externe requis (appeler POST /api/orders/{order}/payment), false = wallet a tout couvert, commande déjà payée",
@@ -6155,36 +6150,34 @@
                         "example": "Livraison à domicile"
                     },
                     "subtotal": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 1500
+                        "description": "Sous-total de la commande (format string)",
+                        "type": "string",
+                        "example": "1500.00"
                     },
                     "delivery_fee": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 500
+                        "description": "Frais de livraison (format string)",
+                        "type": "string",
+                        "example": "500.00"
                     },
                     "total_amount": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 2000
+                        "description": "Montant total de la commande (format string)",
+                        "type": "string",
+                        "example": "2000.00"
                     },
                     "wallet_amount_used": {
-                        "description": "Montant payé par le wallet du client lors de la création de la commande",
-                        "type": "number",
-                        "format": "float",
-                        "example": 0
+                        "description": "Montant payé par le wallet du client lors de la création de la commande (format string)",
+                        "type": "string",
+                        "example": "0.00"
                     },
                     "total_amount_to_pay": {
-                        "description": "Montant restant à payer après déduction du wallet (total_amount - wallet_amount_used)",
-                        "type": "number",
-                        "format": "float",
-                        "example": 2000
+                        "description": "Montant restant à payer après déduction du wallet (total_amount - wallet_amount_used) (format string)",
+                        "type": "string",
+                        "example": "2000.00"
                     },
                     "total_refunded_amount": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 0
+                        "description": "Montant total remboursé (format string)",
+                        "type": "string",
+                        "example": "0.00"
                     },
                     "order_date": {
                         "type": "string",
