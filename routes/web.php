@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthCheckController;
+use App\Http\Controllers\PrivacyPolicyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', AuthCheckController::class);
+Route::get('/privacy-policy', PrivacyPolicyController::class)->name('privacy-policy');
 
 /**
  * Include auth routes (must be outside auth middleware)

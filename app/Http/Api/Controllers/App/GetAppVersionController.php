@@ -53,7 +53,8 @@ use OpenApi\Annotations as OA;
  *                     @OA\Property(property="version_code", type="integer", example=1),
  *                     @OA\Property(property="version_name", type="string", example="1.0.0"),
  *                     @OA\Property(property="update_required", type="boolean", example=false),
- *                     @OA\Property(property="release_notes", type="string", nullable=true, example="Version initiale de l'application")
+ *                     @OA\Property(property="release_notes", type="string", nullable=true, example="Version initiale de l'application"),
+ *                     @OA\Property(property="app_link", type="string", nullable=true, example="https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_delivery")
  *                 ),
  *                 @OA\Property(
  *                     property="ios",
@@ -62,7 +63,8 @@ use OpenApi\Annotations as OA;
  *                     @OA\Property(property="version_code", type="integer", example=1),
  *                     @OA\Property(property="version_name", type="string", example="1.0.0"),
  *                     @OA\Property(property="update_required", type="boolean", example=false),
- *                     @OA\Property(property="release_notes", type="string", nullable=true, example="Version initiale de l'application")
+ *                     @OA\Property(property="release_notes", type="string", nullable=true, example="Version initiale de l'application"),
+ *                     @OA\Property(property="app_link", type="string", nullable=true, example="https://apps.apple.com/app/cm.petrolex.isogaz_delivery")
  *                 )
  *             )
  *         )

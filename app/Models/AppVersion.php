@@ -13,6 +13,7 @@ class AppVersion extends Model
         'version_name',
         'update_required',
         'release_notes',
+        'app_link',
     ];
 
     protected $casts = [
@@ -34,6 +35,7 @@ class AppVersion extends Model
                 'version_name' => $version->version_name,
                 'update_required' => $version->update_required,
                 'release_notes' => $version->release_notes ?? '',
+                'app_link' => $version->app_link ?? '',
             ];
         }
 
@@ -54,12 +56,14 @@ class AppVersion extends Model
                 'version_name' => $versions['android']->version_name,
                 'update_required' => $versions['android']->update_required,
                 'release_notes' => $versions['android']->release_notes,
+                'app_link' => $versions['android']->app_link,
             ] : null,
             'ios' => isset($versions['ios']) ? [
                 'version_code' => $versions['ios']->version_code,
                 'version_name' => $versions['ios']->version_name,
                 'update_required' => $versions['ios']->update_required,
                 'release_notes' => $versions['ios']->release_notes,
+                'app_link' => $versions['ios']->app_link,
             ] : null,
         ];
     }

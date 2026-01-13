@@ -16,7 +16,8 @@ class UpdateAppVersionCommand extends Command
                             {--code= : Version code (integer)}
                             {--name= : Version name (e.g. 1.0.0)}
                             {--required : Update is required}
-                            {--notes= : Release notes}';
+                            {--notes= : Release notes}
+                            {--link= : App store link}';
 
     /**
      * The console command description.
@@ -70,8 +71,12 @@ class UpdateAppVersionCommand extends Command
             $updateData['release_notes'] = $this->option('notes');
         }
 
+        if ($this->option('link')) {
+            $updateData['app_link'] = $this->option('link');
+        }
+
         if (empty($updateData)) {
-            $this->warn('No updates specified. Use --code, --name, --required, or --notes');
+            $this->warn('No updates specified. Use --code, --name, --required, --notes, or --link');
             return 1;
         }
 
@@ -79,7 +84,7 @@ class UpdateAppVersionCommand extends Command
 
         $this->info("✅ Version updated successfully!");
         $this->table(
-            ['App Type', 'Platform', 'Code', 'Name', 'Required', 'Notes'],
+            ['App Type', 'Platform', 'Code', 'Name', 'Required', 'Notes', 'App Link'],
             [[
                 $version->app_type,
                 $version->platform,
@@ -87,6 +92,7 @@ class UpdateAppVersionCommand extends Command
                 $version->version_name,
                 $version->update_required ? 'Yes' : 'No',
                 $version->release_notes,
+                $version->app_link,
             ]]
         );
 

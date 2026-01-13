@@ -20,6 +20,7 @@ class AppVersionSeeder extends Seeder
                 'version_name' => '1.0.0',
                 'update_required' => true,
                 'release_notes' => 'Integration du Wallet',
+                'app_link' => 'https://play.google.com/store/apps/details?id=cm.petrolex.isogaz',
             ]
         );
 
@@ -30,6 +31,7 @@ class AppVersionSeeder extends Seeder
                 'version_name' => '1.0.0',
                 'update_required' => false,
                 'release_notes' => 'Integration du Wallet',
+                'app_link' => 'https://apps.apple.com/app/cm.petrolex.isogaz',
             ]
         );
 
@@ -41,6 +43,7 @@ class AppVersionSeeder extends Seeder
                 'version_name' => '1.0.0',
                 'update_required' => true,
                 'release_notes' => 'Modification logos',
+                'app_link' => 'https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_delivery',
             ]
         );
 
@@ -51,6 +54,7 @@ class AppVersionSeeder extends Seeder
                 'version_name' => '1.0.0',
                 'update_required' => false,
                 'release_notes' => 'Modification logos',
+                'app_link' => 'https://apps.apple.com/app/cm.petrolex.isogaz_delivery',
             ]
         );
     }

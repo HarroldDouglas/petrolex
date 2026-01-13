@@ -18,7 +18,7 @@
         "/api/app/version": {
             "get": {
                 "tags": [
-                    "Application"
+                    "App"
                 ],
                 "summary": "Obtenir les informations de version d'une application mobile",
                 "description": "Récupère les informations de version pour Android et iOS d'une application spécifique (client ou livreur)",
@@ -79,6 +79,11 @@
                                                             "type": "string",
                                                             "example": "Version initiale de l'application",
                                                             "nullable": true
+                                                        },
+                                                        "app_link": {
+                                                            "type": "string",
+                                                            "example": "https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_delivery",
+                                                            "nullable": true
                                                         }
                                                     },
                                                     "type": "object",
@@ -101,6 +106,11 @@
                                                         "release_notes": {
                                                             "type": "string",
                                                             "example": "Version initiale de l'application",
+                                                            "nullable": true
+                                                        },
+                                                        "app_link": {
+                                                            "type": "string",
+                                                            "example": "https://apps.apple.com/app/cm.petrolex.isogaz_delivery",
                                                             "nullable": true
                                                         }
                                                     },
@@ -7281,16 +7291,12 @@
     },
     "tags": [
         {
-            "name": "Application",
-            "description": "Application"
+            "name": "App",
+            "description": "App"
         },
         {
             "name": "Commandes",
             "description": "Commandes"
-        },
-        {
-            "name": "App",
-            "description": "App"
         },
         {
             "name": "Authentification",
