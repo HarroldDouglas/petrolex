@@ -200,7 +200,29 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/LoginRequest"
+                                "required": [
+                                    "login",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "login": {
+                                        "description": "Email ou numéro de téléphone",
+                                        "type": "string",
+                                        "example": "customer1@test.com"
+                                    },
+                                    "password": {
+                                        "description": "Mot de passe",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    },
+                                    "country_code": {
+                                        "description": "Code ISO du pays (optionnel)",
+                                        "type": "string",
+                                        "example": "CM"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
@@ -272,7 +294,29 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/LoginRequest"
+                                "required": [
+                                    "login",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "login": {
+                                        "description": "Email ou numéro de téléphone",
+                                        "type": "string",
+                                        "example": "delivery1@test.com"
+                                    },
+                                    "password": {
+                                        "description": "Mot de passe",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    },
+                                    "country_code": {
+                                        "description": "Code ISO du pays (optionnel)",
+                                        "type": "string",
+                                        "example": "CM"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
