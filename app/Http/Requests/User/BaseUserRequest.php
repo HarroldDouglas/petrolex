@@ -24,6 +24,7 @@ abstract class BaseUserRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
+                'confirmed',
                 Rule::unique('users', 'email'),
             ],
             'phone_number' => [
@@ -78,6 +79,7 @@ abstract class BaseUserRequest extends FormRequest
             'email.email' => 'L\'email doit être une adresse email valide.',
             'email.unique' => 'Cet email est déjà utilisé.',
             'email.max' => 'L\'email ne doit pas dépasser 255 caractères.',
+            'email.confirmed' => 'La confirmation de l\'email ne correspond pas.',
             'phone_number.required' => 'Le téléphone est obligatoire.',
             'phone_number.string' => 'Le téléphone doit être une chaîne de caractères.',
             'phone_number.unique' => 'Ce numéro de téléphone est déjà utilisé.',

@@ -20,6 +20,7 @@ use OpenApi\Annotations as OA;
  *                 "first_name",
  *                 "last_name",
  *                 "email",
+ *                 "email_confirmation",
  *                 "phone_number",
  *                 "password",
  *                 "country_code"
@@ -28,6 +29,7 @@ use OpenApi\Annotations as OA;
  *             @OA\Property(property="first_name", type="string", example="Jean"),
  *             @OA\Property(property="last_name", type="string", example="Dupont"),
  *             @OA\Property(property="email", type="string", format="email", example="test@example.com"),
+ *             @OA\Property(property="email_confirmation", type="string", format="email", example="test@example.com", description="Doit correspondre exactement à l'email"),
  *             @OA\Property(property="phone_number", type="string", example="677123456", description="Numéro de téléphone sans code pays"),
  *             @OA\Property(property="country_code", type="string", example="CM", description="Code ISO du pays (ex: CM pour Cameroun)"),
  *             @OA\Property(property="password", type="string", format="password", example="password123"),
