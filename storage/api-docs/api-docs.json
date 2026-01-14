@@ -186,6 +186,150 @@
                 }
             }
         },
+        "/api/login/customer": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Authentification client (Customer App)",
+                "description": "Authentifie un utilisateur CLIENT uniquement et génère un token d'accès API. Ce endpoint est réservé à l'application mobile client (com.isogaz.customer).",
+                "operationId": "api.login.customer",
+                "requestBody": {
+                    "description": "Informations d'authentification",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authentification réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants invalides ou compte non client",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Ces identifiants ne correspondent pas à un compte client. Veuillez utiliser l'application appropriée."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login/delivery": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Authentification livreur (Delivery App)",
+                "description": "Authentifie un utilisateur LIVREUR uniquement et génère un token d'accès API. Ce endpoint est réservé à l'application mobile livreur (cm.petrolex.isogaz_delivery).",
+                "operationId": "api.login.delivery",
+                "requestBody": {
+                    "description": "Informations d'authentification",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authentification réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants invalides ou compte non livreur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Ces identifiants ne correspondent pas à un compte livreur. Veuillez utiliser l'application appropriée."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/my/orders": {
             "get": {
                 "tags": [
@@ -7295,12 +7439,12 @@
             "description": "App"
         },
         {
-            "name": "Commandes",
-            "description": "Commandes"
-        },
-        {
             "name": "Authentification",
             "description": "Authentification"
+        },
+        {
+            "name": "Commandes",
+            "description": "Commandes"
         },
         {
             "name": "Bouteilles",

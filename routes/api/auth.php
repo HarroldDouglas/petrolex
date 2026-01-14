@@ -4,12 +4,20 @@ use App\Http\Api\Controllers\Auth\CheckAuthController;
 use App\Http\Api\Controllers\Auth\ForgotPasswordController;
 use App\Http\Api\Controllers\Auth\GetProfileController;
 use App\Http\Api\Controllers\Auth\LoginController;
+use App\Http\Api\Controllers\Auth\LoginCustomerController;
+use App\Http\Api\Controllers\Auth\LoginDeliveryController;
 use App\Http\Api\Controllers\Auth\LogoutController;
 use App\Http\Api\Controllers\Auth\ResendOtpController;
 use App\Http\Api\Controllers\Auth\VerifyOtpController;
 use Illuminate\Support\Facades\Route;
 
+// New secure login endpoints - USE THESE!
+Route::post('/login/customer', LoginCustomerController::class)->name('api.login.customer');
+Route::post('/login/delivery', LoginDeliveryController::class)->name('api.login.delivery');
+
+// Old login endpoint - DEPRECATED, will be removed soon
 Route::post('/login', LoginController::class)->name('api.login');
+
 Route::post('/register/customer', \App\Http\Api\Controllers\Customer\StoreCustomerController::class)->name('api.register.customer');
 Route::post('/verify-otp', VerifyOtpController::class)->name('api.verify-otp');
 Route::post('/resend-otp', ResendOtpController::class)->name('api.resend-otp');

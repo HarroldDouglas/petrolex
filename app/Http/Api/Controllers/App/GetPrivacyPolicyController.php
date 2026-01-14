@@ -4,7 +4,7 @@ namespace App\Http\Api\Controllers\App;
 
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\View;
 
 class GetPrivacyPolicyController extends Controller
 {
@@ -16,9 +16,12 @@ class GetPrivacyPolicyController extends Controller
      */
     public function __invoke(): ApiResponse
     {
+        // Render the privacy policy view as HTML
+        $htmlContent = View::make('privacy-policy')->render();
+
         return ApiResponse::success(
             data: [
-                'html_content' => Config::get('privacy.content'),
+                'html_content' => $htmlContent,
             ],
             message: 'Politique de confidentialité récupérée avec succès.'
         );

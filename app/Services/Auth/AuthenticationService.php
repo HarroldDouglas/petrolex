@@ -36,6 +36,15 @@ class AuthenticationService implements AuthenticationServiceInterface
             throw new AuthenticationException('Les identifiants fournis sont invalides, vérifiez bien votre email ou téléphone et votre mot de passe.');
         }
 
+        // Verify user type matches the app type
+        if ($credentials->appType === 'customer_app' && ! $user->isCustomer()) {
+            throw new AuthenticationException('Ces identifiants ne correspondent pas à un compte client. Veuillez utiliser l\'application appropriée.');
+        }
+
+        if ($credentials->appType === 'delivery_app' && ! $user->isDeliveryPerson()) {
+            throw new AuthenticationException('Ces identifiants ne correspondent pas à un compte livreur. Veuillez utiliser l\'application appropriée.');
+        }
+
         if (! $user?->is_active) {
             $this->otpService->sendOtp($user->email ?? $user->phone_number);
             throw new AuthenticationException("Votre compte n'est pas encore activé, nous vous avons envoyé un code d'activation par mail.");

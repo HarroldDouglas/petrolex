@@ -4,7 +4,7 @@ namespace App\Http\Api\Controllers\App;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\View;
 
 class PreviewPrivacyPolicyController extends Controller
 {
@@ -16,7 +16,8 @@ class PreviewPrivacyPolicyController extends Controller
      */
     public function __invoke(): Response
     {
-        $htmlContent = Config::get('privacy.content');
+        // Render the privacy policy view as HTML
+        $htmlContent = View::make('privacy-policy')->render();
 
         $fullHtml = $this->wrapInHtmlDocument($htmlContent);
 

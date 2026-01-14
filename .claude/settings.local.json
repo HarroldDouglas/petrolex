@@ -4,7 +4,8 @@
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
       "Bash(php artisan:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(php -r:*)"
     ],
     "deny": [],
     "ask": []
