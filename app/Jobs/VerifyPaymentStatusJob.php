@@ -27,7 +27,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
     private PaymentService $paymentService;
     private OrderPaymentRepositoryInterface $orderPaymentRepository;
 
-    private const MAX_ATTEMPTS = 30; // 30 attempts × 10 seconds = 5 minutes
+    private const MAX_ATTEMPTS = 60; // 60 attempts × 10 seconds = 10 minutes
     private const CHECK_INTERVAL = 10;
     private const MAX_RETRY_ATTEMPTS = 5;
     private const RETRY_BASE_DELAY = 30;
