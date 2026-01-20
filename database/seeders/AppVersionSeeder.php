@@ -16,10 +16,10 @@ class AppVersionSeeder extends Seeder
         AppVersion::updateOrCreate(
             ['app_type' => 'customer_app', 'platform' => 'android'],
             [
-                'version_code' => 4,
-                'version_name' => '1.0.4',
+                'version_code' => 5,
+                'version_name' => '1.0.5',
                 'update_required' => true,
-                'release_notes' => 'Fix sur la déconnexion',
+                'release_notes' => 'Adresse de livraison par defaut',
                 'app_link' => 'https://play.google.com/store/apps/details?id=com.isogaz.customer',
             ]
         );
@@ -27,10 +27,10 @@ class AppVersionSeeder extends Seeder
         AppVersion::updateOrCreate(
             ['app_type' => 'customer_app', 'platform' => 'ios'],
             [
-                'version_code' => 4,
-                'version_name' => '1.0.4',
+                'version_code' => 5,
+                'version_name' => '1.0.5',
                 'update_required' => true,
-                'release_notes' => 'Fix sur la déconnexion',
+                'release_notes' => 'Adresse de livraison par defaut',
                 'app_link' => 'https://apps.apple.com/app/com.isogaz.customer',
             ]
         );
