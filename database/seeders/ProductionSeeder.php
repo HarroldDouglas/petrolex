@@ -4,7 +4,9 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\Production\AccessoryTypeSeeder;
 use Database\Seeders\Production\BottleTypeSeeder;
+use Database\Seeders\Production\ProductSeeder;
 use Illuminate\Database\Seeder;
 
 class ProductionSeeder extends Seeder
@@ -21,6 +23,8 @@ class ProductionSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             BottleTypeSeeder::class,
+            AccessoryTypeSeeder::class,
+            ProductSeeder::class,
         ]);
 
         $this->command->info('========================================');

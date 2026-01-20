@@ -16,10 +16,10 @@ class AppVersionSeeder extends Seeder
         AppVersion::updateOrCreate(
             ['app_type' => 'customer_app', 'platform' => 'android'],
             [
-                'version_code' => 2,
-                'version_name' => '1.0.0',
+                'version_code' => 4,
+                'version_name' => '1.0.4',
                 'update_required' => true,
-                'release_notes' => 'Integration du Wallet',
+                'release_notes' => 'Fix sur la déconnexion',
                 'app_link' => 'https://play.google.com/store/apps/details?id=com.isogaz.customer',
             ]
         );
@@ -27,10 +27,10 @@ class AppVersionSeeder extends Seeder
         AppVersion::updateOrCreate(
             ['app_type' => 'customer_app', 'platform' => 'ios'],
             [
-                'version_code' => 2,
-                'version_name' => '1.0.0',
-                'update_required' => false,
-                'release_notes' => 'Integration du Wallet',
+                'version_code' => 4,
+                'version_name' => '1.0.4',
+                'update_required' => true,
+                'release_notes' => 'Fix sur la déconnexion',
                 'app_link' => 'https://apps.apple.com/app/com.isogaz.customer',
             ]
         );
@@ -39,10 +39,10 @@ class AppVersionSeeder extends Seeder
         AppVersion::updateOrCreate(
             ['app_type' => 'delivery_app', 'platform' => 'android'],
             [
-                'version_code' => 2,
-                'version_name' => '1.0.0',
+                'version_code' => 4,
+                'version_name' => '1.0.4',
                 'update_required' => true,
-                'release_notes' => 'Modification logos',
+                'release_notes' => 'Fix sur la déconnexion',
                 'app_link' => 'https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_delivery',
             ]
         );
@@ -50,10 +50,10 @@ class AppVersionSeeder extends Seeder
         AppVersion::updateOrCreate(
             ['app_type' => 'delivery_app', 'platform' => 'ios'],
             [
-                'version_code' => 2,
-                'version_name' => '1.0.0',
-                'update_required' => false,
-                'release_notes' => 'Modification logos',
+                'version_code' => 4,
+                'version_name' => '1.0.4',
+                'update_required' => true,
+                'release_notes' => 'Fix sur la déconnexion',
                 'app_link' => 'https://apps.apple.com/app/cm.petrolex.isogaz_delivery',
             ]
         );
