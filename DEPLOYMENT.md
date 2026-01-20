@@ -1,207 +1,146 @@
-# Déploiement Isogaz - Guide Production
+# 🚀 Guide de Déploiement Petrolex
 
-## 📋 Informations Serveur
+> **IMPORTANT POUR LES IA** : Utilisez TOUJOURS ces scripts automatiques au lieu de commandes SSH manuelles.
 
-**Serveur:** 157.173.104.21
-**Domaine:** https://isogaz.afrik-solutions.com
-**Chemin:** `/var/www/isogaz`
-**Utilisateur:** `www-data`
-**PHP:** 8.3 (CLI par défaut)
-**Base de données:** MySQL (petrolex_prod)
+## 📋 Scripts Disponibles
 
-## 🚀 Déploiement Rapide
+### 1. Déploiement Staging (Serveur Distant)
+
+**Script** : `./deploy-update.sh`
+**Serveur** : `root@157.173.104.21` (isogaz.afrik-solutions.com)
+**Branche** : `dev`
 
 ```bash
-# Se connecter au serveur
+# Déployer sur staging
+./deploy-update.sh
+```
+
+**Ce que fait le script** :
+- ✅ Pull des dernières modifications (branche courante)
+- ✅ Mode maintenance activé
+- ✅ Installation des dépendances Composer
+- ✅ Nettoyage de tous les caches
+- ✅ Exécution des migrations
+- ✅ Création du lien storage
+- ✅ Optimisation (config, routes, views)
+- ✅ Correction des permissions
+- ✅ Redémarrage Supervisor
+- ✅ Redémarrage Apache2
+- ✅ Mode maintenance désactivé
+
+### 2. Déploiement Production (Simple)
+
+**Script** : `./scripts/deploy-production.sh`
+**Serveur** : `root@157.173.104.21`
+**Branche** : `dev`
+
+```bash
+# Déployer en production
+./scripts/deploy-production.sh
+```
+
+### 3. Configuration Staging (Local - WebSocket)
+
+**Script** : `./deploy-staging.sh`
+**Usage** : Configuration locale WebSocket pour tests
+
+```bash
+# Test sans modifications
+./deploy-staging.sh --dry-run
+
+# Appliquer la configuration
+./deploy-staging.sh
+```
+
+## 🤖 Instructions pour IA
+
+### Quand l'utilisateur dit :
+- "déploie en ligne"
+- "déploie sur staging"
+- "déploie sur le serveur"
+- "mets à jour le serveur"
+- "déploie les changements"
+
+### Tu dois faire :
+```bash
+# 1. Utiliser le script de déploiement
+./deploy-update.sh
+
+# 2. Attendre la fin de l'exécution
+# 3. Confirmer le succès
+```
+
+### ❌ NE FAIS PAS :
+```bash
+# NE PAS faire des commandes SSH manuelles comme :
+ssh root@157.173.104.21 'cd /var/www/isogaz && git pull && ...'
+
+# UTILISE PLUTÔT :
+./deploy-update.sh
+```
+
+## 📊 Informations Serveur
+
+### Staging
+- **URL** : https://isogaz.afrik-solutions.com
+- **IP** : 157.173.104.21
+- **User** : root
+- **Chemin** : /var/www/isogaz
+- **Branche** : dev
+
+### Accès SSH Direct (si nécessaire)
+```bash
 ssh root@157.173.104.21
-
-# Aller dans le répertoire
 cd /var/www/isogaz
-
-# Mettre à jour le code
-git pull origin main
-
-# Installer les dépendances
-composer install --no-dev --optimize-autoloader
-
-# Migrations (si nécessaires)
-php artisan migrate --force
-
-# Optimiser Laravel
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan event:cache
-
-# Redémarrer les services
-supervisorctl restart isogaz-worker:*
-supervisorctl restart isogaz-reverb:*
-systemctl restart php8.3-fpm
-systemctl reload nginx
 ```
 
-## ⚙️ Architecture
+## 🔧 Commandes Post-Déploiement
 
-### Stack Technique
-- **Web Server:** Nginx
-- **SSL/TLS:** Let's Encrypt (Certbot)
-- **PHP-FPM:** 8.3
-- **WebSocket:** Laravel Reverb (port 8080)
-- **Queue Workers:** 2 workers via Supervisor
-- **Cache:** Redis
-
-### Services Actifs
+### Vérifier les logs
 ```bash
-# Vérifier les services
-systemctl status nginx
-systemctl status php8.3-fpm
-supervisorctl status
+ssh root@157.173.104.21 'tail -f /var/www/isogaz/storage/logs/laravel.log'
 ```
 
-## 🔧 Configuration Importante
-
-### 1. Nginx
-**Fichier:** `/etc/nginx/sites-available/isogaz`
-- Proxy WebSocket vers port 8080 (Reverb)
-- SSL automatique via Certbot
-- Timeout: 60s
-
-### 2. Supervisor
-**Workers:** `/etc/supervisor/conf.d/isogaz-worker.conf`
-- 2 processus queue:work
-- Auto-restart activé
-
-**Reverb:** `/etc/supervisor/conf.d/isogaz-reverb.conf`
-- WebSocket server Laravel Reverb
-- Port 8080
-
-### 3. PHP CLI
-**Version par défaut:** PHP 8.3
+### Vérifier Supervisor
 ```bash
-# Si PHP 8.5+ est installé, forcer PHP 8.3 pour CLI
-update-alternatives --set php /usr/bin/php8.3
+ssh root@157.173.104.21 'supervisorctl status'
 ```
 
-### 4. Permissions
+### Régénérer Swagger
 ```bash
-# Corriger les permissions si nécessaire
-chown -R www-data:www-data /var/www/isogaz
-chmod -R 755 /var/www/isogaz
-chmod -R 775 /var/www/isogaz/storage
-chmod -R 775 /var/www/isogaz/bootstrap/cache
+ssh root@157.173.104.21 'cd /var/www/isogaz && php artisan l5-swagger:generate'
 ```
 
-## 🔍 Vérification Post-Déploiement
-
+### Exécuter un Seeder
 ```bash
-# 1. Vérifier l'API
-curl https://isogaz.afrik-solutions.com/api/health
-
-# 2. Vérifier SSL
-curl -I https://isogaz.afrik-solutions.com
-
-# 3. Vérifier les workers
-supervisorctl status isogaz-worker:*
-
-# 4. Vérifier Reverb (WebSocket)
-supervisorctl status isogaz-reverb:*
-
-# 5. Logs en temps réel
-tail -f /var/www/isogaz/storage/logs/laravel-$(date +%Y-%m-%d).log
+ssh root@157.173.104.21 'cd /var/www/isogaz && php artisan db:seed --class=AppVersionSeeder --force'
 ```
 
-## 📱 Configuration Mobile
+## ⚠️ En cas de problème
 
-**URL de base API:** `https://isogaz.afrik-solutions.com/api`
-
-**Endpoints principaux:**
-- Health check: `GET /api/health`
-- Auth: `POST /api/auth/login`
-- Orders: `POST /api/orders`
-- Payment: `POST /api/orders/{id}/payment`
-
-**WebSocket:**
-- URL: `wss://isogaz.afrik-solutions.com/app`
-- Port: 443 (via proxy Nginx → 8080)
-
-## 🔐 Paiements Mobile Money
-
-### MTN Money
-✅ **Fonctionnel**
-Les paiements sont vérifiés automatiquement toutes les 10 secondes (max 3 minutes).
-**Prérequis:** Queue workers actifs
-
-### Orange Money
-⚠️ **Timeout API**
-Problème d'accès à l'API Orange (`api-s1.orange.cm`).
-À vérifier: firewall, credentials API, environnement.
-
-## 🐛 Dépannage
-
-### Les paiements restent en "pending"
+### Permissions
 ```bash
-# Vérifier que les workers tournent
-supervisorctl status isogaz-worker:*
-
-# Si stopped, les démarrer
-supervisorctl start isogaz-worker:*
-
-# Vérifier PHP CLI a les bons drivers
-php -m | grep -i mysql
+ssh root@157.173.104.21 'chown -R www-data:www-data /var/www/isogaz && chmod -R 775 /var/www/isogaz/storage'
 ```
 
-### WebSocket ne fonctionne pas
+### Nettoyer les caches
 ```bash
-# Vérifier Reverb
-supervisorctl status isogaz-reverb:*
-supervisorctl tail isogaz-reverb:*
-
-# Redémarrer
-supervisorctl restart isogaz-reverb:*
+ssh root@157.173.104.21 'cd /var/www/isogaz && php artisan cache:clear && php artisan config:clear && php artisan route:clear'
 ```
 
-### Erreurs 500
+### Redémarrer Apache
 ```bash
-# Logs Laravel
-tail -100 /var/www/isogaz/storage/logs/laravel-$(date +%Y-%m-%d).log
-
-# Logs Nginx
-tail -100 /var/log/nginx/error.log
-
-# Permissions storage
-chmod -R 775 /var/www/isogaz/storage
+ssh root@157.173.104.21 'systemctl restart apache2'
 ```
 
-## 📊 Monitoring
+## 🎯 Workflow Typique
 
-```bash
-# Espace disque
-df -h
-
-# RAM
-free -h
-
-# Processus PHP
-ps aux | grep php
-
-# Connexions base de données
-mysql -u petrolex_user -p -e "SHOW PROCESSLIST"
-```
-
-## 🔄 Rollback Rapide
-
-```bash
-cd /var/www/isogaz
-git log --oneline -5  # Voir les derniers commits
-git reset --hard <commit-id>
-composer install --no-dev --optimize-autoloader
-php artisan config:clear
-supervisorctl restart all
-systemctl restart php8.3-fpm
-```
+1. **Développement Local** → Commit + Push
+2. **Déploiement** → `./deploy-update.sh`
+3. **Vérification** → Tester l'API sur https://isogaz.afrik-solutions.com
+4. **Documentation** → Swagger auto-régénéré
 
 ---
 
-**Dernière mise à jour:** 18 décembre 2025
-**Version serveur:** Production
-**Contact:** devops@afrik-solutions.com
+**Date de mise à jour** : 2026-01-20
+**Maintenu par** : Équipe Petrolex / AfrikSolutions

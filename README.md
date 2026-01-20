@@ -478,3 +478,14 @@ php artisan route:cache
 php artisan view:cache
 ```
 
+
+## 🚀 Déploiement
+
+**⚠️ IMPORTANT** : Utilisez toujours les scripts automatiques pour déployer.
+
+Voir [DEPLOYMENT.md](./DEPLOYMENT.md) pour les instructions complètes de déploiement.
+
+```bash
+# Déployer sur staging
+./deploy-update.sh
+```
