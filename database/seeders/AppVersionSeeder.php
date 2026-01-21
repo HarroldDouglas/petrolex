@@ -20,7 +20,7 @@ class AppVersionSeeder extends Seeder
                 'version_name' => '1.0.5',
                 'update_required' => true,
                 'release_notes' => 'Adresse de livraison par defaut',
-                'app_link' => 'https://play.google.com/store/apps/details?id=com.isogaz.customer',
+                'app_link' => 'https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_customer',
             ]
         );
 
