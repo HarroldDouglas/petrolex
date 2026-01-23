@@ -66,8 +66,9 @@ echo -e "${BLUE}🔄 Redémarrage Supervisor...${NC}"
 supervisorctl restart all
 
 echo ""
-echo -e "${BLUE}🔄 Redémarrage Apache2...${NC}"
-systemctl restart apache2
+echo -e "${BLUE}🔄 Redémarrage PHP-FPM et Nginx...${NC}"
+systemctl restart php8.3-fpm
+systemctl reload nginx
 
 echo ""
 echo -e "${GREEN}✅ Désactivation du mode maintenance...${NC}"
@@ -87,5 +88,6 @@ echo -e "${BLUE}💡 Commandes utiles :${NC}"
 echo "   supervisorctl status          # Voir le statut des workers"
 echo "   supervisorctl restart all     # Redémarrer tous les workers"
 echo "   php artisan queue:restart     # Redémarrer la queue"
-echo "   systemctl status apache2      # Statut d'Apache2"
+echo "   systemctl status nginx        # Statut de Nginx"
+echo "   systemctl status php8.3-fpm   # Statut de PHP-FPM"
 echo ""
