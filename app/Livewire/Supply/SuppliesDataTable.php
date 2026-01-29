@@ -131,16 +131,16 @@ class SuppliesDataTable extends BaseDataTable
                     if ($value === 'has_bottles') {
                         // supplies with at least one bottle
                         return $builder->whereHas('productTypes', function (Builder $query) {
-                            $query->where('product_type', 'bottle');
+                            $query->bottles();
                         });
                     }
 
                     if ($value === 'only_bottles') {
                         // supplies with only bottles and no other product types
                         return $builder->whereDoesntHave('productTypes', function (Builder $query) {
-                            $query->where('product_type', '!=', 'bottle');
+                            $query->accessories();
                         })->whereHas('productTypes', function (Builder $query) {
-                            $query->where('product_type', 'bottle');
+                            $query->bottles();
                         });
                     }
 

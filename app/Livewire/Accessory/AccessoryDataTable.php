@@ -256,9 +256,12 @@ class AccessoryDataTable extends BaseDataTable
                 $status = $newStatus ? 'activé' : 'désactivé';
                 $name = $accessoryType->name;
 
-                session()->flash('success', "L'accessoire a été {$status} avec succès.");
-
-                return redirect()->route('accessories.index')->with('success', "L'accessoire {$name} a été {$status} avec succès.");
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Statut modifié !',
+                    'message' => "L'accessoire {$name} a été {$status} avec succès.",
+                    'timer' => 3000,
+                ]);
             }
         } catch (\Exception $e) {
             Log::error('Error toggling accessory status: '.$e->getMessage());
@@ -295,9 +298,12 @@ class AccessoryDataTable extends BaseDataTable
             $result = $accessoryType->delete();
 
             if ($result) {
-                session()->flash('success', "L'accessoire a été supprimé avec succès.");
-
-                return redirect()->route('accessories.index')->with('success', "L'accessoire {$name} a été supprimé avec succès.");
+                $this->dispatch('show-notification', [
+                    'type' => 'success',
+                    'title' => 'Accessoire supprimé !',
+                    'message' => "L'accessoire {$name} a été supprimé avec succès.",
+                    'timer' => 3000,
+                ]);
             }
         } catch (\Exception $e) {
             Log::error('Error deleting accessory: '.$e->getMessage());

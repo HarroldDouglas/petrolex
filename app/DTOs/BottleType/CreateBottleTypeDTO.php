@@ -10,14 +10,18 @@ class CreateBottleTypeDTO extends BaseDTO
 {
     public function __construct(
         public readonly string $name,
+        public readonly ?string $name_en = null,
         /** @var ProductCategoryCityPriceDTO[]|null */
-        public readonly ?array $bottleTypeCityPrices,
-        public readonly string $capacity,
-        public readonly float $content_price,
-        public readonly float $full_price,
-        public readonly bool $is_active,
-        public readonly ?string $description,
-        public readonly ?float $weight,
+        public readonly ?array $bottleTypeCityPrices = null,
+        public readonly string $capacity = '',
+        public readonly ?float $height = null,
+        public readonly ?float $radius = null,
+        public readonly float $content_price = 0,
+        public readonly float $full_price = 0,
+        public readonly bool $is_active = true,
+        public readonly ?string $description = null,
+        public readonly ?string $description_en = null,
+        public readonly ?float $weight = null,
         /** @var UploadedFile[]|null */
         public readonly ?array $images = null,
     ) {}

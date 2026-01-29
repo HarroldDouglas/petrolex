@@ -2,9 +2,14 @@
     <form class="row app-form g-3" wire:submit.prevent="save">
         @csrf
         
+        <!-- Caractéristiques physiques -->
+        <div class="col-md-12">
+            <h5 class="mb-3">Caractéristiques physiques</h5>
+        </div>
+
         <div class="col-md-6">
             <label for="weight" class="form-label required">Poids (En Kg)</label>
-            <input type="number" step="any" class="form-control @error('weight') is-invalid @enderror" 
+            <input type="number" step="any" class="form-control @error('weight') is-invalid @enderror"
             id="weight" placeholder="Ex: 6" wire:model.live.debounce.500ms="weight">
             @error('weight')
             <div class="invalid-feedback">{{ __($message) }}</div>
@@ -13,18 +18,55 @@
 
         <div class="col-md-6">
             <label for="capacity" class="form-label required">Capacité (en Litre)</label>
-            <input type="number" step="any" class="form-control @error('capacity') is-invalid @enderror" 
+            <input type="number" step="any" class="form-control @error('capacity') is-invalid @enderror"
             id="capacity" placeholder="Ex: 50" wire:model.live.debounce.500ms="capacity">
             @error('capacity')
             <div class="invalid-feedback">{{ __($message) }}</div>
             @enderror
         </div>
 
+        <div class="col-md-6">
+            <label for="height" class="form-label">Hauteur (en cm)</label>
+            <input type="number" step="any" class="form-control @error('height') is-invalid @enderror"
+            id="height" placeholder="Ex: 45" wire:model.live.debounce.500ms="height">
+            @error('height')
+            <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-6">
+            <label for="radius" class="form-label">Rayon (en cm)</label>
+            <input type="number" step="any" class="form-control @error('radius') is-invalid @enderror"
+            id="radius" placeholder="Ex: 17.5" wire:model.live.debounce.500ms="radius">
+            @error('radius')
+            <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <!-- Informations en Français -->
+        <div class="col-md-12 mt-3">
+            <h6 class="mb-3 text-primary">🇫🇷 Informations en Français</h6>
+        </div>
+
         <div class="col-md-12">
-            <label for="name" class="form-label required">Nom du type de bouteille à ajouter</label>
-            <input type="text" class="form-control @error('name') is-invalid @enderror" 
+            <label for="name" class="form-label required">Nom du type de bouteille (FR)</label>
+            <input type="text" class="form-control @error('name') is-invalid @enderror"
             id="name" placeholder="Ex: Bouteille 6kg" wire:model.live.debounce.500ms="name" readonly>
             @error('name')
+            <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <!-- Informations en Anglais -->
+        <div class="col-md-12 mt-3">
+            <h6 class="mb-3 text-success">🇬🇧 Informations en Anglais</h6>
+        </div>
+
+        <div class="col-md-12">
+            <label for="name_en" class="form-label">Nom du type de bouteille (EN)</label>
+            <input type="text" class="form-control @error('name_en') is-invalid @enderror"
+            id="name_en" placeholder="Ex: 6kg Gas Bottle" wire:model.live.debounce.500ms="name_en">
+            @error('name_en')
             <div class="invalid-feedback">{{ __($message) }}</div>
             @enderror
         </div>
@@ -89,10 +131,23 @@
         </div>
 
         <div class="col-md-12">
-            <label for="description" class="form-label">Description du produit</label>
+            <label for="description" class="form-label">Description du produit (FR)</label>
             <textarea class="form-control @error('description') is-invalid @enderror"
-             id="description" rows="3" placeholder="Entrez la description ici" 
+             id="description" rows="3" placeholder="Entrez la description ici"
                 wire:model.live.debounce.500ms="description"></textarea>
+            @error('description')
+            <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
+        </div>
+
+        <div class="col-md-12">
+            <label for="description_en" class="form-label">Description du produit (EN)</label>
+            <textarea class="form-control @error('description_en') is-invalid @enderror"
+             id="description_en" rows="3" placeholder="Enter the description here"
+                wire:model.live.debounce.500ms="description_en"></textarea>
+            @error('description_en')
+            <div class="invalid-feedback">{{ __($message) }}</div>
+            @enderror
         </div>
         
         <!-- City-Specific Pricing Section -->

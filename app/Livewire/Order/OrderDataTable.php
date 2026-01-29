@@ -141,6 +141,7 @@ class OrderDataTable extends BaseDataTable
                 }),
 
             Column::make('Action', 'id')
+                ->excludeFromColumnSelect()
                 ->format(function ($value, $row) {
                     return new HtmlString(
                         '<a href="'.route('orders.details', $row->id).'" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Détails</a>'
@@ -292,5 +293,80 @@ class OrderDataTable extends BaseDataTable
         }
 
         return $query;
+    }
+
+    /**
+     * Override getExportQuery to export all filtered records when no selection is made
+     */
+    protected function getExportQuery(): Builder
+    {
+        $selected = $this->getSelected();
+
+        // Si des éléments sont sélectionnés, exporter uniquement ceux-là
+        if (! empty($selected)) {
+            $query = $this->model::whereIn('id', $selected);
+
+            if ($this->sorts && count($this->sorts) > 0) {
+                foreach ($this->sorts as $column => $direction) {
+                    $query->orderBy($column, $direction);
+                }
+            }
+
+            return $query;
+        }
+
+        // Sinon, exporter toutes les commandes avec les filtres appliqués
+        return $this->builder();
+    }
+
+    /**
+     * Custom mapping for export to avoid field conflicts
+     */
+    protected function customMapAttributesForExport(): array
+    {
+        return [
+            'order_number' => 'N° commande',
+            'distribution_center_id' => 'Centre de distr.',
+            'customer_id' => 'Client',
+            'total_amount' => 'Total',
+            'payment.payment_reference' => 'Réf. Paiement',
+            'delivery_person_id' => 'Livreur',
+            'order_date' => 'Date',
+            'status' => 'Statut',
+        ];
+    }
+
+    /**
+     * Custom formatters for export (text-only, no HTML)
+     */
+    protected function getExportFormatters(): array
+    {
+        return [
+            'order_number' => fn ($value) => $value ?? '-',
+            'distribution_center_id' => fn ($value, $row) => $row->distributionCenter->name ?? '-',
+            'customer_id' => function ($value, $row) {
+                $user = optional(optional($row->customer)->user);
+                if (! $user->first_name && ! $user->last_name) {
+                    return '-';
+                }
+
+                return trim(($user->first_name ?? '').' '.($user->last_name ?? '')) ?: '-';
+            },
+            'total_amount' => fn ($value) => $value ? Currency::from(config('countries.default_currency', 'XAF'))->format($value) : '-',
+            'payment.payment_reference' => fn ($value) => $value ?? '-',
+            'delivery_person_id' => function ($value, $row) {
+                if (! $row->deliveryPerson) {
+                    return '-';
+                }
+                $user = optional($row->deliveryPerson->user);
+                if (! $user->first_name && ! $user->last_name) {
+                    return '-';
+                }
+
+                return trim(($user->first_name ?? '').' '.($user->last_name ?? '')) ?: '-';
+            },
+            'order_date' => fn ($value) => $value ? $value->format('d/m/Y') : '-',
+            'status' => fn (OrderStatus $value) => $value->label,
+        ];
     }
 }

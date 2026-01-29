@@ -1,0 +1,59 @@
+<div>
+    <form wire:submit.prevent="submit">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label" for="name">Nom du Quartier</label>
+                <input class="form-control @error('name') is-invalid @enderror" id="name" type="text" wire:model.defer="name">
+                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="is_active">Statut</label>
+                <select class="form-select @error('is_active') is-invalid @enderror" id="is_active" wire:model.defer="is_active">
+                    <option value="1">Actif</option>
+                    <option value="0">Inactif</option>
+                </select>
+                @error('is_active') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="cityId">Ville</label>
+                <select class="form-select @error('cityId') is-invalid @enderror" id="cityId" wire:model.live="cityId">
+                    <option value="">Sélectionner une ville</option>
+                    @foreach($cities as $city)
+                        <option value="{{ $city['id'] }}">{{ $city['name'] }}</option>
+                    @endforeach
+                </select>
+                @error('cityId') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="municipalityId">Municipalité</label>
+                <select class="form-select @error('municipalityId') is-invalid @enderror" id="municipalityId" wire:model.defer="municipalityId">
+                    <option value="">Sélectionner une municipalité</option>
+                    @foreach($municipalities as $municipality)
+                        <option value="{{ $municipality['id'] }}">{{ $municipality['name'] }}</option>
+                    @endforeach
+                </select>
+                @error('municipalityId') <div class="invalid-feedback">{{ $message }}</div> @enderror
+
+                @if(!empty($municipalities))
+                    <div class="form-text text-success">{{ count($municipalities) }} municipalité(s) disponible(s) pour cette ville.</div>
+                @else
+                    <div class="form-text text-muted">Sélectionnez une ville pour voir les municipalités disponibles.</div>
+                @endif
+            </div>
+
+            <div class="col-12">
+                <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
+                    <a href="{{ route('neighborhoods.index') }}" class="btn btn-light-danger">
+                        <i class="ti ti-x"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="ti ti-check"></i> Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

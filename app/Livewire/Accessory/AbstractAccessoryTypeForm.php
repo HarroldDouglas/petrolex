@@ -14,8 +14,10 @@ abstract class AbstractAccessoryTypeForm extends Component
     use WithFileUploads;
 
     public $name = '';
+    public $name_en = '';
     public $price = '';
     public $description = '';
+    public $description_en = '';
     public $is_active = true;
     /** @var UploadedFile[] */
     public array $images = [];

@@ -16,12 +16,16 @@ abstract class AbstractBottleTypeForm extends Component
     use WithFileUploads;
 
     public $name;
+    public $name_en;
     public $weight;
     public $capacity;
+    public $height;
+    public $radius;
     public $content_price;
     public $full_price;
     public array $product_images = [];
     public $description;
+    public $description_en;
     public $existingImages = [];
     public $imagesIdsToDelete = [];
 

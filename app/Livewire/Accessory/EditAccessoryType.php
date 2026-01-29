@@ -16,8 +16,10 @@ class EditAccessoryType extends AbstractAccessoryTypeForm
     {
         $this->accessoryType = $accessoryType;
         $this->name = $accessoryType->name;
+        $this->name_en = $accessoryType->name_en;
         $this->price = $accessoryType->price;
         $this->description = $accessoryType->description;
+        $this->description_en = $accessoryType->description_en;
         $this->is_active = $accessoryType->is_active;
 
         $this->existingImages = $this->mediaService->getAllImagesForModel($accessoryType) ?? [];

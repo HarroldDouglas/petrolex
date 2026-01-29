@@ -7,25 +7,50 @@
         </div>
 
         <div class="col-md-8">
-            <label for="product_name" class="form-label">Nom du type d'accessoire</label>
-            <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                id="product_name" wire:model="name" placeholder="Entrez le nom du type d'accessoire">
-            @error('name') <span class="error text-danger">{{ $message }}</span> @enderror
-        </div>
-
-        <div class="col-md-4">
             <label for="product_price" class="form-label">Prix</label>
-            <input type="number" class="form-control @error('price') is-invalid @enderror" 
+            <input type="number" class="form-control @error('price') is-invalid @enderror"
                 id="product_price" wire:model="price" placeholder="Prix">
             @error('price') <span class="error text-danger">{{ $message }}</span> @enderror
         </div>
 
+        <!-- Informations en Français -->
+        <div class="col-md-12 mt-3">
+            <h6 class="mb-3 text-primary">🇫🇷 Informations en Français</h6>
+        </div>
+
         <div class="col-md-12">
-            <label for="description" class="form-label">Description du type d'accessoire</label>
-            <textarea class="form-control @error('description') is-invalid @enderror" 
+            <label for="product_name" class="form-label">Nom du type d'accessoire (FR)</label>
+            <input type="text" class="form-control @error('name') is-invalid @enderror"
+                id="product_name" wire:model="name" placeholder="Entrez le nom du type d'accessoire">
+            @error('name') <span class="error text-danger">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="col-md-12">
+            <label for="description" class="form-label">Description du type d'accessoire (FR)</label>
+            <textarea class="form-control @error('description') is-invalid @enderror"
                 id="description" wire:model="description" rows="3"
                 placeholder="Entrez la description du type d'accessoire"></textarea>
             @error('description') <span class="error text-danger">{{ $message }}</span> @enderror
+        </div>
+
+        <!-- Informations en Anglais -->
+        <div class="col-md-12 mt-3">
+            <h6 class="mb-3 text-success">🇬🇧 Informations en Anglais</h6>
+        </div>
+
+        <div class="col-md-12">
+            <label for="product_name_en" class="form-label">Nom du type d'accessoire (EN)</label>
+            <input type="text" class="form-control @error('name_en') is-invalid @enderror"
+                id="product_name_en" wire:model="name_en" placeholder="Enter the accessory type name">
+            @error('name_en') <span class="error text-danger">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="col-md-12">
+            <label for="description_en" class="form-label">Description du type d'accessoire (EN)</label>
+            <textarea class="form-control @error('description_en') is-invalid @enderror"
+                id="description_en" wire:model="description_en" rows="3"
+                placeholder="Enter the accessory type description"></textarea>
+            @error('description_en') <span class="error text-danger">{{ $message }}</span> @enderror
         </div>
 
         <div class="col-md-12">

@@ -75,6 +75,14 @@
                 </li>
             @endcanany
 
+            @can($permissionEnum::PRODUCTS_VIEW()->value)
+                <li class="no-sub">
+                    <a class="" href="{{ route('products.verify-categories') }}">
+                        <i class="iconoir-check-circle"></i> Vérifier les catégories
+                    </a>
+                </li>
+            @endcan
+
             @canany([$permissionEnum::USERS_VIEW()->value, $permissionEnum::USERS_CREATE()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#users">
@@ -137,6 +145,23 @@
                         @endcan
                         @can($permissionEnum::MUNICIPALITIES_CREATE()->value)
                             <li><a href="{{ route('municipalities.create') }}"> Nouveau</a></li>
+                        @endcan
+                    </ul>
+                </li>
+            @endcanany
+
+            @canany([$permissionEnum::MUNICIPALITIES_VIEW()->value,
+                $permissionEnum::MUNICIPALITIES_CREATE()->value])
+                <li>
+                    <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#neighborhoods">
+                        <i class="iconoir-map-pin"></i> Quartiers
+                    </a>
+                    <ul class="collapse" id="neighborhoods">
+                        @can($permissionEnum::MUNICIPALITIES_VIEW()->value)
+                            <li><a href="{{ route('neighborhoods.index') }}"> Liste</a></li>
+                        @endcan
+                        @can($permissionEnum::MUNICIPALITIES_CREATE()->value)
+                            <li><a href="{{ route('neighborhoods.create') }}"> Nouveau</a></li>
                         @endcan
                     </ul>
                 </li>

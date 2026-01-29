@@ -29,11 +29,15 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
     {
         $this->id = $this->bottleType->id;
         $this->name = $this->bottleType->name;
+        $this->name_en = $this->bottleType->name_en;
         $this->capacity = $this->bottleType->capacity;
+        $this->height = $this->bottleType->height;
+        $this->radius = $this->bottleType->radius;
         $this->content_price = $this->bottleType->content_price;
         $this->full_price = $this->bottleType->full_price;
         $this->is_active = $this->bottleType->is_active;
         $this->description = $this->bottleType->description;
+        $this->description_en = $this->bottleType->description_en;
         $this->weight = $this->bottleType->weight;
 
         $this->bottleType->load('media');
@@ -104,12 +108,16 @@ class EditBottleTypeForm extends AbstractBottleTypeForm
             $bottleTypeDTO = new UpdateBottleTypeDTO(
                 id: $this->bottleType->id,
                 name: $validatedData['name'],
+                name_en: $validatedData['name_en'] ?? null,
                 bottleTypeCityPrices: $bottleTypeCityPrices,
                 capacity: $validatedData['capacity'],
+                height: $validatedData['height'] ? (float) $validatedData['height'] : null,
+                radius: $validatedData['radius'] ? (float) $validatedData['radius'] : null,
                 content_price: $validatedData['content_price'],
                 full_price: $validatedData['full_price'],
                 is_active: $validatedData['is_active'],
                 description: $validatedData['description'],
+                description_en: $validatedData['description_en'] ?? null,
                 weight: $validatedData['weight'] ? (float) $validatedData['weight'] : null,
                 images: $this->product_images ?: null,
             );

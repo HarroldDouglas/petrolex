@@ -129,11 +129,11 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="is_active" class="form-label">Statut</label>
-                                <select class="form-select @error('is_active') is-invalid @enderror" 
+                                <select class="form-select @error('is_active') is-invalid @enderror"
                                         id="is_active"
                                         wire:model.live.debounce.500ms="is_active">
-                                    <option value="{{ \App\Enums\EntityStatus::active()->value }}" selected>{{ \App\Enums\EntityStatus::active()->label }}</option>
-                                    <option value="{{ \App\Enums\EntityStatus::inactive()->value }}">{{ \App\Enums\EntityStatus::inactive()->label }}</option>
+                                    <option value="1">{{ \App\Enums\EntityStatus::active()->label }}</option>
+                                    <option value="0">{{ \App\Enums\EntityStatus::inactive()->label }}</option>
                                 </select>
                                 @error('is_active')
                                     <div class="invalid-feedback">{{ __($message) }}</div>

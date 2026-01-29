@@ -55,6 +55,8 @@
     </div>
     @endsection
 
+    <x-sweet-alert-notification-listener />
+
     @section('script')
 
         <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>

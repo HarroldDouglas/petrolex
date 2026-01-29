@@ -14,6 +14,8 @@ class AccessoryTypeDTO extends BaseDTO
         public readonly string $name,
         public readonly float $price,
         public readonly string $description,
+        public readonly ?string $name_en = null,
+        public readonly ?string $description_en = null,
         public readonly bool $is_active = true,
         public readonly ?array $images = null,
     ) {}
@@ -27,6 +29,8 @@ class AccessoryTypeDTO extends BaseDTO
             name: $data['name'],
             price: (float) $data['price'],
             description: $data['description'],
+            name_en: $data['name_en'] ?? null,
+            description_en: $data['description_en'] ?? null,
             is_active: $data['is_active'] ?? true,
             images: $data['images'] ?? null,
         );

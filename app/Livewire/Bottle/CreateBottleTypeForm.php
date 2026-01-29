@@ -38,12 +38,16 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
 
             $bottleTypeDTO = new CreateBottleTypeDTO(
                 name: $validatedData['name'],
+                name_en: $validatedData['name_en'] ?? null,
                 bottleTypeCityPrices: $bottleTypeCityPrices,
                 capacity: $validatedData['capacity'],
+                height: $validatedData['height'] ? (float) $validatedData['height'] : null,
+                radius: $validatedData['radius'] ? (float) $validatedData['radius'] : null,
                 content_price: $validatedData['content_price'],
                 full_price: $validatedData['full_price'],
                 is_active: $validatedData['is_active'],
                 description: $validatedData['description'],
+                description_en: $validatedData['description_en'] ?? null,
                 weight: $validatedData['weight'] ? (float) $validatedData['weight'] : null,
                 images: $this->product_images ?: null,
             );
