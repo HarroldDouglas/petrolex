@@ -25,6 +25,7 @@ use OpenApi\Annotations as OA;
  *
  *         @OA\JsonContent(
  *             required={"login", "password"},
+ *
  *             @OA\Property(property="login", type="string", example="delivery1@test.com", description="Email ou numéro de téléphone"),
  *             @OA\Property(property="password", type="string", format="password", example="password", description="Mot de passe"),
  *             @OA\Property(property="country_code", type="string", example="CM", description="Code ISO du pays (optionnel)")

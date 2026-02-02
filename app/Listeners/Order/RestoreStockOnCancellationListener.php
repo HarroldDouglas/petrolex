@@ -54,7 +54,7 @@ class RestoreStockOnCancellationListener extends BaseListener
         // - PENDING → CANCELLED: Nothing to refund (wallet was never deducted for partial payments)
         $wasPaid = $event->oldStatus?->value === OrderStatus::PAID()->value;
 
-        if (!$wasPaid) {
+        if (! $wasPaid) {
             Log::info('PENDING order cancelled - nothing to restore/refund (wallet never deducted)', [
                 'order_id' => $order->id,
                 'old_status' => $event->oldStatus?->value,
@@ -93,11 +93,25 @@ class RestoreStockOnCancellationListener extends BaseListener
                 ->first();
 
             if (! $stockRecord) {
-                Log::warning('Stock record not found for product category when restoring', [
+                Log::warning('Stock record not found for product category when restoring - creating from real stock', [
                     'product_category_id' => $item->product_category_id,
                     'distribution_center_id' => $order->distribution_center_id,
                 ]);
-                continue;
+
+                // Si le stock pivot n'existe pas, le créer en synchronisant depuis les vraies bouteilles
+                $stockService = app(\App\Services\Stock\StockSynchronizationService::class);
+                $stockService->synchronizeBottleStock($order->distribution_center_id, $item->product_category_id);
+
+                // Recharger l'enregistrement
+                $stockRecord = ProductCategoryDistributionCenter::where('product_category_id', $item->product_category_id)
+                    ->where('distribution_center_id', $order->distribution_center_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $stockRecord) {
+                    Log::error('Failed to create stock record after synchronization when restoring');
+                    continue;
+                }
             }
 
             $productType = $item->productCategory->product_type;

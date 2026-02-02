@@ -93,7 +93,7 @@
                             <button type="button" class="btn btn-primary me-2" id="scanButton">
                                 <i class="ti ti-scan me-1"></i>Scanner
                             </button>
-                            <button type="button" class="btn btn-dark d-none" wire:click="toggleManualForm">
+                            <button type="button" class="btn btn-dark" wire:click="toggleManualForm">
                                 <i class="ti ti-keyboard me-1"></i>Ajouter manuellement
                             </button>
                         </div>

@@ -131,6 +131,7 @@ class SuppliesDataTable extends BaseDataTable
                     if ($value === 'has_bottles') {
                         // supplies with at least one bottle
                         return $builder->whereHas('productTypes', function (Builder $query) {
+                            // @phpstan-ignore method.notFound
                             $query->bottles();
                         });
                     }
@@ -138,8 +139,10 @@ class SuppliesDataTable extends BaseDataTable
                     if ($value === 'only_bottles') {
                         // supplies with only bottles and no other product types
                         return $builder->whereDoesntHave('productTypes', function (Builder $query) {
+                            // @phpstan-ignore method.notFound
                             $query->accessories();
                         })->whereHas('productTypes', function (Builder $query) {
+                            // @phpstan-ignore method.notFound
                             $query->bottles();
                         });
                     }
@@ -230,6 +233,55 @@ class SuppliesDataTable extends BaseDataTable
                 'type' => 'error',
                 'title' => 'Erreur !',
                 'message' => "Une erreur s'est produite lors de la suppression de l'approvisionnement.",
+                'timer' => 3000,
+            ]);
+        }
+    }
+
+    public function completeSupply(int $supplyId): void
+    {
+        try {
+            $supply = SupplierDelivery::findOrFail($supplyId);
+
+            // Vérifier que toutes les bouteilles sont scannées
+            $allDone = true;
+            foreach ($supply->productTypes as $productType) {
+                if (! $productType->incoming_done || ($productType->bottles_out_quantity > 0 && ! $productType->outgoing_done)) {
+                    $allDone = false;
+                    break;
+                }
+            }
+
+            if (! $allDone) {
+                $this->dispatch('show-notification', [
+                    'type' => 'warning',
+                    'title' => 'Attention !',
+                    'message' => 'Toutes les bouteilles n\'ont pas encore été scannées.',
+                    'timer' => 3000,
+                ]);
+
+                return;
+            }
+
+            $supply->status = SupplierDeliveryStatus::COMPLETED();
+            $supply->save();
+
+            // Synchroniser le stock après avoir terminé l'approvisionnement
+            $stockService = app(\App\Services\Stock\StockSynchronizationService::class);
+            $stockService->synchronizeAllBottleStockForCenter($supply->distribution_center_id);
+
+            $this->dispatch('show-notification', [
+                'type' => 'success',
+                'title' => 'Terminé !',
+                'message' => 'Approvisionnement marqué comme terminé avec succès.',
+                'timer' => 3000,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error completing supply: '.$e->getMessage());
+            $this->dispatch('show-notification', [
+                'type' => 'error',
+                'title' => 'Erreur !',
+                'message' => 'Une erreur s\'est produite.',
                 'timer' => 3000,
             ]);
         }

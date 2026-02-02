@@ -90,11 +90,13 @@ class OrderService extends BaseServiceForEntity
                     'product_id' => $product->id,
                     'distribution_center_id' => $order->distribution_center_id,
                     'is_filled' => false,
+                    'status' => 'in_stock',
                 ]);
             } else {
                 $this->bottleRepository->update($bottle, [
                     'is_filled' => false,
                     'distribution_center_id' => $order->distribution_center_id,
+                    'status' => 'in_stock',
                 ]);
             }
 

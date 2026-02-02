@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Neighborhood;
 
-use App\Models\Geography\City;
 use App\Models\Geography\Municipality;
 use App\Models\Geography\Neighborhood;
 use App\Services\Geography\CityService;
@@ -73,6 +72,7 @@ abstract class AbstractNeighborhoodForm extends Component
     {
         if (! $this->cityId) {
             $this->municipalities = [];
+
             return;
         }
 

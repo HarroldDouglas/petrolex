@@ -27,7 +27,7 @@ final class CreateBottleMovementForReturnedBottleListener implements ShouldQueue
      */
     public function handle(EmptyBottleReturnedEvent $event): void
     {
-
+        // Créer le mouvement de bouteille
         $this->bottleMovementRepository->create([
             'bottle_id' => $event->bottle->id,
             'movement_type' => BottleStatus::IN_STOCK(),
@@ -37,5 +37,12 @@ final class CreateBottleMovementForReturnedBottleListener implements ShouldQueue
             'user_id' => auth()->id(),
             'customer_id' => $event->order->customer_id,
         ]);
+
+        // Synchroniser le stock après le retour de la bouteille vide
+        $stockService = app(\App\Services\Stock\StockSynchronizationService::class);
+        $stockService->synchronizeBottleStock(
+            $event->order->distribution_center_id,
+            $event->bottle->product->product_category_id
+        );
     }
 }

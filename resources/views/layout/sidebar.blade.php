@@ -117,15 +117,21 @@
             @endcanany
 
             @canany([$permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value,
-                $permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value])
+                $permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value,
+                $permissionEnum::DISTRIBUTION_CENTER_MANAGE_OWN()->value])
                 <li>
                     <a aria-expanded="false" class="" data-bs-toggle="collapse" href="#point-of-sales">
-                        <i class="iconoir-network"></i> Centres de distribution
+                        <i class="iconoir-network"></i>
+                        {{ auth()->user()->hasRole('center_manager') ? 'Mon Centre' : 'Centres de distribution' }}
                     </a>
                     <ul class="collapse" id="point-of-sales">
-                        @can($permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value)
-                            <li><a href="{{ route('distribution-centers.list') }}"> Liste</a></li>
-                        @endcan
+                        @canany([$permissionEnum::DISTRIBUTION_CENTERS_VIEW()->value, $permissionEnum::DISTRIBUTION_CENTER_MANAGE_OWN()->value])
+                            <li>
+                                <a href="{{ route('distribution-centers.list') }}">
+                                    {{ auth()->user()->hasRole('center_manager') ? 'Voir mon centre' : 'Liste' }}
+                                </a>
+                            </li>
+                        @endcanany
                         @can($permissionEnum::DISTRIBUTION_CENTERS_CREATE()->value)
                             <li><a href="{{ route('distribution-centers.create') }}"> Nouveau</a></li>
                         @endcan

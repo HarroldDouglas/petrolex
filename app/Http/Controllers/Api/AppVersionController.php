@@ -11,13 +11,12 @@ class AppVersionController extends Controller
     /**
      * Get app version info
      *
-     * @param string $appType customer_app or delivery_app
-     * @return JsonResponse
+     * @param  string  $appType  customer_app or delivery_app
      */
     public function show(string $appType): JsonResponse
     {
         // Validate app_type
-        if (!in_array($appType, ['customer_app', 'delivery_app'])) {
+        if (! in_array($appType, ['customer_app', 'delivery_app'])) {
             return response()->json([
                 '_metadata' => [
                     'success' => false,

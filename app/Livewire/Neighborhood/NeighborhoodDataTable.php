@@ -49,6 +49,7 @@ class NeighborhoodDataTable extends BaseDataTable
                 ->format(function ($value) {
                     $badgeClass = $value ? 'text-bg-success' : 'text-bg-danger';
                     $text = $value ? 'Actif' : 'Inactif';
+
                     return '<span class="badge '.$badgeClass.'">'.$text.'</span>';
                 })
                 ->html(),

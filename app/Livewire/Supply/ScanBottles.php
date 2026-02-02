@@ -257,10 +257,22 @@ class ScanBottles extends Component
             $bottle = Bottle::where('barcode', $barcode)->first();
 
             if (! $bottle && $this->isIncomingMode) {
+                // Trouver le product_id depuis la product_category
+                $product = \App\Models\Product::where('product_category_id', $this->selectedProductType->product_category_id)
+                    ->first();
+
+                if (! $product) {
+                    session()->flash('error', 'Aucun produit trouvé pour cette catégorie.');
+
+                    return;
+                }
+
                 $bottle = Bottle::create([
                     'barcode' => $barcode,
-                    'product_category_id' => $this->selectedProductType->product_category_id,
+                    'product_id' => $product->id,
                     'distribution_center_id' => $this->supply->distribution_center_id,
+                    'is_filled' => true,
+                    'status' => 'in_stock',
                 ]);
             } elseif (! $bottle) {
                 session()->flash('error', "Bouteille avec code {$barcode} non trouvée dans le système.");

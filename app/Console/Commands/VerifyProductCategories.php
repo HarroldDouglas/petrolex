@@ -90,7 +90,7 @@ class VerifyProductCategories extends Command
             $status = $category ? '✅' : '❌ MANQUANT';
             $categoryId = $category ? $category->id : '-';
 
-            if (!$category) {
+            if (! $category) {
                 $missingCount++;
 
                 if ($this->option('fix')) {
@@ -135,7 +135,7 @@ class VerifyProductCategories extends Command
             $status = $category ? '✅' : '❌ MANQUANT';
             $categoryId = $category ? $category->id : '-';
 
-            if (!$category) {
+            if (! $category) {
                 $missingCount++;
 
                 if ($this->option('fix')) {
@@ -183,7 +183,7 @@ class VerifyProductCategories extends Command
                 $this->warn("   - {$accessoryMissing} catégorie(s) d'accessoires");
             }
 
-            if (!$this->option('fix')) {
+            if (! $this->option('fix')) {
                 $this->newLine();
                 $this->info('💡 Utilisez --fix pour créer automatiquement les catégories manquantes:');
                 $this->comment('   php artisan products:verify-categories --fix');

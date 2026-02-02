@@ -20,6 +20,21 @@
                 </a>
             </li>
             <li>
+                <a class="dropdown-item" href="#"
+                    onclick="confirmAction({
+                        method: 'completeSupply',
+                        parameters: [{{ $supply->id }}],
+                        componentId: '{{ $this->getId() }}',
+                        title: 'Marquer comme terminé',
+                        text: 'Voulez-vous marquer cet approvisionnement comme terminé ? Toutes les bouteilles seront activées dans le stock.',
+                        icon: 'success',
+                        confirmText: 'Oui, Terminer',
+                        cancelText: 'Annuler'
+                    }); return false;">
+                    <i class="ti ti-check text-success me-2"></i> Marquer comme terminé
+                </a>
+            </li>
+            <li>
                 <a class="dropdown-item" href="#" onclick="confirmActionWithInput({
                     method: 'deleteSupply',
                     parameters: [{{ $supply->id }}],

@@ -1,23 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(lsof:*)",
-      "Bash(xargs kill:*)",
-      "Bash(php artisan:*)",
-      "Bash(curl:*)",
-      "Bash(php -r:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(dig:*)",
-      "Bash(ssh root@157.173.104.21:*)",
-      "Bash(ps aux:*)",
-      "Bash(python3:*)",
-      "Bash(while read file)",
-      "Bash(do if ! grep -q \"x-sweet-alert-notification-listener\" \"$file\")",
-      "Bash(then echo \"$file\" fi done)",
-      "Bash(find:*)",
-      "Bash(cat:*)"
+      "Bash(php artisan test:*)",
+      "Bash(./vendor/bin/phpstan analyse:*)"
     ],
     "deny": [],
     "ask": []

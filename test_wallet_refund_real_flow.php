@@ -1,16 +1,16 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
-$app = require_once __DIR__ . '/bootstrap/app.php';
+$app = require_once __DIR__.'/bootstrap/app.php';
 $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Models\Customer;
-use App\Models\CustomerDeliveryAddress;
-use App\Services\Order\OrderService;
 use App\DTOs\Order\CreateOrderWithoutPaymentDTO;
 use App\DTOs\Order\OrderItemDTO;
 use App\Enums\BottleOrderType;
+use App\Models\Customer;
+use App\Models\CustomerDeliveryAddress;
+use App\Services\Order\OrderService;
 
 $orderService = app(OrderService::class);
 
@@ -22,7 +22,7 @@ echo "========================================\n\n";
 $customer = Customer::find(1);
 $deliveryAddress = CustomerDeliveryAddress::where('customer_id', $customer->id)->first();
 
-if (!$deliveryAddress) {
+if (! $deliveryAddress) {
     echo "❌ ERREUR: Pas d'adresse de livraison pour le customer 1\n";
     exit(1);
 }
@@ -50,7 +50,7 @@ $orderDTO1 = new CreateOrderWithoutPaymentDTO(
             unit_price: 6000.00,
             total_price: 6000.00,
             option: BottleOrderType::RECHARGE()
-        )
+        ),
     ],
     delivery_fee: 500.00,
     total_amount: 6500.00,
@@ -79,7 +79,7 @@ $attendu1 = 6500.00; // Doit rembourser le total_amount
 
 echo "Après annulation:\n";
 echo "  Balance: $balanceFinale1 FCFA (attendu: $attendu1 FCFA)\n";
-echo "  ✅ RÉSULTAT: " . ($balanceFinale1 == $attendu1 ? "OK" : "ERREUR (différence: " . ($balanceFinale1 - $attendu1) . ")") . "\n\n";
+echo '  ✅ RÉSULTAT: '.($balanceFinale1 == $attendu1 ? 'OK' : 'ERREUR (différence: '.($balanceFinale1 - $attendu1).')')."\n\n";
 
 // =========================================================
 // CAS 2: Wallet partiel (3000/6500), commande PENDING, puis annulée
@@ -103,7 +103,7 @@ $orderDTO2 = new CreateOrderWithoutPaymentDTO(
             unit_price: 6000.00,
             total_price: 6000.00,
             option: BottleOrderType::RECHARGE()
-        )
+        ),
     ],
     delivery_fee: 500.00,
     total_amount: 6500.00,
@@ -128,7 +128,7 @@ $attendu2 = 3000.00; // Balance initiale (3000 - 3000 utilisé + 3000 remboursé
 
 echo "Après annulation:\n";
 echo "  Balance: $balanceFinale2 FCFA (attendu: $attendu2 FCFA)\n";
-echo "  ✅ RÉSULTAT: " . ($balanceFinale2 == $attendu2 ? "OK" : "ERREUR (différence: " . ($balanceFinale2 - $attendu2) . ")") . "\n\n";
+echo '  ✅ RÉSULTAT: '.($balanceFinale2 == $attendu2 ? 'OK' : 'ERREUR (différence: '.($balanceFinale2 - $attendu2).')')."\n\n";
 
 // =========================================================
 // CAS 3: Wallet couvre tout (10000/6500), commande auto PAID, puis annulée
@@ -152,7 +152,7 @@ $orderDTO3 = new CreateOrderWithoutPaymentDTO(
             unit_price: 6000.00,
             total_price: 6000.00,
             option: BottleOrderType::RECHARGE()
-        )
+        ),
     ],
     delivery_fee: 500.00,
     total_amount: 6500.00,
@@ -177,7 +177,7 @@ $attendu3 = 10000.00; // Balance initiale (10000 - 6500 utilisé + 6500 rembours
 
 echo "Après annulation:\n";
 echo "  Balance: $balanceFinale3 FCFA (attendu: $attendu3 FCFA)\n";
-echo "  ✅ RÉSULTAT: " . ($balanceFinale3 == $attendu3 ? "OK" : "ERREUR (différence: " . ($balanceFinale3 - $attendu3) . ")") . "\n\n";
+echo '  ✅ RÉSULTAT: '.($balanceFinale3 == $attendu3 ? 'OK' : 'ERREUR (différence: '.($balanceFinale3 - $attendu3).')')."\n\n";
 
 echo "========================================\n";
 echo "RÉSUMÉ FINAL\n";
@@ -186,9 +186,9 @@ $cas1Ok = $balanceFinale1 == $attendu1;
 $cas2Ok = $balanceFinale2 == $attendu2;
 $cas3Ok = $balanceFinale3 == $attendu3;
 
-echo "CAS 1 (wallet=0, PAID→cancelled): " . ($cas1Ok ? "✅ OK" : "❌ ERREUR") . "\n";
-echo "CAS 2 (wallet partiel, PENDING→cancelled): " . ($cas2Ok ? "✅ OK" : "❌ ERREUR") . "\n";
-echo "CAS 3 (wallet complet, auto PAID→cancelled): " . ($cas3Ok ? "✅ OK" : "❌ ERREUR") . "\n\n";
+echo 'CAS 1 (wallet=0, PAID→cancelled): '.($cas1Ok ? '✅ OK' : '❌ ERREUR')."\n";
+echo 'CAS 2 (wallet partiel, PENDING→cancelled): '.($cas2Ok ? '✅ OK' : '❌ ERREUR')."\n";
+echo 'CAS 3 (wallet complet, auto PAID→cancelled): '.($cas3Ok ? '✅ OK' : '❌ ERREUR')."\n\n";
 
 if ($cas1Ok && $cas2Ok && $cas3Ok) {
     echo "🎉 TOUS LES CAS PASSENT - PRÊT POUR DÉPLOIEMENT!\n";

@@ -48,7 +48,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
     public function handle(): void
     {
         // Resolve dependencies here (not in constructor) because job is unserialized from queue
-        $gatewayFactory = new PaymentGatewayFactory();
+        $gatewayFactory = new PaymentGatewayFactory;
         $this->paymentService = app(PaymentService::class);
         $this->orderPaymentRepository = app(OrderPaymentRepositoryInterface::class);
 

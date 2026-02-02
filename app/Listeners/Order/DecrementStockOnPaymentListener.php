@@ -98,12 +98,26 @@ class DecrementStockOnPaymentListener extends BaseListener
             ->first();
 
         if (! $stockRecord) {
-            Log::warning('Stock record not found for product category', [
+            Log::warning('Stock record not found for product category - creating from real stock', [
                 'product_category_id' => $item->product_category_id,
                 'distribution_center_id' => $distributionCenterId,
             ]);
 
-            return;
+            // Si le stock pivot n'existe pas, le créer en synchronisant depuis les vraies bouteilles
+            $stockService = app(\App\Services\Stock\StockSynchronizationService::class);
+            $stockService->synchronizeBottleStock($distributionCenterId, $item->product_category_id);
+
+            // Recharger l'enregistrement
+            $stockRecord = ProductCategoryDistributionCenter::where('product_category_id', $item->product_category_id)
+                ->where('distribution_center_id', $distributionCenterId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $stockRecord) {
+                Log::error('Failed to create stock record after synchronization');
+
+                return;
+            }
         }
 
         $productType = $item->productCategory->product_type;
@@ -113,22 +127,16 @@ class DecrementStockOnPaymentListener extends BaseListener
             $oldStockFilled = $stockRecord->stock_filled;
             $newStockFilled = max(0, $oldStockFilled - $item->quantity);
 
-            // Si c'est une RECHARGE (contenu uniquement), increment stock_empty
-            // car le livreur récupère une bouteille vide du client
+            // Pour RECHARGE: On décrémente seulement stock_filled
+            // Le stock_empty sera incrémenté UNIQUEMENT quand le livreur scanne la bouteille vide retournée
             $updates = ['stock_filled' => $newStockFilled];
 
             if ($item->bottle_type?->value === BottleOrderType::RECHARGE()->value) {
-                $oldStockEmpty = $stockRecord->stock_empty;
-                $newStockEmpty = $oldStockEmpty + $item->quantity;
-                $updates['stock_empty'] = $newStockEmpty;
-
-                Log::info('Decremented bottle stock (RECHARGE - will receive empty bottles)', [
+                Log::info('Decremented bottle stock (RECHARGE - empty bottles will be added when scanned)', [
                     'product_category_id' => $item->product_category_id,
                     'quantity' => $item->quantity,
                     'old_stock_filled' => $oldStockFilled,
                     'new_stock_filled' => $newStockFilled,
-                    'old_stock_empty' => $oldStockEmpty,
-                    'new_stock_empty' => $newStockEmpty,
                 ]);
             } else {
                 Log::info('Decremented bottle stock (FULL - customer keeps bottle)', [

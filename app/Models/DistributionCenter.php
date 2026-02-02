@@ -198,18 +198,26 @@ class DistributionCenter extends Model
 
     /**
      * Get the total number of empty bottles in stock.
+     * Calculated directly from the bottles table for real-time accuracy.
      */
     public function getTotalEmptyBottlesAttribute(): int
     {
-        return $this->bottleTypeStocks()->sum('stock_empty');
+        return $this->bottles()
+            ->where('is_filled', false)
+            ->where('status', 'in_stock')
+            ->count();
     }
 
     /**
      * Get the total number of filled bottles in stock.
+     * Calculated directly from the bottles table for real-time accuracy.
      */
     public function getTotalFilledBottlesAttribute(): int
     {
-        return $this->bottleTypeStocks()->sum('stock_filled');
+        return $this->bottles()
+            ->where('is_filled', true)
+            ->where('status', 'in_stock')
+            ->count();
     }
 
     /**

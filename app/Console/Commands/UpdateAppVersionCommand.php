@@ -33,14 +33,16 @@ class UpdateAppVersionCommand extends Command
         $platform = $this->argument('platform');
 
         // Validate app_type
-        if (!in_array($appType, ['customer_app', 'delivery_app'])) {
+        if (! in_array($appType, ['customer_app', 'delivery_app'])) {
             $this->error('app_type must be customer_app or delivery_app');
+
             return 1;
         }
 
         // Validate platform
-        if (!in_array($platform, ['android', 'ios'])) {
+        if (! in_array($platform, ['android', 'ios'])) {
             $this->error('platform must be android or ios');
+
             return 1;
         }
 
@@ -48,8 +50,9 @@ class UpdateAppVersionCommand extends Command
             ->where('platform', $platform)
             ->first();
 
-        if (!$version) {
+        if (! $version) {
             $this->error("Version not found for {$appType} - {$platform}");
+
             return 1;
         }
 
@@ -75,14 +78,15 @@ class UpdateAppVersionCommand extends Command
             $updateData['app_link'] = $this->option('link');
         }
 
-        if (empty($updateData)) {
+        if (count($updateData) === 0) {
             $this->warn('No updates specified. Use --code, --name, --required, --notes, or --link');
+
             return 1;
         }
 
         $version->update($updateData);
 
-        $this->info("✅ Version updated successfully!");
+        $this->info('✅ Version updated successfully!');
         $this->table(
             ['App Type', 'Platform', 'Code', 'Name', 'Required', 'Notes', 'App Link'],
             [[

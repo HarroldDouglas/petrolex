@@ -78,6 +78,19 @@
                                 @endif
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-medium">Responsable :</div>
+                            <div class="col-md-8">
+                                @if ($distributionCenter->manager)
+                                    <a href="{{ route('users.details', $distributionCenter->manager->id) }}" class="text-primary">
+                                        <i class="ti ti-user me-1"></i>
+                                        {{ $distributionCenter->manager->first_name }} {{ $distributionCenter->manager->last_name }}
+                                    </a>
+                                @else
+                                    <span class="text-muted">Non assigné</span>
+                                @endif
+                            </div>
+                        </div>
                         @if ($distributionCenter->description)
                             <div class="row mb-3">
                                 <div class="col-md-4 fw-medium">Description :</div>
@@ -121,7 +134,7 @@
         </div>
 
         <div class="row mt-4">
-            <div class="col-12">
+            <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Stock détaillé par type de bouteille</h5>
@@ -137,18 +150,76 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($distributionCenter->bottleTypeStocks as $bottleType)
+                                    @php
+                                        // Calculer le stock directement depuis la table bottles pour avoir les vraies valeurs
+                                        $bottleStats = $distributionCenter->bottles()
+                                            ->with('product.productCategory')
+                                            ->where('status', 'in_stock')
+                                            ->get()
+                                            ->groupBy('product.product_category_id')
+                                            ->map(function($bottles) {
+                                                $first = $bottles->first();
+                                                return [
+                                                    'name' => $first->product->productCategory->name,
+                                                    'empty' => $bottles->where('is_filled', false)->count(),
+                                                    'filled' => $bottles->where('is_filled', true)->count(),
+                                                ];
+                                            });
+                                    @endphp
+                                    @forelse($bottleStats as $stats)
                                         <tr>
-                                            <td>{{ $bottleType->name }}</td>
-                                            <td>{{ $bottleType->pivot->stock_empty }}</td>
-                                            <td>{{ $bottleType->pivot->stock_filled }}</td>
-                                            <td>{{ $bottleType->pivot->stock_empty + $bottleType->pivot->stock_filled }}
-                                            </td>
+                                            <td>{{ $stats['name'] }}</td>
+                                            <td>{{ $stats['empty'] }}</td>
+                                            <td>{{ $stats['filled'] }}</td>
+                                            <td>{{ $stats['empty'] + $stats['filled'] }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center">Aucun type de bouteille associé à ce
-                                                centre de distribution</td>
+                                            <td colspan="4" class="text-center">Aucune bouteille en stock</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Stock des accessoires</h5>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Type d'accessoire</th>
+                                        <th>Quantité</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $accessories = $distributionCenter->accessories()
+                                            ->with('product.productCategory')
+                                            ->get()
+                                            ->groupBy('product.product_category_id')
+                                            ->map(function($group) {
+                                                $first = $group->first();
+                                                return [
+                                                    'name' => $first->product->productCategory->name,
+                                                    'quantity' => $group->sum('quantity')
+                                                ];
+                                            });
+                                    @endphp
+                                    @forelse($accessories as $accessory)
+                                        <tr>
+                                            <td>{{ $accessory['name'] }}</td>
+                                            <td>{{ $accessory['quantity'] }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="2" class="text-center">Aucun accessoire en stock</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

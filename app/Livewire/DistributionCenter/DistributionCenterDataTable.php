@@ -76,6 +76,22 @@ class DistributionCenterDataTable extends BaseDataTable
                 ->sortable()
                 ->searchable(),
 
+            Column::make('Responsable')
+                ->label(function ($row) {
+                    $manager = $row->manager;
+                    if ($manager) {
+                        $fullName = $manager->first_name.' '.$manager->last_name;
+
+                        return new HtmlString(
+                            '<a href="'.route('users.details', $manager->id).'" class="text-primary">'.
+                            e($fullName).
+                            '</a>'
+                        );
+                    }
+
+                    return new HtmlString('<span class="text-muted">Non assigné</span>');
+                }),
+
             Column::make('Date', 'created_at')
                 ->sortable()
                 ->format(fn ($value) => $value->format('d/m/Y')),
@@ -102,8 +118,25 @@ class DistributionCenterDataTable extends BaseDataTable
 
     public function builder(): Builder
     {
-        return DistributionCenter::query()
+        $query = DistributionCenter::query()
             ->with(['neighborhood.municipality.city.country']);
+
+        /** @var \App\Models\User|null $user */
+        $user = auth()->user();
+
+        // Si l'utilisateur est un responsable de centre, afficher uniquement SON centre
+        if ($user && $user->hasRole('center_manager')) {
+            $centerIds = $user->distributionCenters()->pluck('distribution_center_id')->toArray();
+
+            if (! empty($centerIds)) {
+                $query->whereIn('id', $centerIds);
+            } else {
+                // Si le responsable n'a aucun centre assigné, ne rien afficher
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        return $query;
     }
 
     protected function customMapAttributes()
@@ -111,6 +144,11 @@ class DistributionCenterDataTable extends BaseDataTable
         return [
             'status' => function ($row) {
                 return $row->is_active ? 'Actif' : 'Inactif';
+            },
+            'responsable' => function ($row) {
+                $manager = $row->manager;
+
+                return $manager ? $manager->first_name.' '.$manager->last_name : 'Non assigné';
             },
         ];
     }

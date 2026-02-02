@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             GeographicSeeder::class,
             RolePermissionSeeder::class,
             UserSeeder::class,
+            TestCustomerSeeder::class, // Permanent test customer for mobile app testing
             Production\BottleTypeSeeder::class,
             Production\AccessoryTypeSeeder::class,
         ]);

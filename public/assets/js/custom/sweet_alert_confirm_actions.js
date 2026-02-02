@@ -252,6 +252,11 @@ function confirmActionWithInput(params) {
                 if (targetComponent) {
                     try {
                         targetComponent.call(methodName, ...methodParams);
+
+                        // Fermer le loading automatiquement après 2 secondes
+                        setTimeout(() => {
+                            Swal.close();
+                        }, 2000);
                     } catch (e) {
                         Swal.fire({
                             title: "Erreur",
