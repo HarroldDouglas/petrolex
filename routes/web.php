@@ -8,6 +8,18 @@ Route::get('/', AuthCheckController::class);
 Route::get('/privacy-policy', PrivacyPolicyController::class)->name('privacy-policy');
 
 /**
+ * Public routes for Google Play Store compliance
+ * Account deletion information pages
+ */
+Route::get('/account-deletion/customer', function () {
+    return view('account-deletion.customer');
+})->name('account-deletion.customer');
+
+Route::get('/account-deletion/delivery', function () {
+    return view('account-deletion.delivery');
+})->name('account-deletion.delivery');
+
+/**
  * Include auth routes (must be outside auth middleware)
  */
 require __DIR__.'/web/auth.php';
