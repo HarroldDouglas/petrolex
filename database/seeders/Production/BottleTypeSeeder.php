@@ -17,19 +17,29 @@ class BottleTypeSeeder extends Seeder
     {
         $this->command->info('Creating bottle types...');
 
+        // Real specifications from client - DO NOT modify without client approval
         $bottleTypes = [
             [
                 'name' => 'Bouteille de 9Kg',
                 'name_en' => '9Kg Gas Bottle',
-                'description' => 'Bouteille moyenne de 9kg pour usage régulier',
-                'description_en' => 'Medium 9kg bottle for regular use',
-                'capacity' => '9',
-                'height' => 45.0,
-                'weight' => 16.0,
-                'radius' => 17.5,
-                'content_price' => 6000,
-                'full_price' => 6500,
+                'description' => 'Bouteille de gaz butane de 9kg',
+                'description_en' => '9kg butane gas bottle',
+                'content_type' => 'BUTANE',
+                'capacity' => '18.5',           // Volume: 18.5 L
+                'height' => 461,                // Hauteur: 461 mm
+                'weight' => 9,                  // Masse du contenant: 9 kg
+                'test_pressure' => '30 BAR',    // Test Pressure: 30 BAR
+                'radius' => 0,
+                'content_price' => 4680,        // Prix de la recharge: 4680 FCFA
+                'full_price' => 21780,          // Prix consigne + recharge: 21780 FCFA
                 'is_active' => true,
+                'specifications' => json_encode([
+                    ['name' => 'Contenant', 'value' => 'BUTANE'],
+                    ['name' => 'Masse du contenant', 'value' => '9 kg'],
+                    ['name' => 'Volume', 'value' => '18.5 L'],
+                    ['name' => 'Test Pressure', 'value' => '30 BAR'],
+                    ['name' => 'Hauteur', 'value' => '461 mm'],
+                ]),
             ],
         ];
 

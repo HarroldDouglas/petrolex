@@ -27,9 +27,16 @@ final class InitiatePaymentRequest extends FormRequest
     {
         $paymentMethod = $this->input('payment_method');
 
+        // Temporarily disabled payment methods (not yet ready for production)
+        $disabledMethods = ['credit_card'];
+        $allowedMethods = array_filter(
+            PaymentMethod::values(),
+            fn ($method) => !in_array($method, $disabledMethods)
+        );
+
         $rules = [
             // payment_method is nullable - wallet-only payment is allowed if balance is sufficient
-            'payment_method' => ['nullable', 'string', Rule::in(PaymentMethod::values())],
+            'payment_method' => ['nullable', 'string', Rule::in($allowedMethods)],
             'use_wallet' => ['nullable', 'boolean'],
         ];
 

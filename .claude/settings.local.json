@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(php artisan test:*)",
-      "Bash(./vendor/bin/phpstan analyse:*)"
+      "Bash(./vendor/bin/phpstan analyse:*)",
+      "Bash(./scripts/test-customer-api.sh:*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(php -l:*)",
+      "Bash(cat:*)",
+      "Bash(php artisan:*)"
     ],
     "deny": [],
     "ask": []

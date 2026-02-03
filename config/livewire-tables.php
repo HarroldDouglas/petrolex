@@ -14,7 +14,7 @@ return [
     /**
      * Use JSON Translations instead of PHP Array
      */
-    'use_json_translations' => true,
+    'use_json_translations' => false,
 
     /**
      * Configuration options for Events

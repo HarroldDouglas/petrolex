@@ -23,4 +23,12 @@ php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 
+# Restart queue workers
+echo "🔄 Restarting queue workers..."
+supervisorctl restart isogaz-worker:*
+
+# Restart reverb if running
+echo "🔄 Restarting reverb..."
+supervisorctl restart isogaz-reverb 2>/dev/null || true
+
 echo "✅ Post-deployment completed successfully!"

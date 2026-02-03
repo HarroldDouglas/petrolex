@@ -5,7 +5,7 @@
 # =============================================================================
 
 # Base URL
-export BASE_URL="http://localhost:8001"
+export BASE_URL="https://isogaz.afrik-solutions.com"
 
 # Test User Credentials
 export TEST_EMAIL="customer1@test.com"
@@ -41,7 +41,7 @@ export PAYMENT_METHOD_MTN="mtn_money"
 export PAYMENT_METHOD_CARD="credit_card"
 
 # Test Payment Details
-export TEST_PHONE="677889900"
+export TEST_PHONE="676636794"
 export TEST_NAME="Test User"
 export TEST_CARD_NUMBER="4000000000000002"  # Valid Visa test card
 export TEST_CVV="123"
