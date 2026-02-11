@@ -9,8 +9,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- google_maps CSS -->
-    <link href="https://api.google_maps.com/google_maps-gl-js/v2.15.0/google_maps-gl.css" rel="stylesheet">
+    <!-- Google Maps - pas besoin de CSS externe -->
     
     <!-- Custom CSS -->
     <style>
@@ -244,8 +243,8 @@
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Statut</span>
-                    <span class="badge status-badge bg-{{ $order->status === 'processing' ? 'warning' : 'primary' }}">
-                        {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                    <span class="badge status-badge {{ $order->status->getBadgeClass() }}">
+                        {{ $order->status->label }}
                     </span>
                 </div>
             </div>
@@ -290,7 +289,7 @@
             @endif
 
             <!-- Events History -->
-            <div class="panel-section">
+            <div class="panel-section scrollable">
                 <h6 class="mb-3">Historique des événements</h6>
                 <div id="events-container">
                     <div class="event-item">
@@ -304,158 +303,38 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://api.google_maps.com/google_maps-gl-js/v2.15.0/google_maps-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    
-    <!-- Reverb Client -->
-    <script type="module">
-        // Import du ReverbClient
-        class ReverbClient {
-            constructor(appKey, options = {}) {
-                this.appKey = appKey;
-                this.options = {
-                    wsHost: options.wsHost || "127.0.0.1",
-                    wsPort: options.wsPort || 8080,
-                    ...options,
-                };
-                this.state = "initialized";
-                this.channels = new Map();
-                this.callbacks = new Map();
-                this.socketId = null;
-                this.connection = { bind: this.bind.bind(this) };
-                this.connect();
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+
+    <!-- Google Maps callback -->
+    <script>
+        window.initGoogleMapsManager = function() {
+            console.log("🗺️ Google Maps chargé pour Manager");
+            window.googleMapsLoaded = true;
+            if (window.managerApp && window.managerApp.onGoogleMapsReady) {
+                window.managerApp.onGoogleMapsReady();
             }
-
-            connect() {
-                const url = `ws://${this.options.wsHost}:${this.options.wsPort}/app/${this.appKey}?protocol=7&client=js&version=8.3.0&flash=false`;
-                console.log("🔗 ReverbClient connecting to:", url);
-
-                this.ws = new WebSocket(url);
-
-                this.ws.onopen = () => {
-                    this.setState("connecting");
-                };
-
-                this.ws.onmessage = (event) => {
-                    const message = JSON.parse(event.data);
-                    this.handleMessage(message);
-                };
-
-                this.ws.onerror = (error) => {
-                    console.error("❌ ReverbClient error:", error);
-                    this.setState("failed");
-                };
-
-                this.ws.onclose = (event) => {
-                    console.log("🔒 ReverbClient closed:", event.code, event.reason);
-                    this.setState("disconnected");
-                };
-            }
-
-            handleMessage(message) {
-                if (message.event === "pusher:ping") {
-                    this.send({
-                        event: "pusher:pong",
-                        data: {},
-                    });
-                    return;
-                }
-
-                if (message.event === "pusher:connection_established") {
-                    this.socketId = JSON.parse(message.data).socket_id;
-                    this.setState("connected");
-                    this.trigger("connected");
-                } else if (message.channel) {
-                    const channel = this.channels.get(message.channel);
-                    if (channel) {
-                        channel.trigger(
-                            message.event,
-                            JSON.parse(message.data || "{}"),
-                        );
-                    }
-                }
-            }
-
-            setState(newState) {
-                const previousState = this.state;
-                this.state = newState;
-                console.log(`🔄 ReverbClient: ${previousState} → ${newState}`);
-                this.trigger("state_change", {
-                    previous: previousState,
-                    current: newState,
-                });
-            }
-
-            subscribe(channelName) {
-                const channel = new ReverbChannel(this, channelName);
-                this.channels.set(channelName, channel);
-
-                if (this.state === "connected") {
-                    channel.subscribe();
-                }
-
-                return channel;
-            }
-
-            bind(event, callback) {
-                if (!this.callbacks.has(event)) {
-                    this.callbacks.set(event, []);
-                }
-                this.callbacks.get(event).push(callback);
-            }
-
-            trigger(event, data) {
-                const callbacks = this.callbacks.get(event) || [];
-                callbacks.forEach((callback) => callback(data));
-            }
-
-            send(data) {
-                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-                    this.ws.send(JSON.stringify(data));
-                }
-            }
-        }
-
-        class ReverbChannel {
-            constructor(client, name) {
-                this.client = client;
-                this.name = name;
-                this.callbacks = new Map();
-                this.subscribed = false;
-            }
-
-            subscribe() {
-                this.client.send({
-                    event: "pusher:subscribe",
-                    data: { channel: this.name },
-                });
-            }
-
-            bind(event, callback) {
-                if (!this.callbacks.has(event)) {
-                    this.callbacks.set(event, []);
-                }
-                this.callbacks.get(event).push(callback);
-            }
-
-            trigger(event, data) {
-                const callbacks = this.callbacks.get(event) || [];
-                callbacks.forEach((callback) => callback(data));
-
-                if (event === "pusher_internal:subscription_succeeded") {
-                    this.subscribed = true;
-                    console.log(`📡 Souscrit au canal: ${this.name}`);
-                }
-            }
-        }
-
-        // Rendre disponible globalement
-        window.ReverbClient = ReverbClient;
+        };
     </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $trackingConfig['google_maps']['api_key'] }}&libraries=places&callback=initGoogleMapsManager"></script>
 
     <!-- Configuration -->
     <script>
         window.MANAGER_TRACKING_CONFIG = @json($trackingConfig);
+
+        // Fusionner les données de tracking avec les coordonnées de destination de la commande
+        @if($order->deliveryTracking)
+            window.INITIAL_TRACKING_DATA = @json($order->deliveryTracking);
+            window.INITIAL_TRACKING_DATA.destination_lat = @json($order->destination_lat);
+            window.INITIAL_TRACKING_DATA.destination_lng = @json($order->destination_lng);
+        @else
+            window.INITIAL_TRACKING_DATA = {
+                destination_lat: @json($order->destination_lat),
+                destination_lng: @json($order->destination_lng)
+            };
+        @endif
+
+        console.log('📦 INITIAL_TRACKING_DATA:', window.INITIAL_TRACKING_DATA);
     </script>
 
     <!-- Manager Tracking App -->
@@ -468,34 +347,51 @@
                 this.currentOrder = null;
                 this.driverMarker = null;
                 this.destinationMarker = null;
-                this.routeLayer = null;
+                this.routePolyline = null;
                 this.mapInitialized = false;
-                
+                this.viewAdjusted = false;
+
                 this.init();
             }
 
             async init() {
                 console.log('🚀 Manager Tracking App - Initialisation...');
-                
+
+                // Attendre que Google Maps soit chargé avant de continuer
+                await this.waitForGoogleMaps();
+
                 this.initializeMap();
                 this.initializeWebSocket();
                 await this.loadInitialData();
                 this.startPeriodicUpdates();
             }
 
+            waitForGoogleMaps() {
+                return new Promise((resolve) => {
+                    if (window.google && window.google.maps) {
+                        console.log('✅ Google Maps déjà chargé');
+                        resolve();
+                    } else {
+                        console.log('⏳ En attente de Google Maps...');
+                        window.initGoogleMapsManager = () => {
+                            console.log('✅ Google Maps chargé via callback');
+                            window.googleMapsLoaded = true;
+                            resolve();
+                        };
+                    }
+                });
+            }
+
             initializeMap() {
-                google_mapsgl.accessToken = MANAGER_TRACKING_CONFIG.google_maps.access_token;
-                
-                this.map = new google_mapsgl.Map({
-                    container: 'map',
-                    style: 'google_maps://styles/google_maps/streets-v12',
-                    center: [11.5021, 3.8480], // Yaoundé
-                    zoom: 12
+                this.map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: 3.8480, lng: 11.5021 }, // Yaoundé
+                    zoom: 12,
+                    mapTypeControl: false,
+                    streetViewControl: false
                 });
 
-                this.map.on('load', () => {
-                    console.log('✅ Carte initialisée');
-                });
+                console.log('✅ Carte Google Maps initialisée');
+                this.mapInitialized = true;
             }
 
             initializeWebSocket() {
@@ -506,29 +402,53 @@
                 }
 
                 try {
-                    // Utiliser ReverbClient au lieu de Pusher
-                    this.pusher = new ReverbClient(MANAGER_TRACKING_CONFIG.websocket.key, {
-                        wsHost: MANAGER_TRACKING_CONFIG.websocket.host,
-                        wsPort: MANAGER_TRACKING_CONFIG.websocket.port
+                    // Configuration Pusher pour Reverb
+                    Pusher.logToConsole = true; // Debug
+
+                    console.log('🔧 Configuration Pusher:', {
+                        key: MANAGER_TRACKING_CONFIG.websocket.key,
+                        host: MANAGER_TRACKING_CONFIG.websocket.host,
+                        port: MANAGER_TRACKING_CONFIG.websocket.port,
+                        cluster: MANAGER_TRACKING_CONFIG.websocket.cluster
                     });
 
-                    this.trackingChannel = this.pusher.subscribe('delivery-tracking');
-                    
+                    this.pusher = new Pusher(MANAGER_TRACKING_CONFIG.websocket.key, {
+                        wsHost: MANAGER_TRACKING_CONFIG.websocket.host,
+                        wsPort: MANAGER_TRACKING_CONFIG.websocket.port,
+                        wssPort: MANAGER_TRACKING_CONFIG.websocket.port,
+                        forceTLS: MANAGER_TRACKING_CONFIG.websocket.force_tls || false,
+                        encrypted: false,
+                        disableStats: true,
+                        enabledTransports: ['ws', 'wss'],
+                        cluster: MANAGER_TRACKING_CONFIG.websocket.cluster || 'mt1',
+                        activityTimeout: 30000,
+                        pongTimeout: 10000
+                    });
+
+                    // S'abonner au canal spécifique de la commande
+                    const channelName = `delivery-${MANAGER_TRACKING_CONFIG.order_number}`;
+                    console.log(`📡 Abonnement au canal: ${channelName}`);
+                    this.trackingChannel = this.pusher.subscribe(channelName);
+
                     this.trackingChannel.bind('delivery-position-updated', (data) => {
                         console.log('📍 Position mise à jour:', data);
                         this.handlePositionUpdate(data);
                     });
 
-                    // Écouter les changements d'état de connexion
-                    this.pusher.bind('connected', () => {
-                        console.log('✅ Reverb WebSocket connecté');
+                    // Écouter les changements d'état de connexion Pusher
+                    this.pusher.connection.bind('connected', () => {
+                        console.log('✅ Pusher WebSocket connecté');
                         this.updateWebSocketStatus(true);
                     });
 
-                    this.pusher.bind('state_change', (states) => {
-                        console.log(`🔄 État WebSocket: ${states.previous} → ${states.current}`);
-                        const isConnected = states.current === 'connected';
-                        this.updateWebSocketStatus(isConnected);
+                    this.pusher.connection.bind('disconnected', () => {
+                        console.log('⚠️ Pusher WebSocket déconnecté');
+                        this.updateWebSocketStatus(false);
+                    });
+
+                    this.pusher.connection.bind('error', (err) => {
+                        console.error('❌ Erreur Pusher:', err);
+                        this.updateWebSocketStatus(false);
                     });
 
                 } catch (error) {
@@ -539,33 +459,76 @@
 
             async loadInitialData() {
                 try {
-                    const response = await fetch(MANAGER_TRACKING_CONFIG.api_endpoints.tracking_details);
+                    // Utiliser les données initiales chargées côté serveur
+                    if (window.INITIAL_TRACKING_DATA) {
+                        this.currentOrder = window.INITIAL_TRACKING_DATA;
+                        console.log('✅ Données initiales chargées:', this.currentOrder);
+                        this.updateUI();
+                        this.updateMap();
+                        this.addEvent('Données de tracking chargées');
+                        return;
+                    }
+
+                    // Fallback: essayer de charger via API avec authentification
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    const response = await fetch(MANAGER_TRACKING_CONFIG.api_endpoints.tracking_details, {
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin'
+                    });
                     const data = await response.json();
-                    
+
                     if (data._metadata?.success && data.data) {
                         this.currentOrder = data.data;
                         this.updateUI();
                         this.updateMap();
+                    } else {
+                        console.warn('⚠️ Pas de données de tracking disponibles');
+                        this.addEvent('En attente des données de tracking...');
                     }
                 } catch (error) {
                     console.error('❌ Erreur chargement données:', error);
+                    this.addEvent('Erreur de chargement - en attente WebSocket');
                 }
             }
 
             handlePositionUpdate(data) {
-                if (data.order_number === MANAGER_TRACKING_CONFIG.order_number) {
-                    console.log('📊 Mise à jour position pour commande:', data.order_number);
-                    
-                    // Mettre à jour les données
-                    Object.assign(this.currentOrder, data);
-                    
-                    // Mettre à jour l'interface
-                    this.updateUI();
-                    this.updateMap();
-                    
-                    // Ajouter événement
-                    this.addEvent(`Position mise à jour: ${data.driver_lat}, ${data.driver_lng}`);
+                console.log('📡 Événement WebSocket reçu:', data);
+
+                // Initialiser currentOrder s'il n'existe pas
+                if (!this.currentOrder) {
+                    this.currentOrder = {};
                 }
+
+                // Mapper les données de l'événement vers le format attendu
+                const mappedData = {
+                    order_id: data.order_id,
+                    order_number: data.order_number,
+                    driver_lat: data.current_latitude || data.driver_lat,
+                    driver_lng: data.current_longitude || data.driver_lng,
+                    destination_lat: data.destination_latitude || data.destination_lat,
+                    destination_lng: data.destination_longitude || data.destination_lng,
+                    progress_percentage: data.progress_percentage,
+                    distance_remaining: data.distance_remaining,
+                    estimated_duration: data.estimated_duration || data.eta,
+                    current_speed: data.current_speed,
+                    status: data.status
+                };
+
+                console.log('✅ Données mappées:', mappedData);
+
+                // Mettre à jour les données
+                Object.assign(this.currentOrder, mappedData);
+
+                // Mettre à jour l'interface
+                this.updateUI();
+                this.updateMap();
+
+                // Ajouter événement
+                const progress = Math.round(parseFloat(data.progress_percentage || 0));
+                this.addEvent(`Position: ${progress}% - ${data.distance_remaining || '?'}km - ${data.estimated_duration || '?'}min`);
             }
 
             updateUI() {
@@ -588,125 +551,135 @@
             }
 
             updateMap() {
-                if (!this.currentOrder || !this.map) return;
+                if (!this.currentOrder || !this.map) {
+                    console.log('⏭️ updateMap ignoré:', {currentOrder: !!this.currentOrder, map: !!this.map});
+                    return;
+                }
 
                 const hasDriverCoords = this.currentOrder.driver_lat && this.currentOrder.driver_lng;
                 const hasDestinationCoords = this.currentOrder.destination_lat && this.currentOrder.destination_lng;
 
+                console.log('🗺️ updateMap:', {
+                    hasDriverCoords,
+                    hasDestinationCoords,
+                    driver: hasDriverCoords ? `${this.currentOrder.driver_lat}, ${this.currentOrder.driver_lng}` : 'N/A',
+                    destination: hasDestinationCoords ? `${this.currentOrder.destination_lat}, ${this.currentOrder.destination_lng}` : 'N/A'
+                });
+
                 // Position du livreur
                 if (hasDriverCoords) {
-                    const driverPosition = [
-                        parseFloat(this.currentOrder.driver_lng),
-                        parseFloat(this.currentOrder.driver_lat)
-                    ];
+                    const driverLatLng = { lat: parseFloat(this.currentOrder.driver_lat), lng: parseFloat(this.currentOrder.driver_lng) };
 
                     if (this.driverMarker) {
-                        this.driverMarker.setLngLat(driverPosition);
+                        this.driverMarker.setPosition(driverLatLng);
+                        console.log('📍 Marqueur livreur mis à jour');
                     } else {
-                        this.driverMarker = new google_mapsgl.Marker({ color: '#007bff' })
-                            .setLngLat(driverPosition)
-                            .setPopup(new google_mapsgl.Popup().setHTML('<strong>Livreur</strong>'))
-                            .addTo(this.map);
+                        this.driverMarker = new google.maps.Marker({
+                            position: driverLatLng,
+                            map: this.map,
+                            title: 'Livreur',
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 10,
+                                fillColor: '#007bff',
+                                fillOpacity: 1,
+                                strokeColor: '#ffffff',
+                                strokeWeight: 2
+                            }
+                        });
+                        console.log('✅ Marqueur livreur créé');
                     }
                 }
 
                 // Destination
                 if (hasDestinationCoords) {
-                    const destinationPosition = [
-                        parseFloat(this.currentOrder.destination_lng),
-                        parseFloat(this.currentOrder.destination_lat)
-                    ];
+                    const destLatLng = { lat: parseFloat(this.currentOrder.destination_lat), lng: parseFloat(this.currentOrder.destination_lng) };
 
                     if (!this.destinationMarker) {
-                        this.destinationMarker = new google_mapsgl.Marker({ color: '#dc3545' })
-                            .setLngLat(destinationPosition)
-                            .setPopup(new google_mapsgl.Popup().setHTML('<strong>Destination</strong>'))
-                            .addTo(this.map);
+                        this.destinationMarker = new google.maps.Marker({
+                            position: destLatLng,
+                            map: this.map,
+                            title: 'Destination',
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 10,
+                                fillColor: '#dc3545',
+                                fillOpacity: 1,
+                                strokeColor: '#ffffff',
+                                strokeWeight: 2
+                            }
+                        });
+                        console.log('✅ Marqueur destination créé');
                     }
                 }
 
-                // Tracer l'itinéraire seulement s'il n'existe pas encore
-                if (hasDriverCoords && hasDestinationCoords && !this.map.getSource('route')) {
+                // Redessiner l'itinéraire à chaque mise à jour de position
+                if (hasDriverCoords && hasDestinationCoords) {
+                    console.log('🛣️ Mise à jour de l\'itinéraire...');
                     this.drawRoute();
                 }
 
                 // Ajuster la vue seulement si c'est la première fois
-                if (!this.mapInitialized) {
+                if (!this.viewAdjusted && hasDriverCoords && hasDestinationCoords) {
+                    console.log('🎯 Ajustement de la vue...');
                     this.fitMapToPoints();
-                    this.mapInitialized = true;
+                    this.viewAdjusted = true;
                 }
             }
 
             async drawRoute() {
-                const start = [parseFloat(this.currentOrder.driver_lng), parseFloat(this.currentOrder.driver_lat)];
-                const end = [parseFloat(this.currentOrder.destination_lng), parseFloat(this.currentOrder.destination_lat)];
+                const origin = { lat: parseFloat(this.currentOrder.driver_lat), lng: parseFloat(this.currentOrder.driver_lng) };
+                const destination = { lat: parseFloat(this.currentOrder.destination_lat), lng: parseFloat(this.currentOrder.destination_lng) };
+
+                console.log('🚗 Tracé itinéraire:', {
+                    origin: `${origin.lat}, ${origin.lng}`,
+                    destination: `${destination.lat}, ${destination.lng}`
+                });
+
+                // Nettoyer l'ancien itinéraire s'il existe
+                if (this.routePolyline) {
+                    this.routePolyline.setMap(null);
+                    console.log('🗑️ Ancien itinéraire supprimé');
+                }
+
+                const directionsService = new google.maps.DirectionsService();
+                const directionsRenderer = new google.maps.DirectionsRenderer({
+                    map: this.map,
+                    suppressMarkers: true, // On utilise nos propres marqueurs
+                    polylineOptions: {
+                        strokeColor: '#227093',
+                        strokeWeight: 4
+                    }
+                });
 
                 try {
-                    const response = await fetch(
-                        `https://api.google_maps.com/directions/v5/google_maps/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${MANAGER_TRACKING_CONFIG.google_maps.access_token}`
-                    );
-                    
-                    const data = await response.json();
-                    
-                    if (data.routes && data.routes.length > 0) {
-                        const route = data.routes[0];
-                        
-                        // Supprimer l'ancien itinéraire s'il existe
-                        if (this.map.getSource('route')) {
-                            this.map.removeLayer('route');
-                            this.map.removeSource('route');
-                        }
+                    const result = await directionsService.route({
+                        origin: origin,
+                        destination: destination,
+                        travelMode: google.maps.TravelMode.DRIVING
+                    });
 
-                        // Ajouter le nouvel itinéraire
-                        this.map.addSource('route', {
-                            type: 'geojson',
-                            data: {
-                                type: 'Feature',
-                                properties: {},
-                                geometry: route.geometry
-                            }
-                        });
-
-                        this.map.addLayer({
-                            id: 'route',
-                            type: 'line',
-                            source: 'route',
-                            layout: {
-                                'line-join': 'round',
-                                'line-cap': 'round'
-                            },
-                            paint: {
-                                'line-color': 'rgba(34,112,147, 0.8)',
-                                'line-width': 4
-                            }
-                        });
-
-                        console.log('✅ Itinéraire tracé');
-                    }
+                    directionsRenderer.setDirections(result);
+                    this.routePolyline = directionsRenderer;
+                    console.log('✅ Itinéraire mis à jour');
                 } catch (error) {
-                    console.error('❌ Erreur lors du calcul de l\'itinéraire:', error);
+                    console.error('❌ Erreur itinéraire:', error);
                 }
             }
 
             fitMapToPoints() {
-                const points = [];
-                
+                const bounds = new google.maps.LatLngBounds();
+
                 if (this.driverMarker) {
-                    points.push(this.driverMarker.getLngLat().toArray());
-                }
-                
-                if (this.destinationMarker) {
-                    points.push(this.destinationMarker.getLngLat().toArray());
+                    bounds.extend(this.driverMarker.getPosition());
                 }
 
-                if (points.length > 0) {
-                    const bounds = new google_mapsgl.LngLatBounds();
-                    points.forEach(point => bounds.extend(point));
-                    
-                    this.map.fitBounds(bounds, {
-                        padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                        maxZoom: 15
-                    });
+                if (this.destinationMarker) {
+                    bounds.extend(this.destinationMarker.getPosition());
+                }
+
+                if (!bounds.isEmpty()) {
+                    this.map.fitBounds(bounds, { top: 50, bottom: 50, left: 50, right: 50 });
                 }
             }
 
@@ -740,9 +713,14 @@
             }
 
             startPeriodicUpdates() {
+                // Pas besoin de polling si WebSocket fonctionne
+                // On garde juste une mise à jour toutes les 30 secondes en backup
                 setInterval(() => {
-                    this.loadInitialData();
-                }, 5000); // Mise à jour toutes les 5 secondes
+                    if (!this.currentOrder || !this.currentOrder.driver_lat) {
+                        console.log('🔄 Tentative de rechargement des données (backup)');
+                        this.loadInitialData();
+                    }
+                }, 30000);
             }
         }
 

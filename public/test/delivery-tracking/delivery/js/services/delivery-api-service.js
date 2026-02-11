@@ -91,10 +91,8 @@ class DeliveryPersonApiService {
     }
 
     buildOrdersEndpoint(deliveryPersonId, filters, page) {
-        let endpoint = DELIVERY_CONFIG.API.ENDPOINTS.DELIVERY_PERSON_ORDERS.replace(
-            "{id}",
-            deliveryPersonId,
-        );
+        // 🔧 FIX: Utiliser MY_ORDERS au lieu de DELIVERY_PERSON_ORDERS (route obsolète)
+        let endpoint = DELIVERY_CONFIG.API.ENDPOINTS.MY_ORDERS;
 
         const params = new URLSearchParams({
             page: page.toString(),
