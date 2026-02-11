@@ -9,7 +9,27 @@
             :value="$revenue"
             :url="$this->revenueUrl"
         />
-        
+
+        <x-dashboard.stat-block
+            bg-color="light-success"
+            text-color="success"
+            icon="check-circle"
+            title="Commandes"
+            subtitle="payées"
+            :value="$paidOrders"
+            :url="$this->paidOrdersUrl"
+        />
+
+        <x-dashboard.stat-block
+            bg-color="light-info"
+            text-color="info"
+            icon="package"
+            title="Commandes"
+            subtitle="en traitement"
+            :value="$processingOrders"
+            :url="$this->processingOrdersUrl"
+        />
+
         <x-dashboard.stat-block
             bg-color="light-warning"
             text-color="warning"
@@ -19,7 +39,7 @@
             :value="$pendingOrders"
             :url="$this->pendingOrdersUrl"
         />
-        
+
         <x-dashboard.stat-block
             bg-color="light-success"
             text-color="success"
@@ -29,7 +49,7 @@
             :value="$deliveredOrders"
             :url="$this->deliveredOrdersUrl"
         />
-        
+
         <x-dashboard.stat-block
             bg-color="light-danger"
             text-color="danger"

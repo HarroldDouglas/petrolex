@@ -11,6 +11,8 @@ use Livewire\Component;
 class StatsOverview extends Component
 {
     public string $revenue = '0';
+    public int $paidOrders = 0;
+    public int $processingOrders = 0;
     public int $pendingOrders = 0;
     public int $deliveredOrders = 0;
     public int $canceledOrders = 0;
@@ -89,6 +91,8 @@ class StatsOverview extends Component
     private function updateStats($stats): void
     {
         $this->revenue = $stats->revenue;
+        $this->paidOrders = $stats->paidOrders;
+        $this->processingOrders = $stats->processingOrders;
         $this->pendingOrders = $stats->pendingOrders;
         $this->deliveredOrders = $stats->deliveredOrders;
         $this->canceledOrders = $stats->canceledOrders;
@@ -108,12 +112,40 @@ class StatsOverview extends Component
         ]);
     }
 
+    public function getPaidOrdersUrlProperty(): string
+    {
+        return '/orders?'.http_build_query([
+            'table-filters' => [
+                'centre_de_distribution' => $this->currentDistributionCenterId ?? '',
+                'statut' => ['paid'],
+                'période_de_date_de_commande' => [
+                    'minDate' => $this->currentStartDate,
+                    'maxDate' => $this->currentEndDate,
+                ],
+            ],
+        ]);
+    }
+
+    public function getProcessingOrdersUrlProperty(): string
+    {
+        return '/orders?'.http_build_query([
+            'table-filters' => [
+                'centre_de_distribution' => $this->currentDistributionCenterId ?? '',
+                'statut' => ['processing'],
+                'période_de_date_de_commande' => [
+                    'minDate' => $this->currentStartDate,
+                    'maxDate' => $this->currentEndDate,
+                ],
+            ],
+        ]);
+    }
+
     public function getPendingOrdersUrlProperty(): string
     {
         return '/orders?'.http_build_query([
             'table-filters' => [
                 'centre_de_distribution' => $this->currentDistributionCenterId ?? '',
-                'statut' => ['confirmed', 'processing'],
+                'statut' => ['pending'],
                 'période_de_date_de_commande' => [
                     'minDate' => $this->currentStartDate,
                     'maxDate' => $this->currentEndDate,

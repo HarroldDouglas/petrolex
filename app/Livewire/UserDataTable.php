@@ -21,8 +21,20 @@ class UserDataTable extends BaseDataTable
 {
     protected $model = User::class;
 
-    protected const DEFAULT_SORT_FIELD = 'last_name';
-    protected const DEFAULT_SORT_DIRECTION = 'asc';
+    protected const DEFAULT_SORT_FIELD = 'created_at';
+    protected const DEFAULT_SORT_DIRECTION = 'desc';
+
+    public function configure(): void
+    {
+        parent::configure();
+
+        $this->setSearchEnabled()
+            ->setSearchVisibilityEnabled()
+            ->setSearchFieldAttributes([
+                'placeholder' => 'Rechercher par nom, prénom, email ou téléphone...',
+            ])
+            ->setSearchDebounce(500);
+    }
 
     protected function getExportFileName(): string
     {
@@ -83,6 +95,14 @@ class UserDataTable extends BaseDataTable
                 ->sortable()
                 ->searchable(),
 
+            Column::make('Email', 'email')
+                ->sortable()
+                ->searchable(),
+
+            Column::make('Téléphone', 'phone_number')
+                ->sortable()
+                ->searchable(),
+
             Column::make('Centres de distribution')
                 ->sortable(function (Builder $query, $direction) {
                     return $query->leftJoin('distribution_center_user', 'users.id', '=', 'distribution_center_user.user_id')
@@ -105,10 +125,6 @@ class UserDataTable extends BaseDataTable
                     return $centers ?: '-';
                 })
                 ->html(),
-
-            Column::make('Téléphone', 'phone_number')
-                ->sortable()
-                ->searchable(),
 
             Column::make('Fonction')
                 ->label(function ($row) {
@@ -145,8 +161,7 @@ class UserDataTable extends BaseDataTable
 
             Column::make('Créé le', 'created_at')
                 ->sortable()
-                ->format(fn ($value) => $value->format('d/m/Y'))
-                ->deselected(),
+                ->format(fn ($value) => $value->format('d/m/Y')),
 
             Column::make('Actions')
                 ->label(function (User $row) {

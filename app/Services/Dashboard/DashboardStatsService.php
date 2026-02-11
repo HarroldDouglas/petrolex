@@ -26,12 +26,16 @@ class DashboardStatsService
         $centerIds = $this->normalizeCenterIds($distributionCenterIds);
 
         $revenue = $this->orderRepository->calculateRevenue($startDateCarbon, $endDateCarbon, $centerIds);
+        $paidOrders = $this->orderRepository->countPaidOrders($startDateCarbon, $endDateCarbon, $centerIds);
+        $processingOrders = $this->orderRepository->countProcessingOrders($startDateCarbon, $endDateCarbon, $centerIds);
         $pendingOrders = $this->orderRepository->countPendingOrders($startDateCarbon, $endDateCarbon, $centerIds);
         $deliveredOrders = $this->orderRepository->countDeliveredOrders($startDateCarbon, $endDateCarbon, $centerIds);
         $canceledOrders = $this->orderRepository->countCanceledOrders($startDateCarbon, $endDateCarbon, $centerIds);
 
         return new StatsDTO(
             revenue: $revenue,
+            paidOrders: $paidOrders,
+            processingOrders: $processingOrders,
             pendingOrders: $pendingOrders,
             deliveredOrders: $deliveredOrders,
             canceledOrders: $canceledOrders

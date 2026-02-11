@@ -10,7 +10,10 @@
       "Bash(git push:*)",
       "Bash(php -l:*)",
       "Bash(cat:*)",
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "Bash(pgrep:*)",
+      "Bash(ssh root@157.173.104.21 \"supervisorctl status | grep reverb\")",
+      "Bash(ssh root@157.173.104.21 \"netstat -tuln | grep 8080\")"
     ],
     "deny": [],
     "ask": []

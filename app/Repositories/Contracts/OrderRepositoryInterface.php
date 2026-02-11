@@ -39,6 +39,16 @@ interface OrderRepositoryInterface extends BaseRepositoryInterface
     public function calculateRevenue(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): float;
 
     /**
+     * Count paid orders
+     */
+    public function countPaidOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int;
+
+    /**
+     * Count processing orders
+     */
+    public function countProcessingOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int;
+
+    /**
      * Count pending orders
      */
     public function countPendingOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int;

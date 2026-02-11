@@ -86,18 +86,33 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
     }
 
     /**
+     * Count paid orders
+     */
+    public function countPaidOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int
+    {
+        return $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
+            ->where('status', OrderStatus::PAID()->value)
+            ->count();
+    }
+
+    /**
+     * Count processing orders
+     */
+    public function countProcessingOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int
+    {
+        return $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
+            ->where('status', OrderStatus::PROCESSING()->value)
+            ->count();
+    }
+
+    /**
      * Count pending orders
      */
     public function countPendingOrders(?Carbon $startDate = null, ?Carbon $endDate = null, ?array $distributionCenterIds = null): int
     {
-        $query = $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
-            ->whereIn('status', [
-                OrderStatus::PAID()->value,
-                OrderStatus::PROCESSING()->value,
-                OrderStatus::PENDING()->value,
-            ]);
-
-        return $query->count();
+        return $this->createBaseStatsQuery($startDate, $endDate, $distributionCenterIds)
+            ->where('status', OrderStatus::PENDING()->value)
+            ->count();
     }
 
     /**

@@ -25,6 +25,13 @@ class OrderDataTable extends BaseDataTable
     protected const DEFAULT_SORT_FIELD = 'order_date';
     protected const DEFAULT_SORT_DIRECTION = 'desc';
 
+    public function configure(): void
+    {
+        parent::configure();
+
+        $this->setDefaultSort('order_date', 'desc');
+    }
+
     protected function getExportFileName(): string
     {
         return 'commandes';
