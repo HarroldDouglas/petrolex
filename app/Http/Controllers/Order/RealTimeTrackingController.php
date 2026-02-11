@@ -37,12 +37,12 @@ class RealTimeTrackingController extends Controller
                 'api_key' => config('services.google_maps.api_key', env('GOOGLE_MAPS_API_KEY', 'AIzaSyB0w8HLsobdoJgK7WUTQxLFUuZOirvmUCI')),
             ],
             'websocket' => [
-                'enabled' => true, // Always enabled since Reverb works
+                'enabled' => true,
                 'key' => config('broadcasting.connections.reverb.key', 'local-key'),
                 'cluster' => config('broadcasting.connections.reverb.options.cluster', 'mt1'),
                 'host' => config('broadcasting.connections.reverb.options.host', '127.0.0.1'),
-                'port' => config('broadcasting.connections.reverb.port', 8080),
-                'force_tls' => config('app.env') === 'production' || request()->secure(),
+                'port' => request()->secure() ? 443 : config('broadcasting.connections.reverb.port', 8080),
+                'force_tls' => request()->secure(),
             ],
             'api_endpoints' => [
                 'tracking_details' => route('tracking.delivery.details', $order->id),
