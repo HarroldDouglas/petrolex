@@ -40,7 +40,8 @@ class RealTimeTrackingController extends Controller
                 'enabled' => true,
                 'key' => config('broadcasting.connections.reverb.key', 'local-key'),
                 'cluster' => config('broadcasting.connections.reverb.options.cluster', 'mt1'),
-                'host' => config('broadcasting.connections.reverb.options.host', '127.0.0.1'),
+                // 🌍 Use domain in production (HTTPS) so Nginx can proxy, localhost in dev
+                'host' => request()->secure() ? request()->getHost() : config('broadcasting.connections.reverb.options.host', '127.0.0.1'),
                 'port' => request()->secure() ? 443 : config('broadcasting.connections.reverb.port', 8080),
                 'force_tls' => request()->secure(),
             ],
