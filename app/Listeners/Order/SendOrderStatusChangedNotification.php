@@ -113,28 +113,34 @@ class SendOrderStatusChangedNotification extends BaseListener
     }
 
     /**
-     * Add the delivery person to the recipients list if the order status is changing to processing
-     * and they have a valid email.
+     * Add the delivery person to the recipients list when status is relevant to them.
      */
     private function addDeliveryPersonToRecipientsIfNeeded($recipients, $order): void
     {
-        if ($order->status === OrderStatus::PROCESSING()->value) {
-            $deliveryPerson = $order->deliveryPerson?->user;
-            if ($deliveryPerson?->email) {
-                $recipients->push($deliveryPerson);
-                Log::info('Added delivery person to recipients', [
-                    'email' => $deliveryPerson->email,
-                    'order_id' => $order->id,
-                ]);
-            } else {
-                Log::info('Delivery person not assigned or has no email', [
-                    'order_id' => $order->id,
-                    'has_delivery_person' => (bool) $order->deliveryPerson,
-                    'has_user' => $order->deliveryPerson ? (bool) $order->deliveryPerson->user : false,
-                    'has_email' => $order->deliveryPerson && $order->deliveryPerson->user ? (bool) $order->deliveryPerson->user->email : false,
-                ]);
-            }
+        $statusesRelevantToDeliveryPerson = [
+            OrderStatus::PROCESSING()->value,
+            OrderStatus::DELIVERED()->value,
+            OrderStatus::CANCELLED()->value,
+        ];
 
+        if (! in_array($order->status, $statusesRelevantToDeliveryPerson)) {
+            return;
+        }
+
+        $deliveryPerson = $order->deliveryPerson?->user;
+        if ($deliveryPerson?->email) {
+            $recipients->push($deliveryPerson);
+            Log::info('Added delivery person to recipients', [
+                'email' => $deliveryPerson->email,
+                'order_id' => $order->id,
+            ]);
+        } else {
+            Log::info('Delivery person not assigned or has no email', [
+                'order_id' => $order->id,
+                'has_delivery_person' => (bool) $order->deliveryPerson,
+                'has_user' => $order->deliveryPerson ? (bool) $order->deliveryPerson->user : false,
+                'has_email' => $order->deliveryPerson && $order->deliveryPerson->user ? (bool) $order->deliveryPerson->user->email : false,
+            ]);
         }
     }
 

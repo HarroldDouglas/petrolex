@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\CustomerDeliveryAddress;
 use App\Models\DistributionCenter;
 use App\Models\Order;
+use App\Models\DeliveryPerson;
 use App\Models\User;
 use App\Models\UserDistributionCenter;
 use App\Notifications\OrderStatusChangedNotification;

@@ -13,7 +13,14 @@
       "Bash(php artisan:*)",
       "Bash(pgrep:*)",
       "Bash(ssh root@157.173.104.21 \"supervisorctl status | grep reverb\")",
-      "Bash(ssh root@157.173.104.21 \"netstat -tuln | grep 8080\")"
+      "Bash(ssh root@157.173.104.21 \"netstat -tuln | grep 8080\")",
+      "Bash(python3 -m json.tool:*)",
+      "Bash(python3:*)",
+      "Bash(./vendor/bin/phpunit:*)",
+      "Bash(find:*)",
+      "Bash(./vendor/bin/pint:*)",
+      "Bash(grep:*)",
+      "Bash(dpkg -l:*)"
     ],
     "deny": [],
     "ask": []
