@@ -187,6 +187,9 @@ return [
         ],
     ],
 
+    // Order Status Changed
+    'order_status_changed_message' => 'Le statut de la commande **#:order_number** est passé de :old_status à :new_status.',
+
     // Order Cancelled Refund
     'order_cancelled_refund_subject' => 'Remboursement effectué - Commande #:order_number',
     'order_cancelled_refund_intro' => 'Suite à l\'annulation de votre commande **#:order_number**, nous avons crédité le montant sur votre portefeuille.',

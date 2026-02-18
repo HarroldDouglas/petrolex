@@ -112,6 +112,8 @@ class UserRole extends Enum
 
                 PermissionEnum::CUSTOMERS_VIEW()->value,
 
+                PermissionEnum::PRODUCTS_VIEW()->value,
+
                 PermissionEnum::REPORTS_MANAGE()->value,
             ],
             'delivery_person' => [

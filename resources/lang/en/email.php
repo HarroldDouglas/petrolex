@@ -186,6 +186,9 @@ return [
     'order_cancelled_manager_button' => 'View Order',
     'order_cancelled_manager_footer' => 'Please review the cancellation details.',
 
+    // Order Status Changed
+    'order_status_changed_message' => 'Order **#:order_number** status changed from :old_status to :new_status.',
+
     // Order Cancelled Refund
     'order_cancelled_refund_subject' => 'Refund Completed - Order #:order_number',
     'order_cancelled_refund_intro' => 'Following the cancellation of your order **#:order_number**, we have credited the amount to your wallet.',
