@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Supply;
 
+use App\Enums\BottleStatus;
 use App\Enums\ProductType;
 use App\Enums\SupplierDeliveryBottleMovementType;
 use App\Models\Bottle;
@@ -272,7 +273,7 @@ class ScanBottles extends Component
                     'product_id' => $product->id,
                     'distribution_center_id' => $this->supply->distribution_center_id,
                     'is_filled' => true,
-                    'status' => 'in_stock',
+                    'status' => BottleStatus::PENDING_RECEPTION(),
                 ]);
             } elseif (! $bottle) {
                 session()->flash('error', "Bouteille avec code {$barcode} non trouvée dans le système.");
@@ -290,6 +291,15 @@ class ScanBottles extends Component
                 session()->flash('warning', "Cette bouteille a déjà été scannée comme {$direction} pour cet approvisionnement.");
 
                 return;
+            }
+
+            // Mark existing bottles as pending reception during incoming scan
+            if ($this->isIncomingMode && ! $bottle->status->equals(BottleStatus::PENDING_RECEPTION())) {
+                $bottle->update([
+                    'status' => BottleStatus::PENDING_RECEPTION(),
+                    'is_filled' => true,
+                    'distribution_center_id' => $this->supply->distribution_center_id,
+                ]);
             }
 
             SupplierDeliveryBottle::create([

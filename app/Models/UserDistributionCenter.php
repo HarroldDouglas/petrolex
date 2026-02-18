@@ -38,6 +38,7 @@ class UserDistributionCenter extends Model
     protected $fillable = [
         'user_id',
         'distribution_center_id',
+        'is_active',
     ];
 
     /**

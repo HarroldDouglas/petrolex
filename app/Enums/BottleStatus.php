@@ -5,6 +5,7 @@ namespace App\Enums;
 use Spatie\Enum\Laravel\Enum;
 
 /**
+ * @method static self PENDING_RECEPTION()
  * @method static self IN_STOCK()
  * @method static self WITH_DELIVERY_PERSON()
  * @method static self WITH_CLIENT()
@@ -19,6 +20,7 @@ class BottleStatus extends Enum
     public static function labels(): array
     {
         return [
+            'PENDING_RECEPTION' => 'En attente de réception',
             'IN_STOCK' => 'En stock',
             'WITH_DELIVERY_PERSON' => 'Avec un livreur',
             'WITH_CLIENT' => 'Chez un client',
@@ -33,6 +35,7 @@ class BottleStatus extends Enum
     public static function values(): array
     {
         return [
+            'PENDING_RECEPTION' => 'pending_reception',
             'IN_STOCK' => 'in_stock',
             'WITH_DELIVERY_PERSON' => 'with_delivery_person',
             'WITH_CLIENT' => 'with_client',

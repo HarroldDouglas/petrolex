@@ -118,6 +118,7 @@ class UserSeeder extends Seeder
             $user->assignRole(UserRole::CENTER_MANAGER()->value);
             $user->distributionCenters()->create([
                 'distribution_center_id' => $center->id,
+                'is_active' => true,
             ]);
         }
 

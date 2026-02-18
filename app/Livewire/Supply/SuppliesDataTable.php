@@ -263,6 +263,18 @@ class SuppliesDataTable extends BaseDataTable
                 return;
             }
 
+            // Transition: PENDING_RECEPTION → IN_STOCK for all scanned bottles
+            $bottleIds = $supply->productTypes()
+                ->with('deliveryBottles')
+                ->get()
+                ->flatMap(fn ($pt) => $pt->deliveryBottles->pluck('bottle_id'));
+
+            if ($bottleIds->isNotEmpty()) {
+                \App\Models\Bottle::whereIn('id', $bottleIds)
+                    ->where('status', \App\Enums\BottleStatus::PENDING_RECEPTION())
+                    ->update(['status' => \App\Enums\BottleStatus::IN_STOCK()]);
+            }
+
             $supply->status = SupplierDeliveryStatus::COMPLETED();
             $supply->save();
 

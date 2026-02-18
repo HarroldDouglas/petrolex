@@ -106,4 +106,84 @@ class OrderNotificationTest extends TestCase
         Notification::assertSentTo($customerUser, OrderStatusChangedNotification::class);
         Notification::assertSentTo($managerUser, OrderStatusChangedNotification::class);
     }
+
+    public function test_delivery_person_is_notified_when_order_is_delivered()
+    {
+        Notification::fake();
+
+        $order = $this->createOrderWithAllActors();
+
+        $deliveryPersonUser = $order->deliveryPerson->user;
+
+        $listener = new \App\Listeners\Order\SendOrderStatusChangedNotification;
+        $listener->handle(new OrderStatusChanged($order, OrderStatus::PROCESSING(), OrderStatus::DELIVERED()));
+
+        Notification::assertSentTo($deliveryPersonUser, OrderStatusChangedNotification::class);
+    }
+
+    public function test_delivery_person_and_manager_are_notified_when_order_is_cancelled()
+    {
+        Notification::fake();
+
+        $order = $this->createOrderWithAllActors();
+
+        $deliveryPersonUser = $order->deliveryPerson->user;
+        $managerUser = $order->distributionCenter->manager;
+
+        $listener = new \App\Listeners\Order\SendOrderStatusChangedNotification;
+        $listener->handle(new OrderStatusChanged($order, OrderStatus::PAID(), OrderStatus::CANCELLED()));
+
+        Notification::assertSentTo($deliveryPersonUser, OrderStatusChangedNotification::class);
+        Notification::assertSentTo($managerUser, OrderStatusChangedNotification::class);
+    }
+
+    public function test_delivery_person_is_not_notified_when_order_is_paid()
+    {
+        Notification::fake();
+
+        $order = $this->createOrderWithAllActors(OrderStatus::PAID());
+
+        $deliveryPersonUser = $order->deliveryPerson->user;
+
+        $listener = new \App\Listeners\Order\SendOrderStatusChangedNotification;
+        $listener->handle(new OrderStatusChanged($order, OrderStatus::PENDING(), OrderStatus::PAID()));
+
+        Notification::assertNotSentTo($deliveryPersonUser, OrderStatusChangedNotification::class);
+    }
+
+    private function createOrderWithAllActors(?OrderStatus $status = null): Order
+    {
+        $customerUser = User::factory()->create();
+        $customer = Customer::factory()->create(['user_id' => $customerUser->id]);
+
+        $managerUser = User::factory()->create();
+        $managerUser->assignRole(UserRole::CENTER_MANAGER()->value);
+
+        $distributionCenter = DistributionCenter::factory()->create();
+
+        UserDistributionCenter::create([
+            'user_id' => $managerUser->id,
+            'distribution_center_id' => $distributionCenter->id,
+        ]);
+
+        $deliveryPerson = DeliveryPerson::factory()->create();
+
+        $order = new Order;
+        $order->forceFill([
+            'customer_id' => $customer->id,
+            'distribution_center_id' => $distributionCenter->id,
+            'delivery_person_id' => $deliveryPerson->id,
+            'delivery_address_id' => CustomerDeliveryAddress::factory()->create(['customer_id' => $customer->id])->id,
+            'order_number' => 'TEST-' . uniqid(),
+            'status' => $status ?? OrderStatus::PROCESSING(),
+            'subtotal' => 1000,
+            'delivery_fee' => 500,
+            'total_amount' => 1500,
+            'order_date' => now(),
+            'delivery_type' => 'normal',
+        ]);
+        $order->saveQuietly();
+
+        return $order;
+    }
 }
