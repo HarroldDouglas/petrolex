@@ -235,14 +235,18 @@ class DeliveryManager {
                 const existingTrackingFromDB = await this.checkExistingTrackingInDB(selectedOrder.id);
                 
                 if (!hasExistingTracking && !existingTrackingFromDB) {
-                    // Pas de tracking existant - DÉMARRER le tracking d'abord
-                    console.log('📡 Pas de tracking existant - démarrage du tracking');
+                    // Pas de tracking existant
                     this.ui.updateRouteEstimates(adjustedDuration, distanceKm);
                     this.currentEstimatedDuration = adjustedDuration;
                     this.ui.updateCurrentPosition(null, currentSpeed);
 
-                    // 🔧 CORRECTION: Appeler /start pour créer le tracking
-                    await this.startTrackingForOrder(selectedOrder.id);
+                    // Démarrer le tracking UNIQUEMENT si la commande est en cours de livraison
+                    if (selectedOrder.status === SHARED_CONFIG.ORDER_STATUS.PROCESSING) {
+                        console.log('📡 Commande en processing - démarrage du tracking');
+                        await this.startTrackingForOrder(selectedOrder.id);
+                    } else {
+                        console.log(`📦 Commande en ${selectedOrder.status} - affichage route sans tracking`);
+                    }
                 } else {
                     // Tracking existant - utiliser données existantes
                     const existingProgress = parseFloat(selectedOrder.trackingData.progress_percentage);
