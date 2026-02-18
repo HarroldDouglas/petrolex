@@ -25,25 +25,12 @@
 <!-- sweetalert js-->
 <script src="{{ asset('assets/vendor/sweetalert/sweetalert.js') }}" defer></script>
 
-<!-- PWA: Service Worker Registration -->
+<!-- PWA: Service Worker disabled temporarily -->
 <script>
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-            .then(function(registration) {
-                setInterval(function() { registration.update(); }, 60 * 60 * 1000);
-                registration.addEventListener('updatefound', function() {
-                    var newWorker = registration.installing;
-                    newWorker.addEventListener('statechange', function() {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            if (confirm('Une nouvelle version est disponible. Mettre à jour ?')) {
-                                newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                window.location.reload();
-                            }
-                        }
-                    });
-                });
-            })
-            .catch(function(err) { console.error('[PWA] SW registration failed:', err); });
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            registrations.forEach(function(registration) { registration.unregister(); });
+        });
     }
 
     // Standalone mode detection
