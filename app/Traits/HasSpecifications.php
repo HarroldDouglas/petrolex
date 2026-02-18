@@ -10,7 +10,11 @@ trait HasSpecifications
     public function getSpecificationsAttribute($value): array
     {
         if ($value) {
-            $specifications = json_decode($value, true) ?? [];
+            $specifications = is_array($value) ? $value : (json_decode($value, true) ?? []);
+
+            if (! is_array($specifications)) {
+                $specifications = [];
+            }
 
             return $this->translateSpecifications($specifications);
         }

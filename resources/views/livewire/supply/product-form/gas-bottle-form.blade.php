@@ -1,8 +1,8 @@
 <div>
-    <div class="card p-3">
+    <div class="border rounded p-3">
         <form wire:submit="save">
-            <div class="row">
-                <div class="col-md-4">
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
                     <label class="form-label">Type de bouteille *</label>
                     <select wire:model.live="selectedBottleType"
                         class="form-select @error('selectedBottleType') is-invalid @enderror">
@@ -22,7 +22,7 @@
                     @enderror
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <label class="form-label">Quantité entrante *</label>
                     <input type="number" wire:model="incomingQuantity"
                         class="form-control @error('incomingQuantity') is-invalid @enderror" placeholder="Ex: 50">
@@ -31,7 +31,7 @@
                     @enderror
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-6 col-md-3">
                     <label class="form-label">Quantité sortante</label>
                     <input type="number" wire:model="outgoingQuantity"
                         class="form-control @error('outgoingQuantity') is-invalid @enderror" placeholder="Ex: 10">
@@ -40,16 +40,15 @@
                     @enderror
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">&nbsp;</label>
-                        <button type="submit" class="btn btn-success w-100" wire:loading.attr="disabled">
-                            <span wire:loading.remove>
-                                <i class="ti ti-device-floppy"></i> Enregistrer
-                            </span>
-                            <span wire:loading>
-                                <i class="ti ti-loader-2 me-1"></i>Enregistrement ...
-                            </span>
-                        </button>
+                <div class="col-12 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100" wire:loading.attr="disabled">
+                        <span wire:loading.remove>
+                            <i class="ti ti-device-floppy"></i> Enregistrer
+                        </span>
+                        <span wire:loading>
+                            <i class="ti ti-loader-2 me-1"></i>Enregistrement ...
+                        </span>
+                    </button>
                 </div>
             </div>
         </form>

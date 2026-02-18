@@ -5710,16 +5710,58 @@
                         "example": "Centre Principal"
                     },
                     "country": {
-                        "type": "string",
-                        "example": "Cameroun"
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Country"
+                            }
+                        ],
+                        "nullable": true
                     },
                     "city": {
-                        "type": "string",
-                        "example": "Douala"
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/City"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "municipality": {
+                        "description": "Municipality with its neighborhoods (all quartiers available for delivery)",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Yaoundé I"
+                            },
+                            "city": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/City"
+                                    }
+                                ],
+                                "nullable": true
+                            },
+                            "neighborhoods": {
+                                "description": "All neighborhoods in this municipality available for delivery",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Neighborhood"
+                                }
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
                     },
                     "neighborhood": {
-                        "type": "string",
-                        "example": "Bonanjo"
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Neighborhood"
+                            }
+                        ],
+                        "nullable": true
                     },
                     "address": {
                         "type": "string",
@@ -5745,24 +5787,10 @@
                         "type": "string",
                         "example": "centre.principal@petrolex.cm"
                     },
-                    "is_active": {
-                        "type": "boolean",
-                        "example": true
-                    },
                     "storage_capacity": {
-                        "type": "string",
+                        "type": "integer",
                         "example": null,
                         "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2025-07-04T14:47:11.000000Z"
                     }
                 },
                 "type": "object"

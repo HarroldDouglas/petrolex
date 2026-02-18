@@ -33,6 +33,14 @@ class OrderDetailsActions extends Component
         $this->updateReason = $order->delivery_person_update_reason;
     }
 
+    /**
+     * Refresh order from database on each poll cycle.
+     */
+    public function refreshOrder(): void
+    {
+        $this->order->refresh();
+    }
+
     public function assignDeliveryPerson()
     {
         if (! $this->order->canChangeDeliveryPerson()) {

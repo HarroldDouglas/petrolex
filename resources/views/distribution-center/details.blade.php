@@ -200,15 +200,15 @@
                                 </thead>
                                 <tbody>
                                     @php
-                                        $accessories = $distributionCenter->accessories()
-                                            ->with('product.productCategory')
+                                        $accessories = $distributionCenter->productCategories()
+                                            ->where('product_type', 'accessory')
+                                            ->wherePivot('stock', '>', 0)
                                             ->get()
-                                            ->groupBy('product.product_category_id')
-                                            ->map(function($group) {
-                                                $first = $group->first();
+                                            ->map(function($category) {
+                                                $accessoryType = \App\Models\AccessoryType::find($category->product_type_id);
                                                 return [
-                                                    'name' => $first->product->productCategory->name,
-                                                    'quantity' => $group->sum('quantity')
+                                                    'name' => $accessoryType->name ?? 'Inconnu',
+                                                    'quantity' => $category->pivot->stock,
                                                 ];
                                             });
                                     @endphp

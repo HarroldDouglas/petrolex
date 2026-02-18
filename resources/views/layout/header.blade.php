@@ -2,15 +2,16 @@
 <header class="header-main">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-6 col-sm-4 d-flex align-items-center header-left p-0">
-                <span class="header-toggle me-3">
+            <div class="col col-sm-4 d-flex align-items-center header-left p-0">
+                <span class="header-toggle d-flex align-items-center gap-2">
                     <i class="iconoir-view-grid"></i>
+                    <span class="mobile-header-menu-text fw-semibold">Menu</span>
                 </span>
             </div>
 
-            <div class="col-6 col-sm-8 d-flex align-items-center justify-content-end header-right p-0">
+            <div class="col-auto col-sm-8 d-flex align-items-center justify-content-end header-right p-0">
                 <ul class="d-flex align-items-center">
-                    <li class="header-apps">
+                    <li class="header-apps d-none d-sm-block">
                         <a class="d-block head-icon" href="#" onclick="toggleFullScreen()" role="button"
                             data-bs-toggle="tooltip" data-bs-placement="bottom" title="Passer en mode plein écran">
                             <i class="iconoir-key-command"></i>

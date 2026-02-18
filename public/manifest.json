@@ -1,0 +1,32 @@
+{
+    "name": "Isogaz - Gestion de Distribution de Gaz",
+    "short_name": "Isogaz",
+    "description": "Plateforme de gestion de distribution de gaz domestique",
+    "display": "standalone",
+    "start_url": "/?source=pwa",
+    "scope": "/",
+    "theme_color": "#0089B7",
+    "background_color": "#ffffff",
+    "orientation": "portrait-primary",
+    "lang": "fr",
+    "icons": [
+        {
+            "src": "/assets/images/logo/isogaz-no-bg.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/assets/images/logo/isogaz-no-bg.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/assets/images/logo/isogaz-white-bg.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

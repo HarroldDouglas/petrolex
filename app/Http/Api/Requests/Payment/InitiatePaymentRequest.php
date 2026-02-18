@@ -31,7 +31,7 @@ final class InitiatePaymentRequest extends FormRequest
         $disabledMethods = ['credit_card'];
         $allowedMethods = array_filter(
             PaymentMethod::values(),
-            fn ($method) => !in_array($method, $disabledMethods)
+            fn ($method) => ! in_array($method, $disabledMethods)
         );
 
         $rules = [

@@ -183,3 +183,48 @@ header.header-main .container-fluid .header-left .header-toggle {
     content: " *";
     color: red;
 }
+
+/* ===== Mobile header & sidebar fixes ===== */
+
+.mobile-header-menu-text {
+    display: none;
+}
+
+@media screen and (max-width: 767px) {
+    /* Hide nav logo when sidebar is closed - prevent overflow */
+    .app-wrapper nav:not(.semi-nav) {
+        overflow: hidden;
+    }
+
+    /* Force header row on a single line */
+    header.header-main .row {
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+    }
+
+    header.header-main .header-right {
+        padding-right: 36px !important;
+    }
+
+    header.header-main .header-right ul {
+        gap: 0;
+    }
+
+    /* Show "Menu" text next to burger icon */
+    .mobile-header-menu-text {
+        display: inline-block !important;
+        font-size: 14px;
+        color: rgba(var(--dark), 0.8);
+    }
+
+    /* Overlay: clickable to close sidebar */
+    .app-wrapper .semi-nav ~ .app-content:before {
+        pointer-events: auto;
+        cursor: pointer;
+    }
+
+    /* Sidebar open: shadow */
+    .app-wrapper nav.semi-nav {
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+    }
+}

@@ -11,6 +11,11 @@
 
         #supply-tabs {
             border: none !important;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #supply-tabs::-webkit-scrollbar {
+            display: none;
         }
     </style>
     @stack('css')
@@ -19,8 +24,8 @@
 @section('main-content')
     <div class="container-fluid">
         <!-- Breadcrumb -->
-        <div class="row m-1">
-            <div class="col-8">
+        <div class="row m-1 align-items-center">
+            <div class="col-12 col-sm-8">
                 <h4 class="main-title">@yield('page-title')</h4>
                 <ul class="app-line-breadcrumbs mb-3">
                     <li><a href="{{ route('supplies.list') }}" class="f-s-14 f-w-500">
@@ -28,9 +33,9 @@
                     <li class="active"><a href="#" class="f-s-14 f-w-500">@yield('breadcrumb-title')</a></li>
                 </ul>
             </div>
-            <div class="col-4 p-0">
-                <div class="d-flex justify-content-end">
-                    <a href="{{ route('supplies.list') }}" class="btn btn-primary">
+            <div class="col-12 col-sm-4 p-0 mb-2 mb-sm-0">
+                <div class="d-flex justify-content-start justify-content-sm-end">
+                    <a href="{{ route('supplies.list') }}" class="btn btn-primary btn-sm">
                         <i class="ti ti-arrow-back"></i> Retourner à la liste
                     </a>
                 </div>

@@ -475,6 +475,7 @@ class Order extends Model
             'customer.deliveryAddresses.neighborhood.municipality.city.country',
             'deliveryPerson.user',
             'distributionCenter.neighborhood.municipality.city.country',
+            'distributionCenter.neighborhood.municipality.neighborhoods',
             'refunds',
             'deliveryTracking',
         ]);

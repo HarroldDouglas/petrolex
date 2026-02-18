@@ -135,14 +135,23 @@ if (typeof window.BarcodeScannerModule === "undefined") {
 
         function initializeQuagga(scannerViewport) {
             console.log("Initializing Quagga");
-            const quaggaConfig = {
+
+            // Camera requires a secure context (HTTPS, localhost, or 127.0.0.1)
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.error("getUserMedia not available - requires HTTPS");
+                removeScannerFromDOM();
+                alert("L'accès à la caméra nécessite HTTPS. Veuillez utiliser l'URL HTTPS du site.");
+                return;
+            }
+
+            var quaggaConfig = {
                 inputStream: {
                     name: "Live",
                     type: "LiveStream",
                     target: scannerViewport,
                     constraints: {
-                        width: 640,
-                        height: 480,
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
                         facingMode: "environment",
                     },
                 },
@@ -158,20 +167,6 @@ if (typeof window.BarcodeScannerModule === "undefined") {
                         "upc_e_reader",
                         "i2of5_reader",
                     ],
-                    debug: {
-                        showCanvas: true,
-                        showPatches: true,
-                        showFoundPatches: true,
-                        showSkeleton: true,
-                        showLabels: true,
-                        showPatchLabels: true,
-                        showRemainingPatchLabels: true,
-                        boxFromPatches: {
-                            showTransformed: true,
-                            showTransformedBox: true,
-                            showBB: true,
-                        },
-                    },
                 },
                 locate: true,
             };
@@ -180,6 +175,14 @@ if (typeof window.BarcodeScannerModule === "undefined") {
                 if (err) {
                     console.error("Error initializing Quagga:", err);
                     removeScannerFromDOM();
+
+                    if (err.name === "NotAllowedError") {
+                        alert("Accès à la caméra refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.");
+                    } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+                        alert("Aucune caméra détectée sur cet appareil.");
+                    } else {
+                        alert("Erreur lors de l'initialisation du scanner : " + err.message);
+                    }
                     return;
                 }
                 console.log("Quagga initialized successfully, starting Quagga");

@@ -19,7 +19,7 @@ class GetPaymentMethodsController extends Controller
         $disabledMethods = ['credit_card'];
 
         $paymentMethods = collect(PaymentMethod::cases())
-            ->filter(fn ($case) => !in_array($case->value, $disabledMethods))
+            ->filter(fn ($case) => ! in_array($case->value, $disabledMethods))
             ->map(fn ($case) => [
                 'value' => $case->value,
                 'label' => $case->label,

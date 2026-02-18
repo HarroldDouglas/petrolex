@@ -18,4 +18,19 @@ Je compte sur toi pr agir comme un senior, garde nos standards, code bien propre
 
 ## nous devons modifier la bd pr que l'api retourne les produits de façon plus flexible, genre on aura un champs specificités, qui sera un array qui aura la clé nom et valeur! par exemple dans le cas des bouteilles, specificités sera: [ "height"(on va devoir traduire car ce name sera directement affiché cote mobile) --- 12, "weight" ---- 9KG]! on devra faire ça pr les bouteilles et les accessoires, je sens que ça peut impliquer de bien modifier la bd pr rendre les éléments coe ça très flexible, mais pas le choix, tu vas le faire proprement et partout! 
 
-## Verifier un peu la logique si un produit est en rupture, est ce que c'est renvoyé ou bien ? 
+## Verifier un peu la logique si un produit est en rupture, est ce que c'est renvoyé ou bien ?
+
+## [CRITIQUE] Implémenter la validation de stock à la création de commande
+La méthode `validateStock` dans `CreateOrderRequest::withValidator()` est commentée (ligne 88). Aucune vérification de stock n'est faite : on peut commander 50 régulateurs alors qu'il n'y en a que 30 en stock. Il faut :
+- Implémenter `validateStock()` dans `app/Http/Api/Requests/Order/CreateOrderRequest.php`
+- Pour chaque item, vérifier le stock dans la table pivot `product_category_distribution_center`
+- Pour les bouteilles : vérifier `stock_filled` (bottle_with_content) ou `stock` (content/recharge)
+- Pour les accessoires : vérifier `stock`
+- Décommenter l'appel `$this->validateStock($validator)` ligne 88
+- Annuler les 2 commandes de test créées (CMD-202602-0016 et CMD-202602-0017)
+
+## Créer l'interface web pour le retour des bouteilles vides
+Le backend existe déjà (API: `POST /api/orders/{order}/scan-empty-bottle`, service: `OrderService::handleEmptyBottleReturn()`). Il manque l'interface web (Livewire) pour que le responsable du centre puisse scanner/saisir manuellement les bouteilles vides retournées par le livreur.
+- Créer un composant Livewire avec scan (Quagga) + saisie manuelle (comme `OrderScanBottles`)
+- Ajouter un bouton "Lier les bouteilles vides" sur la page détails de la commande (à côté de "Lier des bouteilles pour la livraison")
+- L'action ne doit s'afficher QUE si les bouteilles vides n'ont pas déjà été liées (vérifier si `empty_bottle_id` est null sur les `OrderBottleScans` de la commande). Si le livreur l'a déjà fait via l'app mobile, le bouton ne doit pas apparaître.

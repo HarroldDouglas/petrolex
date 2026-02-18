@@ -34,7 +34,7 @@ class RealTimeTrackingController extends Controller
             'order_id' => $order->id,
             'order_number' => $order->order_number,
             'google_maps' => [
-                'api_key' => config('services.google_maps.api_key', env('GOOGLE_MAPS_API_KEY', 'AIzaSyB0w8HLsobdoJgK7WUTQxLFUuZOirvmUCI')),
+                'api_key' => config('services.google_maps.api_key'),
             ],
             'websocket' => [
                 'enabled' => true,

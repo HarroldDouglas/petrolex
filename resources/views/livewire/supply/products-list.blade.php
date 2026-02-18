@@ -1,14 +1,15 @@
 <div>
     @if (count($products) > 0)
-        <div class="card">
-            <div class="card-header">
+        <div class="border rounded">
+            <div class="px-3 py-2 border-bottom">
                 <h6 class="mb-0">
                     <i class="ti ti-list me-2"></i>
                     Produits enregistrés ({{ count($products) }})
                 </h6>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
+            <div class="p-0 pb-3">
+                {{-- Table desktop --}}
+                <div class="table-responsive d-none d-md-block">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
@@ -37,11 +38,7 @@
                                         <strong>{{ $this->getProductDisplayName($product) }}</strong>
                                     </td>
                                     <td>
-                                        @if($productType === 'bottle')
-                                            <span class="badge bg-success fs-6">{{ $product['expected_quantity'] ?? 0 }}</span>
-                                        @else
-                                            <span class="badge bg-success fs-6">{{ $product['expected_quantity'] ?? 0 }}</span>
-                                        @endif
+                                        <span class="badge bg-success fs-6">{{ $product['expected_quantity'] ?? 0 }}</span>
                                     </td>
                                     <td>
                                         @if($productType === 'bottle')
@@ -83,6 +80,65 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Cards mobile --}}
+                <div class="d-md-none px-3 pt-3">
+                    @foreach ($products as $product)
+                        @php
+                            $productType = $this->getProductTypeDisplay($product);
+                        @endphp
+                        <div class="border rounded p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge {{ $productType === 'bottle' ? 'bg-primary' : 'bg-secondary' }} mb-1">
+                                        <i class="{{ $productType === 'bottle' ? 'iconoir-cylinder' : 'ti ti-tool' }} me-1"></i>
+                                        {{ $productType === 'bottle' ? 'Bouteille' : 'Accessoire' }}
+                                    </span>
+                                    <div class="fw-bold mt-1">{{ $this->getProductDisplayName($product) }}</div>
+                                </div>
+                                @if($supplierDelivery->canBeEdited())
+                                <div class="btn-group dropdown-icon-none">
+                                    <button class="btn btn-light-primary icon-btn w-30 h-30 me-0 dropdown-toggle" type="button"
+                                        id="dropdownMenuButtonMobile{{ $product['id'] }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="ti ti-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButtonMobile{{ $product['id'] }}">
+                                        <li>
+                                            <a class="dropdown-item" href="#" wire:click.prevent="editProduct({{ $product['id'] }})">
+                                                <i class="iconoir-edit text-info me-2"></i> Modifier
+                                            </a>
+                                        </li>
+                                        @if($productType === 'bottle')
+                                        <li>
+                                            <a class="dropdown-item" href="#" wire:click.prevent="scanBottles({{ $product['id'] }})">
+                                                <i class="ti ti-scan text-primary me-2"></i> Scanner
+                                            </a>
+                                        </li>
+                                        @endif
+                                        <li>
+                                            <a class="dropdown-item" href="#" wire:click.prevent="confirmDeleteProduct({{ $product['id'] }})">
+                                                <i class="iconoir-trash text-danger me-2"></i> Supprimer
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                @endif
+                            </div>
+                            <div class="d-flex gap-3">
+                                <div>
+                                    <small class="text-muted d-block">Qté entrante</small>
+                                    <span class="badge bg-success fs-6">{{ $product['expected_quantity'] ?? 0 }}</span>
+                                </div>
+                                @if($productType === 'bottle')
+                                <div>
+                                    <small class="text-muted d-block">Qté sortante</small>
+                                    <span class="badge bg-warning fs-6">{{ $product['bottles_out_quantity'] ?? 0 }}</span>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>

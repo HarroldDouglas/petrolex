@@ -25,6 +25,7 @@ class MunicipalityResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'city' => new CityResource($this->whenLoaded('city')),
+            'neighborhoods' => NeighborhoodResource::collection($this->whenLoaded('neighborhoods')),
         ];
     }
 }

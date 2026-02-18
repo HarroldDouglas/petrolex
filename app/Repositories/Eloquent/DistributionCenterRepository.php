@@ -16,6 +16,15 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function all(array $columns = ['*']): Collection
+    {
+        return DistributionCenter::with(['neighborhood.municipality.city.country', 'neighborhood.municipality.neighborhoods'])
+            ->get($columns);
+    }
+
+    /**
      * Get distribution centers by IDs.
      *
      * @param  array<int>  $ids
@@ -36,7 +45,7 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
 
     public function findClosest(float $latitude, float $longitude): ?DistributionCenter
     {
-        return DistributionCenter::with(['neighborhood.municipality.city.country'])
+        return DistributionCenter::with(['neighborhood.municipality.city.country', 'neighborhood.municipality.neighborhoods'])
             ->select('distribution_centers.*'
             )
             ->selectRaw(
@@ -64,7 +73,8 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
             $query->where('id', $neighborhoodMunicipality->id);
         })
             ->where('is_active', true)
-            ->with(['neighborhood.municipality.city.country'])
+            // ensure municipality->neighborhoods are loaded so the client can propose all quartiers
+            ->with(['neighborhood.municipality.city.country', 'neighborhood.municipality.neighborhoods'])
             ->get();
 
         if ($centersInSameMunicipality->isNotEmpty()) {
@@ -74,7 +84,7 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
 
         // If no centers in the same municipality, find the closest one by distance
         // We'll use the municipality's coordinates or fallback to general search
-        return DistributionCenter::with(['neighborhood.municipality.city.country'])
+        return DistributionCenter::with(['neighborhood.municipality.city.country', 'neighborhood.municipality.neighborhoods'])
             ->where('is_active', true)
             ->orderBy('id') // Simple ordering as fallback
             ->first();

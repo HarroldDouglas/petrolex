@@ -113,4 +113,12 @@ class BottleRepository extends BaseEloquentRepository implements BottleRepositor
             ->whereIn('status', $statuses)
             ->first();
     }
+
+    /**
+     * Find bottles by their IDs
+     */
+    public function findByIds(array $ids): Collection
+    {
+        return $this->model->whereIn('id', $ids)->get();
+    }
 }

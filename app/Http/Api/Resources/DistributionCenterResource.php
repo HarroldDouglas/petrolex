@@ -34,9 +34,10 @@ class DistributionCenterResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'country' => new CountryResource($this->country),
-            'city' => new CityResource($this->city),
-            'neighborhood' => new NeighborhoodResource($this->neighborhood),
+            'country' => $this->country ? new CountryResource($this->country) : null,
+            'city' => $this->city ? new CityResource($this->city) : null,
+            'municipality' => $this->municipality ? new MunicipalityResource($this->municipality) : null,
+            'neighborhood' => $this->neighborhood ? new NeighborhoodResource($this->neighborhood) : null,
             'address' => $this->address,
             'description' => $this->description,
             'latitude' => $this->latitude,

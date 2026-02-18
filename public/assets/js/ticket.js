@@ -32,7 +32,9 @@ $('.ticket-slider').slick({
 
 
   $(function() {
-    $('#ticketdatatable').DataTable(); 
+    if ($('#ticketdatatable').length && typeof $.fn.DataTable === 'function') {
+      $('#ticketdatatable').DataTable();
+    }
    });
 
    function tableBodyFun() {

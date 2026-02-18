@@ -1,4 +1,4 @@
-<div class="col mt-3 mb-3 text-end">
+<div class="col mt-3 mb-3 text-end" wire:poll.15s="refreshOrder">
     <div class="d-flex align-items-center justify-content-end">
         <div class="dropdown">
             <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -8,7 +8,7 @@
                 @if ($order->canScanBottles())
                     <li><a class="dropdown-item" href="#" data-bs-toggle="collapse" data-bs-target="#collapseScanBottles"
                             aria-expanded="false" aria-controls="collapseScanBottles">
-                            <i class="ti ti-scan me-2"></i>Scanner les bouteilles
+                            <i class="ti ti-link me-2"></i>Lier des bouteilles pour la livraison
                             <span class="badge bg-{{ $order->areAllBottlesScanned() ? 'success' : 'warning' }} ms-1">
                                 {{ $order->bottle_scan_progress }}%
                             </span>

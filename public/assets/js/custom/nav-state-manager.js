@@ -4,6 +4,7 @@
  */
 const NavStateManager = {
     storageKey: 'navState',
+    mobileBreakpoint: 767,
     classes: {
         collapsed: 'semi-nav'
     },
@@ -14,19 +15,46 @@ const NavStateManager = {
         this.setupEventListeners();
     },
 
+    isMobile: function() {
+        return window.innerWidth <= this.mobileBreakpoint;
+    },
+
     setupEventListeners: function() {
-        $(document).on('click', '.header-toggle', () => {
-            this.toggleState();
+        var self = this;
+
+        $(document).on('click', '.header-toggle', function() {
+            self.toggleState();
         });
 
-        $('.toggle-semi-nav').on('click', () => {
-            this.setExpanded();
+        $('.toggle-semi-nav').on('click', function() {
+            self.setExpanded();
+        });
+
+        // Close sidebar when clicking the overlay on mobile/tablet
+        $(document).on('click', '.app-content', function(e) {
+            if (!self.isMobile()) return;
+            if (!self.$nav.hasClass(self.classes.collapsed)) return;
+            if ($(e.target).closest('header').length) return;
+            self.closeMobileSidebar();
+        });
+
+        // Close sidebar when clicking a navigation link on mobile
+        $(document).on('click', 'nav .main-nav a[href]:not([data-bs-toggle])', function() {
+            if (self.isMobile() && self.$nav.hasClass(self.classes.collapsed)) {
+                self.closeMobileSidebar();
+            }
         });
     },
 
     toggleState: function() {
         this.$nav.toggleClass(this.classes.collapsed);
-        this.saveState();
+        if (!this.isMobile()) {
+            this.saveState();
+        }
+    },
+
+    closeMobileSidebar: function() {
+        this.$nav.removeClass(this.classes.collapsed);
     },
 
     setExpanded: function() {
@@ -40,13 +68,17 @@ const NavStateManager = {
     },
 
     saveState: function() {
-        const state = this.$nav.hasClass(this.classes.collapsed) ? 'semi-nav' : 'full-nav';
+        var state = this.$nav.hasClass(this.classes.collapsed) ? 'semi-nav' : 'full-nav';
         localStorage.setItem(this.storageKey, state);
     },
 
     restoreState: function() {
-        const savedState = localStorage.getItem(this.storageKey);
+        if (this.isMobile()) {
+            this.$nav.removeClass(this.classes.collapsed);
+            return;
+        }
 
+        var savedState = localStorage.getItem(this.storageKey);
         if (savedState === 'semi-nav') {
             this.$nav.addClass(this.classes.collapsed);
         } else {

@@ -39,4 +39,9 @@ interface BottleRepositoryInterface extends BaseRepositoryInterface
      * Find a bottle by its barcode and status
      */
     public function findByBarcodeAndStatus(string $barcode, array $statuses): ?Bottle;
+
+    /**
+     * Find bottles by their IDs
+     */
+    public function findByIds(array $ids): Collection;
 }

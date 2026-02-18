@@ -106,6 +106,14 @@ class DistributionCenter extends Model
     }
 
     /**
+     * Get the municipality of the distribution center through its neighborhood.
+     */
+    public function getMunicipalityAttribute(): ?\App\Models\Geography\Municipality
+    {
+        return $this->neighborhood->municipality ?? null;
+    }
+
+    /**
      * Get the country of the distribution center through its city.
      */
     public function getCountryAttribute(): ?Country

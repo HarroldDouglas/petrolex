@@ -7,7 +7,7 @@
     </a>
 
     <div aria-labelledby="profilecanvasRight" class="offcanvas offcanvas-end header-profile-canvas"
-        id="profilecanvasRight" tabindex="-1" style="max-height: 280px;">
+        id="profilecanvasRight" tabindex="-1" style="max-height: 330px;">
         <div class="offcanvas-body p-3">
             <ul class="m-0 p-0">
                 <li class="d-flex align-items-center gap-3 mb-3">
@@ -34,6 +34,56 @@
                         <i class="iconoir-help-circle pe-2 f-s-18"></i>Aide
                     </a>
                 </li>
+
+                {{-- PWA Install Button - hidden by default, shown via JS when installable --}}
+                <li class="mb-2" id="pwa-install-btn" style="display: none;">
+                    <a class="f-w-500 d-block rounded hover-bg-light text-primary" href="#"
+                        onclick="event.preventDefault(); pwaInstall();">
+                        <i class="iconoir-download pe-2 f-s-18"></i>Installer l'appli
+                    </a>
+                </li>
+                <script>
+                    (function() {
+                        var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                            || window.navigator.standalone === true;
+                        var btn = document.getElementById('pwa-install-btn');
+
+                        if (isStandalone) {
+                            // Already running as installed app
+                            if (btn) btn.remove();
+                            localStorage.setItem('pwa_install_status', 'installed');
+                            return;
+                        }
+
+                        // Clear stale install status (user may have uninstalled)
+                        if (localStorage.getItem('pwa_install_status') === 'installed' && !isStandalone) {
+                            localStorage.removeItem('pwa_install_status');
+                        }
+
+                        // Show button if prompt was already captured
+                        if (window.pwaInstallReady && btn) {
+                            btn.style.display = '';
+                            console.log('[PWA] Install button visible');
+                        }
+                    })();
+
+                    function pwaInstall() {
+                        if (!window.deferredPrompt) {
+                            console.warn('[PWA] No deferred prompt available');
+                            return;
+                        }
+                        window.deferredPrompt.prompt();
+                        window.deferredPrompt.userChoice.then(function(result) {
+                            console.log('[PWA] User choice:', result.outcome);
+                            if (result.outcome === 'accepted') {
+                                localStorage.setItem('pwa_install_status', 'installed');
+                                var btn = document.getElementById('pwa-install-btn');
+                                if (btn) btn.style.display = 'none';
+                            }
+                            window.deferredPrompt = null;
+                        });
+                    }
+                </script>
 
                 <li>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST"

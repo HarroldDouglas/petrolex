@@ -38,6 +38,7 @@ final class StartDeliveryTrackingController extends Controller
         return DB::transaction(function () use ($request, $orderId) {
             $order = $this->getValidatedOrder($orderId);
             $this->validateDeliveryPersonAccess($order);
+            $this->validateBottlesLinked($order);
             $existingTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
             if ($this->isTrackingCompleted($existingTracking)) {
@@ -212,6 +213,24 @@ final class StartDeliveryTrackingController extends Controller
         $freshTracking = $tracking->fresh()->load('order.customer', 'order.deliveryAddress');
 
         return DeliveryTrackingResponse::make($freshTracking, $message);
+    }
+
+    private function validateBottlesLinked(Order $order): void
+    {
+        if (! $order->hasBottleItems()) {
+            return;
+        }
+
+        if (! $order->areAllBottlesScanned()) {
+            Log::warning('Delivery start blocked: bottles not linked', [
+                'order_id' => $order->id,
+                'progress' => $order->bottle_scan_progress.'%',
+            ]);
+
+            throw new \InvalidArgumentException(
+                'Impossible de démarrer la livraison. Les bouteilles de gaz n\'ont pas encore été liées à cette commande.'
+            );
+        }
     }
 
     private function validateDeliveryPersonAccess(Order $order): void
