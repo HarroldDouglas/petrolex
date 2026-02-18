@@ -1,4 +1,4 @@
-const CACHE_VERSION = '1.0.0';
+const CACHE_VERSION = '1.0.1';
 const STATIC_CACHE = `isogaz-static-v${CACHE_VERSION}`;
 const PAGES_CACHE = `isogaz-pages-v${CACHE_VERSION}`;
 const IMAGES_CACHE = `isogaz-images-v${CACHE_VERSION}`;
