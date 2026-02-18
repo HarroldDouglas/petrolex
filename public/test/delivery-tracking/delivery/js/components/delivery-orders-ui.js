@@ -49,7 +49,7 @@ class DeliveryOrdersUI {
                     <p class="mb-1 text-sm"><strong>Client:</strong> ${customerName}</p>
                     <p class="mb-1 text-sm"><strong>Téléphone:</strong> ${customerPhone}</p>
                     <p class="mb-1 text-sm"><strong>Adresse:</strong> ${deliveryAddress}</p>
-                    <p class="mb-0 text-sm"><strong>Montant:</strong> ${order.total_amount || 0}€</p>
+                    <p class="mb-0 text-sm"><strong>Montant:</strong> ${(order.total_amount || 0).toLocaleString()} FCFA</p>
                 </div>
                 <div class="text-end">
                     <span class="badge bg-${statusColor} mb-2">${statusLabel}</span>

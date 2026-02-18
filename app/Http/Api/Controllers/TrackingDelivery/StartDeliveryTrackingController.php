@@ -35,27 +35,37 @@ final class StartDeliveryTrackingController extends Controller
     {
         Log::info('Starting delivery tracking', ['order_id' => $orderId]);
 
-        return DB::transaction(function () use ($request, $orderId) {
-            $order = $this->getValidatedOrder($orderId);
-            $this->validateDeliveryPersonAccess($order);
-            $this->validateBottlesLinked($order);
-            $existingTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
+        try {
+            return DB::transaction(function () use ($request, $orderId) {
+                $order = $this->getValidatedOrder($orderId);
+                $this->validateDeliveryPersonAccess($order);
+                $this->validateBottlesLinked($order);
+                $existingTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
-            if ($this->isTrackingCompleted($existingTracking)) {
-                return $this->createConflictResponse();
-            }
+                if ($this->isTrackingCompleted($existingTracking)) {
+                    return $this->createConflictResponse();
+                }
 
-            $coordinatesData = $this->extractCoordinatesData($request);
-            $tracking = $this->ensureTrackingExists($existingTracking, $order, $coordinatesData);
+                $coordinatesData = $this->extractCoordinatesData($request);
+                $tracking = $this->ensureTrackingExists($existingTracking, $order, $coordinatesData);
 
-            $this->startTrackingProcess($tracking, $coordinatesData, $order);
-            $this->updateOrderStatus($order);
-            $this->broadcastDeliveryUpdate($tracking);
+                $this->startTrackingProcess($tracking, $coordinatesData, $order);
+                $this->updateOrderStatus($order);
+                $this->broadcastDeliveryUpdate($tracking);
 
-            Log::info('Delivery tracking started successfully', ['order_id' => $orderId]);
+                Log::info('Delivery tracking started successfully', ['order_id' => $orderId]);
 
-            return $this->createSuccessResponse($tracking, $existingTracking !== null);
-        });
+                return $this->createSuccessResponse($tracking, $existingTracking !== null);
+            });
+        } catch (\InvalidArgumentException $e) {
+            Log::error($e->getMessage(), ['userId' => auth()->id()]);
+
+            return DeliveryTrackingResponse::error(
+                $e->getMessage(),
+                null,
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
     }
 
     private function getValidatedOrder(int $orderId): Order

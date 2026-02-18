@@ -1,160 +1,91 @@
-// Prevent duplicate declaration by checking if the module already exists
+// Barcode Scanner Module using Html5-Qrcode (replaces Quagga)
 if (typeof window.BarcodeScannerModule === "undefined") {
     window.BarcodeScannerModule = (function () {
+        let scanner = null;
         let isProcessing = false;
 
-        // Consensus buffer: collect multiple reads and accept only when stable
-        const REQUIRED_CONSENSUS = 3;
-        const MAX_BUFFER_SIZE = 8;
-        const ERROR_THRESHOLD = 0.08;
-        let scanBuffer = [];
-
         function createScannerUI() {
-            const scannerContainer = document.createElement("div");
+            var scannerContainer = document.createElement("div");
             scannerContainer.id = "scanner-container";
             scannerContainer.style.cssText =
                 "position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;" +
-                "background:rgba(0,0,0,0.85);display:flex;flex-direction:column;" +
+                "background:rgba(0,0,0,0.9);display:flex;flex-direction:column;" +
                 "align-items:center;justify-content:center;";
 
-            const scannerTitle = document.createElement("h3");
+            var scannerTitle = document.createElement("h3");
             scannerTitle.textContent = "Scanner un code-barres";
             scannerTitle.style.cssText = "color:white;margin-bottom:10px;";
             scannerContainer.appendChild(scannerTitle);
 
-            const scannerViewport = document.createElement("div");
+            var scannerViewport = document.createElement("div");
             scannerViewport.id = "scanner-viewport";
             scannerViewport.style.cssText =
-                "width:100%;max-width:500px;height:350px;border:2px solid white;" +
-                "border-radius:8px;overflow:hidden;position:relative;";
+                "width:100%;max-width:500px;border-radius:8px;overflow:hidden;";
             scannerContainer.appendChild(scannerViewport);
 
-            // Scan status indicator
-            const statusIndicator = document.createElement("div");
+            var statusIndicator = document.createElement("div");
             statusIndicator.id = "scan-status";
             statusIndicator.style.cssText =
                 "color:white;margin-top:10px;font-size:14px;min-height:20px;";
             statusIndicator.textContent = "Pointez vers le code-barres...";
             scannerContainer.appendChild(statusIndicator);
 
-            const closeButton = document.createElement("button");
+            var closeButton = document.createElement("button");
             closeButton.textContent = "Annuler";
             closeButton.style.cssText =
-                "margin-top:15px;padding:8px 20px;border-radius:4px;" +
+                "margin-top:15px;padding:10px 30px;border-radius:4px;" +
                 "background:#dc3545;color:white;border:none;cursor:pointer;font-size:16px;";
             closeButton.addEventListener("click", function () {
-                Quagga.stop();
-                removeScannerFromDOM();
+                stopScanner();
             });
             scannerContainer.appendChild(closeButton);
 
-            return { container: scannerContainer, viewport: scannerViewport };
+            return scannerContainer;
+        }
+
+        function stopScanner() {
+            if (scanner) {
+                scanner
+                    .stop()
+                    .then(function () {
+                        scanner.clear();
+                        scanner = null;
+                    })
+                    .catch(function () {
+                        scanner = null;
+                    });
+            }
+            removeScannerFromDOM();
         }
 
         function removeScannerFromDOM() {
-            const container = document.getElementById("scanner-container");
+            var container = document.getElementById("scanner-container");
             if (container && document.body.contains(container)) {
                 document.body.removeChild(container);
             }
-            scanBuffer = [];
         }
 
         function updateStatus(text) {
-            const el = document.getElementById("scan-status");
+            var el = document.getElementById("scan-status");
             if (el) el.textContent = text;
         }
 
-        /**
-         * Calculate average error from Quagga's decodedCodes.
-         * Lower = more confident.
-         */
-        function getAverageError(result) {
-            const codes = result.codeResult.decodedCodes;
-            if (!codes || !codes.length) return 1;
-
-            const errors = codes
-                .filter(function (c) {
-                    return c.error !== undefined && c.error !== null;
-                })
-                .map(function (c) {
-                    return c.error;
-                });
-
-            if (errors.length === 0) return 1;
-
-            const sum = errors.reduce(function (a, b) {
-                return a + b;
-            }, 0);
-            return sum / errors.length;
-        }
-
-        /**
-         * Check if the buffer has consensus: same barcode read REQUIRED_CONSENSUS times.
-         * Returns the barcode string if consensus reached, null otherwise.
-         */
-        function getConsensusBarcode() {
-            var counts = {};
-            for (var i = 0; i < scanBuffer.length; i++) {
-                var code = scanBuffer[i];
-                counts[code] = (counts[code] || 0) + 1;
-                if (counts[code] >= REQUIRED_CONSENSUS) {
-                    return code;
-                }
-            }
-            return null;
-        }
-
-        function handleBarcodeDetection(result) {
+        function onScanSuccess(decodedText) {
             if (isProcessing) return;
 
-            var avgError = getAverageError(result);
-            var barcode = result.codeResult.code;
-
-            // Reject low-confidence reads
-            if (avgError > ERROR_THRESHOLD) {
+            // Validate EAN-13: must be exactly 13 digits
+            if (!/^\d{13}$/.test(decodedText)) {
                 return;
             }
 
-            // Reject invalid EAN-13 (must be 13 digits)
-            if (!barcode || !/^\d{13}$/.test(barcode)) {
-                return;
-            }
-
-            // Add to consensus buffer
-            scanBuffer.push(barcode);
-            if (scanBuffer.length > MAX_BUFFER_SIZE) {
-                scanBuffer.shift();
-            }
-
-            // Check for consensus
-            var consensusBarcode = getConsensusBarcode();
-
-            if (!consensusBarcode) {
-                updateStatus(
-                    "Lecture en cours... (" +
-                        scanBuffer.length +
-                        "/" +
-                        REQUIRED_CONSENSUS +
-                        ")",
-                );
-                return;
-            }
-
-            // Consensus reached - accept the barcode
             isProcessing = true;
-            updateStatus("Code lu : " + consensusBarcode);
+            updateStatus("Code lu : " + decodedText);
 
-            try {
-                Quagga.stop();
-            } catch (e) {
-                // ignore
-            }
-
-            removeScannerFromDOM();
+            stopScanner();
 
             try {
                 Livewire.dispatch("barcode-scanned", [
-                    { barcode: consensusBarcode },
+                    { barcode: decodedText },
                 ]);
             } catch (error) {
                 alert(
@@ -168,81 +99,89 @@ if (typeof window.BarcodeScannerModule === "undefined") {
             }
         }
 
-        function initializeQuagga(scannerViewport) {
-            // Camera requires a secure context (HTTPS, localhost, or 127.0.0.1)
-            if (
-                !navigator.mediaDevices ||
-                !navigator.mediaDevices.getUserMedia
-            ) {
-                removeScannerFromDOM();
-                alert(
-                    "L'acc\u00e8s \u00e0 la cam\u00e9ra n\u00e9cessite HTTPS. Veuillez utiliser l'URL HTTPS du site.",
-                );
-                return;
-            }
-
-            var quaggaConfig = {
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: scannerViewport,
-                    constraints: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        facingMode: "environment",
-                    },
-                },
-                decoder: {
-                    readers: ["ean_reader", "ean_8_reader"],
-                },
-                locate: true,
-                frequency: 15,
-            };
-
-            Quagga.init(quaggaConfig, function (err) {
-                if (err) {
-                    removeScannerFromDOM();
-
-                    if (err.name === "NotAllowedError") {
-                        alert(
-                            "Acc\u00e8s \u00e0 la cam\u00e9ra refus\u00e9. Veuillez autoriser l'acc\u00e8s dans les param\u00e8tres de votre navigateur.",
-                        );
-                    } else if (
-                        err.name === "NotFoundError" ||
-                        err.name === "DevicesNotFoundError"
-                    ) {
-                        alert("Aucune cam\u00e9ra d\u00e9tect\u00e9e sur cet appareil.");
-                    } else {
-                        alert(
-                            "Erreur lors de l'initialisation du scanner : " +
-                                err.message,
-                        );
-                    }
-                    return;
-                }
-                Quagga.start();
-            });
-
-            Quagga.onDetected(handleBarcodeDetection);
-        }
-
         return {
             init: function () {
-                scanBuffer = [];
                 isProcessing = false;
+
+                // Clean up any previous scanner
+                if (scanner) {
+                    try {
+                        scanner.stop();
+                        scanner.clear();
+                    } catch (e) {
+                        // ignore
+                    }
+                    scanner = null;
+                }
+                removeScannerFromDOM();
+
+                // Check for camera support
+                if (
+                    !navigator.mediaDevices ||
+                    !navigator.mediaDevices.getUserMedia
+                ) {
+                    alert(
+                        "L'acc\u00e8s \u00e0 la cam\u00e9ra n\u00e9cessite HTTPS. Veuillez utiliser l'URL HTTPS du site.",
+                    );
+                    return;
+                }
+
                 var ui = createScannerUI();
-                document.body.appendChild(ui.container);
-                initializeQuagga(ui.viewport);
+                document.body.appendChild(ui);
+
+                scanner = new Html5Qrcode("scanner-viewport");
+
+                var config = {
+                    fps: 15,
+                    qrbox: { width: 300, height: 150 },
+                    formatsToSupport: [
+                        Html5QrcodeSupportedFormats.EAN_13,
+                        Html5QrcodeSupportedFormats.EAN_8,
+                    ],
+                    // Prefer native BarcodeDetector API when available
+                    useBarCodeDetectorIfSupported: true,
+                };
+
+                scanner
+                    .start(
+                        { facingMode: "environment" },
+                        config,
+                        onScanSuccess,
+                        function () {
+                            // ignore scan failures (no barcode in frame)
+                        },
+                    )
+                    .catch(function (err) {
+                        removeScannerFromDOM();
+                        scanner = null;
+
+                        if (
+                            err.toString().indexOf("NotAllowedError") !== -1
+                        ) {
+                            alert(
+                                "Acc\u00e8s \u00e0 la cam\u00e9ra refus\u00e9. Veuillez autoriser l'acc\u00e8s dans les param\u00e8tres de votre navigateur.",
+                            );
+                        } else if (
+                            err.toString().indexOf("NotFoundError") !== -1
+                        ) {
+                            alert(
+                                "Aucune cam\u00e9ra d\u00e9tect\u00e9e sur cet appareil.",
+                            );
+                        } else {
+                            alert(
+                                "Erreur lors de l'initialisation du scanner : " +
+                                    err,
+                            );
+                        }
+                    });
             },
         };
     })();
 
-    // Define the global function that's called from the blade file
     window.initBarcodeScanner = function () {
         window.BarcodeScannerModule.init();
     };
 } else {
-    // Module already exists, just reset state for next scan
     window.initBarcodeScanner = function () {
         window.BarcodeScannerModule.init();
     };

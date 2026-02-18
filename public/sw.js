@@ -50,6 +50,7 @@ self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
     if (event.request.method !== 'GET') return;
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
     if (!shouldCache(url)) return;
 
     // Static assets (CSS, JS, fonts) -> Cache first

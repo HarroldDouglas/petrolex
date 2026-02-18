@@ -142,7 +142,7 @@
     @endif
 
     @push('scripts')
-        <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+        <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
         <script src="{{ asset('assets/js/scan-code-bar.js') }}"></script>
         <script>
             document.addEventListener('livewire:initialized', function() {
