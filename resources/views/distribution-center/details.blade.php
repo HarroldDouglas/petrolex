@@ -151,20 +151,17 @@
                                 </thead>
                                 <tbody>
                                     @php
-                                        // Calculer le stock directement depuis la table bottles pour avoir les vraies valeurs
-                                        $bottleStats = $distributionCenter->bottles()
-                                            ->with('product.productCategory')
-                                            ->where('status', 'in_stock')
+                                        $bottleStats = $distributionCenter->productCategories()
+                                            ->where('product_type', 'bottle')
                                             ->get()
-                                            ->groupBy('product.product_category_id')
-                                            ->map(function($bottles) {
-                                                $first = $bottles->first();
+                                            ->map(function($category) {
                                                 return [
-                                                    'name' => $first->product->productCategory->name,
-                                                    'empty' => $bottles->where('is_filled', false)->count(),
-                                                    'filled' => $bottles->where('is_filled', true)->count(),
+                                                    'name' => $category->name,
+                                                    'empty' => $category->pivot->stock_empty ?? 0,
+                                                    'filled' => $category->pivot->stock_filled ?? 0,
                                                 ];
-                                            });
+                                            })
+                                            ->filter(fn($s) => $s['empty'] > 0 || $s['filled'] > 0);
                                     @endphp
                                     @forelse($bottleStats as $stats)
                                         <tr>

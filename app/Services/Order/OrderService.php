@@ -443,7 +443,7 @@ class OrderService extends BaseServiceForEntity
         $oldStatus = $oldStatusValue ? OrderStatus::tryFrom($oldStatusValue) : null;
 
         $result = parent::update($model, $data);
-        if (isset($data['status']) && $result) {
+        if (isset($data['status']) && $result && $oldStatus?->value !== $data['status']) {
             $newStatus = OrderStatus::from($data['status']);
             Event::dispatch(new OrderStatusChanged($result, $oldStatus, $newStatus));
         }

@@ -212,9 +212,12 @@ class ScanBottles extends Component
     public function addManualBarcode()
     {
         $this->validate();
-        $this->addBottle($this->manualBarcode);
-        $this->manualBarcode = '';
-        $this->showManualForm = false;
+        Log::info('addManualBarcode called', ['barcode' => $this->manualBarcode, 'productId' => $this->selectedProductId]);
+        $result = $this->addBottle($this->manualBarcode);
+        if ($result) {
+            $this->manualBarcode = '';
+            $this->showManualForm = false;
+        }
     }
 
     public function updatedIsIncomingMode()
@@ -228,12 +231,13 @@ class ScanBottles extends Component
         ]);
     }
 
-    public function addBottle($barcode)
+    public function addBottle($barcode): bool
     {
         if (! $this->selectedProductType) {
+            Log::warning('addBottle: no selectedProductType');
             session()->flash('error', 'Veuillez d\'abord sélectionner un type de bouteille.');
 
-            return;
+            return false;
         }
 
         $movementType = $this->isIncomingMode ?
@@ -245,11 +249,13 @@ class ScanBottles extends Component
             $this->selectedProductType->incoming_scanned_count :
             $this->selectedProductType->outgoing_scanned_count;
 
+        Log::info('addBottle', ['barcode' => $barcode, 'incoming' => $this->isIncomingMode, 'current' => $currentCount, 'max' => $maxAllowed]);
+
         if ($currentCount >= $maxAllowed) {
             $direction = $this->isIncomingMode ? 'entrantes' : 'sortantes';
             session()->flash('warning', "Vous avez atteint la quantité maximale de bouteilles {$direction} à scanner.");
 
-            return;
+            return false;
         }
 
         try {
@@ -258,14 +264,15 @@ class ScanBottles extends Component
             $bottle = Bottle::where('barcode', $barcode)->first();
 
             if (! $bottle && $this->isIncomingMode) {
-                // Trouver le product_id depuis la product_category
                 $product = \App\Models\Product::where('product_category_id', $this->selectedProductType->product_category_id)
                     ->first();
 
                 if (! $product) {
+                    DB::rollBack();
+                    Log::error('addBottle: no product found', ['category_id' => $this->selectedProductType->product_category_id]);
                     session()->flash('error', 'Aucun produit trouvé pour cette catégorie.');
 
-                    return;
+                    return false;
                 }
 
                 $bottle = Bottle::create([
@@ -275,10 +282,12 @@ class ScanBottles extends Component
                     'is_filled' => true,
                     'status' => BottleStatus::PENDING_RECEPTION(),
                 ]);
+                Log::info('addBottle: new bottle created', ['bottle_id' => $bottle->id]);
             } elseif (! $bottle) {
+                DB::rollBack();
                 session()->flash('error', "Bouteille avec code {$barcode} non trouvée dans le système.");
 
-                return;
+                return false;
             }
 
             $existingBottle = SupplierDeliveryBottle::where('supplier_delivery_product_type_id', $this->selectedProductType->id)
@@ -287,13 +296,13 @@ class ScanBottles extends Component
                 ->first();
 
             if ($existingBottle) {
+                DB::rollBack();
                 $direction = $this->isIncomingMode ? 'entrante' : 'sortante';
                 session()->flash('warning', "Cette bouteille a déjà été scannée comme {$direction} pour cet approvisionnement.");
 
-                return;
+                return false;
             }
 
-            // Mark existing bottles as pending reception during incoming scan
             if ($this->isIncomingMode && ! $bottle->status->equals(BottleStatus::PENDING_RECEPTION())) {
                 $bottle->update([
                     'status' => BottleStatus::PENDING_RECEPTION(),
@@ -314,10 +323,16 @@ class ScanBottles extends Component
             $this->loadAvailableProducts();
 
             session()->flash('message', "Bouteille {$barcode} ajoutée avec succès.");
+            Log::info('addBottle: success', ['barcode' => $barcode]);
+
+            return true;
 
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
+            Log::error('addBottle exception', ['error' => $e->getMessage()]);
             session()->flash('error', 'Erreur lors de l\'ajout de la bouteille: '.$e->getMessage());
+
+            return false;
         }
     }
 
