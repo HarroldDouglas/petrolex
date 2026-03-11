@@ -5,12 +5,22 @@ class CustomerGoogleMapService {
         this.destinationMarker = null;
         this.routeRenderer = null;
         this.directionsService = null;
-        this.fallbackPolyline = null; // Pour la ligne droite de fallback
+        this.fallbackPolyline = null;
         this.initialized = false;
         this.infoWindows = [];
     }
 
+    isGoogleAvailable() {
+        return typeof google !== 'undefined' && google.maps;
+    }
+
     initialize(containerId) {
+        if (!this.isGoogleAvailable()) {
+            console.warn("Google Maps non disponible - carte désactivée");
+            const el = document.getElementById(containerId);
+            if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;flex-direction:column;gap:8px"><span style="font-size:2rem">🗺️</span><span>Carte non disponible</span><small>Google Maps ne peut pas être chargé</small></div>';
+            return null;
+        }
         if (this.initialized) {
             console.warn("Map already initialized");
             return;
@@ -54,6 +64,7 @@ class CustomerGoogleMapService {
     }
 
     updateDriverPosition(lat, lng, driverInfo = {}) {
+        if (!this.isGoogleAvailable() || !this.map) return;
         // Supprimer l'ancien marqueur du livreur
         if (this.driverMarker) {
             this.driverMarker.setMap(null);
@@ -100,6 +111,7 @@ class CustomerGoogleMapService {
     }
 
     setDestination(lat, lng, customerInfo = {}) {
+        if (!this.isGoogleAvailable() || !this.map) return;
         // Supprimer l'ancien marqueur de destination
         if (this.destinationMarker) {
             this.destinationMarker.setMap(null);
@@ -141,6 +153,7 @@ class CustomerGoogleMapService {
     }
 
     async drawRoute(startLat, startLng, endLat, endLng) {
+        if (!this.isGoogleAvailable() || !this.map) return { duration: 0, distance: 0, durationText: '-', distanceText: '-' };
         try {
             const request = {
                 origin: { lat: startLat, lng: startLng },
@@ -308,6 +321,7 @@ class CustomerGoogleMapService {
 
     // Méthode pour adapter la vue aux deux marqueurs
     fitBoundsToMarkers() {
+        if (!this.isGoogleAvailable() || !this.map) return;
         if (!this.driverMarker && !this.destinationMarker) return;
 
         const bounds = new google.maps.LatLngBounds();

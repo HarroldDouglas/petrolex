@@ -27,10 +27,16 @@ class DatabaseSeeder extends Seeder
             $this->command->info('Development data seeded successfully!');
         }
 
-        // Product seeders (need DistributionCenters to exist first)
+        // Product category seeders (reference data)
         $this->call([
             Production\ProductCategorySeeder::class,
-            Production\ProductSeeder::class,
+            Production\DistributionCenterSeeder::class,
+            AppVersionSeeder::class,
         ]);
+
+        // ProductSeeder only in dev (production uses real data created via admin)
+        if (app()->environment('local', 'development', 'testing')) {
+            $this->call(Production\ProductSeeder::class);
+        }
     }
 }

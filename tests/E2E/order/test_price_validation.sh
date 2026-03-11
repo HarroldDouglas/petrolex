@@ -41,8 +41,7 @@ RESPONSE=$(curl -s -X POST "$BASE_URL/api/orders" \
             {
                 \"product_category_id\": $PRODUCT_CATEGORY_2_ID,
                 \"quantity\": 1,
-                \"unit_price\": $PRODUCT_CATEGORY_2_FULL_PRICE,
-                \"option\": \"$BOTTLE_OPTION_FULL\"
+                \"unit_price\": $PRODUCT_CATEGORY_2_FULL_PRICE
             }
         ],
         \"delivery_fee\": $DELIVERY_FEE_NORMAL,
@@ -92,8 +91,7 @@ RESPONSE2=$(curl -s -X POST "$BASE_URL/api/orders" \
             {
                 \"product_category_id\": $PRODUCT_CATEGORY_2_ID,
                 \"quantity\": 1,
-                \"unit_price\": $WRONG_PRICE_2,
-                \"option\": \"$BOTTLE_OPTION_FULL\"
+                \"unit_price\": $WRONG_PRICE_2
             }
         ],
         \"delivery_fee\": $DELIVERY_FEE_FAST,
@@ -144,8 +142,7 @@ RESPONSE3=$(curl -s -X POST "$BASE_URL/api/orders" \
             {
                 \"product_category_id\": $PRODUCT_CATEGORY_2_ID,
                 \"quantity\": 1,
-                \"unit_price\": $PRODUCT_CATEGORY_2_FULL_PRICE,
-                \"option\": \"$BOTTLE_OPTION_FULL\"
+                \"unit_price\": $PRODUCT_CATEGORY_2_FULL_PRICE
             }
         ],
         \"delivery_fee\": $DELIVERY_FEE_NORMAL,

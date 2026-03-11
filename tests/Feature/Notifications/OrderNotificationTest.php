@@ -7,9 +7,9 @@ use App\Enums\UserRole;
 use App\Events\OrderStatusChanged;
 use App\Models\Customer;
 use App\Models\CustomerDeliveryAddress;
+use App\Models\DeliveryPerson;
 use App\Models\DistributionCenter;
 use App\Models\Order;
-use App\Models\DeliveryPerson;
 use App\Models\User;
 use App\Models\UserDistributionCenter;
 use App\Notifications\OrderStatusChangedNotification;
@@ -174,7 +174,7 @@ class OrderNotificationTest extends TestCase
             'distribution_center_id' => $distributionCenter->id,
             'delivery_person_id' => $deliveryPerson->id,
             'delivery_address_id' => CustomerDeliveryAddress::factory()->create(['customer_id' => $customer->id])->id,
-            'order_number' => 'TEST-' . uniqid(),
+            'order_number' => 'TEST-'.uniqid(),
             'status' => $status ?? OrderStatus::PROCESSING(),
             'subtotal' => 1000,
             'delivery_fee' => 500,

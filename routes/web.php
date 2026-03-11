@@ -46,6 +46,8 @@ Route::middleware(['web', 'auth'])->group(function () {
     require __DIR__.'/web/roles.php';
 });
 
-Route::get('/test/manager/dashboard', function () {
-    return view('manager.dashboard');
-})->name('manager.dashboard');
+if (! app()->isProduction()) {
+    Route::get('/test/manager/dashboard', function () {
+        return view('manager.dashboard');
+    })->name('manager.dashboard');
+}

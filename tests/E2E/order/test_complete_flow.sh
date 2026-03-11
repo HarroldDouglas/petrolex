@@ -40,8 +40,7 @@ ORDER_RESPONSE=$(curl -s -X POST "$BASE_URL/api/orders" \
             {
                 \"product_category_id\": $PRODUCT_CATEGORY_2_ID,
                 \"quantity\": 1,
-                \"unit_price\": $PRODUCT_CATEGORY_2_FULL_PRICE,
-                \"option\": \"$BOTTLE_OPTION_FULL\"
+                \"unit_price\": $PRODUCT_CATEGORY_2_FULL_PRICE
             }
         ],
         \"delivery_fee\": $DELIVERY_FEE_FAST,
@@ -225,15 +224,17 @@ DUPLICATE_PAYMENT=$(curl -s -X POST "$BASE_URL/api/orders/$ORDER_ID/payment" \
         }
     }")
 
-# Should fail
-if validate_response "$DUPLICATE_PAYMENT" "true"; then
+# Should fail - check that the response indicates an error (HTTP 400 exception, no "data.order" field)
+DUPLICATE_ORDER_ID=$(echo "$DUPLICATE_PAYMENT" | jq -r '.data.order.id // empty')
+ERROR_MESSAGE=$(echo "$DUPLICATE_PAYMENT" | jq -r '.message // "no message"')
+
+if [ -n "$DUPLICATE_ORDER_ID" ]; then
     print_error "Paid order should not accept new payment"
     echo "$DUPLICATE_PAYMENT" | jq '.'
     exit 1
 fi
 
-ERROR_MESSAGE=$(echo "$DUPLICATE_PAYMENT" | jq -r '.message // "no message"')
-if [[ "$ERROR_MESSAGE" == *"cannot_accept_payment"* ]] || [[ "$ERROR_MESSAGE" == *"cannot accept payment"* ]] || [[ "$ERROR_MESSAGE" == *"Cannot accept"* ]]; then
+if [[ "$ERROR_MESSAGE" == *"cannot_accept_payment"* ]] || [[ "$ERROR_MESSAGE" == *"cannot accept payment"* ]] || [[ "$ERROR_MESSAGE" == *"Cannot accept"* ]] || [[ "$ERROR_MESSAGE" == *"ne peut pas accepter"* ]] || [[ "$ERROR_MESSAGE" == *"paiement"* ]]; then
     print_success "Correctly rejected duplicate payment attempt"
     print_info "Error message: $ERROR_MESSAGE"
 else

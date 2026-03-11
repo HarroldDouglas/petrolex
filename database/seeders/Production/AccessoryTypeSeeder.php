@@ -17,13 +17,6 @@ class AccessoryTypeSeeder extends Seeder
     {
         $this->command->info('Creating accessory types...');
 
-        // Skip if accessory types already exist (idempotent)
-        if (AccessoryType::count() > 0) {
-            $this->command->info('Accessory types already exist, skipping...');
-
-            return;
-        }
-
         $accessoryTypes = [
             [
                 'name' => 'Brûleur à gaz avec soupape en laiton',
@@ -32,15 +25,7 @@ class AccessoryTypeSeeder extends Seeder
                 'description' => 'Brûleur à gaz de haute qualité avec soupape en laiton pour une meilleure durabilité et sécurité.',
                 'description_en' => 'High quality gas burner with brass valve for better durability and safety.',
                 'is_active' => true,
-                'images' => [
-                    'image1.jpg',
-                    'image2.jpg',
-                    'image3.jpg',
-                    'image4.jpg',
-                    'WhatsApp Image 2025-11-26 at 14.00.35(1).png',
-                    'WhatsApp Image 2025-11-26 at 14.00.35.png',
-                    'WhatsApp Image 2025-11-26 at 14.00.36.png',
-                ],
+                'images' => ['image9.jpg.jpeg'],
             ],
             [
                 'name' => 'Support en fer noir (foyer)',
@@ -49,12 +34,7 @@ class AccessoryTypeSeeder extends Seeder
                 'description' => 'Support en fer noir robuste pour cylindre de 6kg. Idéal pour une utilisation domestique.',
                 'description_en' => 'Sturdy black iron stand for 6kg cylinder. Ideal for domestic use.',
                 'is_active' => true,
-                'images' => [
-                    'image5.jpg',
-                    'Untitled6.jpg',
-                    'WhatsApp Image 2025-11-26 at 14.08.10(2).png',
-                    'WhatsApp Image 2025-11-26 at 14.08.10.png',
-                ],
+                'images' => ['image7.jpg.jpeg'],
             ],
             [
                 'name' => 'Régulateur de gaz avec clé (détendeur)',
@@ -63,10 +43,7 @@ class AccessoryTypeSeeder extends Seeder
                 'description' => 'Régulateur de gaz avec clé de serrage. Taille : sortie de 8mm.',
                 'description_en' => 'Gas regulator with tightening key. Size: 8mm outlet.',
                 'is_active' => true,
-                'images' => [
-                    'Untitled9.jpg',
-                    'Untitled10.jpg',
-                ],
+                'images' => ['image10.jpg.jpeg'],
             ],
             [
                 'name' => 'Tuyau de gaz en PVC blanc 2m',
@@ -75,12 +52,7 @@ class AccessoryTypeSeeder extends Seeder
                 'description' => 'Tuyau de gaz en PVC blanc. Taille : 8x14mm x 2.0m.',
                 'description_en' => 'White PVC gas hose. Size: 8x14mm x 2.0m.',
                 'is_active' => true,
-                'images' => [
-                    'Untitled7.jpg',
-                    'Untitled8.jpg',
-                    'WhatsApp Image 2025-11-26 at 14.08.21.png',
-                    'WhatsApp Image 2025-11-26 at 14.08.22.png',
-                ],
+                'images' => ['image8.jpg.jpeg'],
             ],
             [
                 'name' => 'Tuyau de gaz en PVC blanc 1.5m',
@@ -89,22 +61,20 @@ class AccessoryTypeSeeder extends Seeder
                 'description' => 'Tuyau de gaz en PVC blanc. Taille : 8x14mm x 1.5m.',
                 'description_en' => 'White PVC gas hose. Size: 8x14mm x 1.5m.',
                 'is_active' => true,
-                'images' => [
-                    'Untitled7.jpg',
-                    'Untitled8.jpg',
-                    'WhatsApp Image 2025-11-26 at 14.08.21.png',
-                    'WhatsApp Image 2025-11-26 at 14.08.22.png',
-                ],
+                'images' => ['image11.jpg.jpeg'],
             ],
         ];
 
         foreach ($accessoryTypes as $accessoryTypeData) {
-            // Extraire les images avant de créer l'accessoire
             $images = $accessoryTypeData['images'] ?? [];
             unset($accessoryTypeData['images']);
 
-            $accessory = AccessoryType::create($accessoryTypeData);
+            $accessory = AccessoryType::updateOrCreate(
+                ['name' => $accessoryTypeData['name']],
+                $accessoryTypeData
+            );
 
+            $accessory->clearMediaCollection('images');
             $this->addAccessoryImages($accessory, $images);
         }
 
@@ -116,7 +86,7 @@ class AccessoryTypeSeeder extends Seeder
      */
     private function addAccessoryImages(AccessoryType $accessory, array $imageNames): void
     {
-        $imagesPath = public_path('zip/PRODUITS/Gadgets');
+        $imagesPath = public_path('assets/products');
 
         if (! File::exists($imagesPath)) {
             $this->command->warn("Images directory not found: {$imagesPath}");
@@ -137,16 +107,20 @@ class AccessoryTypeSeeder extends Seeder
             $imagePath = $imagesPath.'/'.$imageName;
 
             if (File::exists($imagePath)) {
-                $existingMedia = $accessory->getMedia('images')->where('name', pathinfo($imageName, PATHINFO_FILENAME))->first();
+                try {
+                    $existingMedia = $accessory->getMedia('images')->where('name', pathinfo($imageName, PATHINFO_FILENAME))->first();
 
-                if (! $existingMedia) {
-                    $accessory->addMedia($imagePath)
-                        ->preservingOriginal()
-                        ->usingName(pathinfo($imageName, PATHINFO_FILENAME))
-                        ->toMediaCollection('images');
+                    if (! $existingMedia) {
+                        $accessory->addMedia($imagePath)
+                            ->preservingOriginal()
+                            ->usingName(pathinfo($imageName, PATHINFO_FILENAME))
+                            ->toMediaCollection('images');
 
-                    $addedCount++;
-                    $this->command->info("  ✓ Added image: {$imageName}");
+                        $addedCount++;
+                        $this->command->info("  ✓ Added image: {$imageName}");
+                    }
+                } catch (\Exception $e) {
+                    $this->command->warn("  ✗ Could not add image {$imageName}: {$e->getMessage()}");
                 }
             } else {
                 $this->command->warn("  ✗ Image not found: {$imagePath}");

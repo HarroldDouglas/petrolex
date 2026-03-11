@@ -102,7 +102,7 @@ class MTNMoneyGateway implements PaymentGateway
             }
 
             $formattedPhone = $this->formatPhoneNumber($phoneNumber);
-            $amount = '10'; // TODO put back $payment->amount_due after testing
+            $amount = (string) (int) $payment->amount_due;
 
             Log::info('MTN MoMo: Phone number source', [
                 'phone_from_payment_details' => $paymentDetails->getPhone(),

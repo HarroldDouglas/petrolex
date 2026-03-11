@@ -85,7 +85,7 @@ final class CreateOrderRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $this->validatePricing($validator);
-            // $this->validateStock($validator); // Temporarily disabled for testing
+            // $this->validateStock($validator); // TODO: Implement stock validation
             $this->validateDeliveryFee($validator);
             $this->validateTotalAmount($validator);
         });

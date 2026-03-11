@@ -16,22 +16,22 @@ class AppVersionSeeder extends Seeder
         AppVersion::updateOrCreate(
             ['app_type' => 'customer_app', 'platform' => 'android'],
             [
-                'version_code' => 5,
-                'version_name' => '1.0.5',
+                'version_code' => 11,
+                'version_name' => '1.0.11',
                 'update_required' => true,
-                'release_notes' => 'Adresse de livraison par defaut',
-                'app_link' => 'https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_customer',
+                'release_notes' => 'Commandez et faites vous livrer à domicile',
+                'app_link' => 'https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_customer_app',
             ]
         );
 
         AppVersion::updateOrCreate(
             ['app_type' => 'customer_app', 'platform' => 'ios'],
             [
-                'version_code' => 5,
-                'version_name' => '1.0.5',
+                'version_code' => 11,
+                'version_name' => '1.0.11',
                 'update_required' => true,
-                'release_notes' => 'Adresse de livraison par defaut',
-                'app_link' => 'https://apps.apple.com/app/com.isogaz.customer',
+                'release_notes' => 'Commandez et faites vous livrer à domicile',
+                'app_link' => 'https://apps.apple.com/app/com.isogaz.customer_app',
             ]
         );
 
@@ -39,22 +39,22 @@ class AppVersionSeeder extends Seeder
         AppVersion::updateOrCreate(
             ['app_type' => 'delivery_app', 'platform' => 'android'],
             [
-                'version_code' => 4,
-                'version_name' => '1.0.4',
+                'version_code' => 10,
+                'version_name' => '1.0.10',
                 'update_required' => true,
-                'release_notes' => 'Fix sur la déconnexion',
-                'app_link' => 'https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_delivery',
+                'release_notes' => 'Tracking et livraison des commandes',
+                'app_link' => 'https://play.google.com/store/apps/details?id=cm.petrolex.isogaz_delivery_app',
             ]
         );
 
         AppVersion::updateOrCreate(
             ['app_type' => 'delivery_app', 'platform' => 'ios'],
             [
-                'version_code' => 4,
-                'version_name' => '1.0.4',
+                'version_code' => 10,
+                'version_name' => '1.0.10',
                 'update_required' => true,
-                'release_notes' => 'Fix sur la déconnexion',
-                'app_link' => 'https://apps.apple.com/app/cm.petrolex.isogaz_delivery',
+                'release_notes' => 'Tracking et livraison des commandes',
+                'app_link' => 'https://apps.apple.com/app/com.isogaz.delivery_app',
             ]
         );
     }

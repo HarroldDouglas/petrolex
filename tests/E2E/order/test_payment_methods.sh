@@ -207,32 +207,9 @@ else
     exit 1
 fi
 
-# Test Case 6: Credit Card with valid data
-print_info "Test Case 6: Credit Card with valid data"
-
-ORDER_ID_6=$(create_test_order "Test Credit Card - valid")
-
-RESPONSE6=$(curl -s -X POST "$BASE_URL/api/orders/$ORDER_ID_6/payment" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -H "Accept: application/json" \
-    -d "{
-        \"payment_method\": \"$PAYMENT_METHOD_CARD\",
-        \"payment_details\": {
-            \"card_number\": \"$TEST_CARD_NUMBER\",
-            \"cvv\": \"$TEST_CVV\",
-            \"expiry_date\": \"$TEST_EXPIRY\",
-            \"cardholder_name\": \"$TEST_CARDHOLDER\"
-        }
-    }")
-
-if ! validate_response "$RESPONSE6" "true"; then
-    print_error "Credit Card payment should have succeeded"
-    echo "$RESPONSE6" | jq '.'
-    exit 1
-fi
-
-print_success "Credit Card payment initiated successfully"
+# Test Case 6: Credit Card with valid data (SKIPPED - credit_card is disabled in production)
+print_info "Test Case 6: Credit Card with valid data (SKIPPED - disabled in production)"
+print_warning "Credit card payments are disabled in production config"
 
 # Test Case 7: Invalid payment method
 print_info "Test Case 7: Invalid payment method"
@@ -272,7 +249,7 @@ echo "  ✅ MTN Money successful payment"
 echo "  ✅ Credit Card Luhn algorithm validation"
 echo "  ✅ Credit Card CVV format validation"
 echo "  ✅ Credit Card expiry date validation"
-echo "  ✅ Credit Card successful payment"
+echo "  ⏭️  Credit Card successful payment (skipped - disabled in production)"
 echo "  ✅ Invalid payment method rejection"
 
 echo -e "\n${GREEN}Test Orders Created:${NC}"

@@ -22,6 +22,19 @@ class UpdateProfileRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $phone = $this->input('phone_number');
+        $countryCode = $this->input('country_code', '');
+
+        if ($phone && $countryCode) {
+            $phoneCode = \App\Models\Geography\Country::where('code', strtoupper($countryCode))->value('phone_code');
+            if ($phoneCode && str_starts_with($phone, $phoneCode)) {
+                $this->merge(['phone_number' => substr($phone, strlen($phoneCode))]);
+            }
+        }
+    }
+
     public function rules(): array
     {
         $userId = auth()->id();

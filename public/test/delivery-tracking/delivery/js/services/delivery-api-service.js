@@ -59,7 +59,7 @@ class DeliveryPersonApiService {
     }
 
     async login(email, password) {
-        const response = await this.request(DELIVERY_CONFIG.API.ENDPOINTS.LOGIN, {
+        const response = await this.request(DELIVERY_CONFIG.API.ENDPOINTS.LOGIN_DELIVERY, {
             method: "POST",
             body: JSON.stringify({
                 login: email,

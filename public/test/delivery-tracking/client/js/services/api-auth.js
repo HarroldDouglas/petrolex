@@ -8,7 +8,7 @@ class CustomerAuthService {
     async login(email, password) {
         try {
             const response = await fetch(
-                `${CUSTOMER_CONFIG.API.BASE_URL}${CUSTOMER_CONFIG.API.ENDPOINTS.LOGIN}`,
+                `${CUSTOMER_CONFIG.API.BASE_URL}${CUSTOMER_CONFIG.API.ENDPOINTS.LOGIN_CUSTOMER}`,
                 {
                     method: "POST",
                     headers: {

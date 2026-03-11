@@ -44,7 +44,7 @@ class DistributionCenterResource extends JsonResource
             'longitude' => $this->longitude,
             'phone' => $this->phone,
             'email' => $this->email,
-            'storage_capacity' => $this->storage_capacity,
+            'storage_capacity' => (string) $this->storage_capacity,
         ];
     }
 }

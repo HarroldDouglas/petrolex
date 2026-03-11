@@ -45,19 +45,21 @@ const SHARED_CONFIG = {
         ENDPOINTS: {
             // Auth endpoints
             LOGIN: '/login',
+            LOGIN_CUSTOMER: '/login/customer',
+            LOGIN_DELIVERY: '/login/delivery',
             LOGOUT: '/logout',
-            
+
             // Customer endpoints
             CUSTOMERS: '/customers',
             MY_ORDERS: '/my/orders',
-            
+
             // Delivery endpoints
             DELIVERY_ORDERS: '/delivery/orders',
             DELIVERY_PERSON_ORDERS: '/delivery-persons/{id}/orders',
             DELIVERY_TRACKING: '/delivery/tracking',
             UPDATE_LOCATION: '/delivery/update-location',
-            
-            // Tracking endpoints  
+
+            // Tracking endpoints
             TRACKING_DETAILS: '/tracking/delivery/{orderId}',
             ORDER_STATUS_UPDATE: '/orders/{orderId}/status'
         }
@@ -126,17 +128,17 @@ const SHARED_CONFIG = {
 
     // Configuration WebSocket pour Laravel Reverb
     WEBSOCKET: {
-        ENABLED: true, // Réactivé avec config Laravel Reverb
-        APP_KEY: 'petro-key-12345',
-        APP_SECRET: 'petro-secret-67890',
+        ENABLED: true,
+        APP_KEY: '2a8cb035de46499fd5680360db575b49f291f5b6',
+        APP_SECRET: 'c0b5164badc7790a50081dd28b8bdf4d9a44ea13',
         HOST: ENV_CONFIG.WS_HOST,  // 🌍 Auto-détection production/dev
         PORT: ENV_CONFIG.WS_PORT,
         FORCE_TLS: ENV_CONFIG.FORCE_TLS,
         ENABLED_TRANSPORTS: ['websocket', 'polling'],
         // Configuration spécifique pour Laravel Reverb
-        PUSHER_APP_ID: 'petro-app',
-        PUSHER_APP_KEY: 'petro-key-12345',
-        PUSHER_APP_SECRET: 'petro-secret-67890',
+        PUSHER_APP_ID: '3a4b230a1c314804',
+        PUSHER_APP_KEY: '2a8cb035de46499fd5680360db575b49f291f5b6',
+        PUSHER_APP_SECRET: 'c0b5164badc7790a50081dd28b8bdf4d9a44ea13',
         PUSHER_APP_CLUSTER: 'mt1'
     },
 

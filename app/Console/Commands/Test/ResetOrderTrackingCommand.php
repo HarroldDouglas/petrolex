@@ -29,6 +29,12 @@ class ResetOrderTrackingCommand extends Command
      */
     public function handle()
     {
+        if (app()->isProduction()) {
+            $this->error('This command is disabled in production.');
+
+            return 1;
+        }
+
         $orderId = $this->argument('order_number');
 
         if (! $orderId) {

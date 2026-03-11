@@ -33,18 +33,18 @@ class BottleTypeSeeder extends Seeder
                 'content_price' => 4680,        // Prix de la recharge: 4680 FCFA
                 'full_price' => 21780,          // Prix consigne + recharge: 21780 FCFA
                 'is_active' => true,
-                'specifications' => json_encode([
+                'specifications' => [
                     ['name' => 'Contenant', 'value' => 'BUTANE'],
                     ['name' => 'Masse du contenant', 'value' => '9 kg'],
                     ['name' => 'Volume', 'value' => '18.5 L'],
                     ['name' => 'Test Pressure', 'value' => '30 BAR'],
                     ['name' => 'Hauteur', 'value' => '461 mm'],
-                ]),
+                ],
             ],
         ];
 
         foreach ($bottleTypes as $bottleType) {
-            $bottle = BottleType::firstOrCreate(
+            $bottle = BottleType::updateOrCreate(
                 ['name' => $bottleType['name']],
                 $bottleType
             );
@@ -60,7 +60,7 @@ class BottleTypeSeeder extends Seeder
      */
     private function addBottleImages(BottleType $bottle): void
     {
-        $imagesPath = public_path('zip/PRODUITS/Gadgets');
+        $imagesPath = public_path('assets/images/mobile/products/bottles');
 
         if (! File::exists($imagesPath)) {
             $this->command->warn("Images directory not found: {$imagesPath}");
@@ -71,7 +71,7 @@ class BottleTypeSeeder extends Seeder
 
         $imageMapping = [
             'Bouteille de 9Kg' => [
-                'bouteille_de_gaz.jpg',
+                'bouteille_gaz_9kg_1.jpeg',
             ],
         ];
 
@@ -83,16 +83,20 @@ class BottleTypeSeeder extends Seeder
                 $imagePath = $imagesPath.'/'.$imageName;
 
                 if (File::exists($imagePath)) {
-                    $existingMedia = $bottle->getMedia('images')->where('name', $imageName)->first();
+                    try {
+                        $existingMedia = $bottle->getMedia('images')->where('name', $imageName)->first();
 
-                    if (! $existingMedia) {
-                        $bottle->addMedia($imagePath)
-                            ->preservingOriginal()
-                            ->usingName($imageName)
-                            ->toMediaCollection('images');
+                        if (! $existingMedia) {
+                            $bottle->addMedia($imagePath)
+                                ->preservingOriginal()
+                                ->usingName($imageName)
+                                ->toMediaCollection('images');
 
-                        $addedCount++;
-                        $this->command->info("Added image {$imageName} to {$bottle->name}");
+                            $addedCount++;
+                            $this->command->info("Added image {$imageName} to {$bottle->name}");
+                        }
+                    } catch (\Exception $e) {
+                        $this->command->warn("Could not add image {$imageName}: {$e->getMessage()}");
                     }
                 } else {
                     $this->command->warn("Image not found: {$imagePath}");

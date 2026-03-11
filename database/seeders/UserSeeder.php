@@ -16,8 +16,13 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $this->createSuperAdmin();
-        $this->createGasManager();
-        $this->createCenterManager();
+
+        // Gas Manager and Center Manager are only created in dev
+        // In production, the super_admin creates these via the admin panel
+        if (app()->environment('local', 'development', 'testing')) {
+            $this->createGasManager();
+            $this->createCenterManager();
+        }
     }
 
     /**

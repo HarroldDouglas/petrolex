@@ -31,6 +31,12 @@ class UpdateOrderStatusCommand extends Command
      */
     public function handle()
     {
+        if (app()->isProduction()) {
+            $this->error('This command is disabled in production.');
+
+            return self::FAILURE;
+        }
+
         $orderId = $this->argument('order_id');
         $deliveryPersonId = $this->option('delivery_person_id');
 

@@ -50,7 +50,7 @@ class LoginForm {
                                         id="email" 
                                         name="email"
                                         required
-                                        value="customer1@test.com"
+                                        value="test.customer@petrolex.com"
                                     >
                                 </div>
                                 <div class="mb-3">
@@ -58,13 +58,13 @@ class LoginForm {
                                         <i class="fas fa-lock me-1"></i>
                                         Mot de passe
                                     </label>
-                                    <input 
-                                        type="password" 
-                                        class="form-control" 
-                                        id="password" 
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="password"
                                         name="password"
                                         required
-                                        value="password"
+                                        value="TestPetrolex2026!"
                                     >
                                 </div>
                                 <div class="d-grid">
