@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 class DeliveryPersonSeeder extends Seeder
 {
     private const DELIVERY_EMAIL = 'livreur.douala@isogaz.net';
-    private const DELIVERY_PASSWORD = 'Livreur@2026!';
+    private const DELIVERY_PASSWORD = '12345678';
     private const DELIVERY_PHONE = '650000001';
 
     public function run(): void
