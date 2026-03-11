@@ -300,7 +300,7 @@ class MTNMoneyGateway implements PaymentGateway
                     transactionReference: $transactionReference,
                     paymentUrl: null,
                     amount: (float) ($data['amount'] ?? 0),
-                    errorMessage: null,
+                    errorMessage: $this->mapMTNFailureReason($data['reason'] ?? null),
                     gatewayResponse: $data
                 );
             }
@@ -319,6 +319,25 @@ class MTNMoneyGateway implements PaymentGateway
                 gatewayResponse: null
             );
         }
+    }
+
+    private function mapMTNFailureReason(?string $reason): ?string
+    {
+        if (! $reason) {
+            return null;
+        }
+
+        return match ($reason) {
+            'LOW_BALANCE_OR_PAYEE_LIMIT_REACHED_OR_NOT_ALLOWED' => 'Solde insuffisant ou limite de paiement atteinte.',
+            'PAYER_NOT_FOUND'                                    => 'Numéro non enregistré sur MTN Mobile Money.',
+            'NOT_ALLOWED'                                        => 'Transaction non autorisée par MTN.',
+            'NOT_ALLOWED_TARGET_ENVIRONMENT'                     => 'Transaction non autorisée dans cet environnement.',
+            'APPROVAL_REJECTED'                                  => 'Paiement refusé par le client.',
+            'EXPIRED'                                            => 'Délai de confirmation expiré.',
+            'CANCELLED'                                          => 'Paiement annulé.',
+            'RESOURCE_NOT_FOUND'                                 => 'Transaction introuvable.',
+            default                                              => "Échec du paiement MTN ({$reason}).",
+        };
     }
 
     public function supports(string $paymentMethod): bool

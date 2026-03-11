@@ -248,7 +248,7 @@ class PaymentService
                 transactionReference: $callbackDto->transactionReference,
                 paymentUrl: null,
                 amount: $callbackDto->amount,
-                errorMessage: null,
+                errorMessage: $callbackData['failure_reason'] ?? null,
                 gatewayResponse: $callbackDto->rawData
             );
 
@@ -313,7 +313,7 @@ class PaymentService
 
         $updateData = [
             'payment_status' => $status,
-            'payment_notes' => $response->notes ?? null,
+            'payment_notes' => $response->errorMessage ?? null,
             'gateway_response' => $response,
             'transaction_reference' => $response->transactionReference,
             'payment_date' => in_array($status, [PaymentStatus::PAID()->value, PaymentStatus::FAILED()->value]) ? $now : null,

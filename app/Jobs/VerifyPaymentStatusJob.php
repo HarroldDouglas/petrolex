@@ -72,6 +72,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
                 'amount' => $response->amount ?? null,
                 'should_retry' => $shouldRetry,
                 'is_network_timeout' => $isNetworkTimeout,
+                'failure_reason' => $response->errorMessage,
             ];
 
             Log::info('📋 NEW IN JOB PAYMENT Verification Result', [
