@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);
+        $middleware->alias([
+            'mobile.dev' => \App\Http\Middleware\VerifyMobileDevToken::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

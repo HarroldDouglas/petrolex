@@ -7,6 +7,7 @@ use App\Http\Api\Controllers\App\GetSupportContactController;
 use App\Http\Api\Controllers\App\GetTermsAndConditionsController;
 use App\Http\Api\Controllers\App\PreviewPrivacyPolicyController;
 use App\Http\Api\Controllers\App\PreviewTermsAndConditionsController;
+use App\Http\Api\Controllers\App\UpdateAppVersionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('app')->name('api.app.')->group(function () {
@@ -17,4 +18,9 @@ Route::prefix('app')->name('api.app.')->group(function () {
     Route::get('/support/contact', GetSupportContactController::class)->name('support.contact');
     Route::get('/advertising/banners', GetAdvertisingBannersController::class)->name('advertising.banners');
     Route::get('/version', GetAppVersionController::class)->name('version');
+
+    // Réservé au dev mobile — protégé par X-Mobile-Dev-Token
+    Route::middleware('mobile.dev')->group(function () {
+        Route::put('/version/{app_type}', UpdateAppVersionController::class)->name('version.update');
+    });
 });
