@@ -24,7 +24,8 @@ class CustomerRepository extends BaseEloquentRepository implements CustomerRepos
                 'payment',
                 'customer.deliveryAddresses.neighborhood.municipality.city.country',
                 'deliveryPerson.user',
-                'distributionCenter',
+                'distributionCenter.neighborhood.municipality.city.country',
+                'distributionCenter.neighborhood.municipality.neighborhoods',
                 'refunds',
                 'deliveryTracking',
             ])
