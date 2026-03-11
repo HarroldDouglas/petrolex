@@ -78,16 +78,21 @@ class DistributionCenterRepository extends BaseEloquentRepository implements Dis
             ->get();
 
         if ($centersInSameMunicipality->isNotEmpty()) {
-            // If we have centers in the same municipality, return the first one
             return $centersInSameMunicipality->first();
         }
 
-        // If no centers in the same municipality, find the closest one by distance
-        // We'll use the municipality's coordinates or fallback to general search
-        return DistributionCenter::with(['neighborhood.municipality.city.country', 'neighborhood.municipality.neighborhoods'])
+        // No center in the exact municipality — fallback to same city
+        $cityId = $neighborhoodMunicipality->city_id;
+
+        $centerInSameCity = DistributionCenter::whereHas('neighborhood.municipality', function ($query) use ($cityId) {
+            $query->where('city_id', $cityId);
+        })
             ->where('is_active', true)
-            ->orderBy('id') // Simple ordering as fallback
+            ->with(['neighborhood.municipality.city.country', 'neighborhood.municipality.neighborhoods'])
             ->first();
+
+        // If still nothing, the city is not covered — return null so caller shows a clear error
+        return $centerInSameCity;
     }
 
     /**

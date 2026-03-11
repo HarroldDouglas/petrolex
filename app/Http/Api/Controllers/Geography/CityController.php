@@ -20,8 +20,18 @@ class CityController extends Controller
     {
         $cities = $this->cityService->getCitiesByCountry($country);
 
-        // Load necessary relationships for the Resources
-        $cities->load(['neighborhoods.municipality']);
+        // Load only neighborhoods whose municipality has an active distribution center
+        $cities->load(['neighborhoods' => function ($query) {
+            $query->whereHas('municipality', function ($q) {
+                $q->whereHas('neighborhoods', function ($sub) {
+                    $sub->whereExists(function ($dc) {
+                        $dc->from('distribution_centers')
+                            ->whereColumn('distribution_centers.neighborhood_id', 'neighborhoods.id')
+                            ->where('distribution_centers.is_active', true);
+                    });
+                });
+            });
+        }, 'neighborhoods.municipality']);
 
         return ApiResponse::success(
             data: CityResource::collection($cities),

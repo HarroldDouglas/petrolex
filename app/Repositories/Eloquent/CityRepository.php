@@ -20,6 +20,13 @@ class CityRepository extends BaseEloquentRepository implements CityRepositoryInt
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Geography\City> */
         return $this->model->where('country_id', $country)
             ->where('is_active', true)
+            ->whereHas('neighborhoods', function ($q) {
+                $q->whereExists(function ($sub) {
+                    $sub->from('distribution_centers')
+                        ->whereColumn('distribution_centers.neighborhood_id', 'neighborhoods.id')
+                        ->where('distribution_centers.is_active', true);
+                });
+            })
             ->orderBy('name', 'asc')
             ->get();
     }

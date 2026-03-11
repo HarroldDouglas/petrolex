@@ -11,7 +11,6 @@ use App\Http\Api\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Services\DistributionCenter\DistributionCenterService;
 
-// TODO: update this to be sure that we have at least one distribution center in the same municipality as the customer delivery address
 final class GetClosestDistributionCenterController extends Controller
 {
     public function __construct(private readonly DistributionCenterService $distributionCenterService) {}
@@ -40,7 +39,7 @@ final class GetClosestDistributionCenterController extends Controller
 
         if (! $closestCenter) {
             return ApiResponse::error(
-                message: 'Aucun centre de distribution trouvé.',
+                message: "Votre zone de livraison n'est pas encore couverte. Veuillez choisir une autre adresse de livraison.",
                 statusCode: 404
             );
         }
