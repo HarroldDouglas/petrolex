@@ -8,6 +8,7 @@ use App\Services\Geography\CityService;
 use App\Services\Geography\MunicipalityService;
 use App\Services\Geography\NeighborhoodService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 
 abstract class AbstractNeighborhoodForm extends Component
@@ -19,6 +20,9 @@ abstract class AbstractNeighborhoodForm extends Component
     public bool $is_active = true;
     public array $cities = [];
     public array $municipalities = [];
+    public bool $hasPolygon = false;
+    public bool $fetchingPolygon = false;
+    public ?string $polygonMessage = null;
 
     protected CityService $cityService;
     protected MunicipalityService $municipalityService;
@@ -92,6 +96,61 @@ abstract class AbstractNeighborhoodForm extends Component
     public function render()
     {
         return view('livewire.neighborhood.form');
+    }
+
+    public function fetchPolygonFromOsm(): void
+    {
+        if (empty($this->name)) {
+            $this->polygonMessage = 'error:Veuillez d\'abord saisir le nom du quartier.';
+
+            return;
+        }
+
+        $this->fetchingPolygon = true;
+        $this->polygonMessage = null;
+
+        $cityName = '';
+        if ($this->cityId) {
+            $city = collect($this->cities)->firstWhere('id', $this->cityId);
+            $cityName = $city['name'] ?? '';
+        }
+
+        $searchQuery = $cityName
+            ? "{$this->name}, {$cityName}, Cameroon"
+            : "{$this->name}, Cameroon";
+
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => 'Petrolex/1.0 (contact@isogaz.net)',
+            ])->get('https://nominatim.openstreetmap.org/search', [
+                'q' => $searchQuery,
+                'format' => 'geojson',
+                'polygon_geojson' => 1,
+                'limit' => 1,
+            ]);
+
+            $features = $response->ok() ? $response->json('features') : [];
+
+            if (! empty($features)) {
+                $geometry = $features[0]['geometry'] ?? null;
+
+                if ($geometry && in_array($geometry['type'], ['Polygon', 'MultiPolygon'])) {
+                    if ($this->neighborhood) {
+                        $this->neighborhood->update(['polygon' => $geometry]);
+                    }
+                    $this->hasPolygon = true;
+                    $this->polygonMessage = 'success:Polygone récupéré avec succès depuis OpenStreetMap.';
+                } else {
+                    $this->polygonMessage = 'warning:Aucun polygone trouvé pour ce quartier sur OpenStreetMap.';
+                }
+            } else {
+                $this->polygonMessage = 'warning:Aucun résultat trouvé sur OpenStreetMap pour "' . $searchQuery . '".';
+            }
+        } catch (\Exception $e) {
+            $this->polygonMessage = 'error:Erreur lors de la récupération : ' . $e->getMessage();
+        }
+
+        $this->fetchingPolygon = false;
     }
 
     abstract public function submit();

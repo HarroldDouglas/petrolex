@@ -16,7 +16,7 @@ class EditUserForm extends AbstractUserForm
 
     protected function customRequest(): FormRequest
     {
-        return new UpdateUserRequest($this->user->id);
+        return UpdateUserRequest::createFrom(request())->withId($this->user->id);
     }
 
     public function mount(User $user)

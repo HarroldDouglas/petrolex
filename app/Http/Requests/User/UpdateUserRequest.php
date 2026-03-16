@@ -9,9 +9,16 @@ class UpdateUserRequest extends BaseUserRequest
     /**
      * Constructor
      */
-    public function __construct(protected $id)
+    public function __construct(protected $id = null)
     {
         parent::__construct();
+    }
+
+    public function withId($id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function authorize(): bool

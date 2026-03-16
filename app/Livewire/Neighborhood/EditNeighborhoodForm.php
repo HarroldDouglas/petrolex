@@ -16,6 +16,7 @@ class EditNeighborhoodForm extends AbstractNeighborhoodForm
         $this->municipalityId = $this->neighborhood->municipality_id;
         $this->cityId = $this->neighborhood->municipality->city_id ?? null;
         $this->is_active = $this->neighborhood->is_active;
+        $this->hasPolygon = ! empty($this->neighborhood->polygon);
 
         $this->initialize();
     }

@@ -64,6 +64,9 @@ class UserDataTable extends BaseDataTable
                                 $subQ->whereIn('distribution_center_id', $centerIds);
                             });
                         });
+                    } else {
+                        // Non-center-managers (admins) also see users with no center assigned
+                        $query->orWhereDoesntHave('accessibleDistributionCenters');
                     }
                 });
             } else {
@@ -111,7 +114,7 @@ class UserDataTable extends BaseDataTable
                         ->orderBy(DB::raw('GROUP_CONCAT(distribution_centers.name ORDER BY distribution_centers.name ASC SEPARATOR ", ")'), $direction);
                 })
                 ->searchable(function (Builder $query, string $searchTerm) {
-                    $query->whereHas('accessibleDistributionCenters', function ($q) use ($searchTerm) {
+                    $query->orWhereHas('accessibleDistributionCenters', function ($q) use ($searchTerm) {
                         $q->where('name', 'like', "%$searchTerm%");
                     });
                 })
@@ -137,7 +140,7 @@ class UserDataTable extends BaseDataTable
                 ->sortable(fn ($query, $direction) => $query->orderBy('id', $direction)
                 )
                 ->searchable(function (Builder $query, string $searchTerm) {
-                    $query->whereHas('roles', function ($q) use ($searchTerm) {
+                    $query->orWhereHas('roles', function ($q) use ($searchTerm) {
                         $q->where('name', 'like', "%$searchTerm%");
                     });
                 }),

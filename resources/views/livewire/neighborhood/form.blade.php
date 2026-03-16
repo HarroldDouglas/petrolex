@@ -44,6 +44,32 @@
                 @endif
             </div>
 
+            {{-- Polygon OSM --}}
+            <div class="col-12">
+                <label class="form-label">Polygone géographique</label>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    @if($hasPolygon)
+                        <span class="badge bg-success"><i class="ti ti-check"></i> Polygone défini</span>
+                    @else
+                        <span class="badge bg-warning text-dark"><i class="ti ti-alert-triangle"></i> Aucun polygone</span>
+                    @endif
+
+                    <button type="button" class="btn btn-sm btn-outline-primary" wire:click="fetchPolygonFromOsm" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="fetchPolygonFromOsm"><i class="ti ti-map-search"></i> Récupérer depuis OpenStreetMap</span>
+                        <span wire:loading wire:target="fetchPolygonFromOsm"><i class="ti ti-loader ti-spin"></i> Récupération en cours...</span>
+                    </button>
+                </div>
+
+                @if($polygonMessage)
+                    @php [$type, $msg] = explode(':', $polygonMessage, 2); @endphp
+                    <div class="mt-2 alert alert-{{ $type === 'success' ? 'success' : ($type === 'warning' ? 'warning' : 'danger') }} py-2">
+                        {{ $msg }}
+                    </div>
+                @endif
+
+                <div class="form-text text-muted">Le polygone délimite la zone géographique du quartier et sert à valider les coordonnées GPS des adresses de livraison.</div>
+            </div>
+
             <div class="col-12">
                 <div class="mt-4 d-flex justify-content-end gap-2 flex-column flex-sm-row text-end">
                     <a href="{{ route('neighborhoods.index') }}" class="btn btn-light-danger">

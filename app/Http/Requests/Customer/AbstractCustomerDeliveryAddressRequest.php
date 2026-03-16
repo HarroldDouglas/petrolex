@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Customer;
 
 use App\Rules\CountryPhoneRule;
+use App\Rules\NeighborhoodContainsCoordinates;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AbstractCustomerDeliveryAddressRequest extends FormRequest
@@ -29,7 +30,7 @@ class AbstractCustomerDeliveryAddressRequest extends FormRequest
         return [
             'label' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
-            'neighborhood_id' => ['required', 'integer', 'exists:neighborhoods,id'],
+            'neighborhood_id' => ['required', 'integer', 'exists:neighborhoods,id', new NeighborhoodContainsCoordinates],
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'phone' => [

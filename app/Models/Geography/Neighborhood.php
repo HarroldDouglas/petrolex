@@ -17,7 +17,14 @@ class Neighborhood extends Model
     protected $fillable = [
         'municipality_id',
         'name',
+        'latitude',
+        'longitude',
+        'polygon',
         'is_active',
+    ];
+
+    protected $casts = [
+        'polygon' => 'array',
     ];
 
     public function municipality(): BelongsTo

@@ -67,7 +67,9 @@ class EditProfileForm extends Component
     public function rules()
     {
         // @phpstan-ignore-next-line
-        return $this->customRequest()->rules();
+        return collect($this->customRequest()->rules())
+            ->only(['first_name', 'last_name', 'email', 'phone_number', 'password', 'image'])
+            ->toArray();
     }
 
     public function messages()
@@ -77,7 +79,7 @@ class EditProfileForm extends Component
 
     protected function customRequest(): FormRequest
     {
-        return new UpdateProfileRequest;
+        return UpdateProfileRequest::createFrom(request());
     }
 
     public function getImagePreviewStyleProperty(): string

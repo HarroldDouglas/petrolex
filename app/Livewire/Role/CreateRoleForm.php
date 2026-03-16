@@ -14,7 +14,7 @@ class CreateRoleForm extends AbstractRoleForm
 
     protected function customRequest(): BaseRoleRequest
     {
-        return new StoreRoleRequest;
+        return StoreRoleRequest::createFrom(request());
     }
 
     public function submit()

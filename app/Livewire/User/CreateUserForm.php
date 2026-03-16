@@ -18,7 +18,7 @@ class CreateUserForm extends AbstractUserForm
 
     protected function customRequest(): FormRequest
     {
-        return new StoreUserRequest;
+        return StoreUserRequest::createFrom(request());
     }
 
     public function save()

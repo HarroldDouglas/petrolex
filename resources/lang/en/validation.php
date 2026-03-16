@@ -151,6 +151,7 @@ return [
         'address_required' => 'The address is required.',
         'neighborhood_required' => 'The neighborhood is required.',
         'neighborhood_invalid' => 'The selected neighborhood is invalid.',
+        'coordinates_outside_neighborhood' => 'The GPS coordinates do not match the selected neighborhood.',
         'email_invalid' => 'The email address is not valid.',
         'phone_max' => 'The phone number must not exceed 20 characters.',
     ],

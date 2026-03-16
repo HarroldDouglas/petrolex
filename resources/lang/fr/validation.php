@@ -150,6 +150,7 @@ return [
         'address_required' => 'L\'adresse est obligatoire.',
         'neighborhood_required' => 'Le quartier est obligatoire.',
         'neighborhood_invalid' => 'Le quartier sélectionné n\'est pas valide.',
+        'coordinates_outside_neighborhood' => 'Les coordonnées GPS ne correspondent pas au quartier sélectionné.',
         'email_invalid' => 'L\'adresse email n\'est pas valide.',
         'phone_max' => 'Le numéro de téléphone ne doit pas dépasser 20 caractères.',
     ],

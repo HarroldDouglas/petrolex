@@ -117,6 +117,11 @@ class DistributionCenterService
      */
     public static function getForUser(User $user): \Illuminate\Database\Eloquent\Collection
     {
+        // Super admins and admins always have access to all distribution centers
+        if ($user->hasAnyRole(['super_admin', 'admin'])) {
+            return DistributionCenter::all();
+        }
+
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\DistributionCenter> $distributionCenters */
         $distributionCenters = $user->activeDistributionCenters()->get();
 
