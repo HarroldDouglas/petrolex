@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8001",
+            "url": "https://5551-165-211-32-18.ngrok-free.app",
             "description": "API Server"
         }
     ],
@@ -4774,8 +4774,7 @@
             "StoreCustomerDeliveryAddressRequest": {
                 "required": [
                     "label",
-                    "address",
-                    "neighborhood_id"
+                    "phone"
                 ],
                 "properties": {
                     "label": {
@@ -4783,34 +4782,41 @@
                         "type": "string",
                         "example": "Maison secondaire"
                     },
-                    "address": {
-                        "description": "Full street address",
+                    "phone": {
+                        "description": "Contact phone number without country code",
                         "type": "string",
-                        "example": "456 Avenue de la Liberté"
-                    },
-                    "neighborhood_id": {
-                        "description": "ID of the neighborhood",
-                        "type": "integer",
-                        "example": 1
+                        "example": "699887766"
                     },
                     "latitude": {
-                        "description": "Latitude coordinate",
+                        "description": "Latitude coordinate (required if no location_link)",
                         "type": "number",
                         "format": "float",
                         "example": 3.848,
                         "nullable": true
                     },
                     "longitude": {
-                        "description": "Longitude coordinate",
+                        "description": "Longitude coordinate (required if no location_link)",
                         "type": "number",
                         "format": "float",
                         "example": 11.502,
                         "nullable": true
                     },
-                    "phone": {
-                        "description": "Contact phone number without country code",
+                    "location_link": {
+                        "description": "Geolocation link (required if no latitude/longitude)",
                         "type": "string",
-                        "example": "699887766",
+                        "example": "https://maps.google.com/?q=3.848,11.502",
+                        "nullable": true
+                    },
+                    "address": {
+                        "description": "Full street address",
+                        "type": "string",
+                        "example": "456 Avenue de la Liberté",
+                        "nullable": true
+                    },
+                    "neighborhood_id": {
+                        "description": "ID of the neighborhood",
+                        "type": "integer",
+                        "example": 1,
                         "nullable": true
                     },
                     "phone_country_code": {
@@ -4875,8 +4881,7 @@
             "UpdateCustomerDeliveryAddressRequest": {
                 "required": [
                     "label",
-                    "address",
-                    "neighborhood_id"
+                    "phone"
                 ],
                 "properties": {
                     "label": {
@@ -4884,34 +4889,41 @@
                         "type": "string",
                         "example": "Maison secondaire"
                     },
-                    "address": {
-                        "description": "Full street address",
+                    "phone": {
+                        "description": "Contact phone number without country code",
                         "type": "string",
-                        "example": "456 Avenue de la Liberté"
-                    },
-                    "neighborhood_id": {
-                        "description": "ID of the neighborhood",
-                        "type": "integer",
-                        "example": 1
+                        "example": "699887766"
                     },
                     "latitude": {
-                        "description": "Latitude coordinate",
+                        "description": "Latitude coordinate (required if no location_link)",
                         "type": "number",
                         "format": "float",
                         "example": 3.848,
                         "nullable": true
                     },
                     "longitude": {
-                        "description": "Longitude coordinate",
+                        "description": "Longitude coordinate (required if no location_link)",
                         "type": "number",
                         "format": "float",
                         "example": 11.502,
                         "nullable": true
                     },
-                    "phone": {
-                        "description": "Contact phone number without country code",
+                    "location_link": {
+                        "description": "Geolocation link (required if no latitude/longitude)",
                         "type": "string",
-                        "example": "699887766",
+                        "example": "https://maps.google.com/?q=3.848,11.502",
+                        "nullable": true
+                    },
+                    "address": {
+                        "description": "Full street address",
+                        "type": "string",
+                        "example": "456 Avenue de la Liberté",
+                        "nullable": true
+                    },
+                    "neighborhood_id": {
+                        "description": "ID of the neighborhood",
+                        "type": "integer",
+                        "example": 1,
                         "nullable": true
                     },
                     "phone_country_code": {
@@ -6044,7 +6056,8 @@
                     },
                     "address": {
                         "type": "string",
-                        "example": "456 Avenue de la Liberté"
+                        "example": "456 Avenue de la Liberté",
+                        "nullable": true
                     },
                     "neighborhood": {
                         "description": "Neighborhood data without nested relationships",
@@ -6160,6 +6173,12 @@
                         "type": "number",
                         "format": "float",
                         "example": 11.502,
+                        "nullable": true
+                    },
+                    "location_link": {
+                        "description": "Geolocation link (alternative to GPS coordinates)",
+                        "type": "string",
+                        "example": "https://maps.google.com/?q=3.848,11.502",
                         "nullable": true
                     },
                     "phone": {
@@ -6880,6 +6899,32 @@
                         "format": "date-time",
                         "nullable": true
                     },
+                    "destination_lat": {
+                        "description": "Destination latitude from delivery address",
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.848,
+                        "nullable": true
+                    },
+                    "destination_lng": {
+                        "description": "Destination longitude from delivery address",
+                        "type": "number",
+                        "format": "float",
+                        "example": 11.502,
+                        "nullable": true
+                    },
+                    "destination_location_link": {
+                        "description": "Destination geolocation link (alternative to GPS coordinates)",
+                        "type": "string",
+                        "example": "https://maps.google.com/?q=3.848,11.502",
+                        "nullable": true
+                    },
+                    "destination_address": {
+                        "description": "Full formatted destination address",
+                        "type": "string",
+                        "example": "Maison, Bali, Yaoundé",
+                        "nullable": true
+                    },
                     "started_at": {
                         "type": "string",
                         "format": "date-time",
@@ -7068,11 +7113,19 @@
                             },
                             "latitude": {
                                 "type": "string",
-                                "example": "-4.21324600"
+                                "example": "-4.21324600",
+                                "nullable": true
                             },
                             "longitude": {
                                 "type": "string",
-                                "example": "-4.04634900"
+                                "example": "-4.04634900",
+                                "nullable": true
+                            },
+                            "location_link": {
+                                "description": "Geolocation link (alternative to GPS coordinates)",
+                                "type": "string",
+                                "example": "https://maps.google.com/?q=3.848,11.502",
+                                "nullable": true
                             }
                         },
                         "type": "object"

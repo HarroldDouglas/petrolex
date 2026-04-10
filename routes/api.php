@@ -27,6 +27,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Client-side JS log collector (for remote debugging on mobile)
+Route::post('/js-log', function (Request $request) {
+    $entries = $request->input('entries', []);
+    $ua = $request->userAgent();
+    $ip = $request->ip();
+
+    foreach (array_slice($entries, 0, 50) as $entry) {
+        \Illuminate\Support\Facades\Log::channel('jslog')->info($entry['message'] ?? '', [
+            'level' => $entry['level'] ?? 'log',
+            'url' => $entry['url'] ?? '',
+            'ua' => $ua,
+            'ip' => $ip,
+        ]);
+    }
+
+    return response()->json(['ok' => true]);
+});
+
 // Inclure les routes modulaires
 require __DIR__.'/api/auth.php';
 require __DIR__.'/api/distribution-centers.php';

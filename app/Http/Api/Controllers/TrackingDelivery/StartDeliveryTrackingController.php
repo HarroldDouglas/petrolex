@@ -180,6 +180,17 @@ final class StartDeliveryTrackingController extends Controller
     private function calculateDeliveryRoute(Order $order, array $coordinates): object
     {
         if ($this->hasInvalidDestinationCoordinates($order)) {
+            // If the delivery address uses a location link instead of GPS, return empty route data
+            if ($order->deliveryAddress?->hasLocationLink()) {
+                Log::info('Delivery address uses location link, skipping route calculation', ['order_id' => $order->id]);
+
+                return (object) [
+                    'duration' => null,
+                    'distance' => 0,
+                    'geometry' => null,
+                ];
+            }
+
             Log::error('Missing destination coordinates', ['order_id' => $order->id]);
             throw new \InvalidArgumentException('Order destination coordinates are missing');
         }

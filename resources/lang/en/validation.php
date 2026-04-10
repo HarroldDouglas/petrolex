@@ -148,9 +148,12 @@ return [
     // Delivery address validation messages
     'delivery_address' => [
         'label_required' => 'The address label is required.',
+        'phone_required' => 'The phone number is required.',
         'address_required' => 'The address is required.',
         'neighborhood_required' => 'The neighborhood is required.',
         'neighborhood_invalid' => 'The selected neighborhood is invalid.',
+        'coordinates_or_link_required' => 'Please provide either a GPS position or a location link.',
+        'location_link_invalid' => 'The location link must be a valid URL.',
         'coordinates_outside_neighborhood' => 'The GPS coordinates do not match the selected neighborhood.',
         'email_invalid' => 'The email address is not valid.',
         'phone_max' => 'The phone number must not exceed 20 characters.',
