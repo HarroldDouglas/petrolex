@@ -18,7 +18,7 @@ class VerifyPaymentStatusJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 1;
-    public int $timeout = 30;
+    public int $timeout = 300;
 
     private string $referenceId;
     private int $attemptCount;
@@ -27,8 +27,8 @@ class VerifyPaymentStatusJob implements ShouldQueue
     private PaymentService $paymentService;
     private OrderPaymentRepositoryInterface $orderPaymentRepository;
 
-    private const MAX_ATTEMPTS = 180; // ~1 hour with progressive intervals
-    private const CHECK_INTERVAL = 10; // Base interval (used for first phase)
+    private const MAX_ATTEMPTS = 60; // 60 attempts × 10 seconds = 10 minutes
+    private const CHECK_INTERVAL = 10;
     private const MAX_RETRY_ATTEMPTS = 5;
     private const RETRY_BASE_DELAY = 30;
     private const TIMEOUT_CAP = 300; // Maximum delay in seconds (5 minutes)
@@ -63,8 +63,8 @@ class VerifyPaymentStatusJob implements ShouldQueue
             $response = $gateway->verifyPayment($this->referenceId);
 
             $isNetworkTimeout = $this->isNetworkTimeoutError($response->errorMessage ?? '');
-            $shouldRetry = strtolower($response->status) === 'pending' ||
-                          (strtolower($response->status) === 'failed' && $isNetworkTimeout);
+            $shouldRetry = $response->status === 'PENDING' ||
+                          ($response->status === 'FAILED' && $isNetworkTimeout);
 
             $result = [
                 'success' => $response->success,
@@ -81,8 +81,8 @@ class VerifyPaymentStatusJob implements ShouldQueue
                 'result' => $result,
                 'retry_logic' => [
                     'should_retry' => $shouldRetry,
-                    'is_pending' => strtolower($response->status) === 'pending',
-                    'is_failed_with_network_timeout' => strtolower($response->status) === 'failed' && $isNetworkTimeout,
+                    'is_pending' => $response->status === 'PENDING',
+                    'is_failed_with_network_timeout' => $response->status === 'FAILED' && $isNetworkTimeout,
                     'error_message' => $response->errorMessage ?? null,
                 ],
             ]);
@@ -274,35 +274,15 @@ class VerifyPaymentStatusJob implements ShouldQueue
     private function scheduleNextAttempt(): void
     {
         $nextAttempt = $this->attemptCount + 1;
-        $delay = $this->getCheckInterval();
 
         Log::info('📅 NEW Scheduling Next Payment Status Check', [
             'reference_id' => $this->referenceId,
             'current_attempt' => $this->attemptCount,
             'next_attempt' => $nextAttempt,
-            'delay' => $delay.' seconds',
+            'delay' => self::CHECK_INTERVAL.' seconds',
         ]);
 
-        dispatch((new self($this->referenceId, $this->paymentMethod, $nextAttempt))->delay(now()->addSeconds($delay)));
-    }
-
-    /**
-     * Progressive check interval:
-     * - First 5 min (attempts 1-30): every 10s — client confirms quickly
-     * - Next 10 min (attempts 31-50): every 30s — still waiting
-     * - Remaining ~45 min (attempts 51+): every 60s — slow polling
-     */
-    private function getCheckInterval(): int
-    {
-        if ($this->attemptCount <= 30) {
-            return 10;
-        }
-
-        if ($this->attemptCount <= 50) {
-            return 30;
-        }
-
-        return 60;
+        dispatch((new self($this->referenceId, $this->paymentMethod, $nextAttempt))->delay(now()->addSeconds(self::CHECK_INTERVAL)));
     }
 
     /**

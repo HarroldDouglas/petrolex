@@ -130,18 +130,6 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
-        'jslog' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/jslog.log'),
-            'level' => 'debug',
-            'days' => 7,
-            'formatter' => \Monolog\Formatter\LineFormatter::class,
-            'formatter_with' => [
-                'format' => "[%datetime%] [%context.level%] %message% | url=%context.url% | ua=%context.ua%\n",
-                'dateFormat' => 'Y-m-d H:i:s',
-            ],
-        ],
-
         'user-dynamic' => [
             'driver' => 'daily',
             'path' => storage_path('logs/user.log'),

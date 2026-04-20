@@ -15,12 +15,11 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $customer_id
- * @property int|null $neighborhood_id
+ * @property int $neighborhood_id
  * @property string $label
- * @property string|null $address
+ * @property string $address
  * @property float|null $latitude
  * @property float|null $longitude
- * @property string|null $location_link
  * @property string|null $phone
  * @property string|null $phone_country_code
  * @property string|null $contact_firstname
@@ -62,7 +61,6 @@ class CustomerDeliveryAddress extends Model
         'neighborhood_id',
         'latitude',
         'longitude',
-        'location_link',
         'phone',
         'phone_country_code',
         'contact_firstname',
@@ -124,22 +122,6 @@ class CustomerDeliveryAddress extends Model
     }
 
     /**
-     * Check if the address has GPS coordinates.
-     */
-    public function hasGpsCoordinates(): bool
-    {
-        return $this->latitude !== null && $this->longitude !== null;
-    }
-
-    /**
-     * Check if the address has a location link.
-     */
-    public function hasLocationLink(): bool
-    {
-        return ! empty($this->location_link);
-    }
-
-    /**
      * Get the full formatted address.
      */
     public function fullAddress(): string
@@ -153,10 +135,8 @@ class CustomerDeliveryAddress extends Model
             $this->country->name ?? null,
         ];
 
-        if ($this->hasGpsCoordinates()) {
+        if ($this->latitude && $this->longitude) {
             $parts[] = "GPS: {$this->latitude}, {$this->longitude}";
-        } elseif ($this->hasLocationLink()) {
-            $parts[] = "Lien: {$this->location_link}";
         }
 
         return implode(', ', array_filter($parts)) ?: 'Address not specified';

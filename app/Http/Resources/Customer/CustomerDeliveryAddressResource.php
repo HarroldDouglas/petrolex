@@ -71,7 +71,6 @@ class CustomerDeliveryAddressResource extends JsonResource
             'country' => $country,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
-            'location_link' => $this->location_link,
             'phone' => $this->phone,
             'phone_country_code' => $this->phone_country_code,
             'contact_firstname' => $this->contact_firstname,

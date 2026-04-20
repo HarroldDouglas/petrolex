@@ -459,11 +459,6 @@ class OrderService extends BaseServiceForEntity
         $deliveryAddress = CustomerDeliveryAddress::with(['neighborhood.municipality'])->findOrFail($orderDTO->delivery_address_id);
         $distributionCenter = DistributionCenter::with(['neighborhood.municipality'])->findOrFail($orderDTO->distribution_center_id);
 
-        // Skip municipality validation if the delivery address has no neighborhood (location link mode)
-        if ($deliveryAddress->neighborhood_id === null) {
-            return;
-        }
-
         $deliveryMunicipalityId = $deliveryAddress->neighborhood->municipality_id;
         $centerMunicipalityId = $distributionCenter->neighborhood->municipality_id;
 

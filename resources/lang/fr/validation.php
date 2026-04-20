@@ -147,12 +147,9 @@ return [
     // Delivery address validation messages
     'delivery_address' => [
         'label_required' => 'Le libellé de l\'adresse est obligatoire.',
-        'phone_required' => 'Le numéro de téléphone est obligatoire.',
         'address_required' => 'L\'adresse est obligatoire.',
         'neighborhood_required' => 'Le quartier est obligatoire.',
         'neighborhood_invalid' => 'Le quartier sélectionné n\'est pas valide.',
-        'coordinates_or_link_required' => 'Veuillez fournir soit une position GPS, soit un lien de localisation.',
-        'location_link_invalid' => 'Le lien de localisation doit être une URL valide.',
         'coordinates_outside_neighborhood' => 'Les coordonnées GPS ne correspondent pas au quartier sélectionné.',
         'email_invalid' => 'L\'adresse email n\'est pas valide.',
         'phone_max' => 'Le numéro de téléphone ne doit pas dépasser 20 caractères.',

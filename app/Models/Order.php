@@ -399,9 +399,7 @@ class Order extends Model
      */
     public function getDestinationLatAttribute(): ?float
     {
-        $lat = $this->deliveryAddress?->latitude;
-
-        return $lat !== null ? (float) $lat : null;
+        return (float) $this->deliveryAddress?->latitude;
     }
 
     /**
@@ -409,9 +407,7 @@ class Order extends Model
      */
     public function getDestinationLngAttribute(): ?float
     {
-        $lng = $this->deliveryAddress?->longitude;
-
-        return $lng !== null ? (float) $lng : null;
+        return (float) $this->deliveryAddress?->longitude;
     }
 
     /**

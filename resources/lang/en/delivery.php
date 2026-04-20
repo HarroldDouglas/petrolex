@@ -2,7 +2,7 @@
 
 return [
     'descriptions' => [
-        'normal' => 'Within 24 hours',
-        'fast' => 'Within 1 hour',
+        'normal' => 'Within 48 hours',
+        'fast' => 'Within 24 hours',
     ],
 ];

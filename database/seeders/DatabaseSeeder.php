@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             TestCustomerSeeder::class, // Permanent test customer for mobile app testing
-            TestDeliveryPersonSeeder::class, // Permanent test delivery person for mobile app testing
             Production\BottleTypeSeeder::class,
             Production\AccessoryTypeSeeder::class,
         ]);

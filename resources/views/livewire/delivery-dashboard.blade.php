@@ -173,18 +173,6 @@ function addDeliveryToMap(delivery) {
             if (delivery.route_geometry) {
                 addRouteToMap(orderNumber, delivery.route_geometry);
             }
-        } else if (delivery.destination_location_link) {
-            // No GPS but has a location link — show info popup on driver marker
-            const driverMarkerObj = deliveryMarkers[orderNumber]?.driver;
-            if (driverMarkerObj) {
-                const linkPopup = new google_mapsgl.Popup()
-                    .setHTML(`
-                        <h6>Destination (lien)</h6>
-                        <p>Client: ${delivery.customer_name || 'N/A'}</p>
-                        <p><a href="${delivery.destination_location_link}" target="_blank">Ouvrir le lien de localisation</a></p>
-                    `);
-                driverMarkerObj.setPopup(linkPopup);
-            }
         }
     }
 }

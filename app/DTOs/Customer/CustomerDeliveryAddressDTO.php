@@ -8,11 +8,10 @@ class CustomerDeliveryAddressDTO extends BaseDTO
 {
     public function __construct(
         public string $label,
-        public ?string $address,
-        public ?int $neighborhood_id,
+        public string $address,
+        public int $neighborhood_id,
         public ?float $latitude,
         public ?float $longitude,
-        public ?string $location_link,
         public ?string $phone,
         public ?string $phone_country_code,
         public ?string $contact_firstname,

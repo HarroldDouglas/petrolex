@@ -204,14 +204,10 @@
         <!-- Adresse de livraison -->
         <div class="delivery-section">
             <div class="section-title">LIVRAISON</div>
-            <div>{{ $order->deliveryAddress->label ?? 'Adresse' }}</div>
-            @if($order->deliveryAddress->address)
-                <div>{{ $order->deliveryAddress->address }}</div>
-            @endif
-            @if($order->deliveryAddress?->hasLocationLink())
-                <div><strong>Lien:</strong> {{ $order->deliveryAddress->location_link }}</div>
-            @elseif($order->deliveryAddress?->hasGpsCoordinates())
-                <div><strong>GPS:</strong> {{ $order->deliveryAddress->latitude }}, {{ $order->deliveryAddress->longitude }}</div>
+            <div>{{ $order->deliveryAddress->address ?? '123 Rue de la Paix' }}</div>
+            <div>{{ ($order->deliveryAddress->postal_code ?? '75001') . ' ' . ($order->deliveryAddress->city ?? 'Paris') }}</div>
+            @if($order->deliveryAddress->additional_info ?? 'Appartement 4B')
+                <div>{{ $order->deliveryAddress->additional_info ?? 'Appartement 4B' }}</div>
             @endif
             @if($order->delivery_date)
                 <div><strong>Livraison prévue:</strong> {{ $order->delivery_date->format('d/m/Y H:i') }}</div>

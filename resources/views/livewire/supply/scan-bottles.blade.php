@@ -201,10 +201,8 @@
     </div>
 
     @push('scripts')
-        <script src="{{ asset('assets/js/js-logger.js') }}?v={{ filemtime(public_path('assets/js/js-logger.js')) }}"></script>
         <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-        <script src="{{ asset('assets/js/scan-code-bar.js') }}?v={{ filemtime(public_path('assets/js/scan-code-bar.js')) }}"></script>
-
+        <script src="{{ asset('assets/js/scan-code-bar.js') }}"></script>
         <script>
             console.log('Livewire blade template script starting');
 

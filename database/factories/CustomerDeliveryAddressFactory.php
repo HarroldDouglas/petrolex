@@ -22,7 +22,6 @@ class CustomerDeliveryAddressFactory extends Factory
             'address' => fake()->address(),
             'latitude' => fake()->latitude(3.8, 4.1), // Cameroun coords (Yaoundé-Douala region)
             'longitude' => fake()->longitude(9.6, 11.6), // Cameroun coords (Douala-Yaoundé region)
-            'location_link' => null,
             'phone' => fake()->phoneNumber(),
             'phone_country_code' => '+237',
             'contact_firstname' => fake()->firstName(),
@@ -32,19 +31,6 @@ class CustomerDeliveryAddressFactory extends Factory
             'neighborhood_id' => Neighborhood::inRandomOrder()->first()?->id,
             'is_default' => false,
         ];
-    }
-
-    /**
-     * Use a location link instead of GPS coordinates.
-     */
-    public function withLocationLink(): static
-    {
-        return $this->state([
-            'latitude' => null,
-            'longitude' => null,
-            'location_link' => 'https://maps.google.com/?q=' . fake()->latitude(3.8, 4.1) . ',' . fake()->longitude(9.6, 11.6),
-            'neighborhood_id' => null,
-        ]);
     }
 
     /**

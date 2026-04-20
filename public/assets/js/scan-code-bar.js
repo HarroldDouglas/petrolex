@@ -26,8 +26,7 @@ if (typeof window.BarcodeScannerModule === "undefined") {
             var statusIndicator = document.createElement("div");
             statusIndicator.id = "scan-status";
             statusIndicator.style.cssText =
-                "color:white;margin-top:10px;font-size:14px;min-height:20px;padding:4px 8px;" +
-                "background:rgba(0,0,0,0.5);border-radius:4px;max-width:500px;width:100%;text-align:center;";
+                "color:white;margin-top:10px;font-size:14px;min-height:20px;";
             statusIndicator.textContent = "Pointez vers le code-barres...";
             scannerContainer.appendChild(statusIndicator);
 
@@ -71,25 +70,32 @@ if (typeof window.BarcodeScannerModule === "undefined") {
             if (el) el.textContent = text;
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
+        function onScanSuccess(decodedText) {
             if (isProcessing) return;
-            if (!decodedText) return;
 
-            var format = (decodedResult && decodedResult.result && decodedResult.result.format)
-                ? decodedResult.result.format.formatName : "?";
-
-            alert("SCAN DETECTE!\nFormat: " + format + "\nValeur: " + decodedText);
-            updateStatus("✅ Lu [" + format + "]: " + decodedText);
+            // Validate EAN-13: must be exactly 13 digits
+            if (!/^\d{13}$/.test(decodedText)) {
+                return;
+            }
 
             isProcessing = true;
+            updateStatus("Code lu : " + decodedText);
+
             stopScanner();
 
             try {
-                Livewire.dispatch("barcode-scanned", [{ barcode: decodedText }]);
+                Livewire.dispatch("barcode-scanned", [
+                    { barcode: decodedText },
+                ]);
             } catch (error) {
-                alert("Erreur Livewire: " + error.message);
+                alert(
+                    "Erreur lors du traitement du code-barres: " +
+                        error.message,
+                );
             } finally {
-                setTimeout(function () { isProcessing = false; }, 500);
+                setTimeout(function () {
+                    isProcessing = false;
+                }, 500);
             }
         }
 
@@ -97,20 +103,31 @@ if (typeof window.BarcodeScannerModule === "undefined") {
             init: function () {
                 isProcessing = false;
 
+                // Clean up any previous scanner
                 if (scanner) {
-                    try { scanner.stop(); scanner.clear(); } catch (e) {}
+                    try {
+                        scanner.stop();
+                        scanner.clear();
+                    } catch (e) {
+                        // ignore
+                    }
                     scanner = null;
                 }
                 removeScannerFromDOM();
 
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    alert("Caméra non disponible. HTTPS requis.");
+                // Check for camera support
+                if (
+                    !navigator.mediaDevices ||
+                    !navigator.mediaDevices.getUserMedia
+                ) {
+                    alert(
+                        "L'acc\u00e8s \u00e0 la cam\u00e9ra n\u00e9cessite HTTPS. Veuillez utiliser l'URL HTTPS du site.",
+                    );
                     return;
                 }
 
                 var ui = createScannerUI();
                 document.body.appendChild(ui);
-                updateStatus("Caméra en cours d'ouverture...");
 
                 scanner = new Html5Qrcode("scanner-viewport");
 
@@ -121,6 +138,7 @@ if (typeof window.BarcodeScannerModule === "undefined") {
                         Html5QrcodeSupportedFormats.EAN_13,
                         Html5QrcodeSupportedFormats.EAN_8,
                     ],
+                    // Prefer native BarcodeDetector API when available
                     useBarCodeDetectorIfSupported: true,
                 };
 
@@ -129,15 +147,32 @@ if (typeof window.BarcodeScannerModule === "undefined") {
                         { facingMode: "environment" },
                         config,
                         onScanSuccess,
-                        function () {}
+                        function () {
+                            // ignore scan failures (no barcode in frame)
+                        },
                     )
-                    .then(function() {
-                        updateStatus("Pointez vers le code-barres...");
-                    })
                     .catch(function (err) {
                         removeScannerFromDOM();
                         scanner = null;
-                        alert("Erreur démarrage caméra: " + err);
+
+                        if (
+                            err.toString().indexOf("NotAllowedError") !== -1
+                        ) {
+                            alert(
+                                "Acc\u00e8s \u00e0 la cam\u00e9ra refus\u00e9. Veuillez autoriser l'acc\u00e8s dans les param\u00e8tres de votre navigateur.",
+                            );
+                        } else if (
+                            err.toString().indexOf("NotFoundError") !== -1
+                        ) {
+                            alert(
+                                "Aucune cam\u00e9ra d\u00e9tect\u00e9e sur cet appareil.",
+                            );
+                        } else {
+                            alert(
+                                "Erreur lors de l'initialisation du scanner : " +
+                                    err,
+                            );
+                        }
                     });
             },
         };

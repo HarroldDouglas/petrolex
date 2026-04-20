@@ -37,9 +37,8 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="country", type="string", nullable=true, example=null),
  *         @OA\Property(property="neighborhood", type="string", nullable=true, example=null),
  *         @OA\Property(property="address_precision", type="string", example="Magni minus quasi minima eligendi commodi."),
- *         @OA\Property(property="latitude", type="string", nullable=true, example="-4.21324600"),
- *         @OA\Property(property="longitude", type="string", nullable=true, example="-4.04634900"),
- *         @OA\Property(property="location_link", type="string", nullable=true, example="https://maps.google.com/?q=3.848,11.502", description="Geolocation link (alternative to GPS coordinates)")
+ *         @OA\Property(property="latitude", type="string", example="-4.21324600"),
+ *         @OA\Property(property="longitude", type="string", example="-4.04634900")
  *     )
  * )
  */

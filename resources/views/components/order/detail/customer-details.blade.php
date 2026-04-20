@@ -20,14 +20,7 @@
             <div class="d-flex justify-content-between mt-3">
                 <h6 class="f-w-600 text-dark"><i class="ti ti-map-pin f-s-18 text-secondary me-2"></i>Adresse de la commande</h6>
                 <div class="text-end">
-                    <p>
-                        {{ $order->deliveryAddress?->fullAddress() ?? 'Non spécifiée' }}
-                        @if($order->deliveryAddress?->hasLocationLink())
-                            <br><a href="{{ $order->deliveryAddress->location_link }}" target="_blank" class="btn-link">
-                                <i class="ti ti-external-link"></i> Voir sur la carte
-                            </a>
-                        @endif
-                    </p>
+                    <p>{{ $order->deliveryAddress?->fullAddress() ?? 'Non spécifiée' }}</p>
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-3">
