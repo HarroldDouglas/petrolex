@@ -7,16 +7,16 @@ use OpenApi\Annotations as OA;
  *     schema="StoreCustomerDeliveryAddressRequest",
  *     required={
  *         "label",
- *         "address",
- *         "neighborhood_id"
+ *         "phone"
  *     },
  *
  *     @OA\Property(property="label", type="string", example="Maison secondaire", description="Label for the delivery address"),
- *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté", description="Full street address"),
- *     @OA\Property(property="neighborhood_id", type="integer", example=1, description="ID of the neighborhood"),
- *     @OA\Property(property="latitude", type="number", format="float", example=3.848, nullable=true, description="Latitude coordinate"),
- *     @OA\Property(property="longitude", type="number", format="float", example=11.502, nullable=true, description="Longitude coordinate"),
- *     @OA\Property(property="phone", type="string", example="699887766", nullable=true, description="Contact phone number without country code"),
+ *     @OA\Property(property="phone", type="string", example="699887766", description="Contact phone number without country code"),
+ *     @OA\Property(property="latitude", type="number", format="float", example=3.848, nullable=true, description="Latitude coordinate (required if no location_link)"),
+ *     @OA\Property(property="longitude", type="number", format="float", example=11.502, nullable=true, description="Longitude coordinate (required if no location_link)"),
+ *     @OA\Property(property="location_link", type="string", example="https://maps.google.com/?q=3.848,11.502", nullable=true, description="Geolocation link (required if no latitude/longitude)"),
+ *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté", nullable=true, description="Full street address"),
+ *     @OA\Property(property="neighborhood_id", type="integer", example=1, nullable=true, description="ID of the neighborhood"),
  *     @OA\Property(property="phone_country_code", type="string", example="+237", nullable=true, description="Country code for the phone number"),
  *     @OA\Property(property="contact_firstname", type="string", example="Marie", nullable=true, description="Contact person's first name"),
  *     @OA\Property(property="contact_lastname", type="string", example="Curie", nullable=true, description="Contact person's last name"),

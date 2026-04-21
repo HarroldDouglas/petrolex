@@ -102,7 +102,7 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="label", type="string", example="Maison"),
- *     @OA\Property(property="address", type="string", example="456 Avenue de la Liberté"),
+ *     @OA\Property(property="address", type="string", nullable=true, example="456 Avenue de la Liberté"),
  *     @OA\Property(
  *         property="neighborhood",
  *         type="object",
@@ -148,6 +148,7 @@ use OpenApi\Annotations as OA;
  *     ),
  *     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=3.848),
  *     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=11.502),
+ *     @OA\Property(property="location_link", type="string", nullable=true, example="https://maps.google.com/?q=3.848,11.502", description="Geolocation link (alternative to GPS coordinates)"),
  *     @OA\Property(property="phone", type="string", nullable=true, example="699887766"),
  *     @OA\Property(property="phone_country_code", type="string", nullable=true, example="+237"),
  *     @OA\Property(property="contact_firstname", type="string", nullable=true, example="Marie"),
@@ -383,6 +384,10 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="current_latitude", type="number", format="float", nullable=true, example=3.850),
  *     @OA\Property(property="current_longitude", type="number", format="float", nullable=true, example=11.500),
  *     @OA\Property(property="estimated_arrival", type="string", format="date-time", nullable=true),
+ *     @OA\Property(property="destination_lat", type="number", format="float", nullable=true, example=3.848, description="Destination latitude from delivery address"),
+ *     @OA\Property(property="destination_lng", type="number", format="float", nullable=true, example=11.502, description="Destination longitude from delivery address"),
+ *     @OA\Property(property="destination_location_link", type="string", nullable=true, example="https://maps.google.com/?q=3.848,11.502", description="Destination geolocation link (alternative to GPS coordinates)"),
+ *     @OA\Property(property="destination_address", type="string", nullable=true, example="Maison, Bali, Yaoundé", description="Full formatted destination address"),
  *     @OA\Property(property="started_at", type="string", format="date-time", nullable=true),
  *     @OA\Property(property="completed_at", type="string", format="date-time", nullable=true),
  *     @OA\Property(property="created_at", type="string", format="date-time"),

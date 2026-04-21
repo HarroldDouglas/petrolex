@@ -138,21 +138,27 @@
             <p>
                 <strong>{{ $order->customer?->user->first_name }} {{ $order->customer?->user->last_name }}</strong><br>
                 @if($order->delivery_address_id && $order->deliveryAddress)
-                    {{ $order->deliveryAddress->address }}<br>
+                    {{ $order->deliveryAddress->label }}<br>
+                    @if($order->deliveryAddress->address)
+                        {{ $order->deliveryAddress->address }}<br>
+                    @endif
                     @if($order->deliveryAddress->neighborhood)
                         {{ $order->deliveryAddress->neighborhood->name }},
                     @endif
-                    {{ $order->deliveryAddress->city->name ?? 'Yaoundé' }}<br>
-                    {{ $order->deliveryAddress->country->name ?? 'Cameroun' }}<br>
+                    @if($order->deliveryAddress->city)
+                        {{ $order->deliveryAddress->city->name }}<br>
+                    @endif
                     <strong>Tél:</strong> {{ $order->deliveryAddress->phone ?? ($order->customer?->phone ?? 'Non disponible') }}
-                    @if($order->deliveryAddress->contact_name)
-                        <br><strong>Contact:</strong> {{ $order->deliveryAddress->contact_name }}
+                    @if($order->deliveryAddress->hasLocationLink())
+                        <br><strong>Localisation:</strong> {{ $order->deliveryAddress->location_link }}
+                    @elseif($order->deliveryAddress->hasGpsCoordinates())
+                        <br><strong>GPS:</strong> {{ $order->deliveryAddress->latitude }}, {{ $order->deliveryAddress->longitude }}
                     @endif
                     @if($order->customer?->email)
                         <br><strong>Email:</strong> {{ $order->customer->email }}
                     @endif
                 @else
-                    {{ $order->delivery_address ?? $order->customer?->address ?? 'Adresse non disponible' }}<br>
+                    {{ $order->customer?->address ?? 'Adresse non disponible' }}<br>
                     <strong>Tél:</strong> {{ $order->customer?->phone ?? 'Non disponible' }}
                     @if($order->customer?->email)
                     <br><strong>Email:</strong> {{ $order->customer->email }}

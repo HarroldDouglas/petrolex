@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Customer;
 
 use App\Rules\CountryPhoneRule;
-use App\Rules\NeighborhoodContainsCoordinates;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AbstractCustomerDeliveryAddressRequest extends FormRequest
@@ -29,16 +28,17 @@ class AbstractCustomerDeliveryAddressRequest extends FormRequest
 
         return [
             'label' => ['required', 'string', 'max:255'],
-            'address' => ['required', 'string', 'max:255'],
-            'neighborhood_id' => ['required', 'integer', 'exists:neighborhoods,id', new NeighborhoodContainsCoordinates],
-            'latitude' => ['nullable', 'numeric'],
-            'longitude' => ['nullable', 'numeric'],
             'phone' => [
-                'nullable',
+                'required',
                 'string',
                 'max:20',
                 new CountryPhoneRule($countryCode),
             ],
+            'latitude' => ['nullable', 'numeric', 'required_without:location_link'],
+            'longitude' => ['nullable', 'numeric', 'required_without:location_link'],
+            'location_link' => ['nullable', 'string', 'url', 'max:2048', 'required_without:latitude'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'neighborhood_id' => ['nullable', 'integer', 'exists:neighborhoods,id'],
             'phone_country_code' => ['nullable', 'string', 'max:10'],
             'contact_firstname' => ['nullable', 'string', 'max:255'],
             'contact_lastname' => ['nullable', 'string', 'max:255'],
@@ -57,8 +57,11 @@ class AbstractCustomerDeliveryAddressRequest extends FormRequest
     {
         return [
             'label.required' => __('validation.delivery_address.label_required'),
-            'address.required' => __('validation.delivery_address.address_required'),
-            'neighborhood_id.required' => __('validation.delivery_address.neighborhood_required'),
+            'phone.required' => __('validation.delivery_address.phone_required'),
+            'latitude.required_without' => __('validation.delivery_address.coordinates_or_link_required'),
+            'longitude.required_without' => __('validation.delivery_address.coordinates_or_link_required'),
+            'location_link.required_without' => __('validation.delivery_address.coordinates_or_link_required'),
+            'location_link.url' => __('validation.delivery_address.location_link_invalid'),
             'neighborhood_id.exists' => __('validation.delivery_address.neighborhood_invalid'),
             'email.email' => __('validation.delivery_address.email_invalid'),
             'phone.max' => __('validation.delivery_address.phone_max'),

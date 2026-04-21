@@ -417,8 +417,7 @@ class OrangeMoneyGateway implements PaymentGateway
     {
         return match (strtoupper($orangeStatus)) {
             'SUCCESSFULL', 'SUCCESS' => PaymentStatus::PAID()->value,
-            'FAILED' => PaymentStatus::FAILED()->value,
-            'EXPIRED' => PaymentStatus::FAILED()->value,
+            'FAILED', 'CANCELLED', 'EXPIRED' => PaymentStatus::FAILED()->value,
             'INITIATED', 'PENDING' => PaymentStatus::PENDING()->value,
             default => PaymentStatus::PENDING()->value,
         };
