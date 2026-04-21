@@ -29,39 +29,22 @@ class UpdateCustomerDeliveryAddressTest extends TestCase
     {
         parent::setUp();
 
-        // Create geographic entities
-        $this->country = Country::factory()->create([
-            'name' => 'Cameroun',
-            'code' => 'CM',
-        ]);
+        $this->country = Country::factory()->create(['name' => 'Cameroun', 'code' => 'CM']);
+        $this->city = City::factory()->create(['name' => 'Yaoundé', 'country_id' => $this->country->id]);
+        $this->municipality = Municipality::factory()->create(['name' => 'Yaoundé I', 'city_id' => $this->city->id]);
+        $this->neighborhood = Neighborhood::factory()->create(['name' => 'Bali', 'municipality_id' => $this->municipality->id]);
 
-        $this->city = City::factory()->create([
-            'name' => 'Yaoundé',
-            'country_id' => $this->country->id,
-        ]);
-
-        $this->municipality = Municipality::factory()->create([
-            'name' => 'Yaoundé I',
-            'city_id' => $this->city->id,
-        ]);
-
-        $this->neighborhood = Neighborhood::factory()->create([
-            'name' => 'Bali',
-            'municipality_id' => $this->municipality->id,
-        ]);
-
-        // Create user and customer
         $this->user = User::factory()->create();
-        $this->customer = Customer::factory()->create([
-            'user_id' => $this->user->id,
-        ]);
+        $this->customer = Customer::factory()->create(['user_id' => $this->user->id]);
 
-        // Create delivery address
         $this->deliveryAddress = CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
             'neighborhood_id' => $this->neighborhood->id,
             'label' => 'Original Label',
             'address' => 'Original Address',
+            'phone' => '677000000',
+            'latitude' => 3.856,
+            'longitude' => 11.495,
             'is_default' => false,
         ]);
 
@@ -72,8 +55,11 @@ class UpdateCustomerDeliveryAddressTest extends TestCase
     {
         $requestData = [
             'label' => 'Updated Label',
+            'phone' => '677123456',
             'address' => 'Updated Address',
             'neighborhood_id' => $this->neighborhood->id,
+            'latitude' => 3.856,
+            'longitude' => 11.495,
             'is_default' => true,
         ];
 
@@ -109,15 +95,44 @@ class UpdateCustomerDeliveryAddressTest extends TestCase
             ->putJson("/api/my/delivery-addresses/{$this->deliveryAddress->id}", []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['label', 'address', 'neighborhood_id']);
+            ->assertJsonValidationErrors(['label', 'phone']);
+    }
+
+    public function test_validates_gps_or_location_link_required(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->putJson("/api/my/delivery-addresses/{$this->deliveryAddress->id}", [
+                'label' => 'Test',
+                'phone' => '677123456',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['latitude', 'longitude', 'location_link']);
+    }
+
+    public function test_can_update_with_location_link_instead_of_gps(): void
+    {
+        $requestData = [
+            'label' => 'Updated Label',
+            'phone' => '677123456',
+            'location_link' => 'https://maps.google.com/?q=3.856,11.495',
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->putJson("/api/my/delivery-addresses/{$this->deliveryAddress->id}", $requestData);
+
+        $response->assertStatus(200);
     }
 
     public function test_returns_full_geographic_data_structure(): void
     {
         $requestData = [
             'label' => 'Updated Label',
+            'phone' => '677123456',
             'address' => 'Updated Address',
             'neighborhood_id' => $this->neighborhood->id,
+            'latitude' => 3.856,
+            'longitude' => 11.495,
         ];
 
         $response = $this->actingAs($this->user)

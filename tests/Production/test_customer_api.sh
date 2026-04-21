@@ -8,7 +8,7 @@
 
 set -e
 
-BASE_URL="https://isogaz.afrik-solutions.com"
+BASE_URL="https://isogaz.net"
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
@@ -21,8 +21,8 @@ echo -e "${BLUE}  Testing: $BASE_URL${NC}"
 echo -e "${BLUE}================================================${NC}\n"
 
 # Test credentials
-EMAIL="customer1@test.com"
-PASSWORD="password"
+EMAIL="test.customer@petrolex.com"
+PASSWORD="TestPetrolex2026!"
 
 PASSED=0
 FAILED=0
@@ -245,16 +245,15 @@ CREATE_ADDRESS=$(curl -s -X POST "$BASE_URL/api/my/delivery-addresses" \
     -H "Accept: application/json" \
     -d "{
         \"label\": \"Test Address $(date +%s)\",
-        \"address\": \"Rue Test\",
-        \"neighborhood_id\": 1,
-        \"latitude\": 3.856,
-        \"longitude\": 11.495,
+        \"neighborhood_id\": 17,
+        \"latitude\": 4.040,
+        \"longitude\": 9.690,
         \"phone\": \"677123456\",
         \"phone_country_code\": \"+237\",
         \"contact_firstname\": \"Test\",
         \"contact_lastname\": \"User\",
         \"email\": \"test@test.com\",
-        \"address_precision\": \"Test address\",
+        \"address_precision\": \"Test address Douala\",
         \"is_default\": false
     }")
 
@@ -276,22 +275,22 @@ if [ -n "$ADDRESS_ID" ] && [ "$ADDRESS_ID" != "null" ]; then
         -H "Accept: application/json" \
         -d "{
             \"label\": \"Updated Test Address\",
-            \"address\": \"Rue Test Updated\",
-            \"neighborhood_id\": 1,
-            \"latitude\": 3.856,
-            \"longitude\": 11.495,
+            \"neighborhood_id\": 17,
+            \"latitude\": 4.040,
+            \"longitude\": 9.690,
             \"phone\": \"677123456\",
             \"phone_country_code\": \"+237\",
             \"contact_firstname\": \"Test\",
             \"contact_lastname\": \"User\",
             \"email\": \"test@test.com\",
-            \"address_precision\": \"Updated address\",
+            \"address_precision\": \"Updated address Douala\",
             \"is_default\": false
         }")
 
     if echo "$UPDATE_ADDRESS" | jq -e '._metadata.success' > /dev/null 2>&1; then
         success "Delivery address updated"
     else
+        echo "$UPDATE_ADDRESS" | jq '.'
         fail "Failed to update delivery address"
     fi
 else
@@ -319,18 +318,18 @@ CREATE_ORDER=$(curl -s -X POST "$BASE_URL/api/orders" \
     -H "Accept: application/json" \
     -d "{
         \"distribution_center_id\": 1,
-        \"delivery_address_id\": 1,
+        \"delivery_address_id\": $ADDRESS_ID,
         \"items\": [
             {
                 \"product_category_id\": 1,
                 \"quantity\": 1,
                 \"option\": \"bottle_with_content\",
-                \"unit_price\": 6500
+                \"unit_price\": 21780
             }
         ],
         \"delivery_type\": \"normal\",
         \"delivery_fee\": 500,
-        \"total_amount\": 7000
+        \"total_amount\": 22280
     }")
 
 if echo "$CREATE_ORDER" | jq -e '._metadata.success' > /dev/null 2>&1; then

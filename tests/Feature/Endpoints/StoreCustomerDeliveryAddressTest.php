@@ -27,40 +27,23 @@ class StoreCustomerDeliveryAddressTest extends TestCase
     {
         parent::setUp();
 
-        // Create geographic data
-        $this->country = Country::factory()->create([
-            'name' => 'Cameroun',
-            'code' => 'CM',
-        ]);
+        $this->country = Country::factory()->create(['name' => 'Cameroun', 'code' => 'CM']);
+        $this->city = City::factory()->create(['name' => 'Yaoundé', 'country_id' => $this->country->id]);
+        $this->municipality = Municipality::factory()->create(['name' => 'Yaoundé I', 'city_id' => $this->city->id]);
+        $this->neighborhood = Neighborhood::factory()->create(['name' => 'Bali', 'municipality_id' => $this->municipality->id]);
 
-        $this->city = City::factory()->create([
-            'name' => 'Yaoundé',
-            'country_id' => $this->country->id,
-        ]);
-
-        $this->municipality = Municipality::factory()->create([
-            'name' => 'Yaoundé I',
-            'city_id' => $this->city->id,
-        ]);
-
-        $this->neighborhood = Neighborhood::factory()->create([
-            'name' => 'Bali',
-            'municipality_id' => $this->municipality->id,
-        ]);
-
-        // Create user and customer
         $this->user = User::factory()->create();
-        $this->customer = Customer::factory()->create([
-            'user_id' => $this->user->id,
-        ]);
+        $this->customer = Customer::factory()->create(['user_id' => $this->user->id]);
     }
 
     public function test_can_store_customer_delivery_address_with_required_fields(): void
     {
         $requestData = [
             'label' => 'Maison principale',
-            'address' => '123 Avenue de la Liberté',
+            'phone' => '677123456',
             'neighborhood_id' => $this->neighborhood->id,
+            'latitude' => 3.856,
+            'longitude' => 11.495,
         ];
 
         $response = $this->actingAs($this->user)
@@ -73,9 +56,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
                     'message' => 'Adresse de livraison créée avec succès',
                 ],
                 'data' => [
-                    'id' => 1,
                     'label' => 'Maison principale',
-                    'address' => '123 Avenue de la Liberté',
                     'neighborhood' => [
                         'id' => $this->neighborhood->id,
                         'name' => 'Bali',
@@ -103,7 +84,6 @@ class StoreCustomerDeliveryAddressTest extends TestCase
         $this->assertDatabaseHas('customer_delivery_addresses', [
             'customer_id' => $this->customer->id,
             'label' => 'Maison principale',
-            'address' => '123 Avenue de la Liberté',
             'neighborhood_id' => $this->neighborhood->id,
         ]);
     }
@@ -112,11 +92,11 @@ class StoreCustomerDeliveryAddressTest extends TestCase
     {
         $requestData = [
             'label' => 'Bureau secondaire',
+            'phone' => '699887766',
             'address' => '456 Boulevard du 20 Mai',
             'neighborhood_id' => $this->neighborhood->id,
             'latitude' => 3.848,
             'longitude' => 11.502,
-            'phone' => '699887766',
             'phone_country_code' => '+237',
             'contact_firstname' => 'Marie',
             'contact_lastname' => 'Curie',
@@ -130,9 +110,7 @@ class StoreCustomerDeliveryAddressTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJson([
-                '_metadata' => [
-                    'success' => true,
-                ],
+                '_metadata' => ['success' => true],
                 'data' => [
                     'label' => 'Bureau secondaire',
                     'address' => '456 Boulevard du 20 Mai',
@@ -150,19 +128,41 @@ class StoreCustomerDeliveryAddressTest extends TestCase
             ]);
     }
 
+    public function test_can_store_with_location_link_instead_of_gps(): void
+    {
+        $requestData = [
+            'label' => 'Adresse avec lien',
+            'phone' => '677123456',
+            'location_link' => 'https://maps.google.com/?q=3.856,11.495',
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->postJson('/api/my/delivery-addresses', $requestData);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('customer_delivery_addresses', [
+            'customer_id' => $this->customer->id,
+            'location_link' => 'https://maps.google.com/?q=3.856,11.495',
+        ]);
+    }
+
     public function test_setting_default_address_unsets_other_default_addresses(): void
     {
-        // Create an existing default address
         CustomerDeliveryAddress::factory()->create([
             'customer_id' => $this->customer->id,
             'neighborhood_id' => $this->neighborhood->id,
+            'phone' => '677000000',
+            'latitude' => 3.856,
+            'longitude' => 11.495,
             'is_default' => true,
         ]);
 
         $requestData = [
             'label' => 'Nouvelle adresse par défaut',
-            'address' => '789 Rue de la Paix',
+            'phone' => '677123456',
             'neighborhood_id' => $this->neighborhood->id,
+            'latitude' => 3.848,
+            'longitude' => 11.502,
             'is_default' => true,
         ];
 
@@ -171,7 +171,6 @@ class StoreCustomerDeliveryAddressTest extends TestCase
 
         $response->assertStatus(201);
 
-        // Verify only the new address is default
         $this->assertEquals(1, CustomerDeliveryAddress::where('customer_id', $this->customer->id)
             ->where('is_default', true)
             ->count());
@@ -185,13 +184,12 @@ class StoreCustomerDeliveryAddressTest extends TestCase
 
     public function test_requires_authentication(): void
     {
-        $requestData = [
+        $response = $this->postJson('/api/my/delivery-addresses', [
             'label' => 'Test',
-            'address' => 'Test Address',
-            'neighborhood_id' => $this->neighborhood->id,
-        ];
-
-        $response = $this->postJson('/api/my/delivery-addresses', $requestData);
+            'phone' => '677123456',
+            'latitude' => 3.856,
+            'longitude' => 11.495,
+        ]);
 
         $response->assertStatus(401);
     }
@@ -202,19 +200,31 @@ class StoreCustomerDeliveryAddressTest extends TestCase
             ->postJson('/api/my/delivery-addresses', []);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['label', 'address', 'neighborhood_id']);
+            ->assertJsonValidationErrors(['label', 'phone']);
+    }
+
+    public function test_validates_gps_or_location_link_required(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->postJson('/api/my/delivery-addresses', [
+                'label' => 'Test',
+                'phone' => '677123456',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['latitude', 'longitude', 'location_link']);
     }
 
     public function test_validates_neighborhood_exists(): void
     {
-        $requestData = [
-            'label' => 'Test',
-            'address' => 'Test Address',
-            'neighborhood_id' => 99999, // Non-existing neighborhood
-        ];
-
         $response = $this->actingAs($this->user)
-            ->postJson('/api/my/delivery-addresses', $requestData);
+            ->postJson('/api/my/delivery-addresses', [
+                'label' => 'Test',
+                'phone' => '677123456',
+                'latitude' => 3.856,
+                'longitude' => 11.495,
+                'neighborhood_id' => 99999,
+            ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['neighborhood_id']);
@@ -222,15 +232,15 @@ class StoreCustomerDeliveryAddressTest extends TestCase
 
     public function test_validates_email_format(): void
     {
-        $requestData = [
-            'label' => 'Test',
-            'address' => 'Test Address',
-            'neighborhood_id' => $this->neighborhood->id,
-            'email' => 'invalid-email',
-        ];
-
         $response = $this->actingAs($this->user)
-            ->postJson('/api/my/delivery-addresses', $requestData);
+            ->postJson('/api/my/delivery-addresses', [
+                'label' => 'Test',
+                'phone' => '677123456',
+                'latitude' => 3.856,
+                'longitude' => 11.495,
+                'neighborhood_id' => $this->neighborhood->id,
+                'email' => 'invalid-email',
+            ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
@@ -238,16 +248,14 @@ class StoreCustomerDeliveryAddressTest extends TestCase
 
     public function test_validates_numeric_coordinates(): void
     {
-        $requestData = [
-            'label' => 'Test',
-            'address' => 'Test Address',
-            'neighborhood_id' => $this->neighborhood->id,
-            'latitude' => 'not-a-number',
-            'longitude' => 'not-a-number',
-        ];
-
         $response = $this->actingAs($this->user)
-            ->postJson('/api/my/delivery-addresses', $requestData);
+            ->postJson('/api/my/delivery-addresses', [
+                'label' => 'Test',
+                'phone' => '677123456',
+                'neighborhood_id' => $this->neighborhood->id,
+                'latitude' => 'not-a-number',
+                'longitude' => 'not-a-number',
+            ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['latitude', 'longitude']);
@@ -257,8 +265,10 @@ class StoreCustomerDeliveryAddressTest extends TestCase
     {
         $requestData = [
             'label' => 'Test Address',
-            'address' => '123 Test Street',
+            'phone' => '677123456',
             'neighborhood_id' => $this->neighborhood->id,
+            'latitude' => 3.856,
+            'longitude' => 11.495,
         ];
 
         $response = $this->actingAs($this->user)
@@ -274,7 +284,6 @@ class StoreCustomerDeliveryAddressTest extends TestCase
                 ],
             ]);
 
-        // Verify the geographic data matches the expected relationships
         $responseData = $response->json('data');
         $this->assertEquals($this->neighborhood->id, $responseData['neighborhood']['id']);
         $this->assertEquals($this->municipality->id, $responseData['municipality']['id']);

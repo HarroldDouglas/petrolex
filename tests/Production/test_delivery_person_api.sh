@@ -8,7 +8,7 @@
 
 set -e
 
-BASE_URL="https://isogaz.afrik-solutions.com"
+BASE_URL="https://isogaz.net"
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
@@ -81,8 +81,8 @@ USER_RESPONSE=$(curl -s -X GET "$BASE_URL/api/user" \
 
 echo "$USER_RESPONSE" | jq '{id, first_name, last_name, email, roles, delivery_person_id}'
 
-if echo "$USER_RESPONSE" | jq -e '.id' > /dev/null 2>&1; then
-    DELIVERY_PERSON_ID=$(echo "$USER_RESPONSE" | jq -r '.delivery_person_id // empty')
+if echo "$USER_RESPONSE" | jq -e '.id // .data.id' > /dev/null 2>&1; then
+    DELIVERY_PERSON_ID=$(echo "$USER_RESPONSE" | jq -r '.delivery_person_id // .data.delivery_person_id // empty')
     success "Profile retrieved (Delivery Person ID: $DELIVERY_PERSON_ID)"
 else
     fail "Failed to get profile"
