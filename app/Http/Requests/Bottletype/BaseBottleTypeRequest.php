@@ -11,9 +11,13 @@ abstract class BaseBottleTypeRequest extends FormRequest
     {
         return [
             'name' => $this->nameRules(),
+            'name_en' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'min:3'],
+            'description_en' => ['nullable', 'string', 'min:3'],
             'weight' => ['required', 'numeric', 'min:0'],
-            'capacity' => ['required', 'numeric', 'min:0'],
+            'capacity' => ['nullable', 'numeric', 'min:0'],
+            'height' => ['nullable', 'numeric', 'min:0'],
+            'radius' => ['nullable', 'numeric', 'min:0'],
             'content_price' => ['required', 'numeric', 'min:0'],
             'full_price' => ['required', 'numeric', 'min:0', 'gt:content_price'],
             'is_active' => ['required', 'boolean'],

@@ -16,14 +16,7 @@
             @enderror
         </div>
 
-        <div class="col-md-6">
-            <label for="capacity" class="form-label required">Capacité (en Litre)</label>
-            <input type="number" step="any" class="form-control @error('capacity') is-invalid @enderror"
-            id="capacity" placeholder="Ex: 50" wire:model.live.debounce.500ms="capacity">
-            @error('capacity')
-            <div class="invalid-feedback">{{ __($message) }}</div>
-            @enderror
-        </div>
+        <input type="hidden" wire:model="capacity">
 
         <div class="col-md-6">
             <label for="height" class="form-label">Hauteur (en cm)</label>
