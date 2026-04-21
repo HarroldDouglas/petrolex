@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Services\Order\OrderService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use OpenApi\Annotations as OA;
 
 /**
@@ -89,6 +90,18 @@ class DownloadInvoiceController extends Controller
             abort(Response::HTTP_FORBIDDEN, __('api.order_invoice_not_belongs_to_you'));
         }
 
+        $filename = 'facture-'.($order->order_number ?? $order->id).'.pdf';
+        $cachePath = 'invoices/'.$order->id.'_'.$order->updated_at->timestamp.'.pdf';
+
+        if (Storage::disk('local')->exists($cachePath)) {
+            $pdfContent = Storage::disk('local')->get($cachePath);
+
+            return response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            ]);
+        }
+
         set_time_limit(120);
 
         $orderDetails = $this->orderService->getOrderWithGroupedItems($order->id);
@@ -102,8 +115,13 @@ class DownloadInvoiceController extends Controller
             'groupedItems' => $orderDetails->groupedItems,
         ]);
 
-        $filename = 'facture-'.($order->order_number ?? $order->id).'.pdf';
+        $pdfContent = $pdf->output();
 
-        return $pdf->download($filename);
+        Storage::disk('local')->put($cachePath, $pdfContent);
+
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
     }
 }
