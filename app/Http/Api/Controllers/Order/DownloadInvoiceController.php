@@ -89,6 +89,8 @@ class DownloadInvoiceController extends Controller
             abort(Response::HTTP_FORBIDDEN, __('api.order_invoice_not_belongs_to_you'));
         }
 
+        set_time_limit(120);
+
         $orderDetails = $this->orderService->getOrderWithGroupedItems($order->id);
 
         if (! $orderDetails) {
