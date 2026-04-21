@@ -186,6 +186,14 @@ return [
     'order_cancelled_manager_button' => 'View Order',
     'order_cancelled_manager_footer' => 'Please review the cancellation details.',
 
+    // Order Assigned to Delivery Person
+    'order_assigned_delivery_subject' => 'New Order to Deliver - #:order_number',
+    'order_assigned_delivery_message' => 'Order **#:order_number** has been assigned to you. Please prepare for delivery.',
+    'order_assigned_delivery_note' => 'Log in to the app to start the delivery once the order is ready.',
+    'order_assigned_delivery_notification_message' => 'Order #:order_number has been assigned to you.',
+    'order_customer_phone' => 'Customer phone',
+    'order_delivery_type' => 'Delivery type',
+
     // Order Status Changed
     'order_status_changed_message' => 'Order **#:order_number** status changed from :old_status to :new_status.',
 

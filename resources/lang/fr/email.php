@@ -187,6 +187,14 @@ return [
         ],
     ],
 
+    // Order Assigned to Delivery Person
+    'order_assigned_delivery_subject' => 'Nouvelle commande à livrer - #:order_number',
+    'order_assigned_delivery_message' => 'La commande **#:order_number** vous a été assignée. Veuillez préparer la livraison.',
+    'order_assigned_delivery_note' => 'Connectez-vous à l\'application pour démarrer la livraison dès que la commande est prête.',
+    'order_assigned_delivery_notification_message' => 'La commande #:order_number vous a été assignée.',
+    'order_customer_phone' => 'Téléphone client',
+    'order_delivery_type' => 'Type de livraison',
+
     // Order Status Changed
     'order_status_changed_message' => 'Le statut de la commande **#:order_number** est passé de :old_status à :new_status.',
 

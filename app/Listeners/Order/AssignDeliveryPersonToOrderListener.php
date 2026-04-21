@@ -3,6 +3,7 @@
 namespace App\Listeners\Order;
 
 use App\Events\OrderCreatedEvent;
+use App\Notifications\OrderAssignedToDeliveryPersonNotification;
 use App\Services\DeliveryPersonService;
 use App\Services\Order\OrderService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,6 +26,10 @@ class AssignDeliveryPersonToOrderListener implements ShouldQueue
 
             if ($deliveryPerson) {
                 $this->orderService->assignDeliveryPerson($order, $deliveryPerson->id);
+
+                if ($deliveryPerson->user) {
+                    $deliveryPerson->user->notify(new OrderAssignedToDeliveryPersonNotification($order->fresh()));
+                }
             }
         }
     }
