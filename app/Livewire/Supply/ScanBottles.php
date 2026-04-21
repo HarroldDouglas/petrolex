@@ -198,9 +198,9 @@ class ScanBottles extends Component
     }
 
     #[On('barcode-scanned')]
-    public function handleScannedBarcode($data)
+    public function handleScannedBarcode($barcode)
     {
-        $this->addBottle($data['barcode']);
+        $this->addBottle($barcode);
     }
 
     public function toggleManualForm()

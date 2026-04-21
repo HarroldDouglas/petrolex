@@ -84,9 +84,7 @@ if (typeof window.BarcodeScannerModule === "undefined") {
             stopScanner();
 
             try {
-                Livewire.dispatch("barcode-scanned", [
-                    { barcode: decodedText },
-                ]);
+                Livewire.dispatch("barcode-scanned", { barcode: decodedText });
             } catch (error) {
                 alert(
                     "Erreur lors du traitement du code-barres: " +
