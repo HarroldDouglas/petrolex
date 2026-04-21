@@ -75,11 +75,7 @@ if (typeof window.BarcodeScannerModule === "undefined") {
             if (isProcessing) return;
             if (!decodedText) return;
 
-            var format = (decodedResult && decodedResult.result && decodedResult.result.format)
-                ? decodedResult.result.format.formatName : "?";
-
-            alert("SCAN DETECTE!\nFormat: " + format + "\nValeur: " + decodedText);
-            updateStatus("✅ Lu [" + format + "]: " + decodedText);
+            updateStatus("✅ Code lu : " + decodedText);
 
             isProcessing = true;
             stopScanner();
