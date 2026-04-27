@@ -145,7 +145,44 @@ abstract class AbstractUserForm extends Component
             $this->toggleDistributionCenters();
         }
 
+        if (in_array($propertyName, ['phone_number', 'country_code'])) {
+            $this->normalizePhoneNumber();
+        }
+
         $this->validateOnly($propertyName);
+    }
+
+    public function validate($rules = null, $messages = null, $attributes = null): array
+    {
+        $this->normalizePhoneNumber();
+
+        return parent::validate($rules, $messages, $attributes);
+    }
+
+    protected function normalizePhoneNumber(): void
+    {
+        if ($this->phone_number === '' || $this->country_code === '') {
+            return;
+        }
+
+        $phone = trim($this->phone_number);
+        $phoneCode = \App\Models\Geography\Country::where('code', strtoupper($this->country_code))
+            ->value('phone_code');
+
+        if (! $phoneCode) {
+            return;
+        }
+
+        // Accept the prefix with or without the leading +
+        $variants = [$phoneCode, ltrim($phoneCode, '+')];
+
+        foreach ($variants as $variant) {
+            if ($variant !== '' && str_starts_with($phone, $variant)) {
+                $this->phone_number = substr($phone, strlen($variant));
+
+                return;
+            }
+        }
     }
 
     abstract public function save();

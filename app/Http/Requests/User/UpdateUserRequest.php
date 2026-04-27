@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\User;
 
+use App\Rules\CountryPhoneRule;
+use App\Rules\UniquePhoneByCountryRule;
 use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends BaseUserRequest
@@ -28,6 +30,8 @@ class UpdateUserRequest extends BaseUserRequest
 
     public function rules(): array
     {
+        $countryCode = $this->input('country_code', '');
+
         return array_merge(
             parent::rules(),
             [
@@ -42,7 +46,8 @@ class UpdateUserRequest extends BaseUserRequest
                     'required',
                     'string',
                     'max:20',
-                    Rule::unique('users', 'phone_number')->ignore($this->id),
+                    new CountryPhoneRule($countryCode),
+                    new UniquePhoneByCountryRule($countryCode, $this->id),
                 ],
                 'password' => ['nullable', 'string', 'min:8'],
             ]

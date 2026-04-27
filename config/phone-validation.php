@@ -12,12 +12,15 @@ return [
     */
 
     'rules' => [
-        // Cameroon
+        // Cameroon — mobile only. Active prefixes:
+        //   MTN: 650-654, 670-679, 680-684
+        //   Orange: 655-659, 690-699
+        //   Camtel/Nexttel: 620-629, 660-669, 685-689
         'CM' => [
             'min_length' => 9,
             'max_length' => 9,
-            'regex' => '/^6[0-9]{8}$/',
-            'description' => 'Doit comporter 9 chiffres commençant par 6 (ex. : 677123456)',
+            'regex' => '/^6(2[0-9]|5[0-9]|6[0-9]|7[0-9]|8[0-9]|9[0-9])[0-9]{6}$/',
+            'description' => 'Doit comporter 9 chiffres commençant par 62, 65, 66, 67, 68 ou 69 (ex. : 677123456)',
         ],
 
         // France
