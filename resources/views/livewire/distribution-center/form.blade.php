@@ -79,6 +79,12 @@
                 <input type="text" class="form-control" placeholder="Latitude" id="latitude" wire:model.live="latitude">
                 @error('latitude') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
+            <div class="col-12 mb-3" wire:ignore>
+                <label class="form-label">Position sur la carte</label>
+                <p class="text-muted small mb-2 mt-0">Recherchez une adresse, cliquez sur la carte, ou déplacez le marqueur pour définir la position du centre.</p>
+                <input type="text" id="dc-map-search" class="form-control mb-2" placeholder="Rechercher une adresse, une ville, un lieu...">
+                <div id="dc-map-picker" style="height: 380px; width: 100%; border-radius: 8px; background:#eef2f7;"></div>
+            </div>
             <div class="col-md-6 mb-3">
                 <label for="statut" class="form-label">Statut</label>
                 <select class="form-select" id="statut" wire:model.live="is_active">
@@ -124,7 +130,7 @@
                 placeholder: $(this).data('placeholder'),
                 allowClear: true
             });
-            
+
             $(this).on('change', function (e) {
                 const elementId = e.target.id;
                 const value = $(this).val();
@@ -132,5 +138,87 @@
             });
         });
     }
+
+    let dcMap = null;
+    let dcMarker = null;
+
+    window.initDistributionCenterMap = function () {
+        const mapEl = document.getElementById('dc-map-picker');
+        if (!mapEl || typeof google === 'undefined' || !google.maps) {
+            return;
+        }
+
+        const latInput = document.getElementById('latitude');
+        const lngInput = document.getElementById('longitude');
+        const initialLat = parseFloat(latInput?.value);
+        const initialLng = parseFloat(lngInput?.value);
+        const hasInitial = !isNaN(initialLat) && !isNaN(initialLng);
+
+        // Default fallback: Cameroon (Yaoundé)
+        const center = hasInitial
+            ? { lat: initialLat, lng: initialLng }
+            : { lat: 3.848, lng: 11.502 };
+
+        dcMap = new google.maps.Map(mapEl, {
+            zoom: hasInitial ? 15 : 6,
+            center: center,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            streetViewControl: false,
+            mapTypeControl: false,
+        });
+
+        dcMarker = new google.maps.Marker({
+            map: dcMap,
+            position: center,
+            draggable: true,
+            visible: hasInitial,
+        });
+
+        dcMap.addListener('click', function (e) {
+            placeDcMarker(e.latLng);
+        });
+
+        dcMarker.addListener('dragend', function (e) {
+            updateDcCoords(e.latLng);
+        });
+
+        const searchInput = document.getElementById('dc-map-search');
+        if (searchInput && google.maps.places) {
+            const ac = new google.maps.places.Autocomplete(searchInput, {
+                fields: ['geometry', 'name', 'formatted_address'],
+            });
+            ac.bindTo('bounds', dcMap);
+            ac.addListener('place_changed', function () {
+                const place = ac.getPlace();
+                if (!place.geometry || !place.geometry.location) {
+                    return;
+                }
+                if (place.geometry.viewport) {
+                    dcMap.fitBounds(place.geometry.viewport);
+                } else {
+                    dcMap.setCenter(place.geometry.location);
+                    dcMap.setZoom(15);
+                }
+                placeDcMarker(place.geometry.location);
+            });
+        }
+    };
+
+    function placeDcMarker(latLng) {
+        if (!dcMarker) return;
+        dcMarker.setPosition(latLng);
+        dcMarker.setVisible(true);
+        updateDcCoords(latLng);
+    }
+
+    function updateDcCoords(latLng) {
+        const lat = typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat;
+        const lng = typeof latLng.lng === 'function' ? latLng.lng() : latLng.lng;
+        @this.set('latitude', lat.toFixed(6));
+        @this.set('longitude', lng.toFixed(6));
+    }
 </script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&libraries=places&callback=initDistributionCenterMap&v=weekly"
+    async defer></script>
 @endpush
