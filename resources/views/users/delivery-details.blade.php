@@ -69,12 +69,7 @@
                                             </h5>
 
                                             <div class="my-2">
-                                                {{-- This "Profile" button seems to have no defined action.
-                                                     If it's meant to edit the profile, you'd link it there.
-                                                     For now, it's just a button. Removed the ID if not used for JS. --}}
-                                                <button type="button" class="btn btn-primary b-r-22">
-                                                    <i class="ti ti-user"></i> Profil
-                                                </button>
+                                                @livewire('user.user-actions', ['user' => $user], key('user-actions-'.$user->id))
                                             </div>
                                         </div>
                                     </div>
