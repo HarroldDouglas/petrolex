@@ -169,7 +169,7 @@ class UserDataTable extends BaseDataTable
             Column::make('Actions')
                 ->label(function (User $row) {
                     return match (true) {
-                        $row->isDeliveryPerson() => view('partials.users.actions-delivery', ['user' => $row]),
+                        $row->isDeliveryPerson() => view('partials.users.actions-delivery', ['user' => $row, 'this' => $this]),
                         $row->isCustomer() => view('partials.users.actions-customer', ['user' => $row]),
                         default => view('partials.users.actions-admin', ['user' => $row, 'this' => $this]),
                     };
