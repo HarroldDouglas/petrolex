@@ -86,15 +86,15 @@ class ProductResource extends JsonResource
         return [
             'options' => [
                 [
-                    'value' => BottleOrderType::FULL()->value,
-                    'label' => BottleOrderType::FULL()->getLocalizedLabel(),
-                    'price' => number_format((float) $bottleType->full_price, $decimalPlaces, '.', ''),
-                    'is_default' => true,
-                ],
-                [
                     'value' => BottleOrderType::RECHARGE()->value,
                     'label' => BottleOrderType::RECHARGE()->getLocalizedLabel(),
                     'price' => number_format((float) $bottleType->content_price, $decimalPlaces, '.', ''),
+                    'is_default' => true,
+                ],
+                [
+                    'value' => BottleOrderType::FULL()->value,
+                    'label' => BottleOrderType::FULL()->getLocalizedLabel(),
+                    'price' => number_format((float) $bottleType->full_price, $decimalPlaces, '.', ''),
                     'is_default' => false,
                 ],
             ],
