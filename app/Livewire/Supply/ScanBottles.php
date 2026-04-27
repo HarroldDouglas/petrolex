@@ -264,16 +264,9 @@ class ScanBottles extends Component
             $bottle = Bottle::where('barcode', $barcode)->first();
 
             if (! $bottle && $this->isIncomingMode) {
-                $product = \App\Models\Product::where('product_category_id', $this->selectedProductType->product_category_id)
-                    ->first();
-
-                if (! $product) {
-                    DB::rollBack();
-                    Log::error('addBottle: no product found', ['category_id' => $this->selectedProductType->product_category_id]);
-                    session()->flash('error', 'Aucun produit trouvé pour cette catégorie.');
-
-                    return false;
-                }
+                $product = \App\Models\Product::firstOrCreate([
+                    'product_category_id' => $this->selectedProductType->product_category_id,
+                ]);
 
                 $bottle = Bottle::create([
                     'barcode' => $barcode,
@@ -290,32 +283,36 @@ class ScanBottles extends Component
                 return false;
             }
 
-            $existingBottle = SupplierDeliveryBottle::where('supplier_delivery_product_type_id', $this->selectedProductType->id)
+            $existingBottle = SupplierDeliveryBottle::withTrashed()
+                ->where('supplier_delivery_product_type_id', $this->selectedProductType->id)
                 ->where('bottle_id', $bottle->id)
-                ->where('movement_type', $movementType)
                 ->first();
 
             if ($existingBottle) {
-                DB::rollBack();
-                $direction = $this->isIncomingMode ? 'entrante' : 'sortante';
-                session()->flash('warning', "Cette bouteille a déjà été scannée comme {$direction} pour cet approvisionnement.");
+                if ($existingBottle->trashed()) {
+                    $existingBottle->restore();
+                    $existingBottle->update(['movement_type' => $movementType]);
+                } else {
+                    DB::rollBack();
+                    session()->flash('warning', "Cette bouteille a déjà été scannée pour cet approvisionnement.");
 
-                return false;
-            }
+                    return false;
+                }
+            } else {
+                if ($this->isIncomingMode && ! $bottle->status->equals(BottleStatus::PENDING_RECEPTION())) {
+                    $bottle->update([
+                        'status' => BottleStatus::PENDING_RECEPTION(),
+                        'is_filled' => true,
+                        'distribution_center_id' => $this->supply->distribution_center_id,
+                    ]);
+                }
 
-            if ($this->isIncomingMode && ! $bottle->status->equals(BottleStatus::PENDING_RECEPTION())) {
-                $bottle->update([
-                    'status' => BottleStatus::PENDING_RECEPTION(),
-                    'is_filled' => true,
-                    'distribution_center_id' => $this->supply->distribution_center_id,
+                SupplierDeliveryBottle::create([
+                    'supplier_delivery_product_type_id' => $this->selectedProductType->id,
+                    'bottle_id' => $bottle->id,
+                    'movement_type' => $movementType,
                 ]);
             }
-
-            SupplierDeliveryBottle::create([
-                'supplier_delivery_product_type_id' => $this->selectedProductType->id,
-                'bottle_id' => $bottle->id,
-                'movement_type' => $movementType,
-            ]);
 
             DB::commit();
 
