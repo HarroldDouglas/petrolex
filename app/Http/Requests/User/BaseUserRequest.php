@@ -38,7 +38,7 @@ abstract class BaseUserRequest extends FormRequest
                 'email',
                 'max:255',
                 'confirmed',
-                Rule::unique('users', 'email'),
+                Rule::unique('users', 'email')->whereNull('deleted_at'),
             ],
             'phone_number' => [
                 'required',

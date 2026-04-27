@@ -48,7 +48,7 @@ class UpdateProfileRequest extends FormRequest
                 'sometimes',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($userId),
+                Rule::unique('users', 'email')->ignore($userId)->whereNull('deleted_at'),
             ],
             'phone_number' => [
                 'sometimes',

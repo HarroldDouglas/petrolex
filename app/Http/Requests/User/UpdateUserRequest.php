@@ -40,7 +40,7 @@ class UpdateUserRequest extends BaseUserRequest
                     'required',
                     'email',
                     'max:255',
-                    Rule::unique('users', 'email')->ignore($this->id),
+                    Rule::unique('users', 'email')->ignore($this->id)->whereNull('deleted_at'),
                 ],
                 'phone_number' => [
                     'required',
