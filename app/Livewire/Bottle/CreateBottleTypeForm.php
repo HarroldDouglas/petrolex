@@ -40,7 +40,7 @@ class CreateBottleTypeForm extends AbstractBottleTypeForm
                 name: $validatedData['name'],
                 name_en: $validatedData['name_en'] ?? null,
                 bottleTypeCityPrices: $bottleTypeCityPrices,
-                capacity: $validatedData['capacity'],
+                capacity: $validatedData['capacity'] ?? '0',
                 height: $validatedData['height'] ? (float) $validatedData['height'] : null,
                 radius: $validatedData['radius'] ? (float) $validatedData['radius'] : null,
                 content_price: $validatedData['content_price'],

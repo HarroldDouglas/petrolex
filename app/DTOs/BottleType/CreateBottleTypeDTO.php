@@ -13,7 +13,7 @@ class CreateBottleTypeDTO extends BaseDTO
         public readonly ?string $name_en = null,
         /** @var ProductCategoryCityPriceDTO[]|null */
         public readonly ?array $bottleTypeCityPrices = null,
-        public readonly string $capacity = '',
+        public readonly ?string $capacity = null,
         public readonly ?float $height = null,
         public readonly ?float $radius = null,
         public readonly float $content_price = 0,
