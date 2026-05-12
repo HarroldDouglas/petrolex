@@ -245,7 +245,7 @@ return [
          *
          * @var bool
          */
-        'enable_javascript' => true,
+        'enable_javascript' => false,
 
         /**
          * Enable remote file access
@@ -295,7 +295,7 @@ return [
          *
          * @var bool
          */
-        'enable_html5_parser' => true,
+        'enable_html5_parser' => false,
     ],
 
 ];

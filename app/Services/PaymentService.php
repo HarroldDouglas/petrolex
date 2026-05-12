@@ -8,6 +8,7 @@ use App\DTOs\PaymentResponse;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Jobs\GenerateInvoicePdfJob;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Repositories\Contracts\OrderPaymentRepositoryInterface;
@@ -47,12 +48,16 @@ class PaymentService
         array $paymentDetails = [],
         bool $useWallet = true
     ): array {
-        return DB::transaction(function () use ($order, $method, $paymentDetails, $useWallet) {
+        $tGlobal = microtime(true);
+        $orderId = $order->id;
+
+        return DB::transaction(function () use ($order, $method, $paymentDetails, $useWallet, $tGlobal, $orderId) {
             $customer = $order->customer;
             $totalAmount = (float) $order->total_amount;
 
-            // Calculate payment breakdown
+            $t0 = microtime(true);
             $breakdown = $this->walletService->calculatePaymentBreakdown($customer, $totalAmount);
+            Log::info('TIMING payment.wallet_breakdown', ['order_id' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
 
             Log::info('Payment breakdown calculated', [
                 'order_id' => $order->id,
@@ -69,7 +74,9 @@ class PaymentService
 
             // Use wallet if enabled and has balance
             if ($useWallet && $breakdown['wallet_amount'] > 0) {
+                $t0 = microtime(true);
                 $walletResult = $this->walletService->processOrderPayment($customer, $order, true);
+                Log::info('TIMING payment.wallet_process', ['order_id' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
                 $walletTransaction = $walletResult['wallet_transaction'];
                 $walletAmountUsed = $walletResult['wallet_amount_used'];
 
@@ -83,7 +90,10 @@ class PaymentService
 
             // If wallet covers full amount, mark order as paid
             if ($useWallet && $breakdown['wallet_sufficient']) {
+                $t0 = microtime(true);
                 $this->markOrderAsPaidByWallet($order, $walletTransaction);
+                Log::info('TIMING payment.mark_paid_wallet', ['order_id' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
+                Log::info('TIMING payment.initiate.TOTAL', ['order_id' => $orderId, 'ms' => round((microtime(true) - $tGlobal) * 1000, 2), 'path' => 'wallet_only']);
 
                 return [
                     'order_payment' => null,
@@ -101,7 +111,7 @@ class PaymentService
             // External payment required (for remaining amount)
             $externalAmount = $useWallet ? $breakdown['payment_amount'] : $totalAmount;
 
-            // Create order payment for the remaining amount
+            $t0 = microtime(true);
             $payment = $this->createOrderPaymentWithWalletInfo(
                 $order,
                 $method,
@@ -109,14 +119,22 @@ class PaymentService
                 $walletAmountUsed,
                 $walletTransaction?->reference
             );
+            Log::info('TIMING payment.create_order_payment', ['order_id' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
 
+            $t0 = microtime(true);
             $payment->load('order.customer.user');
+            Log::info('TIMING payment.load_relations', ['order_id' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
 
             $paymentDetailsDto = PaymentDetailsData::from($paymentDetails);
 
+            $t0 = microtime(true);
             $gateway = $this->gatewayFactory->create($method->value);
             $response = $gateway->initiatePayment($payment, $paymentDetailsDto);
+            Log::info('TIMING payment.gateway_initiate', ['order_id' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2), 'method' => $method->value]);
+
+            $t0 = microtime(true);
             $this->updatePaymentFromResponse($payment, $response);
+            Log::info('TIMING payment.update_from_response', ['order_id' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
 
             Log::info('External payment initiated', [
                 'payment_id' => $payment->id,
@@ -127,7 +145,11 @@ class PaymentService
                 'external_amount' => $externalAmount,
             ]);
 
+            $t0 = microtime(true);
             $this->schedulePaymentCallback($payment, $response);
+            Log::info('TIMING payment.schedule_callback', ['order_id' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
+
+            Log::info('TIMING payment.initiate.TOTAL', ['order_id' => $orderId, 'ms' => round((microtime(true) - $tGlobal) * 1000, 2), 'path' => 'external_gateway']);
 
             return [
                 'order_payment' => $payment->refresh(),
@@ -159,6 +181,8 @@ class PaymentService
             'order_number' => $order->order_number,
             'wallet_transaction_reference' => $walletTransaction?->reference,
         ]);
+
+        GenerateInvoicePdfJob::dispatch($order->id);
     }
 
     /**
@@ -215,8 +239,12 @@ class PaymentService
 
     public function handleCallback(string $orderId, array $callbackData): void
     {
-        DB::transaction(function () use ($orderId, $callbackData) {
+        $tGlobal = microtime(true);
+
+        DB::transaction(function () use ($orderId, $callbackData, $tGlobal) {
+            $t0 = microtime(true);
             $payment = $this->orderPaymentRepository->findByOrderId($orderId);
+            Log::info('TIMING callback.find_payment', ['order_ref' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
 
             $gateway = $this->gatewayFactory->create($payment?->payment_method?->value);
             Log::info('🔔 Received Payment Callback', [
@@ -252,7 +280,11 @@ class PaymentService
                 gatewayResponse: $callbackDto->rawData
             );
 
+            $t0 = microtime(true);
             $this->processPaymentResponse($payment, $response);
+            Log::info('TIMING callback.process_response', ['order_ref' => $orderId, 'ms' => round((microtime(true) - $t0) * 1000, 2)]);
+
+            Log::info('TIMING callback.TOTAL', ['order_ref' => $orderId, 'ms' => round((microtime(true) - $tGlobal) * 1000, 2)]);
         });
     }
 
@@ -369,6 +401,10 @@ class PaymentService
             ]);
 
             $this->orderService->update($payment->order, $orderUpdateData);
+
+            if ($status === PaymentStatus::PAID()->value) {
+                GenerateInvoicePdfJob::dispatch($payment->order_id);
+            }
         }
     }
 
