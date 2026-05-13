@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Order;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\PrintOrderRequest;
+use App\Models\Order;
+use App\Services\Order\InvoicePdfService;
 use App\Services\Order\OrderService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 
@@ -13,6 +14,7 @@ class PrintOrderController extends Controller
 {
     public function __construct(
         private OrderService $orderService,
+        private InvoicePdfService $invoicePdfService,
     ) {}
 
     /**
@@ -41,19 +43,18 @@ class PrintOrderController extends Controller
 
     public function downloadPdf(int $orderId): Response
     {
-        $orderDetails = $this->orderService->getOrderWithGroupedItems($orderId);
+        $order = Order::find($orderId);
 
-        if (! $orderDetails) {
+        if (! $order) {
             abort(Response::HTTP_NOT_FOUND, 'Commande introuvable');
         }
 
-        $pdf = Pdf::loadView('orders.print.pdf-invoice', [
-            'order' => $orderDetails->order,
-            'groupedItems' => $orderDetails->groupedItems,
+        $pdfContent = $this->invoicePdfService->getContent($order);
+        $filename = 'facture-'.($order->order_number ?? $order->id).'.pdf';
+
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
-
-        $filename = 'facture-'.($orderDetails->order->order_number ?? $orderDetails->order->id).'.pdf';
-
-        return $pdf->download($filename);
     }
 }

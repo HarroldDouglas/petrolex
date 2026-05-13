@@ -5,17 +5,23 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Facture - {{ $order->order_number }}</title>
     <style>
+        @page { margin: 20px 25px; }
         body {
             font-family: DejaVu Sans, Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            font-size: 12px;
-            line-height: 1.4;
+            padding: 0;
+            font-size: 10px;
+            line-height: 1.25;
             color: #333;
         }
+        h3 {
+            font-size: 11px;
+            margin: 0 0 3px 0;
+        }
+        p { margin: 0 0 4px 0; }
         .header {
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
         .header:after {
             content: "";
@@ -28,18 +34,19 @@
         }
         .company-info {
             float: right;
-            width: 40%;
+            width: 50%;
             text-align: right;
+            font-size: 9px;
         }
         .invoice-title {
             text-align: center;
-            font-size: 20px;
-            margin: 20px 0;
+            font-size: 14px;
+            margin: 6px 0 10px;
             font-weight: bold;
         }
         .invoice-details {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
         .invoice-details:after {
             content: "";
@@ -48,20 +55,20 @@
         }
         .client-info {
             float: left;
-            width: 45%;
+            width: 55%;
         }
         .invoice-info {
             float: right;
-            width: 45%;
+            width: 42%;
             text-align: right;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 8px 0;
         }
         th, td {
-            padding: 8px;
+            padding: 4px 6px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -71,45 +78,46 @@
         }
         .totals {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 6px;
         }
         .total-right {
             text-align: right;
         }
         .total-row {
-            margin: 5px 0;
+            margin: 2px 0;
             clear: both;
         }
         .total-label {
             font-weight: bold;
             display: inline-block;
-            width: 150px;
+            width: 130px;
             text-align: left;
         }
         .total-value {
             display: inline-block;
-            width: 120px;
+            width: 110px;
             text-align: right;
         }
         .grand-total {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
-            margin-top: 10px;
-            padding-top: 5px;
+            margin-top: 4px;
+            padding-top: 3px;
             border-top: 1px solid #333;
         }
         .payment-info {
-            margin: 20px 0;
-            padding: 10px;
+            margin: 8px 0;
+            padding: 6px 8px;
             background-color: #f8f9fa;
         }
         .footer {
-            margin-top: 40px;
+            margin-top: 12px;
             text-align: center;
-            font-size: 11px;
+            font-size: 9px;
             border-top: 1px solid #ddd;
-            padding-top: 10px;
+            padding-top: 5px;
         }
+        .footer p { margin: 2px 0; }
         .footer strong {
             font-weight: bold;
         }
@@ -118,7 +126,7 @@
 <body>
     <div class="header">
         <div class="logo-container">
-            <img src="{{ public_path('assets/images/logo/isogaz-no-bg.png') }}" alt="Petrolex Logo" style="width: 150px;">
+            <img src="{{ public_path('assets/images/logo/isogaz-no-bg.png') }}" alt="Petrolex Logo" style="width: 110px;">
         </div>
         <div class="company-info">
             <p>

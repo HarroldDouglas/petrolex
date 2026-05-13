@@ -8,6 +8,7 @@ use App\DTOs\Order\GetOrdersFilterDTO;
 use App\Models\DeliveryPerson;
 use App\Repositories\Contracts\DeliveryPersonRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class DeliveryPersonService extends BaseServiceForEntity
 {
@@ -21,6 +22,13 @@ class DeliveryPersonService extends BaseServiceForEntity
     protected function getModel(): string
     {
         return DeliveryPerson::class;
+    }
+
+    public function getAll(): Collection
+    {
+        return DeliveryPerson::whereHas('user')
+            ->with('user')
+            ->get();
     }
 
     /**
