@@ -24,11 +24,11 @@ class CreateUserRelatedEntitiesListener implements ShouldQueue
         $user->assignRole($role);
         $user->accessibleDistributionCenters()->sync($distribution_center_ids);
         if ($role === UserRole::DELIVERY_PERSON()->value) {
-            $user->deliveryPerson()->create();
+            $user->deliveryPerson()->firstOrCreate([]);
             $user->email_verified_at = now();
             $user->phone_verified_at = now();
         } elseif ($role === UserRole::CUSTOMER()->value) {
-            $user->customer()->create(['current_balance' => 0]);
+            $user->customer()->firstOrCreate([], ['current_balance' => 0]);
         }
 
         $user->save();
