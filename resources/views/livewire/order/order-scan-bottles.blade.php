@@ -184,38 +184,54 @@
                     }
                 });
                 
-                // Écouteur pour les erreurs de scan
-                Livewire.on('scanError', (data) => {
+                function ensureScanFeedbackContainer() {
+                    let container = document.getElementById('scan-feedback-container');
+                    if (!container) {
+                        container = document.createElement('div');
+                        container.id = 'scan-feedback-container';
+                        container.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:10000;max-width:90%;width:500px;display:flex;flex-direction:column;gap:8px;';
+                        document.body.appendChild(container);
+                    }
+                    return container;
+                }
+
+                function showScanFeedback(message, type, barcode, autoDismiss) {
+                    const container = ensureScanFeedbackContainer();
                     const alertDiv = document.createElement('div');
-                    alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
-                    alertDiv.style.zIndex = '9999';
-                    alertDiv.style.maxWidth = '80%';
+                    const cls = type === 'success' ? 'alert-success' : 'alert-danger';
+                    alertDiv.className = 'alert ' + cls + ' alert-dismissible fade show shadow';
+                    alertDiv.setAttribute('role', 'alert');
+                    const time = new Date().toLocaleTimeString();
+                    const barcodeLine = barcode ? `<div><strong>Code scanné:</strong> <code>${barcode}</code></div>` : '';
                     alertDiv.innerHTML = `
-                        ${data.message}
+                        <div style="font-size:12px;opacity:0.7;">${time}</div>
+                        ${barcodeLine}
+                        <div>${message}</div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     `;
-                    
-                    document.body.appendChild(alertDiv);
-                    
-                    setTimeout(() => {
-                        alertDiv.classList.remove('show');
+                    container.appendChild(alertDiv);
+
+                    if (autoDismiss) {
                         setTimeout(() => {
-                            if (document.body.contains(alertDiv)) {
-                                document.body.removeChild(alertDiv);
-                            }
-                        }, 150);
-                    }, 5000);
+                            alertDiv.classList.remove('show');
+                            setTimeout(() => {
+                                if (alertDiv.parentNode) alertDiv.parentNode.removeChild(alertDiv);
+                            }, 150);
+                        }, 4000);
+                    }
+                }
+
+                Livewire.on('scanError', (data) => {
+                    const payload = Array.isArray(data) ? data[0] : data;
+                    showScanFeedback(payload.message || 'Erreur de scan', 'error', payload.barcode, false);
+                });
+
+                Livewire.on('scanSuccess', (data) => {
+                    const payload = Array.isArray(data) ? data[0] : data;
+                    showScanFeedback(payload.message || 'Bouteille liée', 'success', payload.barcode, true);
                 });
             });
 
-            // Ajouter un écouteur d'événement pour récupérer le barcode détecté par scan-code-bar.js
-            document.addEventListener('DOMContentLoaded', function() {
-                document.addEventListener('barcode-detected', function(e) {
-                    const barcode = e.detail.barcode;
-                    console.log("Barcode détecté et transmis à Livewire:", barcode);
-                    @this.processBarcode({barcode: barcode});
-                });
-            });
         </script>
 
         <style>

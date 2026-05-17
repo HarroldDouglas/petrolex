@@ -9,6 +9,7 @@ use App\Models\OrderBottleScans;
 use App\Models\OrderItem;
 use App\Services\Order\OrderBottleScanService;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class OrderScanBottles extends Component
@@ -25,8 +26,13 @@ class OrderScanBottles extends Component
 
     protected $listeners = [
         'bottleScanned' => '$refresh',
-        'barcodeScanned' => 'processBarcode',
     ];
+
+    #[On('barcode-scanned')]
+    public function handleScannedBarcode($barcode): void
+    {
+        $this->processBarcode(['barcode' => $barcode]);
+    }
 
     protected $rules = [
         'manualBarcode' => 'required|string|min:3',
@@ -138,6 +144,14 @@ class OrderScanBottles extends Component
     {
         $barcode = $data['barcode'] ?? null;
 
+        Log::info('[Scan] processBarcode appelé', [
+            'order_id' => $this->order->id ?? null,
+            'barcode' => $barcode,
+            'selected_bottle_type_id' => $this->selectedBottleTypeId,
+            'scanned_for_type' => $this->scannedBottlesForType,
+            'total_for_type' => $this->totalBottlesForType,
+        ]);
+
         if (! $barcode) {
             $this->dispatch('scanError', ['message' => 'Code-barres vide ou invalide']);
 
@@ -158,23 +172,32 @@ class OrderScanBottles extends Component
 
         try {
             $orderItem = $this->bottleScanService->scanBottle($this->order, $barcode);
-            session()->flash('message', 'Bouteille scannée avec succès');
+
+            Log::info('[Scan] Bouteille liée avec succès', [
+                'order_id' => $this->order->id,
+                'barcode' => $barcode,
+                'order_item_id' => $orderItem->id ?? null,
+            ]);
 
             $this->loadBottleTypes();
             $this->updateSelectedBottleType();
 
             $this->dispatch('bottleScanned', ['barcode' => $barcode]);
+            $this->dispatch('scanSuccess', ['message' => 'Bouteille liée avec succès', 'barcode' => $barcode]);
         } catch (BottleScanException $e) {
-            session()->flash('error', $e->getMessage());
-            $this->dispatch('scanError', ['message' => $e->getMessage()]);
+            Log::warning('[Scan] Échec scan bouteille', [
+                'order_id' => $this->order->id,
+                'barcode' => $barcode,
+                'reason' => $e->getMessage(),
+            ]);
+            $this->dispatch('scanError', ['message' => $e->getMessage(), 'barcode' => $barcode]);
         } catch (\Exception $e) {
-            Log::error('Erreur inattendue lors du scan', [
+            Log::error('[Scan] Erreur inattendue', [
                 'exception' => $e->getMessage(),
                 'order_id' => $this->order->id,
                 'barcode' => $barcode,
             ]);
-            session()->flash('error', 'Une erreur est survenue lors du scan de la bouteille.');
-            $this->dispatch('scanError', ['message' => 'Une erreur est survenue lors du scan de la bouteille.']);
+            $this->dispatch('scanError', ['message' => 'Une erreur est survenue lors du scan de la bouteille.', 'barcode' => $barcode]);
         }
     }
 
