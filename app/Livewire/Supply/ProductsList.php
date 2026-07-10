@@ -167,9 +167,13 @@ class ProductsList extends Component
         }
 
         try {
-            $deleted = SupplierDeliveryProductType::find($this->productToDelete)?->delete();
+            $productType = SupplierDeliveryProductType::find($this->productToDelete);
+            $bottleIds = $productType?->deliveryBottles()->pluck('bottle_id') ?? collect();
+            $deleted = $productType?->delete();
 
             if ($deleted) {
+                app(\App\Services\Supply\BottleReleaseService::class)
+                    ->releaseOrphanedBottles($bottleIds);
                 session()->flash('success', 'Product successfully deleted');
                 $this->refreshProducts();
             } else {

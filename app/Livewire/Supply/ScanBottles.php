@@ -200,6 +200,12 @@ class ScanBottles extends Component
     #[On('barcode-scanned')]
     public function handleScannedBarcode($barcode)
     {
+        Log::info('[SupplyScan] handleScannedBarcode reçu', [
+            'barcode' => $barcode,
+            'supply_id' => $this->supplyId,
+            'selectedProductId' => $this->selectedProductId,
+            'isIncomingMode' => $this->isIncomingMode,
+        ]);
         $this->addBottle($barcode);
     }
 
@@ -292,8 +298,14 @@ class ScanBottles extends Component
                 if ($existingBottle->trashed()) {
                     $existingBottle->restore();
                     $existingBottle->update(['movement_type' => $movementType]);
+                    Log::info('[SupplyScan] bouteille restaurée (était soft-deleted)', ['barcode' => $barcode]);
                 } else {
                     DB::rollBack();
+                    Log::warning('[SupplyScan] bouteille déjà scannée pour cet approvisionnement', [
+                        'barcode' => $barcode,
+                        'bottle_id' => $bottle->id,
+                        'supply_id' => $this->supplyId,
+                    ]);
                     session()->flash('warning', "Cette bouteille a déjà été scannée pour cet approvisionnement.");
 
                     return false;
@@ -342,7 +354,13 @@ class ScanBottles extends Component
         try {
             DB::beginTransaction();
 
+            $bottleIds = SupplierDeliveryBottle::whereIn('id', $this->selectedBottles)
+                ->pluck('bottle_id');
+
             SupplierDeliveryBottle::whereIn('id', $this->selectedBottles)->delete();
+
+            app(\App\Services\Supply\BottleReleaseService::class)
+                ->releaseOrphanedBottles($bottleIds);
 
             DB::commit();
 

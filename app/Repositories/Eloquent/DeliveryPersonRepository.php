@@ -20,14 +20,17 @@ class DeliveryPersonRepository extends BaseEloquentRepository implements Deliver
 
     public function findLeastBusyDeliveryPerson(?int $distributionCenterId = null): ?DeliveryPerson
     {
-        $query = $this->model::withCount([
-            'orders' => function ($query) {
-                $query->whereIn('status', [
-                    OrderStatus::PAID(),
-                    OrderStatus::PROCESSING(),
-                ]);
-            },
-        ]);
+        $query = $this->model::query()
+            ->where('is_active', true)
+            ->whereHas('user')
+            ->withCount([
+                'orders' => function ($query) {
+                    $query->whereIn('status', [
+                        OrderStatus::PAID(),
+                        OrderStatus::PROCESSING(),
+                    ]);
+                },
+            ]);
 
         // If distribution center ID is provided, filter delivery persons by that center
         if ($distributionCenterId !== null) {

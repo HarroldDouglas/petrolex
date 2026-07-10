@@ -211,7 +211,14 @@ class SuppliesDataTable extends BaseDataTable
             }
 
             $deliveryNumber = $supply->delivery_number;
+            $bottleIds = $supply->productTypes()
+                ->with('deliveryBottles:id,bottle_id,supplier_delivery_product_type_id')
+                ->get()
+                ->flatMap(fn ($pt) => $pt->deliveryBottles->pluck('bottle_id'));
+
             if ($supply->delete()) {
+                app(\App\Services\Supply\BottleReleaseService::class)
+                    ->releaseOrphanedBottles($bottleIds);
 
                 $this->dispatch('show-notification', [
                     'type' => 'success',
@@ -305,6 +312,13 @@ class SuppliesDataTable extends BaseDataTable
             $supply = SupplierDelivery::findOrFail($supplyId);
             $supply->status = SupplierDeliveryStatus::CANCELLED();
             $supply->save();
+
+            $bottleIds = $supply->productTypes()
+                ->with('deliveryBottles:id,bottle_id,supplier_delivery_product_type_id')
+                ->get()
+                ->flatMap(fn ($pt) => $pt->deliveryBottles->pluck('bottle_id'));
+            app(\App\Services\Supply\BottleReleaseService::class)
+                ->releaseOrphanedBottles($bottleIds);
 
             $this->dispatch('show-notification', [
                 'type' => 'success',

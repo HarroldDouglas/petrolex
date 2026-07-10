@@ -3,6 +3,20 @@ if (typeof window.BarcodeScannerModule === "undefined") {
     window.BarcodeScannerModule = (function () {
         let scanner = null;
         let isProcessing = false;
+        let lastStopAt = 0;
+        let stoppingPromise = null;
+        let recentReads = [];
+        const CAMERA_RELEASE_DELAY_MS = 400;
+        const CONFIRMATION_COUNT = 3; // require N consecutive identical reads
+
+        function log() {
+            // V2 ÉLIMINATION: DOM update retiré. Seulement console.log.
+            try {
+                var args = Array.prototype.slice.call(arguments);
+                args.unshift("[Scanner]");
+                console.log.apply(console, args);
+            } catch (e) {}
+        }
 
         function createScannerUI() {
             var scannerContainer = document.createElement("div");
@@ -45,24 +59,25 @@ if (typeof window.BarcodeScannerModule === "undefined") {
         }
 
         function stopScanner() {
+            log("stopScanner called, scanner present?", !!scanner);
             if (scanner) {
-                scanner
-                    .stop()
-                    .then(function () {
-                        scanner.clear();
-                        scanner = null;
-                    })
-                    .catch(function () {
-                        scanner = null;
-                    });
+                var localScanner = scanner;
+                scanner = null;
+                stoppingPromise = (async function () {
+                    try { await withTimeout(localScanner.stop(), 1500, "stop"); log("stopScanner: stop resolved"); } catch (e) { log("stopScanner: stop timeout/err:", String(e)); }
+                    try { await withTimeout(localScanner.clear(), 1500, "clear"); log("stopScanner: clear resolved"); } catch (e) { log("stopScanner: clear timeout/err:", String(e)); }
+                    lastStopAt = Date.now();
+                })();
             }
             removeScannerFromDOM();
+            return stoppingPromise;
         }
 
         function removeScannerFromDOM() {
             var container = document.getElementById("scanner-container");
             if (container && document.body.contains(container)) {
                 document.body.removeChild(container);
+                log("scanner DOM removed");
             }
         }
 
@@ -71,11 +86,57 @@ if (typeof window.BarcodeScannerModule === "undefined") {
             if (el) el.textContent = text;
         }
 
+        function isValidLinearBarcode(text) {
+            // Linear barcodes (EAN, UPC, Code 128, Code 39): alphanumeric +
+            // a few separator chars, 4-30 chars long, no path/URL/JSON syntax.
+            // Real bottle barcodes look like "12-E01414" or "09-002633".
+            // This still blocks QR content that contains "/", ":", "{", "."
+            // (URLs, JSON, etc.).
+            return /^[A-Z0-9][A-Z0-9\- ]{2,29}$/i.test(text);
+        }
+
         function onScanSuccess(decodedText, decodedResult) {
             if (isProcessing) return;
             if (!decodedText) return;
 
-            updateStatus("✅ Code lu : " + decodedText);
+            // Hard reject anything reported as QR_CODE by the underlying decoder.
+            // Reliable source of truth, doesn't depend on content shape.
+            try {
+                var fmt = decodedResult && decodedResult.result && decodedResult.result.format;
+                var fmtName = fmt && (fmt.formatName || fmt.format);
+                if (fmtName && String(fmtName).toUpperCase().indexOf("QR") !== -1) {
+                    updateStatus("⚠️ QR code ignoré");
+                    log("rejected QR format:", fmtName, "text:", decodedText);
+                    return;
+                }
+            } catch (e) {}
+
+            if (!isValidLinearBarcode(decodedText)) {
+                updateStatus("⚠️ Format ignoré: " + decodedText);
+                log("rejected non-barcode:", decodedText);
+                return;
+            }
+
+            // Multi-read confirmation: require N consecutive identical decodes
+            // before trusting the value. Mitigates frame-to-frame instability
+            // on Code 128 reads where wrong values can occasionally pass.
+            recentReads.push(decodedText);
+            if (recentReads.length > CONFIRMATION_COUNT) {
+                recentReads.shift();
+            }
+
+            var allMatch = recentReads.length === CONFIRMATION_COUNT &&
+                recentReads.every(function (v) { return v === decodedText; });
+
+            if (!allMatch) {
+                updateStatus("🔍 Lecture en cours… (" + recentReads.length + "/" + CONFIRMATION_COUNT + ") : " + decodedText);
+                log("partial read", recentReads.length, "of", CONFIRMATION_COUNT, ":", decodedText);
+                return;
+            }
+
+            log("confirmed:", decodedText);
+            updateStatus("✅ Code confirmé : " + decodedText);
+            recentReads = [];
 
             isProcessing = true;
             stopScanner();
@@ -89,52 +150,115 @@ if (typeof window.BarcodeScannerModule === "undefined") {
             }
         }
 
+        function sleep(ms) {
+            return new Promise(function (r) { setTimeout(r, ms); });
+        }
+
+        function withTimeout(promise, ms, label) {
+            return Promise.race([
+                promise,
+                new Promise(function (_, reject) {
+                    setTimeout(function () { reject(new Error(label + " timeout " + ms + "ms")); }, ms);
+                }),
+            ]);
+        }
+
+        async function startScannerInternal() {
+            log("init: entering, stoppingPromise?", !!stoppingPromise, "scanner?", !!scanner);
+            isProcessing = false;
+            recentReads = [];
+
+            // CRITICAL: wait for any pending stop initiated by onScanSuccess
+            // to actually release the camera before reopening.
+            if (stoppingPromise) {
+                log("init: awaiting pending stoppingPromise");
+                try { await stoppingPromise; } catch (e) {}
+                stoppingPromise = null;
+                log("init: stoppingPromise settled");
+            }
+
+            if (scanner) {
+                var prev = scanner;
+                scanner = null;
+                try { await withTimeout(prev.stop(), 1500, "stop"); } catch (e) {}
+                try { await withTimeout(prev.clear(), 1500, "clear"); } catch (e) {}
+                lastStopAt = Date.now();
+            }
+            removeScannerFromDOM();
+
+            // Wait for camera to be fully released after a previous stop.
+            var elapsed = Date.now() - lastStopAt;
+            if (lastStopAt && elapsed < CAMERA_RELEASE_DELAY_MS) {
+                var wait = CAMERA_RELEASE_DELAY_MS - elapsed;
+                log("init: waiting", wait, "ms for camera release");
+                await sleep(wait);
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Caméra non disponible. HTTPS requis.");
+                return;
+            }
+
+            var ui = createScannerUI();
+            document.body.appendChild(ui);
+            updateStatus("Caméra en cours d'ouverture...");
+            log("init: UI created, building Html5Qrcode");
+
+            scanner = new Html5Qrcode("scanner-viewport");
+
+            var config = {
+                fps: 25,
+                // No qrbox = decode the FULL viewfinder, matching the Flutter
+                // mobile app behavior. Restricting decode to a fixed pixel-size
+                // qrbox made small/far-away barcodes (manager's phones) unscannable.
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.CODE_128,
+                    Html5QrcodeSupportedFormats.CODE_39,
+                    Html5QrcodeSupportedFormats.EAN_13,
+                    Html5QrcodeSupportedFormats.EAN_8,
+                    Html5QrcodeSupportedFormats.UPC_A,
+                    Html5QrcodeSupportedFormats.UPC_E,
+                ],
+                useBarCodeDetectorIfSupported: true,
+                // HD video constraints belong here. html5-qrcode rejects
+                // the cameraIdOrConfig arg when it has more than one key.
+                videoConstraints: {
+                    facingMode: { ideal: "environment" },
+                    width:  { ideal: 1920 },
+                    height: { ideal: 1080 },
+                },
+            };
+
+            // cameraIdOrConfig must be a string or a single-key object whose
+            // facingMode is a plain string ("environment") or { exact: "..." }.
+            // {ideal: "environment"} is rejected by html5-qrcode 2.3.8.
+            var cameraIdOrConfig = { facingMode: "environment" };
+
+            try {
+                await scanner.start(
+                    cameraIdOrConfig,
+                    config,
+                    onScanSuccess,
+                    function () {}
+                );
+                updateStatus("Pointez vers le code-barres...");
+                log("init: scanner started successfully");
+            } catch (err) {
+                log("init: scanner.start failed:", String(err));
+                removeScannerFromDOM();
+                scanner = null;
+                alert("Erreur démarrage caméra: " + err);
+            }
+        }
+
         return {
             init: function () {
-                isProcessing = false;
-
-                if (scanner) {
-                    try { scanner.stop(); scanner.clear(); } catch (e) {}
+                startScannerInternal().catch(function (err) {
+                    log("init: unexpected rejection:", String(err));
+                    try { removeScannerFromDOM(); } catch (e) {}
                     scanner = null;
-                }
-                removeScannerFromDOM();
-
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    alert("Caméra non disponible. HTTPS requis.");
-                    return;
-                }
-
-                var ui = createScannerUI();
-                document.body.appendChild(ui);
-                updateStatus("Caméra en cours d'ouverture...");
-
-                scanner = new Html5Qrcode("scanner-viewport");
-
-                var config = {
-                    fps: 15,
-                    qrbox: { width: 300, height: 150 },
-                    formatsToSupport: [
-                        Html5QrcodeSupportedFormats.EAN_13,
-                        Html5QrcodeSupportedFormats.EAN_8,
-                    ],
-                    useBarCodeDetectorIfSupported: true,
-                };
-
-                scanner
-                    .start(
-                        { facingMode: "environment" },
-                        config,
-                        onScanSuccess,
-                        function () {}
-                    )
-                    .then(function() {
-                        updateStatus("Pointez vers le code-barres...");
-                    })
-                    .catch(function (err) {
-                        removeScannerFromDOM();
-                        scanner = null;
-                        alert("Erreur démarrage caméra: " + err);
-                    });
+                    alert("Erreur scanner: " + (err && err.message ? err.message : err));
+                });
             },
         };
     })();

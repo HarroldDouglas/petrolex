@@ -200,6 +200,13 @@
         </div>
     </div>
 
+    {{-- DO NOT REMOVE: empty hidden anchor. Without it Livewire morph re-renders
+         the scanButton in a way that breaks the click-after-warning flow, and
+         the camera scanner stops reopening on the next click. Cause unclear
+         (likely a morph child-count edge case in Livewire 3 + html5-qrcode).
+         Diagnosed 2026-06-01. Keep until root cause is properly understood. --}}
+    <div id="scan-debug-bar" style="display:none;"></div>
+
     @push('scripts')
         <script src="{{ asset('assets/js/js-logger.js') }}?v={{ filemtime(public_path('assets/js/js-logger.js')) }}"></script>
         <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -236,11 +243,9 @@
             }
 
             function scanButtonClickHandler() {
-                console.log('Scan button clicked - calling initBarcodeScanner()');
                 if (typeof window.initBarcodeScanner === 'function') {
                     window.initBarcodeScanner();
                 } else {
-                    console.error('initBarcodeScanner function not found!');
                     alert('Erreur: La fonction de scan n\'est pas disponible');
                 }
             }

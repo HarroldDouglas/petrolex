@@ -70,6 +70,8 @@ class DeliveryPerson extends Model
             'user_distribution_centers',
             'user_id',
             'distribution_center_id',
+            'user_id',
+            'id',
         )
             ->withPivot(['is_active'])
             ->withTimestamps()

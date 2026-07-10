@@ -118,6 +118,7 @@ class SendOrderStatusChangedNotification extends BaseListener
     private function addDeliveryPersonToRecipientsIfNeeded($recipients, $order): void
     {
         $statusesRelevantToDeliveryPerson = [
+            OrderStatus::PAID()->value,
             OrderStatus::PROCESSING()->value,
             OrderStatus::DELIVERED()->value,
             OrderStatus::CANCELLED()->value,

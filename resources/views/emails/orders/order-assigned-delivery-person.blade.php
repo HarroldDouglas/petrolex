@@ -30,7 +30,7 @@
                 {{ $order->delivery_address->city?->name }}
             </p>
         @endif
-        <p><strong>{{ __('email.order_delivery_type') }}:</strong> {{ $order->delivery_type->label() }}</p>
+        <p><strong>{{ __('email.order_delivery_type') }}:</strong> {{ $order->delivery_type->label }}</p>
     </div>
 
     <div style="background-color: #fff3cd; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #ffc107;">

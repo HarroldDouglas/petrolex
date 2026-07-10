@@ -143,7 +143,7 @@
 
     @push('scripts')
         <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-        <script src="{{ asset('assets/js/scan-code-bar.js') }}"></script>
+        <script src="{{ asset('assets/js/scan-code-bar.js') }}?v={{ filemtime(public_path('assets/js/scan-code-bar.js')) }}"></script>
         <script>
             document.addEventListener('livewire:initialized', function() {
                 initScanButton();
