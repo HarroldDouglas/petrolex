@@ -23,6 +23,7 @@ use App\Listeners\LogUserDeleted;
 use App\Listeners\LogUserUpdated;
 use App\Listeners\Order\AssignDeliveryPersonToOrderListener;
 use App\Listeners\Order\DecrementStockOnPaymentListener;
+use App\Listeners\Order\ReleaseBottlesOnOrderCancellation;
 use App\Listeners\Order\RestoreStockOnCancellationListener;
 use App\Listeners\Order\SendOrderPaidNotification;
 use App\Listeners\Order\SendOrderStatusChangedNotification;
@@ -81,6 +82,7 @@ class EventServiceProvider extends ServiceProvider
             SendOrderStatusChangedNotification::class,
             DecrementStockOnPaymentListener::class,
             RestoreStockOnCancellationListener::class,
+            ReleaseBottlesOnOrderCancellation::class,
         ],
     ];
 

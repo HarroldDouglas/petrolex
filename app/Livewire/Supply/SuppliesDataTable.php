@@ -270,16 +270,36 @@ class SuppliesDataTable extends BaseDataTable
                 return;
             }
 
-            // Transition: PENDING_RECEPTION → IN_STOCK for all scanned bottles
-            $bottleIds = $supply->productTypes()
-                ->with('deliveryBottles')
-                ->get()
-                ->flatMap(fn ($pt) => $pt->deliveryBottles->pluck('bottle_id'));
+            // Transitions at completion:
+            // - incoming scanned bottles: PENDING_RECEPTION → IN_STOCK
+            // - outgoing scanned bottles: physically left with the supplier →
+            //   RETURNED_TO_SUPPLIER + empty, so stock counts stay correct and
+            //   the bottle can be received again when the supplier brings it back.
+            $productTypes = $supply->productTypes()->with('deliveryBottles')->get();
 
-            if ($bottleIds->isNotEmpty()) {
-                \App\Models\Bottle::whereIn('id', $bottleIds)
+            $incomingIds = $productTypes->flatMap(
+                fn ($pt) => $pt->deliveryBottles
+                    ->filter(fn ($row) => (string) $row->movement_type === 'incoming')
+                    ->pluck('bottle_id')
+            );
+            $outgoingIds = $productTypes->flatMap(
+                fn ($pt) => $pt->deliveryBottles
+                    ->filter(fn ($row) => (string) $row->movement_type === 'outgoing')
+                    ->pluck('bottle_id')
+            );
+
+            if ($incomingIds->isNotEmpty()) {
+                \App\Models\Bottle::whereIn('id', $incomingIds)
                     ->where('status', \App\Enums\BottleStatus::PENDING_RECEPTION())
                     ->update(['status' => \App\Enums\BottleStatus::IN_STOCK()]);
+            }
+
+            if ($outgoingIds->isNotEmpty()) {
+                \App\Models\Bottle::whereIn('id', $outgoingIds)
+                    ->update([
+                        'status' => \App\Enums\BottleStatus::RETURNED_TO_SUPPLIER(),
+                        'is_filled' => false,
+                    ]);
             }
 
             $supply->status = SupplierDeliveryStatus::COMPLETED();
@@ -310,6 +330,18 @@ class SuppliesDataTable extends BaseDataTable
     {
         try {
             $supply = SupplierDelivery::findOrFail($supplyId);
+
+            if (! $supply->canBeEdited()) {
+                $this->dispatch('show-notification', [
+                    'type' => 'error',
+                    'title' => 'Erreur !',
+                    'message' => 'Seul un approvisionnement en cours peut être annulé.',
+                    'timer' => 3000,
+                ]);
+
+                return;
+            }
+
             $supply->status = SupplierDeliveryStatus::CANCELLED();
             $supply->save();
 
