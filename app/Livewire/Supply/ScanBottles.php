@@ -287,6 +287,31 @@ class ScanBottles extends Component
                 session()->flash('error', "Bouteille avec code {$barcode} non trouvée dans le système.");
 
                 return false;
+            } elseif ($this->isIncomingMode) {
+                // The guard rejects bottles already held by an active scan of
+                // ANY in-progress supply (one bottle = one open supply at a
+                // time) and bottles in circulation.
+                $reason = app(\App\Services\Supply\IncomingScanGuard::class)
+                    ->rejectionReason($bottle, (int) $this->selectedProductType->id);
+
+                if ($reason !== null) {
+                    DB::rollBack();
+                    Log::warning('[SupplyScan] scan entrant refusé', [
+                        'barcode' => $barcode,
+                        'bottle_id' => $bottle->id,
+                        'supply_id' => $this->supplyId,
+                        'reason' => $reason,
+                    ]);
+                    session()->flash('warning', $reason);
+
+                    return false;
+                }
+
+                $bottle->update([
+                    'status' => BottleStatus::PENDING_RECEPTION(),
+                    'is_filled' => true,
+                    'distribution_center_id' => $this->supply->distribution_center_id,
+                ]);
             }
 
             $existingBottle = SupplierDeliveryBottle::withTrashed()
@@ -311,14 +336,6 @@ class ScanBottles extends Component
                     return false;
                 }
             } else {
-                if ($this->isIncomingMode && ! $bottle->status->equals(BottleStatus::PENDING_RECEPTION())) {
-                    $bottle->update([
-                        'status' => BottleStatus::PENDING_RECEPTION(),
-                        'is_filled' => true,
-                        'distribution_center_id' => $this->supply->distribution_center_id,
-                    ]);
-                }
-
                 SupplierDeliveryBottle::create([
                     'supplier_delivery_product_type_id' => $this->selectedProductType->id,
                     'bottle_id' => $bottle->id,

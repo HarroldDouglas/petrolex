@@ -202,11 +202,9 @@ Route::middleware('auth:sanctum')
                 $bottle = Bottle::where('barcode', $barcode)->first();
 
                 // Look up any existing scan (active or soft-deleted) for this
-                // bottle on this supply product-type. If a soft-deleted scan
-                // exists, this is a legitimate re-scan after deletion — we
-                // restore it and skip the strict status validation (the
-                // bottle's current pending_reception status was caused by
-                // THIS supply in the first place).
+                // bottle on this supply product-type. A soft-deleted scan is
+                // restored instead of re-created (unique constraint on
+                // product_type + bottle covers trashed rows too).
                 $existing = null;
                 if ($bottle) {
                     $existing = SupplierDeliveryBottle::withTrashed()
@@ -214,7 +212,6 @@ Route::middleware('auth:sanctum')
                         ->where('bottle_id', $bottle->id)
                         ->first();
                 }
-                $isRestoringDeletedScan = $existing && $existing->trashed();
 
                 if ($isIncoming) {
                     if (! $bottle) {
@@ -228,20 +225,15 @@ Route::middleware('auth:sanctum')
                             'is_filled' => true,
                             'status' => BottleStatus::PENDING_RECEPTION(),
                         ]);
-                    } elseif (! $isRestoringDeletedScan) {
-                        // Existing bottle, no prior scan to restore: must be
-                        // in a re-receivable state (returned/lost), OR already
-                        // pending_reception from another supply still open.
-                        $allowedReSupplyStatuses = [
-                            BottleStatus::RETURNED_TO_SUPPLIER()->value,
-                            BottleStatus::LOST_STOLEN()->value,
-                        ];
-                        if (! in_array($bottle->status->value, $allowedReSupplyStatuses, true)) {
+                    } else {
+                        // The guard rejects bottles already held by an active
+                        // scan of ANY in-progress supply (one bottle = one open
+                        // supply at a time) and bottles in circulation.
+                        $reason = app(\App\Services\Supply\IncomingScanGuard::class)
+                            ->rejectionReason($bottle, (int) $productType->id);
+                        if ($reason !== null) {
                             DB::rollBack();
-                            return response()->json([
-                                'ok' => false,
-                                'message' => "Bouteille déjà active dans le système (statut: {$bottle->status->label}).",
-                            ], 409);
+                            return response()->json(['ok' => false, 'message' => $reason], 409);
                         }
                         $bottle->update([
                             'status' => BottleStatus::PENDING_RECEPTION(),
@@ -249,7 +241,6 @@ Route::middleware('auth:sanctum')
                             'distribution_center_id' => $supply->distribution_center_id,
                         ]);
                     }
-                    // else (restoring): bottle stays as-is, just restore the scan below.
                 } else {
                     // OUTGOING: bottle must already exist.
                     if (! $bottle) {
