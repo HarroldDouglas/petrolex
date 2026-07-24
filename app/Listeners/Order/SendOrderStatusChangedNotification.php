@@ -160,13 +160,25 @@ class SendOrderStatusChangedNotification extends BaseListener
      */
     private function sendNotification(Collection $recipients, Order $order, ?OrderStatus $oldStatus, ?OrderStatus $newStatus): void
     {
-        Notification::send(
-            $recipients,
-            new OrderStatusChangedNotification(
-                $order,
-                $oldStatus,
-                $newStatus
-            )
-        );
+        // A notification must NEVER be able to break the caller. This listener
+        // runs inside the payment DB transaction, and an uncaught mail/queue
+        // failure here would roll back the whole payment confirmation.
+        try {
+            Notification::send(
+                $recipients,
+                new OrderStatusChangedNotification(
+                    $order,
+                    $oldStatus,
+                    $newStatus
+                )
+            );
+        } catch (\Throwable $e) {
+            Log::error('Failed to send order status notification (swallowed to protect the transaction)', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'new_status' => $newStatus?->value,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

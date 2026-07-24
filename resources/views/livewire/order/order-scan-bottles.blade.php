@@ -141,6 +141,8 @@
         </div>
     @endif
 
+    @include('partials.mobile-app-scan-prompt')
+
     @push('scripts')
         <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
         <script src="{{ asset('assets/js/scan-code-bar.js') }}?v={{ filemtime(public_path('assets/js/scan-code-bar.js')) }}"></script>
@@ -164,7 +166,7 @@
 
             function scanButtonClickHandler() {
                 if (typeof window.initBarcodeScanner === 'function') {
-                    window.initBarcodeScanner();
+                    window.promptMobileAppThenScan(window.initBarcodeScanner);
                 } else {
                     console.error("La fonction initBarcodeScanner n'est pas disponible");
                     alert("Erreur: La fonction de scan n'est pas disponible");

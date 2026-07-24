@@ -200,12 +200,6 @@ class ScanBottles extends Component
     #[On('barcode-scanned')]
     public function handleScannedBarcode($barcode)
     {
-        Log::info('[SupplyScan] handleScannedBarcode reçu', [
-            'barcode' => $barcode,
-            'supply_id' => $this->supplyId,
-            'selectedProductId' => $this->selectedProductId,
-            'isIncomingMode' => $this->isIncomingMode,
-        ]);
         $this->addBottle($barcode);
     }
 
@@ -218,7 +212,6 @@ class ScanBottles extends Component
     public function addManualBarcode()
     {
         $this->validate();
-        Log::info('addManualBarcode called', ['barcode' => $this->manualBarcode, 'productId' => $this->selectedProductId]);
         $result = $this->addBottle($this->manualBarcode);
         if ($result) {
             $this->manualBarcode = '';
@@ -230,11 +223,6 @@ class ScanBottles extends Component
     {
         $this->selectedBottles = [];
         $this->loadBottles();
-
-        Log::debug('Mode changed via updatedIsIncomingMode', [
-            'isIncomingMode' => $this->isIncomingMode,
-            'bottleCount' => count($this->bottles),
-        ]);
     }
 
     public function addBottle($barcode): bool
@@ -296,7 +284,7 @@ class ScanBottles extends Component
 
                 if ($reason !== null) {
                     DB::rollBack();
-                    Log::warning('[SupplyScan] scan entrant refusé', [
+                    Log::warning('Scan entrant refusé', [
                         'barcode' => $barcode,
                         'bottle_id' => $bottle->id,
                         'supply_id' => $this->supplyId,
@@ -323,10 +311,9 @@ class ScanBottles extends Component
                 if ($existingBottle->trashed()) {
                     $existingBottle->restore();
                     $existingBottle->update(['movement_type' => $movementType]);
-                    Log::info('[SupplyScan] bouteille restaurée (était soft-deleted)', ['barcode' => $barcode]);
                 } else {
                     DB::rollBack();
-                    Log::warning('[SupplyScan] bouteille déjà scannée pour cet approvisionnement', [
+                    Log::warning('Bouteille déjà scannée pour cet approvisionnement', [
                         'barcode' => $barcode,
                         'bottle_id' => $bottle->id,
                         'supply_id' => $this->supplyId,

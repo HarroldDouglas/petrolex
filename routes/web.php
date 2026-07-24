@@ -20,15 +20,6 @@ Route::get('/account-deletion/delivery', function () {
 })->name('account-deletion.delivery');
 
 /**
- * Public test page for comparing barcode scanner implementations.
- * Used to A/B test scan accuracy across low-end devices (e.g. Samsung A17).
- * No auth required — direct access from any phone for in-field testing.
- */
-Route::get('/test-scanner', function () {
-    return view('test.scanner');
-})->name('test.scanner');
-
-/**
  * Public install page for the Petrolex Manager Android app (Flutter).
  * Distributed direct (no Play Store): manager visits the URL, downloads the
  * APK, installs it, logs in with their normal Petrolex credentials.

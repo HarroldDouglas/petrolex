@@ -10,12 +10,7 @@ if (typeof window.BarcodeScannerModule === "undefined") {
         const CONFIRMATION_COUNT = 3; // require N consecutive identical reads
 
         function log() {
-            // V2 ÉLIMINATION: DOM update retiré. Seulement console.log.
-            try {
-                var args = Array.prototype.slice.call(arguments);
-                args.unshift("[Scanner]");
-                console.log.apply(console, args);
-            } catch (e) {}
+            // No-op: debug logging removed for production.
         }
 
         function createScannerUI() {
@@ -211,13 +206,16 @@ if (typeof window.BarcodeScannerModule === "undefined") {
                 // No qrbox = decode the FULL viewfinder, matching the Flutter
                 // mobile app behavior. Restricting decode to a fixed pixel-size
                 // qrbox made small/far-away barcodes (manager's phones) unscannable.
+                //
+                // ONLY Code 128 + Code 39 — ISOGAZ bottle labels use Code 128
+                // ("12-000395" format). Enabling EAN/UPC lets the scanner
+                // accidentally decode the QR-adjacent internal EAN-13 (13-digit)
+                // sitting next to the real Code 128, which the 3-read
+                // confirmation can't catch (a stable misread just repeats).
+                // This mirrors the mobile app's hard-won format restriction.
                 formatsToSupport: [
                     Html5QrcodeSupportedFormats.CODE_128,
                     Html5QrcodeSupportedFormats.CODE_39,
-                    Html5QrcodeSupportedFormats.EAN_13,
-                    Html5QrcodeSupportedFormats.EAN_8,
-                    Html5QrcodeSupportedFormats.UPC_A,
-                    Html5QrcodeSupportedFormats.UPC_E,
                 ],
                 useBarCodeDetectorIfSupported: true,
                 // HD video constraints belong here. html5-qrcode rejects

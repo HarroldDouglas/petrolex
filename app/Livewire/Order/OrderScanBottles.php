@@ -144,14 +144,6 @@ class OrderScanBottles extends Component
     {
         $barcode = $data['barcode'] ?? null;
 
-        Log::info('[Scan] processBarcode appelé', [
-            'order_id' => $this->order->id ?? null,
-            'barcode' => $barcode,
-            'selected_bottle_type_id' => $this->selectedBottleTypeId,
-            'scanned_for_type' => $this->scannedBottlesForType,
-            'total_for_type' => $this->totalBottlesForType,
-        ]);
-
         if (! $barcode) {
             $this->dispatch('scanError', ['message' => 'Code-barres vide ou invalide']);
 
@@ -173,26 +165,20 @@ class OrderScanBottles extends Component
         try {
             $orderItem = $this->bottleScanService->scanBottle($this->order, $barcode);
 
-            Log::info('[Scan] Bouteille liée avec succès', [
-                'order_id' => $this->order->id,
-                'barcode' => $barcode,
-                'order_item_id' => $orderItem->id ?? null,
-            ]);
-
             $this->loadBottleTypes();
             $this->updateSelectedBottleType();
 
             $this->dispatch('bottleScanned', ['barcode' => $barcode]);
             $this->dispatch('scanSuccess', ['message' => 'Bouteille liée avec succès', 'barcode' => $barcode]);
         } catch (BottleScanException $e) {
-            Log::warning('[Scan] Échec scan bouteille', [
+            Log::warning('Échec scan bouteille', [
                 'order_id' => $this->order->id,
                 'barcode' => $barcode,
                 'reason' => $e->getMessage(),
             ]);
             $this->dispatch('scanError', ['message' => $e->getMessage(), 'barcode' => $barcode]);
         } catch (\Exception $e) {
-            Log::error('[Scan] Erreur inattendue', [
+            Log::error('Erreur inattendue lors du scan', [
                 'exception' => $e->getMessage(),
                 'order_id' => $this->order->id,
                 'barcode' => $barcode,

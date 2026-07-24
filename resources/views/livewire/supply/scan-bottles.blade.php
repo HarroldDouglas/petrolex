@@ -207,44 +207,36 @@
          Diagnosed 2026-06-01. Keep until root cause is properly understood. --}}
     <div id="scan-debug-bar" style="display:none;"></div>
 
+    @include('partials.mobile-app-scan-prompt')
+
     @push('scripts')
-        <script src="{{ asset('assets/js/js-logger.js') }}?v={{ filemtime(public_path('assets/js/js-logger.js')) }}"></script>
         <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
         <script src="{{ asset('assets/js/scan-code-bar.js') }}?v={{ filemtime(public_path('assets/js/scan-code-bar.js')) }}"></script>
 
         <script>
-            console.log('Livewire blade template script starting');
-
             // Initialize scanner button on every component update
             document.addEventListener('livewire:init', function() {
                 Livewire.hook('morph.updated', (el) => {
-                    console.log('Component updated, reinitializing scanner button');
                     initScanButton();
                 });
             });
 
             document.addEventListener('DOMContentLoaded', function() {
-                console.log('DOM fully loaded, setting up scanner');
                 initScanButton();
             });
 
             function initScanButton() {
-                console.log('Initializing scan button');
                 const scanButton = document.getElementById('scanButton');
-                console.log('Scan button element:', scanButton);
 
                 if (scanButton) {
-                    console.log('Removing old listeners and adding new click event listener to scan button');
                     scanButton.removeEventListener('click', scanButtonClickHandler);
                     scanButton.addEventListener('click', scanButtonClickHandler);
-                } else {
-                    console.warn('Scan button not found in DOM - might be hidden based on conditions');
                 }
             }
 
             function scanButtonClickHandler() {
                 if (typeof window.initBarcodeScanner === 'function') {
-                    window.initBarcodeScanner();
+                    window.promptMobileAppThenScan(window.initBarcodeScanner);
                 } else {
                     alert('Erreur: La fonction de scan n\'est pas disponible');
                 }
@@ -252,7 +244,6 @@
 
             // Set up bottle added animation
             window.addEventListener('bottleAdded', event => {
-                console.log('Bottle added event received');
                 const progress = document.querySelector('.progress-bar');
                 if (progress) {
                     progress.classList.add('progress-bar-animated');
@@ -260,13 +251,6 @@
                         progress.classList.remove('progress-bar-animated');
                     }, 1000);
                 }
-            });
-
-            // Check if script is loaded
-            console.log('scan-code-bar.js status:', {
-                scriptLoaded: typeof window.initBarcodeScanner === 'function',
-                windowAndroid: !!window.Android,
-                livewireAvailable: !!window.Livewire
             });
         </script>
     @endpush

@@ -10,7 +10,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\ScanEmptyBottleRequest;
 use App\Models\Order;
 use App\Services\Order\OrderService;
-use Illuminate\Support\Facades\Log;
 
 final class ScanEmptyBottleController extends Controller
 {
@@ -26,18 +25,6 @@ final class ScanEmptyBottleController extends Controller
      */
     public function __invoke(ScanEmptyBottleRequest $request, Order $order): ScanEmptyBottleResponse
     {
-        $rawBarcode = $request->input('barcode');
-
-        Log::info('[MobileScan] scan-empty-bottle reçu', [
-            'endpoint' => 'POST /api/orders/{order}/scan-empty-bottle',
-            'order_id' => $order->id,
-            'barcode' => $rawBarcode,
-            'order_item_id' => $request->input('order_item_id'),
-            'user_id' => auth()->id(),
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
         $user = auth()->user();
 
         $isOrderOwner = $user->customer && $user->customer->id === $order->customer_id;

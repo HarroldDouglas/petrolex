@@ -5,15 +5,20 @@ namespace App\Notifications;
 use App\Mail\Order\OrderCreatedMail;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class OrderCreatedNotification extends Notification
+class OrderCreatedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(
         public Order $order
-    ) {}
+    ) {
+        // Dispatch after the surrounding DB transaction commits, so a
+        // mail/database failure can never roll back the payment/refund.
+        $this->afterCommit = true;
+    }
 
     /**
      * Get the notification's delivery channels.
