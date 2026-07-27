@@ -16,7 +16,7 @@ Backend Laravel : app mobile clients + livreurs, admin Livewire, paiements Mobil
 - `gotchas.md` — Pièges critiques à éviter (ALWAYS APPLY)
 - `code-style.md` — Standards PHP + conventions commentaires
 - `workflow.md` — Règles de dev (ALWAYS APPLY)
-- `production.md` — Serveur, déploiement (⚠️ prod = copie de fichiers, PAS git)
+- `production.md` — Serveur + LE circuit de déploiement (`/deploy` — prod = dépôt git)
 - `graphify.md` — Knowledge graph
 
 ## Self-improvement
