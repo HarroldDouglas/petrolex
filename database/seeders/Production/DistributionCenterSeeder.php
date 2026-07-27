@@ -12,20 +12,26 @@ class DistributionCenterSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->command->info('Creating default distribution center...');
+        $this->command->info('Creating default distribution center (Logbessou)...');
 
+        /*
+         * Default distribution center = Logbessou (the live production center).
+         * Data mirrors the current prod row so `migrate:fresh --seed` yields a
+         * functional setup: the mobile app resolves the city (Douala) and its base
+         * prices. Stock is intentionally left at 0 — provisioning is the client's job.
+         */
         $dc = DistributionCenter::updateOrCreate(
-            ['name' => 'Petrolex Cameroun - Siège Douala'],
+            ['name' => 'Logbessou'],
             [
-                'address'          => '399, Rue 1225 Dominique Savio, Bonanjo',
-                'neighborhood_id'  => 17, // Bonanjo, Douala
-                'phone'            => '+237699000000',
-                'email'            => 'contact@isogaz.net',
-                'latitude'         => 4.0280392,
-                'longitude'        => 9.6960282,
-                'is_active'        => true,
-                'storage_capacity' => 5000,
-                'description'      => 'Centre de distribution principal - Siège social Petrolex Cameroun',
+                'address' => 'Pk-14',
+                'neighborhood_id' => 26, // Logbessou, Douala V, Douala (city_id=2)
+                'phone' => '679523777',
+                'email' => 'lazare.tchamabe@petrolex.net',
+                'latitude' => 4.0441020,
+                'longitude' => 9.6819680,
+                'is_active' => true,
+                'storage_capacity' => 1000,
+                'description' => 'Centre de distribution Logbessou - Douala',
             ]
         );
 
