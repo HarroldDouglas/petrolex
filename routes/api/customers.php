@@ -8,11 +8,21 @@ use App\Http\Api\Controllers\Customer\UpdateCustomerDeliveryAddressController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('customers')->name('api.')->group(function () {
-    Route::post('/', StoreCustomerController::class)->name('customers.store');
+    /*
+     * Registration sends an OTP (SMS = real Twilio cost). This route hits the
+     * same controller as POST /register/customer, so it must carry the same
+     * throttle — otherwise it becomes an unthrottled bypass for SMS flooding.
+     */
+    Route::middleware('throttle:4,1')->group(function () {
+        Route::post('/', StoreCustomerController::class)->name('customers.store');
+    });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    /*
+     * Reading customer records exposes personal data (names, phones, addresses)
+     * of the whole base, so it is restricted to staff roles — never other customers.
+     */
+    Route::middleware(['auth:sanctum', 'role:super_admin|admin|manager|gas_manager|center_manager'])->group(function () {
         Route::get('/', GetCustomersController::class)->name('customers.index');
-        Route::get('/', GetCustomersController::class)->name('*customers');
         Route::get('/{customerId}', GetCustomerController::class)->name('customers.show');
     });
 });

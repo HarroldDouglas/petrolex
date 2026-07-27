@@ -11,17 +11,25 @@ use App\Http\Api\Controllers\Auth\ResendOtpController;
 use App\Http\Api\Controllers\Auth\VerifyOtpController;
 use Illuminate\Support\Facades\Route;
 
-// New secure login endpoints - USE THESE!
-Route::post('/login/customer', LoginCustomerController::class)->name('api.login.customer');
-Route::post('/login/delivery', LoginDeliveryController::class)->name('api.login.delivery');
+// Rate-limited public auth endpoints: guard against password brute-force,
+// OTP brute-force (6-digit code) and SMS/OTP flooding (Twilio = real cost).
+Route::middleware('throttle:8,1')->group(function () {
+    // New secure login endpoints - USE THESE!
+    Route::post('/login/customer', LoginCustomerController::class)->name('api.login.customer');
+    Route::post('/login/delivery', LoginDeliveryController::class)->name('api.login.delivery');
 
-// Old login endpoint - DEPRECATED, will be removed soon
-Route::post('/login', LoginController::class)->name('api.login');
+    // Old login endpoint - DEPRECATED, will be removed soon
+    Route::post('/login', LoginController::class)->name('api.login');
 
-Route::post('/register/customer', \App\Http\Api\Controllers\Customer\StoreCustomerController::class)->name('api.register.customer');
-Route::post('/verify-otp', VerifyOtpController::class)->name('api.verify-otp');
-Route::post('/resend-otp', ResendOtpController::class)->name('api.resend-otp');
-Route::post('/forgot-password', ForgotPasswordController::class)->name('api.forgot-password');
+    Route::post('/verify-otp', VerifyOtpController::class)->name('api.verify-otp');
+    Route::post('/forgot-password', ForgotPasswordController::class)->name('api.forgot-password');
+});
+
+// Sending an SMS/OTP is the most expensive + abusable action: throttle harder.
+Route::middleware('throttle:4,1')->group(function () {
+    Route::post('/register/customer', \App\Http\Api\Controllers\Customer\StoreCustomerController::class)->name('api.register.customer');
+    Route::post('/resend-otp', ResendOtpController::class)->name('api.resend-otp');
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/check', CheckAuthController::class)->name('api.auth.check');

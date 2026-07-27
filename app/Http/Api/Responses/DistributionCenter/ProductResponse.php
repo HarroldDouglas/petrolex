@@ -13,11 +13,12 @@ class ProductResponse extends ApiResponse
      */
     public static function withCollection(
         Collection|array $products,
+        ?int $cityId = null,
         ?string $message = null,
         int $statusCode = 200
     ): self {
         return new self(
-            ProductResource::collection($products),
+            ProductResource::collectionForCity($products, $cityId),
             $message ?? __('messages.products_retrieved_successfully'),
             true,
             $statusCode

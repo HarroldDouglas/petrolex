@@ -21,6 +21,9 @@ class GetProductsController extends Controller
     {
         $products = $this->distributionCenterService->getProducts($distributionCenterId);
 
-        return ProductResponse::withCollection($products);
+        $cityId = app(\App\Services\ProductCategoryService::class)
+            ->resolveCityIdForDistributionCenter($distributionCenterId);
+
+        return ProductResponse::withCollection($products, $cityId);
     }
 }

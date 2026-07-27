@@ -22,6 +22,26 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class ProductResource extends JsonResource
 {
     /**
+     * City used to price the bottle options (admin-defined city prices). Set by
+     * the controller via self::collectionForCity(); null falls back to base price.
+     */
+    public ?int $pricingCityId = null;
+
+    /**
+     * Build a resource collection priced for a specific city, so the price
+     * displayed matches what the order validation expects for that city.
+     */
+    public static function collectionForCity($resource, ?int $cityId): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        $collection = static::collection($resource);
+        $collection->collection->each(function (self $item) use ($cityId): void {
+            $item->pricingCityId = $cityId;
+        });
+
+        return $collection;
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
@@ -83,18 +103,28 @@ class ProductResource extends JsonResource
             return ['options' => []];
         }
 
+        // Show the admin-defined city price for the distribution center being
+        // browsed, so the price displayed matches what the order validation
+        // expects. Falls back to the base price when no city price is set.
+        $cityPrice = $this->pricingCityId !== null
+            ? app(\App\Services\ProductCategoryService::class)->findCityPrice($this->resource->id, $this->pricingCityId)
+            : null;
+
+        $rechargePrice = (float) ($cityPrice?->content_price ?? $bottleType->content_price);
+        $fullPrice = (float) ($cityPrice?->content_with_bottle_price ?? $bottleType->full_price);
+
         return [
             'options' => [
                 [
                     'value' => BottleOrderType::RECHARGE()->value,
                     'label' => BottleOrderType::RECHARGE()->getLocalizedLabel(),
-                    'price' => number_format((float) $bottleType->content_price, $decimalPlaces, '.', ''),
+                    'price' => number_format($rechargePrice, $decimalPlaces, '.', ''),
                     'is_default' => true,
                 ],
                 [
                     'value' => BottleOrderType::FULL()->value,
                     'label' => BottleOrderType::FULL()->getLocalizedLabel(),
-                    'price' => number_format((float) $bottleType->full_price, $decimalPlaces, '.', ''),
+                    'price' => number_format($fullPrice, $decimalPlaces, '.', ''),
                     'is_default' => false,
                 ],
             ],

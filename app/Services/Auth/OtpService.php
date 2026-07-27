@@ -15,6 +15,8 @@ class OtpService implements OtpServiceInterface
     private const OTP_LENGTH = 6;
     private const OTP_TTL_MINUTES = 10;
     private const OTP_CACHE_PREFIX = 'otp_';
+    private const OTP_ATTEMPTS_PREFIX = 'otp_attempts_';
+    private const OTP_MAX_ATTEMPTS = 5;
     private const SMS_MESSAGE_TEMPLATE = 'Votre code de vérification est %s. Ce code expirera dans 10 minutes.';
     private const RESET_TOKEN_TTL_MINUTES = 10;
     private const SECONDS_PER_MINUTE = 60;
@@ -132,6 +134,7 @@ class OtpService implements OtpServiceInterface
     public function invalidateOtp(string $identifier): bool
     {
         $cacheKey = $this->generateCacheKey($identifier);
+        Cache::forget(self::OTP_ATTEMPTS_PREFIX.md5($identifier));
 
         return Cache::forget($cacheKey);
     }
@@ -162,6 +165,16 @@ class OtpService implements OtpServiceInterface
             return null;
         }
 
+        // Per-identifier brute-force guard: after too many wrong tries the OTP
+        // is burned, forcing the user to request a fresh code. This blocks an
+        // attacker who rotates IPs to bypass the per-IP route throttle.
+        $attemptsKey = self::OTP_ATTEMPTS_PREFIX.md5($identifier);
+        if ((int) Cache::get($attemptsKey, 0) >= self::OTP_MAX_ATTEMPTS) {
+            $this->invalidateOtp($identifier);
+
+            return null;
+        }
+
         if ($storedOtp === $otp) {
             $this->invalidateOtp($identifier);
             $user = $this->userRepository->findByEmailOrPhone($identifier);
@@ -174,7 +187,12 @@ class OtpService implements OtpServiceInterface
 
                 return $user;
             }
+
+            return null;
         }
+
+        // Wrong code: count the failed attempt (TTL matches the OTP lifetime).
+        Cache::put($attemptsKey, (int) Cache::get($attemptsKey, 0) + 1, now()->addMinutes(self::OTP_TTL_MINUTES));
 
         return null;
     }

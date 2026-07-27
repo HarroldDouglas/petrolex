@@ -47,10 +47,14 @@ final class GetClosestDistributionCenterController extends Controller
         // Get products for this distribution center
         $products = $this->distributionCenterService->getProducts($closestCenter->id);
 
+        // Price products in this center's city so displayed prices match the
+        // admin-defined city prices the order validation will enforce.
+        $cityId = $closestCenter->city?->id;
+
         return ApiResponse::success(
             data: [
                 'distribution_center' => new DistributionCenterResource($closestCenter),
-                'products' => ProductResource::collection($products),
+                'products' => ProductResource::collectionForCity($products, $cityId),
             ],
             message: __('messages.closest_distribution_center_found')
         );

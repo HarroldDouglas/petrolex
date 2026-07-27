@@ -17,9 +17,10 @@ class OrangeCallbackController extends Controller
         Log::info('Orange Money callback received', $request->all());
 
         try {
-            // TODO: Implement Orange Money callback logic
-            // This should handle the payment verification and update order status
-
+            // Intentionally a no-op ACK. Payment confirmation is NOT trusted from
+            // this inbound callback (it is unauthenticated and spoofable). The
+            // authoritative status is pulled server-side from the Orange API by
+            // App\Jobs\VerifyPaymentStatusJob. We only acknowledge receipt here.
             return response('OK', 200);
         } catch (\Exception $e) {
             Log::error('Orange Money callback error: '.$e->getMessage(), [

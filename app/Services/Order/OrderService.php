@@ -226,11 +226,18 @@ class OrderService extends BaseServiceForEntity
 
         return $this->executeInTransaction(function () use ($orderDTO) {
 
-            $orderItemsData = array_map(function (OrderItemDTO $itemDTO): OrderItemDTO {
+            // Price the order in the distribution center's city (admin-defined
+            // city prices override the base price; falls back to base if none).
+            $cityId = $this->productCategoryService->resolveCityIdForDistributionCenter(
+                $orderDTO->distribution_center_id ?? null
+            );
+
+            $orderItemsData = array_map(function (OrderItemDTO $itemDTO) use ($cityId): OrderItemDTO {
 
                 $unitPrice = $this->productCategoryService->getProductPrice(
                     $itemDTO->product_category_id,
-                    $itemDTO->option
+                    $itemDTO->option,
+                    $cityId
                 );
 
                 $itemTotalPrice = $unitPrice * $itemDTO->quantity;

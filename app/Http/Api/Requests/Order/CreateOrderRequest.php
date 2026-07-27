@@ -121,15 +121,23 @@ final class CreateOrderRequest extends FormRequest
 
     private function validatePricing($validator): void
     {
+        $productCategoryService = app(\App\Services\ProductCategoryService::class);
+        // Orders are priced in the city of the chosen distribution center
+        // (which equals the delivery city — enforced by validateSameMunicipality).
+        $cityId = $productCategoryService->resolveCityIdForDistributionCenter(
+            $this->input('distribution_center_id')
+        );
+
         foreach ($this->input('items', []) as $index => $item) {
             // Skip validation if required fields are missing (will be caught by basic validation)
             if (! isset($item['product_category_id']) || ! isset($item['unit_price'])) {
                 continue;
             }
 
-            $expectedPrice = app(\App\Services\ProductCategoryService::class)->getProductPrice(
+            $expectedPrice = $productCategoryService->getProductPrice(
                 $item['product_category_id'],
-                isset($item['option']) ? BottleOrderType::from($item['option']) : null
+                isset($item['option']) ? BottleOrderType::from($item['option']) : null,
+                $cityId
             );
 
             if (abs($item['unit_price'] - $expectedPrice) > 0.01) {
