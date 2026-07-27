@@ -24,3 +24,13 @@ npm-debug.log
 /.vscode
 bin/
 tests/Curl/token.txt
+# Root-level manual test scripts with sandbox credentials (untracked)
+/test_mtn.php
+/test_orange.php
+/test_wallet_correct_flow.php
+/test_wallet_refund.php
+/test_wallet_refund_real_flow.php
+# Local, machine-specific Claude Code settings (never share)
+/.claude/settings.local.json
+# Generated PDF font metric cache
+/storage/fonts/
