@@ -49,16 +49,8 @@ echo "    ($(zcat "$BK/db.sql.gz" | grep -c 'CREATE TABLE') tables sauvegardées
 
 php artisan down --retry=30 || true
 
-# Les seeders (UserSeeder) utilisent des factories → Faker (dep DEV) requis
-# le temps du seed. On réinstalle dev, on seede, puis on repasse en --no-dev.
-echo "  → composer (avec dev, pour Faker)"
-composer install --optimize-autoloader --no-interaction >/dev/null 2>&1
-
 echo "  → migrate:fresh --seed (WIPE + baseline)"
 php artisan migrate:fresh --seed --force
-
-echo "  → composer --no-dev (retire Faker)"
-composer install --no-dev --optimize-autoloader --no-interaction >/dev/null 2>&1
 
 echo "  → permissions + caches"
 chmod -R ug+rwX storage bootstrap/cache 2>/dev/null || true

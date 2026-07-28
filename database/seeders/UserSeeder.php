@@ -32,13 +32,15 @@ class UserSeeder extends Seeder
     {
         $cameroon = Country::where('code', 'CM')->first();
 
-        $superAdmin = User::factory()->create([
+        $superAdmin = User::create([
             'first_name' => config('super-admin.first_name', 'Super'),
             'last_name' => config('super-admin.last_name', 'Admin'),
             'email' => config('super-admin.email', 'admin@petrolex.com'),
             'phone_number' => config('super-admin.phone', '670000001'),
             'country_id' => $cameroon?->id,
             'password' => Hash::make(config('super-admin.password', 'password')),
+            'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         $superAdmin->assignRole(UserRole::SUPER_ADMIN()->value);
@@ -51,13 +53,15 @@ class UserSeeder extends Seeder
     {
         $cameroon = Country::where('code', 'CM')->first();
 
-        $gasManager = User::factory()->create([
+        $gasManager = User::create([
             'first_name' => 'Responsable',
             'last_name' => 'Gaz',
             'email' => 'responsablegaz@petrolex.com',
             'phone_number' => '670000002',
             'country_id' => $cameroon?->id,
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         $gasManager->assignRole(UserRole::GAS_MANAGER()->value);
@@ -70,13 +74,15 @@ class UserSeeder extends Seeder
     {
         $cameroon = Country::where('code', 'CM')->first();
 
-        $centerManager = User::factory()->create([
+        $centerManager = User::create([
             'first_name' => 'Responsable',
             'last_name' => 'Centre',
             'email' => 'responsablecentre@petrolex.com',
             'phone_number' => '670000003',
             'country_id' => $cameroon?->id,
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+            'is_active' => true,
         ]);
 
         $centerManager->assignRole(UserRole::CENTER_MANAGER()->value);
