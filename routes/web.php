@@ -31,6 +31,7 @@ Route::get('/mobileapp', function () {
     $manifest = $available && file_exists($manifestPath)
         ? json_decode(file_get_contents($manifestPath), true)
         : null;
+
     return view('mobile-app.install', [
         'available' => $available,
         'version' => $manifest['version'] ?? null,
@@ -41,7 +42,8 @@ Route::get('/mobileapp', function () {
 
 Route::get('/mobileapp/download', function () {
     $apkPath = storage_path('app/mobile-app/petrolex-manager.apk');
-    abort_unless(file_exists($apkPath), 404, "APK pas encore disponible.");
+    abort_unless(file_exists($apkPath), 404, 'APK pas encore disponible.');
+
     return response()->download($apkPath, 'petrolex-manager.apk', [
         'Content-Type' => 'application/vnd.android.package-archive',
     ]);
@@ -55,7 +57,7 @@ require __DIR__.'/web/auth.php';
 /**
  * All authenticated routes
  */
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['web', 'auth', 'staff'])->group(function () {
     require __DIR__.'/web/dashboard.php';
     require __DIR__.'/web/admin.php';
     require __DIR__.'/web/orders.php';

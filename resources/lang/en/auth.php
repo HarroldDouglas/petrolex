@@ -26,4 +26,7 @@ return [
 
     'identifier_required' => 'Please enter an email or phone number.',
     'password_required' => 'Password is required.',
+
+    // Web panel access control
+    'staff_only' => 'This account cannot access the dashboard. Please use the mobile app.',
 ];

@@ -60,4 +60,7 @@ return [
     'resend_code' => 'Renvoyer le code',
     'otp_resent' => 'Un nouveau code de vérification a été envoyé.',
     'sent_to' => 'Envoyé à',
+
+    // Web panel access control
+    'staff_only' => 'Ce compte n\'a pas accès au tableau de bord. Utilisez l\'application mobile.',
 ];

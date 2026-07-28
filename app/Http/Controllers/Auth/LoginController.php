@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\EnsureUserIsStaff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -38,6 +39,19 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
+            // The web panel is staff-only. Customers and delivery persons live in
+            // the same users table and authenticate with the same guard, so a
+            // valid credential is not enough — reject anyone without a staff role.
+            if (! $request->user()->hasAnyRole(EnsureUserIsStaff::staffRoles())) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                throw ValidationException::withMessages([
+                    'email' => [__('auth.staff_only')],
+                ]);
+            }
+
             $request->session()->regenerate();
 
             $sweetAlert = [

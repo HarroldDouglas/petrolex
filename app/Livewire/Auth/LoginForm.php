@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use App\Http\Middleware\EnsureUserIsStaff;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -48,6 +49,17 @@ class LoginForm extends Component
             $credentials = $this->getCredentials();
 
             if (Auth::attempt($credentials, $this->remember)) {
+                // Web panel is staff-only. Customers/delivery persons share the
+                // users table and web guard, so a valid credential is not enough.
+                if (! Auth::user()->hasAnyRole(EnsureUserIsStaff::staffRoles())) {
+                    Auth::logout();
+                    request()->session()->invalidate();
+                    request()->session()->regenerateToken();
+                    $this->addError('identifier', __('auth.staff_only'));
+
+                    return;
+                }
+
                 request()->session()->regenerate();
 
                 return $this->handleSuccessfulLogin();
