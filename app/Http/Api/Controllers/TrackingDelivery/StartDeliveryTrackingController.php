@@ -9,6 +9,7 @@ use App\DTOs\Order\UpdateOrderDTO;
 use App\Enums\DeliveryTrackingStatus;
 use App\Enums\OrderStatus;
 use App\Events\DeliveryPositionUpdated;
+use App\Http\Api\Controllers\TrackingDelivery\Concerns\AuthorizesDeliveryPerson;
 use App\Http\Api\Requests\TrackingDelivery\StartDeliveryTrackingRequest;
 use App\Http\Api\Responses\ApiResponse;
 use App\Http\Api\Responses\TrackingDelivery\DeliveryTrackingResponse;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class StartDeliveryTrackingController extends Controller
 {
+    use AuthorizesDeliveryPerson;
+
     public function __construct(
         private readonly DeliveryTrackingServiceInterface $deliveryTrackingService,
         private readonly DeliveryTrackingRepositoryInterface $deliveryTrackingRepository,
@@ -38,7 +41,7 @@ final class StartDeliveryTrackingController extends Controller
         try {
             return DB::transaction(function () use ($request, $orderId) {
                 $order = $this->getValidatedOrder($orderId);
-                $this->validateDeliveryPersonAccess($order);
+                $this->ensureAssignedDeliveryPerson($order);
                 $this->validateBottlesLinked($order);
                 $existingTracking = $this->deliveryTrackingRepository->findByOrder($orderId);
 
@@ -251,21 +254,6 @@ final class StartDeliveryTrackingController extends Controller
             throw new \InvalidArgumentException(
                 'Impossible de démarrer la livraison. Les bouteilles de gaz n\'ont pas encore été liées à cette commande.'
             );
-        }
-    }
-
-    private function validateDeliveryPersonAccess(Order $order): void
-    {
-        $authenticatedUser = auth()->user();
-
-        if (! $order->deliveryPerson || $order->deliveryPerson->user_id !== $authenticatedUser->id) {
-            Log::warning('Unauthorized delivery person access attempt', [
-                'order_id' => $order->id,
-                'authenticated_user_id' => $authenticatedUser->id,
-                'assigned_delivery_person_id' => $order->deliveryPerson?->user_id,
-            ]);
-
-            throw new \InvalidArgumentException('You are not authorized to access this delivery');
         }
     }
 }

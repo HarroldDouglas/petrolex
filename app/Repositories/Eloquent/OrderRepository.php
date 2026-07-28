@@ -182,6 +182,16 @@ class OrderRepository extends BaseEloquentRepository implements OrderRepositoryI
             is_string($distributionCenterId) ? [$distributionCenterId] : $distributionCenterId
         );
 
+        // Whitelist keeps the raw aggregation expression injection-proof, even if
+        // a future caller ever forwards user input into these two arguments.
+        $allowedTypes = ['SUM', 'COUNT', 'AVG', 'MIN', 'MAX'];
+        $allowedColumns = ['*', 'total_amount', 'subtotal', 'delivery_fee'];
+        $aggregationType = strtoupper($aggregationType);
+
+        if (! in_array($aggregationType, $allowedTypes, true) || ! in_array($aggregationColumn, $allowedColumns, true)) {
+            throw new \InvalidArgumentException('Invalid aggregation parameters.');
+        }
+
         $selectClause = DB::raw("DATE(order_date) as date, {$aggregationType}({$aggregationColumn}) as value_total");
 
         $results = $query
