@@ -11,7 +11,7 @@ set -euo pipefail
 SERVER="isogaz"                 # alias SSH (~/.ssh/config)
 REMOTE_PATH="/var/www/petrolex"
 GIT_REMOTE="github"             # remote pointant vers GitHub sur le serveur
-REF="dev"                       # branche ou tag à déployer (défaut: dev)
+REF=""                          # tag à déployer (OBLIGATOIRE — ex: v1.7.0)
 SKIP_MAINTENANCE=false
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; CYAN='\033[0;36m'; NC='\033[0m'
@@ -23,14 +23,26 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo -e "${BLUE}Déploiement Petrolex${NC}"
             echo -e "${YELLOW}Usage:${NC}"
-            echo "  ./deploy-from-local.sh [ref]                 # déploie une branche ou un tag (défaut: dev)"
-            echo "  ./deploy-from-local.sh v1.6.0                # déploie un tag"
-            echo "  ./deploy-from-local.sh dev --no-maintenance  # sans page de maintenance"
+            echo "  ./deploy-from-local.sh <tag>                    # déploie un tag versionné (OBLIGATOIRE)"
+            echo "  ./deploy-from-local.sh v1.7.0                   # exemple"
+            echo "  ./deploy-from-local.sh v1.7.0 --no-maintenance  # sans page de maintenance"
             echo ""
             exit 0 ;;
         *) REF="$1"; shift ;;
     esac
 done
+
+# Garde-fou : la prod ne se déploie que par tag versionné (décision 2026-08-10),
+# jamais par branche — une branche est mouvante, un tag est traçable et rollbackable.
+if [[ -z "$REF" ]]; then
+    echo -e "${RED}Ref manquante : indiquez le tag à déployer (ex: ./deploy-from-local.sh v1.7.0)${NC}"
+    echo -e "Tags disponibles : $(git tag -l 'v*' | tail -3 | tr '\n' ' ')"
+    exit 1
+fi
+if [[ ! "$REF" =~ ^v[0-9] ]]; then
+    echo -e "${RED}'$REF' n'est pas un tag versionné (vX.Y.Z). La prod ne se déploie que par tag.${NC}"
+    exit 1
+fi
 
 # Garde-fou : la ref ne doit contenir que des caractères sûrs (anti-injection SSH)
 if [[ ! "$REF" =~ ^[A-Za-z0-9._/-]+$ ]]; then

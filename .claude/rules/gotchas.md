@@ -32,6 +32,13 @@ alwaysApply: true
   Une même bouteille ne peut pas être reçue dans deux approvisionnements à la fois. Statuts :
   `in_stock`, `with_delivery_person`, `returned_to_supplier`, `pending_reception`, …
 
+## Données géo & apps mobiles (incident 2026-08)
+- **Toute donnée géographique exposée aux apps mobiles doit être non-nulle** : les apps Flutter
+  sont fortement typées et crashent sur un `null` inattendu (« type 'Null' is not a subtype… »).
+  Les quartiers exigent lat/lng (BD NOT NULL + formulaire admin + seeder complet — ne pas détricoter).
+- Les crashs mobiles ne remontent nulle part par défaut → les apps doivent poster leurs erreurs
+  sur `POST /api/app/logs` (visualisation : admin → Logs mobiles).
+
 ## Sécurité
 - Accès aux ressources client verrouillé au staff (anti-IDOR). Login + OTP rate-limités.
 - L'ancien endpoint de callback paiement non-authentifié (exploit) a été **supprimé** — ne pas le réintroduire.

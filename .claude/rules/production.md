@@ -18,19 +18,23 @@ globs:
 
 ## ✅ LE circuit de déploiement (à suivre — ne pas improviser)
 
-La prod **est un dépôt git** trackant `github/dev` (remote `github`). Déployer **uniquement** ainsi :
+La prod **est un dépôt git** (remote `github`). Déployer **uniquement par TAG versionné** —
+jamais par branche (décision 2026-08-10 ; le script refuse toute ref non `vX.Y.Z`) :
 
 ```
-/deploy                          # déploie dev
-./deploy-from-local.sh <ref>     # branche ou tag
+git tag -a v1.X.Y <commit> -m "..." && git push github v1.X.Y
+/deploy v1.X.Y                       # ou: ./deploy-from-local.sh v1.X.Y
 ```
+
+⚠️ **Toute action d'écriture sur la prod (déploiement, données, config, restarts) exige la
+confirmation explicite de l'utilisateur au préalable.** Lecture seule (logs, SELECT) OK.
 
 Le script (`deploy-from-local.sh`) fait, côté serveur : maintenance → `git fetch github` +
 `git reset --hard` → `composer install --no-dev` → **`php artisan migrate --force`** → ré-assertion
 des permissions `resources/lang` → caches → `queue:restart` → `sudo systemctl reload php8.2-fpm`
 → `sudo supervisorctl restart all` → maintenance off → health check.
 
-Prérequis : la ref doit être poussée sur `github` d'abord (`git push github <ref>`).
+Prérequis : le tag doit être poussé sur `github` d'abord (`git push github <tag>`).
 
 ## ⛔ Interdits / pièges
 
