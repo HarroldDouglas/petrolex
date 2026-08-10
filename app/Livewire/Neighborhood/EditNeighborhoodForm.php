@@ -16,6 +16,8 @@ class EditNeighborhoodForm extends AbstractNeighborhoodForm
         $this->municipalityId = $this->neighborhood->municipality_id;
         $this->cityId = $this->neighborhood->municipality->city_id ?? null;
         $this->is_active = $this->neighborhood->is_active;
+        $this->latitude = $this->neighborhood->latitude !== null ? (string) $this->neighborhood->latitude : null;
+        $this->longitude = $this->neighborhood->longitude !== null ? (string) $this->neighborhood->longitude : null;
         $this->hasPolygon = ! empty($this->neighborhood->polygon);
 
         $this->initialize();
@@ -31,9 +33,11 @@ class EditNeighborhoodForm extends AbstractNeighborhoodForm
         $validatedData = $this->validate();
 
         $data = [
-            'name' => $validatedData['name'],
+            'name' => trim($validatedData['name']),
             'municipality_id' => $validatedData['municipalityId'],
             'is_active' => $validatedData['is_active'],
+            'latitude' => (float) $validatedData['latitude'],
+            'longitude' => (float) $validatedData['longitude'],
         ];
 
         $this->neighborhoodService->update($this->neighborhood, $data);

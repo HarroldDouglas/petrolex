@@ -22,9 +22,11 @@ class CreateNeighborhoodForm extends AbstractNeighborhoodForm
         $validatedData = $this->validate();
 
         $data = [
-            'name' => $validatedData['name'],
+            'name' => trim($validatedData['name']),
             'municipality_id' => $validatedData['municipalityId'],
             'is_active' => $validatedData['is_active'],
+            'latitude' => (float) $validatedData['latitude'],
+            'longitude' => (float) $validatedData['longitude'],
         ];
 
         $this->neighborhoodService->create($data);

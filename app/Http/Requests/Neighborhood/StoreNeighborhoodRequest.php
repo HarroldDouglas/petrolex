@@ -23,6 +23,8 @@ class StoreNeighborhoodRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'municipalityId' => ['required', 'integer', 'exists:municipalities,id'],
             'is_active' => ['required', 'boolean'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
         ];
     }
 
@@ -40,6 +42,12 @@ class StoreNeighborhoodRequest extends FormRequest
             'municipalityId.exists' => 'La municipalité sélectionnée n\'existe pas.',
             'is_active.required' => 'Le statut est obligatoire.',
             'is_active.boolean' => 'Le statut doit être actif ou inactif.',
+            'latitude.required' => 'La latitude est obligatoire (les apps mobiles plantent sans coordonnées).',
+            'latitude.numeric' => 'La latitude doit être un nombre.',
+            'latitude.between' => 'La latitude doit être comprise entre -90 et 90.',
+            'longitude.required' => 'La longitude est obligatoire (les apps mobiles plantent sans coordonnées).',
+            'longitude.numeric' => 'La longitude doit être un nombre.',
+            'longitude.between' => 'La longitude doit être comprise entre -180 et 180.',
         ];
     }
 }

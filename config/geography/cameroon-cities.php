@@ -77,6 +77,8 @@ return [
                     'name' => 'Douala II',
                     'neighborhoods' => [
                         'new-bell' => ['name' => 'New Bell', 'latitude' => 4.030, 'longitude' => 9.720],
+                        'nkololoun' => ['name' => 'Nkololoun', 'latitude' => 4.0561, 'longitude' => 9.7067],
+                        'bassa' => ['name' => 'Bassa', 'latitude' => 4.0430, 'longitude' => 9.7450],
                     ],
                 ],
                 'douala-3' => [ // Douala III
@@ -84,17 +86,26 @@ return [
                     'neighborhoods' => [
                         'deido' => ['name' => 'Deido', 'latitude' => 4.060, 'longitude' => 9.700],
                         'bonapriso' => ['name' => 'Bonapriso', 'latitude' => 4.050, 'longitude' => 9.700],
+                        'logbaba' => ['name' => 'Logbaba', 'latitude' => 4.0330, 'longitude' => 9.7680],
+                        'ndogpassi' => ['name' => 'Ndogpassi', 'latitude' => 4.0210, 'longitude' => 9.7660],
+                        'nyalla' => ['name' => 'Nyalla', 'latitude' => 4.0280, 'longitude' => 9.7770],
                     ],
                 ],
                 'douala-4' => [ // Douala IV
                     'name' => 'Douala IV',
                     'neighborhoods' => [
-                        // Aucun de tes quartiers existants ici
+                        'bonaberi' => ['name' => 'Bonabéri', 'latitude' => 4.0700, 'longitude' => 9.6830],
+                        'bonassama' => ['name' => 'Bonassama', 'latitude' => 4.0620, 'longitude' => 9.6870],
+                        'bonendale' => ['name' => 'Bonendale', 'latitude' => 4.0890, 'longitude' => 9.6600],
+                        'mambanda' => ['name' => 'Mambanda', 'latitude' => 4.0550, 'longitude' => 9.6720],
+                        'ndobo' => ['name' => 'Ndobo', 'latitude' => 4.0900, 'longitude' => 9.6720],
                     ],
                 ],
                 'douala-5' => [ // Douala V
                     'name' => 'Douala V',
                     'neighborhoods' => [
+                        'bonamoussadi' => ['name' => 'Bonamoussadi', 'latitude' => 4.0930, 'longitude' => 9.7350],
+                        'bepanda' => ['name' => 'Bépanda', 'latitude' => 4.0670, 'longitude' => 9.7300],
                         'nylon' => ['name' => 'Nylon', 'latitude' => 4.070, 'longitude' => 9.750],
                         'makepe' => ['name' => 'Makepe', 'latitude' => 4.080, 'longitude' => 9.730],
                         'kotto' => ['name' => 'Kotto', 'latitude' => 4.090, 'longitude' => 9.740],

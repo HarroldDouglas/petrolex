@@ -74,6 +74,7 @@ Route::middleware(['web', 'auth', 'staff'])->group(function () {
     require __DIR__.'/web/municipalities.php';
     require __DIR__.'/web/neighborhoods.php';
     require __DIR__.'/web/roles.php';
+    require __DIR__.'/web/mobile-app-logs.php';
 });
 
 if (! app()->isProduction()) {

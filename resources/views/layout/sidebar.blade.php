@@ -172,6 +172,14 @@
                     </ul>
                 </li>
             @endcanany
+
+            @can($permissionEnum::USERS_VIEW()->value)
+                <li>
+                    <a href="{{ route('mobile-app-logs.index') }}">
+                        <i class="iconoir-smartphone-device"></i> Logs mobiles
+                    </a>
+                </li>
+            @endcan
         </ul>
     </div>
 

@@ -204,8 +204,8 @@ use OpenApi\Annotations as OA;
  *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Bali"),
- *     @OA\Property(property="latitude", type="number", format="float", nullable=true, example=3.848),
- *     @OA\Property(property="longitude", type="number", format="float", nullable=true, example=11.502),
+ *     @OA\Property(property="latitude", type="number", format="float", example=3.848, description="Never null since 2026-08 (DB-enforced)"),
+ *     @OA\Property(property="longitude", type="number", format="float", example=11.502, description="Never null since 2026-08 (DB-enforced)"),
  *     @OA\Property(property="is_active", type="boolean", example=true),
  *     @OA\Property(property="municipality", ref="#/components/schemas/Municipality", nullable=true),
  *     @OA\Property(property="city", ref="#/components/schemas/City", nullable=true)

@@ -44,6 +44,22 @@
                 @endif
             </div>
 
+            <div class="col-md-6">
+                <label class="form-label" for="latitude">Latitude</label>
+                <input class="form-control @error('latitude') is-invalid @enderror" id="latitude" type="text"
+                    inputmode="decimal" placeholder="Ex : 4.0700000" wire:model.defer="latitude">
+                @error('latitude') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="longitude">Longitude</label>
+                <input class="form-control @error('longitude') is-invalid @enderror" id="longitude" type="text"
+                    inputmode="decimal" placeholder="Ex : 9.6830000" wire:model.defer="longitude">
+                @error('longitude') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="form-text text-muted">Obligatoire : les applications mobiles ont besoin des coordonnées de
+                    chaque quartier. Le bouton OpenStreetMap ci-dessous peut les remplir automatiquement.</div>
+            </div>
+
             {{-- Polygon OSM --}}
             <div class="col-12">
                 <label class="form-label">Polygone géographique</label>

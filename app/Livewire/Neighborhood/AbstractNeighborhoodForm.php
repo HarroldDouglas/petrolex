@@ -17,6 +17,8 @@ abstract class AbstractNeighborhoodForm extends Component
     public ?string $name = '';
     public ?int $cityId = null;
     public ?int $municipalityId = null;
+    public ?string $latitude = null;
+    public ?string $longitude = null;
     public bool $is_active = true;
     public array $cities = [];
     public array $municipalities = [];
@@ -134,6 +136,15 @@ abstract class AbstractNeighborhoodForm extends Component
             if (! empty($features)) {
                 $geometry = $features[0]['geometry'] ?? null;
 
+                /* Auto-fill missing coordinates from the OSM bbox center so an
+                   admin can't save a neighborhood without them (null coords
+                   crash the strongly-typed mobile apps). */
+                $bbox = $features[0]['bbox'] ?? null;
+                if ($bbox && count($bbox) === 4 && ($this->latitude === null || $this->latitude === '')) {
+                    $this->longitude = (string) round(($bbox[0] + $bbox[2]) / 2, 8);
+                    $this->latitude = (string) round(($bbox[1] + $bbox[3]) / 2, 8);
+                }
+
                 if ($geometry && in_array($geometry['type'], ['Polygon', 'MultiPolygon'])) {
                     if ($this->neighborhood) {
                         $this->neighborhood->update(['polygon' => $geometry]);
@@ -144,10 +155,10 @@ abstract class AbstractNeighborhoodForm extends Component
                     $this->polygonMessage = 'warning:Aucun polygone trouvé pour ce quartier sur OpenStreetMap.';
                 }
             } else {
-                $this->polygonMessage = 'warning:Aucun résultat trouvé sur OpenStreetMap pour "' . $searchQuery . '".';
+                $this->polygonMessage = 'warning:Aucun résultat trouvé sur OpenStreetMap pour "'.$searchQuery.'".';
             }
         } catch (\Exception $e) {
-            $this->polygonMessage = 'error:Erreur lors de la récupération : ' . $e->getMessage();
+            $this->polygonMessage = 'error:Erreur lors de la récupération : '.$e->getMessage();
         }
 
         $this->fetchingPolygon = false;

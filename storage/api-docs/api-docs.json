@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "https://5551-165-211-32-18.ngrok-free.app",
+            "url": "http://127.0.0.1:8000",
             "description": "API Server"
         }
     ],
@@ -179,6 +179,145 @@
                                         }
                                     },
                                     "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/app/logs": {
+            "post": {
+                "tags": [
+                    "Application"
+                ],
+                "summary": "Remonter un log d'erreur depuis une application mobile",
+                "description": "Enregistre une erreur/crash survenu dans une app mobile pour visualisation dans le panneau admin. Non authentifié (les crashs surviennent souvent avant le login) ; si un token Bearer est fourni, l'utilisateur est attaché au log. Limité à 30 requêtes/minute.",
+                "operationId": "api.app.logs.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "app_type",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "app_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "customer_app",
+                                            "delivery_app",
+                                            "manager_app"
+                                        ],
+                                        "example": "customer_app"
+                                    },
+                                    "platform": {
+                                        "type": "string",
+                                        "enum": [
+                                            "android",
+                                            "ios"
+                                        ],
+                                        "example": "android",
+                                        "nullable": true
+                                    },
+                                    "app_version": {
+                                        "type": "string",
+                                        "example": "1.0.11",
+                                        "nullable": true
+                                    },
+                                    "device_model": {
+                                        "type": "string",
+                                        "example": "Samsung SM-A125F",
+                                        "nullable": true
+                                    },
+                                    "os_version": {
+                                        "type": "string",
+                                        "example": "Android 13",
+                                        "nullable": true
+                                    },
+                                    "level": {
+                                        "description": "Défaut : error",
+                                        "type": "string",
+                                        "enum": [
+                                            "error",
+                                            "warning",
+                                            "info"
+                                        ],
+                                        "example": "error",
+                                        "nullable": true
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "example": "type 'Null' is not a subtype of type 'String' in type cast"
+                                    },
+                                    "stack_trace": {
+                                        "type": "string",
+                                        "maxLength": 20000,
+                                        "nullable": true
+                                    },
+                                    "context": {
+                                        "type": "object",
+                                        "example": {
+                                            "screen": "login",
+                                            "endpoint": "/api/distribution-centers/closest"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "occurred_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Log enregistré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "_metadata": {
+                                            "properties": {
+                                                "success": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Log enregistré avec succès."
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
                                 }
                             }
                         }
@@ -6339,16 +6478,16 @@
                         "example": "Bali"
                     },
                     "latitude": {
+                        "description": "Never null since 2026-08 (DB-enforced)",
                         "type": "number",
                         "format": "float",
-                        "example": 3.848,
-                        "nullable": true
+                        "example": 3.848
                     },
                     "longitude": {
+                        "description": "Never null since 2026-08 (DB-enforced)",
                         "type": "number",
                         "format": "float",
-                        "example": 11.502,
-                        "nullable": true
+                        "example": 11.502
                     },
                     "is_active": {
                         "type": "boolean",
@@ -7569,6 +7708,10 @@
         {
             "name": "App",
             "description": "App"
+        },
+        {
+            "name": "Application",
+            "description": "Application"
         },
         {
             "name": "Authentification",
