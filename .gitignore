@@ -34,3 +34,6 @@ tests/Curl/token.txt
 /.claude/settings.local.json
 # Generated PDF font metric cache
 /storage/fonts/
+
+# Generated client documentation (rebuild: docs/client/_build/README.md)
+docs/client/pdf/
