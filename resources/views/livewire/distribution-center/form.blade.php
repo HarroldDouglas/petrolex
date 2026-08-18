@@ -69,6 +69,26 @@
                 <input type="number" class="form-control" placeholder="Capacité de stockage" id="storage_capacity" wire:model.live="storage_capacity">
                 @error('storage_capacity') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
+            <div class="col-12 mb-3">
+                <label for="mapsLink" class="form-label">Lien Google Maps <span class="text-muted">(optionnel)</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="mapsLink"
+                        placeholder="Collez ici un lien Google Maps — la latitude et la longitude seront remplies automatiquement"
+                        wire:model.defer="mapsLink" wire:keydown.enter.prevent="extractCoordinates">
+                    <button class="btn btn-outline-primary" type="button" wire:click="extractCoordinates"
+                        wire:loading.attr="disabled" wire:target="extractCoordinates">
+                        <span wire:loading.remove wire:target="extractCoordinates">Extraire</span>
+                        <span wire:loading wire:target="extractCoordinates">Extraction…</span>
+                    </button>
+                </div>
+                @if($mapsLinkMessage)
+                    @php [$mapsType, $mapsText] = explode(':', $mapsLinkMessage, 2); @endphp
+                    <span class="small text-{{ $mapsType === 'success' ? 'success' : 'danger' }}">{{ $mapsText }}</span>
+                @else
+                    <span class="small text-muted">Sur Google Maps, faites un clic droit sur le point puis
+                        « Copier les coordonnées », ou copiez l'adresse de la page.</span>
+                @endif
+            </div>
             <div class="col-md-6 mb-3">
                 <label for="longitude" class="form-label">Longitude</label>
                 <input type="text" class="form-control" placeholder="Longitude" id="longitude" wire:model.live="longitude">
@@ -217,6 +237,19 @@
         @this.set('latitude', lat.toFixed(6));
         @this.set('longitude', lng.toFixed(6));
     }
+
+    /* Keep the map in sync when coordinates come from a pasted Maps link. */
+    document.addEventListener('livewire:init', function () {
+        Livewire.on('coordinates-extracted', function (payload) {
+            const data = Array.isArray(payload) ? payload[0] : payload;
+            if (!data || !dcMap || !dcMarker) return;
+            const position = { lat: Number(data.lat), lng: Number(data.lng) };
+            dcMarker.setPosition(position);
+            dcMarker.setVisible(true);
+            dcMap.setCenter(position);
+            dcMap.setZoom(16);
+        });
+    });
 </script>
 <script
     src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps.api_key') }}&libraries=places&callback=initDistributionCenterMap&v=weekly"

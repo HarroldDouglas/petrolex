@@ -4,6 +4,7 @@ namespace App\Livewire\DistributionCenter;
 
 use App\Models\Geography\Country;
 use App\Repositories\Geography\GeographyRepositoryInterface;
+use App\Services\Geography\GoogleMapsLinkParser;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 use Livewire\Component;
@@ -22,6 +23,8 @@ abstract class AbstractDistributionCenterForm extends Component
     public $storage_capacity;
     public $is_active = 1;
     public $description;
+    public ?string $mapsLink = null;
+    public ?string $mapsLinkMessage = null;
 
     public Collection $availableCountries;
     public Collection $availableCities;
@@ -50,6 +53,32 @@ abstract class AbstractDistributionCenterForm extends Component
         if ($this->city_id) {
             $this->availableNeighborhoods = $this->geographyRepository->getNeighborhoodsByCityId($this->city_id);
         }
+    }
+
+    /** Fills lat/lng from a pasted Google Maps link and re-centers the map marker. */
+    public function extractCoordinates(GoogleMapsLinkParser $parser): void
+    {
+        $coordinates = $parser->parse($this->mapsLink);
+
+        if ($coordinates === null) {
+            $this->mapsLinkMessage = 'error:Aucune coordonnée trouvée dans ce lien. '
+                .'Sur Google Maps, faites un clic droit sur le point puis « Copier les coordonnées ».';
+
+            return;
+        }
+
+        $this->latitude = (string) $coordinates['latitude'];
+        $this->longitude = (string) $coordinates['longitude'];
+        $this->mapsLinkMessage = 'success:Coordonnées extraites : '
+            .$coordinates['latitude'].', '.$coordinates['longitude'];
+
+        $this->resetValidation(['latitude', 'longitude']);
+
+        $this->dispatch(
+            'coordinates-extracted',
+            lat: $coordinates['latitude'],
+            lng: $coordinates['longitude'],
+        );
     }
 
     public function rules()

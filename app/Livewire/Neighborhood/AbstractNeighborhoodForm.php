@@ -5,6 +5,7 @@ namespace App\Livewire\Neighborhood;
 use App\Models\Geography\Municipality;
 use App\Models\Geography\Neighborhood;
 use App\Services\Geography\CityService;
+use App\Services\Geography\GoogleMapsLinkParser;
 use App\Services\Geography\MunicipalityService;
 use App\Services\Geography\NeighborhoodService;
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,6 +26,8 @@ abstract class AbstractNeighborhoodForm extends Component
     public bool $hasPolygon = false;
     public bool $fetchingPolygon = false;
     public ?string $polygonMessage = null;
+    public ?string $mapsLink = null;
+    public ?string $mapsLinkMessage = null;
 
     protected CityService $cityService;
     protected MunicipalityService $municipalityService;
@@ -52,6 +55,26 @@ abstract class AbstractNeighborhoodForm extends Component
         if ($this->cityId) {
             $this->loadMunicipalities();
         }
+    }
+
+    /** Fills lat/lng from a pasted Google Maps link so admins never read them by hand. */
+    public function extractCoordinates(GoogleMapsLinkParser $parser): void
+    {
+        $coordinates = $parser->parse($this->mapsLink);
+
+        if ($coordinates === null) {
+            $this->mapsLinkMessage = 'error:Aucune coordonnée trouvée dans ce lien. '
+                .'Sur Google Maps, faites un clic droit sur le point puis « Copier les coordonnées ».';
+
+            return;
+        }
+
+        $this->latitude = (string) $coordinates['latitude'];
+        $this->longitude = (string) $coordinates['longitude'];
+        $this->mapsLinkMessage = 'success:Coordonnées extraites : '
+            .$coordinates['latitude'].', '.$coordinates['longitude'];
+
+        $this->resetValidation(['latitude', 'longitude']);
     }
 
     public function rules()
